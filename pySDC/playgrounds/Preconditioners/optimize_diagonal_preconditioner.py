@@ -1,18 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
-import pickle
-import time
 
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
-from pySDC.projects.Resilience.vdp import run_vdp
-from pySDC.projects.Resilience.piline import run_piline
-from pySDC.projects.Resilience.advection import run_advection
-from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon, DiagPreconIMEX
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityResidual
 from pySDC.playgrounds.Preconditioners.configs import get_params, store_precon, store_serial_precon, get_collocation_nodes
 
 print_status = False
@@ -104,12 +96,15 @@ def single_run(x, params, *args, **kwargs):
 
     problem_params = params['problem_params']
 
+    controller_params = params.get('controller_params', {})
+
     sweeper_params, sweeper = prepare_sweeper(x, params, **kwargs)
     custom_description['sweeper_params'] = sweeper_params
     custom_description['sweeper_class'] = sweeper
 
     stats, controller, _ = params['prob'](custom_description=custom_description, hook_class=log_cost,
-                                          custom_problem_params=problem_params)
+                                          custom_problem_params=problem_params,
+                                          custom_controller_params=controller_params)
     return stats, controller
 
 
@@ -161,12 +156,12 @@ def get_error(stats, controller):
     return abs(u_end[1] - exact)
 
 
-def optimize(args, initial_guess, num_nodes, objective_function, tol=1e-16, **kwargs):
+def optimize(params, initial_guess, num_nodes, objective_function, tol=1e-16, **kwargs):
     """
     Run a single optimization run and store the result
 
     Args:
-        args (dict): Parameters for running the problem
+        params (dict): Parameters for running the problem
         initial_guess (numpy.ndarray): Initial guess to start the minimization problem
         num_nodes (int): Number of collocation nodes
         objective_function (function): Objective function for the minimizaiton alogrithm
@@ -174,8 +169,8 @@ def optimize(args, initial_guess, num_nodes, objective_function, tol=1e-16, **kw
     Returns:
         None
     """
-    opt = minimize(objective_function, initial_guess, args=(args, kwargs), tol=tol, method='nelder-mead')
-    store_precon(args, opt.x, initial_guess, **kwargs)
+    opt = minimize(objective_function, initial_guess, args=(params, kwargs), tol=tol, method='nelder-mead')
+    store_precon(params, opt.x, initial_guess, **kwargs)
 
 
 def objective_function_diagonal_adaptivity_embedded_normalized(x, *args):
@@ -201,7 +196,7 @@ def objective_function_k_and_e(x, *args):
     raise NotImplementedError
     params = args[0]
 
-    stats, controller = single_run(x, params, convergence_controllers)
+    stats, controller = single_run(x, params)
 
     # check how many iterations we needed
     k = sum([me[1] for me in get_sorted(stats, type='k')])
@@ -234,22 +229,23 @@ def plot_errors(stats, u_end, exact):
     plt.cla()
 
 
-def optimize_with_sum(args, num_nodes):
+def optimize_with_sum(params, num_nodes):
     initial_guess = (np.arange(num_nodes - 1) + 1) / (num_nodes + 2)
     tol = 1e-16
-    minimize(objective_function_diagonal_adaptivity_embedded_normalized, initial_guess, args=args, tol=tol,
+    minimize(objective_function_diagonal_adaptivity_embedded_normalized, initial_guess, args=params, tol=tol,
              method='nelder-mead')
 
 
-def optimize_without_sum(args, num_nodes, **kwargs):
-    initial_guess = np.array(get_collocation_nodes(args, num_nodes)) / 2.
-    optimize(args, initial_guess, num_nodes, objective_function_k_only, **kwargs)
+def optimize_without_sum(params, num_nodes, **kwargs):
+    initial_guess = np.array(get_collocation_nodes(params, num_nodes)) / 2.
+    optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
 
-def optimize_with_first_row(args, num_nodes, **kwargs):
-    i0 = np.array(get_collocation_nodes(args, num_nodes)) / 2.
+
+def optimize_with_first_row(params, num_nodes, **kwargs):
+    i0 = np.array(get_collocation_nodes(params, num_nodes)) / 2.
     initial_guess = np.append(i0, i0)
     kwargs['use_first_row'] = True
-    optimize(args, initial_guess, num_nodes, objective_function_k_only, **kwargs)
+    optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
 
 
 if __name__ == '__main__':
@@ -259,10 +255,10 @@ if __name__ == '__main__':
         'adaptivity': True
     }
 
-    args = get_params('advection', **kwargs)
+    params = get_params('advection', **kwargs)
     num_nodes = 3
 
-    optimize_without_sum(args, num_nodes, **kwargs)
-    optimize_with_first_row(args, num_nodes, **kwargs)
+    optimize_without_sum(params, num_nodes, **kwargs)
+    optimize_with_first_row(params, num_nodes, **kwargs)
     store_serial_precon('advection', num_nodes, LU=True, **kwargs)
     store_serial_precon('advection', num_nodes, IE=True, **kwargs)

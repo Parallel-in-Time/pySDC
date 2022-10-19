@@ -1,10 +1,7 @@
-import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-
-from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability, plot_contraction, plot_increment
+from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability, plot_contraction
 from pySDC.playgrounds.Preconditioners.optimize_diagonal_preconditioner import single_run
 from pySDC.playgrounds.Preconditioners.configs import load_precon
 
@@ -56,7 +53,7 @@ class PreconPostProcessing:
         Returns:
             pySDC.stats: Stats object created by the run
         '''
-         
+
         sweeper_params =  {
             'diagonal_elements': self.diagonal_elements,
             'first_row': self.first_row,
@@ -72,10 +69,10 @@ class PreconPostProcessing:
         problem_params = {
             'lambdas': lambdas,
         }
-         
+
         desc = {
             'sweeper_params': sweeper_params,
-            'sweeper_class': self.data['args']['sweeper']
+            'sweeper_class': self.data['params']['sweeper']
         }
         stats, _, _ = run_dahlquist(custom_description=desc, custom_problem_params=problem_params, **kwargs)
         self.dahlquist_stats = stats
@@ -113,15 +110,18 @@ class PreconPostProcessing:
         fig.tight_layout()
         return fig
 
-    def run_problem(self, **kwargs):
+    def run_problem(self, logger_level=15, **kwargs):
         """
         Run the problem that the preconditioner was derived with
-        """
-        raise NotImplementedError
-        print(self.data.keys())
-        print(self.data['args'])
 
- 
+        Args:
+            logger_level (int): Logger level to display more information about the run
+        """
+        params = self.data['params']
+        params['controller_params'] = {'logger_level': logger_level}
+        stats, controller = single_run(self.data['x'], params, **self.data['kwargs'])
+
+
 kwargs = {
     'adaptivity': True
 }
@@ -131,6 +131,8 @@ postIE = PreconPostProcessing('advection', 3, IE=True, **kwargs)
 postDiag = PreconPostProcessing('advection', 3, **kwargs)
 postDiagFirstRow = PreconPostProcessing('advection', 3, adaptivity=True, use_first_row=True)
 posts = [postDiagFirstRow, postLU, postDiag, postIE]
+
+postDiag.run_problem()
 
 fig, axs = plt.subplots(2, 2, figsize=(11, 9), sharex=True, sharey=True)
 axs = axs.flatten()

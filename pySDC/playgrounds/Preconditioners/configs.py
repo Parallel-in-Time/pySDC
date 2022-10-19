@@ -16,13 +16,13 @@ from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityResidual
 
 
-args_default = {
+params_default = {
     'quad_type': 'RADAU-RIGHT',
 }
 
 
-args_vdp = {
-    **args_default,
+params_vdp = {
+    **params_default,
     'prob': run_vdp,
     'sweeper': DiagPrecon,
     'serial_sweeper': generic_implicit,
@@ -36,8 +36,8 @@ args_vdp = {
 }
 
 
-args_piline = {
-    **args_default,
+params_piline = {
+    **params_default,
     'prob': run_piline,
     'sweeper': DiagPreconIMEX,
     'serial_sweeper': imex_1st_order,
@@ -51,8 +51,8 @@ args_piline = {
 }
 
 
-args_advection = {
-    **args_default,
+params_advection = {
+    **params_default,
     'prob': run_advection,
     'sweeper': DiagPrecon,
     'serial_sweeper': generic_implicit,
@@ -67,9 +67,9 @@ args_advection = {
 
 
 problems = {
-    'vdp': args_vdp,
-    'piline': args_piline,
-    'advection': args_advection,
+    'vdp': params_vdp,
+    'piline': params_piline,
+    'advection': params_advection,
 }
 
 
@@ -128,12 +128,12 @@ def get_params(problem, **kwargs):
     if problem not in problems.keys():
         raise NotImplementedError(f'{problem} has no predefined parameters in `configs.py`!')
 
-    args = problems[problem]
+    params = problems[problem]
 
-    args['convergence_controllers'] = get_convergence_controllers(args, **kwargs)
+    params['convergence_controllers'] = get_convergence_controllers(params, **kwargs)
 
-    args = get_serial_preconditioner(args, **kwargs)
-    return args
+    params = get_serial_preconditioner(params, **kwargs)
+    return params
 
 
 def get_name(problem, nodes, **kwargs):
@@ -168,7 +168,7 @@ def get_path(problem, nodes, **kwargs):
     return f'data/precons/{get_name(problem, nodes, **kwargs)}.pickle'
 
 
-def store_precon(args, x, initial_guess, **kwargs):
+def store_precon(params, x, initial_guess, **kwargs):
     """
     Store the preconditioner of a specific optimization run.
 
@@ -196,22 +196,22 @@ def store_precon(args, x, initial_guess, **kwargs):
         data['diags'] = x[0: len(x) // 2]
         data['first_row'] = x[len(x) // 2::]
     elif data['LU'] or data['IE']:
-        data['QI'] = args['QI']
+        data['QI'] = params['QI']
     else:
         data['diags'] = x.copy()
 
     data['num_nodes'] = len(data['diags'])
     data['time'] = time.time()
     data['x'] = x.copy()
-    data['args'] = args
+    data['params'] = params
     data['kwargs'] = kwargs
     data['initial_guess'] = initial_guess
-    data['quad_type'] = args.get('quad_type', 'RADAU-RIGHT')
+    data['quad_type'] = params.get('quad_type', 'RADAU-RIGHT')
 
-    with open(get_path(args['name'], data['num_nodes'], **kwargs), 'wb') as file:
+    with open(get_path(params['name'], data['num_nodes'], **kwargs), 'wb') as file:
         pickle.dump(data, file)
 
-    name = get_name(args['name'], data['num_nodes'], **kwargs) 
+    name = get_name(params['name'], data['num_nodes'], **kwargs)
     print(f'Stored preconditioner "{name}"')
 
 
@@ -226,8 +226,8 @@ def store_serial_precon(problem, nodes, **kwargs):
     Returns:
         None
     """
-    args = get_params(problem, **kwargs)
-    store_precon(args=args, x=np.zeros((nodes)), initial_guess=np.zeros((nodes)), **kwargs)
+    params = get_params(problem, **kwargs)
+    store_precon(params=params, x=np.zeros((nodes)), initial_guess=np.zeros((nodes)), **kwargs)
 
 
 def load_precon(problem, nodes, **kwargs):
@@ -246,13 +246,13 @@ def load_precon(problem, nodes, **kwargs):
     return data
 
 
-def get_collocation_nodes(args, num_nodes):
+def get_collocation_nodes(params, num_nodes):
     """
     Get the nodes of the collocation problem
 
     Args:
-        args (dict): Parameters for running the problem
+        params (dict): Parameters for running the problem
         num_nodes (int): Number of collocation nodes
     """
-    coll = CollBase(num_nodes, quad_type=args.get('quad_type', 'RADAU-RIGHT'))
+    coll = CollBase(num_nodes, quad_type=params.get('quad_type', 'RADAU-RIGHT'))
     return coll.nodes
