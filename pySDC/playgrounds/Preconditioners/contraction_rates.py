@@ -15,8 +15,15 @@ class log_residual(hooks):
         '''
         super(log_residual, self).post_iteration(step, level_number)
         L = step.levels[0]
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='res', value=L.status.residual)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='res',
+            value=L.status.residual,
+        )
 
 
 def contraction_rate(ax, precon, desc=None, label=None):
@@ -29,8 +36,12 @@ def contraction_rate(ax, precon, desc=None, label=None):
     custom_description = {'step_params': step_params, 'sweeper_params': sweeper_params, 'level_params': level_params}
     if desc is not None:
         custom_description = {**custom_description, **desc}
-    stats, _, _ = run_advection(hook_class=log_residual, custom_problem_params=custom_problem_params,
-                                custom_description=custom_description, Tend=1e-2)
+    stats, _, _ = run_advection(
+        hook_class=log_residual,
+        custom_problem_params=custom_problem_params,
+        custom_description=custom_description,
+        Tend=1e-2,
+    )
 
     res = get_sorted(stats, type='res')
 

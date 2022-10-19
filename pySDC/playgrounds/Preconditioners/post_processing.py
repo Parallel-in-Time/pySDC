@@ -59,21 +59,22 @@ class PreconPostProcessing:
             'first_row': self.first_row,
             'num_nodes': self.data['num_nodes'],
             'quad_type': self.data['quad_type'],
-            'QI': self.data['QI']
+            'QI': self.data['QI'],
         }
 
         # build lambdas
-        lambdas = np.array([[complex(self.re_range[i], self.im_range[j]) for i in range(len(self.re_range))]
-                            for j in range(len(self.im_range))]).reshape((len(self.re_range) * len(self.im_range)))
+        lambdas = np.array(
+            [
+                [complex(self.re_range[i], self.im_range[j]) for i in range(len(self.re_range))]
+                for j in range(len(self.im_range))
+            ]
+        ).reshape((len(self.re_range) * len(self.im_range)))
 
         problem_params = {
             'lambdas': lambdas,
         }
 
-        desc = {
-            'sweeper_params': sweeper_params,
-            'sweeper_class': self.data['params']['sweeper']
-        }
+        desc = {'sweeper_params': sweeper_params, 'sweeper_class': self.data['params']['sweeper']}
         stats, _, _ = run_dahlquist(custom_description=desc, custom_problem_params=problem_params, **kwargs)
         self.dahlquist_stats = stats
         return stats
@@ -122,9 +123,7 @@ class PreconPostProcessing:
         stats, controller = single_run(self.data['x'], params, **self.data['kwargs'])
 
 
-kwargs = {
-    'adaptivity': True
-}
+kwargs = {'adaptivity': True}
 
 postLU = PreconPostProcessing('advection', 3, LU=True, **kwargs)
 postIE = PreconPostProcessing('advection', 3, IE=True, **kwargs)

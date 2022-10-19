@@ -5,8 +5,12 @@ from scipy.optimize import minimize
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.playgrounds.Preconditioners.configs import get_params, store_precon, store_serial_precon,\
-    get_collocation_nodes
+from pySDC.playgrounds.Preconditioners.configs import (
+    get_params,
+    store_precon,
+    store_serial_precon,
+    get_collocation_nodes,
+)
 
 print_status = False
 
@@ -23,16 +27,51 @@ class log_cost(hooks):
         # some abbreviations
         L = step.levels[level_number]
 
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='u_old', value=L.uold[-1])
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='u', value=L.u[-1])
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='k', value=step.status.iter)
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restarts', value=int(step.status.restart))
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='u_old',
+            value=L.uold[-1],
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.u[-1],
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_em',
+            value=L.status.error_embedded_estimate,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='k',
+            value=step.status.iter,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restarts',
+            value=int(step.status.restart),
+        )
 
 
 def prepare_sweeper(x, params, use_first_row=False, normalize=False, **kwargs):
@@ -49,8 +88,8 @@ def prepare_sweeper(x, params, use_first_row=False, normalize=False, **kwargs):
         dict: Sweeper parameters
     """
     if use_first_row:
-        diags = np.array(x[0:len(x) // 2])
-        first_row = np.array(x[len(x) // 2::])
+        diags = np.array(x[0 : len(x) // 2])
+        first_row = np.array(x[len(x) // 2 : :])
         num_nodes = len(x) // 2 - 1
     else:
         diags = np.array(x)
@@ -103,9 +142,12 @@ def single_run(x, params, *args, **kwargs):
     custom_description['sweeper_params'] = sweeper_params
     custom_description['sweeper_class'] = sweeper
 
-    stats, controller, _ = params['prob'](custom_description=custom_description, hook_class=log_cost,
-                                          custom_problem_params=problem_params,
-                                          custom_controller_params=controller_params)
+    stats, controller, _ = params['prob'](
+        custom_description=custom_description,
+        hook_class=log_cost,
+        custom_problem_params=problem_params,
+        custom_controller_params=controller_params,
+    )
     return stats, controller
 
 
@@ -178,7 +220,7 @@ def objective_function_diagonal_adaptivity_embedded_normalized(x, *args):
     '''
     The same as objective_function_diagonal_residual_embedded, but with sum(x) = 1
     '''
-    return objective_function_k_only(np.append(x, - sum(x) + 1), *args)
+    return objective_function_k_only(np.append(x, -sum(x) + 1), *args)
 
 
 def objective_function_k_and_e(x, *args):
@@ -233,17 +275,22 @@ def plot_errors(stats, u_end, exact):
 def optimize_with_sum(params, num_nodes):
     initial_guess = (np.arange(num_nodes - 1) + 1) / (num_nodes + 2)
     tol = 1e-16
-    minimize(objective_function_diagonal_adaptivity_embedded_normalized, initial_guess, args=params, tol=tol,
-             method='nelder-mead')
+    minimize(
+        objective_function_diagonal_adaptivity_embedded_normalized,
+        initial_guess,
+        args=params,
+        tol=tol,
+        method='nelder-mead',
+    )
 
 
 def optimize_without_sum(params, num_nodes, **kwargs):
-    initial_guess = np.array(get_collocation_nodes(params, num_nodes)) / 2.
+    initial_guess = np.array(get_collocation_nodes(params, num_nodes)) / 2.0
     optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
 
 
 def optimize_with_first_row(params, num_nodes, **kwargs):
-    i0 = np.array(get_collocation_nodes(params, num_nodes)) / 2.
+    i0 = np.array(get_collocation_nodes(params, num_nodes)) / 2.0
     initial_guess = np.append(i0, i0)
     kwargs['use_first_row'] = True
     optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
@@ -252,9 +299,7 @@ def optimize_with_first_row(params, num_nodes, **kwargs):
 if __name__ == '__main__':
     print_status = True
 
-    kwargs = {
-        'adaptivity': True
-    }
+    kwargs = {'adaptivity': True}
 
     params = get_params('advection', **kwargs)
     num_nodes = 3

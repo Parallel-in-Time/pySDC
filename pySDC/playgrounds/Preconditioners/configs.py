@@ -27,10 +27,10 @@ params_vdp = {
     'serial_sweeper': generic_implicit,
     'e_tol': 2e-5,
     'problem_params': None,
-    'r_tol': 1.,
+    'r_tol': 1.0,
     'k': 1,
     'e': 1,
-    'e_em': 1.,
+    'e_em': 1.0,
     'name': 'vdp',
 }
 
@@ -192,8 +192,8 @@ def store_precon(params, x, initial_guess, **kwargs):
 
     # write the data based on configuration
     if data['use_first_row']:
-        data['diags'] = x[0: len(x) // 2]
-        data['first_row'] = x[len(x) // 2::]
+        data['diags'] = x[0 : len(x) // 2]
+        data['first_row'] = x[len(x) // 2 : :]
     elif data['LU'] or data['IE']:
         data['QI'] = params['QI']
     else:
