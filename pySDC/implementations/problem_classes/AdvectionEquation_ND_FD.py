@@ -186,7 +186,7 @@ class advectionNd(ptype):
             if self.params.freq[0] >= 0:
                 me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
             elif self.params.freq[0] == -1:
-                me[:] = np.exp(-0.5 * (((self.xv[0] - (self.params.c * t)) % 1. - 0.5) / self.params.sigma)**2)
+                me[:] = np.exp(-0.5 * (((self.xv[0] - (self.params.c * t)) % 1.0 - 0.5) / self.params.sigma) ** 2)
 
         elif self.params.ndim == 2:
             me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * np.sin(

@@ -193,7 +193,7 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
     # get a grid for plotting
     X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
     if plot_increase:
-        ax.contour(X, Y, rho_log, levels=[0.])
+        ax.contour(X, Y, rho_log, levels=[0.0])
         lim = max(np.abs([rho_log.min(), rho_log.max()]))
         kwargs['vmin'] = kwargs.get('vmin', -lim)
         kwargs['vmax'] = kwargs.get('vmax', lim)
