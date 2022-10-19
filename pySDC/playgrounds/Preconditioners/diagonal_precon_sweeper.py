@@ -20,10 +20,14 @@ class DiagPrecon(generic_implicit):
         """
 
         # call parent's initialization routine
+        QI = params.get('QI', None)
+        if QI is None:
+            params['QI'] = 'IE'
         super(DiagPrecon, self).__init__(params)
 
         # get QI matrix
         self.QI = np.diag(np.append([0], params['diagonal_elements']))
+        self.QI[:, 0] = np.append([0], params['first_row'])
 
 
 class DiagPreconIMEX(imex_1st_order):
@@ -46,4 +50,5 @@ class DiagPreconIMEX(imex_1st_order):
         super(DiagPreconIMEX, self).__init__(params)
 
         self.QI = np.diag(np.append([0], params['diagonal_elements']))
+        self.QI[:, 0] = np.append([0], params['first_row'])
         self.QE = np.diag(np.zeros(len(params['diagonal_elements']) + 1))

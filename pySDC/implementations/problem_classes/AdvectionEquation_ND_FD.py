@@ -69,7 +69,7 @@ class advectionNd(ptype):
                 if freq % 2 != 0 and problem_params['bc'] == 'periodic':
                     raise ProblemError('need even number of frequencies due to periodic BCs')
         else:
-            if problem_params['freq'] % 2 != 0 and problem_params['bc'] == 'periodic':
+            if problem_params['freq'] % 2 != 0 and problem_params['freq'] != -1 and problem_params['bc'] == 'periodic':
                 raise ProblemError('need even number of frequencies due to periodic BCs')
 
         if type(problem_params['nvars']) is tuple:
@@ -183,7 +183,11 @@ class advectionNd(ptype):
 
         me = self.dtype_u(self.init)
         if self.params.ndim == 1:
-            me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
+            if self.params.freq[0] >= 0:
+                me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
+            elif self.params.freq[0] == -1:
+                me[:] = np.exp(-0.5 * (((self.xv[0] - (self.params.c * t)) % 1. - 0.5) / self.params.sigma)**2)
+
         elif self.params.ndim == 2:
             me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * np.sin(
                 np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t)
