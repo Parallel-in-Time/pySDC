@@ -7,7 +7,7 @@ from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
-import matplotlib as mpl
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class log_data(hooks):
@@ -128,7 +128,7 @@ def run_dahlquist(
     return stats, controller, Tend
 
 
-def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=False):
+def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=False, **kwargs):
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     u = get_sorted(stats, type='u', sortby='iter')
 
@@ -162,16 +162,78 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
     u = get_sorted(stats, type='u', sortby='iter')
     u_exact = np.exp(lambdas)
 
-    kwargs['cmap'] = kwargs.get('cmap', 'jet')
+    kwargs['cmap'] = kwargs.get('cmap', 'seismic' if plot_increase else 'jet')
+
+    # decide which iterations to look at
+    iter = [0, 1] if iter is None else iter
+    assert len(iter) > 1, 'Need to compute the contraction factor accross multiple iterations!'
+
+    # get solution for the specified iterations
+    u_iter = [me[1] for me in u if me[0] in iter]
+    if 0 in iter:  # ic's are not stored in stats, so we have to add them manually
+        u_iter = np.append(np.ones_like(lambdas), u_iter)
+    us = np.reshape(u_iter, (len(iter), len(lambdas)))
 
     # get error for each iteration
-    iter = [1] if iter is None else iter
-    us = np.reshape(np.append(np.ones_like(lambdas), [me[1] for me in u if me[0] in iter]),
-                    (len(iter) + 1, len(lambdas)))
     e = abs(us - u_exact)
 
     # get contraction rates for each iteration
     rho = e[1:, :] / e[:-1, :]
+    rho_avg = np.mean(rho, axis=0)
+    rho_log = np.log(np.reshape(rho_avg, (len(np.unique(lambdas.real)), len(np.unique(lambdas.imag)))))
+
+    # get spactially averaged contraction factor
+    # rho_avg_space = np.mean(rho, axis=1)
+    # e_tot = np.sum(e, axis=1)
+    # rho_tot = e_tot[1:] / e_tot[:-1]
+
+    if ax is None:
+        fig, ax = plt.subplots(1, 1)
+
+    # get a grid for plotting
+    X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
+    if plot_increase:
+        ax.contour(X, Y, rho_log, levels=[0.])
+        lim = max(np.abs([rho_log.min(), rho_log.max()]))
+        kwargs['vmin'] = kwargs.get('vmin', -lim)
+        kwargs['vmax'] = kwargs.get('vmax', lim)
+        cs = ax.contourf(X, Y, rho_log, **kwargs)
+    else:
+        cs = ax.contourf(X, Y, np.where(rho_log < 0, rho_log, None), levels=500, **kwargs)
+
+    # decorate
+    ax.axhline(0, color='black')
+    ax.axvline(0, color='black')
+
+    # fix pdf plotting
+    ax.set_rasterized(True)
+
+    if cbar:
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes('right', 0.2, pad=0.1)
+        cb = fig.colorbar(cs, cbar_ax)
+        cb.set_label(r'$\rho$')
+        cbar_ax.set_rasterized(True)
+
+
+def plot_increment(stats, fig=None, ax=None, iter=None, cbar=True, **kwargs):
+    lambdas = get_sorted(stats, type='lambdas')[0][1]
+    u = get_sorted(stats, type='u', sortby='iter')
+
+    kwargs['cmap'] = kwargs.get('cmap', 'jet')
+
+    # decide which iterations to look at
+    iter = [0, 1] if iter is None else iter
+    assert len(iter) > 1, 'Need to compute the increment accross multiple iterations!'
+
+    # get solution for the specified iterations
+    u_iter = [me[1] for me in u if me[0] in iter]
+    if 0 in iter:  # ic's are not stored in stats, so we have to add them manually
+        u_iter = np.append(np.ones_like(lambdas), u_iter)
+    us = np.reshape(u_iter, (len(iter), len(lambdas)))
+
+    # get contraction rates for each iteration
+    rho = abs(us[1:, :] / us[:-1, :])
     rho_avg = np.mean(rho, axis=0)
     rho_log = np.log(np.reshape(rho_avg, (len(np.unique(lambdas.real)), len(np.unique(lambdas.imag)))))
 
@@ -180,18 +242,24 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
 
     # get a grid for plotting
     X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
-    if plot_increase:
-        ax.contourf(X, Y, rho_log, **kwargs)
-        ax.contour(X, Y, rho_log, levels=[0.])
-    else:
-        ax.contourf(X, Y, np.where(rho_log < 0, rho_log, None), levels=500, **kwargs)
+    cs = ax.contourf(X, Y, rho_log, levels=500, **kwargs)
+
+    # outline the region where the increment is 0
+    ax.contour(X, Y, rho_log, levels=[-15], colors=['red'])
 
     # decorate
     ax.axhline(0, color='black')
     ax.axvline(0, color='black')
+
+    # fix pdf plotting
+    ax.set_rasterized(True)
+
     if cbar:
-        cb = fig.colorbar(mpl.cm.ScalarMappable(**kwargs))
-        cb.set_label(r'$\rho$')
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes('right', 0.2, pad=0.1)
+        cb = fig.colorbar(cs, cbar_ax)
+        cb.set_label('increment')
+        cbar_ax.set_rasterized(True)
 
 
 def compare_contraction():

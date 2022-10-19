@@ -54,7 +54,7 @@ class PreconPostProcessing:
             pySDC.stats: Stats object created by the run
         '''
 
-        sweeper_params =  {
+        sweeper_params = {
             'diagonal_elements': self.diagonal_elements,
             'first_row': self.first_row,
             'num_nodes': self.data['num_nodes'],

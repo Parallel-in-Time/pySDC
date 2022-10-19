@@ -20,7 +20,6 @@ params_default = {
     'quad_type': 'RADAU-RIGHT',
 }
 
-
 params_vdp = {
     **params_default,
     'prob': run_vdp,

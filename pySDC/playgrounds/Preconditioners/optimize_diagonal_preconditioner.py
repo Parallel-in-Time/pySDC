@@ -5,7 +5,8 @@ from scipy.optimize import minimize
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.playgrounds.Preconditioners.configs import get_params, store_precon, store_serial_precon, get_collocation_nodes
+from pySDC.playgrounds.Preconditioners.configs import get_params, store_precon, store_serial_precon,\
+    get_collocation_nodes
 
 print_status = False
 
