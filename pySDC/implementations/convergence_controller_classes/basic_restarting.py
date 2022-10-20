@@ -229,23 +229,29 @@ class BasicRestartingMPI(BasicRestartingBase):
         Returns:
             None
         """
-        print("warning! not implemented")
-        return None
-        # check if we performed too many restarts
+        comm = kwargs['comm']
+        assert S.status.slot == comm.rank
+
         if S.status.first:
-            self.buffers.max_restart_reached = (
-                S.status.restarts_in_a_row >= self.params.max_restarts
-            )
-            if self.buffers.max_restart_reached and S.status.restart:
+            # check if we performed too many restarts
+            max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
+            restart_earlier = False  # there is no earlier step
+
+            if max_restart_reached and S.status.restart:
                 self.log(
                     f"Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
 on...",
                     S,
                 )
+        else:
+            # receive information about restarts from earlier ranks
+            restart_earlier, max_restart_reached = self.recv(comm, source=S.status.slot - 1)
 
-        self.buffers.restart = S.status.restart or self.buffers.restart
-        S.status.restart = (
-            S.status.restart or self.buffers.restart
-        ) and not self.buffers.max_restart_reached
+        # decide whether to restart
+        S.status.restart = (S.status.restart or restart_earlier) and not max_restart_reached
+
+        # send information about restarts forward
+        if not S.status.last:
+            self.send(comm, dest=S.status.slot + 1, data=(S.status.restart, max_restart_reached))
 
         return None
