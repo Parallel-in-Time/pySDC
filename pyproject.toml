@@ -1,0 +1,112 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = 'pySDC'
+version = '5.0.0'
+description = 'A Python implementation of spectral deferred correction methods and the likes'
+license = {text = "BSD-2-Clause"}
+readme = 'README.rst'
+authors=[
+    {name='Robert Speck', email='r.speck@fz-juelich.de'},
+    ]
+homepage = "http://www.parallel-in-time.org/pySDC/"
+repository = "https://github.com/Parallel-in-Time/pySDC/"
+documentation = "http://www.parallel-in-time.org/pySDC/"
+
+classifiers = [
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+dependencies = [
+    'numpy>=1.15.4',
+    'scipy>=0.17.1',
+    'matplotlib>=3.0',
+    'sympy>=1.0',
+    'numba>=0.35',
+    'dill>=0.2.6',
+    ]
+
+[project.optional-dependencies]
+apps = [
+    'petsc4py>=3.10.0',
+    'mpi4py>=3.0.0',
+    'fenics>=2019.1.0',
+    'mpi4py-fft>=2.0.2'
+    ]
+dev = [
+    'flakeheaven',
+    'flake8-comprehensions',
+    'flake8-bugbear',
+    'pytest',
+    'pytest-cov',
+    'sphinx'
+    ]
+
+[tool.pytest.ini_options]
+markers = [
+    'base: all basic tests',
+    'fenics: tests relying on FEniCS',
+    'slow: tests taking much longer than bearable',
+    'mpi4py: tests using MPI parallelism (but no other external library such as petsc)',
+    'petsc: tests relying on PETSc/petsc4py',
+    'benchmark: tests for benchmarking',
+    'cupy: tests for cupy on GPUs',
+    ]
+
+[tool.flakeheaven]
+max-line-length = 120
+per-file-ignores = [
+    'pySDC/tutorial/step_6/C_MPI_parallelization.py:F401',
+    'pySDC/projects/Hamiltonian/solar_system.py:F401'
+    ]
+exclude = [
+    'playgrounds',
+    'tests',
+    '*/data/*'
+    ]
+count = true
+show-source = true
+statistics = true
+
+# list of plugins and rules for them
+[tool.flakeheaven.plugins]
+# include everything in pyflakes except F401
+pyflakes = [
+    '+C*', '+E*', '+F*', '+W*', '+B*', '+B9*',
+    '-E203', '-E741', '-E402', '-W504', '-W605', '-F401'
+    ]
+#flake8-black = ["+*"]
+flake8-bugbear = ["+*", '-B023']
+flake8-comprehensions = ["+*", '-C408', '-C417']
+
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+
+[tool.coverage.run]
+omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
+relative_files = true
+
+[tool.coverage.report]
+skip_empty = true
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    'pragma: no cover',
+
+    # Don't complain about missing debug-only code:
+    'def __repr__',
+    'if self\.debug',
+
+    # Don't complain if tests don't hit defensive assertion code:
+    'raise',
+
+    # Don't complain if non-runnable code isn't run:
+    'if 0:',
+    'if __name__ == .__main__.:',
+    'pass',
+    '@abc.abstractmethod',
+    '__author__*',
+    ]

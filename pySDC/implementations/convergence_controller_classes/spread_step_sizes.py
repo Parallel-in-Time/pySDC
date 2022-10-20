@@ -69,10 +69,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
             l = MS[restart_at].levels[i]
             # overrule the step size control to reach Tend if needed
             new_steps[i] = min(
-                [
-                    l.status.dt_new if l.status.dt_new is not None else l.params.dt,
-                    max([dt_max, l.params.dt_initial]),
-                ]
+                [l.status.dt_new if l.status.dt_new is not None else l.params.dt, max([dt_max, l.params.dt_initial])]
             )
 
         for p in active_slots:

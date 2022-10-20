@@ -26,9 +26,7 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             dict: Updated parameters
         """
-        sweeper_type = (
-            "RK" if RungeKutta in description["sweeper_class"].__bases__ else "SDC"
-        )
+        sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__bases__ else 'SDC'
         return {"control_order": -80, "sweeper_type": sweeper_type, **params}
 
     def dependencies(self, controller, description, **kwargs):
@@ -81,10 +79,8 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         """
-        super(EstimateEmbeddedErrorNonMPI, self).__init__(
-            controller, params, description
-        )
-        self.buffers = Pars({"e_em_last": 0.0})
+        super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
+        self.buffers = Pars({'e_em_last': 0.0})
 
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """

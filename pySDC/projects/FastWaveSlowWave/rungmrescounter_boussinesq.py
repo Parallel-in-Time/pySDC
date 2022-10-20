@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
 from pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators import SplitExplicit, dirk, rk_imex
@@ -27,7 +27,7 @@ def main(cwd=''):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-15
+    level_params['restol'] = 1e-15
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -36,7 +36,7 @@ def main(cwd=''):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLegendre
+    sweeper_params['quad_type'] = 'GAUSS'
     sweeper_params['num_nodes'] = 3
 
     # initialize controller parameters
@@ -71,8 +71,7 @@ def main(cwd=''):
     # ORDER OF DIRK/IMEX EQUAL TO NUMBER OF SDC ITERATIONS AND THUS SDC ORDER
     dirk_order = step_params['maxiter']
 
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -149,20 +148,26 @@ def main(cwd=''):
     print(" #### Logging report for DIRK-%1i #### " % dirkp.order)
     print("Number of calls to implicit solver: %5i" % dirkp.logger.solver_calls)
     print("Total number of GMRES iterations: %5i" % dirkp.logger.iterations)
-    print("Average number of iterations per call: %6.3f" %
-          (float(dirkp.logger.iterations) / float(dirkp.logger.solver_calls)))
+    print(
+        "Average number of iterations per call: %6.3f"
+        % (float(dirkp.logger.iterations) / float(dirkp.logger.solver_calls))
+    )
     print(" ")
     print(" #### Logging report for RK-IMEX-%1i #### " % rkimex.order)
     print("Number of calls to implicit solver: %5i" % rkimex.logger.solver_calls)
     print("Total number of GMRES iterations: %5i" % rkimex.logger.iterations)
-    print("Average number of iterations per call: %6.3f" %
-          (float(rkimex.logger.iterations) / float(rkimex.logger.solver_calls)))
+    print(
+        "Average number of iterations per call: %6.3f"
+        % (float(rkimex.logger.iterations) / float(rkimex.logger.solver_calls))
+    )
     print(" ")
     print(" #### Logging report for SDC-(%1i,%1i) #### " % (sweeper_params['num_nodes'], step_params['maxiter']))
     print("Number of calls to implicit solver: %5i" % P.gmres_logger.solver_calls)
     print("Total number of GMRES iterations: %5i" % P.gmres_logger.iterations)
-    print("Average number of iterations per call: %6.3f" %
-          (float(P.gmres_logger.iterations) / float(P.gmres_logger.solver_calls)))
+    print(
+        "Average number of iterations per call: %6.3f"
+        % (float(P.gmres_logger.iterations) / float(P.gmres_logger.solver_calls))
+    )
 
 
 if __name__ == "__main__":

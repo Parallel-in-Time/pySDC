@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
+
 # import progressbar
 
 from pySDC.core.Hooks import hooks
 
 
 class trajectories(hooks):
-
     def __init__(self):
         """
         Initialization of particles output

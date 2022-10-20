@@ -215,9 +215,7 @@ el multistep mode!",
 
             # Taylor expansions of the first derivatives a.k.a. right hand side evaluations
             A[i, self.params.n : self.params.Taylor_order] = (
-                steps_from_now[2 * self.params.n - self.params.Taylor_order :]
-                ** (j[i] - 1)
-                * inv_facs[i - 1]
+                steps_from_now[2 * self.params.n - self.params.Taylor_order :] ** (j[i] - 1) * inv_facs[i - 1]
             )
 
         # prepare rhs
@@ -227,14 +225,10 @@ el multistep mode!",
         # solve linear system for the coefficients
         coeff = np.linalg.solve(A, b)
         self.coeff.u = coeff[: self.params.n]
-        self.coeff.f[self.params.n * 2 - self.params.Taylor_order :] = coeff[
-            self.params.n : self.params.Taylor_order
-        ]
+        self.coeff.f[self.params.n * 2 - self.params.Taylor_order :] = coeff[self.params.n : self.params.Taylor_order]
 
         # determine prefactor
-        step_size_ratios = abs(dt[len(dt) - len(self.coeff.u) :] / dt[-1]) ** (
-            self.params.Taylor_order - 1
-        )
+        step_size_ratios = abs(dt[len(dt) - len(self.coeff.u) :] / dt[-1]) ** (self.params.Taylor_order - 1)
         inv_prefactor = -sum(step_size_ratios[1:]) - 1.0
         for i in range(len(self.coeff.u)):
             inv_prefactor += sum(step_size_ratios[1 : i + 1]) * self.coeff.u[i]

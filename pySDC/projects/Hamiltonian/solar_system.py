@@ -6,8 +6,8 @@ import dill
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted, filter_stats
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.FullSolarSystem import full_solar_system
 from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
@@ -27,12 +27,12 @@ def setup_outer_solar_system():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 100.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'spread'
 
@@ -73,12 +73,12 @@ def setup_full_solar_system():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 10.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'spread'
 
@@ -134,14 +134,13 @@ def run_simulation(prob=None):
     else:
         raise NotImplementedError('Problem type not implemented, got %s' % prob)
 
-    f = open(prob + '_out.txt', 'w')
+    f = open('data/' + prob + '_out.txt', 'w')
     out = 'Running ' + prob + ' problem with %s processors...' % num_procs
     f.write(out + '\n')
     print(out)
 
     # instantiate the controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -151,10 +150,7 @@ def run_simulation(prob=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     # for item in iter_counts:
@@ -169,8 +165,7 @@ def run_simulation(prob=None):
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     f.write(out + '\n')
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -222,7 +217,7 @@ def show_results(prob=None, cwd=''):
         ham = [item[1] for item in v]
         err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
-    assert err_ham < 2.4E-14, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
+    assert err_ham < 2.4e-14, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')
@@ -236,8 +231,7 @@ def show_results(prob=None, cwd=''):
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
     # extract positions and prepare for plotting
-    extract_stats = filter_stats(stats, type='position')
-    result = sort_stats(extract_stats, sortby='time')
+    result = get_sorted(stats, type='position', sortby='time')
 
     fig = plt_helper.plt.figure()
     ax = fig.add_subplot(111, projection='3d')

@@ -1,0 +1,9 @@
+name: pySDC
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - black
+  - flakeheaven
+  - flake8-comprehensions
+  - flake8-bugbear

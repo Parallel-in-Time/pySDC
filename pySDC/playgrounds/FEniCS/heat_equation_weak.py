@@ -1,4 +1,3 @@
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat_weak_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -13,7 +12,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-12
+    level_params['restol'] = 5e-12
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -22,7 +21,7 @@ if __name__ == "__main__":
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     problem_params = dict()
@@ -44,7 +43,7 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_heat_weak_imex
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order # pass sweeper (see part B)
+    description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters

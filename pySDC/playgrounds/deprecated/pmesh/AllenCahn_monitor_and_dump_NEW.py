@@ -5,7 +5,6 @@ from pySDC.core.Hooks import hooks
 
 
 class monitor_and_dump(hooks):
-
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
@@ -53,12 +52,11 @@ class monitor_and_dump(hooks):
         else:
             v_global = v_local
         if self.ndim == 3:
-            radius = (v_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
+            radius = (v_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
         elif self.ndim == 2:
             radius = np.sqrt(v_global / np.pi) * L.prob.dx
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
-
 
         # c_local = np.count_nonzero(L.u[0].values > 0.5)
         # if self.comm is not None:
@@ -76,10 +74,24 @@ class monitor_and_dump(hooks):
 
         # write to stats
         if L.time == 0.0:
-            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                              sweep=L.status.sweep, type='computed_radius', value=radius)
-            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                              sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='computed_radius',
+                value=radius,
+            )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='exact_radius',
+                value=self.init_radius,
+            )
 
         # compute local offset for I/O
         nbytes_local = tmp_u.nbytes
@@ -87,7 +99,7 @@ class monitor_and_dump(hooks):
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
             nbytes_global = [nbytes_local]
-        local_offset = sum(nbytes_global[:self.rank])
+        local_offset = sum(nbytes_global[: self.rank])
 
         # dump initial data
         fname = f"./data/{L.prob.params.name}_{0:08d}"
@@ -156,13 +168,27 @@ class monitor_and_dump(hooks):
         #     raise NotImplementedError('Can use this only for 2 or 3D problems')
 
         # compute exact radius
-        exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (self.ndim - 1) * (L.time + L.dt), 0))
+        exact_radius = np.sqrt(max(self.init_radius**2 - 2.0 * (self.ndim - 1) * (L.time + L.dt), 0))
 
         # write to stats
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='computed_radius', value=radius)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='exact_radius', value=exact_radius)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='computed_radius',
+            value=radius,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='exact_radius',
+            value=exact_radius,
+        )
 
         # compute local offset for I/O
         nbytes_local = tmp_u.nbytes
@@ -170,7 +196,7 @@ class monitor_and_dump(hooks):
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
             nbytes_global = [nbytes_local]
-        local_offset = sum(nbytes_global[:self.rank])
+        local_offset = sum(nbytes_global[: self.rank])
 
         #  dump initial data
         fname = f"./data/{L.prob.params.name}_{self.time_step + step.status.slot:08d}"

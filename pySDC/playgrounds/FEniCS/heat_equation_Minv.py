@@ -1,11 +1,10 @@
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.playgrounds.FEniCS.HookClass_FEniCS_output import fenics_output
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 
 if __name__ == "__main__":
     num_procs = 1
@@ -16,7 +15,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -25,7 +24,7 @@ if __name__ == "__main__":
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     problem_params = dict()
@@ -48,7 +47,7 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_heat
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order # pass sweeper (see part B)
+    description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
@@ -70,8 +69,8 @@ if __name__ == "__main__":
 
     print('(classical) error at time %s: %s' % (Tend, abs(uex - uend) / abs(uex)))
 
-    errors = sort_stats(filter_stats(stats, type='error'), sortby='iter')
-    residuals = sort_stats(filter_stats(stats, type='residual'), sortby='iter')
+    errors = get_sorted(stats, type='error', sortby='iter')
+    residuals = get_sorted(stats, type='residual', sortby='iter')
 
     for err, res in zip(errors, residuals):
         print(err[0], err[1], res[1])

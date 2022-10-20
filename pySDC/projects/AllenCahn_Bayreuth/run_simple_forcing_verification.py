@@ -7,8 +7,8 @@ from mpi4py import MPI
 import pySDC.helpers.plot_helper as plt_helper
 import matplotlib.ticker as ticker
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
@@ -46,13 +46,13 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'spread'
@@ -118,10 +118,10 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     if space_rank == 0:
 
         # convert filtered statistics to list of computed radii, sorted by time
-        computed_radii = sort_stats(filter_stats(stats, type='computed_radius'), sortby='time')
-        exact_radii = sort_stats(filter_stats(stats, type='exact_radius'), sortby='time')
-        computed_vol = sort_stats(filter_stats(stats, type='computed_volume'), sortby='time')
-        exact_vol = sort_stats(filter_stats(stats, type='exact_volume'), sortby='time')
+        computed_radii = get_sorted(stats, type='computed_radius', sortby='time')
+        exact_radii = get_sorted(stats, type='exact_radius', sortby='time')
+        computed_vol = get_sorted(stats, type='computed_volume', sortby='time')
+        exact_vol = get_sorted(stats, type='exact_volume', sortby='time')
 
         # print and store radii and error over time
         err_test = 0.0
@@ -141,8 +141,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
                 errv = 1.0
             if cr[0] == 0.025:
                 err_test = errr
-            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' \
-                  f'{cr[1]:8.6f} / {exrad:8.6f} / {errr:6.4e}'
+            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' f'{cr[1]:8.6f} / {exrad:8.6f} / {errr:6.4e}'
             print(out)
             results[cr[0]] = (cr[1], exrad, errr, cv[1], exvol, errv)
         fname = f'./data/{name}_results.json'
@@ -152,18 +151,18 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         print()
 
         # convert filtered statistics of iterations count, sorted by time
-        iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
         niters = np.mean(np.array([item[1] for item in iter_counts]))
         out = f'Mean number of iterations: {niters:.4f}'
         print(out)
 
         # get setup time
-        timing = sort_stats(filter_stats(stats, type='timing_setup'), sortby='time')
+        timing = get_sorted(stats, type='timing_setup', sortby='time')
         out = f'Setup time: {timing[0][1]:.4f} sec.'
         print(out)
 
         # get running time
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
         out = f'Time to solution: {timing[0][1]:.4f} sec.'
         print(out)
 

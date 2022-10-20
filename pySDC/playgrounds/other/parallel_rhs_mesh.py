@@ -2,7 +2,6 @@ import numpy as np
 
 
 class mymesh(np.ndarray):
-
     def __new__(cls, init, val=0.0):
         """
         Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.

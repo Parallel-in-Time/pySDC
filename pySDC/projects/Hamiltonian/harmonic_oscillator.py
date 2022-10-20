@@ -4,8 +4,8 @@ import dill
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.sweeper_classes.verlet import verlet
@@ -26,7 +26,7 @@ def run_simulation():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'zero'
 
@@ -88,8 +88,9 @@ def run_simulation():
             description['sweeper_params'] = sweeper_params
 
             # instantiate the controller
-            controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                           description=description)
+            controller = controller_nonMPI(
+                num_procs=num_procs, controller_params=controller_params, description=description
+            )
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
@@ -103,10 +104,7 @@ def run_simulation():
             print('Error after run: %s' % abs(uex - uend))
 
             # filter statistics by type (number of iterations)
-            filtered_stats = filter_stats(stats, type='niter')
-
-            # convert filtered statistics to list of iterations count, sorted by process
-            iter_counts = sort_stats(filtered_stats, sortby='time')
+            iter_counts = get_sorted(stats, type='niter', sortby='time')
 
             niters[i] = np.mean(np.array([item[1] for item in iter_counts]))
 
@@ -149,7 +147,9 @@ def show_results(cwd=''):
 
     plt_helper.plt.xlabel('k')
     plt_helper.plt.ylabel('Number of iterations')
-    plt_helper.plt.legend(loc='upper left', )
+    plt_helper.plt.legend(
+        loc='upper left',
+    )
     plt_helper.plt.ylim([0, 15])
 
     fname = 'data/harmonic_qd_iterations'

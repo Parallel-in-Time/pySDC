@@ -1,4 +1,6 @@
+from pathlib import Path
 import matplotlib
+
 matplotlib.use('Agg')
 
 from collections import namedtuple
@@ -7,7 +9,7 @@ import numpy as np
 import os.path
 
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
@@ -22,9 +24,10 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # create list of nvars to do the accuracy test with
-    nvars_list = [2 ** p - 1 for p in range(4, 15)]
+    nvars_list = [2**p - 1 for p in range(4, 15)]
 
     # run accuracy test for all nvars
     results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params)
@@ -32,7 +35,8 @@ def main():
     # compute order of accuracy
     order = get_accuracy_order(results)
 
-    f = open('step_1_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_1_B_out.txt', 'w')
     for l in range(len(order)):
         out = 'Expected order: %2i -- Computed order %4.3f' % (2, order[l])
         f.write(out + '\n')
@@ -42,9 +46,9 @@ def main():
     # visualize results
     plot_accuracy(results)
 
-    assert os.path.isfile('step_1_accuracy_test_space.png'), 'ERROR: plotting did not create file'
+    assert os.path.isfile('data/step_1_accuracy_test_space.png'), 'ERROR: plotting did not create file'
 
-    assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" % order
+    assert all(np.isclose(order, 2, rtol=0.06)), "ERROR: spatial order of accuracy is not as expected, got %s" % order
 
 
 def run_accuracy_check(nvars_list, problem_params):
@@ -64,17 +68,19 @@ def run_accuracy_check(nvars_list, problem_params):
     for nvars in nvars_list:
         # setup problem
         problem_params['nvars'] = nvars
-        prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
-        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars)])
+        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars[0])])
 
         # create a mesh instance and fill it with a sine wave
         u = prob.u_exact(t=0)
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
-        u_lap[:] = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
+        u_lap[:] = (
+            -((np.pi * prob.params.freq[0]) ** 2) * prob.params.nu * np.sin(np.pi * prob.params.freq[0] * xvalues)
+        )
 
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)
@@ -131,14 +137,15 @@ def plot_accuracy(results):
     nvars_list = sorted(results['nvars_list'])
 
     # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
 
     # create new figure
@@ -157,8 +164,8 @@ def plot_accuracy(results):
     order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(nvars_list))]
     plt.loglog(nvars_list, order_guide_space, color='k', ls='--', label='2nd order')
 
-    min_err = 1E99
-    max_err = 0E00
+    min_err = 1e99
+    max_err = 0e00
     err_list = []
     # loop over nvars, get errors and find min/max error for y-axis limits
     for nvars in nvars_list:
@@ -174,7 +181,7 @@ def plot_accuracy(results):
     plt.legend(loc=1, ncol=1, numpoints=1)
 
     # save plot as PDF, beautify
-    fname = 'step_1_accuracy_test_space.png'
+    fname = 'data/step_1_accuracy_test_space.png'
     plt.savefig(fname, bbox_inches='tight')
 
     return None

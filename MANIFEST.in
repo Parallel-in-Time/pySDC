@@ -2,13 +2,11 @@
 include *.md
 include *.txt
 include *.rst
-include .coveragerc
-include .flake8
 include Doxyfile
 include LICENSE
 include data/README
 include *.cff
-include pytest.ini
+include pyproject.toml
 
 recursive-include docs *.bat
 recursive-include docs *.py

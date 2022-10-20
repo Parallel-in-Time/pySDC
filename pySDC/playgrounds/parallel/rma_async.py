@@ -2,8 +2,10 @@ from mpi4py import MPI
 import numpy as np
 import time
 
+
 def sleep(n):
     tmp = np.random.rand(n)
+
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()

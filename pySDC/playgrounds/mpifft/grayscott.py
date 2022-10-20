@@ -2,14 +2,18 @@ import numpy as np
 from mpi4py import MPI
 import matplotlib.pyplot as plt
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted
+
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
-from pySDC.implementations.problem_classes.GrayScott_MPIFFT import grayscott_imex_diffusion, grayscott_imex_linear, \
-    grayscott_mi_diffusion, grayscott_mi_linear
+from pySDC.implementations.problem_classes.GrayScott_MPIFFT import (
+    grayscott_imex_diffusion,
+    grayscott_imex_linear,
+    grayscott_mi_diffusion,
+    grayscott_mi_linear,
+)
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 
@@ -28,15 +32,15 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
-    level_params['dt'] = 8E-00
+    level_params['restol'] = 1e-12
+    level_params['dt'] = 8e-00
     level_params['nsweeps'] = [1]
     level_params['residual_type'] = 'last_abs'
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    # sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    # sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['Q1'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -57,12 +61,12 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     problem_params['A'] = 0.04
     problem_params['B'] = 0.1
     problem_params['newton_maxiter'] = 50
-    problem_params['newton_tol'] = 1E-11
+    problem_params['newton_tol'] = 1e-11
 
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 100
-    step_params['errtol'] = 1E-09
+    step_params['errtol'] = 1e-09
 
     # initialize controller parameters
     controller_params = dict()
@@ -144,28 +148,29 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
 
     if rank == 0:
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
-        out = f'   Min/Mean/Max number of iterations: ' \
-              f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
+        out = (
+            f'   Min/Mean/Max number of iterations: '
+            f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
+        )
         f.write(out + '\n')
         print(out)
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         f.write(out + '\n')
         print(out)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
         out = f'Time to solution: {timing[0][1]:6.4f} sec.'
         f.write(out + '\n')
         print(out)

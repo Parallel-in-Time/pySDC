@@ -39,9 +39,7 @@ class harmonic_oscillator(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(harmonic_oscillator, self).__init__(
-            (1, None, np.dtype("float64")), dtype_u, dtype_f, problem_params
-        )
+        super(harmonic_oscillator, self).__init__((1, None, np.dtype("float64")), dtype_u, dtype_f, problem_params)
 
     def eval_f(self, u, t):
         """
@@ -118,9 +116,7 @@ class harmonic_oscillator(ptype):
             A, B = np.linalg.solve(M, U_0)
 
             me.pos[:] = np.real(A * np.exp(lam_1 * t) + B * np.exp(lam_2 * t))
-            me.vel[:] = np.real(
-                A * lam_1 * np.exp(lam_1 * t) + B * lam_2 * np.exp(lam_2 * t)
-            )
+            me.vel[:] = np.real(A * lam_1 * np.exp(lam_1 * t) + B * lam_2 * np.exp(lam_2 * t))
 
         else:
             pass

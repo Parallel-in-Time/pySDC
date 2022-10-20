@@ -216,17 +216,13 @@ _params']['e_tol']!",
             L = S.levels[0]
 
             # compute next step size
-            order = (
-                S.status.iter
-            )  # embedded error estimate is same order as time marching
+            order = S.status.iter  # embedded error estimate is same order as time marching
+
             e_est = self.get_local_error_estimate(controller, S)
             L.status.dt_new = self.compute_optimal_step_size(
                 self.params.beta, L.params.dt, self.params.e_tol, e_est, order
             )
-            self.log(
-                f"Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}",
-                S,
-            )
+            self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
 
@@ -295,10 +291,7 @@ description['convergence_control_params']['update_order']!",
             L.status.dt_new = self.compute_optimal_step_size(
                 self.params.beta, L.params.dt, self.params.e_tol, e_est, order
             )
-            self.log(
-                f"Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}",
-                S,
-            )
+            self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
 
@@ -415,16 +408,10 @@ smaller than 0!",
 
             if res > self.params.e_tol:
                 L.status.dt_new = min([dt_planned, L.params.dt / 2.0])
-                self.log(
-                    f"Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}",
-                    S,
-                )
+                self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
             elif res < self.params.e_tol_low:
                 L.status.dt_new = max([dt_planned, L.params.dt * 2.0])
-                self.log(
-                    f"Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}",
-                    S,
-                )
+                self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
 

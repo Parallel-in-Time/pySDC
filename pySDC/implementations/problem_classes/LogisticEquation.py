@@ -9,7 +9,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 class logistics_equation(ptype):
     """
     Example implementing the logistic equation, taken from
-    https://www-users.cse.umn.edu/~olver/ln_/odq.pdf (Example 2.2)
+    <https://www-users.cse.umn.edu/~olver/ln\_/odq.pdf> (Example 2.2)
     """
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
@@ -34,8 +34,9 @@ class logistics_equation(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(logistics_equation, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                                 dtype_u, dtype_f, problem_params)
+        super(logistics_equation, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
     def u_exact(self, t):
         """
@@ -48,8 +49,11 @@ class logistics_equation(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = self.params.u0 * np.exp(self.params.lam * t) / (1 - self.params.u0 +
-                                                                self.params.u0 * np.exp(self.params.lam * t))
+        me[:] = (
+            self.params.u0
+            * np.exp(self.params.lam * t)
+            / (1 - self.params.u0 + self.params.u0 * np.exp(self.params.lam * t))
+        )
         return me
 
     def eval_f(self, u, t):
@@ -86,7 +90,7 @@ class logistics_equation(ptype):
         if self.params.direct:
 
             d = (1 - dt * self.params.lam) ** 2 + 4 * dt * self.params.lam * rhs
-            u = (- (1 - dt * self.params.lam) + np.sqrt(d)) / (2 * dt * self.params.lam)
+            u = (-(1 - dt * self.params.lam) + np.sqrt(d)) / (2 * dt * self.params.lam)
             return u
 
         else:

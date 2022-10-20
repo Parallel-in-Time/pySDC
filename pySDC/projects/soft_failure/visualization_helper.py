@@ -85,8 +85,9 @@ def show_min_max_residual_across_simulation(fname, minres, maxres, meanres, medi
     plt.plot(np.linspace(1, maxiter, num=maxiter), np.log10(maxres), 'og--', label='max')
     plt.plot(np.linspace(1, maxiter, num=maxiter), np.log10(meanres), 'or--', label='mean')
     plt.plot(np.linspace(1, maxiter, num=maxiter), np.log10(medianres), 'oy--', label='median')
-    plt.fill_between(np.linspace(1, maxiter, num=maxiter), np.log10(minres), np.log10(maxres), color='grey',
-                     alpha=0.3, label='range')
+    plt.fill_between(
+        np.linspace(1, maxiter, num=maxiter), np.log10(minres), np.log10(maxres), color='grey', alpha=0.3, label='range'
+    )
     plt.axis([0, 14, -12, 3])
     plt.legend()
 

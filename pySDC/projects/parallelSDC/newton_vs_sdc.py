@@ -2,8 +2,8 @@ import os
 import pickle
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.projects.parallelSDC.ErrReductionHook import err_reduction_hook
@@ -15,7 +15,7 @@ from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec import l
 def main():
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
@@ -27,12 +27,12 @@ def main():
     problem_params['nvars'] = 2047
     problem_params['lambda0'] = 5.0
     problem_params['newton_maxiter'] = 50
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['interval'] = (-5, 5)
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'
     sweeper_params['fixed_time_in_jacobian'] = 0
@@ -54,7 +54,7 @@ def main():
     Tend = 0.1
 
     sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel, linearized_implicit_fixed_parallel_prec]
-    dt_list = [Tend / 2 ** i for i in range(1, 5)]
+    dt_list = [Tend / 2**i for i in range(1, 5)]
 
     results = dict()
     results['sweeper_list'] = [sweeper.__name__ for sweeper in sweeper_list]
@@ -81,11 +81,9 @@ def main():
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
             # filter statistics
-            filtered_stats = filter_stats(stats, type='error_pre_iteration')
-            error_pre = sort_stats(filtered_stats, sortby='iter')[0][1]
+            error_pre = get_sorted(stats, type='error_pre_iteration', sortby='iter')[0][1]
 
-            filtered_stats = filter_stats(stats, type='error_post_iteration')
-            error_post = sort_stats(filtered_stats, sortby='iter')[0][1]
+            error_post = get_sorted(stats, type='error_post_iteration', sortby='iter')[0][1]
 
             error_reduction.append(error_post / error_pre)
 
@@ -132,12 +130,14 @@ def plot_graphs(cwd=''):
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
     for sweeper, color, marker, label in setups:
-        plt_helper.plt.loglog(dt_list, results[sweeper], lw=1, ls='-', color=color, marker=marker,
-                              markeredgecolor='k', label=label)
+        plt_helper.plt.loglog(
+            dt_list, results[sweeper], lw=1, ls='-', color=color, marker=marker, markeredgecolor='k', label=label
+        )
 
     plt_helper.plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=0.5, ls='--', color='k', label='linear')
-    plt_helper.plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=0.5, ls='-.', color='k',
-                          label='quadratic')
+    plt_helper.plt.loglog(
+        dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=0.5, ls='-.', color='k', label='quadratic'
+    )
 
     plt_helper.plt.xlabel('dt')
     plt_helper.plt.ylabel('error reduction')
@@ -150,7 +150,7 @@ def plot_graphs(cwd=''):
 
     plt_helper.plt.gca().invert_xaxis()
     plt_helper.plt.xlim([dt_list[0] * 1.1, dt_list[-1] / 1.1])
-    plt_helper.plt.ylim([4E-03, 1E0])
+    plt_helper.plt.ylim([4e-03, 1e0])
 
     # save plot, beautify
     fname = 'data/parallelSDC_fisher_newton'

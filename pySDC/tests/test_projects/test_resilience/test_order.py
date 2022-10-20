@@ -1,6 +1,8 @@
 import pytest
 
-from pySDC.projects.Resilience.accuracy_check import main
 
+@pytest.mark.base
 def test_main():
+    from pySDC.projects.Resilience.accuracy_check import main
+
     main()

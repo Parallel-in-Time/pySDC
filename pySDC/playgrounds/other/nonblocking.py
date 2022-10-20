@@ -1,6 +1,7 @@
 from mpi4py import MPI
 import numpy as np
 
+
 def main():
 
     comm = MPI.COMM_WORLD
@@ -28,6 +29,7 @@ def main():
     #         # print(f'{rank} sending {i} to {1} - STOP')
     # elif rank == 1:
     #     pass
+
 
 if __name__ == '__main__':
     main()

@@ -34,8 +34,9 @@ class nonlinear_ODE_1(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(nonlinear_ODE_1, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                              dtype_u, dtype_f, problem_params)
+        super(nonlinear_ODE_1, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
     def u_exact(self, t):
         """
@@ -48,7 +49,7 @@ class nonlinear_ODE_1(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = t - t ** 2 / 4
+        me[:] = t - t**2 / 4
         return me
 
     def eval_f(self, u, t):

@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from pySDC.core.Errors import ParameterError
@@ -36,7 +35,7 @@ class outer_solar_system(ptype):
         super(outer_solar_system, self).__init__(((3, 6), None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
 
         # gravitational constant
-        self.G = 2.95912208286E-4
+        self.G = 2.95912208286e-4
 
     def eval_f(self, u, t):
         """
@@ -57,7 +56,7 @@ class outer_solar_system(ptype):
             for i in range(1, self.init[0][-1]):
                 dx = u.pos[:, i] - u.pos[:, 0]
                 r = np.sqrt(np.dot(dx, dx))
-                df = self.G * dx / (r ** 3)
+                df = self.G * dx / (r**3)
                 me[:, i] -= u.m[0] * df
 
         # ... or with all planets involved
@@ -67,7 +66,7 @@ class outer_solar_system(ptype):
                 for j in range(i):
                     dx = u.pos[:, i] - u.pos[:, j]
                     r = np.sqrt(np.dot(dx, dx))
-                    df = self.G * dx / (r ** 3)
+                    df = self.G * dx / (r**3)
                     me[:, i] -= u.m[j] * df
                     me[:, j] += u.m[i] * df
 
@@ -99,12 +98,12 @@ class outer_solar_system(ptype):
         me.vel[:, 4] = [0.00288930, 0.00114527, 0.00039677]
         me.vel[:, 5] = [0.00276725, -0.0017072, -0.00136504]
 
-        me.m[0] = 1.00000597682         # Sun
-        me.m[1] = 0.000954786104043     # Jupiter
-        me.m[2] = 0.000285583733151     # Saturn
-        me.m[3] = 0.0000437273164546    # Uranus
-        me.m[4] = 0.0000517759138449    # Neptune
-        me.m[5] = 1.0 / 130000000.0     # Pluto
+        me.m[0] = 1.00000597682  # Sun
+        me.m[1] = 0.000954786104043  # Jupiter
+        me.m[2] = 0.000285583733151  # Saturn
+        me.m[3] = 0.0000437273164546  # Uranus
+        me.m[4] = 0.0000517759138449  # Neptune
+        me.m[5] = 1.0 / 130000000.0  # Pluto
 
         return me
 

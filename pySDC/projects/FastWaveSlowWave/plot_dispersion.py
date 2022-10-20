@@ -9,7 +9,7 @@ from pylab import rcParams
 
 from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.acoustic_helpers.standard_integrators import dirk, rk_imex
 
 from pySDC.core.Step import step
@@ -18,8 +18,9 @@ from pySDC.core.Step import step
 def findomega(stab_fh):
     assert np.array_equal(np.shape(stab_fh), [2, 2]), 'Not 2x2 matrix...'
     omega = sympy.Symbol('omega')
-    func = (sympy.exp(-1j * omega) - stab_fh[0, 0]) * (sympy.exp(-1j * omega) - stab_fh[1, 1]) - \
-        stab_fh[0, 1] * stab_fh[1, 0]
+    func = (sympy.exp(-1j * omega) - stab_fh[0, 0]) * (sympy.exp(-1j * omega) - stab_fh[1, 1]) - stab_fh[
+        0, 1
+    ] * stab_fh[1, 0]
     solsym = sympy.solve(func, omega)
     sol0 = complex(solsym[0])
     sol1 = complex(solsym[1])
@@ -43,7 +44,7 @@ def compute_and_plot_dispersion():
     # initialize sweeper parameters
     sweeper_params = dict()
     # SET TYPE AND NUMBER OF QUADRATURE NODES ###
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['do_coll_update'] = True
     sweeper_params['num_nodes'] = 3
 
@@ -145,10 +146,26 @@ def compute_and_plot_dispersion():
     fig = plt.figure()
     plt.plot(k_vec, (U_speed + c_speed) + np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
     plt.plot(k_vec, phase[1, :], '-', color='g', linewidth=1.5, label='DIRK(' + str(dirkts.order) + ')')
-    plt.plot(k_vec, phase[2, :], '-+', color='r', linewidth=1.5, label='IMEX(' + str(rkimex.order) + ')',
-             markevery=(2, 3), mew=1.0)
-    plt.plot(k_vec, phase[0, :], '-o', color='b', linewidth=1.5, label='SDC(' + str(K) + ')', markevery=(1, 3),
-             markersize=fs / 2)
+    plt.plot(
+        k_vec,
+        phase[2, :],
+        '-+',
+        color='r',
+        linewidth=1.5,
+        label='IMEX(' + str(rkimex.order) + ')',
+        markevery=(2, 3),
+        mew=1.0,
+    )
+    plt.plot(
+        k_vec,
+        phase[0, :],
+        '-o',
+        color='b',
+        linewidth=1.5,
+        label='SDC(' + str(K) + ')',
+        markevery=(1, 3),
+        markersize=fs / 2,
+    )
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Phase speed', fontsize=fs, labelpad=0.5)
     plt.xlim([k_vec[0], k_vec[-1:]])
@@ -162,10 +179,26 @@ def compute_and_plot_dispersion():
     fig = plt.figure()
     plt.plot(k_vec, 1.0 + np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
     plt.plot(k_vec, amp_factor[1, :], '-', color='g', linewidth=1.5, label='DIRK(' + str(dirkts.order) + ')')
-    plt.plot(k_vec, amp_factor[2, :], '-+', color='r', linewidth=1.5, label='IMEX(' + str(rkimex.order) + ')',
-             markevery=(2, 3), mew=1.0)
-    plt.plot(k_vec, amp_factor[0, :], '-o', color='b', linewidth=1.5, label='SDC(' + str(K) + ')', markevery=(1, 3),
-             markersize=fs / 2)
+    plt.plot(
+        k_vec,
+        amp_factor[2, :],
+        '-+',
+        color='r',
+        linewidth=1.5,
+        label='IMEX(' + str(rkimex.order) + ')',
+        markevery=(2, 3),
+        mew=1.0,
+    )
+    plt.plot(
+        k_vec,
+        amp_factor[0, :],
+        '-o',
+        color='b',
+        linewidth=1.5,
+        label='SDC(' + str(K) + ')',
+        markevery=(1, 3),
+        markersize=fs / 2,
+    )
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Amplification factor', fontsize=fs, labelpad=0.5)
     fig.gca().tick_params(axis='both', labelsize=fs)

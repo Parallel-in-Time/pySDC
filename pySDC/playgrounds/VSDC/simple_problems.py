@@ -5,8 +5,8 @@ import dill
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted, filter_stats
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.problem_classes.HenonHeiles import henon_heiles
@@ -26,12 +26,12 @@ def setup_harmonic():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.5
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['initial_guess'] = 'zero'
 
@@ -74,12 +74,12 @@ def setup_henonheiles():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 0E-10
+    level_params['restol'] = 0e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['initial_guess'] = 'zero'
 
@@ -134,8 +134,7 @@ def run_simulation(prob=None):
         raise NotImplemented('Problem type not implemented, got %s' % prob)
 
     # instantiate the controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -145,10 +144,7 @@ def run_simulation(prob=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     # for item in iter_counts:
@@ -160,8 +156,7 @@ def run_simulation(prob=None):
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)

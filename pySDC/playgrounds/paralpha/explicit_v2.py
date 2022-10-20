@@ -2,8 +2,9 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.linalg as sl
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
+
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
+
 
 def get_config():
     problem_params = dict()
@@ -13,14 +14,16 @@ def get_config():
     problem_params['type'] = 'upwind'
     problem_params['ndim'] = 1
     problem_params['order'] = 1
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
-    problem = advectionNd_periodic(problem_params)
+    problem = advectionNd(problem_params)
 
     time_params = dict()
-    time_params['dt'] = 5E-04
-    time_params['Tend'] = 1E-02
+    time_params['dt'] = 5e-04
+    time_params['Tend'] = 1e-02
 
     return problem, time_params
+
 
 def run_explicit_euler(problem, time_params):
 
@@ -46,10 +49,11 @@ def get_alpha(m0, rhs1, uL, Lip, L):
     eps = np.finfo(complex).eps
     norm_rhs1 = max([abs(r) for r in rhs1])
     p = L * 6 * eps * norm_rhs1 / (m0 + L * Lip * m0 - L * 3 * eps * norm_rhs1)
-    alpha = -p / 2 + np.sqrt(p ** 2 + 2 * p) / 2
+    alpha = -p / 2 + np.sqrt(p**2 + 2 * p) / 2
     m0 = (alpha + L * Lip) / (1 - alpha) * m0 + L * 3 * eps * norm_rhs1 / alpha + L * 3 * eps * abs(uL)
 
     return alpha, m0
+
 
 def run_paralpha(problem, time_params, err_euler):
     # coll = CollGaussRadau_Right(M, 0, 1)
@@ -67,7 +71,7 @@ def run_paralpha(problem, time_params, err_euler):
 
     print(Lip)
 
-    u = [problem.dtype_u(problem.params.nvars, val=0.0) for _ in range(L)]
+    u = [problem.dtype_u(problem.init, val=0.0) for _ in range(L)]
 
     u0 = [problem.u_exact(t=0) for _ in range(L)]
 
@@ -81,7 +85,7 @@ def run_paralpha(problem, time_params, err_euler):
             rhs1.append(dt * problem.eval_f(u[l], t + dt * l))
         rhs1[0] += u0[0]
 
-        alpha, m0 = get_alpha(m0, rhs1, u[L-1], Lip, L)
+        alpha, m0 = get_alpha(m0, rhs1, u[L - 1], Lip, L)
         Ea = sp.eye(k=-1, m=L) + alpha * sp.eye(k=L - 1, m=L)
         d, S = np.linalg.eig(Ea.todense())
         Sinv = np.linalg.inv(S)  # S @ d @ Sinv = Ea
@@ -91,7 +95,7 @@ def run_paralpha(problem, time_params, err_euler):
         rhs1[0] -= alpha * u[-1]
 
         for i in range(L):
-            tmp = problem.dtype_u(problem.params.nvars, val=0.0+0.0j)
+            tmp = problem.dtype_u(problem.init, val=0.0 + 0.0j)
             for j in range(L):
                 tmp += Sinv[i, j] * rhs1[j]
             u[i] = problem.dtype_u(tmp)
@@ -101,7 +105,7 @@ def run_paralpha(problem, time_params, err_euler):
 
         u1 = [problem.dtype_u(u[l], val=0.0) for l in range(L)]
         for i in range(L):
-            tmp = problem.dtype_u(problem.params.nvars, val=0.0+0.0j)
+            tmp = problem.dtype_u(problem.init, val=0.0 + 0.0j)
             for j in range(L):
                 tmp += S[i, j] * u1[j]
             u[i] = problem.dtype_u(tmp)

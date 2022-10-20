@@ -35,8 +35,12 @@ class piline(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(piline, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                     dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(piline, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx and get discretization matrix A
         self.A = np.zeros((3, 3))
@@ -103,20 +107,23 @@ class piline(ptype):
         me[1] = 0.0  # v2
         me[2] = 0.0  # p3
 
-        if t > 0.:
+        if t > 0.0:
             if u_init is not None:
                 if t_init is None:
-                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
-is not 0!')
+                    raise ValueError(
+                        'Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!'
+                    )
                 me = u_init
             else:
-                t_init = 0.
+                t_init = 0.0
 
             def rhs(t, u):
                 f = self.eval_f(u, t)
                 return f.impl + f.expl  # evaluate only explicitly rather than IMEX
 
             tol = 100 * np.finfo(float).eps
+
             me[:] = solve_ivp(rhs, (t_init, t), me, rtol=tol, atol=tol).y[:, -1]
 
         return me

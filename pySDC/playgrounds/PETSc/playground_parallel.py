@@ -14,7 +14,6 @@ def main():
     print(v.getLocalSize())
     exit()
 
-
     da = PETSc.DMDA().create([n, n], stencil_width=1)
 
     rank = PETSc.COMM_WORLD.getRank()
@@ -25,7 +24,7 @@ def main():
     print(da.getRanges())
     for i in range(xs, xe):
         for j in range(ys, ye):
-            xa[i, j] = j*n + i
+            xa[i, j] = j * n + i
     print('x=', rank, x.getArray(), xs, xe, ys, ye)
 
     A = da.createMatrix()
@@ -45,7 +44,7 @@ def main():
     res = da.createGlobalVec()
     A.mult(x, res)
     print(rank, res.getArray())
-    print((res-x).norm())
+    print((res - x).norm())
 
 
 if __name__ == "__main__":

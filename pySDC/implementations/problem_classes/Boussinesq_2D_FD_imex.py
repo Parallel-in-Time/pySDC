@@ -28,29 +28,51 @@ class boussinesq_2d_imex(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'c_s', 'u_adv', 'Nfreq', 'x_bounds', 'z_bounds', 'order_upw', 'order',
-                          'gmres_maxiter', 'gmres_restart', 'gmres_tol_limit']
+        essential_keys = [
+            'nvars',
+            'c_s',
+            'u_adv',
+            'Nfreq',
+            'x_bounds',
+            'z_bounds',
+            'order_upw',
+            'order',
+            'gmres_maxiter',
+            'gmres_restart',
+            'gmres_tol_limit',
+        ]
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(boussinesq_2d_imex, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                                 dtype_u, dtype_f, problem_params)
+        super(boussinesq_2d_imex, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
         self.N = [self.params.nvars[1], self.params.nvars[2]]
 
-        self.bc_hor = [['periodic', 'periodic'], ['periodic', 'periodic'], ['periodic', 'periodic'],
-                       ['periodic', 'periodic']]
-        self.bc_ver = [['neumann', 'neumann'], ['dirichlet', 'dirichlet'], ['dirichlet', 'dirichlet'],
-                       ['neumann', 'neumann']]
+        self.bc_hor = [
+            ['periodic', 'periodic'],
+            ['periodic', 'periodic'],
+            ['periodic', 'periodic'],
+            ['periodic', 'periodic'],
+        ]
+        self.bc_ver = [
+            ['neumann', 'neumann'],
+            ['dirichlet', 'dirichlet'],
+            ['dirichlet', 'dirichlet'],
+            ['neumann', 'neumann'],
+        ]
 
-        self.xx, self.zz, self.h = get2DMesh(self.N, self.params.x_bounds, self.params.z_bounds,
-                                             self.bc_hor[0], self.bc_ver[0])
+        self.xx, self.zz, self.h = get2DMesh(
+            self.N, self.params.x_bounds, self.params.z_bounds, self.bc_hor[0], self.bc_ver[0]
+        )
 
-        self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.params.c_s,
-                                                self.params.Nfreq, self.params.order)
+        self.Id, self.M = getBoussinesq2DMatrix(
+            self.N, self.h, self.bc_hor, self.bc_ver, self.params.c_s, self.params.Nfreq, self.params.order
+        )
         self.D_upwind = getBoussinesq2DUpwindMatrix(self.N, self.h[0], self.params.u_adv, self.params.order_upw)
 
         self.gmres_logger = logging()
@@ -72,8 +94,16 @@ class boussinesq_2d_imex(ptype):
         b = rhs.flatten()
         cb = Callback()
 
-        sol, info = gmres(self.Id - factor * self.M, b, x0=u0.flatten(), tol=self.params.gmres_tol_limit,
-                          restart=self.params.gmres_restart, maxiter=self.params.gmres_maxiter, callback=cb)
+        sol, info = gmres(
+            self.Id - factor * self.M,
+            b,
+            x0=u0.flatten(),
+            tol=self.params.gmres_tol_limit,
+            restart=self.params.gmres_restart,
+            maxiter=self.params.gmres_maxiter,
+            atol=0,
+            callback=cb,
+        )
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor != 0.0:
             self.gmres_logger.add(cb.getcounter())
@@ -148,6 +178,7 @@ class boussinesq_2d_imex(ptype):
         Returns:
             dtype_u: exact solution
         """
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         dtheta = 0.01
         H = 10.0

@@ -2,8 +2,8 @@ import os
 
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
@@ -28,13 +28,13 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-11
-    level_params['dt'] = 1E-05
+    level_params['restol'] = 1e-11
+    level_params['dt'] = 1e-05
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'zero'
@@ -45,8 +45,8 @@ def setup_parameters():
     problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-12
-    problem_params['lin_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
+    problem_params['lin_tol'] = 1e-12
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
@@ -84,13 +84,13 @@ def setup_parameters_FFT():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-11
-    level_params['dt'] = 1E-04
+    level_params['restol'] = 1e-11
+    level_params['dt'] = 1e-04
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'zero'
@@ -101,8 +101,8 @@ def setup_parameters_FFT():
     problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-12
-    problem_params['lin_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
+    problem_params['lin_tol'] = 1e-12
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
@@ -142,8 +142,7 @@ def run_reference(Tend):
     t0 = 0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -153,10 +152,7 @@ def run_reference(Tend):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     niters = np.array([item[1] for item in iter_counts])
@@ -164,18 +160,17 @@ def run_reference(Tend):
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
     print()
 
-    computed_radii_tmp = sort_stats(filter_stats(stats, type='computed_radius'), sortby='time')
+    computed_radii_tmp = get_sorted(stats, type='computed_radius', sortby='time')
     computed_radii = np.array([item0[1] for item0 in computed_radii_tmp])
     print(len(computed_radii_tmp), len(computed_radii))
 
@@ -198,7 +193,6 @@ def main(cwd=''):
 
     loaded = np.load(fname)
     uend = loaded['uend']
-
 
 
 if __name__ == "__main__":

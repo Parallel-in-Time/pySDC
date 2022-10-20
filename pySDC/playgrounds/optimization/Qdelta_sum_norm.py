@@ -1,8 +1,5 @@
-
 import indiesolver
 import numpy as np
-
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 
 def evaluate(solution):
@@ -41,7 +38,7 @@ def evaluate(solution):
     for i in range(-8, 8):
         for l in range(-8, 8):
             k += 1
-            lamdt = -10 ** i + 1j * 10 ** l
+            lamdt = -(10**i) + 1j * 10**l
             if lamdt * np.linalg.norm(Qd, np.inf) != 1.0:
                 rhoR = abs(lamdt * np.linalg.norm(Q - Qd, np.inf) / (1.0 - lamdt * np.linalg.norm(Qd, np.inf)))
             else:
@@ -82,9 +79,11 @@ params['x3i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax,
 # params['x8'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 # params['x9'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_sum_norm',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_sum_norm',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

@@ -36,8 +36,9 @@ class vanderpol(ptype):
             problem_params['crash_at_maxiter'] = True
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(vanderpol, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                        dtype_u, dtype_f, problem_params)
+        super(vanderpol, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
@@ -54,7 +55,7 @@ class vanderpol(ptype):
 
         me = self.dtype_u(self.init)
 
-        if t > 0.:
+        if t > 0.0:
 
             def rhs(t, u):
                 return self.eval_f(u, t)
@@ -63,12 +64,14 @@ class vanderpol(ptype):
 
             if u_init is not None:
                 if t_init is None:
-                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
-is not 0!')
+                    raise ValueError(
+                        'Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!'
+                    )
                 me = u_init.copy()
             else:
                 u_init = self.params.u0.copy()
-                t_init = 0.
+                t_init = 0.0
             me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
         else:
             me[:] = self.params.u0[:]
@@ -89,7 +92,7 @@ is not 0!')
         x2 = u[1]
         f = self.dtype_f(self.init)
         f[0] = x2
-        f[1] = self.params.mu * (1 - x1 ** 2) * x2 - x1
+        f[1] = self.params.mu * (1 - x1**2) * x2 - x1
         return f
 
     def solve_system(self, rhs, dt, u0, t):
@@ -119,7 +122,7 @@ is not 0!')
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = np.array([x1 - dt * x2 - rhs[0], x2 - dt * (mu * (1 - x1 ** 2) * x2 - x1) - rhs[1]])
+            g = np.array([x1 - dt * x2 - rhs[0], x2 - dt * (mu * (1 - x1**2) * x2 - x1) - rhs[1]])
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -127,9 +130,9 @@ is not 0!')
                 break
 
             # prefactor for dg/du
-            c = 1.0 / (-2 * dt ** 2 * mu * x1 * x2 - dt ** 2 - 1 + dt * mu * (1 - x1 ** 2))
+            c = 1.0 / (-2 * dt**2 * mu * x1 * x2 - dt**2 - 1 + dt * mu * (1 - x1**2))
             # assemble dg/du
-            dg = c * np.array([[dt * mu * (1 - x1 ** 2) - 1, -dt], [2 * dt * mu * x1 * x2 + dt, -1]])
+            dg = c * np.array([[dt * mu * (1 - x1**2) - 1, -dt], [2 * dt * mu * x1 * x2 + dt, -1]])
 
             # newton update: u1 = u0 - g/dg
             u -= np.dot(dg, g)

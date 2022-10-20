@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.helpers.transfer_helper import interpolation_matrix_1d
 
 
@@ -42,15 +42,15 @@ def SDC():
     # Mc = 1
     dt = 1.0
     lamb = -1.0
-    tol = 1E-10
+    tol = 1e-10
 
     coll = CollGaussRadau_Right(M, 0, 1)
     collc = CollGaussRadau_Right(Mc, 0, 1)
     collc2 = CollGaussRadau_Right(1, 0, 1)
 
-    Q = coll.Qmat[1:,1:]
-    Qc = collc.Qmat[1:,1:]
-    Qc2 = collc2.Qmat[1:,1:]
+    Q = coll.Qmat[1:, 1:]
+    Qc = collc.Qmat[1:, 1:]
+    Qc2 = collc2.Qmat[1:, 1:]
 
     _, _, U = sp.linalg.lu(Q.T, overwrite_a=False)
     Qd = U.T
@@ -142,7 +142,7 @@ def SDC():
     print()
 
     Ea = E.copy()
-    Ea[0, -1] = 1E+00
+    Ea[0, -1] = 1e00
     Sa = np.kron(np.eye(K), P) - np.kron(Ea, P - C)
     Sainv = np.linalg.inv(Sa)
 
@@ -190,9 +190,6 @@ def SDC():
         l += 1
         print(l, np.linalg.norm(res, np.inf))
     print()
-
-
-
 
     # T = np.eye(M) - Pinv.dot(C)
     # Tc = I.dot(np.eye(Mc) - Pcinv.dot(Cc)).dot(R)
@@ -259,6 +256,7 @@ def SDC():
     #     print(l, np.linalg.norm(res, np.inf))
     # print()
 
+
 def Jacobi():
     N = 127
     dx = 1.0 / (N + 1)
@@ -266,17 +264,17 @@ def Jacobi():
     K = 20
     stencil = [-1, 2, -1]
     A = sp.sparse.diags(stencil, [-1, 0, 1], shape=(N, N), format='csc')
-    A *= nu / (dx ** 2)
+    A *= nu / (dx**2)
 
     D = sp.sparse.diags(2.0 * A.diagonal(), 0, shape=(N, N), format='csc')
-    Dinv = sp.sparse.diags(0.5 * 1.0/A.diagonal(), 0, shape=(N, N), format='csc')
+    Dinv = sp.sparse.diags(0.5 * 1.0 / A.diagonal(), 0, shape=(N, N), format='csc')
 
     f = np.ones(N)
     f = np.zeros(N)
-    u = np.sin([int(3.0 * N / 4.0) * np.pi * (i+1) * dx for i in range(N)])
+    u = np.sin([int(3.0 * N / 4.0) * np.pi * (i + 1) * dx for i in range(N)])
     res = f - A.dot(u)
 
-    for k in range(1, K+1):
+    for k in range(1, K + 1):
         u += Dinv.dot(res)
         res = f - A.dot(u)
         print(k, np.linalg.norm(res, np.inf))
@@ -289,7 +287,7 @@ def Jacobi():
     dxc = 1.0 / (Nc + 1)
 
     Ac = sp.sparse.diags(stencil, [-1, 0, 1], shape=(Nc, Nc), format='csc')
-    Ac *= nu / (dxc ** 2)
+    Ac *= nu / (dxc**2)
 
     Dc = sp.sparse.diags(2.0 * Ac.diagonal(), 0, shape=(Nc, Nc), format='csc')
     Dcinv = sp.sparse.diags(0.5 * 1.0 / Ac.diagonal(), 0, shape=(Nc, Nc), format='csc')
@@ -298,7 +296,6 @@ def Jacobi():
     coarse_grid = np.array([(i + 1) * dxc for i in range(Nc)])
     I = sp.sparse.csc_matrix(interpolation_matrix_1d(fine_grid, coarse_grid, k=6, periodic=False, equidist_nested=True))
     R = sp.sparse.csc_matrix(I.T)
-
 
     T = sp.sparse.csc_matrix(sp.sparse.eye(N) - Dinv.dot(A))
     Tc = sp.sparse.csc_matrix(I.dot(sp.sparse.eye(Nc) - Dcinv.dot(Ac)).dot(R))
@@ -313,7 +310,11 @@ def Jacobi():
     while np.linalg.norm(res, np.inf) > tol and l < K:
 
         for k in range(1, K):
-            u[k * N: (k+1) * N] = T.dot(uold[(k-1) * N: k * N]) + Tc.dot(u[(k-1) * N: k * N] - uold[(k-1) * N: k * N]) + fvec[(k-1) * N: k * N]
+            u[k * N : (k + 1) * N] = (
+                T.dot(uold[(k - 1) * N : k * N])
+                + Tc.dot(u[(k - 1) * N : k * N] - uold[(k - 1) * N : k * N])
+                + fvec[(k - 1) * N : k * N]
+            )
 
         res = f - A.dot(u[-N:])
         l += 1
@@ -341,7 +342,7 @@ def Jacobi():
     u = np.kron(np.ones(K), np.sin([int(3.0 * N / 4.0) * np.pi * (i + 1) * dx for i in range(N)]))
     l = 0
     fvec = np.kron(np.ones(K), f)
-    res = f - A.dot(u[0: N])
+    res = f - A.dot(u[0:N])
     while np.linalg.norm(res, np.inf) > tol and l < K:
         # u += Sainv.dot(u0vec - S.dot(u))
         u += Sdiaginv.dot(fvec - S.dot(u))
@@ -367,8 +368,6 @@ def Jacobi():
     # print(np.linalg.inv(A.todense()).dot(f))
 
 
-
 if __name__ == "__main__":
     # SDC()
     Jacobi()
-

@@ -4,7 +4,6 @@ from pySDC.core.Hooks import hooks
 
 
 class monitor(hooks):
-
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
@@ -28,8 +27,15 @@ class monitor(hooks):
 
         print(self.init_volume)
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='exact_volume', value=self.init_volume)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='exact_volume',
+            value=self.init_volume,
+        )
 
     def post_step(self, step, level_number):
         """
@@ -52,7 +58,21 @@ class monitor(hooks):
 
         print(exact_volume, computed_volume, abs(exact_volume - computed_volume), abs(L.uend - uex))
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='exact_volume', value=exact_volume)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='computed_volume', value=computed_volume)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='exact_volume',
+            value=exact_volume,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='computed_volume',
+            value=computed_volume,
+        )

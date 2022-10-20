@@ -60,12 +60,10 @@ class ConvergenceController(object):
         Returns:
             None
         """
-        self.logger.log(
-            level, f"Process {S.status.slot:2d} on time {S.time:.6f} - {msg}"
-        )
+        self.logger.log(level, f'Process {S.status.slot:2d} on time {S.time:.6f} - {msg}')
         return None
 
-    def setup(self, controller, params, description, **kwargs):
+    def setup(self, controller, params, description):
         """
         Setup various variables that only need to be set once in the beginning.
 

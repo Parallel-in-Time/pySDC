@@ -30,14 +30,19 @@ class mesh(np.ndarray):
 
         """
         if isinstance(init, mesh):
-            obj = np.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, buffer=buffer, offset=offset,
-                                     strides=strides, order=order)
+            obj = np.ndarray.__new__(
+                cls, shape=init.shape, dtype=init.dtype, buffer=buffer, offset=offset, strides=strides, order=order
+            )
             obj[:] = init[:]
             obj._comm = init._comm
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], np.dtype):
-            obj = np.ndarray.__new__(cls, init[0], dtype=init[2], buffer=buffer, offset=offset,
-                                     strides=strides, order=order)
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], np.dtype)
+        ):
+            obj = np.ndarray.__new__(
+                cls, init[0], dtype=init[2], buffer=buffer, offset=offset, strides=strides, order=order
+            )
             obj.fill(val)
             obj._comm = init[1]
         else:
@@ -166,8 +171,11 @@ class imex_mesh(object):
         if isinstance(init, type(self)):
             self.impl = mesh(init.impl)
             self.expl = mesh(init.expl)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], np.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], np.dtype)
+        ):
             self.impl = mesh(init, val=val)
             self.expl = mesh(init, val=val)
         # something is wrong, if none of the ones above hit
@@ -198,8 +206,11 @@ class comp2_mesh(object):
         if isinstance(init, type(self)):
             self.comp1 = mesh(init.comp1)
             self.comp2 = mesh(init.comp2)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], np.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], np.dtype)
+        ):
             self.comp1 = mesh(init, val=val)
             self.comp2 = mesh(init, val=val)
         # something is wrong, if none of the ones above hit

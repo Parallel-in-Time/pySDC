@@ -35,16 +35,51 @@ class log_fault_stats_data(FaultInjector):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=-1,
-                          sweep=L.status.sweep, type='u', value=L.uend)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=-1,
-                          sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='k', value=step.status.iter)
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restarts', value=int(step.status.restart))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=-1,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.uend,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=-1,
+            sweep=L.status.sweep,
+            type='e_em',
+            value=L.status.error_embedded_estimate,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='k',
+            value=step.status.iter,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restarts',
+            value=int(step.status.restart),
+        )
 
 
 class log_local_error(log_fault_stats_data):
@@ -58,9 +93,15 @@ class log_local_error(log_fault_stats_data):
 
         # some abbreviations
         L = step.levels[level_number]
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_loc',
-                          value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_loc',
+            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]),
+        )
 
 
 class log_all_iterates(log_fault_stats_data):
@@ -71,18 +112,40 @@ class log_all_iterates(log_fault_stats_data):
         iter = step.status.iter
 
         L.sweep.compute_end_point()
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=iter,
-                          sweep=L.status.sweep, type='u', value=L.uend)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=iter,
-                          sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=iter,
-                          sweep=L.status.sweep, type='e_ex', value=L.status.error_extrapolation_estimate)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=iter,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.uend,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=iter,
+            sweep=L.status.sweep,
+            type='e_em',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=iter,
+            sweep=L.status.sweep,
+            type='e_ex',
+            value=L.status.error_extrapolation_estimate,
+        )
 
 
 class Strategy:
     '''
     Abstract class for resilience strategies
     '''
+
     def __init__(self):
         '''
         Initialization routine
@@ -145,6 +208,7 @@ class BaseStrategy(Strategy):
     '''
     Do a fixed iteration count
     '''
+
     def __init__(self):
         '''
         Initialization routine
@@ -160,6 +224,7 @@ class AdaptivityStrategy(Strategy):
     '''
     Adaptivity as a resilience strategy
     '''
+
     def __init__(self):
         '''
         Initialization routine
@@ -188,8 +253,10 @@ class AdaptivityStrategy(Strategy):
             e_tol = 2e-5
             dt_min = 1e-3
         else:
-            raise NotImplementedError('I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
- strategy')
+            raise NotImplementedError(
+                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
+ strategy'
+            )
 
         custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min}}}
 
@@ -200,6 +267,7 @@ class AdaptiveHotRodStrategy(Strategy):
     '''
     Adaptivity + Hot Rod as a resilience strategy
     '''
+
     def __init__(self):
         '''
         Initialization routine
@@ -227,8 +295,10 @@ class AdaptiveHotRodStrategy(Strategy):
             maxiter = 4
             HotRod_tol = 3e-7
         else:
-            raise NotImplementedError('I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
-to the strategy')
+            raise NotImplementedError(
+                'I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
+to the strategy'
+            )
 
         no_storage = num_procs > 1
 
@@ -247,6 +317,7 @@ class IterateStrategy(Strategy):
     '''
     Iterate for as much as you want
     '''
+
     def __init__(self):
         '''
         Initialization routine
@@ -273,8 +344,10 @@ class IterateStrategy(Strategy):
         elif problem == run_vdp:
             restol = 9e-7
         else:
-            raise NotImplementedError('I don\'t have a residual tolerance for your problem. Please add one to the \
-strategy')
+            raise NotImplementedError(
+                'I don\'t have a residual tolerance for your problem. Please add one to the \
+strategy'
+            )
 
         custom_description = {
             'step_params': {'maxiter': 99},
@@ -288,6 +361,7 @@ class HotRodStrategy(Strategy):
     '''
     Hot Rod as a resilience strategy
     '''
+
     def __init__(self):
         '''
         Initialization routine
@@ -313,8 +387,10 @@ class HotRodStrategy(Strategy):
             HotRod_tol = 5e-7
             maxiter = 4
         else:
-            raise NotImplementedError('I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
- strategy')
+            raise NotImplementedError(
+                'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
+ strategy'
+            )
 
         no_storage = num_procs > 1
 
@@ -331,8 +407,16 @@ class FaultStats:
     Class to generate and analyse fault statistics
     '''
 
-    def __init__(self, prob=None, strategies=None, faults=None, reload=True, recovery_thresh=1 + 1e-3,
-                 num_procs=1, mode='combination'):
+    def __init__(
+        self,
+        prob=None,
+        strategies=None,
+        faults=None,
+        reload=True,
+        recovery_thresh=1 + 1e-3,
+        num_procs=1,
+        mode='combination',
+    ):
         '''
         Initialization routine
 
@@ -363,7 +447,7 @@ class FaultStats:
         if self.prob == run_vdp:
             return 2.3752559741400825
         elif self.prob == run_piline:
-            return 20.
+            return 20.0
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -421,8 +505,9 @@ class FaultStats:
                         runs_partial = min(i, max_runs)
                     else:
                         runs_partial = min([5, i])
-                    self.generate_stats(strategy=self.strategies[j], runs=runs_partial, faults=f,
-                                        reload=self.reload or reload)
+                    self.generate_stats(
+                        strategy=self.strategies[j], runs=runs_partial, faults=f, reload=self.reload or reload
+                    )
                 self.get_recovered(self.strategies[j])
             reload = True
 
@@ -463,18 +548,22 @@ class FaultStats:
             already_completed = self.load(strategy, faults)
             if already_completed['runs'] > 0 and already_completed['runs'] <= runs:
                 for k in dat.keys():
-                    dat[k][:min([already_completed['runs'], runs])] = already_completed.get(k, [])
+                    dat[k][: min([already_completed['runs'], runs])] = already_completed.get(k, [])
         else:
             already_completed = {'runs': 0}
 
         if already_completed['runs'] < runs:
             if faults:
-                print(f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} with faults from \
-{already_completed["runs"]} to {runs}')
+                print(
+                    f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} with faults from \
+{already_completed["runs"]} to {runs}'
+                )
                 sys.stdout.flush()
             else:
-                print(f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} from {already_completed["runs"]} to \
-{runs}')
+                print(
+                    f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} from {already_completed["runs"]} to \
+{runs}'
+                )
                 sys.stdout.flush()
 
         # perform the remaining experiments
@@ -561,9 +650,15 @@ class FaultStats:
         else:
             fault_stuff = None
 
-        return self.prob(custom_description=custom_description, num_procs=self.num_procs,
-                         hook_class=hook_class, fault_stuff=fault_stuff, Tend=self.get_Tend(),
-                         custom_controller_params=custom_controller_params, custom_problem_params=custom_problem_params)
+        return self.prob(
+            custom_description=custom_description,
+            num_procs=self.num_procs,
+            hook_class=hook_class,
+            fault_stuff=fault_stuff,
+            Tend=self.get_Tend(),
+            custom_controller_params=custom_controller_params,
+            custom_problem_params=custom_problem_params,
+        )
 
     def compare_strategies(self, run=0, faults=False, ax=None):
         '''
@@ -618,8 +713,9 @@ class FaultStats:
 
         force_params = dict()
 
-        stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params,
-                                                  hook_class=log_local_error)
+        stats, controller, Tend = self.single_run(
+            strategy=strategy, run=run, faults=faults, force_params=force_params, hook_class=log_local_error
+        )
 
         # plot the local error
         e_loc = get_sorted(stats, type='e_loc', recomputed=False)
@@ -682,8 +778,10 @@ class FaultStats:
             error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
         recovery_thresh = e_star * self.recovery_thresh
 
-        print(f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
-{error < recovery_thresh}')
+        print(
+            f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
+{error < recovery_thresh}'
+        )
         print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
 
         # checkout the step size
@@ -940,19 +1038,38 @@ class FaultStats:
                 me_recovered[i] = op(dat, no_faults, thingA, _mask & dat['recovered'])
 
         if recovered:
-            ax.plot(admissable_thingB, me_recovered, label=f'{strategy.name} (only recovered)', color=strategy.color,
-                    marker=strategy.marker, ls='--', linewidth=3)
+            ax.plot(
+                admissable_thingB,
+                me_recovered,
+                label=f'{strategy.name} (only recovered)',
+                color=strategy.color,
+                marker=strategy.marker,
+                ls='--',
+                linewidth=3,
+            )
 
-        ax.plot(admissable_thingB, me, label=f'{strategy.name}', color=strategy.color, marker=strategy.marker,
-                linewidth=2)
+        ax.plot(
+            admissable_thingB, me, label=f'{strategy.name}', color=strategy.color, marker=strategy.marker, linewidth=2
+        )
 
         ax.legend(frameon=False)
         ax.set_xlabel(thingB)
         ax.set_ylabel(thingA)
         return None
 
-    def plot_things_per_things(self, thingA='bit', thingB='bit', recovered=False, mask=None, op=None, args=None,
-                               strategies=None, name=None, store=True, ax=None):
+    def plot_things_per_things(
+        self,
+        thingA='bit',
+        thingB='bit',
+        recovered=False,
+        mask=None,
+        op=None,
+        args=None,
+        strategies=None,
+        name=None,
+        store=True,
+        ax=None,
+    ):
         '''
         Plot thingA vs thingB for multiple strategies
 
@@ -1048,11 +1165,14 @@ class FaultStats:
         print('-------+-----+------+------+----------+----------+----------+----------')
         for i in index:
             e_em, e_glob = self.analyse_adaptivity_single(int(i))
-            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_em[1]:.2e}\
- | {e_em[0]:.2e} | {e_glob[1]:.2e} | {e_glob[0]:.2e}')
+            print(
+                f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_em[1]:.2e}\
+ | {e_em[0]:.2e} | {e_glob[1]:.2e} | {e_glob[0]:.2e}'
+            )
 
-        e_tol = AdaptivityStrategy().get_custom_description(self.prob, self.num_procs)[
-            'convergence_controllers'][Adaptivity]['e_tol']
+        e_tol = AdaptivityStrategy().get_custom_description(self.prob, self.num_procs)['convergence_controllers'][
+            Adaptivity
+        ]['e_tol']
         print(f'We only restart when e_em > e_tol = {e_tol:.2e}!')
         return None
 
@@ -1071,8 +1191,9 @@ class FaultStats:
         stats = []
         controllers = []
         for faults in [True, False]:
-            s, c, _ = self.single_run(strategy=AdaptivityStrategy(), run=run, faults=faults,
-                                      hook_class=log_all_iterates)
+            s, c, _ = self.single_run(
+                strategy=AdaptivityStrategy(), run=run, faults=faults, hook_class=log_all_iterates
+            )
             stats += [s]
             controllers += [c]
 
@@ -1102,18 +1223,25 @@ class FaultStats:
         dat = self.load()
 
         # make a header
-        print('  run  | bit | node | iter |  e_ex^*  |   e_ex   |  e_em^*  |   e_em   |   diff*  |   diff   | e_glob^* \
-|  e_glob  ')
-        print('-------+-----+------+------+----------+----------+----------+----------+----------+----------+----------\
-+----------')
+        print(
+            '  run  | bit | node | iter |  e_ex^*  |   e_ex   |  e_em^*  |   e_em   |   diff*  |   diff   | e_glob^* \
+|  e_glob  '
+        )
+        print(
+            '-------+-----+------+------+----------+----------+----------+----------+----------+----------+----------\
++----------'
+        )
         for i in index:
             e_em, e_ex, e_glob = self.analyse_HotRod_single(int(i))
-            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_ex[1]:.2e}\
+            print(
+                f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_ex[1]:.2e}\
  | {e_ex[0]:.2e} | {e_em[1]:.2e} | {e_em[0]:.2e} | {abs(e_em[1]-e_ex[1]):.2e} | {abs(e_em[0]-e_ex[0]):.2e} | \
-{e_glob[1]:.2e} | {e_glob[0]:.2e}')
+{e_glob[1]:.2e} | {e_glob[0]:.2e}'
+            )
 
-        tol = HotRodStrategy().get_custom_description(self.prob, self.num_procs)[
-            'convergence_controllers'][HotRod]['HotRod_tol']
+        tol = HotRodStrategy().get_custom_description(self.prob, self.num_procs)['convergence_controllers'][HotRod][
+            'HotRod_tol'
+        ]
         print(f'We only restart when diff > tol = {tol:.2e}!')
         return None
 
@@ -1133,8 +1261,7 @@ class FaultStats:
         stats = []
         controllers = []
         for faults in [True, False]:
-            s, c, _ = self.single_run(strategy=HotRodStrategy(), run=run, faults=faults,
-                                      hook_class=log_all_iterates)
+            s, c, _ = self.single_run(strategy=HotRodStrategy(), run=run, faults=faults, hook_class=log_all_iterates)
             stats += [s]
             controllers += [c]
 
@@ -1169,8 +1296,10 @@ class FaultStats:
         print('  run  | bit | node | iter | space pos')
         print('-------+-----+------+------+-----------')
         for i in index:
-            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | \
-{dat["problem_pos"][i]}')
+            print(
+                f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | \
+{dat["problem_pos"][i]}'
+            )
 
         return None
 
@@ -1396,8 +1525,9 @@ class FaultStats:
         else:
             return None, None, 0
 
-    def bar_plot_thing(self, x=None, thing=None, ax=None, mask=None, store=False, faults=False, name=None, op=None,
-                       args=None):
+    def bar_plot_thing(
+        self, x=None, thing=None, ax=None, mask=None, store=False, faults=False, name=None, op=None, args=None
+    ):
         '''
         Make a bar plot about something!
 
@@ -1456,25 +1586,48 @@ class FaultStats:
 
 
 def main():
-    stats_analyser = FaultStats(prob=run_vdp, strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(),
-                                HotRodStrategy()], faults=[False, True], reload=True, recovery_thresh=1.1,
-                                num_procs=1, mode='combination')
+    stats_analyser = FaultStats(
+        prob=run_vdp,
+        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        faults=[False, True],
+        reload=True,
+        recovery_thresh=1.1,
+        num_procs=1,
+        mode='combination',
+    )
 
     stats_analyser.run_stats_generation(runs=5000, step=50)
     mask = None
 
-    stats_analyser.plot_things_per_things('recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask,
-                                          args={'ylabel': 'recovery rate'})
-    stats_analyser.plot_things_per_things('recovered', 'iteration', False, op=stats_analyser.rec_rate, mask=mask,
-                                          args={'ylabel': 'recovery rate'})
-    stats_analyser.plot_things_per_things('recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask,
-                                          args={'ylabel': 'recovery rate'})
-    stats_analyser.plot_things_per_things('total_iteration', 'bit', True, op=stats_analyser.mean, mask=mask,
-                                          args={'yscale': 'log', 'ylabel': 'total iterations'})
-    stats_analyser.plot_things_per_things('total_iteration', 'bit', True, op=stats_analyser.extra_mean, mask=mask,
-                                          args={'yscale': 'linear', 'ylabel': 'extra iterations'}, name='extra_iter')
-    stats_analyser.plot_things_per_things('error', 'bit', True, op=stats_analyser.mean, mask=mask,
-                                          args={'yscale': 'log'})
+    stats_analyser.plot_things_per_things(
+        'recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
+    )
+    stats_analyser.plot_things_per_things(
+        'recovered', 'iteration', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
+    )
+    stats_analyser.plot_things_per_things(
+        'recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
+    )
+    stats_analyser.plot_things_per_things(
+        'total_iteration',
+        'bit',
+        True,
+        op=stats_analyser.mean,
+        mask=mask,
+        args={'yscale': 'log', 'ylabel': 'total iterations'},
+    )
+    stats_analyser.plot_things_per_things(
+        'total_iteration',
+        'bit',
+        True,
+        op=stats_analyser.extra_mean,
+        mask=mask,
+        args={'yscale': 'linear', 'ylabel': 'extra iterations'},
+        name='extra_iter',
+    )
+    stats_analyser.plot_things_per_things(
+        'error', 'bit', True, op=stats_analyser.mean, mask=mask, args={'yscale': 'log'}
+    )
 
     stats_analyser.plot_recovery_thresholds()
     stats_analyser.compare_strategies()

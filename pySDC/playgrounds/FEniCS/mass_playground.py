@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pySDC.helpers.plot_helper as plt_helper
 
 import pylustrator
+
 # pylustrator.start()
 
 
@@ -48,8 +49,10 @@ plt_helper.setup_mpl()
 
 plt_helper.newfig(240, 1, ratio=0.8)
 plt_helper.plt.plot(abs(fw2), lw=2, label=f'N = {N} \n degree = {d} \n wave number = {k}')
-plt_helper.plt.xticks([0, ndofs / 4 - 1, ndofs / 2 - 1, 3 * ndofs / 4 - 1, ndofs - 1],
-                      (r'-$\pi$', r'-$\pi/2$', r'$0$', r'+$\pi$/2', r'+$\pi$'))
+plt_helper.plt.xticks(
+    [0, ndofs / 4 - 1, ndofs / 2 - 1, 3 * ndofs / 4 - 1, ndofs - 1],
+    (r'-$\pi$', r'-$\pi/2$', r'$0$', r'+$\pi$/2', r'+$\pi$'),
+)
 plt_helper.plt.xlabel('spectrum')
 plt_helper.plt.ylabel('normed amplitude')
 # plt_helper.plt.legend()
@@ -60,8 +63,10 @@ plt_helper.savefig('spectrum_noM_CG')
 
 plt_helper.newfig(240, 1, ratio=0.8)
 plt_helper.plt.plot(abs(fMw2), lw=2, label=f'N = {N} \n degree = {d} \n wave number = {k}')
-plt_helper.plt.xticks([0, ndofs / 4 - 1, ndofs / 2 - 1, 3 * ndofs / 4 - 1, ndofs - 1],
-                      (r'-$\pi$', r'-$\pi/2$', r'$0$', r'+$\pi$/2', r'+$\pi$'))
+plt_helper.plt.xticks(
+    [0, ndofs / 4 - 1, ndofs / 2 - 1, 3 * ndofs / 4 - 1, ndofs - 1],
+    (r'-$\pi$', r'-$\pi/2$', r'$0$', r'+$\pi$/2', r'+$\pi$'),
+)
 plt_helper.plt.xlabel('spectrum')
 plt_helper.plt.ylabel('normed amplitude')
 # plt_helper.plt.legend()
@@ -71,4 +76,3 @@ plt_helper.savefig('spectrum_M_CG')
 # plt_helper.savefig('spectrum_M_DG_8')
 
 # plt.show()
-

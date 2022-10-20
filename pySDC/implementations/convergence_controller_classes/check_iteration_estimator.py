@@ -126,15 +126,11 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
 
             # estimate how many more iterations we need for this step to converge to the desired tolerance
             alpha = 1 / (1 - self.buffers.Ltilde_loc) * self.status.diff_first_loc[slot]
-            self.buffers.Kest_loc = (
-                np.log(self.params.errtol / alpha)
-                / np.log(self.buffers.Ltilde_loc)
-                * 1.05
-            )
+            self.buffers.Kest_loc = np.log(self.params.errtol / alpha) / np.log(self.buffers.Ltilde_loc) * 1.05
             self.logger.debug(
-                f"LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(self.buffers.Kest_loc))}, "
-                f"{self.buffers.Ltilde_loc:8.6e}, {self.buffers.Kest_loc:8.6e}, \
-{self.buffers.Ltilde_loc ** S.status.iter * alpha:8.6e}"
+                f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(self.buffers.Kest_loc))}, '
+                f'{self.buffers.Ltilde_loc:8.6e}, {self.buffers.Kest_loc:8.6e}, \
+{self.buffers.Ltilde_loc ** S.status.iter * alpha:8.6e}'
             )
 
             # set global Kest as last local one, force stop if done

@@ -2,7 +2,6 @@ from pySDC.core.Hooks import hooks
 
 
 class hamiltonian_and_energy_output(hooks):
-
     def __init__(self):
         """
         Initialization of particles output
@@ -37,14 +36,35 @@ class hamiltonian_and_energy_output(hooks):
         H = P.eval_hamiltonian(L.uend)
         E = P.eval_mode_energy(L.uend)
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='hamiltonian', value=H)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='hamiltonian',
+            value=H,
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='err_hamiltonian', value=abs(self.ham_init - H))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='err_hamiltonian',
+            value=abs(self.ham_init - H),
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='energy_iter', value=E)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='energy_iter',
+            value=E,
+        )
 
         return None
 
@@ -64,10 +84,24 @@ class hamiltonian_and_energy_output(hooks):
 
         E = P.eval_mode_energy(L.uend)
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='position', value=L.uend.pos)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='position',
+            value=L.uend.pos,
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='energy_step', value=E)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='energy_step',
+            value=E,
+        )
 
         return None

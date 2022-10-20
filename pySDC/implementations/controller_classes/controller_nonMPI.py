@@ -71,8 +71,9 @@ class controller_nonMPI(controller):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
         if self.nlevels == 1 and self.params.predict_type is not None:
-            self.logger.warning('you have specified a predictor type but only a single level.. '
-                                'predictor will be ignored')
+            self.logger.warning(
+                'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
+            )
 
         self.add_convergence_controller(BasicRestartingNonMPI, description)
 
@@ -214,36 +215,71 @@ class controller_nonMPI(controller):
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
 
-    @staticmethod
-    def recv(target, source, tag=None):
+    def send_full(self, S, level=None, add_to_stats=False):
         """
-        Receive function
+        Function to perform the send, including bookkeeping and logging
 
         Args:
-            target: level which will receive the values
-            source: level which initiated the send
-            tag: identifier to check if this message is really for me
+            S: the current step
+            level: the level number
+            add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
 
-        if tag is not None and source.tag != tag:
-            raise CommunicationError('source and target tag are not the same, got %s and %s' % (source.tag, tag))
-        # simply do a deepcopy of the values uend to become the new u0 at the target
-        target.u[0] = target.prob.dtype_u(source.uend)
-        # re-evaluate f on left interval boundary
-        target.f[0] = target.prob.eval_f(target.u[0], target.time)
+        def send(source, tag):
+            """
+            Send function
 
-    @staticmethod
-    def send(source, tag):
+            Args:
+                source: level which has the new values
+                tag: identifier for this message
+            """
+            # sending here means computing uend ("one-sided communication")
+            source.sweep.compute_end_point()
+            source.tag = cp.deepcopy(tag)
+
+        self.hooks.pre_comm(step=S, level_number=level)
+        if not S.status.last:
+            self.logger.debug(
+                'Process %2i provides data on level %2i with tag %s' % (S.status.slot, level, S.status.iter)
+            )
+            send(S.levels[level], tag=(level, S.status.iter, S.status.slot))
+        self.hooks.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
+
+    def recv_full(self, S, level=None, add_to_stats=False):
         """
-        Send function
+        Function to perform the recv, including bookkeeping and logging
 
         Args:
-            source: level which has the new values
-            tag: identifier for this message
+            S: the current step
+            level: the level number
+            add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
-        # sending here means computing uend ("one-sided communication")
-        source.sweep.compute_end_point()
-        source.tag = cp.deepcopy(tag)
+
+        def recv(target, source, tag=None):
+            """
+            Receive function
+
+            Args:
+                target: level which will receive the values
+                source: level which initiated the send
+                tag: identifier to check if this message is really for me
+            """
+
+            if tag is not None and source.tag != tag:
+                raise CommunicationError('source and target tag are not the same, got %s and %s' % (source.tag, tag))
+            # simply do a deepcopy of the values uend to become the new u0 at the target
+            target.u[0] = target.prob.dtype_u(source.uend)
+            # re-evaluate f on left interval boundary
+            target.f[0] = target.prob.eval_f(target.u[0], target.time)
+
+        self.hooks.pre_comm(step=S, level_number=level)
+        if not S.status.prev_done and not S.status.first:
+            self.logger.debug(
+                'Process %2i receives from %2i on level %2i with tag %s'
+                % (S.status.slot, S.prev.status.slot, level, S.status.iter)
+            )
+            recv(S.levels[level], S.prev.levels[level], tag=(level, S.status.iter, S.prev.status.slot))
+        self.hooks.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
 
     def pfasst(self, local_MS_active):
         """
@@ -275,7 +311,7 @@ class controller_nonMPI(controller):
             'IT_FINE': self.it_fine,
             'IT_DOWN': self.it_down,
             'IT_COARSE': self.it_coarse,
-            'IT_UP': self.it_up
+            'IT_UP': self.it_up,
         }
 
         switcher.get(stage, self.default)(MS_running)
@@ -391,23 +427,14 @@ class controller_nonMPI(controller):
                     # do the sweep with new values
                     S.levels[-1].sweep.update_nodes()
 
-                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                     # send updated values on coarsest level
-                    self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
-                                      % (S.status.slot, len(S.levels) - 1, 0))
-                    self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
-                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
+                    self.send_full(S, level=len(S.levels) - 1)
 
                 # loop over last steps: [2,3,4], [3,4], [4]
                 for p in range(q + 1, len(local_MS_running)):
                     S = local_MS_running[p]
                     # receive values sent during previous sweep
-                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
-                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
-                    self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
-                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1,
-                                         add_to_stats=(p == len(local_MS_running) - 1))
+                    self.recv_full(S, level=len(S.levels) - 1, add_to_stats=(p == len(local_MS_running) - 1))
 
             # loop over all steps
             for S in local_MS_running:
@@ -417,18 +444,9 @@ class controller_nonMPI(controller):
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
                 # send updated values forward
-                self.hooks.pre_comm(step=S, level_number=0)
-                if not S.status.last:
-                    self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                      % (S.status.slot, 0, S.status.iter))
-                    self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
-
+                self.send_full(S, level=0)
                 # receive values
-                if not S.status.prev_done and not S.status.first:
-                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                      (S.status.slot, S.prev.status.slot, 0, S.status.iter))
-                    self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
-                self.hooks.post_comm(step=S, level_number=0)
+                self.recv_full(S, level=0)
 
             # end this with a fine sweep
             for S in local_MS_running:
@@ -459,18 +477,11 @@ class controller_nonMPI(controller):
         for S in local_MS_running:
 
             # send updated values forward
-            self.hooks.pre_comm(step=S, level_number=0)
-            if not S.status.last:
-                self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                  % (S.status.slot, 0, S.status.iter))
-                self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
-
+            self.send_full(S, level=0)
             # receive values
-            if not S.status.prev_done and not S.status.first:
-                self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                  (S.status.slot, S.prev.status.slot, 0, S.status.iter))
-                self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
-            self.hooks.post_comm(step=S, level_number=0)
+            self.recv_full(S, level=0)
+            # compute current residual
+            S.levels[0].sweep.compute_residual()
 
         for S in local_MS_running:
 
@@ -532,18 +543,9 @@ class controller_nonMPI(controller):
 
             for S in local_MS_running:
                 # send updated values forward
-                self.hooks.pre_comm(step=S, level_number=0)
-                if not S.status.last:
-                    self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                      % (S.status.slot, 0, S.status.iter))
-                    self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
-
-                # # receive values
-                if not S.status.prev_done and not S.status.first:
-                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                      (S.status.slot, S.prev.status.slot, 0, S.status.iter))
-                    self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
-                self.hooks.post_comm(step=S, level_number=0, add_to_stats=(k == self.nsweeps[0] - 1))
+                self.send_full(S, level=0)
+                # receive values
+                self.recv_full(S, level=0, add_to_stats=(k == self.nsweeps[0] - 1))
 
             for S in local_MS_running:
                 # standard sweep workflow: update nodes, compute residual, log progress
@@ -576,18 +578,9 @@ class controller_nonMPI(controller):
                 for S in local_MS_running:
 
                     # send updated values forward
-                    self.hooks.pre_comm(step=S, level_number=l)
-                    if not S.status.last:
-                        self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                          % (S.status.slot, l, S.status.iter))
-                        self.send(S.levels[l], tag=(l, S.status.iter, S.status.slot))
-
-                    # # receive values
-                    if not S.status.prev_done and not S.status.first:
-                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                          (S.status.slot, S.prev.status.slot, l, S.status.iter))
-                        self.recv(S.levels[l], S.prev.levels[l], tag=(l, S.status.iter, S.prev.status.slot))
-                    self.hooks.post_comm(step=S, level_number=l)
+                    self.send_full(S, level=l)
+                    # receive values
+                    self.recv_full(S, level=l)
 
                 for S in local_MS_running:
                     self.hooks.pre_sweep(step=S, level_number=l)
@@ -614,12 +607,7 @@ class controller_nonMPI(controller):
         for S in local_MS_running:
 
             # receive from previous step (if not first)
-            self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-            if not S.status.first and not S.status.prev_done:
-                self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                  (S.status.slot, S.prev.status.slot, len(S.levels) - 1, S.status.iter))
-                self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), S.status.iter, S.prev.status.slot))
-            self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
+            self.recv_full(S, level=len(S.levels) - 1)
 
             # do the sweep
             self.hooks.pre_sweep(step=S, level_number=len(S.levels) - 1)
@@ -628,12 +616,7 @@ class controller_nonMPI(controller):
             self.hooks.post_sweep(step=S, level_number=len(S.levels) - 1)
 
             # send to succ step
-            self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-            if not S.status.last:
-                self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                  % (S.status.slot, len(S.levels) - 1, S.status.iter))
-                self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
-            self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=True)
+            self.send_full(S, level=len(S.levels) - 1, add_to_stats=True)
 
             # update stage
             if len(S.levels) > 1:  # MLSDC or PFASST
@@ -663,20 +646,9 @@ class controller_nonMPI(controller):
                     for S in local_MS_running:
 
                         # send updated values forward
-                        self.hooks.pre_comm(step=S, level_number=l - 1)
-                        if not S.status.last:
-                            self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                              % (S.status.slot, l - 1, S.status.iter))
-                            self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
-
-                        # # receive values
-                        if not S.status.prev_done and not S.status.first:
-                            self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                              (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
-                            self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
-                                                                                  S.prev.status.slot))
-                        self.hooks.post_comm(step=S, level_number=l - 1,
-                                             add_to_stats=(k == self.nsweeps[l - 1] - 1))
+                        self.send_full(S, level=l - 1)
+                        # receive values
+                        self.recv_full(S, level=l - 1, add_to_stats=(k == self.nsweeps[l - 1] - 1))
 
                     for S in local_MS_running:
                         self.hooks.pre_sweep(step=S, level_number=l - 1)
