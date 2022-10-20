@@ -44,11 +44,7 @@ class CheckConvergence(ConvergenceController):
 
         # get residual and check against prescribed tolerance (plus check number of iterations
         res = L.status.residual
-        converged = (
-            S.status.iter >= S.params.maxiter
-            or res <= L.params.restol
-            or S.status.force_done
-        )
+        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
         if converged is not None:
             S.status.done = converged
 

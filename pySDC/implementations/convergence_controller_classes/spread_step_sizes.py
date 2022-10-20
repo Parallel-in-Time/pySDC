@@ -36,9 +36,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
     Non-MPI version
     """
 
-    def prepare_next_block_nonMPI(
-        self, controller, MS, active_slots, time, Tend, **kwargs
-    ):
+    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend, **kwargs):
         """
         Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based
         on Tend

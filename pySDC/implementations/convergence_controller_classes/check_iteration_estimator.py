@@ -13,9 +13,7 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         """
-        super(CheckIterationEstimatorNonMPI, self).__init__(
-            controller, params, description
-        )
+        super(CheckIterationEstimatorNonMPI, self).__init__(controller, params, description)
         self.buffers = Status(["Kest_loc", "diff_new", "Ltilde_loc"])
         self.status = Status(["diff_old_loc", "diff_first_loc"])
 
@@ -118,9 +116,7 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
             self.status.diff_first_loc[slot] = self.buffers.diff_new
         elif S.status.iter > 1:
             # approximate contraction factor
-            self.buffers.Ltilde_loc = min(
-                self.buffers.diff_new / self.status.diff_old_loc[slot], 0.9
-            )
+            self.buffers.Ltilde_loc = min(self.buffers.diff_new / self.status.diff_old_loc[slot], 0.9)
 
             self.status.diff_old_loc[slot] = self.buffers.diff_new
 

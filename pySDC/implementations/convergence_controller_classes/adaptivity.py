@@ -52,16 +52,11 @@ class AdaptivityBase(ConvergenceController):
             None
         """
 
-        if (
-            "dt_min" in self.params.__dict__.keys()
-            or "dt_max" in self.params.__dict__.keys()
-        ):
+        if "dt_min" in self.params.__dict__.keys() or "dt_max" in self.params.__dict__.keys():
             step_limiter_params = dict()
             step_limiter_params["dt_min"] = self.params.__dict__.get("dt_min", 0)
             step_limiter_params["dt_max"] = self.params.__dict__.get("dt_max", np.inf)
-            controller.add_convergence_controller(
-                StepSizeLimiter, params=step_limiter_params, description=description
-            )
+            controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
 
         return None
 
@@ -126,9 +121,7 @@ class AdaptivityBase(ConvergenceController):
             e_est = self.get_local_error_estimate(controller, S)
             if e_est >= self.params.e_tol:
                 S.status.restart = True
-                self.log(
-                    f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S
-                )
+                self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
 
         return None
 
@@ -155,13 +148,9 @@ class Adaptivity(AdaptivityBase):
         """
         super(Adaptivity, self).dependencies(controller, description)
         if type(controller) == controller_nonMPI:
-            controller.add_convergence_controller(
-                EstimateEmbeddedErrorNonMPI, description=description
-            )
+            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
         else:
-            raise NotImplementedError(
-                "I only have an implementation of the embedded error for non MPI versions"
-            )
+            raise NotImplementedError("I only have an implementation of the embedded error for non MPI versions")
         return None
 
     def check_parameters(self, controller, params, description, **kwargs):
@@ -266,9 +255,7 @@ class AdaptivityRK(Adaptivity):
 description['convergence_control_params']['update_order']!",
             )
 
-        return super(AdaptivityRK, self).check_parameters(
-            controller, params, description
-        )
+        return super(AdaptivityRK, self).check_parameters(controller, params, description)
 
     def get_new_step_size(self, controller, S, **kwargs):
         """
@@ -344,14 +331,10 @@ class AdaptivityResidual(AdaptivityBase):
         """
         if self.params.max_restarts is not None:
             conv_controllers = controller.convergence_controllers
-            restart_cont = [
-                me for me in conv_controllers if type(me) == BasicRestartingNonMPI
-            ]
+            restart_cont = [me for me in conv_controllers if type(me) == BasicRestartingNonMPI]
 
             if len(restart_cont) == 0:
-                raise NotImplementedError(
-                    "Please implement override of maximum number of restarts!"
-                )
+                raise NotImplementedError("Please implement override of maximum number of restarts!")
 
             restart_cont[0].params.max_restarts = self.params.max_restarts
         return None

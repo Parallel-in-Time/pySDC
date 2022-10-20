@@ -112,10 +112,7 @@ smaller than 0!",
                 L.status.error_extrapolation_estimate,
                 L.status.error_embedded_estimate,
             ]:
-                diff = abs(
-                    L.status.error_extrapolation_estimate
-                    - L.status.error_embedded_estimate
-                )
+                diff = abs(L.status.error_extrapolation_estimate - L.status.error_embedded_estimate)
                 if diff > self.params.HotRod_tol:
                     S.status.restart = True
                     self.log(

@@ -290,3 +290,50 @@ class ConvergenceController(object):
             S (pySDC.Step): The current step
         """
         pass
+
+    def send(self, comm, dest, data, blocking=False, **kwargs):
+        """
+        Send data to a different rank
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            dest (int): The target rank
+            data: Data to be sent
+            blocking (bool): Whether the communication is blocking or not
+
+        Returns:
+            request handle of the communication
+        """
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates send to step {dest}')
+
+        if blocking:
+            req = comm.send(data, dest=dest, **kwargs)
+        else:
+            req = comm.isend(data, dest=dest, **kwargs)
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} leaves send to step {dest}')
+
+        return req
+
+    def recv(self, comm, source, **kwargs):
+        """
+        Receive some data
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            source (int): Where to look for receiving
+
+        Returns:
+            whatever has been received
+        """
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates receive from step {source}')
+
+        data = comm.recv(source=source, **kwargs)
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} leaves receive from step {source}')
+
+        return data

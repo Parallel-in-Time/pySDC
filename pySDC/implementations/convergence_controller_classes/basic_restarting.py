@@ -62,9 +62,7 @@ class BasicRestartingBase(ConvergenceController):
         Returns:
             None
         """
-        controller.add_convergence_controller(
-            self.params.step_size_spreader, description=description
-        )
+        controller.add_convergence_controller(self.params.step_size_spreader, description=description)
         return None
 
     def determine_restart(self, controller, S, **kwargs):
@@ -79,9 +77,7 @@ class BasicRestartingBase(ConvergenceController):
         Returns:
             None
         """
-        raise NotImplementedError(
-            "Please implement a function to determine if we need a restart here!"
-        )
+        raise NotImplementedError("Please implement a function to determine if we need a restart here!")
 
     def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
         """
@@ -97,9 +93,7 @@ class BasicRestartingBase(ConvergenceController):
         Returns:
             None
         """
-        S.status.restarts_in_a_row = (
-            S.status.restarts_in_a_row + 1 if S.status.restart else 0
-        )
+        S.status.restarts_in_a_row = S.status.restarts_in_a_row + 1 if S.status.restart else 0
 
         return None
 
@@ -166,9 +160,7 @@ class BasicRestartingNonMPI(BasicRestartingBase):
         """
         # check if we performed too many restarts
         if S.status.first:
-            self.buffers.max_restart_reached = (
-                S.status.restarts_in_a_row >= self.params.max_restarts
-            )
+            self.buffers.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
             if self.buffers.max_restart_reached and S.status.restart:
                 self.log(
                     f"Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
@@ -177,9 +169,7 @@ on...",
                 )
 
         self.buffers.restart = S.status.restart or self.buffers.restart
-        S.status.restart = (
-            S.status.restart or self.buffers.restart
-        ) and not self.buffers.max_restart_reached
+        S.status.restart = (S.status.restart or self.buffers.restart) and not self.buffers.max_restart_reached
 
         return None
 

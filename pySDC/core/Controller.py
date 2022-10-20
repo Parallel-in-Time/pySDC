@@ -295,8 +295,8 @@ class controller(object):
         '''
         This function is for debugging purposes to keep track of the different convergence controllers and their order.
         '''
-        print('    | order | convergence controller')
-        print('----+-------+-------------------------------------------------------------------')
+        print('    | order | convergence controller', flush=True)
+        print('----+-------+-------------------------------------------------------------------', flush=True)
         for i in range(len(self.convergence_controllers)):
             C = self.convergence_controllers[self.convergence_controller_order[i]]
-            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}')
+            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}', flush=True)

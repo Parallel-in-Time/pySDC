@@ -116,9 +116,7 @@ level"
         if S.status.iter > 1 or self.params.sweeper_type == "RK":
             for L in S.levels:
                 temp = self.estimate_embedded_error_serial(L)
-                L.status.error_embedded_estimate = max(
-                    [abs(temp - self.buffers.e_em_last), np.finfo(float).eps]
-                )
+                L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
             self.buffers.e_em_last = temp * 1.0
 

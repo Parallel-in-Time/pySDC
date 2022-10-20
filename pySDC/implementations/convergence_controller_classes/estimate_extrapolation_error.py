@@ -24,15 +24,9 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
             params (dict): The params passed for this specific convergence controller
             description (dict): The description object used to instantiate the controller
         """
-        self.prev = Status(
-            ["t", "u", "f", "dt"]
-        )  # store solutions etc. of previous steps here
-        self.coeff = Status(
-            ["u", "f", "prefactor"]
-        )  # store coefficients for extrapolation here
-        super(EstimateExtrapolationErrorBase, self).__init__(
-            controller, params, description
-        )
+        self.prev = Status(["t", "u", "f", "dt"])  # store solutions etc. of previous steps here
+        self.coeff = Status(["u", "f", "prefactor"])  # store coefficients for extrapolation here
+        super(EstimateExtrapolationErrorBase, self).__init__(controller, params, description)
 
     def setup(self, controller, params, description, **kwargs):
         """
@@ -56,15 +50,8 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
 
         default_params = {
             "control_order": -75,
-            "use_adaptivity": any(
-                [
-                    me == Adaptivity
-                    for me in description.get("convergence_controllers", {})
-                ]
-            ),
-            "use_HotRod": any(
-                [me == HotRod for me in description.get("convergence_controllers", {})]
-            ),
+            "use_adaptivity": any([me == Adaptivity for me in description.get("convergence_controllers", {})]),
+            "use_HotRod": any([me == HotRod for me in description.get("convergence_controllers", {})]),
             "order_time_marching": description["step_params"]["maxiter"],
         }
 
@@ -74,9 +61,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         new_params["Taylor_order"] = new_params["order_time_marching"] + 2
 
         # Estimate and store values from this iteration
-        new_params["estimate_iter"] = new_params["order_time_marching"] - (
-            1 if new_params["use_HotRod"] else 0
-        )
+        new_params["estimate_iter"] = new_params["order_time_marching"] - (1 if new_params["use_HotRod"] else 0)
 
         # Store n values. Since we store u and f, we need only half of each (the +1 is for rounding)
         new_params["n"] = (new_params["Taylor_order"] + 1) // 2
@@ -255,9 +240,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         Returns:
             dict: Updated parameters with default values
         """
-        default_params = super(EstimateExtrapolationErrorNonMPI, self).setup(
-            controller, params, description
-        )
+        default_params = super(EstimateExtrapolationErrorNonMPI, self).setup(controller, params, description)
 
         non_mpi_defaults = {
             "no_storage": False,
@@ -319,9 +302,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return None
 
-    def prepare_next_block_nonMPI(
-        self, controller, MS, active_slots, time, Tend, **kwargs
-    ):
+    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend, **kwargs):
         """
         If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available. Otherwise, we
         need to store all the stuff that we can.
@@ -347,9 +328,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             # decide where we need to restart to store everything up to that point
             MS_active = [MS[i] for i in range(len(MS)) if i in active_slots]
             restarts = [S.status.restart for S in MS_active]
-            restart_at = (
-                np.where(restarts)[0][0] if True in restarts else len(MS_active)
-            )
+            restart_at = np.where(restarts)[0][0] if True in restarts else len(MS_active)
 
             # store values in the current block that don't need restarting
             if restart_at > 0:
@@ -368,9 +347,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             dtype_u: The extrapolated solution
         """
         if len(S.levels) > 1:
-            raise NotImplementedError(
-                "Extrapolated estimate only works on the finest level for now"
-            )
+            raise NotImplementedError("Extrapolated estimate only works on the finest level for now")
 
         # prepare variables
         u_ex = S.levels[0].u[-1] * 0.0
@@ -387,10 +364,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         # do the extrapolation by summing everything up
         for i in range(self.params.n):
-            u_ex += (
-                self.coeff.u[i] * self.prev.u[idx[mask][i]]
-                + self.coeff.f[i] * self.prev.f[idx[mask][i]]
-            )
+            u_ex += self.coeff.u[i] * self.prev.u[idx[mask][i]] + self.coeff.f[i] * self.prev.f[idx[mask][i]]
 
         return u_ex
 
@@ -407,9 +381,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         """
         u_ex = self.get_extrapolated_solution(S)
         if u_ex is not None:
-            S.levels[0].status.error_extrapolation_estimate = (
-                abs(u_ex - S.levels[0].u[-1]) * self.coeff.prefactor
-            )
+            S.levels[0].status.error_extrapolation_estimate = abs(u_ex - S.levels[0].u[-1]) * self.coeff.prefactor
         else:
             S.levels[0].status.error_extrapolation_estimate = None
 
