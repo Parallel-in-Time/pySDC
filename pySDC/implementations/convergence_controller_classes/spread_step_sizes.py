@@ -3,17 +3,17 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 
 class SpreadStepSizesBlockwiseBase(ConvergenceController):
-    '''
+    """
     Take the step size from the last step in the block and spread it to all steps in the next block such that every step
     in a block always has the same step size.
     By block we refer to a composite collocation problem, which is solved in pipelined SDC parallel-in-time.
 
     Also, we overrule the step size control here, if we get close to the final time and we would take too large of a
     step otherwise.
-    '''
+    """
 
     def setup(self, controller, params, description, **kwargs):
-        '''
+        """
         Define parameters here
 
         Args:
@@ -23,9 +23,9 @@ class SpreadStepSizesBlockwiseBase(ConvergenceController):
 
         Returns:
             (dict): The updated params dictionary
-        '''
+        """
         defaults = {
-            'control_order': +100,
+            "control_order": +100,
         }
 
         return {**defaults, **params}
@@ -36,7 +36,9 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
     Non-MPI version
     """
 
-    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend, **kwargs):
+    def prepare_next_block_nonMPI(
+        self, controller, MS, active_slots, time, Tend, **kwargs
+    ):
         """
         Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based
         on Tend
@@ -66,8 +68,12 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
         for i in range(len(MS[restart_at].levels)):
             l = MS[restart_at].levels[i]
             # overrule the step size control to reach Tend if needed
-            new_steps[i] = min([l.status.dt_new if l.status.dt_new is not None else l.params.dt,
-                                max([dt_max, l.params.dt_initial])])
+            new_steps[i] = min(
+                [
+                    l.status.dt_new if l.status.dt_new is not None else l.params.dt,
+                    max([dt_max, l.params.dt_initial]),
+                ]
+            )
 
         for p in active_slots:
             # spread the step sizes to all levels

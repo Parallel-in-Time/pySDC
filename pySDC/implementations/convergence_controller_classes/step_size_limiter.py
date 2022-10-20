@@ -10,7 +10,7 @@ class StepSizeLimiter(ConvergenceController):
     """
 
     def setup(self, controller, params, description, **kwargs):
-        '''
+        """
         Define parameters here
 
         Args:
@@ -20,11 +20,11 @@ class StepSizeLimiter(ConvergenceController):
 
         Returns:
             (dict): The updated params dictionary
-        '''
-        return {'control_order': +92, 'dt_min': 0, 'dt_max': np.inf, **params}
+        """
+        return {"control_order": +92, "dt_min": 0, "dt_max": np.inf, **params}
 
     def get_new_step_size(self, controller, S, **kwargs):
-        '''
+        """
         Enforce an upper and lower limit to the step size here
 
         Args:
@@ -33,16 +33,22 @@ class StepSizeLimiter(ConvergenceController):
 
         Returns:
             None
-        '''
+        """
         for L in S.levels:
             if L.status.dt_new is not None:
                 if L.status.dt_new < self.params.dt_min:
-                    self.log(f'Step size is below minimum, increasing from {L.status.dt_new:.2e} to \
-{self.params.dt_min:.2e}', S)
+                    self.log(
+                        f"Step size is below minimum, increasing from {L.status.dt_new:.2e} to \
+{self.params.dt_min:.2e}",
+                        S,
+                    )
                     L.status.dt_new = self.params.dt_min
                 elif L.status.dt_new > self.params.dt_max:
-                    self.log(f'Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to \
-{self.params.dt_max:.2e}', S)
+                    self.log(
+                        f"Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to \
+{self.params.dt_max:.2e}",
+                        S,
+                    )
                     L.status.dt_new = self.params.dt_max
 
         return None

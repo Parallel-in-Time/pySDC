@@ -4,16 +4,16 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 
 class CheckConvergence(ConvergenceController):
-    '''
+    """
     Perform simple checks on convergence for SDC iterations.
 
     Iteration is terminated via one of two criteria:
      - Residual tolerance
      - Maximum number of iterations
-    '''
+    """
 
     def setup(self, controller, params, description, **kwargs):
-        '''
+        """
         Define default parameters here
 
         Args:
@@ -23,8 +23,8 @@ class CheckConvergence(ConvergenceController):
 
         Returns:
             (dict): The updated params dictionary
-        '''
-        return {'control_order': +200, **params}
+        """
+        return {"control_order": +200, **params}
 
     def check_iteration_status(self, controller, S, **kwargs):
         """
@@ -44,17 +44,22 @@ class CheckConvergence(ConvergenceController):
 
         # get residual and check against prescribed tolerance (plus check number of iterations
         res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
+        converged = (
+            S.status.iter >= S.params.maxiter
+            or res <= L.params.restol
+            or S.status.force_done
+        )
         if converged is not None:
             S.status.done = converged
 
-        if 'comm' in kwargs.keys():
+        if "comm" in kwargs.keys():
             self.communicate_convergence(controller, S, **kwargs)
 
         return None
 
     def communicate_convergence(self, controller, S, comm):
         from mpi4py import MPI
+
         """
         Communicate the convergence status
 
@@ -84,16 +89,25 @@ class CheckConvergence(ConvergenceController):
                 tmp = np.empty(1, dtype=int)
                 comm.Irecv((tmp, MPI.INT), source=S.prev, tag=99).Wait()
                 S.status.prev_done = tmp
-                self.logger.debug('recv status: status %s, process %s, time %s, source %s, tag %s, iter %s' %
-                                  (S.status.prev_done, S.status.slot, S.time, S.prev,
-                                   99, S.status.iter))
+                self.logger.debug(
+                    "recv status: status %s, process %s, time %s, source %s, tag %s, iter %s"
+                    % (
+                        S.status.prev_done,
+                        S.status.slot,
+                        S.time,
+                        S.prev,
+                        99,
+                        S.status.iter,
+                    )
+                )
                 S.status.done = S.status.done and S.status.prev_done
 
             # send status forward
             if not S.status.last:
-                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (S.status.done, S.status.slot, S.time, S.next,
-                                   99, S.status.iter))
+                self.logger.debug(
+                    "isend status: status %s, process %s, time %s, target %s, tag %s, iter %s"
+                    % (S.status.done, S.status.slot, S.time, S.next, 99, S.status.iter)
+                )
                 tmp = np.array(S.status.done, dtype=int)
                 controller.req_status = comm.Issend((tmp, MPI.INT), dest=S.next, tag=99)
 
