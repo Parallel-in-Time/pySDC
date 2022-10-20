@@ -123,22 +123,21 @@ class controller_MPI(controller):
             while not self.S.status.done:
                 self.pfasst(comm_active, num_procs)
 
-            # TODO: implement restarting of particular steps
-            time += self.S.dt
+            # determine where to restart
+            restarts = comm_active.allgather(self.S.status.restart)
+            restart_at = np.where(restarts)[0][0] if True in restarts else comm_active.size - 1
 
-            # broadcast uend, set new times and fine active processes
-            tend = comm_active.bcast(time, root=num_procs - 1)
-            uend = self.S.levels[0].uend.bcast(root=num_procs - 1, comm=comm_active)
+            # communicate time and solution to be used as next initial conditions
+            if True in restarts:
+                tend = comm_active.bcast(time, root=restart_at)
+                uend = self.S.levels[0].u[0].bcast(root=restart_at, comm=comm_active)
+            else:
+                time += self.S.dt
+                tend = comm_active.bcast(time, root=num_procs - 1)
+                uend = self.S.levels[0].uend.bcast(root=num_procs - 1, comm=comm_active)
+
             all_dt = comm_active.allgather(self.S.dt)
             all_time = [tend + sum(all_dt[0:i]) for i in range(num_procs)]
-            time = all_time[rank]
-            all_active = all_time < Tend - 10 * np.finfo(float).eps
-            active = all_active[rank]
-            if not all(all_active):
-                comm_active = comm_active.Split(active)
-                rank = comm_active.Get_rank()
-                num_procs = comm_active.Get_size()
-                self.S.status.slot = rank
 
             # do convergence controller stuff
             if not self.S.status.restart:
@@ -147,6 +146,15 @@ class controller_MPI(controller):
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.prepare_next_block(self, self.S, self.S.status.time_size, time, Tend)
+
+            time = all_time[rank]
+            all_active = all_time < Tend - 10 * np.finfo(float).eps
+            active = all_active[rank]
+            if not all(all_active):
+                comm_active = comm_active.Split(active)
+                rank = comm_active.Get_rank()
+                num_procs = comm_active.Get_size()
+                self.S.status.slot = rank
 
             # initialize block of steps with u0
             self.restart_block(num_procs, time, uend)
@@ -574,15 +582,17 @@ class controller_MPI(controller):
             self.S.levels[0].sweep.compute_end_point()
 
             if not self.S.status.last:
-                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   0, self.S.status.iter))
+                self.logger.debug(
+                    'isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s'
+                    % (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next, 0, self.S.status.iter)
+                )
                 self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
             if not self.S.status.first and not self.S.status.prev_done:
-                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   0, self.S.status.iter))
+                self.logger.debug(
+                    'recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s'
+                    % (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev, 0, self.S.status.iter)
+                )
                 self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             self.hooks.post_comm(step=self.S, level_number=0)
