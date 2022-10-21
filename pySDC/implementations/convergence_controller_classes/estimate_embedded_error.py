@@ -121,3 +121,40 @@ level"
             self.buffers.e_em_last = temp * 1.0
 
         return None
+
+
+class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
+    def post_iteration_processing(self, controller, S, **kwargs):
+        """
+        Compute embedded error estimate on the last node of each level
+        In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        comm = kwargs['comm']
+
+        if S.status.iter > 1 or self.params.sweeper_type == "RK":
+            for L in S.levels:
+
+                # get accumulated local errors from previous steps
+                if not S.status.first:
+                    e_em_last = self.recv(comm, S.status.slot - 1)
+                else:
+                    e_em_last = 0.0
+
+                # estimate accumulated local error
+                temp = self.estimate_embedded_error_serial(L)
+
+                # estimate local error as difference of accumulated errors
+                L.status.error_embedded_estimate = max([abs(temp - e_em_last), np.finfo(float).eps])
+
+                # send the accumulated local errors forward
+                if not S.status.last:
+                    self.send(comm, dest=S.status.slot + 1, data=temp, blocking=True)
+
+        return None

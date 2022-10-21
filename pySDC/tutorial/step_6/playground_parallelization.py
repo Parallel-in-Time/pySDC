@@ -4,7 +4,6 @@ from pathlib import Path
 from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import get_sorted
-# from pySDC.implementations.controller_classes.controller_MPIOLD import controller_MPI
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.tutorial.step_6.A_run_non_MPI_controller import set_parameters_ml
 
@@ -18,7 +17,6 @@ if __name__ == "__main__":
 
     # get parameters from Part A
     description, controller_params, t0, Tend = set_parameters_ml()
-    # controller_params['logger_level'] = 10
 
     # instantiate controllers
     controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
@@ -27,7 +25,6 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main functions to get things done...
-    controller.print_convergence_controllers()
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)

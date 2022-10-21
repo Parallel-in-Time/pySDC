@@ -71,7 +71,7 @@ def sort_stats(stats, sortby, comm=None):
         result.append((item, v))
 
     if comm is not None:
-        # gather the results accross all ranks and the flatten the list
+        # gather the results across all ranks and the flatten the list
         result = [item for sub_result in comm.allgather(result) for item in sub_result]
 
     # sort by first element of the tuple (which is the sortby key) and return
@@ -102,6 +102,7 @@ def get_list_of_types(stats):
 def get_sorted(stats, sortby='time', comm=None, **kwargs):
     """
     Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
+    Keyword arguments are passed to `filter_stats` for filtering.
 
     stats (dict): raw statistics from a controller run
     sortby (str): string to specify which key to use for sorting

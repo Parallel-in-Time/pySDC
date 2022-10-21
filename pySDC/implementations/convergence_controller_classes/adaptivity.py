@@ -1,8 +1,5 @@
 import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
-    EstimateEmbeddedErrorNonMPI,
-)
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
     StepSizeLimiter,
 )
@@ -148,9 +145,17 @@ class Adaptivity(AdaptivityBase):
         """
         super(Adaptivity, self).dependencies(controller, description)
         if type(controller) == controller_nonMPI:
+            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
+                EstimateEmbeddedErrorNonMPI,
+            )
+
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
         else:
-            raise NotImplementedError("I only have an implementation of the embedded error for non MPI versions")
+            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
+                EstimateEmbeddedErrorMPI,
+            )
+
+            controller.add_convergence_controller(EstimateEmbeddedErrorMPI, description=description)
         return None
 
     def check_parameters(self, controller, params, description, **kwargs):
