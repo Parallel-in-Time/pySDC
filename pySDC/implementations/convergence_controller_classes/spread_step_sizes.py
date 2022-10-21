@@ -79,4 +79,52 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
 
 
 class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwiseBase):
-    pass
+    def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
+        """
+        Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based
+        on Tend
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.step): The current step
+            size (int): The number of ranks
+            time (list): List containing the time of all the steps
+            Tend (float): Final time of the simulation
+
+        Returns:
+            None
+        """
+        comm = kwargs['comm']
+
+        # figure out where the block is restarted
+        restarts = comm.allgather(S.status.restart)
+        if True in restarts:
+            restart_at = np.where(restarts)[0][0]
+        else:
+            restart_at = len(restarts) - 1
+
+        # Compute the maximum allowed step size based on Tend.
+        dt_max = (Tend - time) / size
+
+        # record the step sizes to restart with from all the levels of the step
+        new_steps = [None] * len(S.levels)
+        if S.status.slot == restart_at:
+            for i in range(len(S.levels)):
+                l = S.levels[i]
+                # overrule the step size control to reach Tend if needed
+                new_steps[i] = min(
+                    [
+                        l.status.dt_new if l.status.dt_new is not None else l.params.dt,
+                        max([dt_max, l.params.dt_initial]),
+                    ]
+                )
+
+                if new_steps[i] < l.status.dt_new if l.status.dt_new is not None else l.params.dt:
+                    self.log(f"Overwriting stepsize control to reach Tend", S)
+        new_steps = comm.bcast(new_steps, root=restart_at)
+
+        # spread the step sizes to all levels
+        for i in range(len(S.levels)):
+            S.levels[i].params.dt = new_steps[i]
+
+        return None
