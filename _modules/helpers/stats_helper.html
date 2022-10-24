@@ -93,13 +93,14 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="sort_stats"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.sort_stats">[docs]</a><span class="k">def</span> <span class="nf">sort_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="p">):</span>
+<div class="viewcode-block" id="sort_stats"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.sort_stats">[docs]</a><span class="k">def</span> <span class="nf">sort_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to transform stats dictionary to sorted list of tuples</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stats (dict): dictionary of statistics</span>
 <span class="sd">        sortby (str): string to specify which key to use for sorting</span>
+<span class="sd">        comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list: list of tuples containing the sortby item and the value</span>
@@ -111,8 +112,14 @@
         <span class="n">item</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">sortby</span><span class="p">)</span>
         <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">item</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
 
+    <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># gather the results across all ranks and the flatten the list</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sub_result</span> <span class="ow">in</span> <span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sub_result</span><span class="p">]</span>
+
     <span class="c1"># sort by first element of the tuple (which is the sortby key) and return</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+    <span class="n">sorted_data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">sorted_data</span></div>
 
 
 <div class="viewcode-block" id="get_list_of_types"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.get_list_of_types">[docs]</a><span class="k">def</span> <span class="nf">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
@@ -134,10 +141,22 @@
     <span class="k">return</span> <span class="n">type_list</span></div>
 
 
-<div class="viewcode-block" id="get_sorted"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.get_sorted">[docs]</a><span class="k">def</span> <span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="get_sorted"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.get_sorted">[docs]</a><span class="k">def</span> <span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.</span>
+<span class="sd">    Keyword arguments are passed to `filter_stats` for filtering.</span>
+
+<span class="sd">    stats (dict): raw statistics from a controller run</span>
+<span class="sd">    sortby (str): string to specify which key to use for sorting</span>
+<span class="sd">    comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of tuples containing the sortby item and the value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">sort_stats</span><span class="p">(</span>
-        <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="n">recomputed</span><span class="p">),</span>
+        <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
         <span class="n">sortby</span><span class="o">=</span><span class="n">sortby</span><span class="p">,</span>
+        <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

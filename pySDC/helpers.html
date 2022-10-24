@@ -149,18 +149,32 @@ step was restarted if True. (Or filter the restarted if False. Use None to get b
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.get_sorted">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">get_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_sorted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">get_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_sorted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
+Keyword arguments are passed to <cite>filter_stats</cite> for filtering.</p>
+<p>stats (dict): raw statistics from a controller run
+sortby (str): string to specify which key to use for sorting
+comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples containing the sortby item and the value</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.sort_stats">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">sort_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#sort_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.sort_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">sort_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#sort_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.sort_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to transform stats dictionary to sorted list of tuples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stats</strong> (<em>dict</em>) – dictionary of statistics</p></li>
 <li><p><strong>sortby</strong> (<em>str</em>) – string to specify which key to use for sorting</p></li>
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator (or None if not applicable)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

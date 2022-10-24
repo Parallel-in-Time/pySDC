@@ -49,28 +49,28 @@
 
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">[docs]</a><span class="k">class</span> <span class="nc">EstimateExtrapolationErrorBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for extrapolated error estimates</span>
 <span class="sd">    ----------------------------------------------------</span>
 <span class="sd">    This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.</span>
 <span class="sd">    In particular, child classes need to implement how to make these solutions available, which works differently for</span>
 <span class="sd">    MPI and non-MPI versions.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            params (dict): The params passed for this specific convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">])</span>  <span class="c1"># store solutions etc. of previous steps here</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;prefactor&#39;</span><span class="p">])</span>  <span class="c1"># store coefficients for extrapolation here</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">])</span>  <span class="c1"># store solutions etc. of previous steps here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;prefactor&quot;</span><span class="p">])</span>  <span class="c1"># store coefficients for extrapolation here</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving</span>
 <span class="sd">        a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are</span>
@@ -86,31 +86,33 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.hotrod</span> <span class="kn">import</span> <span class="n">HotRod</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.adaptivity</span> <span class="kn">import</span> <span class="n">Adaptivity</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.adaptivity</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">Adaptivity</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="n">default_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span>
-            <span class="s1">&#39;use_adaptivity&#39;</span><span class="p">:</span> <span class="nb">any</span><span class="p">([</span><span class="n">me</span> <span class="o">==</span> <span class="n">Adaptivity</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})]),</span>
-            <span class="s1">&#39;use_HotRod&#39;</span><span class="p">:</span> <span class="nb">any</span><span class="p">([</span><span class="n">me</span> <span class="o">==</span> <span class="n">HotRod</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})]),</span>
-            <span class="s1">&#39;order_time_marching&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="s1">&#39;maxiter&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span>
+            <span class="s2">&quot;use_adaptivity&quot;</span><span class="p">:</span> <span class="nb">any</span><span class="p">([</span><span class="n">me</span> <span class="o">==</span> <span class="n">Adaptivity</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;convergence_controllers&quot;</span><span class="p">,</span> <span class="p">{})]),</span>
+            <span class="s2">&quot;use_HotRod&quot;</span><span class="p">:</span> <span class="nb">any</span><span class="p">([</span><span class="n">me</span> <span class="o">==</span> <span class="n">HotRod</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;convergence_controllers&quot;</span><span class="p">,</span> <span class="p">{})]),</span>
+            <span class="s2">&quot;order_time_marching&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">][</span><span class="s2">&quot;maxiter&quot;</span><span class="p">],</span>
         <span class="p">}</span>
 
         <span class="n">new_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">default_params</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span>
 
         <span class="c1"># Do a sufficiently high order Taylor expansion</span>
-        <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;Taylor_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;order_time_marching&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;Taylor_order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;order_time_marching&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span>
 
         <span class="c1"># Estimate and store values from this iteration</span>
-        <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;estimate_iter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;order_time_marching&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;use_HotRod&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;estimate_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;order_time_marching&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;use_HotRod&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># Store n values. Since we store u and f, we need only half of each (the +1 is for rounding)</span>
-        <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;Taylor_order&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
-        <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;n_per_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;Taylor_order&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;n_per_proc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>
 
         <span class="k">return</span> <span class="n">new_params</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize coefficient variables.</span>
 
 <span class="sd">        Args:</span>
@@ -118,13 +120,13 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorBase.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
 
 <span class="sd">        Args:</span>
@@ -135,24 +137,24 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Whether the parameters are compatible</span>
 <span class="sd">            str: Error message</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restol&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;restol&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
-                <span class="s1">&#39;Extrapolation error needs constant order in time and hence restol in the step parameters </span><span class="se">\</span>
-<span class="s1">has to be smaller than 0!&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;Extrapolation error needs constant order in time and hence restol in the step parameters </span><span class="se">\</span>
+<span class="s2">has to be smaller than 0!&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">mssdc_jac</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
-                <span class="s1">&#39;Extrapolation error estimator needs the same order on all steps, please activate Gauss-Seid</span><span class="se">\</span>
-<span class="s1">el multistep mode!&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;Extrapolation error estimator needs the same order on all steps, please activate Gauss-Seid</span><span class="se">\</span>
+<span class="s2">el multistep mode!&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;&#39;</span></div>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorBase.store_values"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values">[docs]</a>    <span class="k">def</span> <span class="nf">store_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.store_values"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values">[docs]</a>    <span class="k">def</span> <span class="nf">store_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the required attributes of the step to do the extrapolation. We only care about the last collocation</span>
 <span class="sd">        node on the finest level at the moment.</span>
@@ -177,8 +179,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">oldest_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Unable to store f from datatype </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s1">, extrapolation based error estimate only</span><span class="se">\</span>
-<span class="s1"> works with types imex_mesh and mesh&#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;Unable to store f from datatype </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2">, extrapolation based error estimate only</span><span class="se">\</span>
+<span class="s2"> works with types imex_mesh and mesh&quot;</span>
             <span class="p">)</span>
 
         <span class="c1"># store the rest of the values</span>
@@ -263,12 +265,12 @@
 
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateExtrapolationErrorNonMPI</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implementation of the extrapolation error estimate for the non-MPI controller.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a no parameter &#39;no_storage&#39; which decides whether the standart or the no-memory-overhead version is run,</span>
 <span class="sd">        where only values are used for extrapolation which are in memory of other processes</span>
 
@@ -279,17 +281,17 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Updated parameters with default values</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">default_params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="n">non_mpi_defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;no_storage&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;no_storage&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">non_mpi_defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">default_params</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize storage variables.</span>
 
 <span class="sd">        Args:</span>
@@ -297,7 +299,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -307,8 +309,8 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        We perform three key operations here in the last iteration:</span>
 <span class="sd">         - Compute the error estimate</span>
 <span class="sd">         - Compute the coefficients if needed</span>
@@ -320,7 +322,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">estimate_iter</span><span class="p">:</span>
             <span class="n">t_eval</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span>
 
@@ -342,8 +344,8 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If the no-memory-overhead version is used, we need to delete stuff that shouldn&#39;t be available. Otherwise, we</span>
 <span class="sd">        need to store all the stuff that we can.</span>
 
@@ -356,7 +358,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># delete values that should not be available in the next step</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -376,8 +378,8 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_solution"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_solution"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine values from previous steps to extrapolate.</span>
 
 <span class="sd">        Args:</span>
@@ -385,9 +387,9 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dtype_u: The extrapolated solution</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Extrapolated estimate only works on the finest level for now&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Extrapolated estimate only works on the finest level for now&quot;</span><span class="p">)</span>
 
         <span class="c1"># prepare variables</span>
         <span class="n">u_ex</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.0</span>
@@ -408,7 +410,7 @@
 
         <span class="k">return</span> <span class="n">u_ex</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolated_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolated_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
 <span class="sd">        solution obtained by the time marching scheme.</span>

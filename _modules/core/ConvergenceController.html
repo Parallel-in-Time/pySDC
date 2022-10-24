@@ -75,7 +75,7 @@
 <span class="sd">    count and time step size.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
@@ -88,9 +88,9 @@
         <span class="n">params_ok</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_parameters</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">params_ok</span><span class="p">,</span> <span class="n">msg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ConvergenceController.log"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.log"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shortcut that has a default level for the logger. 15 is above debug but below info.</span>
 
@@ -119,7 +119,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">params</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.dependencies"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.dependencies"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load dependencies on other convergence controllers here.</span>
 
@@ -132,7 +132,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.check_parameters"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.check_parameters"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
 
@@ -145,9 +145,9 @@
 <span class="sd">            bool: Whether the parameters are compatible</span>
 <span class="sd">            str: The error message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;&#39;</span></div>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.check_iteration_status"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.check_iteration_status">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.check_iteration_status"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.check_iteration_status">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determine whether to keep iterating or not in this function.</span>
 
@@ -160,7 +160,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.get_new_step_size"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.get_new_step_size"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function allows to set a step size with arbitrary criteria.</span>
 <span class="sd">        Make sure to give an order to the convergence controller by setting the `control_order` variable in the params.</span>
@@ -176,7 +176,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.determine_restart"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.determine_restart"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determine for each step separately if it wants to be restarted for whatever reason.</span>
 
@@ -189,7 +189,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.setup_status_variables"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.setup_status_variables"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup status variables.</span>
 <span class="sd">        This is not done at the time of instatiation, since the controller is not fully instantiated at that time and</span>
@@ -199,12 +199,28 @@
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 
-<span class="sd">        Reutrns:</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.reset_buffers_nonMPI"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.reset_buffers"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to</span>
+<span class="sd">        do communication. These can be reset in order to make sure the value was freshly communicated rather than</span>
+<span class="sd">        reused.</span>
+
+<span class="sd">        This function is called both at the end of instantiating the controller, as well as after each iteration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ConvergenceController.reset_buffers_nonMPI"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to</span>
 <span class="sd">        immitate communication in non mpi versions. These have to be reset in order to replicate avalability of</span>
@@ -228,7 +244,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.post_iteration_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.post_iteration_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Do whatever you want to after each iteration here.</span>
 
@@ -241,7 +257,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.post_step_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.post_step_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.post_step_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.post_step_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Do whatever you want to after each step here.</span>
 
@@ -254,7 +270,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.prepare_next_block"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.prepare_next_block"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prepare stuff like spreading step sizes or whatever.</span>
 
@@ -289,7 +305,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.convergence_control"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.convergence_control">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.convergence_control"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.convergence_control">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Call all the functions related to convergence control.</span>
 <span class="sd">        This is called in `it_check` in the controller after every iteration just after `post_iteration_processing`.</span>
@@ -301,13 +317,13 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_new_step_size</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">determine_restart</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_iteration_status</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_new_step_size</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">determine_restart</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_iteration_status</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.post_spread_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.post_spread_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.post_spread_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.post_spread_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function is called at the end of the `SPREAD` stage in the controller</span>
 
@@ -315,7 +331,54 @@
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            S (pySDC.Step): The current step</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ConvergenceController.send"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">blocking</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send data to a different rank</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator</span>
+<span class="sd">            dest (int): The target rank</span>
+<span class="sd">            data: Data to be sent</span>
+<span class="sd">            blocking (bool): Whether the communication is blocking or not</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            request handle of the communication</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># log what&#39;s happening for debug purposes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Step </span><span class="si">{</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="si">}</span><span class="s1"> initiates send to step </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">blocking</span><span class="p">:</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># log what&#39;s happening for debug purposes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Step </span><span class="si">{</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="si">}</span><span class="s1"> leaves send to step </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">req</span></div>
+
+<div class="viewcode-block" id="ConvergenceController.recv"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Receive some data</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator</span>
+<span class="sd">            source (int): Where to look for receiving</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            whatever has been received</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># log what&#39;s happening for debug purposes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Step </span><span class="si">{</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="si">}</span><span class="s1"> initiates receive from step </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># log what&#39;s happening for debug purposes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Step </span><span class="si">{</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="si">}</span><span class="s1"> leaves receive from step </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

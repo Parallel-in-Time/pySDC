@@ -477,13 +477,13 @@ count or a residual based stopping criterion, as well as all convergence control
 <span id="core-convergencecontroller-module"></span><h2>core.ConvergenceController module<a class="headerlink" href="#module-core.ConvergenceController" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.ConvergenceController.</span></span><span class="sig-name descname"><span class="pre">ConvergenceController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.ConvergenceController.</span></span><span class="sig-name descname"><span class="pre">ConvergenceController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
 count and time step size.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_iteration_status">
-<span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_iteration_status" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_iteration_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine whether to keep iterating or not in this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -500,7 +500,7 @@ count and time step size.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_parameters">
-<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_parameters" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -522,7 +522,7 @@ str: The error message</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.convergence_control">
-<span class="sig-name descname"><span class="pre">convergence_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.convergence_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.convergence_control" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convergence_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.convergence_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.convergence_control" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call all the functions related to convergence control.
 This is called in <cite>it_check</cite> in the controller after every iteration just after <cite>post_iteration_processing</cite>.
 :param controller: The controller
@@ -538,7 +538,7 @@ This is called in <cite>it_check</cite> in the controller after every iteration 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.dependencies">
-<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.dependencies" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load dependencies on other convergence controllers here.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -555,7 +555,7 @@ This is called in <cite>it_check</cite> in the controller after every iteration 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.determine_restart">
-<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.determine_restart" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.determine_restart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine for each step separately if it wants to be restarted for whatever reason.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -572,7 +572,7 @@ This is called in <cite>it_check</cite> in the controller after every iteration 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.get_new_step_size">
-<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.get_new_step_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function allows to set a step size with arbitrary criteria.
 Make sure to give an order to the convergence controller by setting the <cite>control_order</cite> variable in the params.
 This variable is an integer and you can see what the current order is by using
@@ -592,7 +592,7 @@ This variable is an integer and you can see what the current order is by using
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.log">
-<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.log" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shortcut that has a default level for the logger. 15 is above debug but below info.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -610,7 +610,7 @@ This variable is an integer and you can see what the current order is by using
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_iteration_processing">
-<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do whatever you want to after each iteration here.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -627,7 +627,7 @@ This variable is an integer and you can see what the current order is by using
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_spread_processing">
-<span class="sig-name descname"><span class="pre">post_spread_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_spread_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_spread_processing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">post_spread_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_spread_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_spread_processing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is called at the end of the <cite>SPREAD</cite> stage in the controller</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -641,7 +641,7 @@ This variable is an integer and you can see what the current order is by using
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_step_processing">
-<span class="sig-name descname"><span class="pre">post_step_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_step_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_step_processing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">post_step_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_step_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_step_processing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do whatever you want to after each step here.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -658,7 +658,7 @@ This variable is an integer and you can see what the current order is by using
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_next_block">
-<span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare stuff like spreading step sizes or whatever.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -700,8 +700,42 @@ in fact forwards communication, even though it looks backwards.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.recv">
+<span class="sig-name descname"><span class="pre">recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive some data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>source</strong> (<em>int</em>) – Where to look for receiving</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whatever has been received</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_buffers">
+<span class="sig-name descname"><span class="pre">reset_buffers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
+do communication. These can be reset in order to make sure the value was freshly communicated rather than
+reused.</p>
+<p>This function is called both at the end of instantiating the controller, as well as after each iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">
-<span class="sig-name descname"><span class="pre">reset_buffers_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reset_buffers_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
 immitate communication in non mpi versions. These have to be reset in order to replicate avalability of
 variables in mpi versions.</p>
@@ -718,6 +752,25 @@ step to the first one for instance.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.send">
+<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send data to a different rank</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>dest</strong> (<em>int</em>) – The target rank</p></li>
+<li><p><strong>data</strong> – Data to be sent</p></li>
+<li><p><strong>blocking</strong> (<em>bool</em>) – Whether the communication is blocking or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>request handle of the communication</p>
 </dd>
 </dl>
 </dd></dl>
@@ -745,7 +798,7 @@ step to the first one for instance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup_status_variables">
-<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup_status_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup status variables.
 This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
 hence not all information are available. Instead, this function is called after the controller has been fully
@@ -754,9 +807,8 @@ instantiated.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Reutrns:</dt><dd><p>None</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2174,7 +2226,10 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_step_processing"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.post_step_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.prepare_next_block()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.prepare_next_block_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.recv"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.recv()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.send"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.send()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.setup()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.setup_status_variables()</span></code></a></li>
 </ul>

@@ -229,7 +229,11 @@
 </li>
       <li><a href="pySDC/implementations.transfer_classes.html#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass">base_transfer_mass (class in implementations.transfer_classes.BaseTransfer_mass)</a>
 </li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI">BasicRestartingNonMPI (class in implementations.convergence_controller_classes.basic_restarting_nonMPI)</a>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase">BasicRestartingBase (class in implementations.convergence_controller_classes.basic_restarting)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI">BasicRestartingMPI (class in implementations.convergence_controller_classes.basic_restarting)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI">BasicRestartingNonMPI (class in implementations.convergence_controller_classes.basic_restarting)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery">battery (class in implementations.problem_classes.Battery)</a>
 </li>
@@ -310,11 +314,7 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.hotrod.HotRod.check_parameters">(implementations.convergence_controller_classes.hotrod.HotRod method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.check_parameters">(implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise method)</a>
-</li>
       </ul></li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.check_residual">check_residual() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
-</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence">CheckConvergence (class in implementations.convergence_controller_classes.check_convergence)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI">CheckIterationEstimatorNonMPI (class in implementations.convergence_controller_classes.check_iteration_estimator)</a>
@@ -334,6 +334,8 @@
       <li><a href="pySDC/core.html#core.Errors.CollocationError">CollocationError</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.comm">comm (implementations.datatype_classes.mesh.mesh property)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">communicate_convergence() (implementations.convergence_controller_classes.check_convergence.CheckConvergence method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Errors.CommunicationError">CommunicationError</a>
 </li>
@@ -526,7 +528,7 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.dependencies">(implementations.convergence_controller_classes.adaptivity.AdaptivityBase method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI.dependencies">(implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.dependencies">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.dependencies">(implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI method)</a>
 </li>
@@ -540,7 +542,11 @@
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.determine_restart">(implementations.convergence_controller_classes.adaptivity.AdaptivityBase method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI.determine_restart">(implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.determine_restart">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.determine_restart">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.hotrod.HotRod.determine_restart">(implementations.convergence_controller_classes.hotrod.HotRod method)</a>
 </li>
@@ -557,10 +563,10 @@
         <li><a href="pySDC/core.html#core.Step.step.dt">(core.Step.step property)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.html#core.Problem.ptype.dtype_f">dtype_f (core.Problem.ptype attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Problem.ptype.dtype_f">dtype_f (core.Problem.ptype attribute)</a>
+</li>
       <li><a href="pySDC/core.html#core.Problem.ptype.dtype_u">dtype_u (core.Problem.ptype attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Controller.controller.dump_setup">dump_setup() (core.Controller.controller method)</a>
@@ -618,6 +624,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.estimate_embedded_error_serial">estimate_embedded_error_serial() (implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError">EstimateEmbeddedError (class in implementations.convergence_controller_classes.estimate_embedded_error)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI">EstimateEmbeddedErrorMPI (class in implementations.convergence_controller_classes.estimate_embedded_error)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI">EstimateEmbeddedErrorNonMPI (class in implementations.convergence_controller_classes.estimate_embedded_error)</a>
 </li>
@@ -1241,10 +1249,10 @@
 </li>
       </ul></li>
       <li>
-    implementations.convergence_controller_classes.basic_restarting_nonMPI
+    implementations.convergence_controller_classes.basic_restarting
 
       <ul>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes.basic_restarting_nonMPI">module</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes.basic_restarting">module</a>
 </li>
       </ul></li>
       <li>
@@ -2096,7 +2104,7 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes.adaptivity">implementations.convergence_controller_classes.adaptivity</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes.basic_restarting_nonMPI">implementations.convergence_controller_classes.basic_restarting_nonMPI</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes.basic_restarting">implementations.convergence_controller_classes.basic_restarting</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes.check_convergence">implementations.convergence_controller_classes.check_convergence</a>
 </li>
@@ -2386,6 +2394,8 @@
       <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.post_iteration_processing">post_iteration_processing() (core.ConvergenceController.ConvergenceController method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI.post_iteration_processing">(implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI.post_iteration_processing">(implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing">(implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI method)</a>
@@ -2438,15 +2448,19 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.prepare_next_block">prepare_next_block() (core.ConvergenceController.ConvergenceController method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.prepare_next_block">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase method)</a>
 </li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">(implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI">prepare_next_block_nonMPI() (core.ConvergenceController.ConvergenceController method)</a>
 
       <ul>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI.prepare_next_block_nonMPI">(implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI method)</a>
-</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI">(implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.prepare_next_block_nonMPI">(implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI">(implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.html#core.Step.step.prev">prev (core.Step.step property)</a>
@@ -2541,9 +2555,11 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.recv">recv() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.recv">recv() (core.ConvergenceController.ConvergenceController method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.recv">(implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+</li>
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.recv">(implementations.datatype_classes.particles.particles method)</a>
 </li>
       </ul></li>
@@ -2553,10 +2569,12 @@
         <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers">reset_buffers() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">reset_buffers_nonMPI() (core.ConvergenceController.ConvergenceController method)</a>
 
       <ul>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI.reset_buffers_nonMPI">(implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.reset_buffers_nonMPI">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.reset_buffers_nonMPI">(implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI method)</a>
 </li>
@@ -2663,8 +2681,12 @@
 </li>
       <li><a href="pySDC/helpers.html#helpers.plot_helper.savefig">savefig() (in module helpers.plot_helper)</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.send">send() (implementations.datatype_classes.particles.particles method)</a>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.send">send() (core.ConvergenceController.ConvergenceController method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.send">(implementations.datatype_classes.particles.particles method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.send_full">send_full() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 
       <ul>
@@ -2678,7 +2700,11 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup">(implementations.convergence_controller_classes.adaptivity.AdaptivityResidual method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI.setup">(implementations.convergence_controller_classes.basic_restarting_nonMPI.BasicRestartingNonMPI method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.setup">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.setup">(implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">(implementations.convergence_controller_classes.check_convergence.CheckConvergence method)</a>
 </li>
@@ -2692,7 +2718,7 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.hotrod.HotRod.setup">(implementations.convergence_controller_classes.hotrod.HotRod method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.setup">(implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase.setup">(implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.setup">(implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter method)</a>
 </li>
@@ -2855,7 +2881,11 @@
         <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise">SpreadStepSizesBlockwise (class in implementations.convergence_controller_classes.spread_step_sizes)</a>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase">SpreadStepSizesBlockwiseBase (class in implementations.convergence_controller_classes.spread_step_sizes)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">SpreadStepSizesBlockwiseMPI (class in implementations.convergence_controller_classes.spread_step_sizes)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI">SpreadStepSizesBlockwiseNonMPI (class in implementations.convergence_controller_classes.spread_step_sizes)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ">SQ (implementations.sweeper_classes.boris_2nd_order.boris_2nd_order attribute)</a>
 </li>

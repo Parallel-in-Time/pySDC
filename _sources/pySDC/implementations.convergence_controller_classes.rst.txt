@@ -12,10 +12,10 @@ implementations.convergence\_controller\_classes.adaptivity module
    :undoc-members:
    :show-inheritance:
 
-implementations.convergence\_controller\_classes.basic\_restarting\_nonMPI module
----------------------------------------------------------------------------------
+implementations.convergence\_controller\_classes.basic\_restarting module
+-------------------------------------------------------------------------
 
-.. automodule:: implementations.convergence_controller_classes.basic_restarting_nonMPI
+.. automodule:: implementations.convergence_controller_classes.basic_restarting
    :members:
    :undoc-members:
    :show-inheritance:
