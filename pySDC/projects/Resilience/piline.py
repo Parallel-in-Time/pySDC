@@ -103,8 +103,6 @@ def run_piline(
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
-    use_MPI=False,
-    **kwargs,
 ):
     """
     A simple test program to do SDC runs for Piline problem
@@ -167,13 +165,7 @@ def run_piline(
     t0 = 0.0
 
     # instantiate controller
-    if use_MPI:
-        from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-        from mpi4py import MPI
-        controller = controller_MPI(controller_params=controller_params, description=description, comm=MPI.COMM_WORLD)
-    else:
-        controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                       description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # insert faults
     if fault_stuff is not None:
@@ -340,12 +332,6 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
 
 def main():
     generate_reference = False
-    
-    try:
-        from mpi4py import MPI
-        use_MPI = bool(MPI.COMM_WORLD.size > 1)
-    except ModuleNotFoundError:
-        use_MPI = False
 
     for use_adaptivity in [True, False]:
         custom_description = {'convergence_controllers': {}}
@@ -354,7 +340,7 @@ def main():
 
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
-            stats, _, _ = run_piline(custom_description, num_procs=num_procs, use_MPI=use_MPI)
+            stats, _, _ = run_piline(custom_description, num_procs=num_procs)
             data = get_data(stats)
             fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
             plot_error(data, ax, use_adaptivity)
