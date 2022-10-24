@@ -6,11 +6,10 @@ import subprocess
 @pytest.mark.mpi4py
 def test_main():
     import pySDC.projects.Resilience.vdp as vdp
-    import pySDC
 
     # Set python path once
     my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = pySDC.__file__[:-12]
+    my_env['PYTHONPATH'] = vdp.__file__[:-27]
 
     # set list of number of parallel steps (even)
     num_procs_list = [1, 2, 5, 8]
