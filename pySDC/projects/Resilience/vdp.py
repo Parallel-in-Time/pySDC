@@ -9,11 +9,6 @@ from pySDC.implementations.convergence_controller_classes.adaptivity import Adap
 from pySDC.core.Hooks import hooks
 from pySDC.core.Errors import ProblemError
 
-try:
-    from mpi4py import MPI
-except ModuleNotFoundError:
-    pass
-
 
 def plot_step_sizes(stats, ax):
 
