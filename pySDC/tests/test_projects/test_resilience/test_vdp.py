@@ -9,7 +9,7 @@ def test_main():
 
     # Set python path once
     my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../../../'
+    my_env['PYTHONPATH'] = '../../../..:.'
 
     # set list of number of parallel steps (even)
     num_procs_list = [1, 2, 5, 8]
