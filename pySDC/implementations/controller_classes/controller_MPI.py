@@ -573,33 +573,23 @@ class controller_MPI(controller):
         """
         Key routine to check for convergence/termination
         """
-        if not self.params.use_iteration_estimator:
-            # Update values to compute the residual
-            self.hooks.pre_comm(step=self.S, level_number=0)
 
-            self.wait_with_interrupt(request=self.req_send[0])
-            if self.S.status.force_done:
-                return None
+        # Update values to compute the residual
+        self.send_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
 
-            self.S.levels[0].sweep.compute_end_point()
+        self.recv_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
 
-            if not self.S.status.last:
-                self.logger.debug(
-                    'isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s'
-                    % (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next, 0, self.S.status.iter)
-                )
-                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+        # compute the residual
+        self.S.levels[0].sweep.compute_residual()
 
-            if not self.S.status.first and not self.S.status.prev_done:
-                self.logger.debug(
-                    'recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s'
-                    % (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev, 0, self.S.status.iter)
-                )
-                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-
-            self.hooks.post_comm(step=self.S, level_number=0)
-        else:
+        if self.params.use_iteration_estimator:
+            # TODO: replace with convergence controller
             self.check_iteration_estimate(comm=comm)
+
         if self.S.status.force_done:
             return None
 
