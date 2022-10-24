@@ -17,7 +17,7 @@ def test_main():
 
     # run code with different number of MPI processes
     for num_procs in num_procs_list:
-        cmd = f"mpirun -np {num_procs} --oversubscribe python3 {vdp.__file__}".split()
+        cmd = f"mpirun -np {num_procs} python3 {vdp.__file__}".split()
 
         p = subprocess.Popen(cmd, env=my_env, cwd=".")
 

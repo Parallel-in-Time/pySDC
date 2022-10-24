@@ -258,8 +258,10 @@ def check_if_tests_match(data_nonMPI, data_MPI):
             val_nonMPI = op(data_nonMPI[type])
             val_MPI = op(data_MPI[type])
             assert np.isclose(val_nonMPI, val_MPI), (
-                f"Mismatch in operation {op.__name__} on type \"{type}\": " f"nonMPI: {val_nonMPI}, MPI: {val_MPI}"
+                f"Mismatch in operation {op.__name__} on type \"{type}\": with {data_MPI['size'][0]} ranks: "
+                f"nonMPI: {val_nonMPI}, MPI: {val_MPI}"
             )
+    print(f'Passed with {data_MPI["size"][0]} ranks')
 
 
 def mpi_vs_nonMPI(MPI_ready, comm):
@@ -293,6 +295,7 @@ def mpi_vs_nonMPI(MPI_ready, comm):
                 comm=comm,
             )
             data[i] = fetch_test_data(stats, comm, use_MPI=use_MPI[i])
+            data[i]['size'] = [size]
 
     if rank == 0:
         check_if_tests_match(data[1], data[0])
