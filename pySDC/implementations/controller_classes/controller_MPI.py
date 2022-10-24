@@ -4,6 +4,7 @@ from mpi4py import MPI
 from pySDC.core.Controller import controller
 from pySDC.core.Errors import ControllerError
 from pySDC.core.Step import step
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingMPI
 
 
 class controller_MPI(controller):
@@ -59,6 +60,12 @@ class controller_MPI(controller):
             self.logger.warning(
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
+
+        self.add_convergence_controller(BasicRestartingMPI, description)
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers(self, comm=comm)
+            C.setup_status_variables(self, comm=comm)
 
     def run(self, u0, t0, Tend):
         """
@@ -116,13 +123,31 @@ class controller_MPI(controller):
             while not self.S.status.done:
                 self.pfasst(comm_active, num_procs)
 
-            time += self.S.dt
+            # determine where to restart
+            restarts = comm_active.allgather(self.S.status.restart)
+            restart_at = np.where(restarts)[0][0] if True in restarts else comm_active.size - 1
 
-            # broadcast uend, set new times and fine active processes
-            tend = comm_active.bcast(time, root=num_procs - 1)
-            uend = self.S.levels[0].uend.bcast(root=num_procs - 1, comm=comm_active)
+            # communicate time and solution to be used as next initial conditions
+            if True in restarts:
+                uend = self.S.levels[0].u[0].bcast(root=restart_at, comm=comm_active)
+                tend = comm_active.bcast(self.S.time, root=restart_at)
+                self.logger.info(f'Starting next block with initial conditions from step {restart_at}')
+            else:
+                time += self.S.dt
+                uend = self.S.levels[0].uend.bcast(root=num_procs - 1, comm=comm_active)
+                tend = comm_active.bcast(self.S.time + self.S.dt, root=comm_active.size - 1)
+
+            # do convergence controller stuff
+            if not self.S.status.restart:
+                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                    C.post_step_processing(self, self.S)
+
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.prepare_next_block(self, self.S, self.S.status.time_size, time, Tend, comm=comm_active)
+
             all_dt = comm_active.allgather(self.S.dt)
             all_time = [tend + sum(all_dt[0:i]) for i in range(num_procs)]
+
             time = all_time[rank]
             all_active = all_time < Tend - 10 * np.finfo(float).eps
             active = all_active[rank]
@@ -179,6 +204,7 @@ class controller_MPI(controller):
         self.req_send = [None] * len(self.S.levels)
         self.S.status.prev_done = False
         self.S.status.force_done = False
+        self.S.status.restart = False
 
         self.S.status.time_size = size
 
@@ -361,65 +387,6 @@ class controller_MPI(controller):
                     self.hooks.pre_comm(step=self.S, level_number=0)
                     self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
-    def check_residual(self, comm):
-        """
-        Routine to compute and check the residual
-
-        Args:
-            comm: time-communicator
-        """
-
-        # Update values to compute the residual
-        self.send_full(comm=comm, level=0)
-        if self.S.status.force_done:
-            return None
-
-        self.recv_full(comm=comm, level=0)
-        if self.S.status.force_done:
-            return None
-
-        # Compute residual and check for convergence
-        self.S.levels[0].sweep.compute_residual()
-        self.S.status.done = self.check_convergence(self.S)
-
-        # Either gather information about all status or send forward own
-        if self.params.all_to_done:
-
-            self.hooks.pre_comm(step=self.S, level_number=0)
-            self.S.status.done = comm.allreduce(sendobj=self.S.status.done, op=MPI.LAND)
-            self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
-
-        else:
-
-            self.hooks.pre_comm(step=self.S, level_number=0)
-
-            # check if an open request of the status send is pending
-            self.wait_with_interrupt(request=self.req_status)
-            if self.S.status.force_done:
-                return None
-
-            # recv status
-            if not self.S.status.first and not self.S.status.prev_done:
-                tmp = np.empty(1, dtype=int)
-                comm.Irecv((tmp, MPI.INT), source=self.S.prev, tag=99).Wait()
-                self.S.status.prev_done = tmp
-                self.logger.debug(
-                    'recv status: status %s, process %s, time %s, source %s, tag %s, iter %s'
-                    % (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.prev, 99, self.S.status.iter)
-                )
-                self.S.status.done = self.S.status.done and self.S.status.prev_done
-
-            # send status forward
-            if not self.S.status.last:
-                self.logger.debug(
-                    'isend status: status %s, process %s, time %s, target %s, tag %s, iter %s'
-                    % (self.S.status.done, self.S.status.slot, self.S.time, self.S.next, 99, self.S.status.iter)
-                )
-                tmp = np.array(self.S.status.done, dtype=int)
-                self.req_status = comm.Issend((tmp, MPI.INT), dest=self.S.next, tag=99)
-
-            self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
-
     def pfasst(self, comm, num_procs):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
@@ -496,6 +463,9 @@ class controller_MPI(controller):
             self.S.status.stage = 'PREDICT'
         else:
             self.S.status.stage = 'IT_CHECK'
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_spread_processing(self, self.S, comm=comm)
 
     def predict(self, comm, num_procs):
         """
@@ -603,17 +573,35 @@ class controller_MPI(controller):
         """
         Key routine to check for convergence/termination
         """
-        if not self.params.use_iteration_estimator:
-            self.check_residual(comm=comm)
-        else:
+
+        # Update values to compute the residual
+        self.send_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
+
+        self.recv_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
+
+        # compute the residual
+        self.S.levels[0].sweep.compute_residual()
+
+        if self.params.use_iteration_estimator:
+            # TODO: replace with convergence controller
             self.check_iteration_estimate(comm=comm)
+
         if self.S.status.force_done:
             return None
 
         if self.S.status.iter > 0:
             self.hooks.post_iteration(step=self.S, level_number=0)
 
-        # if not readys, keep doing stuff
+        # decide if the step is done, needs to be restarted and other things convergence related
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing(self, self.S, comm=comm)
+            C.convergence_control(self, self.S, comm=comm)
+
+        # if not ready, keep doing stuff
         if not self.S.status.done:
 
             # increment iteration count here (and only here)
@@ -656,6 +644,9 @@ class controller_MPI(controller):
 
             self.hooks.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers(self, comm=comm)
 
     def it_fine(self, comm, num_procs):
         """
