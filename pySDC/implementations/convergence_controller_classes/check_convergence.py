@@ -67,9 +67,10 @@ class CheckConvergence(ConvergenceController):
         """
         # Either gather information about all status or send forward own
         if controller.params.all_to_done:
+            from mpi4py.MPI import LAND
 
             controller.hooks.pre_comm(step=S, level_number=0)
-            S.status.done = comm.allreduce(sendobj=S.status.done, op=MPI.LAND)
+            S.status.done = comm.allreduce(sendobj=S.status.done, op=LAND)
             controller.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
 
         else:
