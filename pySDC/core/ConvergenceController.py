@@ -147,15 +147,19 @@ class ConvergenceController(object):
         """
         pass
 
-    def setup_status_variables(self, controller, **kwargs):
+    def setup_status_variables(self, controller, reset=False, **kwargs):
         """
         Setup status variables.
         This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
         hence not all information are available. Instead, this function is called after the controller has been fully
         instantiated.
 
+        In the `restart_block` function, this is again called, but with `reset=True`, which let's the user controll,
+        which variables are reset in every block and which aren't.
+
         Args:
             controller (pySDC.Controller): The controller
+            reset (bool): Whether the function is called for the first time or to reset
 
         Returns:
             None
@@ -337,3 +341,33 @@ class ConvergenceController(object):
         self.logger.debug(f'Step {comm.rank} leaves receive from step {source}')
 
         return data
+
+    def add_variable(self, controller, name, MPI=False, place=None, where=None, init=None):
+        """
+        Add a variable to a frozen class.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            name (str): The name of the variable
+            MPI (bool): Whether to use MPI controller
+            place (object): The object you want to add the variable to
+            where (list): List of strings containing a path to where you want to add the variable
+            init: Initial value of the variable
+
+        Returns:
+            None
+        """
+        where = ["S" if MPI else "MS", "levels", "status"] if where is None else where
+        place = controller if place is None else place
+
+        if len(where) == 0:
+            place.__dict__[name] = init
+
+        else:
+            new_places = place.__dict__[where[0]]
+
+            if type(new_places) == list:
+                for new_place in new_places:
+                    self.add_variable(controller, name, MPI=MPI, place=new_place, where=where[1:], init=init)
+            else:
+                self.add_variable(controller, name, MPI=MPI, place=new_places, where=where[1:], init=init)

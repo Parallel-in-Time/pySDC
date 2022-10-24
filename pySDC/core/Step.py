@@ -31,8 +31,6 @@ class _Status(FrozenClass):
         self.time_size = None
         self.diff_old_loc = None
         self.diff_first_loc = None
-        self.restart = False  # do I want to be restarted now?
-        self.restarts_in_a_row = 0  # how many times was I restarted?
         # freeze class, no further attributes allowed from this point
         self._freeze()
 

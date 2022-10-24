@@ -106,7 +106,7 @@ class controller_MPI(controller):
         self.S.status.slot = rank
 
         # initialize block of steps with u0
-        self.restart_block(num_procs, time, u0)
+        self.restart_block(num_procs, time, u0, comm=comm_active)
         uend = u0
 
         # call post-setup hook
@@ -158,7 +158,7 @@ class controller_MPI(controller):
                 self.S.status.slot = rank
 
             # initialize block of steps with u0
-            self.restart_block(num_procs, time, uend)
+            self.restart_block(num_procs, time, uend, comm=comm_active)
 
         # call post-run hook
         self.hooks.post_run(step=self.S, level_number=0)
@@ -167,7 +167,7 @@ class controller_MPI(controller):
 
         return uend, self.hooks.return_stats()
 
-    def restart_block(self, size, time, u0):
+    def restart_block(self, size, time, u0, comm):
         """
         Helper routine to reset/restart block of (active) steps
 
@@ -175,6 +175,7 @@ class controller_MPI(controller):
             size: number of active time steps
             time: current time
             u0: initial value to distribute across the steps
+            comm: the communicator
 
         Returns:
             block of (all) steps
@@ -204,7 +205,9 @@ class controller_MPI(controller):
         self.req_send = [None] * len(self.S.levels)
         self.S.status.prev_done = False
         self.S.status.force_done = False
-        self.S.status.restart = False
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.setup_status_variables(self, comm=comm, reset=True)
 
         self.S.status.time_size = size
 

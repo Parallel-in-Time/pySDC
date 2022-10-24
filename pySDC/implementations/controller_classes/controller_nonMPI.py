@@ -205,7 +205,9 @@ class controller_nonMPI(controller):
             self.MS[p].status.stage = 'SPREAD'
             self.MS[p].status.force_done = False
             self.MS[p].status.time_size = len(active_slots)
-            self.MS[p].status.restart = False
+
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.setup_status_variables(self, reset=True)
 
             for l in self.MS[p].levels:
                 l.tag = None
