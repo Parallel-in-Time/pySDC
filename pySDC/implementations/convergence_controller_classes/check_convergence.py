@@ -54,8 +54,6 @@ class CheckConvergence(ConvergenceController):
         return None
 
     def communicate_convergence(self, controller, S, comm):
-        from mpi4py import MPI
-
         """
         Communicate the convergence status
 
@@ -63,6 +61,9 @@ class CheckConvergence(ConvergenceController):
             controller (pySDC.Controller): The controller
             S (pySDC.Step.step): The current step
             comm (mpi4py.MPI.Comm): MPI communicator
+
+        Returns:
+            None
         """
         # Either gather information about all status or send forward own
         if controller.params.all_to_done:
@@ -82,29 +83,11 @@ class CheckConvergence(ConvergenceController):
 
             # recv status
             if not S.status.first and not S.status.prev_done:
-                tmp = np.empty(1, dtype=int)
-                comm.Irecv((tmp, MPI.INT), source=S.prev, tag=99).Wait()
-                S.status.prev_done = tmp
-                self.logger.debug(
-                    "recv status: status %s, process %s, time %s, source %s, tag %s, iter %s"
-                    % (
-                        S.status.prev_done,
-                        S.status.slot,
-                        S.time,
-                        S.prev,
-                        99,
-                        S.status.iter,
-                    )
-                )
+                S.status.prev_done = self.recv(comm, source=S.status.slot - 1)
                 S.status.done = S.status.done and S.status.prev_done
 
             # send status forward
             if not S.status.last:
-                self.logger.debug(
-                    "isend status: status %s, process %s, time %s, target %s, tag %s, iter %s"
-                    % (S.status.done, S.status.slot, S.time, S.next, 99, S.status.iter)
-                )
-                tmp = np.array(S.status.done, dtype=int)
-                controller.req_status = comm.Issend((tmp, MPI.INT), dest=S.next, tag=99)
+                self.send(comm, dest=S.status.slot + 1, data=S.status.done)
 
             controller.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
