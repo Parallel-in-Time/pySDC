@@ -9,6 +9,11 @@ from pySDC.implementations.convergence_controller_classes.adaptivity import Adap
 from pySDC.core.Hooks import hooks
 from pySDC.core.Errors import ProblemError
 
+try:
+    from mpi4py import MPI
+except ModuleNotFoundError:
+    pass
+
 
 def plot_step_sizes(stats, ax):
 
@@ -183,16 +188,19 @@ def run_vdp(
 
     # instantiate controller
     if use_MPI:
-        import mpi4py
+        from mpi4py import MPI
         from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
         comm = kwargs.get('comm', MPI.COMM_WORLD)
-        controller = controller_MPI(controller_params=controller_params, description=description, comm=MPI.COMM_WORLD)
+        controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
 
         # get initial values on finest level
         P = controller.S.levels[0].prob
         uinit = P.u_exact(t0)
     else:
-        controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params=controller_params, description=description
+        )
 
         # get initial values on finest level
         P = controller.MS[0].levels[0].prob
@@ -205,7 +213,6 @@ def run_vdp(
             rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
             args={'time': 1.0, 'target': 0, **fault_stuff.get('args', {})},
         )
-
 
     # call main function to get things done...
     try:
@@ -255,22 +262,23 @@ def check_if_tests_match(data_nonMPI, data_MPI):
         for op in ops:
             val_nonMPI = op(data_nonMPI[type])
             val_MPI = op(data_MPI[type])
-            assert np.isclose(val_nonMPI, val_MPI), f"Mismatch in operation {op.__name__} on type \"{type}\": "\
-                f"nonMPI: {val_nonMPI}, MPI: {val_MPI}"
+            assert np.isclose(val_nonMPI, val_MPI), (
+                f"Mismatch in operation {op.__name__} on type \"{type}\": " f"nonMPI: {val_nonMPI}, MPI: {val_MPI}"
+            )
 
 
-if __name__ == "__main__":
-    try:
-        from mpi4py import MPI
-        comm = MPI.COMM_WORLD
+def mpi_vs_nonMPI(MPI_ready, comm):
+    if MPI_ready:
         size = comm.size
         rank = comm.rank
-        MPI_ready = True
-    except ModuleNotFoundError:
-        comm = None
+        use_MPI = [True, False]
+    else:
         size = 1
         rank = 0
-        MPI_ready = False
+        use_MPI = [False, False]
+
+    if rank == 0:
+        print(f"Running with {size} ranks")
 
     custom_description = {'convergence_controllers': {}}
     custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
@@ -278,13 +286,30 @@ if __name__ == "__main__":
     custom_controller_params = {'logger_level': 30}
 
     data = [{}, {}]
-    use_MPI = [True, False]
 
     for i in range(2):
         if use_MPI[i] or rank == 0:
-            stats, controller, Tend = run_vdp(custom_description=custom_description, num_procs=size, use_MPI=use_MPI[i],
-                                            custom_controller_params=custom_controller_params, Tend=1.)
+            stats, controller, Tend = run_vdp(
+                custom_description=custom_description,
+                num_procs=size,
+                use_MPI=use_MPI[i],
+                custom_controller_params=custom_controller_params,
+                Tend=1.0,
+                comm=comm,
+            )
             data[i] = fetch_test_data(stats, comm, use_MPI=use_MPI[i])
 
     if rank == 0:
         check_if_tests_match(data[1], data[0])
+
+
+if __name__ in "__main__":
+    try:
+        from mpi4py import MPI
+
+        MPI_ready = True
+        comm = MPI.COMM_WORLD
+    except ModuleNotFoundError:
+        MPI_ready = False
+        comm = None
+    mpi_vs_nonMPI(MPI_ready, comm)
