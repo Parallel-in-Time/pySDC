@@ -18,6 +18,12 @@ class _Pars(FrozenClass):
 
 # short helper class to bundle all status variables
 class _Status(FrozenClass):
+    """
+    This class carries the status of the step. All variables that the core SDC / PFASST functionality depend on are
+    initialized here, while the convergence controllers are allowed to add more variables in a controlled fashion
+    later on using the `add_variable` function.
+    """
+
     def __init__(self):
         self.iter = None
         self.stage = None

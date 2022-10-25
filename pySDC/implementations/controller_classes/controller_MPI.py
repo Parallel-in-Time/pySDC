@@ -207,7 +207,7 @@ class controller_MPI(controller):
         self.S.status.force_done = False
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.setup_status_variables(self, comm=comm, reset=True)
+            C.reset_status_variables(self, comm=comm)
 
         self.S.status.time_size = size
 

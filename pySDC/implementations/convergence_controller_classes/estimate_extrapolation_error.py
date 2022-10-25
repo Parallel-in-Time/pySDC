@@ -69,7 +69,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
 
         return new_params
 
-    def setup_status_variables(self, controller, reset=False, **kwargs):
+    def setup_status_variables(self, controller, **kwargs):
         """
         Initialize coefficient variables.
 
@@ -79,9 +79,8 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         Returns:
             None
         """
-        if not reset:
-            self.coeff.u = [None] * self.params.n
-            self.coeff.f = [0.0] * self.params.n
+        self.coeff.u = [None] * self.params.n
+        self.coeff.f = [0.0] * self.params.n
         return None
 
     def check_parameters(self, controller, params, description, **kwargs):
@@ -249,7 +248,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return {**non_mpi_defaults, **default_params}
 
-    def setup_status_variables(self, controller, reset=False, **kwargs):
+    def setup_status_variables(self, controller, **kwargs):
         """
         Initialize storage variables.
 
@@ -259,13 +258,12 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         Returns:
             None
         """
-        super(EstimateExtrapolationErrorNonMPI, self).setup_status_variables(controller, reset=reset, **kwargs)
+        super(EstimateExtrapolationErrorNonMPI, self).setup_status_variables(controller, **kwargs)
 
-        if not reset:
-            self.prev.t = np.array([None] * self.params.n)
-            self.prev.dt = np.array([None] * self.params.n)
-            self.prev.u = [None] * self.params.n
-            self.prev.f = [None] * self.params.n
+        self.prev.t = np.array([None] * self.params.n)
+        self.prev.dt = np.array([None] * self.params.n)
+        self.prev.u = [None] * self.params.n
+        self.prev.f = [None] * self.params.n
 
         return None
 

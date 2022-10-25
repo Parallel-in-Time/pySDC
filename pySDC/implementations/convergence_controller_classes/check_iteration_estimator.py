@@ -81,7 +81,7 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
         self.buffers.diff_new = 0.0
         self.buffers.Ltilde_loc = 0.0
 
-    def setup_status_variables(self, controller, reset=False, **kwargs):
+    def setup_status_variables(self, controller, **kwargs):
         """
         Setup storage variables for the differences between sweeps for all steps.
 
@@ -91,9 +91,8 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
         Returns:
             None
         """
-        if not reset:
-            self.status.diff_old_loc = [0.0] * len(controller.MS)
-            self.status.diff_first_loc = [0.0] * len(controller.MS)
+        self.status.diff_old_loc = [0.0] * len(controller.MS)
+        self.status.diff_first_loc = [0.0] * len(controller.MS)
         return None
 
     def check_iteration_status(self, controller, S, **kwargs):

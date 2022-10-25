@@ -207,7 +207,7 @@ class controller_nonMPI(controller):
             self.MS[p].status.time_size = len(active_slots)
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.setup_status_variables(self, reset=True)
+                C.reset_status_variables(self)
 
             for l in self.MS[p].levels:
                 l.tag = None
