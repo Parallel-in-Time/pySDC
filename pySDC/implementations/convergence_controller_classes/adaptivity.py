@@ -324,7 +324,7 @@ class AdaptivityResidual(AdaptivityBase):
         }
         return {**defaults, **params}
 
-    def setup_status_variables(self, controller, **kwargs):
+    def setup_status_variables(self, controller, reset=False, **kwargs):
         """
         Change maximum number of allowed restarts here.
 
@@ -334,7 +334,7 @@ class AdaptivityResidual(AdaptivityBase):
         Reutrns:
             None
         """
-        if self.params.max_restarts is not None:
+        if self.params.max_restarts is not None and not reset:
             conv_controllers = controller.convergence_controllers
             restart_cont = [me for me in conv_controllers if type(me) == BasicRestartingNonMPI]
 
