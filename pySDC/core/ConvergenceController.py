@@ -53,7 +53,7 @@ class ConvergenceController(object):
         Shortcut that has a default level for the logger. 15 is above debug but below info.
 
         Args:
-            msg (str): Meassage you want to log
+            msg (str): Message you want to log
             S (pySDC.step): The current step
             level (int): the level passed to the logger
 
@@ -163,12 +163,9 @@ class ConvergenceController(object):
     def setup_status_variables(self, controller, **kwargs):
         """
         Setup status variables.
-        This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
+        This is not done at the time of instantiation, since the controller is not fully instantiated at that time and
         hence not all information are available. Instead, this function is called after the controller has been fully
         instantiated.
-
-        In the `restart_block` function, this is again called, but with `reset=True`, which let's the user controll,
-        which variables are reset in every block and which aren't.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -198,8 +195,8 @@ class ConvergenceController(object):
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
         Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
-        immitate communication in non mpi versions. These have to be reset in order to replicate avalability of
-        variables in mpi versions.
+        imitate communication in non MPI versions. These have to be reset in order to replicate availability of
+        variables in MPI versions.
 
         For instance, if step 0 sets self.buffers.x = 1 from self.buffers.x = 0, when the same MPI rank uses the
         variable with step 1, it will still carry the value of self.buffers.x = 1, equivalent to a send from the rank
@@ -418,7 +415,7 @@ class ConvergenceController(object):
             # actually add or overwrite the variable
             place.__dict__[name] = init
 
-        # follow the path to the final destination recusively
+        # follow the path to the final destination recursively
         else:
             # get all possible new places to continue the path
             new_places = place.__dict__[where[0]]
