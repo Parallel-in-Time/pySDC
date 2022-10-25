@@ -153,7 +153,6 @@ class ConvergenceController(object):
         This is called in the `restart_block` function.
         Args:
             controller (pySDC.Controller): The controller
-            reset (bool): Whether the function is called for the first time or to reset
 
         Returns:
             None
@@ -169,7 +168,6 @@ class ConvergenceController(object):
 
         Args:
             controller (pySDC.Controller): The controller
-            reset (bool): Whether the function is called for the first time or to reset
 
         Returns:
             None
