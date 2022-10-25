@@ -258,7 +258,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         Returns:
             None
         """
-        super(EstimateExtrapolationErrorNonMPI, self).setup_status_variables(controller)
+        super(EstimateExtrapolationErrorNonMPI, self).setup_status_variables(controller, **kwargs)
 
         self.prev.t = np.array([None] * self.params.n)
         self.prev.dt = np.array([None] * self.params.n)

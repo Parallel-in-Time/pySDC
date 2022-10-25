@@ -51,6 +51,37 @@ class BasicRestartingBase(ConvergenceController):
 
         return {**defaults, **params}
 
+    def setup_status_variables(self, controller, **kwargs):
+        """
+        Add status variables for whether to restart now and how many times the step has been restarted in a row to the
+        Steps
+
+        Args:
+            controller (pySDC.Controller): The controller
+            reset (bool): Whether the function is called for the first time or to reset
+
+        Returns:
+            None
+        """
+        where = ["S" if 'comm' in kwargs.keys() else "MS", "status"]
+        self.add_variable(controller, name='restart', where=where, init=False)
+        self.add_variable(controller, name='restarts_in_a_row', where=where, init=0)
+
+    def reset_status_variables(self, controller, reset=False, **kwargs):
+        """
+        Add status variables for whether to restart now and how many times the step has been restarted in a row to the
+        Steps
+
+        Args:
+            controller (pySDC.Controller): The controller
+            reset (bool): Whether the function is called for the first time or to reset
+
+        Returns:
+            None
+        """
+        where = ["S" if 'comm' in kwargs.keys() else "MS", "status"]
+        self.reset_variable(controller, name='restart', where=where, init=False)
+
     def dependencies(self, controller, description, **kwargs):
         """
         Load a convergence controller that spreads the step sizes between steps.
