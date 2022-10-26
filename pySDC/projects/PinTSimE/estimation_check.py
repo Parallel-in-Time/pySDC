@@ -196,7 +196,7 @@ def check(cwd='./'):
     restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
     restart_ax.set_label('Restarts')
 
-    lines = pos1 + pos2 +pos3 + restarts
+    lines = pos1 + pos2 + pos3 + restarts
     labels = [l.get_label() for l in lines]
     ax.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
     fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')

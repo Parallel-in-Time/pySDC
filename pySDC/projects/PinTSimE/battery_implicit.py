@@ -118,9 +118,10 @@ def main(dt=1e-2, use_switch_estimator=True):
 
     return description, stats
 
+
 def plot_voltages(description, use_switch_estimator, cwd='./'):
     """
-    Routine to plot voltages of explicit battery model
+    Routine to plot voltages of implicit battery model
     """
 
     f = open(cwd + 'data/battery_implicit.dat', 'rb')
@@ -150,6 +151,7 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
 
     fig.savefig('data/battery_implicit_model_solution.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
+
 
 def run_check(cwd='./'):
     """
@@ -223,7 +225,7 @@ def run_check(cwd='./'):
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
     ax.set_title("Average number of iterations for implicit Euler")
-    ax.plot(dt_list, niters_true_all,'d--',  label='SE=True')
+    ax.plot(dt_list, niters_true_all, 'd--', label='SE=True')
     ax.plot(dt_list, niters_false_all, 'd--', label='SE=False')
     ax.legend(frameon=False, fontsize=10, loc='lower left')
     ax.set_xscale('log', base=10)
@@ -250,11 +252,12 @@ def run_check(cwd='./'):
     restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
     restart_ax.set_label('Restarts')
 
-    lines = pos1 + pos2 +pos3 + restarts
+    lines = pos1 + pos2 + pos3 + restarts
     labels = [l.get_label() for l in lines]
     ax1.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
     fig1.savefig('data/diffs_estimation_{}.png'.format(description['sweeper_class']), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig1)
+
 
 if __name__ == "__main__":
     run_check()

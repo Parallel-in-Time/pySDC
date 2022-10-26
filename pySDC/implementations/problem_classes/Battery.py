@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
+from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -118,6 +118,7 @@ class battery(ptype):
         me[1] = self.params.alpha * self.params.V_ref  # vC
 
         return me
+
 
 class battery_explicit(ptype):
     """
@@ -244,6 +245,7 @@ class battery_explicit(ptype):
 
         return me
 
+
 class battery_implicit(ptype):
     """
     Example implementing the battery drain model as in the description in the PinTSimE project
@@ -263,7 +265,19 @@ class battery_implicit(ptype):
         problem_params['nvars'] = 2
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['newton_maxiter', 'newton_tol', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref', 'set_switch', 't_switch']
+        essential_keys = [
+            'newton_maxiter',
+            'newton_tol',
+            'Vs',
+            'Rs',
+            'C',
+            'R',
+            'L',
+            'alpha',
+            'V_ref',
+            'set_switch',
+            't_switch',
+        ]
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -359,11 +373,7 @@ class battery_implicit(ptype):
         res = 99
         while n < self.params.newton_maxiter:
             # form function g with g(u) = 0
-            g = (
-                u
-                - rhs
-                - factor * (self.A.dot(u) + non_f)
-            )
+            g = u - rhs - factor * (self.A.dot(u) + non_f)
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)

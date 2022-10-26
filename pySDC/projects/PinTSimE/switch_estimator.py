@@ -1,8 +1,5 @@
 import numpy as np
 import scipy as sp
-import matplotlib
-import matplotlib.pyplot as plt
-matplotlib.use('TkAgg')
 
 from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController
@@ -96,9 +93,9 @@ class SwitchEstimator(ConvergenceController):
                     SwitchResults = sp.optimize.root_scalar(
                         p,
                         method='brentq',
-                        bracket=[t_interp[0],t_interp[m_guess]],
+                        bracket=[t_interp[0], t_interp[m_guess]],
                         x0=t_interp[m_guess],
-                        xtol = 1e-10,
+                        xtol=1e-10,
                     )
                     self.t_switch = SwitchResults.root  # t_switch[0]
 
