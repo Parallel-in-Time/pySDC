@@ -57,6 +57,11 @@ class sweeper(object):
         if 'collocation_class' not in params:
             params['collocation_class'] = CollBase
 
+        # prepare random generator for initial guess
+        if params.get('initial_guess', 'spread') == 'random':
+            params['random_seed'] = params.get('random_seed', 1984)
+            self.rng = np.random.RandomState(params['random_seed'])
+
         self.params = _Pars(params)
 
         coll = params['collocation_class'](**params)
@@ -316,8 +321,8 @@ class sweeper(object):
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
             # start with random initial guess
             elif self.params.initial_guess == 'random':
-                L.u[m] = P.dtype_u(init=P.init, val=np.random.rand(1)[0])
-                L.f[m] = P.dtype_f(init=P.init, val=np.random.rand(1)[0])
+                L.u[m] = P.dtype_u(init=P.init, val=self.rng.rand(1)[0])
+                L.f[m] = P.dtype_f(init=P.init, val=self.rng.rand(1)[0])
             else:
                 raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
