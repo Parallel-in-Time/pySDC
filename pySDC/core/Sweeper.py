@@ -3,6 +3,7 @@ import logging
 import numpy as np
 import scipy.linalg
 import scipy.optimize as opt
+from scipy.special import factorial
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Level import level
@@ -55,6 +56,11 @@ class sweeper(object):
 
         if 'collocation_class' not in params:
             params['collocation_class'] = CollBase
+
+        # prepare random generator for initial guess
+        if params.get('initial_guess', 'spread') == 'random':
+            params['random_seed'] = params.get('random_seed', 1984)
+            self.rng = np.random.RandomState(params['random_seed'])
 
         self.params = _Pars(params)
 
@@ -262,7 +268,7 @@ class sweeper(object):
             QDmat[1:, 1:] = np.diag(x)
             self.parallelizable = True
         else:
-            raise NotImplementedError('qd_type implicit not implemented')
+            raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
         # check if we got not more than a lower triangular matrix
         np.testing.assert_array_equal(
             np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
@@ -315,8 +321,8 @@ class sweeper(object):
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
             # start with random initial guess
             elif self.params.initial_guess == 'random':
-                L.u[m] = P.dtype_u(init=P.init, val=np.random.rand(1)[0])
-                L.f[m] = P.dtype_f(init=P.init, val=np.random.rand(1)[0])
+                L.u[m] = P.dtype_u(init=P.init, val=self.rng.rand(1)[0])
+                L.f[m] = P.dtype_f(init=P.init, val=self.rng.rand(1)[0])
             else:
                 raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
