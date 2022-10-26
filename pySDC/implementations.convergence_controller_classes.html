@@ -512,6 +512,24 @@ with the restarts and want to move on anyways.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingBase.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add status variables for whether to restart now and how many times the step has been restarted in a row to the
+Steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – Whether the function is called for the first time or to reset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingBase.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define parameters here.</p>
@@ -544,6 +562,24 @@ with the restarts and want to move on anyways.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingBase.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add status variables for whether to restart now and how many times the step has been restarted in a row to the
+Steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – Whether the function is called for the first time or to reset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -723,7 +759,20 @@ with the restarts and want to move on anyways.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">
 <span class="sig-name descname"><span class="pre">communicate_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_convergence.html#CheckConvergence.communicate_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Communicate the convergence status</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Comm</em>) – MPI communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">
@@ -1607,7 +1656,9 @@ on Tend</p>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.dependencies"><code class="docutils literal notranslate"><span class="pre">BasicRestartingBase.dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.determine_restart"><code class="docutils literal notranslate"><span class="pre">BasicRestartingBase.determine_restart()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">BasicRestartingBase.prepare_next_block()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">BasicRestartingBase.reset_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup"><code class="docutils literal notranslate"><span class="pre">BasicRestartingBase.setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingBase.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">BasicRestartingBase.setup_status_variables()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI"><code class="docutils literal notranslate"><span class="pre">BasicRestartingMPI</span></code></a><ul>

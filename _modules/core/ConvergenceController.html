@@ -95,7 +95,7 @@
 <span class="sd">        Shortcut that has a default level for the logger. 15 is above debug but below info.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            msg (str): Meassage you want to log</span>
+<span class="sd">            msg (str): Message you want to log</span>
 <span class="sd">            S (pySDC.step): The current step</span>
 <span class="sd">            level (int): the level passed to the logger</span>
 
@@ -189,15 +189,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
+<div class="viewcode-block" id="ConvergenceController.reset_status_variables"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset status variables.</span>
+<span class="sd">        This is called in the `restart_block` function.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            reset (bool): Whether the function is called for the first time or to reset</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="ConvergenceController.setup_status_variables"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup status variables.</span>
-<span class="sd">        This is not done at the time of instatiation, since the controller is not fully instantiated at that time and</span>
+<span class="sd">        This is not done at the time of instantiation, since the controller is not fully instantiated at that time and</span>
 <span class="sd">        hence not all information are available. Instead, this function is called after the controller has been fully</span>
 <span class="sd">        instantiated.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            reset (bool): Whether the function is called for the first time or to reset</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -223,8 +237,8 @@
 <div class="viewcode-block" id="ConvergenceController.reset_buffers_nonMPI"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to</span>
-<span class="sd">        immitate communication in non mpi versions. These have to be reset in order to replicate avalability of</span>
-<span class="sd">        variables in mpi versions.</span>
+<span class="sd">        imitate communication in non MPI versions. These have to be reset in order to replicate availability of</span>
+<span class="sd">        variables in MPI versions.</span>
 
 <span class="sd">        For instance, if step 0 sets self.buffers.x = 1 from self.buffers.x = 0, when the same MPI rank uses the</span>
 <span class="sd">        variable with step 1, it will still carry the value of self.buffers.x = 1, equivalent to a send from the rank</span>
@@ -378,7 +392,100 @@
         <span class="c1"># log what&#39;s happening for debug purposes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Step </span><span class="si">{</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="si">}</span><span class="s1"> leaves receive from step </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">data</span></div></div>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="ConvergenceController.reset_variable"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_variable">[docs]</a>    <span class="k">def</span> <span class="nf">reset_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">MPI</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">place</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Utility function for resetting variables. This function will call the `add_variable` function with all the same</span>
+<span class="sd">        arguments, but with `allow_overwrite = True`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            name (str): The name of the variable</span>
+<span class="sd">            MPI (bool): Whether to use MPI controller</span>
+<span class="sd">            place (object): The object you want to reset the variable of</span>
+<span class="sd">            where (list): List of strings containing a path to where you want to reset the variable</span>
+<span class="sd">            init: Initial value of the variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">MPI</span><span class="p">,</span> <span class="n">place</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvergenceController.add_variable"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.add_variable">[docs]</a>    <span class="k">def</span> <span class="nf">add_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">MPI</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">place</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a variable to a frozen class.</span>
+
+<span class="sd">        This function goes through the path to the destination of the variable recursively and adds it to all instances</span>
+<span class="sd">        that are possible in the path. For example, giving `where = [&quot;MS&quot;, &quot;levels&quot;, &quot;status&quot;]` will result in adding a</span>
+<span class="sd">        variable to the status object of all levels of all steps of the controller.</span>
+
+<span class="sd">        Part of the functionality of the frozen class is to separate initialization and setting of variables. By</span>
+<span class="sd">        enforcing this, you can make sure not to overwrite already existing variables. Since this function is called</span>
+<span class="sd">        outside of the `__init__` function of the status objects, this can otherwise lead to bugs that are hard to find.</span>
+<span class="sd">        For this reason, you need to specifically set `allow_overwrite = True` if you want to forgo the check if the</span>
+<span class="sd">        variable already exists. This can be useful when resetting variables between steps, but make sure to set it to</span>
+<span class="sd">        `allow_overwrite = False` the first time you add a variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            name (str): The name of the variable</span>
+<span class="sd">            MPI (bool): Whether to use MPI controller</span>
+<span class="sd">            place (object): The object you want to add the variable to</span>
+<span class="sd">            where (list): List of strings containing a path to where you want to add the variable</span>
+<span class="sd">            init: Initial value of the variable</span>
+<span class="sd">            allow_overwrite (bool): Allow overwriting the variables if they already exist or raise an exception</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">where</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span> <span class="k">if</span> <span class="n">MPI</span> <span class="k">else</span> <span class="s2">&quot;MS&quot;</span><span class="p">,</span> <span class="s2">&quot;levels&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">where</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">where</span>
+        <span class="n">place</span> <span class="o">=</span> <span class="n">controller</span> <span class="k">if</span> <span class="n">place</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">place</span>
+
+        <span class="c1"># check if we have arrived at the end of the path to the variable</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">where</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">variable_exitsts</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="c1"># check if the variable already exists and raise an error in case we are about to introduce a bug</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span> <span class="ow">and</span> <span class="n">variable_exitsts</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> already exists in </span><span class="si">{</span><span class="n">place</span><span class="si">}</span><span class="s2">! Please rename the variable in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># if we allow overwriting, but the variable does not exist already, we are violating the intended purpose</span>
+            <span class="c1"># of this function, so we also raise an error if someone should be so mad as to attempt this</span>
+            <span class="k">elif</span> <span class="n">allow_overwrite</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">variable_exitsts</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> is supposed to be overwritten in </span><span class="si">{</span><span class="n">place</span><span class="si">}</span><span class="s2">, but it does not exist!&quot;</span><span class="p">)</span>
+
+            <span class="c1"># actually add or overwrite the variable</span>
+            <span class="n">place</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">init</span>
+
+        <span class="c1"># follow the path to the final destination recursively</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># get all possible new places to continue the path</span>
+            <span class="n">new_places</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">where</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+            <span class="c1"># continue all possible paths</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">new_places</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="c1"># loop through all possibilities</span>
+                <span class="k">for</span> <span class="n">new_place</span> <span class="ow">in</span> <span class="n">new_places</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span>
+                        <span class="n">controller</span><span class="p">,</span>
+                        <span class="n">name</span><span class="p">,</span>
+                        <span class="n">MPI</span><span class="o">=</span><span class="n">MPI</span><span class="p">,</span>
+                        <span class="n">place</span><span class="o">=</span><span class="n">new_place</span><span class="p">,</span>
+                        <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                        <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span>
+                        <span class="n">allow_overwrite</span><span class="o">=</span><span class="n">allow_overwrite</span><span class="p">,</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># go to the only possible possibility</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span>
+                    <span class="n">controller</span><span class="p">,</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="n">MPI</span><span class="o">=</span><span class="n">MPI</span><span class="p">,</span>
+                    <span class="n">place</span><span class="o">=</span><span class="n">new_places</span><span class="p">,</span>
+                    <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                    <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span>
+                    <span class="n">allow_overwrite</span><span class="o">=</span><span class="n">allow_overwrite</span><span class="p">,</span>
+                <span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

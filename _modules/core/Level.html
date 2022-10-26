@@ -61,6 +61,12 @@
 
 <span class="c1"># short helper class to bundle all status variables</span>
 <span class="k">class</span> <span class="nc">_Status</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class carries the status of the level. All variables that the core SDC / PFASST functionality depend on are</span>
+<span class="sd">    initialized here, while the convergence controllers are allowed to add more variables in a controlled fashion</span>
+<span class="sd">    later on using the `add_variable` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">False</span>

@@ -482,6 +482,37 @@ count or a residual based stopping criterion, as well as all convergence control
 <p>Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
 count and time step size.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.add_variable">
+<span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.add_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.add_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a variable to a frozen class.</p>
+<p>This function goes through the path to the destination of the variable recursively and adds it to all instances
+that are possible in the path. For example, giving <cite>where = [“MS”, “levels”, “status”]</cite> will result in adding a
+variable to the status object of all levels of all steps of the controller.</p>
+<p>Part of the functionality of the frozen class is to separate initialization and setting of variables. By
+enforcing this, you can make sure not to overwrite already existing variables. Since this function is called
+outside of the <cite>__init__</cite> function of the status objects, this can otherwise lead to bugs that are hard to find.
+For this reason, you need to specifically set <cite>allow_overwrite = True</cite> if you want to forgo the check if the
+variable already exists. This can be useful when resetting variables between steps, but make sure to set it to
+<cite>allow_overwrite = False</cite> the first time you add a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the variable</p></li>
+<li><p><strong>MPI</strong> (<em>bool</em>) – Whether to use MPI controller</p></li>
+<li><p><strong>place</strong> (<em>object</em>) – The object you want to add the variable to</p></li>
+<li><p><strong>where</strong> (<em>list</em>) – List of strings containing a path to where you want to add the variable</p></li>
+<li><p><strong>init</strong> – Initial value of the variable</p></li>
+<li><p><strong>allow_overwrite</strong> (<em>bool</em>) – Allow overwriting the variables if they already exist or raise an exception</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_iteration_status">
 <span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_iteration_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine whether to keep iterating or not in this function.</p>
@@ -597,7 +628,7 @@ This variable is an integer and you can see what the current order is by using
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> (<em>str</em>) – Meassage you want to log</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – Message you want to log</p></li>
 <li><p><strong>S</strong> (<em>pySDC.step</em>) – The current step</p></li>
 <li><p><strong>level</strong> (<em>int</em>) – the level passed to the logger</p></li>
 </ul>
@@ -737,8 +768,8 @@ reused.</p>
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">
 <span class="sig-name descname"><span class="pre">reset_buffers_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
-immitate communication in non mpi versions. These have to be reset in order to replicate avalability of
-variables in mpi versions.</p>
+imitate communication in non MPI versions. These have to be reset in order to replicate availability of
+variables in MPI versions.</p>
 <p>For instance, if step 0 sets self.buffers.x = 1 from self.buffers.x = 0, when the same MPI rank uses the
 variable with step 1, it will still carry the value of self.buffers.x = 1, equivalent to a send from the rank
 computing step 0 to the rank computing step 1.</p>
@@ -749,6 +780,44 @@ step to the first one for instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset status variables.
+This is called in the <cite>restart_block</cite> function.
+:param controller: The controller
+:type controller: pySDC.Controller
+:param reset: Whether the function is called for the first time or to reset
+:type reset: bool</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_variable">
+<span class="sig-name descname"><span class="pre">reset_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for resetting variables. This function will call the <cite>add_variable</cite> function with all the same
+arguments, but with <cite>allow_overwrite = True</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the variable</p></li>
+<li><p><strong>MPI</strong> (<em>bool</em>) – Whether to use MPI controller</p></li>
+<li><p><strong>place</strong> (<em>object</em>) – The object you want to reset the variable of</p></li>
+<li><p><strong>where</strong> (<em>list</em>) – List of strings containing a path to where you want to reset the variable</p></li>
+<li><p><strong>init</strong> – Initial value of the variable</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -800,12 +869,15 @@ step to the first one for instance.</p>
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup_status_variables">
 <span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup_status_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup status variables.
-This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
+This is not done at the time of instantiation, since the controller is not fully instantiated at that time and
 hence not all information are available. Instead, this function is called after the controller has been fully
 instantiated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – Whether the function is called for the first time or to reset</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -2214,6 +2286,7 @@ and evaluates the RHS of the ODE there</p>
 </li>
 <li><a class="reference internal" href="#module-core.ConvergenceController">core.ConvergenceController module</a><ul>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController"><code class="docutils literal notranslate"><span class="pre">ConvergenceController</span></code></a><ul>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.add_variable"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.add_variable()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.check_iteration_status()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_parameters"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.convergence_control"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.convergence_control()</span></code></a></li>
@@ -2229,6 +2302,8 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.recv"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.recv()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_variable"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_variable()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.send"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.send()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.setup()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.setup_status_variables()</span></code></a></li>

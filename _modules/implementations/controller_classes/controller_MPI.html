@@ -148,7 +148,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">=</span> <span class="n">rank</span>
 
         <span class="c1"># initialize block of steps with u0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm_active</span><span class="p">)</span>
         <span class="n">uend</span> <span class="o">=</span> <span class="n">u0</span>
 
         <span class="c1"># call post-setup hook</span>
@@ -200,7 +200,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">=</span> <span class="n">rank</span>
 
             <span class="c1"># initialize block of steps with u0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">uend</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">uend</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm_active</span><span class="p">)</span>
 
         <span class="c1"># call post-run hook</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">post_run</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -209,7 +209,7 @@
 
         <span class="k">return</span> <span class="n">uend</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">return_stats</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="controller_MPI.restart_block"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">[docs]</a>    <span class="k">def</span> <span class="nf">restart_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<div class="viewcode-block" id="controller_MPI.restart_block"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">[docs]</a>    <span class="k">def</span> <span class="nf">restart_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper routine to reset/restart block of (active) steps</span>
 
@@ -217,6 +217,7 @@
 <span class="sd">            size: number of active time steps</span>
 <span class="sd">            time: current time</span>
 <span class="sd">            u0: initial value to distribute across the steps</span>
+<span class="sd">            comm: the communicator</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            block of (all) steps</span>
@@ -246,7 +247,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">req_send</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time_size</span> <span class="o">=</span> <span class="n">size</span>
 
