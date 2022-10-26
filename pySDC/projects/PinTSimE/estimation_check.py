@@ -113,6 +113,7 @@ def check(cwd='./'):
     V_ref = 1.0
     dt_list = [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
+    restarts_all = []
     for dt_item in dt_list:
         for item in use_switch_estimator:
             stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
@@ -124,6 +125,7 @@ def check(cwd='./'):
 
             if item:
                 restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+                restarts_all.append(np.sum(restarts))
                 print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
 
     val_switch_all = []
@@ -179,10 +181,10 @@ def check(cwd='./'):
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
     ax.set_title("Difference $v_{C}-V_{ref}$")
-    ax.plot(dt_list, diff_false_all_before, 'rs-', label='SE=False - before switch')
-    ax.plot(dt_list, diff_false_all_after, 'bd--', label='SE=False - after switch')
-    ax.plot(dt_list, diff_true_all, 'kd--', label='SE=True')
-    ax.legend(frameon=False, fontsize=8, loc='center right')
+    pos1 = ax.plot(dt_list, diff_false_all_before, 'rs-', label='SE=False - before switch')
+    pos2 = ax.plot(dt_list, diff_false_all_after, 'bd--', label='SE=False - after switch')
+    pos3 = ax.plot(dt_list, diff_true_all, 'kd--', label='SE=True')
+    # ax.legend(frameon=False, fontsize=8, loc='center right')
     ax.set_xticks(dt_list)
     ax.set_xticklabels(dt_list)
     ax.set_xscale('log', base=10)
@@ -190,6 +192,13 @@ def check(cwd='./'):
     ax.set_ylim(-1, 1)
     ax.set_xlabel(r'$\Delta t$')
 
+    restart_ax = ax.twinx()
+    restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
+    restart_ax.set_label('Restarts')
+
+    lines = pos1 + pos2 +pos3 + restarts
+    labels = [l.get_label() for l in lines]
+    ax.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
     fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
