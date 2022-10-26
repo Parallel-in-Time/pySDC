@@ -60,6 +60,7 @@ class PreconPostProcessing:
             'num_nodes': self.data['num_nodes'],
             'quad_type': self.data['quad_type'],
             'QI': self.data['QI'],
+            'initial_guess': 'random',
         }
 
         # build lambdas
@@ -131,7 +132,7 @@ postDiag = PreconPostProcessing('advection', 3, **kwargs)
 postDiagFirstRow = PreconPostProcessing('advection', 3, adaptivity=True, use_first_row=True)
 posts = [postDiagFirstRow, postLU, postDiag, postIE]
 
-postDiag.run_problem()
+#postDiag.run_problem()
 
 fig, axs = plt.subplots(2, 2, figsize=(11, 9), sharex=True, sharey=True)
 axs = axs.flatten()
