@@ -33,7 +33,7 @@ class ConvergenceController(object):
     count and time step size.
     """
 
-    def __init__(self, controller, params, description):
+    def __init__(self, controller, params, description, **kwargs):
         """
         Initialization routine
 
@@ -46,14 +46,14 @@ class ConvergenceController(object):
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
         self.dependencies(controller, description)
-        self.logger = logging.getLogger(f'{type(self).__name__}')
+        self.logger = logging.getLogger(f"{type(self).__name__}")
 
-    def log(self, msg, S, level=15):
+    def log(self, msg, S, level=15, **kwargs):
         """
         Shortcut that has a default level for the logger. 15 is above debug but below info.
 
         Args:
-            msg (str): Meassage you want to log
+            msg (str): Message you want to log
             S (pySDC.step): The current step
             level (int): the level passed to the logger
 
@@ -77,7 +77,7 @@ class ConvergenceController(object):
         """
         return params
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         """
         Load dependencies on other convergence controllers here.
 
@@ -90,7 +90,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
@@ -103,9 +103,9 @@ class ConvergenceController(object):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        return True, ''
+        return True, ""
 
-    def check_iteration_status(self, controller, S):
+    def check_iteration_status(self, controller, S, **kwargs):
         """
         Determine whether to keep iterating or not in this function.
 
@@ -118,7 +118,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         """
         This function allows to set a step size with arbitrary criteria.
         Make sure to give an order to the convergence controller by setting the `control_order` variable in the params.
@@ -134,7 +134,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def determine_restart(self, controller, S):
+    def determine_restart(self, controller, S, **kwargs):
         """
         Determine for each step separately if it wants to be restarted for whatever reason.
 
@@ -147,26 +147,56 @@ class ConvergenceController(object):
         """
         pass
 
-    def setup_status_variables(self, controller):
+    def reset_status_variables(self, controller, **kwargs):
+        """
+        Reset status variables.
+        This is called in the `restart_block` function.
+        Args:
+            controller (pySDC.Controller): The controller
+            reset (bool): Whether the function is called for the first time or to reset
+
+        Returns:
+            None
+        """
+        return None
+
+    def setup_status_variables(self, controller, **kwargs):
         """
         Setup status variables.
-        This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
+        This is not done at the time of instantiation, since the controller is not fully instantiated at that time and
         hence not all information are available. Instead, this function is called after the controller has been fully
         instantiated.
 
         Args:
             controller (pySDC.Controller): The controller
+            reset (bool): Whether the function is called for the first time or to reset
 
-        Reutrns:
+        Returns:
             None
         """
         return None
 
-    def reset_buffers_nonMPI(self, controller):
+    def reset_buffers(self, controller, **kwargs):
         """
         Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
-        immitate communication in non mpi versions. These have to be reset in order to replicate avalability of
-        variables in mpi versions.
+        do communication. These can be reset in order to make sure the value was freshly communicated rather than
+        reused.
+
+        This function is called both at the end of instantiating the controller, as well as after each iteration.
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Returns:
+            None
+        """
+        pass
+
+    def reset_buffers_nonMPI(self, controller, **kwargs):
+        """
+        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
+        imitate communication in non MPI versions. These have to be reset in order to replicate availability of
+        variables in MPI versions.
 
         For instance, if step 0 sets self.buffers.x = 1 from self.buffers.x = 0, when the same MPI rank uses the
         variable with step 1, it will still carry the value of self.buffers.x = 1, equivalent to a send from the rank
@@ -186,7 +216,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def post_iteration_processing(self, controller, S):
+    def post_iteration_processing(self, controller, S, **kwargs):
         """
         Do whatever you want to after each iteration here.
 
@@ -199,7 +229,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def post_step_processing(self, controller, S):
+    def post_step_processing(self, controller, S, **kwargs):
         """
         Do whatever you want to after each step here.
 
@@ -212,7 +242,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def prepare_next_block(self, controller, S, size, time, Tend):
+    def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
         """
         Prepare stuff like spreading step sizes or whatever.
 
@@ -247,7 +277,7 @@ class ConvergenceController(object):
         """
         pass
 
-    def convergence_control(self, controller, S):
+    def convergence_control(self, controller, S, **kwargs):
         """
         Call all the functions related to convergence control.
         This is called in `it_check` in the controller after every iteration just after `post_iteration_processing`.
@@ -259,13 +289,13 @@ class ConvergenceController(object):
             None
         """
 
-        self.get_new_step_size(controller, S)
-        self.determine_restart(controller, S)
-        self.check_iteration_status(controller, S)
+        self.get_new_step_size(controller, S, **kwargs)
+        self.determine_restart(controller, S, **kwargs)
+        self.check_iteration_status(controller, S, **kwargs)
 
         return None
 
-    def post_spread_processing(self, controller, S):
+    def post_spread_processing(self, controller, S, **kwargs):
         """
         This function is called at the end of the `SPREAD` stage in the controller
 
@@ -274,3 +304,143 @@ class ConvergenceController(object):
             S (pySDC.Step): The current step
         """
         pass
+
+    def send(self, comm, dest, data, blocking=False, **kwargs):
+        """
+        Send data to a different rank
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            dest (int): The target rank
+            data: Data to be sent
+            blocking (bool): Whether the communication is blocking or not
+
+        Returns:
+            request handle of the communication
+        """
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates send to step {dest}')
+
+        if blocking:
+            req = comm.send(data, dest=dest, **kwargs)
+        else:
+            req = comm.isend(data, dest=dest, **kwargs)
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} leaves send to step {dest}')
+
+        return req
+
+    def recv(self, comm, source, **kwargs):
+        """
+        Receive some data
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            source (int): Where to look for receiving
+
+        Returns:
+            whatever has been received
+        """
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates receive from step {source}')
+
+        data = comm.recv(source=source, **kwargs)
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} leaves receive from step {source}')
+
+        return data
+
+    def reset_variable(self, controller, name, MPI=False, place=None, where=None, init=None):
+        """
+        Utility function for resetting variables. This function will call the `add_variable` function with all the same
+        arguments, but with `allow_overwrite = True`.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            name (str): The name of the variable
+            MPI (bool): Whether to use MPI controller
+            place (object): The object you want to reset the variable of
+            where (list): List of strings containing a path to where you want to reset the variable
+            init: Initial value of the variable
+
+        Returns:
+            None
+        """
+        self.add_variable(controller, name, MPI, place, where, init, allow_overwrite=True)
+
+    def add_variable(self, controller, name, MPI=False, place=None, where=None, init=None, allow_overwrite=False):
+        """
+        Add a variable to a frozen class.
+
+        This function goes through the path to the destination of the variable recursively and adds it to all instances
+        that are possible in the path. For example, giving `where = ["MS", "levels", "status"]` will result in adding a
+        variable to the status object of all levels of all steps of the controller.
+
+        Part of the functionality of the frozen class is to separate initialization and setting of variables. By
+        enforcing this, you can make sure not to overwrite already existing variables. Since this function is called
+        outside of the `__init__` function of the status objects, this can otherwise lead to bugs that are hard to find.
+        For this reason, you need to specifically set `allow_overwrite = True` if you want to forgo the check if the
+        variable already exists. This can be useful when resetting variables between steps, but make sure to set it to
+        `allow_overwrite = False` the first time you add a variable.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            name (str): The name of the variable
+            MPI (bool): Whether to use MPI controller
+            place (object): The object you want to add the variable to
+            where (list): List of strings containing a path to where you want to add the variable
+            init: Initial value of the variable
+            allow_overwrite (bool): Allow overwriting the variables if they already exist or raise an exception
+
+        Returns:
+            None
+        """
+        where = ["S" if MPI else "MS", "levels", "status"] if where is None else where
+        place = controller if place is None else place
+
+        # check if we have arrived at the end of the path to the variable
+        if len(where) == 0:
+
+            variable_exitsts = name in place.__dict__.keys()
+            # check if the variable already exists and raise an error in case we are about to introduce a bug
+            if not allow_overwrite and variable_exitsts:
+                raise ValueError(f"Key \"{name}\" already exists in {place}! Please rename the variable in {self}")
+            # if we allow overwriting, but the variable does not exist already, we are violating the intended purpose
+            # of this function, so we also raise an error if someone should be so mad as to attempt this
+            elif allow_overwrite and not variable_exitsts:
+                raise ValueError(f"Key \"{name}\" is supposed to be overwritten in {place}, but it does not exist!")
+
+            # actually add or overwrite the variable
+            place.__dict__[name] = init
+
+        # follow the path to the final destination recursively
+        else:
+            # get all possible new places to continue the path
+            new_places = place.__dict__[where[0]]
+
+            # continue all possible paths
+            if type(new_places) == list:
+                # loop through all possibilities
+                for new_place in new_places:
+                    self.add_variable(
+                        controller,
+                        name,
+                        MPI=MPI,
+                        place=new_place,
+                        where=where[1:],
+                        init=init,
+                        allow_overwrite=allow_overwrite,
+                    )
+            else:
+                # go to the only possible possibility
+                self.add_variable(
+                    controller,
+                    name,
+                    MPI=MPI,
+                    place=new_places,
+                    where=where[1:],
+                    init=init,
+                    allow_overwrite=allow_overwrite,
+                )

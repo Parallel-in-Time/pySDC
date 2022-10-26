@@ -102,16 +102,25 @@ class controller(object):
 
     def welcome_message(self):
         out = (
-            'Welcome to the one and only, really very astonishing and 87.3% bug free'
-            + '\n                                 _____ _____   _____ '
-            + '\n                                / ____|  __ \ / ____|'
-            + '\n                    _ __  _   _| (___ | |  | | |     '
-            + '\n                   | \'_ \| | | |\___ \| |  | | |     '
-            + '\n                   | |_) | |_| |____) | |__| | |____ '
-            + '\n                   | .__/ \__, |_____/|_____/ \_____|'
-            + '\n                   | |     __/ |                     '
-            + '\n                   |_|    |___/                      '
-            + '\n                                                     '
+            "Welcome to the one and only, really very astonishing and 87.3% bug free"
+            + "\n"
+            + r"                                 _____ _____   _____ "
+            + "\n"
+            + r"                                / ____|  __ \ / ____|"
+            + "\n"
+            + r"                    _ __  _   _| (___ | |  | | |     "
+            + "\n"
+            + r"                   | '_ \| | | |\___ \| |  | | |     "
+            + "\n"
+            + r"                   | |_) | |_| |____) | |__| | |____ "
+            + "\n"
+            + r"                   | .__/ \__, |_____/|_____/ \_____|"
+            + "\n"
+            + r"                   | |     __/ |                     "
+            + "\n"
+            + r"                   |_|    |___/                      "
+            + "\n"
+            + r"                                                     "
         )
         self.logger.info(out)
 
@@ -295,8 +304,8 @@ class controller(object):
         '''
         This function is for debugging purposes to keep track of the different convergence controllers and their order.
         '''
-        print('    | order | convergence controller')
-        print('----+-------+-------------------------------------------------------------------')
+        print('    | order | convergence controller', flush=True)
+        print('----+-------+-------------------------------------------------------------------', flush=True)
         for i in range(len(self.convergence_controllers)):
             C = self.convergence_controllers[self.convergence_controller_order[i]]
-            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}')
+            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}', flush=True)
