@@ -68,6 +68,27 @@ class EstimateEmbeddedError(ConvergenceController):
 {self.params.sweeper_type}"
             )
 
+    def setup_status_variables(self, controller, **kwargs):
+        """
+        Add the embedded error variable to the error function.
+
+        Args:
+            controller (pySDC.Controller): The controller
+        """
+        if 'comm' in kwargs.keys():
+            steps = [controller.S]
+        else:
+            if 'active_slots' in kwargs.keys():
+                steps = [controller.MS[i] for i in kwargs['active_slots']]
+            else:
+                steps = controller.MS
+        where = ["levels", "status"]
+        for S in steps:
+            self.add_variable(S, name='error_embedded_estimate', where=where, init=None)
+
+    def reset_status_variables(self, controller, **kwargs):
+        self.setup_status_variables(controller, **kwargs)
+
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
     def __init__(self, controller, params, description, **kwargs):
