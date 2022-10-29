@@ -748,23 +748,6 @@ in fact forwards communication, even though it looks backwards.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_buffers">
-<span class="sig-name descname"><span class="pre">reset_buffers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
-do communication. These can be reset in order to make sure the value was freshly communicated rather than
-reused.</p>
-<p>This function is called both at the end of instantiating the controller, as well as after each iteration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">
 <span class="sig-name descname"><span class="pre">reset_buffers_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
@@ -793,9 +776,7 @@ step to the first one for instance.</p>
 <dd><p>Reset status variables.
 This is called in the <cite>restart_block</cite> function.
 :param controller: The controller
-:type controller: pySDC.Controller
-:param reset: Whether the function is called for the first time or to reset
-:type reset: bool</p>
+:type controller: pySDC.Controller</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -874,10 +855,7 @@ hence not all information are available. Instead, this function is called after 
 instantiated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>reset</strong> (<em>bool</em>) – Whether the function is called for the first time or to reset</p></li>
-</ul>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -2300,7 +2278,6 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.prepare_next_block()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.prepare_next_block_nonMPI()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.recv"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.recv()</span></code></a></li>
-<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers_nonMPI()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_variable"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_variable()</span></code></a></li>

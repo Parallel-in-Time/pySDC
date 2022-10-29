@@ -958,6 +958,20 @@ you make sure your preconditioner is compatible, which you have to just try out�
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedError.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset status variables.
+This is called in the <cite>restart_block</cite> function.
+:param controller: The controller
+:type controller: pySDC.Controller</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedError.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a default value for control order to the parameters and check if we are using a Runge-Kutta sweeper</p>
@@ -974,6 +988,17 @@ you make sure your preconditioner is compatible, which you have to just try out�
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedError.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the embedded error variable to the error function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1699,7 +1724,9 @@ on Tend</p>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.dependencies"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError.dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.estimate_embedded_error_serial"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError.estimate_embedded_error_serial()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError.reset_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError.setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError.setup_status_variables()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedErrorMPI</span></code></a><ul>

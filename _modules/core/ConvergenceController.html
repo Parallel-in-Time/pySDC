@@ -195,7 +195,6 @@
 <span class="sd">        This is called in the `restart_block` function.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            reset (bool): Whether the function is called for the first time or to reset</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -211,28 +210,11 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            reset (bool): Whether the function is called for the first time or to reset</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="ConvergenceController.reset_buffers"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to</span>
-<span class="sd">        do communication. These can be reset in order to make sure the value was freshly communicated rather than</span>
-<span class="sd">        reused.</span>
-
-<span class="sd">        This function is called both at the end of instantiating the controller, as well as after each iteration.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="ConvergenceController.reset_buffers_nonMPI"><a class="viewcode-back" href="../../pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
