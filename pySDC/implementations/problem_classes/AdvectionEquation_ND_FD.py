@@ -169,13 +169,12 @@ class advectionNd(ptype):
             )[0].reshape(self.params.nvars)
         return me
 
-    def u_exact(self, t, u_init=None, t_init=None):
+    def u_exact(self, t, **kwargs):
         """
         Routine to compute the exact solution at time t
 
         Args:
             t (float): current time
-            u_init, t_init: unused parameters for common interface reasons
 
         Returns:
             dtype_u: exact solution

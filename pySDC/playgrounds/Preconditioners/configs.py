@@ -4,6 +4,7 @@ Get configurations as well as functions for where to store and load for various 
 import numpy as np
 import time
 import pickle
+import matplotlib.pyplot as plt
 
 from pySDC.core.Collocation import CollBase
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -12,6 +13,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.advection import run_advection
+from pySDC.projects.Resilience.heat import run_heat
 from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon, DiagPreconIMEX
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityResidual
 
@@ -56,12 +58,30 @@ params_advection = {
     'sweeper': DiagPrecon,
     'serial_sweeper': generic_implicit,
     'e_tol': 1e-9,
-    'problem_params': {'freq': -1, 'sigma': 6e-2},
+    'problem_params': {'freq': -1, 'sigma': 6e-2, 'type': 'backward', 'order': 5, 'nvars': 2**9, 'c':1.},
+    #'problem_params': {'freq': -1, 'sigma': 2e-2, 'type': 'backward', 'order': 5, 'nvars': 2**8, 'c':10.},
+    #'problem_params': {'freq': -1, 'sigma': 1e-2, 'type': 'backward', 'order': 5, 'nvars': 2**6, 'c':1.},
     'r_tol': 2e-11,
     'k': 475,
     'e': 5.98e-8,
     'e_em': 5.91e-10,
     'name': 'advection',
+    'derivative': 1,
+    'L': 1.,
+}
+
+
+params_heat = {
+    **params_default,
+    'prob': run_heat,
+    'sweeper': DiagPrecon,
+    'serial_sweeper': generic_implicit,
+    'e_tol': 1e-9,
+    'problem_params': {'freq': -1, 'order': 2, 'type': 'forward', 'nvars': 2**7, 'nu': 1., 'sigma': 6e-2,},
+    'k': 0,
+    'name': 'heat',
+    'derivative': 2,
+    'L': 1.,
 }
 
 
@@ -69,6 +89,7 @@ problems = {
     'vdp': params_vdp,
     'piline': params_piline,
     'advection': params_advection,
+    'heat': params_heat,
 }
 
 
@@ -255,3 +276,5 @@ def get_collocation_nodes(params, num_nodes):
     """
     coll = CollBase(num_nodes, quad_type=params.get('quad_type', 'RADAU-RIGHT'))
     return coll.nodes
+
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']

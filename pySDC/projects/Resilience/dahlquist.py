@@ -214,6 +214,7 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
         cb = fig.colorbar(cs, cbar_ax)
         cb.set_label(r'$\rho$')
         cbar_ax.set_rasterized(True)
+    return cs
 
 
 def plot_increment(stats, fig=None, ax=None, iter=None, cbar=True, **kwargs):

@@ -1,12 +1,12 @@
-# script to run a simple advection problem
+# script to run a simple heat problem
 
-from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
-import numpy as np
 from pySDC.projects.Resilience.hook import log_error_estimates
+import numpy as np
 
 
 def plot_embedded(stats, ax):
@@ -21,78 +21,7 @@ def plot_embedded(stats, ax):
     ax.legend(frameon=False)
 
 
-class log_data(hooks):
-    def pre_run(self, step, level_number):
-        """
-        Record los conditiones initiales
-        """
-        super(log_data, self).pre_run(step, level_number)
-        L = step.levels[level_number]
-        self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='u0', value=L.u[0])
-
-    def post_iteration(self, step, level_number):
-        super(log_data, self).post_iteration(step, level_number)
-        if step.status.iter == step.params.maxiter - 1:
-            L = step.levels[level_number]
-            L.sweep.compute_end_point()
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time + L.dt,
-                level=L.level_index,
-                iter=0,
-                sweep=L.status.sweep,
-                type='uold',
-                value=L.uold[-1],
-            )
-
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.__dict__.get('error_embedded_estimate', None),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_extrapolated',
-            value=L.status.error_extrapolation_estimate,
-        )
-
-
-def run_advection(
+def run_heat(
     custom_description=None,
     num_procs=1,
     Tend=2e-1,
@@ -112,7 +41,17 @@ def run_advection(
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
 
-    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'backward', 'order': 5, 'bc': 'periodic'}
+    problem_params = {
+        'freq': 2,
+        'nvars': 2**9,
+        'nu': 1.0,
+        'type': 'center',
+        'order': 6,
+        'bc': 'periodic',
+        'direct_solver': True,
+        'lintol': None,
+        'liniter': None,
+    }
 
     if custom_problem_params is not None:
         problem_params = {**problem_params, **custom_problem_params}
@@ -132,7 +71,7 @@ def run_advection(
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advectionNd  # pass problem class
+    description['problem_class'] = heatNd_unforced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -154,6 +93,7 @@ def run_advection(
 
     # insert faults
     if fault_stuff is not None:
+        raise NotImplementedError("The parameters have not been adapted to this equation yet!")
         controller.hooks.random_generator = fault_stuff['rng']
         controller.hooks.add_fault(
             rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
@@ -167,3 +107,7 @@ def run_advection(
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     return stats, controller, Tend
+
+
+if __name__ == '__main__':
+    run_heat()
