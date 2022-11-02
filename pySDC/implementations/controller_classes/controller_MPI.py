@@ -64,7 +64,6 @@ class controller_MPI(controller):
         self.add_convergence_controller(BasicRestartingMPI, description)
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_buffers(self, comm=comm)
             C.setup_status_variables(self, comm=comm)
 
     def run(self, u0, t0, Tend):
@@ -647,9 +646,6 @@ class controller_MPI(controller):
 
             self.hooks.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_buffers(self, comm=comm)
 
     def it_fine(self, comm, num_procs):
         """

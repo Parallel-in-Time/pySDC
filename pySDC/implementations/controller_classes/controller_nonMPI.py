@@ -206,9 +206,6 @@ class controller_nonMPI(controller):
             self.MS[p].status.force_done = False
             self.MS[p].status.time_size = len(active_slots)
 
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.reset_status_variables(self)
-
             for l in self.MS[p].levels:
                 l.tag = None
                 l.status.sweep = 1
@@ -216,6 +213,9 @@ class controller_nonMPI(controller):
         for p in active_slots:
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_status_variables(self, active_slots=active_slots)
 
     def send_full(self, S, level=None, add_to_stats=False):
         """
