@@ -267,43 +267,36 @@ def store_precon(params, x, initial_guess, **kwargs):
 
     Args:
         problem (str): The name of the problem that has been run to obtain the preconditioner
-        nodes (int): Number of nodes that have been used
+        x (numpy.ndarray): The entries of the preconditioner
+        initial_guess (numpy.ndarray): Initial guess to start the minimization problem
 
     Returns:
         None
     """
     data = {}
 
-    # defaults
-    data['QI'] = None
-    data['diags'] = np.zeros_like(x)
-    data['first_row'] = np.zeros_like(x)
-
     # write the configuration in the data array
-    configs = ['use_first_row', 'normalized', 'LU', 'IE', 'MIN']
+    configs = ['use_first_row', 'normalized', 'LU', 'IE', 'MIN', 'random_IG']
     for c in configs:
         data[c] = kwargs.get(c, False)
 
-    # write the data based on configuration
-    if data['use_first_row']:
-        data['diags'] = x[0 : len(x) // 2]
-        data['first_row'] = x[len(x) // 2 : :]
-    else:
-        data['diags'] = x.copy()
+    # get the sweeper parameters
+    sweeper_params, sweeper = prepare_sweeper(x, params, **kwargs)
 
-    data['QI'] = params['QI']
-    data['num_nodes'] = len(data['diags'])
+    # write the data into a dictionary
     data['time'] = time.time()
     data['x'] = x.copy()
     data['params'] = params
     data['kwargs'] = kwargs
     data['initial_guess'] = initial_guess
-    data['quad_type'] = params.get('quad_type', 'RADAU-RIGHT')
+    data['sweeper_params'] = sweeper_params
+    data['sweeper'] = sweeper
 
-    with open(get_path(params['name'], data['num_nodes'], **kwargs), 'wb') as file:
+    # write to file
+    with open(get_path(params['name'], sweeper_params['num_nodes'], **kwargs), 'wb') as file:
         pickle.dump(data, file)
 
-    name = get_name(params['name'], data['num_nodes'], **kwargs)
+    name = get_name(params['name'], sweeper_params['num_nodes'], **kwargs)
     print(f'Stored preconditioner "{name}"')
 
 
@@ -351,3 +344,57 @@ def get_collocation_nodes(params, num_nodes):
 
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+
+def prepare_sweeper(x, params, use_first_row=False, normalized=False, random_IG=False, **kwargs):
+    """
+    Prepare the sweeper with diagonal elements before running the problem
+
+    Args:
+        x (numpy.ndarray): The entries of the preconditioner
+        params (dict): Parameters for setting up the run
+        use_first_row (bool): Use the first row of the preconditioner or not
+        normalize (bool): Normalize the quadrature weights or not
+        random_IG (bool): Use random initial guess in the sweeper
+
+    Returns
+        dict: Sweeper parameters
+    """
+    # process options
+    if use_first_row:
+        if normalized:
+            raise NotImplementedError
+
+        diags = np.array(x[0 : len(x) // 2])
+        first_row = np.array(x[len(x) // 2 : :])
+        num_nodes = len(x) // 2
+    else:
+        if normalized:
+            diags = np.array(np.append(x, -sum(x) + 1))
+            first_row = np.zeros_like(diags)
+            num_nodes = len(x) + 1
+        else:
+            diags = np.array(x)
+            first_row = np.zeros_like(diags)
+            num_nodes = len(x)
+
+    if random_IG:
+        initial_guess = 'random'
+    else:
+        initial_guess = 'spread'
+
+    # setup the sweeper
+    if None not in x:
+        sweeper_params = {
+            **params.get('sweeper_params', {}),
+            'num_nodes': num_nodes,
+            'diagonal_elements': diags,
+            'first_row': first_row,
+            'QI': params.get('QI', 'LU'),
+            'quad_type': params.get('quad_type', 'RADAU-RIGHT'),
+            'initial_guess': initial_guess,
+        }
+    else:
+        sweeper_params = {}
+
+    return sweeper_params, params['sweeper']

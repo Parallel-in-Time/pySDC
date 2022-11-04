@@ -30,10 +30,9 @@ class PreconPostProcessing:
             color (str): The color of lines associated with this preconditioner
             ls (str): The linesyle for plotting this preconditioner
         '''
-        # laod data
+        # load data
         self.data = load_precon(problem, nodes, **kwargs)
-        self.diagonal_elements = self.data['diags']
-        self.first_row = self.data['first_row']
+        self.sweeper_params = self.data['sweeper_params']
 
         # plotting stuff
         self.label = label
@@ -82,11 +81,7 @@ class PreconPostProcessing:
         '''
 
         sweeper_params = {
-            'diagonal_elements': self.diagonal_elements,
-            'first_row': self.first_row,
-            'num_nodes': self.data['num_nodes'],
-            'quad_type': self.data['quad_type'],
-            'QI': self.data['QI'],
+            **self.sweeper_params,
             'initial_guess': 'random',
         }
 
@@ -102,7 +97,7 @@ class PreconPostProcessing:
             'lambdas': lambdas,
         }
 
-        desc = {'sweeper_params': sweeper_params, 'sweeper_class': self.data['params']['sweeper']}
+        desc = {'sweeper_params': sweeper_params, 'sweeper_class': self.data['sweeper']}
         stats, _, _ = run_dahlquist(custom_description=desc, custom_problem_params=problem_params, **kwargs)
         self.dahlquist_stats = stats
         return stats
@@ -176,7 +171,10 @@ class PreconPostProcessing:
 
         # run the problem
         stats, controller = self.run_problem(
-            logger_level=30, replace_params=replace_params, hook_class=log_error_at_iterations
+            logger_level=30,
+            replace_params=replace_params,
+            hook_class=log_error_at_iterations,
+            **kwargs,
         )
 
         steps = kwargs.get('steps', [-1])
@@ -489,9 +487,12 @@ def compare_contraction(precons, plot_eigenvals=False, log=False, vmin=1e-16, **
     )
 
 
-kwargs = {'adaptivity': True}
+kwargs = {
+    'adaptivity': True,
+    'random_IG': True,
+}
 
-problem = 'advection'
+problem = 'heat'
 problem_serial = 'advection'
 
 postLU = PreconPostProcessing(problem_serial, 3, LU=True, label='LU', color=colors[0], ls='--', **kwargs)
@@ -502,7 +503,7 @@ postDiagFirstRow = PreconPostProcessing(
 )
 postMIN = PreconPostProcessing(problem_serial, 3, MIN=True, label='MIN', color=colors[4], ls='-.', **kwargs)
 postNORM = PreconPostProcessing(
-    problem, 2, adaptivity=True, normalized=True, label='normalized', color=colors[5], ls='-'
+    problem, 3, adaptivity=True, normalized=True, label='normalized', color=colors[5], ls='-'
 )
 
 precons = [postDiagFirstRow, postLU, postDiag, postIE]

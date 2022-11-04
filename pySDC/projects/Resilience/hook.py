@@ -1,9 +1,11 @@
 from pySDC.core.Hooks import hooks
 
+
 class log_error_estimates(hooks):
     """
     Record data required for analysis of problems in the resilience project
     """
+
     def pre_run(self, step, level_number):
         """
         Record los conditiones initiales

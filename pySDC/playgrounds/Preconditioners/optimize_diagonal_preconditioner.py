@@ -10,55 +10,10 @@ from pySDC.playgrounds.Preconditioners.configs import (
     store_precon,
     store_serial_precon,
     get_collocation_nodes,
+    prepare_sweeper,
 )
 
 print_status = False
-
-
-def prepare_sweeper(x, params, use_first_row=False, normalized=False, **kwargs):
-    """
-    Prepare the sweeper with diagonal elements before running the problem
-
-    Args:
-        x (numpy.ndarray): The entries of the preconditioner
-        params (dict): Parameters for setting up the run
-        use_first_row (bool): Use the first row of the preconditioner or not
-        normalize (bool) Normalize the quadrature weights or not
-
-    Returns
-        dict: Sweeper parameters
-    """
-    if use_first_row:
-        if normalized:
-            raise NotImplementedError
-
-        diags = np.array(x[0 : len(x) // 2])
-        first_row = np.array(x[len(x) // 2 : :])
-        num_nodes = len(x) // 2
-    else:
-        if normalized:
-            diags = np.array(np.append(x, -sum(x) + 1))
-            first_row = np.zeros_like(diags)
-            num_nodes = len(x) + 1
-        else:
-            diags = np.array(x)
-            first_row = np.zeros_like(diags)
-            num_nodes = len(x)
-
-    # setup the sweeper
-    if None not in x:
-        sweeper_params = {
-            **params.get('sweeper_params', {}),
-            'num_nodes': num_nodes,
-            'diagonal_elements': diags,
-            'first_row': first_row,
-            'QI': params.get('QI', 'LU'),
-            'quad_type': params.get('quad_type', 'RADAU-RIGHT'),
-        }
-    else:
-        sweeper_params = {}
-
-    return sweeper_params, params['sweeper']
 
 
 def single_run(x, params, *args, **kwargs):
@@ -169,13 +124,6 @@ def optimize(params, initial_guess, num_nodes, objective_function, tol=1e-16, **
     store_precon(params, opt.x, initial_guess, **kwargs)
 
 
-def objective_function_diagonal_adaptivity_embedded_normalized(x, *args):
-    '''
-    The same as objective_function_diagonal_residual_embedded, but with sum(x) = 1
-    '''
-    return objective_function_k_only(np.append(x, -sum(x) + 1), *args)
-
-
 def objective_function_k_and_e(x, *args):
     '''
     This function takes as input the diagonal preconditioner entries and runs a problem and then returns the number of
@@ -228,7 +176,7 @@ def plot_errors(stats, u_end, exact):
 def optimize_with_sum(params, num_nodes, **kwargs):
     initial_guess = (np.arange(num_nodes - 1) + 1) / (num_nodes + 2)
     kwargs['normalized'] = True
-    optimize(params, initial_guess, num_nodes, objective_function_diagonal_adaptivity_embedded_normalized, **kwargs)
+    optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
 
 
 def optimize_without_sum(params, num_nodes, **kwargs):
@@ -247,7 +195,10 @@ if __name__ == '__main__':
     print_status = True
     problem = 'advection'
 
-    kwargs = {'adaptivity': True}
+    kwargs = {
+        'adaptivity': True,
+        #'random_IG': True,
+    }
 
     params = get_params(problem, **kwargs)
     num_nodes = 3
