@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 
+from pySDC.playgrounds.Preconditioners.hooks import log_cost
 from pySDC.playgrounds.Preconditioners.configs import (
     get_params,
     store_precon,
@@ -15,66 +15,7 @@ from pySDC.playgrounds.Preconditioners.configs import (
 print_status = False
 
 
-class log_cost(hooks):
-    '''
-    This class stores all relevant information for the cost function
-    '''
-
-    def post_step(self, step, level_number):
-
-        super(log_cost, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u_old',
-            value=L.uold[-1],
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.u[-1],
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_em',
-            value=L.status.error_embedded_estimate,
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='k',
-            value=step.status.iter,
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restarts',
-            value=int(step.status.restart),
-        )
-
-
-def prepare_sweeper(x, params, use_first_row=False, normalize=False, **kwargs):
+def prepare_sweeper(x, params, use_first_row=False, normalized=False, **kwargs):
     """
     Prepare the sweeper with diagonal elements before running the problem
 
@@ -88,20 +29,26 @@ def prepare_sweeper(x, params, use_first_row=False, normalize=False, **kwargs):
         dict: Sweeper parameters
     """
     if use_first_row:
+        if normalized:
+            raise NotImplementedError
+
         diags = np.array(x[0 : len(x) // 2])
         first_row = np.array(x[len(x) // 2 : :])
-        num_nodes = len(x) // 2 - 1
+        num_nodes = len(x) // 2
     else:
-        diags = np.array(x)
-        first_row = np.zeros_like(diags)
-        num_nodes = len(x) - 1
-
-    if normalize:
-        raise NotImplementedError
+        if normalized:
+            diags = np.array(np.append(x, -sum(x) + 1))
+            first_row = np.zeros_like(diags)
+            num_nodes = len(x) + 1
+        else:
+            diags = np.array(x)
+            first_row = np.zeros_like(diags)
+            num_nodes = len(x)
 
     # setup the sweeper
     if None not in x:
         sweeper_params = {
+            **params.get('sweeper_params', {}),
             'num_nodes': num_nodes,
             'diagonal_elements': diags,
             'first_row': first_row,
@@ -139,14 +86,20 @@ def single_run(x, params, *args, **kwargs):
     controller_params = params.get('controller_params', {})
 
     sweeper_params, sweeper = prepare_sweeper(x, params, **kwargs)
-    custom_description['sweeper_params'] = sweeper_params
+    custom_description['sweeper_params'] = {**params.get('sweeper_params', {}), **sweeper_params}
     custom_description['sweeper_class'] = sweeper
+
+    allowed_keys = ['step_params', 'level_params']
+    for key in allowed_keys:
+        custom_description[key] = {**custom_description.get(key, {}), **params.get(key, {})}
 
     stats, controller, _ = params['prob'](
         custom_description=custom_description,
-        hook_class=log_cost,
+        hook_class=kwargs.get('hook_class', log_cost),
         custom_problem_params=problem_params,
         custom_controller_params=controller_params,
+        Tend=params['Tend'],
+        **kwargs.get('pkwargs', {}),
     )
     return stats, controller
 
@@ -272,16 +225,10 @@ def plot_errors(stats, u_end, exact):
     plt.cla()
 
 
-def optimize_with_sum(params, num_nodes):
+def optimize_with_sum(params, num_nodes, **kwargs):
     initial_guess = (np.arange(num_nodes - 1) + 1) / (num_nodes + 2)
-    tol = 1e-16
-    minimize(
-        objective_function_diagonal_adaptivity_embedded_normalized,
-        initial_guess,
-        args=params,
-        tol=tol,
-        method='nelder-mead',
-    )
+    kwargs['normalized'] = True
+    optimize(params, initial_guess, num_nodes, objective_function_diagonal_adaptivity_embedded_normalized, **kwargs)
 
 
 def optimize_without_sum(params, num_nodes, **kwargs):
@@ -298,13 +245,16 @@ def optimize_with_first_row(params, num_nodes, **kwargs):
 
 if __name__ == '__main__':
     print_status = True
+    problem = 'advection'
 
     kwargs = {'adaptivity': True}
 
-    params = get_params('advection', **kwargs)
+    params = get_params(problem, **kwargs)
     num_nodes = 3
 
+    store_serial_precon(problem, num_nodes, LU=True, **kwargs)
+    store_serial_precon(problem, num_nodes, IE=True, **kwargs)
+    store_serial_precon(problem, num_nodes, MIN=True, **kwargs)
+    optimize_with_sum(params, num_nodes, **kwargs)
     optimize_without_sum(params, num_nodes, **kwargs)
     optimize_with_first_row(params, num_nodes, **kwargs)
-    store_serial_precon('advection', num_nodes, LU=True, **kwargs)
-    store_serial_precon('advection', num_nodes, IE=True, **kwargs)

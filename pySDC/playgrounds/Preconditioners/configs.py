@@ -18,9 +18,7 @@ from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityResidual
 
 
-params_default = {
-    'quad_type': 'RADAU-RIGHT',
-}
+params_default = {'quad_type': 'RADAU-RIGHT', 'sweeper_params': {'num_nodes': 3}, 'QI': None}
 
 params_vdp = {
     **params_default,
@@ -28,7 +26,7 @@ params_vdp = {
     'sweeper': DiagPrecon,
     'serial_sweeper': generic_implicit,
     'e_tol': 2e-5,
-    'problem_params': None,
+    'problem_params': {},
     'r_tol': 1.0,
     'k': 1,
     'e': 1,
@@ -58,7 +56,7 @@ params_advection = {
     'sweeper': DiagPrecon,
     'serial_sweeper': generic_implicit,
     'e_tol': 1e-9,
-    'problem_params': {'freq': -1, 'sigma': 6e-2, 'type': 'backward', 'order': 5, 'nvars': 2**9, 'c':1.},
+    'problem_params': {'freq': -1, 'sigma': 6e-2, 'type': 'backward', 'order': 5, 'nvars': 2**9, 'c': 1.0},
     #'problem_params': {'freq': -1, 'sigma': 2e-2, 'type': 'backward', 'order': 5, 'nvars': 2**8, 'c':10.},
     #'problem_params': {'freq': -1, 'sigma': 1e-2, 'type': 'backward', 'order': 5, 'nvars': 2**6, 'c':1.},
     'r_tol': 2e-11,
@@ -67,7 +65,8 @@ params_advection = {
     'e_em': 5.91e-10,
     'name': 'advection',
     'derivative': 1,
-    'L': 1.,
+    'L': 1.0,
+    'Tend': 2e-1,
 }
 
 
@@ -77,11 +76,19 @@ params_heat = {
     'sweeper': DiagPrecon,
     'serial_sweeper': generic_implicit,
     'e_tol': 1e-9,
-    'problem_params': {'freq': -1, 'order': 2, 'type': 'forward', 'nvars': 2**7, 'nu': 1., 'sigma': 6e-2,},
+    'problem_params': {
+        'freq': -1,
+        'order': 2,
+        'type': 'forward',
+        'nvars': 2**7,
+        'nu': 1.0,
+        'sigma': 6e-2,
+    },
     'k': 0,
     'name': 'heat',
     'derivative': 2,
-    'L': 1.,
+    'L': 1.0,
+    'Tend': 2e-1,
 }
 
 
@@ -115,24 +122,90 @@ def get_convergence_controllers(params, adaptivity=False, residual_adaptivity=Fa
     return convergence_controllers
 
 
-def get_serial_preconditioner(params, LU=False, IE=False, **kwargs):
+def get_serial_preconditioner(params, **kwargs):
     """
     Replace sweeper with serial sweeper and add the corresponding preconditioner
 
     Args:
-        LU (bool): LU preconditioner
-        IE (bool): serial implicit Euler preconditioner
+        params (dict): Parameters for running the problem
 
     Returns:
         dict: Updated params
     """
-    if LU:
-        params['sweeper'] = params['serial_sweeper']
-        params['QI'] = 'LU'
-    elif IE:
-        params['sweeper'] = params['serial_sweeper']
-        params['QI'] = 'IE'
+    allowed = ['LU', 'IE', 'MIN']
+    for precon in allowed:
+        if kwargs.get(precon, False):
+            params['sweeper'] = params['serial_sweeper']
+            params['QI'] = precon
     return params
+
+
+def get_params_for_stiffness_plot(problem, **kwargs):
+    """
+    Get params for different equations to reproduce plots from Robert's paper "Parallelizing spectral deferred
+    corrections across the method"
+
+    Args:
+        problem (str): The name of the problem that has been run to obtain the preconditioner
+
+    Returns:
+        dict: Parameters for running a problem
+        numpy.ndarray: List of values for the problem parameter
+    """
+    params = get_params(problem, **kwargs)
+
+    params_heat = {
+        'problem_params': {
+            'freq': 2,
+            'nvars': 63,
+            'bc': 'dirichlet-zero',
+            'type': 'center',
+        },
+        'range': np.logspace(-3, 2, 6),
+        'parameter': 'nu',
+    }
+
+    params_advection = {
+        'problem_params': {
+            'freq': 2,
+            'nvars': 64,
+            'bc': 'periodic',
+            'type': 'center',
+            'order': 2,
+        },
+        'range': np.logspace(-3, 2, 6),
+        'parameter': 'c',
+    }
+
+    params_vdp = {
+        'problem_params': {'nvars': 2, 'newton_tol': 1e-9, 'newton_maxiter': 20, 'u0': np.array([2.0, 0.0])},
+        'range': np.array([0.1 * 2**i for i in range(0, 10)]),
+        'parameter': 'mu',
+    }
+
+    params_all = {
+        'heat': params_heat,
+        'advection': params_advection,
+        'vdp': params_vdp,
+    }
+
+    assert problem in params_all.keys(), f"Don\'t have parameters for stiffness plot for problem \"{problem}\""
+    special_params = params_all[problem]
+
+    if not kwargs.get('adaptivity', True):
+        params['convergence_controllers'] = {}
+        params['step_params'] = {'maxiter': 100}
+        params['level_params'] = {
+            'restol': 1e-8,
+            'dt': 0.1,
+        }
+
+    for key in ['problem_params', 'level_params']:
+        params[key] = {**params.get(key, {}), **special_params.get(key, {})}
+
+    params['Tend'] = params['level_params']['dt']
+
+    return params, special_params['parameter'], special_params['range']
 
 
 def get_params(problem, **kwargs):
@@ -148,7 +221,7 @@ def get_params(problem, **kwargs):
     if problem not in problems.keys():
         raise NotImplementedError(f'{problem} has no predefined parameters in `configs.py`!')
 
-    params = problems[problem]
+    params = problems[problem].copy()
 
     params['convergence_controllers'] = get_convergence_controllers(params, **kwargs)
 
@@ -207,7 +280,7 @@ def store_precon(params, x, initial_guess, **kwargs):
     data['first_row'] = np.zeros_like(x)
 
     # write the configuration in the data array
-    configs = ['use_first_row', 'normalized', 'LU', 'IE']
+    configs = ['use_first_row', 'normalized', 'LU', 'IE', 'MIN']
     for c in configs:
         data[c] = kwargs.get(c, False)
 
@@ -215,11 +288,10 @@ def store_precon(params, x, initial_guess, **kwargs):
     if data['use_first_row']:
         data['diags'] = x[0 : len(x) // 2]
         data['first_row'] = x[len(x) // 2 : :]
-    elif data['LU'] or data['IE']:
-        data['QI'] = params['QI']
     else:
         data['diags'] = x.copy()
 
+    data['QI'] = params['QI']
     data['num_nodes'] = len(data['diags'])
     data['time'] = time.time()
     data['x'] = x.copy()
@@ -276,5 +348,6 @@ def get_collocation_nodes(params, num_nodes):
     """
     coll = CollBase(num_nodes, quad_type=params.get('quad_type', 'RADAU-RIGHT'))
     return coll.nodes
+
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']

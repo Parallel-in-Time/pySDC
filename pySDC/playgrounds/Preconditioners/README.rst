@@ -29,8 +29,14 @@ If this is not the case, the estimate becomes completely meaningless and does no
 Putting this random value with no connection to the local error into adaptivity will produce spuriously large step sizes.
 This is a big issue...
 
+Assessing the quality of preconditioners
+----------------------------------------
+It is apparently vital to choose a random initial guess for the Dahlquist problems when computing the contraction factor.
+The initial conditions, however are left at one, but the initial guess for the collocation nodes needs to be random.
+
 TODO
 ----
  - Try adaptivity with extrapolation estimate instead of embedded estimate
  - Penalize a bad solve of the problem by checking the residual during run time
  - Do heatmap with dahlquist problems instead of advection
+ - I might need to consider Fourier modes in time as well as in space, since I am looking to solve multiple time steps at once.
