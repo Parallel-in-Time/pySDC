@@ -60,7 +60,7 @@ class log_fault_stats_data(FaultInjector):
             iter=-1,
             sweep=L.status.sweep,
             type='e_em',
-            value=L.status.error_embedded_estimate,
+            value=L.status.__dict__.get('error_embedded_estimate', None),
         )
         self.increment_stats(
             process=step.status.slot,
@@ -137,7 +137,7 @@ class log_all_iterates(log_fault_stats_data):
             iter=iter,
             sweep=L.status.sweep,
             type='e_ex',
-            value=L.status.error_extrapolation_estimate,
+            value=L.status.__dict__.get('error_extrapolation_estimate', None),
         )
 
 
