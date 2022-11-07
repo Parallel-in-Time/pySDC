@@ -74,9 +74,9 @@ Not only that, we managed to write the FD scheme as Dahlquist problems, which we
 To fix the notation, we write the Dahlquist problem here:
 
 .. math::
-   u_t = \lambda u,
+   $$u_t = \lambda u,$$
 
-with problem parameter :math:`\lambda \in \mathbb{C}`.
+with problem parameter :math:`$\lambda \in \mathbb{C}$`.
 Notice this is an ordinary differential equation, so there is no space index.
 For :math:`\lambda` on the negative real axis, the exact solution will decay exponentially, for :math:`\lambda` on the imaginary axis, the exact solution will oscillate and for :math:`\lambda` on the positive real axis, the exact solution will grow exponentially.
 
