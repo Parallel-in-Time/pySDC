@@ -230,8 +230,8 @@ class PreconPostProcessing:
             Contraction factor plot
         """
         # get problem parameters
-        problem_params = get_params(problem)['problem_params']
         params = get_params(problem)
+        problem_params = params['problem_params']
 
         # get the eigenvalues of the Toeplitz matrix
         eigenvals = problem_parameter * get_finite_difference_eigenvalues(
@@ -398,10 +398,10 @@ def compare_stiffness(precons, problem, parameter=None, parameter_range=None, **
 
     if 'ax' not in kwargs.keys():
         fig.tight_layout()
-        plt.savefig(f'data/plots/stiffness-{problem}-{parameter}.pdf', bbox_inches='tight')
+        plt.savefig(f'data/plots/stiffness-{problem}-{parameter}.{kwargs.get("format", "pdf")}', bbox_inches='tight')
 
 
-def compare_stiffness_paper(precons):
+def compare_stiffness_paper(precons, **kwargs):
     """
     Reproduce the plots in Robert's paper "Parallelizing spectral deferred corrections across the method", where he
     plots the number of iterations needed for a problem with a given preconditioner in a range from non-stiff to stiff
@@ -425,7 +425,7 @@ def compare_stiffness_paper(precons):
         axs[i].set_title(problems[i])
         axs[i].set_xlabel(xlabels[i])
     fig.tight_layout()
-    plt.savefig('data/plots/stiffness.pdf', bbox_inches='tight')
+    plt.savefig(f'data/plots/stiffness.{kwargs.get("format", "pdf")}', bbox_inches='tight', dpi=200)
 
 
 def compare_Fourier(precons, problem, **kwargs):
@@ -443,7 +443,7 @@ def compare_Fourier(precons, problem, **kwargs):
     for i in range(len(precons)):
         precons[i].plot_fourier_decomposition(problem=problem, ax=axs.flat[i], no_legend=i > 0, labels=i == 2)
     fig.tight_layout()
-    plt.savefig(f'data/plots/fourier_comparison-{problem}.pdf', dpi=200, bbox_inches='tight')
+    plt.savefig(f'data/plots/fourier_comparison-{problem}.{kwargs.get("format", "pdf")}', dpi=200, bbox_inches='tight')
 
 
 def compare_contraction(precons, plot_eigenvals=False, log=False, vmin=1e-16, **kwargs):
@@ -481,7 +481,7 @@ def compare_contraction(precons, plot_eigenvals=False, log=False, vmin=1e-16, **
     cb.set_label(r'$\log \rho$')
 
     plt.savefig(
-        f'data/plots/contraction_comparison{"-" if plot_eigenvals else ""}{kwargs.get("problem", "")}.pdf',
+        f'data/plots/contraction_comparison{"-" if plot_eigenvals else ""}{kwargs.get("problem", "")}.{kwargs.get("format", "pdf")}',
         dpi=200,
         bbox_inches='tight',
     )
@@ -522,5 +522,34 @@ pkwargs = {'Tend': 1e-2}
 # compare_contraction(precons, plot_eigenvals=True, problem_parameter=1, vmin=-10, problem='heat')
 # compare_Fourier(precons, problem='heat')
 # compare_Fourier(precons, problem='advection')
-compare_stiffness_paper(more_precons)
+# compare_stiffness_paper(more_precons, format='png')
+fig, axs = plt.subplots(1, 2, figsize=(11.1, 4.1))
+active_only = False
+im = postIE.plot_eigenvalues(
+    problem='heat',
+    problem_parameter=1.0,
+    active_only=active_only,
+    rescale=True,
+    ax=axs[0],
+    vmin=-16,
+    fig=fig,
+    cbar=False,
+)
+postIE.plot_eigenvalues(
+    problem='advection',
+    problem_parameter=-1.0,
+    active_only=active_only,
+    rescale=True,
+    ax=axs[1],
+    vmin=-16,
+    fig=fig,
+    cbar=False,
+)
+axs[0].set_title('heat')
+axs[1].set_title('advection')
+axs[0].set_xlabel(r'Re($\lambda$)')
+axs[0].set_ylabel(r'Im($\lambda$)')
+cb = fig.colorbar(im, ax=axs.ravel().tolist())
+cb.set_label(r'$\log \rho$')
+plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
 plt.show()

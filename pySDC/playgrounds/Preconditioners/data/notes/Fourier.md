@@ -28,7 +28,7 @@ $$u(x_n) = \sum_{k=0}^{N-1} \hat{u}_k \exp(i\frac{2\pi k}{N}x_n)$$
 
 Now, consider the DFT of the solution at the next point in space $x_{n+1} = x_n + \Delta x$:
 
-$$u(x_{n+1}) = \sum_{k=0}^{N-1} \hat{u}_k \exp\left(i\frac{2\pi k}{N}(x_{n} + \Delta x)\right) = \sum_{k=0}^{N-1} \hat{u}_k \exp\left(i\frac{2\pi k}{N}x_{n}\right) \cdot \exp\left(i\frac{2\pi k}{N}\Delta x\right).$$
+$$u(x_{n+1}) = \sum_{k=0}^{N-1} \hat{u}_k \exp\left(i\frac{2\pi k}{N}(x_n + \Delta x)\right) = \sum_{k=0}^{N-1} \hat{u}_k \exp\left(i\frac{2\pi k}{N}x_n\right) \cdot \exp\left(i\frac{2\pi k}{N}\Delta x\right).$$
 
 We can see that the index shift has become a multiplication by an exponential.
 Using the orthogonality relation
@@ -92,9 +92,11 @@ To keep things interesting, however, we will use stencils with different eigenva
 While these choices of stencils are not necessarily smart for solving the problem, their eigenvalues are spread across the complex plane rather than just falling on a particular axis.
    
 <p>
+<center>
 <img src="./rho-IE-FD-eigenvals.png" alt="Eigenvalues of the FD schemes" style="width:100%;"/>
 <em>Eigenvalues of the stencils we use to solve heat and advection problems. For the advection problem, we have many eigenvalues in the negative half plane, which means the backward (or upwind in this case) stencil is better than a centered stencil.
    For the heat equation, however, the one sided stencil is clearly worse than a centered one, since now we have a substiantial amount of eigenvalues in the positive half plane, where the error is growing with each iteration.</em>
+</center>
 </p>
 
 What can we deduce?
