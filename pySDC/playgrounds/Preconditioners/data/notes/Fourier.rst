@@ -105,7 +105,7 @@ To introduce the concepts, we will stick with implicit Euler as a preconditioner
    :alt: Contraction factor for SDC with implicit Euler preconditioner
 
    Logarithmic contraction factor for SDC with implicit Euler preconditioner after four iterations.
-   The error is rising for some values with Re(:math:`$\lambda`$)>0 and for some values on the imaginary axis, but implicit Euler is A-stable, which means that error is contracting on the entire left half plane.
+   The error is rising for some values with Re(:math:`$\lambda$`)>0 and for some values on the imaginary axis, but implicit Euler is A-stable, which means that error is contracting on the entire left half plane.
 
 We already know where the eigenvalues of heat and advection equations fall in the complex plane, so we can just plot them on top of the contraction factor.
 To keep things interesting, however, we will use stencils with different eigenvalues, namely a second order forward difference stencil for the heat equation and a 5th order backward difference stencil for advection.
