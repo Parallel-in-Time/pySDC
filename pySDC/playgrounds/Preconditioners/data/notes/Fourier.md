@@ -82,9 +82,9 @@ Since we know the exact solution to the Dahlquist problem, we can just compare t
 To introduce the concepts, we will stick with implicit Euler as a preconditioner for the plots, before repeating the same plots with different preconditioners to assess their quality.
 
 <p>
-<img src="./rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:100%;"/>
+<img src="./rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:60%;"/>
 <em>Logarithmic contraction factor for SDC with implicit Euler preconditioner after four iterations.
-The error is rising for some values with Re($\lambda$)>0 and for some values on the imaginary axis, but implicit Euler is A-stable, which means that error is contracting on the entire left half plane.</em>
+The error is rising for some values with on the positive half plane and for some values on the imaginary axis, but implicit Euler is A-stable, which means that error is contracting on the entire left half plane.</em>
 </p>
 
 We already know where the eigenvalues of heat and advection equations fall in the complex plane, so we can just plot them on top of the contraction factor.
