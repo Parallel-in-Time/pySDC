@@ -261,7 +261,7 @@ class PreconPostProcessing:
             real[1] = max([1, real[1]])
             imag[0] = min([-1, imag[0]])
             imag[1] = max([1, imag[1]])
-            self.change_dahlquist_range(re=real, im=imag, res=100, log=False)
+            self.change_dahlquist_range(re=real, im=imag, res=1000, log=False)
 
         # plot the contraction factor
         if ax is None:
@@ -532,8 +532,10 @@ im = postIE.plot_eigenvalues(
     rescale=True,
     ax=axs[0],
     vmin=-16,
+    vmax=0.,
     fig=fig,
     cbar=False,
+    iter=[0, 4],
 )
 postIE.plot_eigenvalues(
     problem='advection',
@@ -542,8 +544,10 @@ postIE.plot_eigenvalues(
     rescale=True,
     ax=axs[1],
     vmin=-16,
+    vmax=0.,
     fig=fig,
     cbar=False,
+    iter=[0, 4],
 )
 axs[0].set_title('heat')
 axs[1].set_title('advection')
@@ -551,5 +555,8 @@ axs[0].set_xlabel(r'Re($\lambda$)')
 axs[0].set_ylabel(r'Im($\lambda$)')
 cb = fig.colorbar(im, ax=axs.ravel().tolist())
 cb.set_label(r'$\log \rho$')
-plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
+if not active_only:
+    plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
+else:
+    plt.savefig('data/notes/rho-IE-FD-eigenvals-active.png', dpi=200, bbox_inches='tight')
 plt.show()
