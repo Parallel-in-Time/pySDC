@@ -176,6 +176,7 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
 
     # get error for each iteration
     e = abs(us - u_exact)
+    e[e == 0] = np.finfo(float).eps
 
     # get contraction rates for each iteration
     rho = e[1:, :] / e[:-1, :]

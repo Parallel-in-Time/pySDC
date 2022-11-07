@@ -40,3 +40,15 @@ TODO
  - Penalize a bad solve of the problem by checking the residual during run time
  - Do heatmap with dahlquist problems instead of advection
  - I might need to consider Fourier modes in time as well as in space, since I am looking to solve multiple time steps at once.
+
+
+Results log
+-----------
+The first problem I ran was advection with a Gaussian for initial conditions.
+
+.. figure:: data/notes/stiffness-advection-random.png
+   :width: 100%
+   :align: center
+
+
+.. include:: data/notes/Fourier.rst
