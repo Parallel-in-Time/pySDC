@@ -32,7 +32,6 @@ class _Status(FrozenClass):
         self.time = None
         self.dt_new = None
         self.sweep = None
-        self.error_extrapolation_estimate = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
 

@@ -71,7 +71,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
 
     def setup_status_variables(self, controller, **kwargs):
         """
-        Initialize coefficient variables.
+        Initialize coefficient variables and add variable to the levels for extrapolated error
 
         Args:
             controller (pySDC.controller): The controller
@@ -81,7 +81,30 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         """
         self.coeff.u = [None] * self.params.n
         self.coeff.f = [0.0] * self.params.n
+
+        self.reset_status_variables(controller, **kwargs)
         return None
+
+    def reset_status_variables(self, controller, **kwargs):
+        """
+        Add variable for extrapolated error
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Returns:
+            None
+        """
+        if 'comm' in kwargs.keys():
+            steps = [controller.S]
+        else:
+            if 'active_slots' in kwargs.keys():
+                steps = [controller.MS[i] for i in kwargs['active_slots']]
+            else:
+                steps = controller.MS
+        where = ["levels", "status"]
+        for S in steps:
+            self.add_variable(S, name='error_extrapolation_estimate', where=where, init=None)
 
     def check_parameters(self, controller, params, description, **kwargs):
         """
