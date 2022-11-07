@@ -80,6 +80,7 @@ Then we will see where the eigenvalues of our FD scheme lie in the complex plane
 Let's start with plotting the contraction factor after four iterations.
 Since we know the exact solution to the Dahlquist problem, we can just compare the initial and final errors to determine how the error shrinks.
 To introduce the concepts, we will stick with implicit Euler as a preconditioner for the plots, before repeating the same plots with different preconditioners to assess their quality.
+
 <p>
 <img src="./rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:60%;"/>
 <em>Logarithmic contraction factor for SDC with implicit Euler preconditioner after four iterations.
@@ -91,14 +92,12 @@ The error is rising for some values with Re($\lambda$)>0 and for some values on 
 We already know where the eigenvalues of heat and advection equations fall in the complex plane, so we can just plot them on top of the contraction factor.
 To keep things interesting, however, we will use stencils with different eigenvalues, namely a second order forward difference stencil for the heat equation and a 5th order backward difference stencil for advection.
 While these choices of stencils are not necessarily smart for solving the problem, their eigenvalues are spread across the complex plane rather than just falling on a particular axis.
-
-.. figure:: rho-IE-FD-eigenvals.png
-   :align: center
-   :width: 100%
-   :alt: Eigenvalues of the FD schemes
-
-   Eigenvalues of the stencils we use to solve heat and advection problems. For the advection problem, we have many eigenvalues in the negative half plane, which means the backward (or upwind in this case) stencil is better than a centered stencil.
-   For the heat equation, however, the one sided stencil is clearly worse than a centered one, since now we have a substiantial amount of eigenvalues in the positive half plane, where the error is growing with each iteration.
+   
+<p>
+<img src="./rho-IE-FD-eigenvals.png" alt="Eigenvalues of the FD schemes" style="width:100%;"/>
+<em>Eigenvalues of the stencils we use to solve heat and advection problems. For the advection problem, we have many eigenvalues in the negative half plane, which means the backward (or upwind in this case) stencil is better than a centered stencil.
+   For the heat equation, however, the one sided stencil is clearly worse than a centered one, since now we have a substiantial amount of eigenvalues in the positive half plane, where the error is growing with each iteration.</em>
+</p>
 
 What can we deduce?
 We know that some frequency components will decay and others will grow, so we cannot make a clear statement on how the overall error will behave.
