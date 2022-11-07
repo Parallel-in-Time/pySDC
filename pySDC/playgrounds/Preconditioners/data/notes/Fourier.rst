@@ -13,7 +13,9 @@ The eigenvalues of this type of matrix are known:
 
 .. math::
 
-   $$\lambda_k = \sum_{j=0}^{N-1} c_j \exp\left(i\frac{2\pi}{N}kj\right)$$
+   $$
+   \lambda_k = \sum_{j=0}^{N-1} c_j \exp\left(i\frac{2\pi}{N}kj\right)
+   $$
 
 The corresponding eigenvectors are
 
