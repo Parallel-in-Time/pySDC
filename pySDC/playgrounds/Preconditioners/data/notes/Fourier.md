@@ -82,13 +82,11 @@ Since we know the exact solution to the Dahlquist problem, we can just compare t
 To introduce the concepts, we will stick with implicit Euler as a preconditioner for the plots, before repeating the same plots with different preconditioners to assess their quality.
 
 <p>
-<img src="./rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:60%;"/>
+<img src="./rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:100%;"/>
 <em>Logarithmic contraction factor for SDC with implicit Euler preconditioner after four iterations.
 The error is rising for some values with Re($\lambda$)>0 and for some values on the imaginary axis, but implicit Euler is A-stable, which means that error is contracting on the entire left half plane.</em>
 </p>
 
-
- 
 We already know where the eigenvalues of heat and advection equations fall in the complex plane, so we can just plot them on top of the contraction factor.
 To keep things interesting, however, we will use stencils with different eigenvalues, namely a second order forward difference stencil for the heat equation and a 5th order backward difference stencil for advection.
 While these choices of stencils are not necessarily smart for solving the problem, their eigenvalues are spread across the complex plane rather than just falling on a particular axis.
@@ -107,13 +105,11 @@ We choose a Gaussian distribution as initial conditions, since that is composed 
 Then, we determine the error and apply a DFT to it.
 Repeating the plot, but only with eigenvalues which modes are represented sufficiently strong, we get
 
-.. figure:: rho-IE-FD-eigenvals-active.png
-   :align: center
-   :width: 100%
-   :alt: Eigenvalues of active modes in the FD schemes
-
-   Eigenvalues of active modes when solving the problems.
+<p>
+<img src="./rho-IE-FD-eigenvals-active.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
+<em>Eigenvalues of active modes when solving the problems.
    A somewhat well resolved Gaussian will consist mostly of low frequency components, which results in similar behaviour as the centered stencils discussed before.
-   For advection, the eigenvalues lie on the imaginary axis, whereas the eigenvalues of the heat equation are in the negative half plane and close to the real axis.
+   For advection, the eigenvalues lie on the imaginary axis, whereas the eigenvalues of the heat equation are in the negative half plane and close to the real axis.</em>
+</p>
 
 Interpretation...
