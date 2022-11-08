@@ -44,7 +44,7 @@ class log_errors(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='e_extrapolated',
-            value=L.status.__dict__.get('error_extrapolation_estimate', None),
+            value=L.status.get('error_extrapolation_estimate'),
         )
         self.add_to_stats(
             process=step.status.slot,
