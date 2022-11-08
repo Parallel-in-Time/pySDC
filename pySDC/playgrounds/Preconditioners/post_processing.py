@@ -44,7 +44,7 @@ class PreconPostProcessing:
         self.re_range = np.linspace(-30, 30, 400)
         self.im_range = np.linspace(-50, 50, 400)
 
-    def change_dahlquist_range(self, re=None, im=None, res=400, log=False):
+    def change_dahlquist_range(self, re=None, im=None, res=400, log=False, **kwargs):
         '''
         Change the range in the complex plane for running the Dahlquist problems and rerun them
 
@@ -67,7 +67,7 @@ class PreconPostProcessing:
             self.re_range = get_range(re[0], re[1], res, log)
         if im is not None:
             self.im_range = get_range(im[0], im[1], res, log)
-        self.run_dahlquist()
+        self.run_dahlquist(**kwargs)
 
     def run_dahlquist(self, **kwargs):
         '''
@@ -97,8 +97,13 @@ class PreconPostProcessing:
             'lambdas': lambdas,
         }
 
-        desc = {'sweeper_params': sweeper_params, 'sweeper_class': self.data['sweeper']}
-        stats, _, _ = run_dahlquist(custom_description=desc, custom_problem_params=problem_params, **kwargs)
+        dt = kwargs.get('dt', 1.0)
+        level_params = {
+            'dt': dt,
+        }
+
+        desc = {'sweeper_params': sweeper_params, 'sweeper_class': self.data['sweeper'], 'level_params': level_params}
+        stats, _, _ = run_dahlquist(custom_description=desc, custom_problem_params=problem_params, Tend=dt, **kwargs)
         self.dahlquist_stats = stats
         return stats
 
@@ -119,7 +124,7 @@ class PreconPostProcessing:
             kwargs['fig'] = fig
 
         if self.dahlquist_stats is None:
-            self.run_dahlquist()
+            self.run_dahlquist(**kwargs)
 
         return plot_func(self.dahlquist_stats, **kwargs)
 
@@ -261,7 +266,7 @@ class PreconPostProcessing:
             real[1] = max([1, real[1]])
             imag[0] = min([-1, imag[0]])
             imag[1] = max([1, imag[1]])
-            self.change_dahlquist_range(re=real, im=imag, res=1000, log=False)
+            self.change_dahlquist_range(re=real, im=imag, log=False, **kwargs)
 
         # plot the contraction factor
         if ax is None:
@@ -524,7 +529,7 @@ pkwargs = {'Tend': 1e-2}
 # compare_Fourier(precons, problem='advection')
 # compare_stiffness_paper(more_precons, format='png')
 fig, axs = plt.subplots(1, 2, figsize=(11.1, 4.1))
-active_only = False
+active_only = True
 im = postIE.plot_eigenvalues(
     problem='heat',
     problem_parameter=1.0,
@@ -532,10 +537,11 @@ im = postIE.plot_eigenvalues(
     rescale=True,
     ax=axs[0],
     vmin=-16,
-    vmax=0.,
+    vmax=0.0,
     fig=fig,
     cbar=False,
     iter=[0, 4],
+    dt=5.0 / 60.0,
 )
 postIE.plot_eigenvalues(
     problem='advection',
@@ -544,19 +550,21 @@ postIE.plot_eigenvalues(
     rescale=True,
     ax=axs[1],
     vmin=-16,
-    vmax=0.,
+    vmax=0.0,
     fig=fig,
     cbar=False,
     iter=[0, 4],
+    res=500,
+    dt=5.0 / 60.0,
 )
 axs[0].set_title('heat')
 axs[1].set_title('advection')
-axs[0].set_xlabel(r'Re($\lambda$)')
-axs[0].set_ylabel(r'Im($\lambda$)')
+axs[0].set_xlabel(r'Re($\lambda \Delta t$)')
+axs[0].set_ylabel(r'Im($\lambda \Delta t$)')
 cb = fig.colorbar(im, ax=axs.ravel().tolist())
 cb.set_label(r'$\log \rho$')
 if not active_only:
     plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
 else:
-    plt.savefig('data/notes/rho-IE-FD-eigenvals-active.png', dpi=200, bbox_inches='tight')
+    plt.savefig('data/notes/rho-IE-FD-eigenvals-active-dt.png', dpi=200, bbox_inches='tight')
 plt.show()

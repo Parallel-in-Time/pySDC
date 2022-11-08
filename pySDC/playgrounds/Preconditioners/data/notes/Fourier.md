@@ -50,11 +50,11 @@ This turns out to be true for all central difference schemes for the first deriv
 
 In contrast, if we consider the heat equation discretized by a similar second order central difference stencil
 
-$$\partial_t u_n = \nu \frac{u_{n+1} + u_{n-1} - 2u_n}{2 \Delta x},$$
+$$\partial_t u_n = \nu \frac{u_{n+1} + u_{n-1} - 2u_n}{\Delta x^2},$$
 
 we get in Fourier space
 
-$$\partial_t \hat{u}_k = \frac{\nu}{\Delta x}\left(\cos\left(\frac{2\pi}{N}k\Delta x\right) - 1\right)\hat{u}_k,$$
+$$\partial_t \hat{u}_k = \frac{2\nu}{\Delta x^2}\left(\cos\left(\frac{2\pi}{N}k\Delta x\right) - 1\right)\hat{u}_k,$$
 
 and we find the eigenvalues to lie exclusively on the negative real axis, since this time the antisymmetric part is cancelled.
 
@@ -105,7 +105,7 @@ For this, we have to match the eigenvalues with their frequencies and determine 
  
 We choose a Gaussian distribution as initial conditions, since that is composed of Fourier modes of multiple frequencies.
 Then, we determine the error and apply a DFT to it.
-Repeating the plot, but only with eigenvalues which modes are represented sufficiently strong, we get
+Repeating the plot, but only with eigenvalues which modes are represented sufficiently strong, we get some strange results.
 
 <p>
 <img src="./rho-IE-FD-eigenvals-active.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
@@ -114,4 +114,20 @@ Repeating the plot, but only with eigenvalues which modes are represented suffic
    For advection, the eigenvalues lie on the imaginary axis, whereas the eigenvalues of the heat equation are in the negative half plane and close to the real axis.</em>
 </p>
 
-Interpretation...
+It appears all eigenvalues of active modes of the advection problem fall in areas on the imaginary axis, where implicit Euler is unstable.
+Remember, that it is A-stable, which means we can chose an arbitrarily large step size and still converge to the correct solution, as long as we are looking at a Dahlquist problem with $\text{Re}(\lambda) < 0$, which is not the case here.
+However, this does not mean we are unable to solve the advection problem, instead it means we have to refine the step size until implicit Euler gets stable again and the error contracts.
+Keep in mind, that we have used $\Delta t=1$ so far, which let us put $\lambda$ on the axes, but actually, we should put $\lambda \Delta t$ on the axes.
+
+The contraction factor depends on the step size, but the FD eigenvalues do not, which means by refining the step size, we can ``zoom'' into the contraction factor, but the eigenvalues stay where they are.
+Looking at the plot, we see that the first region where implicit Euler is unstable occurs at around $\text{Im}(\lambda (\Delta t=1))\approx 5$, and the maximal modulus of imaginary part of the eigenvalues is about 60.
+This means, we should zoom in by a factor of $\Delta t\approx 5/60\approx 0.08$ in order for all important eigenvalues to fall into the stable range in the center.
+Repeating the plot with a smaller step size, we can confirm that solving an advection problem indeed falls within the range of possibility for us.
+
+<p>
+<img src="./rho-IE-FD-eigenvals-active-dt.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
+<em>Eigenvalues of active modes when solving the problems with refined step size.
+   Contraction factors with reduced step size.
+   The error for the heat equation now decays more slowly, because we take smaller steps, but for the advection problem, the smaller step size is required to ensure convergence at all.
+   Notice that the optimal step size is hence different for the two problems.</em>
+</p>
