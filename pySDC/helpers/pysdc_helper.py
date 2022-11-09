@@ -27,3 +27,16 @@ class FrozenClass(object):
         Function to freeze the class
         """
         self.__isfrozen = True
+
+    def get(self, key, default=None):
+        """
+        Wrapper for `__dict__.get` to use when reading variables that might not exist, depending on the configuration
+
+        Args:
+            key (str): Name of the variable you wish to read
+            default: Value to be returned if the variable does not exist
+
+        Returns:
+            __dict__.get(key, default)
+        """
+        return self.__dict__.get(key, default)

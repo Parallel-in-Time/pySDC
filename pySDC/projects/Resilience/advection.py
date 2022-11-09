@@ -70,7 +70,7 @@ class log_data(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='e_embedded',
-            value=L.status.error_embedded_estimate,
+            value=L.status.get('error_embedded_estimate'),
         )
         self.add_to_stats(
             process=step.status.slot,
@@ -79,7 +79,7 @@ class log_data(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='e_extrapolated',
-            value=L.status.error_extrapolation_estimate,
+            value=L.status.get('error_extrapolation_estimate'),
         )
 
 
