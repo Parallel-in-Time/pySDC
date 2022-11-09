@@ -47,7 +47,7 @@ class PreconPostProcessing:
         self.normalized = self.data['normalized']
         self.semi_diagonal = self.data['use_first_row']
         self.nodes = nodes
-        self.random_ig = self.data['random_IG'] and not self.source == 'optimization'
+        self.random_ig = self.data['random_IG'] and self.source == 'optimization'
 
         # prepare empty variables
         self.dahlquist_stats = None
@@ -506,7 +506,7 @@ def generate_metadata_table(precons, path='./data/notes/metadata.md'):
     # TODO: docs...
     with open(path, 'w') as file:
         # print some title etc
-        file.write('# Preconditioners \nWe supply some information about the preconditioners here\n')
+        file.write('# Preconditioners \nWe supply some information about the preconditioners here:\n')
 
         # print header
         file.write('| name | source | parallelizable | normalized | semi-diagonal | random IG |\n')

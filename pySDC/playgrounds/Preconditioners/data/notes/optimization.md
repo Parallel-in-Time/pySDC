@@ -43,7 +43,7 @@ We can try whatever we want...
 Also, we try optimization with random initial guesses in the sweeper.
 Crucially, this does not mean random initial conditions, the initial guess only refers to how we initialize the intermediate solutions at the collocation nodes.
 
-We record the full set of pySDC parameters [here](configurations.md)
+We record the full set of pySDC parameters [here](configurations.md).
 
 ## Numerical results
 To compare the performance of our newly obtained preconditioners, we do the same plots as Robert did in his paper [Parallelizing spectral deferred corrections across the method](https://doi.org/10.1007/s00791-018-0298-x), where he compared advection, diffusion and van der Pol oscillator problems and varied the problem parameter from non-stiff to stiff.
