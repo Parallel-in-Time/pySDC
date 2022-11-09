@@ -47,7 +47,7 @@ class PreconPostProcessing:
         self.normalized = self.data['normalized']
         self.semi_diagonal = self.data['use_first_row']
         self.nodes = nodes
-        self.random_ig = self.data['random_IG']
+        self.random_ig = self.data['random_IG'] and not self.source == 'optimization'
 
         # prepare empty variables
         self.dahlquist_stats = None
@@ -505,10 +505,14 @@ def compare_contraction(precons, plot_eigenvals=False, log=False, vmin=1e-16, **
 def generate_metadata_table(precons, path='./data/notes/metadata.md'):
     # TODO: docs...
     with open(path, 'w') as file:
+        # print some title etc
+        file.write('# Preconditioners \nWe supply some information about the preconditioners here\n')
+
         # print header
         file.write('| name | source | parallelizable | normalized | semi-diagonal | random IG |\n')
         file.write('|------|--------|----------------|------------|---------------|-----------|\n')
 
+        # print data for the precons
         for precon in precons:
             file.write(
                 f'| {precon.label} | {precon.source} | {precon.parallelizable} | {precon.normalized} | {precon.semi_diagonal} | {precon.random_ig} |\n'

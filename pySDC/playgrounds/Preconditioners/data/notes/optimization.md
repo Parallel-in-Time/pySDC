@@ -29,6 +29,7 @@ The simplest imaginable one is of course to just put the numbers on the diagonal
 
 The next step is to put half of them on the diagonal and the other half in the first column.
 This concept allows parallel Crank-Nicholson instead of just parallel Euler as you get from diagonal elements only, but once optimization starts, we get something ``random.''
+We call this semi-diagonal.
 
 The third option we try is to normalize the diagonal elements to one.
 Ultimately, the preconditiner is a quadrature rule to solve the error equation, so it would make sense for it to approximate an integral.
@@ -36,19 +37,42 @@ This requires it to be normalized, however in a very different way as we do here
 We would want the sum of all weights we use for approximating the integral to equal the step size to which we integrate.
 However, this works on a node level, meaning with only diagonal elements the only choice that normalizes the weights appropriately is implicit Euler.
 Alowing also the initial conditions, more options are possible, but there is no motivation for applying optimization here over the second order Crank-Nicholson.
-But hey, what sort of motivation do we have anyways?
+But hey, what sort of motivation do we have for any of this?
 We can try whatever we want...
+
+Also, we try optimization with random initial guesses in the sweeper.
+Crucially, this does not mean random initial conditions, the initial guess only refers to how we initialize the intermediate solutions at the collocation nodes.
 
 We record the full set of pySDC parameters [here](configurations.md)
 
 ## Numerical results
 To compare the performance of our newly obtained preconditioners, we do the same plots as Robert did in his paper [Parallelizing spectral deferred corrections across the method](https://doi.org/10.1007/s00791-018-0298-x), where he compared advection, diffusion and van der Pol oscillator problems and varied the problem parameter from non-stiff to stiff.
 We start with plots obtained with advection as the model problem.
+Please look [here](metadata.md) for a reference on the preconditioners that we use.
+
+We find that employing heat and advection model problems leads to very similar preconditioners.
 
 <p>
-<img src="./optimization_plots/stiffness-advection.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
-<em>Eigenvalues of active modes when solving the problems with refined step size.
-   Contraction factors with reduced step size.
-   The error for the heat equation now decays more slowly, because we take smaller steps, but for the advection problem, the smaller step size is required to ensure convergence at all.
-   Notice that the optimal step size is hence different for the two problems.</em>
+<img src="./optimization_plots/stiffness-advection.png" alt="Iterations vs. stiffness for a preconditiner obtained with advection" style="width:100%;"/>
+<em>The problem parameters range from non-stiff on the left to stiff on the right.
+Solid lines represent preconditioners obtained with optimization, whereas dashed lines are serial preconditioners and dot-dashed lines show diagonal preconditioners from Robert's paper.
+Evidently, the normalized diagonal preconditioner is more effecicient than its non-normalized counterpart, for no apparent reason.
+Diagonal and semi-diagonal preconditioners require almost identical iteration counts.
+</em>
+</p>
+
+<p>
+<img src="./optimization_plots/stiffness-heat.png" alt="Iterations vs. stiffness for a preconditiner obtained with diffusion" style="width:100%;"/>
+<em>Repeating the plot, but with preconditioners obtained using diffusion, we can see remarkably similar performance compared to the advection based optimizaiton.
+Interestingly, this time the normalized preconditioner is performing poorly.
+</em>
+</p>
+
+<p>
+<img src="./optimization_plots/stiffness-advection-randomIG.png" alt="Iterations vs. stiffness for a preconditiner obtained with advection and random initial guess" style="width:100%;"/>
+<em>This plot shows again advection, but this time a random initial guess was used to initialize the intermediate solutions at the collocation nodes.
+We can see that this indeed inmproves the capabilities of the preconditioners to handle stiff problems.
+In particular, the semi-diagonal preconditioner can compete with MIN.
+Since doing the same with the heat equation as a model problem yielded very similar behaviour, we show only advection here.
+</em>
 </p>

@@ -82,7 +82,7 @@ Since we know the exact solution to the Dahlquist problem, we can just compare t
 To introduce the concepts, we will stick with implicit Euler as a preconditioner for the plots, before repeating the same plots with different preconditioners to assess their quality.
 
 <p>
-<img src="./rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:60%;"/>
+<img src="./Fourier_plots/rho-IE.png" alt="Contraction factor for SDC with implicit Euler preconditioner" style="width:60%;"/>
 <em>Logarithmic contraction factor for SDC with implicit Euler preconditioner after four iterations.
 The error is rising for some values with on the positive half plane and for some values on the imaginary axis, but implicit Euler is A-stable, which means that error is contracting on the entire left half plane.</em>
 </p>
@@ -93,7 +93,7 @@ While these choices of stencils are not necessarily smart for solving the proble
    
 <p>
 <center>
-<img src="./rho-IE-FD-eigenvals.png" alt="Eigenvalues of the FD schemes" style="width:100%;"/>
+<img src="./Fourier_plots/rho-IE-FD-eigenvals.png" alt="Eigenvalues of the FD schemes" style="width:100%;"/>
 <em>Eigenvalues of the stencils we use to solve heat and advection problems. For the advection problem, we have many eigenvalues in the negative half plane, which means the backward (or upwind in this case) stencil is better than a centered stencil.
    For the heat equation, however, the one sided stencil is clearly worse than a centered one, since now we have a substiantial amount of eigenvalues in the positive half plane, where the error is growing with each iteration.</em>
 </center>
@@ -108,7 +108,7 @@ Then, we determine the error and apply a DFT to it.
 Repeating the plot, but only with eigenvalues which modes are represented sufficiently strong, we get some strange results.
 
 <p>
-<img src="./rho-IE-FD-eigenvals-active.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
+<img src="./Fourier_plots/rho-IE-FD-eigenvals-active.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
 <em>Eigenvalues of active modes when solving the problems.
    A somewhat well resolved Gaussian will consist mostly of low frequency components, which results in similar behaviour as the centered stencils discussed before.
    For advection, the eigenvalues lie on the imaginary axis, whereas the eigenvalues of the heat equation are in the negative half plane and close to the real axis.</em>
@@ -125,7 +125,7 @@ This means, we should zoom in by a factor of $\Delta t\approx 5/60\approx 0.08$ 
 Repeating the plot with a smaller step size, we can confirm that solving an advection problem indeed falls within the range of possibility for us.
 
 <p>
-<img src="./rho-IE-FD-eigenvals-active-dt.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
+<img src="./Fourier_plots/rho-IE-FD-eigenvals-active-dt.png" alt="Eigenvalues of active modes in the FD schemes" style="width:100%;"/>
 <em>Eigenvalues of active modes when solving the problems with refined step size.
    Contraction factors with reduced step size.
    The error for the heat equation now decays more slowly, because we take smaller steps, but for the advection problem, the smaller step size is required to ensure convergence at all.
