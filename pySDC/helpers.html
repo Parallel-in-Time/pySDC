@@ -99,6 +99,23 @@
 <dd><p>Flag to freeze a class</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.pysdc_helper.FrozenClass.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/pysdc_helper.html#FrozenClass.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.pysdc_helper.FrozenClass.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for <cite>__dict__.get</cite> to use when reading variables that might not exist, depending on the configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Name of the variable you wish to read</p></li>
+<li><p><strong>default</strong> – Value to be returned if the variable does not exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>__dict__.get(key, default)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -374,6 +391,7 @@ in the vector ps and the points which are found periodically.</p>
 <li><a class="reference internal" href="#module-helpers.pysdc_helper">helpers.pysdc_helper module</a><ul>
 <li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass"><code class="docutils literal notranslate"><span class="pre">FrozenClass</span></code></a><ul>
 <li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass.__isfrozen"><code class="docutils literal notranslate"><span class="pre">FrozenClass.__isfrozen</span></code></a></li>
+<li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass.get"><code class="docutils literal notranslate"><span class="pre">FrozenClass.get()</span></code></a></li>
 </ul>
 </li>
 </ul>

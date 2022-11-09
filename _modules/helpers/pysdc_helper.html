@@ -68,7 +68,20 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to freeze the class</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__isfrozen</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__isfrozen</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="FrozenClass.get"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.pysdc_helper.FrozenClass.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrapper for `__dict__.get` to use when reading variables that might not exist, depending on the configuration</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Name of the variable you wish to read</span>
+<span class="sd">            default: Value to be returned if the variable does not exist</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            __dict__.get(key, default)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

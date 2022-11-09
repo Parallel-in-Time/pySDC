@@ -1138,6 +1138,20 @@ iteration.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add variable for extrapolated error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving
@@ -1163,7 +1177,7 @@ initialized which are needed for this process.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables">
 <span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize coefficient variables.</p>
+<dd><p>Initialize coefficient variables and add variable to the levels for extrapolated error</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.controller</em>) – The controller</p>
@@ -1744,6 +1758,7 @@ on Tend</p>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase.check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.get_extrapolation_coefficients"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase.get_extrapolation_coefficients()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase.reset_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase.setup()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase.setup_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase.store_values()</span></code></a></li>
