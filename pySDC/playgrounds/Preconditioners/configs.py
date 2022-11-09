@@ -14,6 +14,7 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.heat import run_heat
+from pySDC.projects.Resilience.dahlquist import run_dahlquist
 from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon, DiagPreconIMEX
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityResidual
 
@@ -92,11 +93,37 @@ params_heat = {
 }
 
 
+re = np.linspace(-300, 1, 302)
+im = np.linspace(-1, 100, 102)
+lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+    (len(re) * len(im))
+)
+
+
+params_Dahlquist = {
+    **params_default,
+    'prob': run_dahlquist,
+    'sweeper': DiagPrecon,
+    'serial_sweeper': generic_implicit,
+    'e_tol': 5e-4,
+    'problem_params': {
+        'lambdas': lambdas,
+        'u0': 1.0 + 0.0j,
+    },
+    'k': 0,
+    'name': 'Dahlquist',
+    'derivative': None,
+    'L': None,
+    'Tend': 1,
+}
+
+
 problems = {
     'vdp': params_vdp,
     'piline': params_piline,
     'advection': params_advection,
     'heat': params_heat,
+    'Dahlquist': params_Dahlquist,
 }
 
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 from pySDC.helpers.stats_helper import get_sorted
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 from pySDC.playgrounds.Preconditioners.hooks import log_cost
 from pySDC.playgrounds.Preconditioners.configs import (
@@ -43,11 +44,12 @@ def single_run(x, params, *args, **kwargs):
 
     sweeper_params, sweeper = prepare_sweeper(x, params, **kwargs)
     custom_description['sweeper_params'] = {
-        **params.get('sweeper_params'),
+        **params.get('sweeper_params', {}),
         **sweeper_params,
         **params.get('force_sweeper_params', {}),
+        **kwargs.get('force_sweeper_params', {}),
     }
-    custom_description['sweeper_class'] = sweeper
+    custom_description['sweeper_class'] = kwargs.get('force_sweeper', sweeper)
 
     allowed_keys = ['step_params', 'level_params']
     for key in allowed_keys:
@@ -62,6 +64,26 @@ def single_run(x, params, *args, **kwargs):
         **kwargs.get('pkwargs', {}),
     )
     return stats, controller
+
+
+def get_defaults(x, params):
+    """
+    Run the problem with LU to see how many iterations that requires
+
+    Args:
+        x (numpy.ndarray): The entries of the preconditioner (ignored except for inferring the number of nodes)
+        params (dict): Params that are passed to `single_run`
+
+    Returns:
+        None
+    """
+    stats, controller = single_run(
+        x, params, force_sweeper=generic_implicit, force_sweeper_params={'QI': 'LU', 'num_nodes': 3}
+    )
+    params['k'] = sum([me[1] for me in get_sorted(stats, type='k', recomputed=None)])
+
+    if print_status:
+        print(f'Needed {params["k"]} iterations for {params["name"]} problem with LU')
 
 
 def objective_function_k_only(x, *args):
@@ -125,6 +147,7 @@ def optimize(params, initial_guess, num_nodes, objective_function, tol=1e-16, **
     Returns:
         None
     """
+    get_defaults(initial_guess, params)
     opt = minimize(objective_function, initial_guess, args=(params, kwargs), tol=tol, method='nelder-mead')
     store_precon(params, opt.x, initial_guess, **kwargs)
 
@@ -198,11 +221,11 @@ def optimize_with_first_row(params, num_nodes, **kwargs):
 
 if __name__ == '__main__':
     print_status = True
-    problem = 'heat'
+    problem = 'Dahlquist'
 
     kwargs = {
         'adaptivity': True,
-        'random_IG': False,
+        'random_IG': True,
     }
 
     params = get_params(problem, **kwargs)
@@ -212,6 +235,6 @@ if __name__ == '__main__':
     store_serial_precon(problem, num_nodes, IE=True, **kwargs)
     store_serial_precon(problem, num_nodes, MIN=True, **kwargs)
     store_serial_precon(problem, num_nodes, MIN3=True, **kwargs)
-    optimize_with_sum(params, num_nodes, **kwargs)
-    optimize_without_sum(params, num_nodes, **kwargs)
     optimize_with_first_row(params, num_nodes, **kwargs)
+    optimize_without_sum(params, num_nodes, **kwargs)
+    optimize_with_sum(params, num_nodes, **kwargs)

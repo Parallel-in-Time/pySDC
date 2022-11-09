@@ -323,6 +323,39 @@ class PreconPostProcessing:
         stats, controller = single_run(self.data['x'], params, **{**self.data['kwargs'], **kwargs})
         return stats, controller
 
+    def plot_signature(self, **kwargs):
+        """
+        Plot the weights.
+
+        Returns:
+            None
+        """
+        if 'ax' not in kwargs.keys():
+            fig, ax = plt.subplots()
+        else:
+            ax = kwargs['ax']
+
+        stats, controller = self.run_problem(logger_level=30)
+        sweeper = controller.MS[0].levels[0].sweep
+
+        QI = sweeper.QI
+        nodes = sweeper.coll.nodes
+
+        ax.plot(np.append(0, nodes), [sum(QI[i, :]) for i in range(QI.shape[0])], color=self.color, label=self.label)
+        for i in range(1, QI.shape[0]):
+            cumsum = np.cumsum(QI[i, : i + 1])
+            unique, idx = np.unique(cumsum[cumsum > 0], return_index=True)
+            num_vals = len(idx)
+            ax.scatter(
+                nodes[i - 1] * np.ones(num_vals),
+                cumsum[cumsum > 0][idx],
+                color=self.color,
+                s=(20 + 10 * (1 + np.arange(num_vals)) ** 2),
+            )
+        ax.legend(frameon=False)
+        ax.set_xlabel('nodes')
+        ax.set_ylabel('cumulative weights')
+
     def get_stiffness(self, problem, parameter=None, parameter_range=None, ax=None, maxiter=10000, **kwargs):
         """
         Run a problem with a range of parameters from non-stiff to stiff
@@ -502,8 +535,34 @@ def compare_contraction(precons, plot_eigenvals=False, log=False, vmin=1e-16, **
     )
 
 
+def compare_signatures(precons, **kwargs):
+    """
+    Compare weights of different preconditioners
+
+    Args:
+        precons (list): List of preconditioners as objects of the PreconPostProcessing class
+
+    Returns:
+        None
+    """
+    fig, ax = plt.subplots()
+    for precon in precons:
+        precon.plot_signature(ax=ax)
+    fig.tight_layout()
+    plt.savefig(f'data/plots/weights.{kwargs.get("format", "pdf")}', bbox_inches='tight', dpi=200)
+
+
 def generate_metadata_table(precons, path='./data/notes/metadata.md'):
-    # TODO: docs...
+    """
+    Generate a table containing some metadata about the preconditioners and store it in a Markdown file.
+
+    Args:
+        precons (list): List of preconditioners as objects of the PreconPostProcessing class
+        path (str): Where to store the file
+
+    Returns:
+        None
+    """
     with open(path, 'w') as file:
         # print some title etc
         file.write('# Preconditioners \nWe supply some information about the preconditioners here:\n')
@@ -524,7 +583,7 @@ kwargs = {
     'random_IG': True,
 }
 
-problem = 'heat'
+problem = 'Dahlquist'
 problem_serial = 'advection'
 
 postLU = PreconPostProcessing(
@@ -593,48 +652,49 @@ custom_problem_params = {
 pkwargs = {'Tend': 1e-2}
 
 
+compare_stiffness_paper(more_precons, format='png')
+compare_signatures([postIE, postLU, postDiag, postDiagFirstRow, postMIN, postMIN3], format='png')
 # compare_contraction(precons, plot_eigenvals= True, problem='advection', problem_parameter=-1, vmin=-9)
 # compare_contraction(precons, plot_eigenvals=True, problem_parameter=1, vmin=-10, problem='heat')
 # compare_Fourier(precons, problem='heat')
 # compare_Fourier(precons, problem='advection')
-generate_metadata_table(more_precons)
-compare_stiffness_paper(more_precons, format='png')
-fig, axs = plt.subplots(1, 2, figsize=(11.1, 4.1))
-active_only = True
-precon = postIE
-im = precon.plot_eigenvalues(
-    problem='heat',
-    problem_parameter=1.0,
-    active_only=active_only,
-    rescale=True,
-    ax=axs[0],
-    vmin=-16,
-    vmax=0.0,
-    fig=fig,
-    cbar=False,
-    iter=[0, 4],
-    dt=5.0 / 60.0,
-)
-precon.plot_eigenvalues(
-    problem='advection',
-    problem_parameter=-1.0,
-    active_only=active_only,
-    rescale=True,
-    ax=axs[1],
-    vmin=-16,
-    vmax=0.0,
-    fig=fig,
-    cbar=False,
-    iter=[0, 4],
-    res=500,
-    dt=5.0 / 60.0,
-)
-axs[0].set_title('heat')
-axs[1].set_title('advection')
-axs[0].set_xlabel(r'Re($\lambda \Delta t$)')
-axs[0].set_ylabel(r'Im($\lambda \Delta t$)')
-cb = fig.colorbar(im, ax=axs.ravel().tolist())
-cb.set_label(r'$\log \rho$')
+# generate_metadata_table(more_precons)
+# fig, axs = plt.subplots(1, 2, figsize=(11.1, 4.1))
+# active_only = True
+# precon = postIE
+# im = precon.plot_eigenvalues(
+#    problem='heat',
+#    problem_parameter=1.0,
+#    active_only=active_only,
+#    rescale=True,
+#    ax=axs[0],
+#    vmin=-16,
+#    vmax=0.0,
+#    fig=fig,
+#    cbar=False,
+#    iter=[0, 4],
+#    #dt=5.0 / 60.0,
+# )
+# precon.plot_eigenvalues(
+#    problem='advection',
+#    problem_parameter=-1.0,
+#    active_only=active_only,
+#    rescale=True,
+#    ax=axs[1],
+#    vmin=-16,
+#    vmax=0.0,
+#    fig=fig,
+#    cbar=False,
+#    iter=[0, 4],
+#    res=500,
+#    #dt=5.0 / 60.0,
+# )
+# axs[0].set_title('heat')
+# axs[1].set_title('advection')
+# axs[0].set_xlabel(r'Re($\lambda \Delta t$)')
+# axs[0].set_ylabel(r'Im($\lambda \Delta t$)')
+# cb = fig.colorbar(im, ax=axs.ravel().tolist())
+# cb.set_label(r'$\log \rho$')
 # if not active_only:
 #    plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
 # else:

@@ -3,7 +3,6 @@ import logging
 import numpy as np
 import scipy.linalg
 import scipy.optimize as opt
-from scipy.special import factorial
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Level import level
