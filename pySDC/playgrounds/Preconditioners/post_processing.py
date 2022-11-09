@@ -20,7 +20,7 @@ from pySDC.playgrounds.Preconditioners.hooks import log_error_at_iterations
 
 class PreconPostProcessing:
     def __init__(
-        self, problem, nodes, label='', color=None, ls='-', source='optimization', parallelizable=False, **kwargs
+        self, problem, nodes, label='', color=None, ls='-', source='optimization', parallelizable=True, **kwargs
     ):
         '''
         Load a preconditioner for postprocessing
@@ -535,6 +535,7 @@ postLU = PreconPostProcessing(
     color=colors[0],
     ls='--',
     source='[Martin Weiser](https://doi.org/10.1007/s10543-014-0540-y)',
+    parallelizable=False,
     **kwargs,
 )
 postIE = PreconPostProcessing(
@@ -545,11 +546,12 @@ postIE = PreconPostProcessing(
     color=colors[1],
     ls='--',
     source='[Dutt et al.](https://doi.org/10.1023/A:1022338906936)',
+    parallelizable=False,
     **kwargs,
 )
 postDiag = PreconPostProcessing(problem, 3, label='Diagonal', color=colors[2], **kwargs)
 postMIN3 = PreconPostProcessing(
-    problem, 3, MIN3=True, label='MIN3', color=colors[6], ls='-.', parallelizable=True, source='Anonymous', **kwargs
+    problem, 3, MIN3=True, label='MIN3', color=colors[6], ls='-.', source='Anonymous', **kwargs
 )
 postDiagFirstRow = PreconPostProcessing(
     problem,
@@ -558,7 +560,6 @@ postDiagFirstRow = PreconPostProcessing(
     use_first_row=True,
     color=colors[3],
     label='Semi-Diagonal',
-    parallelizable=True,
 )
 postMIN = PreconPostProcessing(
     problem_serial,
@@ -568,11 +569,16 @@ postMIN = PreconPostProcessing(
     color=colors[4],
     ls='-.',
     source='[Robert](https://doi.org/10.1007/s00791-018-0298-x)',
-    parallelizable=True,
     **kwargs,
 )
 postNORM = PreconPostProcessing(
-    problem, 3, **kwargs, normalized=True, label='normalized', color=colors[5], ls='-', parallelizable=True
+    problem,
+    3,
+    **kwargs,
+    normalized=True,
+    label='normalized',
+    color=colors[5],
+    ls='-',
 )
 
 precons = [postDiagFirstRow, postLU, postDiag, postIE]
