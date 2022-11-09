@@ -39,9 +39,14 @@ def single_run(x, params, *args, **kwargs):
     problem_params = params['problem_params']
 
     controller_params = params.get('controller_params', {})
+    controller_params['logger_level'] = controller_params.get('logger_level', 30)
 
     sweeper_params, sweeper = prepare_sweeper(x, params, **kwargs)
-    custom_description['sweeper_params'] = {**params.get('sweeper_params', {}), **sweeper_params}
+    custom_description['sweeper_params'] = {
+        **params.get('sweeper_params'),
+        **sweeper_params,
+        **params.get('force_sweeper_params', {}),
+    }
     custom_description['sweeper_class'] = sweeper
 
     allowed_keys = ['step_params', 'level_params']
@@ -193,11 +198,11 @@ def optimize_with_first_row(params, num_nodes, **kwargs):
 
 if __name__ == '__main__':
     print_status = True
-    problem = 'advection'
+    problem = 'heat'
 
     kwargs = {
         'adaptivity': True,
-        #'random_IG': True,
+        'random_IG': False,
     }
 
     params = get_params(problem, **kwargs)
@@ -206,6 +211,7 @@ if __name__ == '__main__':
     store_serial_precon(problem, num_nodes, LU=True, **kwargs)
     store_serial_precon(problem, num_nodes, IE=True, **kwargs)
     store_serial_precon(problem, num_nodes, MIN=True, **kwargs)
+    store_serial_precon(problem, num_nodes, MIN3=True, **kwargs)
     optimize_with_sum(params, num_nodes, **kwargs)
     optimize_without_sum(params, num_nodes, **kwargs)
     optimize_with_first_row(params, num_nodes, **kwargs)

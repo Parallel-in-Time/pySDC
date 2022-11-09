@@ -19,7 +19,9 @@ from pySDC.playgrounds.Preconditioners.hooks import log_error_at_iterations
 
 
 class PreconPostProcessing:
-    def __init__(self, problem, nodes, label='', color=None, ls='-', **kwargs):
+    def __init__(
+        self, problem, nodes, label='', color=None, ls='-', source='optimization', parallelizable=False, **kwargs
+    ):
         '''
         Load a preconditioner for postprocessing
 
@@ -38,6 +40,14 @@ class PreconPostProcessing:
         self.label = label
         self.color = color
         self.ls = ls
+
+        # meta data
+        self.source = source
+        self.parallelizable = parallelizable
+        self.normalized = self.data['normalized']
+        self.semi_diagonal = self.data['use_first_row']
+        self.nodes = nodes
+        self.random_ig = self.data['random_IG']
 
         # prepare empty variables
         self.dahlquist_stats = None
@@ -492,6 +502,19 @@ def compare_contraction(precons, plot_eigenvals=False, log=False, vmin=1e-16, **
     )
 
 
+def generate_metadata_table(precons, path='./data/notes/metadata.md'):
+    # TODO: docs...
+    with open(path, 'w') as file:
+        # print header
+        file.write('| name | source | parallelizable | normalized | semi-diagonal | random IG |\n')
+        file.write('|------|--------|----------------|------------|---------------|-----------|\n')
+
+        for precon in precons:
+            file.write(
+                f'| {precon.label} | {precon.source} | {precon.parallelizable} | {precon.normalized} | {precon.semi_diagonal} | {precon.random_ig} |\n'
+            )
+
+
 kwargs = {
     'adaptivity': True,
     'random_IG': True,
@@ -500,19 +523,56 @@ kwargs = {
 problem = 'heat'
 problem_serial = 'advection'
 
-postLU = PreconPostProcessing(problem_serial, 3, LU=True, label='LU', color=colors[0], ls='--', **kwargs)
-postIE = PreconPostProcessing(problem_serial, 3, IE=True, label='Implicit Euler', color=colors[1], ls='--', **kwargs)
-postDiag = PreconPostProcessing(problem, 3, label='Diagonal', color=colors[2], **kwargs)
-postDiagFirstRow = PreconPostProcessing(
-    problem, 3, adaptivity=True, use_first_row=True, color=colors[3], label='Semi-Diagonal'
+postLU = PreconPostProcessing(
+    problem_serial,
+    3,
+    LU=True,
+    label='LU',
+    color=colors[0],
+    ls='--',
+    source='[Martin Weiser](https://doi.org/10.1007/s10543-014-0540-y)',
+    **kwargs,
 )
-postMIN = PreconPostProcessing(problem_serial, 3, MIN=True, label='MIN', color=colors[4], ls='-.', **kwargs)
+postIE = PreconPostProcessing(
+    problem_serial,
+    3,
+    IE=True,
+    label='Implicit Euler',
+    color=colors[1],
+    ls='--',
+    source='[Dutt et al.](https://doi.org/10.1023/A:1022338906936)',
+    **kwargs,
+)
+postDiag = PreconPostProcessing(problem, 3, label='Diagonal', color=colors[2], **kwargs)
+postMIN3 = PreconPostProcessing(
+    problem, 3, MIN3=True, label='MIN3', color=colors[6], ls='-.', parallelizable=True, source='Anonymous', **kwargs
+)
+postDiagFirstRow = PreconPostProcessing(
+    problem,
+    3,
+    **kwargs,
+    use_first_row=True,
+    color=colors[3],
+    label='Semi-Diagonal',
+    parallelizable=True,
+)
+postMIN = PreconPostProcessing(
+    problem_serial,
+    3,
+    MIN=True,
+    label='MIN',
+    color=colors[4],
+    ls='-.',
+    source='[Robert](https://doi.org/10.1007/s00791-018-0298-x)',
+    parallelizable=True,
+    **kwargs,
+)
 postNORM = PreconPostProcessing(
-    problem, 3, adaptivity=True, normalized=True, label='normalized', color=colors[5], ls='-'
+    problem, 3, **kwargs, normalized=True, label='normalized', color=colors[5], ls='-', parallelizable=True
 )
 
 precons = [postDiagFirstRow, postLU, postDiag, postIE]
-more_precons = precons + [postMIN, postNORM]
+more_precons = precons + [postMIN, postNORM, postMIN3]
 
 custom_problem_params = {
     'sigma': 6e-2,
@@ -527,10 +587,12 @@ pkwargs = {'Tend': 1e-2}
 # compare_contraction(precons, plot_eigenvals=True, problem_parameter=1, vmin=-10, problem='heat')
 # compare_Fourier(precons, problem='heat')
 # compare_Fourier(precons, problem='advection')
-# compare_stiffness_paper(more_precons, format='png')
+generate_metadata_table(more_precons)
+compare_stiffness_paper(more_precons, format='png')
 fig, axs = plt.subplots(1, 2, figsize=(11.1, 4.1))
 active_only = True
-im = postIE.plot_eigenvalues(
+precon = postIE
+im = precon.plot_eigenvalues(
     problem='heat',
     problem_parameter=1.0,
     active_only=active_only,
@@ -543,7 +605,7 @@ im = postIE.plot_eigenvalues(
     iter=[0, 4],
     dt=5.0 / 60.0,
 )
-postIE.plot_eigenvalues(
+precon.plot_eigenvalues(
     problem='advection',
     problem_parameter=-1.0,
     active_only=active_only,
@@ -563,8 +625,8 @@ axs[0].set_xlabel(r'Re($\lambda \Delta t$)')
 axs[0].set_ylabel(r'Im($\lambda \Delta t$)')
 cb = fig.colorbar(im, ax=axs.ravel().tolist())
 cb.set_label(r'$\log \rho$')
-if not active_only:
-    plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
-else:
-    plt.savefig('data/notes/rho-IE-FD-eigenvals-active-dt.png', dpi=200, bbox_inches='tight')
+# if not active_only:
+#    plt.savefig('data/notes/rho-IE-FD-eigenvals.png', dpi=200, bbox_inches='tight')
+# else:
+#    plt.savefig('data/notes/rho-IE-FD-eigenvals-active-dt.png', dpi=200, bbox_inches='tight')
 plt.show()

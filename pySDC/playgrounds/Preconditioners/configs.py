@@ -132,7 +132,7 @@ def get_serial_preconditioner(params, **kwargs):
     Returns:
         dict: Updated params
     """
-    allowed = ['LU', 'IE', 'MIN']
+    allowed = ['LU', 'IE', 'MIN', 'MIN3']
     for precon in allowed:
         if kwargs.get(precon, False):
             params['sweeper'] = params['serial_sweeper']
@@ -200,6 +200,8 @@ def get_params_for_stiffness_plot(problem, **kwargs):
             'dt': 0.1,
         }
 
+    params['force_sweeper_params'] = {'initial_guess': 'spread'}
+
     for key in ['problem_params', 'level_params']:
         params[key] = {**params.get(key, {}), **special_params.get(key, {})}
 
@@ -242,7 +244,8 @@ def get_name(problem, nodes, **kwargs):
     '''
     name = f'{problem}'
     for c in kwargs.keys():
-        name = f'{name}-{c}'
+        if kwargs[c]:
+            name = f'{name}-{c}'
     name += f'-{nodes}nodes'
     return name
 
@@ -276,7 +279,7 @@ def store_precon(params, x, initial_guess, **kwargs):
     data = {}
 
     # write the configuration in the data array
-    configs = ['use_first_row', 'normalized', 'LU', 'IE', 'MIN', 'random_IG']
+    configs = ['use_first_row', 'normalized', 'LU', 'IE', 'MIN', 'random_IG', 'MIN3']
     for c in configs:
         data[c] = kwargs.get(c, False)
 

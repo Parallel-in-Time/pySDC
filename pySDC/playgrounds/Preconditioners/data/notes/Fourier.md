@@ -131,3 +131,8 @@ Repeating the plot with a smaller step size, we can confirm that solving an adve
    The error for the heat equation now decays more slowly, because we take smaller steps, but for the advection problem, the smaller step size is required to ensure convergence at all.
    Notice that the optimal step size is hence different for the two problems.</em>
 </p>
+
+Remember that the eigenvalues depend on the problem parameters (advection speed $c$ or diffusive coefficient $\nu$), which means we can rescale them by this factor.
+This time, it's the contraction factor, that does not depend on the problem parameter.
+In this way, we can rescale contraction factor and eigenvalues relative to one another by changing problem parameter or step size.
+This makes sense, considering both influence how fast the problem is changing within a single step.
