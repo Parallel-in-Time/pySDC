@@ -17,6 +17,9 @@ For minimization, we need only two ingredients.
 First of all, we need a minimization alogrithm, for which we employ `scipy.optimize.minimize` with Nelder-Mead.
 Then we need an objective function, which takes as input the elements of the preconditioner and some sort of cost required to solve a model problem to the desired accuracy.
 
+Given that we reduce the partial differential equations to systems of Dahlquist problems, it makes sense to consider Dahlquist problems directly, which we do, which choosing problem parameters in the top left quarter of the complex plane.
+In particular, we include values on the negative real and positive imaginary axes, which we hope to help us represent the dynamics of advection and heat equation.
+
 ### Objective function
 For the objective function, we start out with the simplest possible configuration: We just set the accuracy of the problem by setting a tolerance for adaptivity and trust it to behave well and use as the cost exclusively the iteration number.
 
@@ -74,5 +77,28 @@ Interestingly, this time the normalized preconditioner is performing poorly.
 We can see that this indeed inmproves the capabilities of the preconditioners to handle stiff problems.
 In particular, the semi-diagonal preconditioner can compete with MIN.
 Since doing the same with the heat equation as a model problem yielded very similar behaviour, we show only advection here.
+</em>
+</p>
+
+Doing this with series of Dahlquist problems directly, we can actually get much better results than with advection or heat equation.
+<p>
+<img src="./optimization_plots/stiffness-dahlquist-randomIG.png" alt="Iterations vs. stiffness for a preconditiner obtained with Dahlquist problems and random initial guess" style="width:100%;"/>
+<em>Preconditioners were obtained with Dahlquist problems and random initial guess.
+They represent the best behaviour we have seen so far.
+</em>
+</p>
+
+To visualize the values in the preconditioners, we plot the cumulative sum of the weights.
+Keep in mind that the preconditioner is a quadrature rule that is used to solve the error equation.
+We have solutions at the times of the quadrature nodes and we wish to integrate the error until then, so that we can refine the solutions approriately.
+However, it turns out that preconditioners that emerge from linear algebra (LU) or optimization will not at all integrate to the time associated with the solutions.
+Instead, LU will integrate past the step size, whereas diagonal only preconditioners solve a much shorter interval than the step size.
+Particularly wackadoodle is the MIN3 preconditioner.
+Not only do have no idea how it was obtained, but the weights are not even increasing, which means the second node is refined with the error at a time earlier than the correction for the first node.
+Why the hell would you do this and more importantly, why on earth does it work so well?
+Note that the full quadrature rule, which is used to compute the residual defines the integration structure, and is responsible for communication of the intermediate solutions between sweeps, which means the order in time corresponding to the solutions is indeed fixed.
+<p>
+<img src="./optimization_plots/weights.png" alt="Weights of the preconditioners" style="width:60%;"/>
+<em>Visualization of the weights in the preconditioners.
 </em>
 </p>
