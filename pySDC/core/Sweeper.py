@@ -102,8 +102,8 @@ class sweeper(object):
             for m in range(coll.num_nodes + 1):
                 QDmat[m, 1 : m + 1] = coll.delta_m[0:m]
         elif qd_type == 'IEpar':
-            for m in range(coll.num_nodes + 1):
-                QDmat[m, m] = np.sum(coll.delta_m[0:m])
+            for m in range(1, coll.num_nodes + 1):
+                QDmat[m, m] = coll.nodes[m - 1]
             self.parallelizable = True
         elif qd_type == 'Qpar':
             QDmat = np.diag(np.diag(coll.Qmat))

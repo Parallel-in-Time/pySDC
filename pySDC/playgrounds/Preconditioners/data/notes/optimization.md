@@ -48,6 +48,16 @@ Crucially, this does not mean random initial conditions, the initial guess only 
 
 We record the full set of pySDC parameters [here](configurations.md).
 
+### Initial conditions for the optimization
+When optimizing, we will, if all goes well, obtain some local minimum and one problem of minimization is that you can never be quite sure if there is a better minimum, so you don't care and just take the one you have (as far as I know.)
+However, which local minimum you end up in depends on the initial conditions for the optimization algorithm.
+
+We've seen later on that the MIN preconditioner integrates significantly shorter than the length of a time step.
+When we chose as initial conditions parallel Euler over half a time step, we get a preconditioner that performs much better in the stiffness test as when we start out with Euler over the full step.
+Why, you may ask?
+Well, the answer is presumably hidden in the cosmic microwave background.
+
+
 ## Numerical results
 To compare the performance of our newly obtained preconditioners, we do the same plots as Robert did in his paper [Parallelizing spectral deferred corrections across the method](https://doi.org/10.1007/s00791-018-0298-x), where he compared advection, diffusion and van der Pol oscillator problems and varied the problem parameter from non-stiff to stiff.
 We start with plots obtained with advection as the model problem.
@@ -90,7 +100,7 @@ They represent the best behaviour we have seen so far.
 
 To visualize the values in the preconditioners, we plot the cumulative sum of the weights.
 Keep in mind that the preconditioner is a quadrature rule that is used to solve the error equation.
-We have solutions at the times of the quadrature nodes and we wish to integrate the error until then, so that we can refine the solutions approriately.
+We have solutions at the times of the quadrature nodes and we wish to integrate the error until then, so that we can refine the solutions appropriately.
 However, it turns out that preconditioners that emerge from linear algebra (LU) or optimization will not at all integrate to the time associated with the solutions.
 Instead, LU will integrate past the step size, whereas diagonal only preconditioners solve a much shorter interval than the step size.
 Particularly wackadoodle is the MIN3 preconditioner.

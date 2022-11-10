@@ -208,13 +208,15 @@ def optimize_with_sum(params, num_nodes, **kwargs):
 
 
 def optimize_without_sum(params, num_nodes, **kwargs):
-    initial_guess = np.array(get_collocation_nodes(params, num_nodes)) / 2.0
+    initial_guess = np.array(get_collocation_nodes(params, num_nodes)) * 0.5
+    #initial_guess = np.ones(num_nodes) * 0.5
     optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
 
 
 def optimize_with_first_row(params, num_nodes, **kwargs):
     i0 = np.array(get_collocation_nodes(params, num_nodes)) / 2.0
     initial_guess = np.append(i0, i0)
+    #initial_guess = np.append(np.ones(num_nodes) * 0.9, - (0.9 - i0 * 2 + np.finfo(float).eps))
     kwargs['use_first_row'] = True
     optimize(params, initial_guess, num_nodes, objective_function_k_only, **kwargs)
 
@@ -235,6 +237,6 @@ if __name__ == '__main__':
     store_serial_precon(problem, num_nodes, IE=True, **kwargs)
     store_serial_precon(problem, num_nodes, MIN=True, **kwargs)
     store_serial_precon(problem, num_nodes, MIN3=True, **kwargs)
-    optimize_with_first_row(params, num_nodes, **kwargs)
+    #optimize_with_first_row(params, num_nodes, **kwargs)
     optimize_without_sum(params, num_nodes, **kwargs)
-    optimize_with_sum(params, num_nodes, **kwargs)
+    #optimize_with_sum(params, num_nodes, **kwargs)

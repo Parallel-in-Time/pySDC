@@ -98,6 +98,7 @@ im = np.linspace(-1, 100, 102)
 lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
     (len(re) * len(im))
 )
+# lambdas = np.append(re, im * 1j)
 
 
 params_Dahlquist = {

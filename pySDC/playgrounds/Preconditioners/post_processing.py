@@ -323,9 +323,12 @@ class PreconPostProcessing:
         stats, controller = single_run(self.data['x'], params, **{**self.data['kwargs'], **kwargs})
         return stats, controller
 
-    def plot_signature(self, **kwargs):
+    def plot_signature(self, plot_Q=False, **kwargs):
         """
         Plot the weights.
+
+        Args:
+            plot_Q (bool): plot also the full quadrature matrix
 
         Returns:
             None
@@ -339,9 +342,14 @@ class PreconPostProcessing:
         sweeper = controller.MS[0].levels[0].sweep
 
         QI = sweeper.QI
+        Q = sweeper.coll.Qmat
         nodes = sweeper.coll.nodes
 
+        if plot_Q:
+            ax.plot(np.append(0, nodes), [sum(Q[i, :]) for i in range(QI.shape[0])], color='black', label='Q', linewidth=6)
+
         ax.plot(np.append(0, nodes), [sum(QI[i, :]) for i in range(QI.shape[0])], color=self.color, label=self.label)
+
         for i in range(1, QI.shape[0]):
             cumsum = np.cumsum(QI[i, : i + 1])
             unique, idx = np.unique(cumsum[cumsum > 0], return_index=True)
@@ -352,6 +360,17 @@ class PreconPostProcessing:
                 color=self.color,
                 s=(20 + 10 * (1 + np.arange(num_vals)) ** 2),
             )
+
+            if plot_Q:
+                cumsum = np.cumsum(Q[i, :])
+                unique, idx = np.unique(cumsum[cumsum > 0], return_index=True)
+                num_vals = len(idx)
+                ax.scatter(
+                    nodes[i - 1] * np.ones(num_vals),
+                    cumsum[cumsum > 0][sorted(idx)],
+                    color='black',
+                    s=(40 + 10 * (1 + np.arange(num_vals)) ** 2),
+                )
         ax.legend(frameon=False)
         ax.set_xlabel('nodes')
         ax.set_ylabel('cumulative weights')
@@ -547,7 +566,7 @@ def compare_signatures(precons, **kwargs):
     """
     fig, ax = plt.subplots()
     for precon in precons:
-        precon.plot_signature(ax=ax)
+        precon.plot_signature(ax=ax, plot_Q=precon==precons[0])
     fig.tight_layout()
     plt.savefig(f'data/plots/weights.{kwargs.get("format", "pdf")}', bbox_inches='tight', dpi=200)
 
