@@ -51,13 +51,14 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
     return result
 
 
-def sort_stats(stats, sortby):
+def sort_stats(stats, sortby, comm=None):
     """
     Helper function to transform stats dictionary to sorted list of tuples
 
     Args:
         stats (dict): dictionary of statistics
         sortby (str): string to specify which key to use for sorting
+        comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)
 
     Returns:
         list: list of tuples containing the sortby item and the value
@@ -69,8 +70,14 @@ def sort_stats(stats, sortby):
         item = getattr(k, sortby)
         result.append((item, v))
 
+    if comm is not None:
+        # gather the results across all ranks and the flatten the list
+        result = [item for sub_result in comm.allgather(result) for item in sub_result]
+
     # sort by first element of the tuple (which is the sortby key) and return
-    return sorted(result, key=lambda tup: tup[0])
+    sorted_data = sorted(result, key=lambda tup: tup[0])
+
+    return sorted_data
 
 
 def get_list_of_types(stats):
@@ -92,8 +99,20 @@ def get_list_of_types(stats):
     return type_list
 
 
-def get_sorted(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, sortby='time'):
+def get_sorted(stats, sortby='time', comm=None, **kwargs):
+    """
+    Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
+    Keyword arguments are passed to `filter_stats` for filtering.
+
+    stats (dict): raw statistics from a controller run
+    sortby (str): string to specify which key to use for sorting
+    comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)
+
+    Returns:
+        list: list of tuples containing the sortby item and the value
+    """
     return sort_stats(
-        filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type, recomputed=recomputed),
+        filter_stats(stats, **kwargs),
         sortby=sortby,
+        comm=comm,
     )

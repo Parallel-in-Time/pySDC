@@ -1,10 +1,11 @@
 # script to run a van der Pol problem
 import numpy as np
 
-from pySDC.helpers.stats_helper import get_sorted
+from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Hooks import hooks
 from pySDC.core.Errors import ProblemError
 
@@ -94,7 +95,7 @@ class log_data(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='e_ex',
-            value=L.status.error_extrapolation_estimate,
+            value=L.status.get('error_extrapolation_estimate'),
         )
         self.increment_stats(
             process=step.status.slot,
@@ -104,6 +105,15 @@ class log_data(hooks):
             sweep=L.status.sweep,
             type='restart',
             value=int(step.status.restart),
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='k',
+            value=step.status.iter,
         )
 
 
@@ -115,6 +125,8 @@ def run_vdp(
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
+    use_MPI=False,
+    **kwargs,
 ):
 
     # initialize level parameters
@@ -170,7 +182,24 @@ def run_vdp(
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+    if use_MPI:
+        from mpi4py import MPI
+        from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
+        comm = kwargs.get('comm', MPI.COMM_WORLD)
+        controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
+
+        # get initial values on finest level
+        P = controller.S.levels[0].prob
+        uinit = P.u_exact(t0)
+    else:
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params=controller_params, description=description
+        )
+
+        # get initial values on finest level
+        P = controller.MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
 
     # insert faults
     if fault_stuff is not None:
@@ -180,10 +209,6 @@ def run_vdp(
             args={'time': 1.0, 'target': 0, **fault_stuff.get('args', {})},
         )
 
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
     # call main function to get things done...
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -191,3 +216,98 @@ def run_vdp(
         stats = controller.hooks.return_stats()
 
     return stats, controller, Tend
+
+
+def fetch_test_data(stats, comm=None, use_MPI=False):
+    """
+    Get data to perform tests on from stats
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+
+    Returns:
+        dict: Key values to perform tests on
+    """
+    types = ['e_em', 'restart', 'dt', 'k', 'residual_post_step']
+    data = {}
+    for type in types:
+        if type not in get_list_of_types(stats):
+            raise ValueError(f"Can't read type \"{type}\" from stats, only got", get_list_of_types(stats))
+
+        if comm is None or use_MPI == False:
+            data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time')]
+        else:
+            data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time', comm=comm)]
+    return data
+
+
+def check_if_tests_match(data_nonMPI, data_MPI):
+    """
+    Check if the data matches between MPI and nonMPI versions
+
+    Args:
+        data_nonMPI (dict): Key values to perform tests on
+        data_MPI (dict): Key values to perform tests on
+
+    Returns:
+        None
+    """
+    ops = [np.mean, np.min, np.max, len, sum]
+    for type in data_nonMPI.keys():
+        for op in ops:
+            val_nonMPI = op(data_nonMPI[type])
+            val_MPI = op(data_MPI[type])
+            assert np.isclose(val_nonMPI, val_MPI), (
+                f"Mismatch in operation {op.__name__} on type \"{type}\": with {data_MPI['size'][0]} ranks: "
+                f"nonMPI: {val_nonMPI}, MPI: {val_MPI}"
+            )
+    print(f'Passed with {data_MPI["size"][0]} ranks')
+
+
+def mpi_vs_nonMPI(MPI_ready, comm):
+    if MPI_ready:
+        size = comm.size
+        rank = comm.rank
+        use_MPI = [True, False]
+    else:
+        size = 1
+        rank = 0
+        use_MPI = [False, False]
+
+    if rank == 0:
+        print(f"Running with {size} ranks")
+
+    custom_description = {'convergence_controllers': {}}
+    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+
+    custom_controller_params = {'logger_level': 30}
+
+    data = [{}, {}]
+
+    for i in range(2):
+        if use_MPI[i] or rank == 0:
+            stats, controller, Tend = run_vdp(
+                custom_description=custom_description,
+                num_procs=size,
+                use_MPI=use_MPI[i],
+                custom_controller_params=custom_controller_params,
+                Tend=1.0,
+                comm=comm,
+            )
+            data[i] = fetch_test_data(stats, comm, use_MPI=use_MPI[i])
+            data[i]['size'] = [size]
+
+    if rank == 0:
+        check_if_tests_match(data[1], data[0])
+
+
+if __name__ in "__main__":
+    try:
+        from mpi4py import MPI
+
+        MPI_ready = True
+        comm = MPI.COMM_WORLD
+    except ModuleNotFoundError:
+        MPI_ready = False
+        comm = None
+    mpi_vs_nonMPI(MPI_ready, comm)

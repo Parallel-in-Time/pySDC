@@ -6,7 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
-from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
 
 class controller_nonMPI(controller):
@@ -205,7 +205,6 @@ class controller_nonMPI(controller):
             self.MS[p].status.stage = 'SPREAD'
             self.MS[p].status.force_done = False
             self.MS[p].status.time_size = len(active_slots)
-            self.MS[p].status.restart = False
 
             for l in self.MS[p].levels:
                 l.tag = None
@@ -214,6 +213,9 @@ class controller_nonMPI(controller):
         for p in active_slots:
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_status_variables(self, active_slots=active_slots)
 
     def send_full(self, S, level=None, add_to_stats=False):
         """
