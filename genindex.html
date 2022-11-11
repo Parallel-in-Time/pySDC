@@ -249,9 +249,11 @@
         <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.bc">(implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex attribute)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.bcast">bcast() (implementations.datatype_classes.mesh.mesh method)</a>
+      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast">bcast() (implementations.datatype_classes.cupy_mesh.cupy_mesh method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.bcast">(implementations.datatype_classes.mesh.mesh method)</a>
+</li>
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.bcast">(implementations.datatype_classes.petsc_vec.petsc_vec method)</a>
 </li>
       </ul></li>
@@ -335,8 +337,12 @@
 </li>
       <li><a href="pySDC/core.html#core.Errors.CollocationError">CollocationError</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.comm">comm (implementations.datatype_classes.mesh.mesh property)</a>
+      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm">comm (implementations.datatype_classes.cupy_mesh.cupy_mesh property)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.comm">(implementations.datatype_classes.mesh.mesh property)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">communicate_convergence() (implementations.convergence_controller_classes.check_convergence.CheckConvergence method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Errors.CommunicationError">CommunicationError</a>
@@ -863,10 +869,10 @@
 </li>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.fenics_mesh.fenics_mesh">fenics_mesh (class in implementations.datatype_classes.fenics_mesh)</a>
 </li>
-      <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d">fenics_vortex_2d (class in implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d">fenics_vortex_2d (class in implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">fermi_pasta_ulam_tsingou (class in implementations.problem_classes.FermiPastaUlamTsingou)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.fft">fft (implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex attribute)</a>
@@ -908,8 +914,6 @@
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full">Fisher_full (class in implementations.problem_classes.GeneralizedFisher_1D_PETSc)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction">Fisher_reaction (class in implementations.problem_classes.GeneralizedFisher_1D_PETSc)</a>
-</li>
-      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.flatten">flatten() (implementations.datatype_classes.cupy_mesh.cupy_mesh method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Level.level.fold">fold (core.Level.level attribute)</a>
 </li>
@@ -958,11 +962,7 @@
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.generic_LU.generic_LU">generic_LU (class in implementations.sweeper_classes.generic_LU)</a>
 </li>
       <li><a href="pySDC/helpers.html#helpers.pysdc_helper.FrozenClass.get">get() (helpers.pysdc_helper.FrozenClass method)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.get">(implementations.datatype_classes.cupy_mesh.cupy_mesh method)</a>
 </li>
-      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMatrix">get2DMatrix() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMesh">get2DMesh() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
@@ -1562,8 +1562,6 @@
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes.FullSolarSystem">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
 
@@ -1571,6 +1569,8 @@
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes.GeneralizedFisher_1D_FD_implicit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_PETSc
 
@@ -1868,9 +1868,11 @@
       </ul></li>
       <li><a href="pySDC/helpers.html#helpers.transfer_helper.interpolation_matrix_1d">interpolation_matrix_1d() (in module helpers.transfer_helper)</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.irecv">irecv() (implementations.datatype_classes.mesh.mesh method)</a>
+      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv">irecv() (implementations.datatype_classes.cupy_mesh.cupy_mesh method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.irecv">(implementations.datatype_classes.mesh.mesh method)</a>
+</li>
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.irecv">(implementations.datatype_classes.petsc_vec.petsc_vec method)</a>
 </li>
       </ul></li>
@@ -1888,9 +1890,11 @@
       </ul></li>
       <li><a href="pySDC/implementations.transfer_classes.html#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine">irfft_object_fine (implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft attribute)</a>
 </li>
-      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.isend">isend() (implementations.datatype_classes.mesh.mesh method)</a>
+      <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">isend() (implementations.datatype_classes.cupy_mesh.cupy_mesh method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.isend">(implementations.datatype_classes.mesh.mesh method)</a>
+</li>
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.isend">(implementations.datatype_classes.particles.particles method)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.isend">(implementations.datatype_classes.petsc_vec.petsc_vec method)</a>

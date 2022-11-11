@@ -87,20 +87,65 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.cupy_mesh.</span></span><span class="sig-name descname"><span class="pre">cupy_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>cupy-based datatype</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+<p>CuPy-based datatype for serial or parallel meshes.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.flatten">
-<span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.flatten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.flatten" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overloading the flatten operator
-:returns: cupy.ndarray</p>
+<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast">
+<span class="sig-name descname"><span class="pre">bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for broadcasting values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>int</em>) – process with value to broadcast</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>broadcasted values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.comm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for the communicator</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overloading the get operator from cupy.ndarray
-:returns: numpy.ndarray</p>
+<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv">
+<span class="sig-name descname"><span class="pre">irecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.irecv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for receiving in time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">
+<span class="sig-name descname"><span class="pre">isend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.isend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for sending data forward in time (non-blocking)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>request handle</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -595,8 +640,10 @@ Can include a communicator and expects a dtype to allow complex data.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh"><code class="docutils literal notranslate"><span class="pre">cupy_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.flatten"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.flatten()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.get"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.get()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.bcast()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.comm</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.irecv()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.isend()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh"><code class="docutils literal notranslate"><span class="pre">imex_cupy_mesh</span></code></a><ul>
