@@ -9,8 +9,8 @@ except ImportError:
 
 class cupy_mesh(cp.ndarray):
     """
-        CuPy-based datatype for serial or parallel meshes.
-        """
+    CuPy-based datatype for serial or parallel meshes.
+    """
 
     def __new__(cls, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
         """
@@ -28,8 +28,11 @@ class cupy_mesh(cp.ndarray):
             obj = cp.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, strides=strides, order=order)
             obj[:] = init[:]
             obj._comm = init._comm
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], cp.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], cp.dtype)
+        ):
             obj = cp.ndarray.__new__(cls, init[0], dtype=init[2], strides=strides, order=order)
             obj.fill(val)
             obj._comm = init[1]
@@ -71,10 +74,10 @@ class cupy_mesh(cp.ndarray):
 
     def __abs__(self):
         """
-            Overloading the abs operator
+        Overloading the abs operator
 
-            Returns:
-                float: absolute maximum of all mesh values
+        Returns:
+            float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
         local_absval = float(cp.amax(cp.ndarray.__abs__(self)))
