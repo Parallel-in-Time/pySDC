@@ -41,7 +41,7 @@ def main(dt=1e-2, use_switch_estimator=True):
     problem_params['C'] = 1.0
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
-    problem_params['alpha'] = 5.0
+    problem_params['alpha'] = 1.2
     problem_params['V_ref'] = 1.0
     problem_params['set_switch'] = np.array([False], dtype=bool)
     problem_params['t_switch'] = np.zeros(1)
@@ -95,7 +95,6 @@ def main(dt=1e-2, use_switch_estimator=True):
 
     # filter statistics by number of iterations
     iter_counts = get_sorted(stats, type='niter', recomputed=None, sortby='time')
-    print(np.array(get_sorted(stats, type='niter', recomputed=None)))
 
     # compute and print statistics
     min_iter = 20
@@ -162,7 +161,7 @@ def run_check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [1e-1]   # [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
+    dt_list = [1e-1, 1e-2]   # [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
     restarts_all = []
     for dt_item in dt_list:
@@ -212,7 +211,7 @@ def run_check(cwd='./'):
 
         iter_counts_true_val = get_sorted(stats_true, type='niter', recomputed=False, sortby='time')
         iter_counts_true = [v[1] for v in iter_counts_true_val]
-        print(iter_counts_true)
+
         iters_time_true_all.append(iter_counts_true)
         niters_true_all.append(np.mean(np.array([item[1] for item in iter_counts_true_val])))
 
@@ -239,7 +238,7 @@ def run_check(cwd='./'):
         val_switch = get_sorted(stats_true, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
         vC_switch = [v[1] for v in val_switch]
-        print(t_switch)
+
         t_switch = t_switch[0]  # battery has only one single switch
         vC_switch = vC_switch[0]
         val_switch_all.append([t_switch, vC_switch])
