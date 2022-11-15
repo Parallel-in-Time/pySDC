@@ -1,14 +1,17 @@
 import numpy as np
 from scipy import optimize
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Sweeper import sweeper
 
+# TODO: consistent initial conditions can be an issue with DAE. Might need to make sure that mesh is initialised correctly 
+# e.g. by disabling the "initialise everything to zero" option. 
 
-class fully_implicit_DAE(sweeper):
+class semi_explicit_DAE(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
-    Newton-Krylov sweeper to solve differential equations in fully implicit form e.g. differential algebraic equations 
+    Sweeper to solve differential algebraic equations in semi-explicit form
 
     Attributes:
         QI: implicit Euler integration matrix
@@ -22,16 +25,17 @@ class fully_implicit_DAE(sweeper):
             params: parameters for the sweeper
         """
 
+        #TODO: ensure that the problem has a differential and an algebraic part
+
         if 'QI' not in params:
             params['QI'] = 'IE'
 
         # call parent's initialization routine
-        super(fully_implicit_DAE, self).__init__(params)
+        super(semi_explicit_DAE, self).__init__(params)
 
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
 
-    # TODO: hijacking this function to return solution from its gradient i.e. fundamental theorem of calculus. 
-    # This works well since (ab)using level.f to store the gradient. Might need to change this for release? 
+    # TODO: change this back to a simple implicit evaluation of the rhs of the differential component of the equation 
     def integrate(self):
         """
         Returns the solution by integrating its gradient (fundamental theorem of calculus)
