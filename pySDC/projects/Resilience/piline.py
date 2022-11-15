@@ -138,7 +138,7 @@ def run_piline(
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
 
@@ -332,11 +332,12 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
 
 def main():
     generate_reference = False
+    wiggle = 10
 
     for use_adaptivity in [True, False]:
         custom_description = {'convergence_controllers': {}}
         if use_adaptivity:
-            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggle': wiggle}
 
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}

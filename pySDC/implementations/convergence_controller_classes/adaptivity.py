@@ -114,13 +114,44 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             None
         """
-        if S.status.iter == S.params.maxiter:
+        if S.status.iter >= S.params.maxiter:
             e_est = self.get_local_error_estimate(controller, S)
             if e_est >= self.params.e_tol:
-                S.status.restart = True
-                self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
+                # see if we allow any wiggle room
+                if self.params.get('wiggle'):
+                    rho = max([L.status.contraction_factor for L in S.levels])
+                    more_iter_needed = np.ceil(np.log(self.params.e_tol / e_est) / np.log(rho))
+
+                    if rho > 1:
+                        S.status.restart = True
+                        self.log(f"Convergence factor = {rho:.2e} > 1 -> restarting", S)
+                    elif more_iter_needed > S.params.maxiter:
+                        S.status.restart = True
+                        self.log(f"{more_iter_needed} more iterations needed for convergence -> restart", S)
+                    else:
+                        S.status.force_continue = True
+                        self.log(f"{more_iter_needed} more iterations needed for convergence -> no restart", S)
+                    print(
+                        rho,
+                        e_est,
+                        S.levels[0].status.error_embedded_estimate_last_iter,
+                        self.params.e_tol,
+                        more_iter_needed,
+                    )
+                else:
+                    S.status.restart = True
+                    self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
 
         return None
+
+    def check_iteration_status(self, controller, S, **kwargs):
+        """
+        Check if the step has converged
+        """
+        if self.params.get('wiggle') and S.status.force_continue:
+            e_est = self.get_local_error_estimate(controller, S)
+            S.status.force_continue = e_est > self.params.e_tol
+            print('bla bla', e_est, self.params.e_tol, S.status.force_continue)
 
 
 class Adaptivity(AdaptivityBase):
@@ -144,6 +175,8 @@ class Adaptivity(AdaptivityBase):
             None
         """
         super(Adaptivity, self).dependencies(controller, description)
+
+        # load embedded error estimate
         if type(controller) == controller_nonMPI:
             from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
                 EstimateEmbeddedErrorNonMPI,
@@ -156,6 +189,14 @@ class Adaptivity(AdaptivityBase):
             )
 
             controller.add_convergence_controller(EstimateEmbeddedErrorMPI, description=description)
+
+        # load contraction factor estimator if necessary
+        if self.params.get('wiggle'):
+            from pySDC.implementations.convergence_controller_classes.estimate_contraction_factor import (
+                EstimateContractionFactor,
+            )
+
+            controller.add_convergence_controller(EstimateContractionFactor, description=description)
         return None
 
     def check_parameters(self, controller, params, description, **kwargs):

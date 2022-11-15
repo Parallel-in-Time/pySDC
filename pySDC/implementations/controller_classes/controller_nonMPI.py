@@ -511,6 +511,8 @@ class controller_nonMPI(controller):
                 # increment iteration count here (and only here)
                 S.status.iter += 1
                 self.hooks.pre_iteration(step=S, level_number=0)
+                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                    C.pre_iteration_processing(self, S)
 
                 if len(S.levels) > 1:  # MLSDC or PFASST
                     S.status.stage = 'IT_DOWN'
