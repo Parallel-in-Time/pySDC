@@ -54,7 +54,7 @@ def run_diffusion(nsweeps):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['freq'] = -1  # frequency for the test value
+    problem_params['freq'] = 1  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
