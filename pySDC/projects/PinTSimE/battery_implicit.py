@@ -100,7 +100,9 @@ def main(dt=1e-2, use_switch_estimator=True):
     max_iter = 0
 
     f = open(
-        'data/battery_implicit_out_dt{}_USE{}_{}.txt'.format(dt, use_switch_estimator, description['sweeper_class']),
+        'data/battery_implicit_out_dt{}_USE{}_{}.txt'.format(
+            dt, use_switch_estimator, description['sweeper_class'].__name__
+        ),
         'w',
     )
     niters = np.array([item[1] for item in iter_counts])
