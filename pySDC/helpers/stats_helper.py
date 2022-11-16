@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None):
+def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, num_restarts=None):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -12,24 +12,14 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
         level (int): the requested level index
         iter (int): the requested iteration count
         type (str): string to describe the requested type of value
-        recomputed (bool): filter out intermediate values that have no impact on the solution because the associated
-                           step was restarted if True. (Or filter the restarted if False. Use None to get both.)
+        recomputed (bool): filter recomputed values from stats if set to anything other than None
+
     Returns:
         dict: dictionary containing only the entries corresponding to the filter
     """
     result = {}
 
-    # check which steps have been recomputed
-    if recomputed is not None:
-        # this will contain a 2d array with all times and whether they have been recomputed
-        restarts = np.array(
-            get_sorted(stats, process=None, time=None, iter=None, type='recomputed', recomputed=None, sortby='time')
-        )
-    else:
-        # dummy values for when no filtering of restarts is desired
-        restarts = np.array([[None, None]])
-
-    for k, v in stats.items():
+    for k, v in stats.items() if recomputed is None else filter_recomputed(stats.copy()).items():
         # get data if key matches the filter (if specified)
         if (
             (k.time == time or time is None)
@@ -37,16 +27,9 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
             and (k.level == level or level is None)
             and (k.iter == iter or iter is None)
             and (k.type == type or type is None)
+            and (k.num_restarts == num_restarts or num_restarts is None)
         ):
-
-            if k.time in restarts[:, 0]:
-                # we know there is only one entry for each time, so we make a mask for the time and take the first and
-                # only entry and then take the second entry of this, which contains whether a restart was performed at
-                # this time as a float and compare it to the value we specified for recomputed
-                if restarts[restarts[:, 0] == k.time][0][1] == float(recomputed):
-                    result[k] = v
-            else:
-                result[k] = v
+            result[k] = v
 
     return result
 
@@ -80,6 +63,41 @@ def sort_stats(stats, sortby, comm=None):
     return sorted_data
 
 
+def filter_recomputed(stats):
+    """
+    Filter recomputed values from the stats and remove them.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+
+    Returns:
+        dict: The filtered stats dict
+    """
+
+    # delete values that have been recorded and superseded by similar, but not identical keys
+    restarted_steps = [me for me in stats.keys() if me.num_restarts > 0]
+    for step in restarted_steps:
+        for i in range(step.num_restarts):
+            to_be_removed = filter_stats(
+                stats,
+                process=step.process,
+                time=step.time,
+                level=step.level,
+                iter=step.iter,
+                type=step.type,
+                num_restarts=i,
+            )
+            [stats.pop(me) for me in to_be_removed.keys()]
+
+    # delete values that were recorded at times that shouln't be recorded because we performed a different step after the restart
+    other_restarted_steps = [me for me in filter_stats(stats, type='_recomputed') if stats[me]]
+    for step in other_restarted_steps:
+        to_be_removed_other = filter_stats(stats, time=step.time)
+        [stats.pop(me) for me in to_be_removed_other.keys()]
+
+    return stats
+
+
 def get_list_of_types(stats):
     """
     Helper function to get list of types registered in stats
@@ -111,6 +129,7 @@ def get_sorted(stats, sortby='time', comm=None, **kwargs):
     Returns:
         list: list of tuples containing the sortby item and the value
     """
+
     return sort_stats(
         filter_stats(stats, **kwargs),
         sortby=sortby,

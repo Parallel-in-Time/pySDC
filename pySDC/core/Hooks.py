@@ -23,6 +23,7 @@ class hooks(object):
         __t1_sweep (float): private variable to get end time of the sweep
         __t1_setup (float): private variable to get end time of setup
         __t1_comm (list): private variable to hold timing of the communication (!)
+        __num_restarts (int): number of restarts of the current step
         logger: logger instance for output
         __stats (dict): dictionary for gathering the statistics of a run
         __entry (namedtuple): statistics entry containign all information to identify the value
@@ -46,12 +47,13 @@ class hooks(object):
         self.__t1_sweep = None
         self.__t1_setup = None
         self.__t1_comm = []
+        self.__num_restarts = 0
 
         self.logger = logging.getLogger('hooks')
 
         # create statistics and entry elements
         self.__stats = {}
-        self.__entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'sweep', 'type'])
+        self.__entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'sweep', 'type', 'num_restarts'])
 
     def add_to_stats(self, process, time, level, iter, sweep, type, value):
         """
@@ -67,7 +69,17 @@ class hooks(object):
             value: the actual data
         """
         # create named tuple for the key and add to dict
-        self.__stats[self.__entry(process=process, time=time, level=level, iter=iter, sweep=sweep, type=type)] = value
+        self.__stats[
+            self.__entry(
+                process=process,
+                time=time,
+                level=level,
+                iter=iter,
+                sweep=sweep,
+                type=type,
+                num_restarts=self.__num_restarts,
+            )
+        ] = value
 
     def increment_stats(self, process, time, level, iter, sweep, type, value, initialize=None):
         """
@@ -84,7 +96,9 @@ class hooks(object):
             value: the actual data
             initialize: if supplied and data does not exist already, this will be used over value
         """
-        key = self.__entry(process=process, time=time, level=level, iter=iter, sweep=sweep, type=type)
+        key = self.__entry(
+            process=process, time=time, level=level, iter=iter, sweep=sweep, type=type, num_restarts=self.__num_restarts
+        )
         if key in self.__stats.keys():
             self.__stats[key] += value
         elif initialize is not None:
@@ -115,6 +129,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t0_setup = time.perf_counter()
 
     def pre_run(self, step, level_number):
@@ -125,6 +140,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t0_run = time.perf_counter()
 
     def pre_predict(self, step, level_number):
@@ -145,6 +161,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t0_step = time.perf_counter()
 
     def pre_iteration(self, step, level_number):
@@ -155,6 +172,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t0_iteration = time.perf_counter()
 
     def pre_sweep(self, step, level_number):
@@ -165,6 +183,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t0_sweep = time.perf_counter()
 
     def pre_comm(self, step, level_number):
@@ -175,6 +194,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         if len(self.__t0_comm) >= level_number + 1:
             self.__t0_comm[level_number] = time.perf_counter()
         else:
@@ -195,6 +215,7 @@ class hooks(object):
             level_number (int): the current level number
             add_to_stats (bool): set if result should go to stats object
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         assert len(self.__t1_comm) >= level_number + 1
         self.__t1_comm[level_number] += time.perf_counter() - self.__t0_comm[level_number]
 
@@ -220,6 +241,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t1_sweep = time.perf_counter()
 
         L = step.levels[level_number]
@@ -262,6 +284,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
         self.__t1_iteration = time.perf_counter()
 
@@ -294,6 +317,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
         self.__t1_step = time.perf_counter()
 
@@ -328,12 +352,10 @@ class hooks(object):
         )
 
         # record the recomputed quantities at weird positions to make sure there is only one value for each step
-        self.add_to_stats(
-            process=-1, time=L.time + L.dt, level=-1, iter=-1, sweep=-1, type='recomputed', value=step.status.restart
-        )
-        self.add_to_stats(
-            process=-1, time=L.time, level=-1, iter=-1, sweep=-1, type='recomputed', value=step.status.restart
-        )
+        for t in [L.time, L.time + L.dt]:
+            self.add_to_stats(
+                process=-1, time=t, level=-1, iter=-1, sweep=-1, type='_recomputed', value=step.status.get('restart')
+            )
 
     def post_predict(self, step, level_number):
         """
@@ -343,6 +365,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t1_predict = time.perf_counter()
 
         L = step.levels[level_number]
@@ -365,6 +388,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t1_run = time.perf_counter()
 
         L = step.levels[level_number]
@@ -387,6 +411,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
         self.__t1_setup = time.perf_counter()
 
         self.add_to_stats(
