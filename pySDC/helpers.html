@@ -122,8 +122,25 @@
 <section id="module-helpers.stats_helper">
 <span id="helpers-stats-helper-module"></span><h2>helpers.stats_helper module<a class="headerlink" href="#module-helpers.stats_helper" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="helpers.stats_helper.filter_recomputed">
+<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">filter_recomputed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_recomputed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_recomputed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter recomputed values from the stats and remove them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stats</strong> (<em>dict</em>) – Raw statistics from a controller run</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The filtered stats dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.filter_stats">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">filter_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">filter_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to extract data from the dictrionary of statistics</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -134,8 +151,7 @@
 <li><p><strong>level</strong> (<em>int</em>) – the requested level index</p></li>
 <li><p><strong>iter</strong> (<em>int</em>) – the requested iteration count</p></li>
 <li><p><strong>type</strong> (<em>str</em>) – string to describe the requested type of value</p></li>
-<li><p><strong>recomputed</strong> (<em>bool</em>) – filter out intermediate values that have no impact on the solution because the associated
-step was restarted if True. (Or filter the restarted if False. Use None to get both.)</p></li>
+<li><p><strong>recomputed</strong> (<em>bool</em>) – filter recomputed values from stats if set to anything other than None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -397,6 +413,7 @@ in the vector ps and the points which are found periodically.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-helpers.stats_helper">helpers.stats_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.stats_helper.filter_recomputed"><code class="docutils literal notranslate"><span class="pre">filter_recomputed()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.stats_helper.filter_stats"><code class="docutils literal notranslate"><span class="pre">filter_stats()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.stats_helper.get_list_of_types"><code class="docutils literal notranslate"><span class="pre">get_list_of_types()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.stats_helper.get_sorted"><code class="docutils literal notranslate"><span class="pre">get_sorted()</span></code></a></li>
