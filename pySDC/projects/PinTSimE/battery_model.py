@@ -1,6 +1,5 @@
 import numpy as np
 import dill
-import glob
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
