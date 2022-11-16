@@ -4,9 +4,8 @@ from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
+from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import log_data, proof_assertions_description
@@ -22,13 +21,11 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-8
+    level_params['restol'] = 1e-12
     level_params['dt'] = dt
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    # sweeper_params['collocation_class'] = Collocation
-    # sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -36,8 +33,6 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_maxiter'] = 200  # remove later
-    problem_params['newton_tol'] = 1e-08  # remove later
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = 1.0
@@ -63,9 +58,9 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery_implicit  # pass problem class
+    description['problem_class'] = battery  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = generic_implicit  # pass sweeper
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
@@ -77,7 +72,7 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.5
+    Tend = 2.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -142,7 +137,7 @@ def check(cwd='./'):
 
 def differences_around_switch(dt_list, restarts, V_ref, cwd='./'):
     """
-    Routine to plot the differences before, at, and after the switch. Produces the diffs_estimation_<sweeper_class>.png file
+    Routine to plot the differences before, at, and after the switch. Produces the diffs_estimation_imex_1st_order.png file
     """
 
     diffs_true = []
@@ -265,6 +260,7 @@ def iterations_over_time(dt_list, maxiter, cwd='./'):
     iters_time_false = []
     times_true = []
     times_false = []
+    t_switches = []
 
     for dt_item in dt_list:
         f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
@@ -284,6 +280,10 @@ def iterations_over_time(dt_list, maxiter, cwd='./'):
         times_true.append([v[1] for v in iter_counts_true_val])
         times_false.append([v[1] for v in iter_counts_false_val])
 
+        val_switch = get_sorted(stats_true, type='switch1', sortby='time')
+        t_switch = [v[0] for v in val_switch]
+        t_switches.append(t_switch[0])
+
     setup_mpl()
     fig_iter_all, ax_iter_all = plt_helper.plt.subplots(
         nrows=2, ncols=len(dt_list), figsize=(2 * len(dt_list) - 1, 3), sharex='col', sharey='row'
@@ -299,7 +299,7 @@ def iterations_over_time(dt_list, maxiter, cwd='./'):
             else:
                 # SE = True
                 ax_iter_all[row, col].plot(times_true[col], iters_time_true[col], label='SE=True')
-                ax_iter_all[row, col].axvline(x=t_switch_all[col], linestyle='--', color='r', label='Switch')
+                ax_iter_all[row, col].axvline(x=t_switches[col], linestyle='--', color='r', label='Switch')
                 ax_iter_all[row, col].set_xlabel('Time', fontsize=6)
                 ax_iter_all[row, col].set_ylim(1, maxiter)
 
