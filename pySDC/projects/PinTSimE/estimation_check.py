@@ -38,7 +38,7 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
     problem_params['C'] = 1.0
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
-    problem_params['alpha'] = 1.2
+    problem_params['alpha'] = 5.0
     problem_params['V_ref'] = V_ref
     problem_params['set_switch'] = np.array([False], dtype=bool)
     problem_params['t_switch'] = np.zeros(1)
@@ -272,13 +272,13 @@ def iterations_over_time(dt_list, maxiter, cwd='./'):
         f2.close()
 
         iter_counts_true_val = get_sorted(stats_true, type='niter', recomputed=False, sortby='time')
-        iter_counts_false_val = get_sorted(stats_false, type='niter', recomputed=False, sortby='time')
+        iter_counts_false_val = get_sorted(stats_false, type='niter', sortby='time')
 
         iters_time_true.append([v[1] for v in iter_counts_true_val])
         iters_time_false.append([v[1] for v in iter_counts_false_val])
 
-        times_true.append([v[1] for v in iter_counts_true_val])
-        times_false.append([v[1] for v in iter_counts_false_val])
+        times_true.append([v[0] for v in iter_counts_true_val])
+        times_false.append([v[0] for v in iter_counts_false_val])
 
         val_switch = get_sorted(stats_true, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
