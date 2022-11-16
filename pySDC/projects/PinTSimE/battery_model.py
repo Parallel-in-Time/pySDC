@@ -1,5 +1,6 @@
 import numpy as np
 import dill
+import glob
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
@@ -42,6 +43,15 @@ class log_data(hooks):
             type='voltage C',
             value=L.uend[1],
         )
+        self.add_to_stats(
+            process=-1,
+            time=L.time,
+            level=-1,
+            iter=-1,
+            sweep=-1,
+            type='k',
+            value=step.status.iter,
+        )
         self.increment_stats(
             process=step.status.slot,
             time=L.time,
@@ -78,7 +88,7 @@ def main(use_switch_estimator=True):
     problem_params['C'] = 1.0
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
-    problem_params['alpha'] = 5.0
+    problem_params['alpha'] = 1.2
     problem_params['V_ref'] = 1.0
     problem_params['set_switch'] = np.array([False], dtype=bool)
     problem_params['t_switch'] = np.zeros(1)
@@ -124,18 +134,18 @@ def main(use_switch_estimator=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/battery.dat'
-    f = open(fname, 'wb')
-    dill.dump(stats, f)
-    f.close()
-
     # filter statistics by number of iterations
     iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     min_iter = 20
     max_iter = 0
+
+    Path("data").mkdir(parents=True, exist_ok=True)
+    fname = 'data/battery.dat'
+    f = open(fname, 'wb')
+    dill.dump(stats, f)
+    f.close()
 
     f = open('data/battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
@@ -180,6 +190,7 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     if use_switch_estimator:
         val_switch = get_sorted(stats, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
+        print(val_switch)
         ax.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch')
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')

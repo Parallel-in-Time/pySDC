@@ -6,7 +6,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-# from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import log_data, proof_assertions_description
@@ -23,7 +23,7 @@ def main(dt=1e-2, use_switch_estimator=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-8
+    level_params['restol'] = 1e-12
     level_params['dt'] = dt
 
     # initialize sweeper parameters
@@ -61,9 +61,9 @@ def main(dt=1e-2, use_switch_estimator=True):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery_implicit  # pass problem class
+    description['problem_class'] = battery  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = generic_implicit  # pass sweeper
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
@@ -161,7 +161,7 @@ def run_check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [1e-1, 1e-2]   # [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
+    dt_list = [1e-1, 1e-2] # [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
     restarts_all = []
     for dt_item in dt_list:

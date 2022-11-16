@@ -4,8 +4,9 @@ from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.problem_classes.Battery import battery
+from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import log_data, proof_assertions_description
@@ -21,7 +22,7 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-13
+    level_params['restol'] = 1e-8
     level_params['dt'] = dt
 
     # initialize sweeper parameters
@@ -35,19 +36,21 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # initialize problem parameters
     problem_params = dict()
+    problem_params['newton_maxiter'] = 200  # remove later
+    problem_params['newton_tol'] = 1e-08  # remove later
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = 1.0
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
-    problem_params['alpha'] = 5.0
+    problem_params['alpha'] = 1.2
     problem_params['V_ref'] = V_ref
     problem_params['set_switch'] = np.array([False], dtype=bool)
     problem_params['t_switch'] = np.zeros(1)
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 10
 
     # initialize controller parameters
     controller_params = dict()
@@ -60,9 +63,9 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery  # pass problem class
+    description['problem_class'] = battery_implicit  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
@@ -74,7 +77,7 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.0
+    Tend = 0.5
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -102,7 +105,7 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
     assert np.mean(niters) <= 11, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    return stats
+    return description, stats
 
 
 def check(cwd='./'):
@@ -111,12 +114,12 @@ def check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [4e-1, 4e-2, 4e-3]
+    dt_list = [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
-    restarts_all = []
+    restarts = []
     for dt_item in dt_list:
         for item in use_switch_estimator:
-            stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
+            description, stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
 
             fname = 'data/battery_dt{}_USE{}.dat'.format(dt_item, item)
             f = open(fname, 'wb')
@@ -124,14 +127,26 @@ def check(cwd='./'):
             f.close()
 
             if item:
-                restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
-                restarts_all.append(np.sum(restarts))
-                print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
+                restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+                restarts.append(np.sum(restarts_sorted))
+                print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts_sorted))
 
-    val_switch_all = []
-    diff_true_all = []
-    diff_false_all_before = []
-    diff_false_all_after = []
+    assert len(dt_list) > 1, 'ERROR: dt_list have to be contained more than one element due to the subplots'
+
+    differences_around_switch(dt_list, restarts, V_ref)
+
+    differences_over_time(dt_list, V_ref)
+
+
+def differences_around_switch(dt_list, restarts, V_ref, cwd = './'):
+    """
+    Routine to plot the differences before, at, and after the switch. Produces the diffs_estimation_<sweeper_class>.png file
+    """
+
+    diffs_true = []
+    diffs_false_before = []
+    diffs_false_after = []
+
     for dt_item in dt_list:
         f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
         stats_true = dill.load(f1)
@@ -143,64 +158,118 @@ def check(cwd='./'):
 
         val_switch = get_sorted(stats_true, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
-        vC_switch = [v[1] for v in val_switch]
         t_switch = t_switch[0]  # battery has only one single switch
-        vC_switch = vC_switch[0]
-        val_switch_all.append([t_switch, vC_switch])
 
         vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time')
         vC_false = get_sorted(stats_false, type='voltage C', sortby='time')
 
-        diff_true = [v[1] - V_ref for v in vC_true]
-        diff_false = [v[1] - V_ref for v in vC_false]
+        diff_true, diff_false = [v[1] - V_ref for v in vC_true], [v[1] - V_ref for v in vC_false]
+        times_true, times_false = [v[0] for v in vC_true], [v[0] for v in vC_false]
 
-        times_true = [v[0] for v in vC_true]
-        times_false = [v[0] for v in vC_false]
         for m in range(len(times_true)):
             if np.round(times_true[m], 15) == np.round(t_switch, 15):
-                diff_true_all.append(diff_true[m])
+                diffs_true.append(diff_true[m])
 
         for m in range(1, len(times_false)):
             if times_false[m - 1] < t_switch < times_false[m]:
-                diff_false_all_before.append(diff_false[m - 1])
-                diff_false_all_after.append(diff_false[m])
-
-        setup_mpl()
-        fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-        ax.set_title('Time evolution of $v_{C}-V_{ref}$')
-        ax.plot(times_true, diff_true, label='SE=True', color='#ff7f0e')
-        ax.plot(times_false, diff_false, label='SE=False', color='#1f77b4')
-        ax.axvline(x=t_switch, linestyle='--', color='k', label='Switch')
-        ax.legend(frameon=False, fontsize=10, loc='lower left')
-        ax.set_yscale('symlog', linthresh=1e-5)
-        ax.set_xlabel('Time')
-
-        fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
-        plt_helper.plt.close(fig)
+                diffs_false_before.append(diff_false[m - 1])
+                diffs_false_after.append(diff_false[m])
 
     setup_mpl()
-    fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
-    ax.set_title("Difference $v_{C}-V_{ref}$")
-    pos1 = ax.plot(dt_list, diff_false_all_before, 'rs-', label='SE=False - before switch')
-    pos2 = ax.plot(dt_list, diff_false_all_after, 'bd--', label='SE=False - after switch')
-    pos3 = ax.plot(dt_list, diff_true_all, 'kd--', label='SE=True')
+    fig_around, ax_around = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
+    ax_around.set_title("Difference $v_{C}-V_{ref}$")
+    pos1 = ax_around.plot(dt_list, diffs_false_before, 'rs-', label='SE=False - before switch')
+    pos2 = ax_around.plot(dt_list, diffs_false_after, 'bd--', label='SE=False - after switch')
+    pos3 = ax_around.plot(dt_list, diffs_true, 'kd--', label='SE=True')
     # ax.legend(frameon=False, fontsize=8, loc='center right')
-    ax.set_xticks(dt_list)
-    ax.set_xticklabels(dt_list)
-    ax.set_xscale('log', base=10)
-    ax.set_yscale('symlog', linthresh=1e-8)
-    ax.set_ylim(-1, 1)
-    ax.set_xlabel(r'$\Delta t$')
+    ax_around.set_xticks(dt_list)
+    ax_around.set_xticklabels(dt_list)
+    ax_around.set_xscale('log', base=10)
+    ax_around.set_yscale('symlog', linthresh=1e-8)
+    ax_around.set_ylim(-1, 1)
+    ax_around.set_xlabel(r'$\Delta t$', fontsize=6)
 
-    restart_ax = ax.twinx()
-    restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
+    restart_ax = ax_around.twinx()
+    restarts_plt = restart_ax.plot(dt_list, restarts, 'cs--', label='Restarts')
     restart_ax.set_label('Restarts')
 
-    lines = pos1 + pos2 + pos3 + restarts
+    lines = pos1 + pos2 + pos3 + restarts_plt
     labels = [l.get_label() for l in lines]
-    ax.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
-    fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
-    plt_helper.plt.close(fig)
+    ax_around.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
+    fig_around.savefig('data/diffs_estimation_imex_1st_order.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig_around)
+
+
+def differences_over_time(dt_list, V_ref, cwd='./'):
+    """
+    Routine to plot the differences in time using the switch estimator or not. Produces the difference_estimation_imex_1st_order.png file
+    """
+
+    # diffs_true = []
+    # diffs_false_before = []
+    # diffs_false_after = []
+
+    setup_mpl()
+    fig_diffs, ax_diffs = plt_helper.plt.subplots(1, len(dt_list), figsize=(2*len(dt_list), 2), sharex='col', sharey='row')
+    count_ax = 0
+    for dt_item in dt_list:
+        f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        stats_true = dill.load(f1)
+        f1.close()
+
+        f2 = open(cwd + 'data/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        stats_false = dill.load(f2)
+        f2.close()
+
+        val_switch = get_sorted(stats_true, type='switch1', sortby='time')
+        t_switch = [v[0] for v in val_switch]
+        t_switch = t_switch[0]  # battery has only one single switch
+
+        vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time')
+        vC_false = get_sorted(stats_false, type='voltage C', sortby='time')
+
+        diff_true, diff_false = [v[1] - V_ref for v in vC_true], [v[1] - V_ref for v in vC_false]
+        times_true, times_false = [v[0] for v in vC_true], [v[0] for v in vC_false]
+
+        #for m in range(len(times_true)):
+        #    if np.round(times_true[m], 15) == np.round(t_switch, 15):
+        #        diffs_true.append(diff_true[m])
+
+        #for m in range(1, len(times_false)):
+        #    if times_false[m - 1] < t_switch < times_false[m]:
+        #        diffs_false_before.append(diff_false[m - 1])
+        #        diffs_false_after.append(diff_false[m])
+
+        ax_diffs[count_ax].set_title('dt={}'.format(dt_item))
+        ax_diffs[count_ax].plot(times_true, diff_true, label='SE=True', color='#ff7f0e')
+        ax_diffs[count_ax].plot(times_false, diff_false, label='SE=False', color='#1f77b4')
+        ax_diffs[count_ax].axvline(x=t_switch, linestyle='--', color='k', label='Switch')
+        ax_diffs[count_ax].legend(frameon=False, fontsize=6, loc='lower left')
+        ax_diffs[count_ax].set_yscale('symlog', linthresh=1e-5)
+        ax_diffs[count_ax].set_xlabel('Time', fontsize=6)
+        if count_ax == 0:
+            ax_diffs[count_ax].set_ylabel('Difference $v_{C}-V_{ref}$', fontsize=6)
+
+        if count_ax == 0 or count_ax == 1:
+            ax_diffs[count_ax].legend(frameon=False, fontsize=6, loc='center right')
+
+        else:
+            ax_diffs[count_ax].legend(frameon=False, fontsize=6, loc='upper right')
+
+        count_ax += 1
+
+    fig_diffs.savefig('data/difference_estimation_imex_1st_order.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig_diffs)
+
+
+#def error_over_time(dt_list):
+
+
+def iterations_over_time():
+    """
+    Routine  to plot the number of iterations over time using switch estimator or not. Produces the iters_imex_1st_order.png file
+    """
+    return None
 
 
 if __name__ == "__main__":
