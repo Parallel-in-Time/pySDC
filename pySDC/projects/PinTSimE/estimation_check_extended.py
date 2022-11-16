@@ -136,7 +136,7 @@ def check(cwd='./'):
             f.close()
 
             if item:
-                restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=False, sortby='time'))
+                restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
                 restarts = restarts_dict[dt_item][:, 1]
                 restarts_all.append(np.sum(restarts))
                 print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
