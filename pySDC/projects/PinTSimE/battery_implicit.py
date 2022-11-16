@@ -94,7 +94,7 @@ def main(dt=1e-2, use_switch_estimator=True):
     f.close()
 
     # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', recomputed=None, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', recomputed=False, sortby='time')
 
     # compute and print statistics
     min_iter = 20
