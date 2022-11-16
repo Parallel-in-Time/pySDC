@@ -109,7 +109,7 @@ def check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
+    dt_list = [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
     restarts = []
     for dt_item in dt_list:
