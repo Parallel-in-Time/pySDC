@@ -1972,6 +1972,73 @@ time-dependent forcing</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.Battery.</span></span><span class="sig-name descname"><span class="pre">battery_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<p>Example implementing the battery drain model as in the description in the PinTSimE project
+.. attribute:: A</p>
+<blockquote>
+<div><p>system matrix, representing the 2 ODEs</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS
+:param u: current values
+:type u: dtype_u
+:param t: current time
+:type t: float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the RHS</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Newton solver
+:param rhs: right-hand side for the linear system
+:type rhs: dtype_f
+:param factor: abbrev. for the local stepsize (or any other factor required)
+:type factor: float
+:param u0: initial guess for the iterative solver
+:type u0: dtype_u
+:param t: current time (e.g. for time-dependent BCs)
+:type t: float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>solution as mesh</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t
+:param t: current time
+:type t: float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>exact solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-implementations.problem_classes.Battery_2Condensators">
 <span id="implementations-problem-classes-battery-2condensators-module"></span><h2>implementations.problem_classes.Battery_2Condensators module<a class="headerlink" href="#module-implementations.problem_classes.Battery_2Condensators" title="Permalink to this heading">¶</a></h2>
@@ -5092,6 +5159,12 @@ IMEX time-stepping</p>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery.eval_f"><code class="docutils literal notranslate"><span class="pre">battery.eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery.solve_system"><code class="docutils literal notranslate"><span class="pre">battery.solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery.u_exact"><code class="docutils literal notranslate"><span class="pre">battery.u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit"><code class="docutils literal notranslate"><span class="pre">battery_implicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.eval_f"><code class="docutils literal notranslate"><span class="pre">battery_implicit.eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.solve_system"><code class="docutils literal notranslate"><span class="pre">battery_implicit.solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.u_exact"><code class="docutils literal notranslate"><span class="pre">battery_implicit.u_exact()</span></code></a></li>
 </ul>
 </li>
 </ul>
