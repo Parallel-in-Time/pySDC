@@ -4,8 +4,9 @@ from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.problem_classes.Battery import battery
+from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
@@ -63,14 +64,14 @@ class log_data(hooks):
         )
 
 
-def main(use_switch_estimator=True):
+def main(problem=battery, restol=1e-12, sweeper=imex_1st_order, use_switch_estimator=True):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-10
+    level_params['restol'] = restol
     level_params['dt'] = 1e-2
 
     # initialize sweeper parameters
@@ -82,6 +83,8 @@ def main(use_switch_estimator=True):
 
     # initialize problem parameters
     problem_params = dict()
+    problem_params['newton_maxiter'] = 200
+    problem_params['newton_tol'] = 1e-08
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = 1.0
@@ -107,9 +110,9 @@ def main(use_switch_estimator=True):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery  # pass problem class
+    description['problem_class'] = problem  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_class'] = sweeper  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
@@ -134,14 +137,14 @@ def main(use_switch_estimator=True):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', sortby='time')
+    iter_counts = get_sorted(stats, type='niter', recomputed=False, sortby='time')
 
     # compute and print statistics
     min_iter = 20
     max_iter = 0
 
     Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/battery.dat'
+    fname = 'data/battery_{}.dat'.format(sweeper.__name__)
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -161,17 +164,32 @@ def main(use_switch_estimator=True):
     assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    plot_voltages(description, use_switch_estimator)
-
-    return np.mean(niters)
+    return description
 
 
-def plot_voltages(description, use_switch_estimator, cwd='./'):
+def run():
+    """
+    Executes the simulation for the battery model using two different sweepers and plot the results
+    as <problem_class>_model_solution_<sweeper_class>.png
+    """
+
+    problem_classes = [battery, battery_implicit]
+    restolerances = [1e-12, 1e-8]
+    sweeper_classes = [imex_1st_order, generic_implicit]
+    use_switch_estimator = [True, True]
+
+    for problem, restol, sweeper, use_SE in zip(problem_classes, restolerances, sweeper_classes, use_switch_estimator):
+        description = main(problem=problem, restol=restol, sweeper=sweeper, use_switch_estimator=use_SE)
+
+        plot_voltages(description, problem.__name__, sweeper.__name__, use_SE)
+
+
+def plot_voltages(description, problem, sweeper, use_switch_estimator, cwd='./'):
     """
     Routine to plot the numerical solution of the model
     """
 
-    f = open(cwd + 'data/battery.dat', 'rb')
+    f = open(cwd + 'data/battery_{}.dat'.format(sweeper), 'rb')
     stats = dill.load(f)
     f.close()
 
@@ -183,13 +201,13 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
+    ax.set_title('Simulation of {} using {}'.format(problem, sweeper), fontsize=10)
     ax.plot(times, [v[1] for v in cL], label=r'$i_L$')
     ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
 
     if use_switch_estimator:
         val_switch = get_sorted(stats, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
-        print(val_switch)
         ax.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch')
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')
@@ -197,7 +215,7 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/{}_model_solution_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
 
@@ -220,4 +238,4 @@ def proof_assertions_description(description, problem_params):
 
 
 if __name__ == "__main__":
-    main()
+    run()
