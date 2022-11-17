@@ -116,67 +116,42 @@ def check(cwd='./'):
     use_switch_estimator = [True, False]
     restarts = []
 
+    problem_classes = [battery, battery_implicit]
+    restolerances = [1e-12, 1e-8]
+    sweeper_classes = [imex_1st_order, generic_implicit]
+
     # loop for imex_1st_order sweeper
-    for dt_item in dt_list:
-        for item in use_switch_estimator:
-            description, stats = run(
-                dt=dt_item,
-                problem=battery,
-                restol=1e-12,
-                sweeper=imex_1st_order,
-                use_switch_estimator=item,
-                V_ref=V_ref,
-            )
+    for problem, restol, sweeper in zip(problem_classes, restolerances, sweeper_classes):
+        for dt_item in dt_list:
+            for item in use_switch_estimator:
+                description, stats = run(
+                    dt=dt_item,
+                    problem=problem,
+                    restol=restol,
+                    sweeper=sweeper,
+                    use_switch_estimator=item,
+                    V_ref=V_ref,
+                )
 
-            fname = 'data/battery_dt{}_USE{}_{}.dat'.format(dt_item, item, description['sweeper_class'].__name__)
-            f = open(fname, 'wb')
-            dill.dump(stats, f)
-            f.close()
+                fname = 'data/battery_dt{}_USE{}_{}.dat'.format(dt_item, item, sweeper.__name__)
+                f = open(fname, 'wb')
+                dill.dump(stats, f)
+                f.close()
 
-            if item:
-                restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
-                restarts.append(np.sum(restarts_sorted))
-                print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts_sorted))
+                if item:
+                    restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+                    restarts.append(np.sum(restarts_sorted))
+                    print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts_sorted))
 
-    assert len(dt_list) > 1, 'ERROR: dt_list have to be contained more than one element due to the subplots'
+        assert len(dt_list) > 1, 'ERROR: dt_list have to be contained more than one element due to the subplots'
 
-    differences_around_switch(dt_list, restarts, description['sweeper_class'].__name__, V_ref)
+        differences_around_switch(dt_list, restarts, sweeper.__name__, V_ref)
 
-    differences_over_time(dt_list, description['sweeper_class'].__name__, V_ref)
+        differences_over_time(dt_list, sweeper.__name__, V_ref)
 
-    iterations_over_time(dt_list, description['step_params']['maxiter'], description['sweeper_class'].__name__)
+        iterations_over_time(dt_list, description['step_params']['maxiter'], sweeper.__name__)
 
-    restarts = []
-
-    # loop for generic_implicit sweeper
-    for dt_item in dt_list:
-        for item in use_switch_estimator:
-            description, stats = run(
-                dt=dt_item,
-                problem=battery_implicit,
-                restol=1e-8,
-                sweeper=generic_implicit,
-                use_switch_estimator=item,
-                V_ref=V_ref,
-            )
-
-            fname = 'data/battery_dt{}_USE{}_{}.dat'.format(dt_item, item, description['sweeper_class'].__name__)
-            f = open(fname, 'wb')
-            dill.dump(stats, f)
-            f.close()
-
-            if item:
-                restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
-                restarts.append(np.sum(restarts_sorted))
-                print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts_sorted))
-
-    assert len(dt_list) > 1, 'ERROR: dt_list have to be contained more than one element due to the subplots'
-
-    differences_around_switch(dt_list, restarts, description['sweeper_class'].__name__, V_ref)
-
-    differences_over_time(dt_list, description['sweeper_class'].__name__, V_ref)
-
-    iterations_over_time(dt_list, description['step_params']['maxiter'], description['sweeper_class'].__name__)
+        restarts = []
 
 
 def differences_around_switch(dt_list, restarts, sweeper, V_ref, cwd='./'):
