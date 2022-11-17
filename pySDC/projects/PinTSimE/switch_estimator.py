@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 
+from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController
 
 
@@ -10,6 +11,13 @@ class SwitchEstimator(ConvergenceController):
     """
 
     def setup(self, controller, params, description):
+        # for RK4 sweeper, sweep.coll.nodes now consists of values of ButcherTableau
+        # for this reason, collocation nodes will be generated here
+        coll = CollBase(
+            num_nodes=description['sweeper_params']['num_nodes'],
+            quad_type=description['sweeper_params']['quad_type'],
+        )
+        self.coll_nodes_local = coll.nodes
         self.switch_detected = False
         self.switch_detected_step = False
         self.t_switch = None
@@ -72,7 +80,7 @@ class SwitchEstimator(ConvergenceController):
                     break
 
             if self.switch_detected:
-                t_interp = [L.time + L.dt * L.sweep.coll.nodes[m] for m in range(len(L.sweep.coll.nodes))]
+                t_interp = [L.time + L.dt * self.coll_nodes_local[m] for m in range(len(self.coll_nodes_local))]
 
                 vC_switch = []
                 for m in range(1, len(L.u)):
@@ -82,9 +90,14 @@ class SwitchEstimator(ConvergenceController):
                 if vC_switch[0] * vC_switch[-1] < 0:
                     p = sp.interpolate.interp1d(t_interp, vC_switch, 'cubic', bounds_error=False)
 
-                    # self.t_switch = regulaFalsiMethod(t_interp[0], t_interp[-1], p, 1e-12)
-                    t_switch, info, _, _ = sp.optimize.fsolve(p, t_interp[m_guess], full_output=True)
-                    self.t_switch = t_switch[0]
+                    SwitchResults = sp.optimize.root_scalar(
+                        p,
+                        method='brentq',
+                        bracket=[t_interp[0], t_interp[m_guess]],
+                        x0=t_interp[m_guess],
+                        xtol=1e-10,
+                    )
+                    self.t_switch = SwitchResults.root  # t_switch[0]
 
                     # if the switch is not find, we need to do ... ?
                     if L.time < self.t_switch < L.time + L.dt:
@@ -126,7 +139,6 @@ class SwitchEstimator(ConvergenceController):
         super(SwitchEstimator, self).determine_restart(controller, S)
 
     def post_step_processing(self, controller, S):
-
         L = S.levels[0]
 
         if self.switch_detected_step:
@@ -135,6 +147,6 @@ class SwitchEstimator(ConvergenceController):
                 self.t_switch = None
                 self.switch_detected_step = False
 
-        L.status.dt_new = self.dt_initial
+                L.status.dt_new = self.dt_initial
 
         super(SwitchEstimator, self).post_step_processing(controller, S)
