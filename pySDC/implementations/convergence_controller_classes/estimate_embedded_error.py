@@ -134,7 +134,7 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
 level"
             )
 
-        if S.status.iter > 1 or self.params.sweeper_type == "RK":
+        if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
                 temp = self.estimate_embedded_error_serial(L)
                 L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
@@ -159,7 +159,7 @@ class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
         """
         comm = kwargs['comm']
 
-        if S.status.iter > 1 or self.params.sweeper_type == "RK":
+        if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
 
                 # get accumulated local errors from previous steps

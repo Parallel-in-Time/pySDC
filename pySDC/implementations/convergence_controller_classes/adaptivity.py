@@ -119,8 +119,8 @@ class AdaptivityBase(ConvergenceController):
             if e_est >= self.params.e_tol:
                 # see if we allow any wiggle room
                 if self.params.get('wiggle'):
+                    more_iter_needed = max([L.status.iter_to_convergence for L in S.levels])
                     rho = max([L.status.contraction_factor for L in S.levels])
-                    more_iter_needed = np.ceil(np.log(self.params.e_tol / e_est) / np.log(rho))
 
                     if rho > 1:
                         S.status.restart = True
@@ -131,13 +131,13 @@ class AdaptivityBase(ConvergenceController):
                     else:
                         S.status.force_continue = True
                         self.log(f"{more_iter_needed} more iterations needed for convergence -> no restart", S)
-                    print(
-                        rho,
-                        e_est,
-                        S.levels[0].status.error_embedded_estimate_last_iter,
-                        self.params.e_tol,
-                        more_iter_needed,
-                    )
+                    # print(
+                    #    rho,
+                    #    e_est,
+                    #    S.levels[0].status.error_embedded_estimate_last_iter,
+                    #    self.params.e_tol,
+                    #    more_iter_needed,
+                    # )
                 else:
                     S.status.restart = True
                     self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
@@ -151,7 +151,7 @@ class AdaptivityBase(ConvergenceController):
         if self.params.get('wiggle') and S.status.force_continue:
             e_est = self.get_local_error_estimate(controller, S)
             S.status.force_continue = e_est > self.params.e_tol
-            print('bla bla', e_est, self.params.e_tol, S.status.force_continue)
+            # print('bla bla', e_est, self.params.e_tol, S.status.force_continue)
 
 
 class Adaptivity(AdaptivityBase):
@@ -196,7 +196,8 @@ class Adaptivity(AdaptivityBase):
                 EstimateContractionFactor,
             )
 
-            controller.add_convergence_controller(EstimateContractionFactor, description=description)
+            params = {'e_tol': self.params.e_tol}
+            controller.add_convergence_controller(EstimateContractionFactor, description=description, params=params)
         return None
 
     def check_parameters(self, controller, params, description, **kwargs):
