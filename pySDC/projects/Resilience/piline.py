@@ -74,15 +74,14 @@ class log_data(hooks):
             type='e_extrapolated',
             value=L.status.get('error_extrapolation_estimate'),
         )
-        self.increment_stats(
+        self.add_to_stats(
             process=step.status.slot,
             time=L.time,
             level=L.level_index,
             iter=0,
             sweep=L.status.sweep,
             type='restart',
-            value=1,
-            initialize=0,
+            value=int(step.status.get('restart')),
         )
         self.increment_stats(
             process=step.status.slot,
@@ -194,8 +193,8 @@ def get_data(stats, recomputed=False):
         'dt': np.array(get_sorted(stats, type='dt', recomputed=recomputed)),
         'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
         'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
-        'restarts': np.array(get_sorted(stats, type='restart', recomputed=recomputed))[:, 1],
-        'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=recomputed))[:, 1],
+        'restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 1],
+        'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=None))[:, 1],
     }
     data['ready'] = np.logical_and(data['e_ex'] != np.array(None), data['e_em'] != np.array(None))
     return data
@@ -268,8 +267,8 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
             'e_em': 2.3681899108396465e-08,
             'e_ex': 3.6491178375304526e-08,
             'dt': 0.08265581329617167,
-            'restarts': 8.0,
-            'sweeps': 2432.0,
+            'restarts': 36.0,
+            'sweeps': 2528.0,
             't': 19.999999999999996,
         }
 
@@ -327,7 +326,7 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
     for k in expected.keys():
         assert np.isclose(
             expected[k], got[k], rtol=1e-4
-        ), f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
+        ), f'{error_msg} Expected {k}={expected[k]:.4e}, got {k}={got[k]:.4e}'
 
 
 def main():
@@ -342,7 +341,7 @@ def main():
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
             stats, _, _ = run_piline(custom_description, num_procs=num_procs)
-            data = get_data(stats)
+            data = get_data(stats, recomputed=False)
             fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
             plot_error(data, ax, use_adaptivity)
             if use_adaptivity:
