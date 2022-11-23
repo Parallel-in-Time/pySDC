@@ -275,7 +275,7 @@ class controller(object):
 
     def add_convergence_controller(self, convergence_controller, description, params=None, allow_double=False):
         '''
-        Add an individual convergence controller to the list of convergence controllers and instiate it.
+        Add an individual convergence controller to the list of convergence controllers and instantiate it.
         Afterwards, the order of the convergence controllers is updated.
 
         Args:
