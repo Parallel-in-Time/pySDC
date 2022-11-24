@@ -6,7 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
-from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
 
 class controller_nonMPI(controller):
@@ -75,7 +75,7 @@ class controller_nonMPI(controller):
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
 
-        self.add_convergence_controller(BasicRestartingNonMPI, description)
+        self.add_convergence_controller(BasicRestarting.get_implementation("nonMPI"), description)
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)

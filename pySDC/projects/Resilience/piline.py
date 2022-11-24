@@ -331,7 +331,7 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
 
 def main():
     generate_reference = False
-    wiggle = 10
+    wiggle = False
 
     for use_adaptivity in [True, False]:
         custom_description = {'convergence_controllers': {}}

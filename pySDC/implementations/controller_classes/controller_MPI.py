@@ -4,7 +4,7 @@ from mpi4py import MPI
 from pySDC.core.Controller import controller
 from pySDC.core.Errors import ControllerError
 from pySDC.core.Step import step
-from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
 
 class controller_MPI(controller):
@@ -61,7 +61,7 @@ class controller_MPI(controller):
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
 
-        self.add_convergence_controller(BasicRestartingMPI, description)
+        self.add_convergence_controller(BasicRestarting.get_implementation('MPI'), description)
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.setup_status_variables(self, comm=comm)

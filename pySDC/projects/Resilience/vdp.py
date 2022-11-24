@@ -278,7 +278,7 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         print(f"Running with {size} ranks")
 
     custom_description = {'convergence_controllers': {}}
-    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggle':False}
 
     custom_controller_params = {'logger_level': 30}
 

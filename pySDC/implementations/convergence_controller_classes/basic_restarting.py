@@ -5,7 +5,7 @@ from pySDC.implementations.convergence_controller_classes.spread_step_sizes impo
 )
 
 
-class BasicRestartingBase(ConvergenceController):
+class BasicRestarting(ConvergenceController):
     """
     Class with some utilities for restarting. The specific functions are:
      - Telling each step after one that requested a restart to get restarted as well
@@ -13,6 +13,24 @@ class BasicRestartingBase(ConvergenceController):
 
     Default control order is 95.
     """
+
+    @classmethod
+    def get_implementation(cls, flavor):
+        """
+        Retrieve the implementation for a specific flavor of this class.
+
+        Args:
+            flavor (str): The implementation that you want
+
+        Returns:
+            cls: The child class that implements the desired flavor
+        """
+        if flavor == 'MPI':
+            return BasicRestartingMPI
+        elif flavor == 'nonMPI':
+            return BasicRestartingNonMPI
+        else:
+            raise NotImplementedError(f'Flavor {flavor} of BasicRestarting is not implemented!')
 
     def __init__(self, controller, params, description, **kwargs):
         """
@@ -23,7 +41,7 @@ class BasicRestartingBase(ConvergenceController):
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         """
-        super(BasicRestartingBase, self).__init__(controller, params, description)
+        super(BasicRestarting, self).__init__(controller, params, description)
         self.buffers = Pars({"restart": False, "max_restart_reached": False})
 
     def setup(self, controller, params, description, **kwargs):
@@ -48,6 +66,9 @@ class BasicRestartingBase(ConvergenceController):
         defaults = {
             "control_order": 95,
         }
+
+        if 'max_restarts' in description.keys():
+            defaults['max_restarts'] = description['max_restarts']
 
         return {**defaults, **params}
 
@@ -129,7 +150,7 @@ class BasicRestartingBase(ConvergenceController):
         return None
 
 
-class BasicRestartingNonMPI(BasicRestartingBase):
+class BasicRestartingNonMPI(BasicRestarting):
     """
     Non-MPI specific version of basic restarting
     """
@@ -205,7 +226,7 @@ on...",
         return None
 
 
-class BasicRestartingMPI(BasicRestartingBase):
+class BasicRestartingMPI(BasicRestarting):
     """
     MPI specific version of basic restarting
     """

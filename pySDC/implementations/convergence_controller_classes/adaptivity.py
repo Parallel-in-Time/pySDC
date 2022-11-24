@@ -174,21 +174,14 @@ class Adaptivity(AdaptivityBase):
         Returns:
             None
         """
+        from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
+
         super(Adaptivity, self).dependencies(controller, description)
 
-        # load embedded error estimate
-        if type(controller) == controller_nonMPI:
-            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
-                EstimateEmbeddedErrorNonMPI,
-            )
-
-            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
-        else:
-            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
-                EstimateEmbeddedErrorMPI,
-            )
-
-            controller.add_convergence_controller(EstimateEmbeddedErrorMPI, description=description)
+        controller.add_convergence_controller(
+            EstimateEmbeddedError.get_implementation("nonMPI" if type(controller) == controller_nonMPI else "MPI"),
+            description=description,
+        )
 
         # load contraction factor estimator if necessary
         if self.params.get('wiggle'):
