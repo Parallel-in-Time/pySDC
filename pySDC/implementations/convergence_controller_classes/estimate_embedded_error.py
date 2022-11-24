@@ -14,6 +14,24 @@ class EstimateEmbeddedError(ConvergenceController):
     you make sure your preconditioner is compatible, which you have to just try out...
     """
 
+    @classmethod
+    def get_implementation(cls, flavor):
+        """
+        Retrieve the implementation for a specific flavor of this class.
+
+        Args:
+            flavor (str): The implementation that you want
+
+        Returns:
+            cls: The child class that implements the desired flavor
+        """
+        if flavor == 'MPI':
+            return EstimateEmbeddedErrorMPI
+        elif flavor == 'nonMPI':
+            return EstimateEmbeddedErrorNonMPI
+        else:
+            raise NotImplementedError(f'Flavor {flavor} of EmstimateEmbeddedError is not implemented!')
+
     def setup(self, controller, params, description, **kwargs):
         """
         Add a default value for control order to the parameters and check if we are using a Runge-Kutta sweeper
