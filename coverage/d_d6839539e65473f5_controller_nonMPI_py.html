@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_adaptivity_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.5.0</a>,
-            created at 2022-11-24 07:36 +0000
+            created at 2022-11-24 08:14 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -88,7 +88,7 @@
     <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Controller</span> <span class="key">import</span> <span class="nam">controller</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span> <span class="key">import</span> <span class="nam">Step</span> <span class="key">as</span> <span class="nam">stepclass</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Errors</span> <span class="key">import</span> <span class="nam">ControllerError</span><span class="op">,</span> <span class="nam">CommunicationError</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">basic_restarting</span> <span class="key">import</span> <span class="nam">BasicRestartingNonMPI</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">basic_restarting</span> <span class="key">import</span> <span class="nam">BasicRestarting</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">class</span> <span class="nam">controller_nonMPI</span><span class="op">(</span><span class="nam">controller</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -157,7 +157,7 @@
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">                <span class="str">'you have specified a predictor type but only a single level.. '</span> <span class="str">'predictor will be ignored'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">add_convergence_controller</span><span class="op">(</span><span class="nam">BasicRestartingNonMPI</span><span class="op">,</span> <span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">add_convergence_controller</span><span class="op">(</span><span class="nam">BasicRestarting</span><span class="op">.</span><span class="nam">get_implementation</span><span class="op">(</span><span class="str">"nonMPI"</span><span class="op">)</span><span class="op">,</span> <span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">        <span class="key">for</span> <span class="nam">C</span> <span class="key">in</span> <span class="op">[</span><span class="nam">self</span><span class="op">.</span><span class="nam">convergence_controllers</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span> <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">convergence_controller_order</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">            <span class="nam">C</span><span class="op">.</span><span class="nam">reset_buffers_nonMPI</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -761,7 +761,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_adaptivity_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.5.0</a>,
-            created at 2022-11-24 07:36 +0000
+            created at 2022-11-24 08:14 +0000
         </p>
     </div>
 </footer>

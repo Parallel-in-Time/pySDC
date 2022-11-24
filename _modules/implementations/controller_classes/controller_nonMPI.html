@@ -48,7 +48,7 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.Controller</span> <span class="kn">import</span> <span class="n">controller</span>
 <span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">Step</span> <span class="k">as</span> <span class="n">stepclass</span>
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ControllerError</span><span class="p">,</span> <span class="n">CommunicationError</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span> <span class="kn">import</span> <span class="n">BasicRestartingNonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span> <span class="kn">import</span> <span class="n">BasicRestarting</span>
 
 
 <div class="viewcode-block" id="controller_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI">[docs]</a><span class="k">class</span> <span class="nc">controller_nonMPI</span><span class="p">(</span><span class="n">controller</span><span class="p">):</span>
@@ -117,7 +117,7 @@
                 <span class="s1">&#39;you have specified a predictor type but only a single level.. &#39;</span> <span class="s1">&#39;predictor will be ignored&#39;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">BasicRestartingNonMPI</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="s2">&quot;nonMPI&quot;</span><span class="p">),</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
             <span class="n">C</span><span class="o">.</span><span class="n">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
