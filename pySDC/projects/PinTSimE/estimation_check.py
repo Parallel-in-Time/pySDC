@@ -172,9 +172,9 @@ def differences_around_switch(dt_list, restarts, sweeper, V_ref, cwd='./'):
         stats_false = dill.load(f2)
         f2.close()
 
-        val_switch = get_sorted(stats_true, type='switch1', sortby='time')
+        val_switch = get_sorted(stats_true, type='switch1', sortby='time', sorting=False)
         t_switch = [v[0] for v in val_switch]
-        t_switch = t_switch[0]  # battery has only one single switch
+        t_switch = t_switch[-1]  # battery has only one single switch
 
         vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time')
         vC_false = get_sorted(stats_false, type='voltage C', sortby='time')
@@ -235,9 +235,9 @@ def differences_over_time(dt_list, sweeper, V_ref, cwd='./'):
         stats_false = dill.load(f2)
         f2.close()
 
-        val_switch = get_sorted(stats_true, type='switch1', sortby='time')
+        val_switch = get_sorted(stats_true, type='switch1', sortby='time', sorting=False)
         t_switch = [v[0] for v in val_switch]
-        t_switch = t_switch[0]  # battery has only one single switch
+        t_switch = t_switch[-1]  # battery has only one single switch
 
         vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time')
         vC_false = get_sorted(stats_false, type='voltage C', sortby='time')
@@ -299,9 +299,9 @@ def iterations_over_time(dt_list, maxiter, sweeper, cwd='./'):
         times_true.append([v[0] for v in iter_counts_true_val])
         times_false.append([v[0] for v in iter_counts_false_val])
 
-        val_switch = get_sorted(stats_true, type='switch1', sortby='time')
+        val_switch = get_sorted(stats_true, type='switch1', sortby='time', sorting=False)
         t_switch = [v[0] for v in val_switch]
-        t_switches.append(t_switch[0])
+        t_switches.append(t_switch[-1])
 
     setup_mpl()
     fig_iter_all, ax_iter_all = plt_helper.plt.subplots(

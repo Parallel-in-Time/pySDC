@@ -206,9 +206,9 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, cwd='./')
     ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
 
     if use_switch_estimator:
-        val_switch = get_sorted(stats, type='switch1', sortby='time')
+        val_switch = get_sorted(stats, type='switch1', sortby='time', sorting=False)
         t_switch = [v[0] for v in val_switch]
-        ax.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch')
+        ax.axvline(x=t_switch[-1], linestyle='--', color='k', label='Switch')
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
