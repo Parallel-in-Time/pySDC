@@ -7,7 +7,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 class ptype_dae(ptype):
     """
-    Interface class for DAE problems. Ensures that all parameters are passed that are needed by the DAE sweeper 
+    Interface class for DAE problems. Ensures that all parameters are passed that are needed by DAE sweepers
     """
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
@@ -25,7 +25,6 @@ class ptype_dae(ptype):
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
-        # TODO consider defining attributes that save solver run data
         
         super(ptype_dae, self).__init__(
             (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params

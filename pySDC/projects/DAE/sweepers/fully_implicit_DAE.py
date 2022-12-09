@@ -11,7 +11,9 @@ class fully_implicit_DAE(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
-    Newton-Krylov sweeper to solve differential equations in fully implicit form e.g. differential algebraic equations 
+    Sweeper to solve first order differential equations in fully implicit form
+    Primarily implemented to be used with differential algebraic equations 
+    Based on the concepts outlined in "Arbitrary order Krylov deferred correction methods for differential algebraic equations" by Huang et al.
 
     Attributes:
         QI: implicit Euler integration matrix
@@ -38,7 +40,7 @@ class fully_implicit_DAE(sweeper):
     def integrate(self):
         """
         Returns the solution by integrating its gradient (fundamental theorem of calculus)
-        Note that level.f stores the gradient values in the fully implicit case
+        Note that level.f stores the gradient values in the fully implicit case, rather than the evaluation of the rhs as in the ODE case 
 
         Returns:
             list of dtype_u: containing the integral as values
@@ -63,7 +65,7 @@ class fully_implicit_DAE(sweeper):
 
     def update_nodes(self):
         """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes i.e. one application of Newton-Krylov 
+        Update the u- and f-values at the collocation nodes -> corresponds to a single iteration of the preconditioned Richardson iteration in "ordinary" SDC
 
         Returns:
             None
@@ -107,13 +109,25 @@ class fully_implicit_DAE(sweeper):
                 params_mesh[:] = params
                 # build parameters to pass to implicit function 
                 local_u_approx = u_approx
+                # note that derivatives of algebraic variables are taken into account here too 
+                # these do not directly affect the output of eval_f but rather indirectly via QI
                 local_u_approx += L.dt * self.QI[m, m] * params_mesh
                 local_u_approx = np.concatenate((local_u_approx, params_mesh))
                 return P.eval_f(local_u_approx, L.time + L.dt * self.coll.nodes[m-1])
 
             # get U_k+1
             # note: not using solve_system here because this solve step is the same for any problem
-            opt = optimize.root(impl_fn, L.f[m], method='hybr', tol=P.params.newton_tol)
+            options = dict()
+            # options['disp'] = True
+            # See link for how different methods use the default tol parameter
+            # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220 
+            options['xtol'] = P.params.newton_tol
+            options['eps'] = 1e-7
+            opt = optimize.root(impl_fn, L.f[m], 
+                method='hybr', 
+                options=options, 
+                # callback= lambda x, f: print("solution:", x, " residual: ", f)
+                )
             # update gradient (recall L.f is being used to store the gradient) 
             L.f[m][:] = opt.x
 
@@ -128,8 +142,11 @@ class fully_implicit_DAE(sweeper):
 
     def predict(self):
         """
-        Need a custom predict function because eval_f() evaluates the implicit formulation 
-        F(u, u', t) rather than the rhs of an ODE formulation
+        Predictor to fill values at nodes before first sweep
+
+        Default prediction for the sweepers, only copies the values to all collocation nodes
+        This function overrides the base implementation by always initialising level.f to zero
+        This is necessary since level.f stores the solution derivative in the fully implicit case, which is not initially known
         """
         # get current level and problem description
         L = self.level
@@ -158,9 +175,10 @@ class fully_implicit_DAE(sweeper):
 
     def compute_residual(self):
         """
-        Need to override residual computation since the implicit formulation of the problem
-        does not allow using the standard residual formulation. Instead use the absolute
-        value of the implicit function. 
+        Overrides the base implementation 
+        Uses the absolute value of the implicit function ||F(u', u, t)|| as the residual 
+        Returns: 
+            None
         """
         # TODO: could consider using the square of the implicit function. How would this change the behaviour? 
         
