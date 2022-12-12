@@ -34,7 +34,7 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
     return result
 
 
-def sort_stats(stats, sortby, sorting, comm=None):
+def sort_stats(stats, sortby, comm=None):
     """
     Helper function to transform stats dictionary to sorted list of tuples
 
@@ -58,10 +58,7 @@ def sort_stats(stats, sortby, sorting, comm=None):
         result = [item for sub_result in comm.allgather(result) for item in sub_result]
 
     # sort by first element of the tuple (which is the sortby key) and return
-    if sorting:
-        sorted_data = sorted(result, key=lambda tup: tup[0])
-    else:
-        sorted_data = result
+    sorted_data = sorted(result, key=lambda tup: tup[0])
 
     return sorted_data
 
@@ -111,7 +108,7 @@ def get_list_of_types(stats):
     return type_list
 
 
-def get_sorted(stats, sortby='time', sorting=True, comm=None, **kwargs):
+def get_sorted(stats, sortby='time', comm=None, **kwargs):
     """
     Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
     Keyword arguments are passed to `filter_stats` for filtering.
@@ -127,6 +124,5 @@ def get_sorted(stats, sortby='time', sorting=True, comm=None, **kwargs):
     return sort_stats(
         filter_stats(stats, **kwargs),
         sortby=sortby,
-        sorting=sorting,
         comm=comm,
     )

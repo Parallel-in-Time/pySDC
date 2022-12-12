@@ -97,7 +97,7 @@ def main(problem=battery, restol=1e-12, sweeper=imex_1st_order, use_switch_estim
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 10
 
     # initialize controller parameters
     controller_params = dict()
@@ -161,7 +161,7 @@ def main(problem=battery, restol=1e-12, sweeper=imex_1st_order, use_switch_estim
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
 
-    assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 5.0, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     return description
@@ -206,8 +206,8 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, cwd='./')
     ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
 
     if use_switch_estimator:
-        val_switch = get_sorted(stats, type='switch1', sortby='time', sorting=False)
-        t_switch = [v[0] for v in val_switch]
+        val_switch = get_sorted(stats, type='switch1', sortby='time')
+        t_switch = [v[1] for v in val_switch]
         ax.axvline(x=t_switch[-1], linestyle='--', color='k', label='Switch')
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')

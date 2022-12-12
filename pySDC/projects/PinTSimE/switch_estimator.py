@@ -114,12 +114,12 @@ class SwitchEstimator(ConvergenceController):
                             L.prob.params.t_switch[self.count_switches] = self.t_switch
                             controller.hooks.add_to_stats(
                                 process=S.status.slot,
-                                time=self.t_switch,
+                                time=L.time,
                                 level=L.level_index,
                                 iter=0,
                                 sweep=L.status.sweep,
                                 type='switch{}'.format(self.count_switches + 1),
-                                value=p(self.t_switch),
+                                value=self.t_switch,
                             )
                             # self.switch_detected_step = self.switch_detected
                             self.switch_detected_step = True
