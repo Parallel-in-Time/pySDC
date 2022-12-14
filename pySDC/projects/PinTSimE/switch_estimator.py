@@ -80,7 +80,7 @@ class SwitchEstimator(ConvergenceController):
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
 
-                    self.t_switch = get_switch(t_interp, vC_switch, m_guess)
+                    self.t_switch = self.get_switch(t_interp, vC_switch, m_guess)
 
                     # if the switch is not find, we need to do ... ?
                     if L.time < self.t_switch < L.time + L.dt:
@@ -160,7 +160,8 @@ class SwitchEstimator(ConvergenceController):
 
         super(SwitchEstimator, self).post_step_processing(controller, S)
 
-    def get_switch(t_interp, vC_witch, m_guess):
+    @staticmethod
+    def get_switch(t_interp, vC_switch, m_guess):
         """
         Routine to do the interpolation and root finding stuff.
 
@@ -181,7 +182,7 @@ class SwitchEstimator(ConvergenceController):
             bracket=[t_interp[0], t_interp[m_guess]],
             x0=t_interp[m_guess],
             xtol=1e-10,
-       )
-       t_switch = SwitchResults.root
+        )
+        t_switch = SwitchResults.root
 
-       return t_switch
+        return t_switch
