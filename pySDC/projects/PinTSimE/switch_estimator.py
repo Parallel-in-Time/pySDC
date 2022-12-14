@@ -7,10 +7,24 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 class SwitchEstimator(ConvergenceController):
     """
-    Method to estimate a discrete event (switch)
+    Class to predict the time point of the switch and setting a new step size
+
+    For the first time, this is a nonMPI version, because a MPI version is not yet developed.
     """
 
     def setup(self, controller, params, description):
+        """
+        Function sets default variables to handle with the switch at the beginning.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        """
+
         # for RK4 sweeper, sweep.coll.nodes now consists of values of ButcherTableau
         # for this reason, collocation nodes will be generated here
         coll = CollBase(
@@ -26,39 +40,16 @@ class SwitchEstimator(ConvergenceController):
         return {'control_order': 100, **params}
 
     def get_new_step_size(self, controller, S):
-        def regulaFalsiMethod(a0, b0, f, tol, maxIter=50):
-            """
-            Regula falsi method to find the root for the switch
-            Args:
-                a0, b0 (np.float):              points to start the method
-                f (callable function):          function values
-                tol (np.float):                 when tol is reached, the secant method breaks
-                maxIter (np.int):               maximum number of iterations to find root
+        """
+        Determine a new step size when a switch is found such that the switch happens at the time step.
 
-            Return:
-                The root of f
-            """
-            count = 0
-            while count <= maxIter:
-                c0 = a0 - ((b0 - a0) / (f(b0) - f(a0))) * f(a0)
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
 
-                if f(a0) * f(c0) > 0:
-                    a0 = c0
-                    b0 = b0
-
-                if f(b0) * f(c0) > 0:
-                    a0 = a0
-                    b0 = c0
-
-                count += 1
-
-                cm = a0 - ((b0 - a0) / (f(b0) - f(a0))) * f(a0)
-
-                if abs(cm - c0) < tol:
-                    print("Regula falsi method: Number of iterations: ", count, "-- Root: ", c0)
-                    break
-
-            return c0
+        Returns:
+            None
+        """
 
         self.switch_detected = False  # reset between steps
 
@@ -88,16 +79,8 @@ class SwitchEstimator(ConvergenceController):
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
-                    p = sp.interpolate.interp1d(t_interp, vC_switch, 'cubic', bounds_error=False)
 
-                    SwitchResults = sp.optimize.root_scalar(
-                        p,
-                        method='brentq',
-                        bracket=[t_interp[0], t_interp[m_guess]],
-                        x0=t_interp[m_guess],
-                        xtol=1e-10,
-                    )
-                    self.t_switch = SwitchResults.root  # t_switch[0]
+                    self.t_switch = get_switch(t_interp, vC_switch, m_guess)
 
                     # if the switch is not find, we need to do ... ?
                     if L.time < self.t_switch < L.time + L.dt:
@@ -105,24 +88,27 @@ class SwitchEstimator(ConvergenceController):
                         tol = self.dt_initial / r
 
                         if not np.isclose(self.t_switch - L.time, L.dt, atol=tol):
-                            L.status.dt_new = self.t_switch - L.time
+                            dt_search = self.t_switch - L.time
 
                         else:
                             print('Switch located at time: {}'.format(self.t_switch))
-                            L.status.dt_new = self.t_switch - L.time
+                            dt_search = self.t_switch - L.time
                             L.prob.params.set_switch[self.count_switches] = self.switch_detected
                             L.prob.params.t_switch[self.count_switches] = self.t_switch
                             controller.hooks.add_to_stats(
                                 process=S.status.slot,
-                                time=self.t_switch,
+                                time=L.time,
                                 level=L.level_index,
                                 iter=0,
                                 sweep=L.status.sweep,
                                 type='switch{}'.format(self.count_switches + 1),
-                                value=p(self.t_switch),
+                                value=self.t_switch,
                             )
-                            # self.switch_detected_step = self.switch_detected
+
                             self.switch_detected_step = True
+
+                        dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
+                        L.status.dt_new = min([dt_planned, dt_search])
 
                     else:
                         self.switch_detected = False
@@ -131,6 +117,17 @@ class SwitchEstimator(ConvergenceController):
                     self.switch_detected = False
 
     def determine_restart(self, controller, S):
+        """
+        Check if the step needs to be restarted due to a predicting switch.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+
         if self.switch_detected:
             print("Restart")
             S.status.restart = True
@@ -139,10 +136,22 @@ class SwitchEstimator(ConvergenceController):
         super(SwitchEstimator, self).determine_restart(controller, S)
 
     def post_step_processing(self, controller, S):
+        """
+        After a step is done, some variables will be prepared for predicting a possibly new switch.
+        If no Adaptivity is used, the next time step will be set as the default one from the front end.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+
         L = S.levels[0]
 
         if self.switch_detected_step:
-            if L.prob.params.set_switch[self.count_switches] and L.time + L.dt > self.t_switch:
+            if L.prob.params.set_switch[self.count_switches] and L.time + L.dt >= self.t_switch:
                 self.count_switches += 1
                 self.t_switch = None
                 self.switch_detected_step = False
@@ -150,3 +159,29 @@ class SwitchEstimator(ConvergenceController):
                 L.status.dt_new = self.dt_initial
 
         super(SwitchEstimator, self).post_step_processing(controller, S)
+
+    def get_switch(t_interp, vC_witch, m_guess):
+        """
+        Routine to do the interpolation and root finding stuff.
+
+        Args:
+            t_interp (list): collocation nodes in a step
+            vC_switch (list): differences vC - V_ref at these collocation nodes
+            m_guess (np.float): Index at which the difference drops below zero
+
+        Returns:
+            t_switch (np.float): time point of th switch
+        """
+
+        p = sp.interpolate.interp1d(t_interp, vC_switch, 'cubic', bounds_error=False)
+
+        SwitchResults = sp.optimize.root_scalar(
+            p,
+            method='brentq',
+            bracket=[t_interp[0], t_interp[m_guess]],
+            x0=t_interp[m_guess],
+            xtol=1e-10,
+       )
+       t_switch = SwitchResults.root
+
+       return t_switch
