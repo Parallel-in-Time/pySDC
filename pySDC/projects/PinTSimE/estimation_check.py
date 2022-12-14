@@ -184,7 +184,7 @@ def check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [4e-1, 4e-2, 4e-3]
+    dt_list = [1e-1, 1e-2]
     use_switch_estimator = [True, False]
     use_adaptivity = [True, False]
     restarts_true = []
