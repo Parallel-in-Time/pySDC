@@ -84,6 +84,7 @@ flake8-comprehensions = ["+*", '-C408', '-C417']
 [tool.black]
 line-length = 120
 skip-string-normalization = true
+force-exclude = ['playgrounds']
 
 [tool.coverage.run]
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
