@@ -10,70 +10,11 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import log_data, proof_assertions_description
-from pySDC.projects.PinTSimE.battery_model import log_data as log_data_battery
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
-
-
-class log_data(hooks):
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='current L',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='voltage C',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.get('restart')),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.error_embedded_estimate,
-        )
 
 
 def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
@@ -114,10 +55,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
-    if not use_adaptivity:
-        controller_params['hook_class'] = log_data_battery
-    else:
-        controller_params['hook_class'] = log_data
+    controller_params['hook_class'] = log_data
     controller_params['mssdc_jac'] = False
 
     # convergence controllers
@@ -291,8 +229,8 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
 
         if len(dt_list) > 1:
             ax_acc[count_ax].set_title(r'$\Delta t$={}'.format(dt_item))
-            dt1 = ax_acc[count_ax].plot([v[0] for v in dt_TT_val], [v[1] for v in dt_TT_val], 'ko-', label='SE+A - $\Delta t$')
-            dt2 = ax_acc[count_ax].plot([v[0] for v in dt_FT_val], [v[1] for v in dt_FT_val], 'g-', label='A - $\Delta t$')
+            dt1 = ax_acc[count_ax].plot([v[0] for v in dt_TT_val], [v[1] for v in dt_TT_val], 'ko-', label=r'SE+A - $\Delta t$')
+            dt2 = ax_acc[count_ax].plot([v[0] for v in dt_FT_val], [v[1] for v in dt_FT_val], 'g-', label=r'A - $\Delta t$')
             ax_acc[count_ax].axvline(x=t_switch_adapt, linestyle='--', linewidth=0.5, color='r', label='Switch')
             ax_acc[count_ax].set_xlabel('Time', fontsize=6)
             if count_ax == 0:
@@ -312,9 +250,9 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
 
         else:
             ax_acc.set_title(r'$\Delta t$={}'.format(dt_item))
-            dt1 = ax_acc.plot([v[0] for v in dt_TT_val], [v[1] for v in dt_TT_val], 'ko-', label='SE+A - $\Delta t$')
-            dt2 = ax_acc.plot([v[0] for v in dt_FT_val], [v[1] for v in dt_FT_val], 'go-', label='A - $\Delta t$')
-            dt3 = ax_acc.axvline(x=t_switch_adapt, linestyle='--', linewidth=0.5, color='r', label='Switch')
+            dt1 = ax_acc.plot([v[0] for v in dt_TT_val], [v[1] for v in dt_TT_val], 'ko-', label=r'SE+A - $\Delta t$')
+            dt2 = ax_acc.plot([v[0] for v in dt_FT_val], [v[1] for v in dt_FT_val], 'go-', label=r'A - $\Delta t$')
+            ax_acc.axvline(x=t_switch_adapt, linestyle='--', linewidth=0.5, color='r', label='Switch')
             ax_acc.set_xlabel('Time', fontsize=6)
             ax_acc.set_ylabel(r'$Delta t_{adapted}$', fontsize=6)
 
