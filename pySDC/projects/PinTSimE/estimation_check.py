@@ -128,7 +128,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
 
     if use_adaptivity:
         adaptivity_params = dict()
-        adaptivity_params['e_tol'] = 1e-12
+        adaptivity_params['e_tol'] = 1e-7
         convergence_controllers.update({Adaptivity: adaptivity_params})
 
     # fill description dictionary for easy step instantiation
@@ -184,7 +184,7 @@ def check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [1e-1, 1e-2]
+    dt_list = [1e-2, 1e-3]
     use_switch_estimator = [True, False]
     use_adaptivity = [True, False]
     restarts_true = []
@@ -293,7 +293,7 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
             ax_acc[count_ax].set_title(r'$\Delta t$={}'.format(dt_item))
             dt1 = ax_acc[count_ax].plot([v[0] for v in dt_TT_val], [v[1] for v in dt_TT_val], 'ko-', label='SE+A - $\Delta t$')
             dt2 = ax_acc[count_ax].plot([v[0] for v in dt_FT_val], [v[1] for v in dt_FT_val], 'g-', label='A - $\Delta t$')
-            dt3 = ax_acc[count_ax].axvline(x=t_switch_adapt, linestyle='--', linewidth=0.5, color='r', label='Switch')
+            ax_acc[count_ax].axvline(x=t_switch_adapt, linestyle='--', linewidth=0.5, color='r', label='Switch')
             ax_acc[count_ax].set_xlabel('Time', fontsize=6)
             if count_ax == 0:
                 ax_acc[count_ax].set_ylabel(r'$\Delta t_{adapted}$', fontsize=6)

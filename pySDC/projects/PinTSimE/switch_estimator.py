@@ -108,7 +108,13 @@ class SwitchEstimator(ConvergenceController):
                             self.switch_detected_step = True
 
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
-                        L.status.dt_new = min([dt_planned, dt_search])
+
+                        # when a switch is found, time step to match with switch should be preferred
+                        if self.switch_detected:
+                            L.status.dt_new = dt_search
+
+                        else:
+                            L.status.dt_new = min([dt_planned, dt_search])
 
                     else:
                         self.switch_detected = False
