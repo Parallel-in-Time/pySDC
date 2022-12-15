@@ -133,7 +133,6 @@ def check(cwd='./'):
     sweeper_classes = [imex_1st_order, generic_implicit]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
-        Path("data/{}".format(problem.__name__)).mkdir(parents=True, exist_ok=True)
         for dt_item in dt_list:
             for use_SE in use_switch_estimator:
                 for use_A in use_adaptivity:
@@ -269,7 +268,7 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
 
         count_ax += 1
 
-    fig_acc.savefig('data/{}/embedded_error_adaptivity_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
+    fig_acc.savefig('data/embedded_error_adaptivity_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_acc)
 
 
@@ -403,7 +402,7 @@ def differences_around_switch(dt_list, problem, restarts_true, restarts_false_ad
     labels = [l.get_label() for l in lines]
     ax_around[2].legend(frameon=False, fontsize=6, loc='lower right')
 
-    fig_around.savefig('data/{}/diffs_estimation_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
+    fig_around.savefig('data/diffs_estimation_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_around)
 
 
@@ -525,7 +524,7 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
         count_ax += 1
 
     plt_helper.plt.tight_layout()
-    fig_diffs.savefig('data/{}/difference_estimation_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
+    fig_diffs.savefig('data/difference_estimation_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_diffs)
 
 def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
@@ -626,7 +625,7 @@ def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
         ax_iter_all.legend(frameon=False, fontsize=6, loc='upper right')
 
     plt_helper.plt.tight_layout()
-    fig_iter_all.savefig('data/{}/iters_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
+    fig_iter_all.savefig('data/iters_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_iter_all)
 
 

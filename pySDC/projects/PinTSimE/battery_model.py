@@ -151,7 +151,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     min_iter = 20
     max_iter = 0
 
-    Path("data/{}".format(problem.__name__)).mkdir(parents=True, exist_ok=True)
+    Path("data").mkdir(parents=True, exist_ok=True)
     fname = 'data/battery_{}_USE{}_USA{}.dat'.format(sweeper.__name__, use_switch_estimator, use_adaptivity)
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -241,7 +241,7 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adapt
     ax.set_xlabel('Time', fontsize=8)
     ax.set_ylabel('Energy', fontsize=8)
 
-    fig.savefig('data/{}/{}_model_solution_{}.png'.format(problem, problem, sweeper), dpi=300, bbox_inches='tight')
+    fig.savefig('data/{}_model_solution_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
 
