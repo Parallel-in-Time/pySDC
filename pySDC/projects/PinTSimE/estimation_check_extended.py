@@ -163,11 +163,11 @@ def check(cwd='./'):
 
         val_switch1 = get_sorted(stats_true, type='switch1', sortby='time')
         val_switch2 = get_sorted(stats_true, type='switch2', sortby='time')
-        t_switch1 = [v[0] for v in val_switch1]
-        t_switch2 = [v[0] for v in val_switch2]
+        t_switch1 = [v[1] for v in val_switch1]
+        t_switch2 = [v[1] for v in val_switch2]
 
-        t_switch1 = t_switch1[0]
-        t_switch2 = t_switch2[0]
+        t_switch1 = t_switch1[-1]
+        t_switch2 = t_switch2[-1]
 
         val_switch_all.append([t_switch1, t_switch2])
 
