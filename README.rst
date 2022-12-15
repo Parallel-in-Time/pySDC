@@ -29,7 +29,7 @@ For this, `pySDC` ships with environment files which can be found in the folder 
 
 .. code-block:: bash
 
-   conda create --yes -f etc/environment-base.yml
+   conda env create --yes -f etc/environment-base.yml
 
 To check your installation, run
 

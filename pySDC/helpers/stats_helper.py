@@ -78,20 +78,13 @@ def filter_recomputed(stats):
     times_restarted = [me.time for me in stats.keys() if me.num_restarts > 0]
     for t in times_restarted:
         restarts = max([me.num_restarts for me in filter_stats(stats, type='_recomputed', time=t).keys()])
-
         for i in range(restarts):
-            to_be_removed = filter_stats(
-                stats,
-                time=t,
-                num_restarts=i,
-            )
-            [stats.pop(me) for me in to_be_removed.keys()]
+            [stats.pop(me) for me in filter_stats(stats, time=t, num_restarts=i).keys()]
 
     # delete values that were recorded at times that shouln't be recorded because we performed a different step after the restart
     other_restarted_steps = [me for me in filter_stats(stats, type='_recomputed') if stats[me]]
     for step in other_restarted_steps:
-        to_be_removed_other = filter_stats(stats, time=step.time)
-        [stats.pop(me) for me in to_be_removed_other.keys()]
+        [stats.pop(me) for me in filter_stats(stats, time=step.time).keys()]
 
     return stats
 

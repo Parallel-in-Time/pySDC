@@ -15,20 +15,18 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
-def run(dt, use_switch_estimator=True, V_ref=1.0):
+def run(dt, problem=battery, restol=1e-12, sweeper=imex_1st_order, use_switch_estimator=True, V_ref=1.0):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-8
+    level_params['restol'] = restol
     level_params['dt'] = dt
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    # sweeper_params['collocation_class'] = Collocation
-    # sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -36,14 +34,14 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_maxiter'] = 200  # remove later
-    problem_params['newton_tol'] = 1e-08  # remove later
+    problem_params['newton_maxiter'] = 200
+    problem_params['newton_tol'] = 1e-08
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = 1.0
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
-    problem_params['alpha'] = 1.2
+    problem_params['alpha'] = 5.0
     problem_params['V_ref'] = V_ref
     problem_params['set_switch'] = np.array([False], dtype=bool)
     problem_params['t_switch'] = np.zeros(1)
@@ -63,9 +61,9 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery_implicit  # pass problem class
+    description['problem_class'] = problem  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = generic_implicit  # pass sweeper
+    description['sweeper_class'] = sweeper  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
@@ -77,7 +75,7 @@ def run(dt, use_switch_estimator=True, V_ref=1.0):
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.5
+    Tend = 2.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -114,31 +112,49 @@ def check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [1e-1, 1e-2, 1e-3, 1e-4]  # [4e-1, 4e-2, 4e-3]
+    dt_list = [1e-1, 1e-2]  # [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
     restarts = []
-    for dt_item in dt_list:
-        for item in use_switch_estimator:
-            description, stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
 
-            fname = 'data/battery_dt{}_USE{}.dat'.format(dt_item, item)
-            f = open(fname, 'wb')
-            dill.dump(stats, f)
-            f.close()
+    problem_classes = [battery, battery_implicit]
+    restolerances = [1e-12, 1e-8]
+    sweeper_classes = [imex_1st_order, generic_implicit]
 
-            if item:
-                restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
-                restarts.append(np.sum(restarts_sorted))
-                print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts_sorted))
+    # loop for imex_1st_order sweeper
+    for problem, restol, sweeper in zip(problem_classes, restolerances, sweeper_classes):
+        for dt_item in dt_list:
+            for item in use_switch_estimator:
+                description, stats = run(
+                    dt=dt_item,
+                    problem=problem,
+                    restol=restol,
+                    sweeper=sweeper,
+                    use_switch_estimator=item,
+                    V_ref=V_ref,
+                )
 
-    assert len(dt_list) > 1, 'ERROR: dt_list have to be contained more than one element due to the subplots'
+                fname = 'data/battery_dt{}_USE{}_{}.dat'.format(dt_item, item, sweeper.__name__)
+                f = open(fname, 'wb')
+                dill.dump(stats, f)
+                f.close()
 
-    differences_around_switch(dt_list, restarts, V_ref)
+                if item:
+                    restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+                    restarts.append(np.sum(restarts_sorted))
+                    print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts_sorted))
 
-    differences_over_time(dt_list, V_ref)
+        assert len(dt_list) > 1, 'ERROR: dt_list have to be contained more than one element due to the subplots'
+
+        differences_around_switch(dt_list, restarts, sweeper.__name__, V_ref)
+
+        differences_over_time(dt_list, sweeper.__name__, V_ref)
+
+        iterations_over_time(dt_list, description['step_params']['maxiter'], sweeper.__name__)
+
+        restarts = []
 
 
-def differences_around_switch(dt_list, restarts, V_ref, cwd = './'):
+def differences_around_switch(dt_list, restarts, sweeper, V_ref, cwd='./'):
     """
     Routine to plot the differences before, at, and after the switch. Produces the diffs_estimation_<sweeper_class>.png file
     """
@@ -148,11 +164,11 @@ def differences_around_switch(dt_list, restarts, V_ref, cwd = './'):
     diffs_false_after = []
 
     for dt_item in dt_list:
-        f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'data/battery_dt{}_USETrue_{}.dat'.format(dt_item, sweeper), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'data/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'data/battery_dt{}_USEFalse_{}.dat'.format(dt_item, sweeper), 'rb')
         stats_false = dill.load(f2)
         f2.close()
 
@@ -196,28 +212,26 @@ def differences_around_switch(dt_list, restarts, V_ref, cwd = './'):
     lines = pos1 + pos2 + pos3 + restarts_plt
     labels = [l.get_label() for l in lines]
     ax_around.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
-    fig_around.savefig('data/diffs_estimation_imex_1st_order.png', dpi=300, bbox_inches='tight')
+    fig_around.savefig('data/diffs_estimation_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_around)
 
 
-def differences_over_time(dt_list, V_ref, cwd='./'):
+def differences_over_time(dt_list, sweeper, V_ref, cwd='./'):
     """
-    Routine to plot the differences in time using the switch estimator or not. Produces the difference_estimation_imex_1st_order.png file
+    Routine to plot the differences in time using the switch estimator or not. Produces the difference_estimation_<sweeper_class>.png file
     """
-
-    # diffs_true = []
-    # diffs_false_before = []
-    # diffs_false_after = []
 
     setup_mpl()
-    fig_diffs, ax_diffs = plt_helper.plt.subplots(1, len(dt_list), figsize=(2*len(dt_list), 2), sharex='col', sharey='row')
+    fig_diffs, ax_diffs = plt_helper.plt.subplots(
+        1, len(dt_list), figsize=(2 * len(dt_list), 2), sharex='col', sharey='row'
+    )
     count_ax = 0
     for dt_item in dt_list:
-        f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'data/battery_dt{}_USETrue_{}.dat'.format(dt_item, sweeper), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'data/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'data/battery_dt{}_USEFalse_{}.dat'.format(dt_item, sweeper), 'rb')
         stats_false = dill.load(f2)
         f2.close()
 
@@ -230,15 +244,6 @@ def differences_over_time(dt_list, V_ref, cwd='./'):
 
         diff_true, diff_false = [v[1] - V_ref for v in vC_true], [v[1] - V_ref for v in vC_false]
         times_true, times_false = [v[0] for v in vC_true], [v[0] for v in vC_false]
-
-        #for m in range(len(times_true)):
-        #    if np.round(times_true[m], 15) == np.round(t_switch, 15):
-        #        diffs_true.append(diff_true[m])
-
-        #for m in range(1, len(times_false)):
-        #    if times_false[m - 1] < t_switch < times_false[m]:
-        #        diffs_false_before.append(diff_false[m - 1])
-        #        diffs_false_after.append(diff_false[m])
 
         ax_diffs[count_ax].set_title('dt={}'.format(dt_item))
         ax_diffs[count_ax].plot(times_true, diff_true, label='SE=True', color='#ff7f0e')
@@ -258,18 +263,72 @@ def differences_over_time(dt_list, V_ref, cwd='./'):
 
         count_ax += 1
 
-    fig_diffs.savefig('data/difference_estimation_imex_1st_order.png', dpi=300, bbox_inches='tight')
+    fig_diffs.savefig('data/difference_estimation_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_diffs)
 
 
-#def error_over_time(dt_list):
+# def error_over_time(dt_list, cwd='./'):
 
 
-def iterations_over_time():
+def iterations_over_time(dt_list, maxiter, sweeper, cwd='./'):
     """
-    Routine  to plot the number of iterations over time using switch estimator or not. Produces the iters_imex_1st_order.png file
+    Routine  to plot the number of iterations over time using switch estimator or not. Produces the iters_<sweeper_class>.png file
     """
-    return None
+
+    iters_time_true = []
+    iters_time_false = []
+    times_true = []
+    times_false = []
+    t_switches = []
+
+    for dt_item in dt_list:
+        f1 = open(cwd + 'data/battery_dt{}_USETrue_{}.dat'.format(dt_item, sweeper), 'rb')
+        stats_true = dill.load(f1)
+        f1.close()
+
+        f2 = open(cwd + 'data/battery_dt{}_USEFalse_{}.dat'.format(dt_item, sweeper), 'rb')
+        stats_false = dill.load(f2)
+        f2.close()
+
+        iter_counts_true_val = get_sorted(stats_true, type='niter', recomputed=False, sortby='time')
+        iter_counts_false_val = get_sorted(stats_false, type='niter', sortby='time')
+
+        iters_time_true.append([v[1] for v in iter_counts_true_val])
+        iters_time_false.append([v[1] for v in iter_counts_false_val])
+
+        times_true.append([v[0] for v in iter_counts_true_val])
+        times_false.append([v[0] for v in iter_counts_false_val])
+
+        val_switch = get_sorted(stats_true, type='switch1', sortby='time')
+        t_switch = [v[0] for v in val_switch]
+        t_switches.append(t_switch[0])
+
+    setup_mpl()
+    fig_iter_all, ax_iter_all = plt_helper.plt.subplots(
+        nrows=2, ncols=len(dt_list), figsize=(2 * len(dt_list) - 1, 3), sharex='col', sharey='row'
+    )
+    for row in range(2):
+        for col in range(len(dt_list)):
+            if row == 0:
+                # SE = False
+                ax_iter_all[row, col].plot(times_false[col], iters_time_false[col], label='SE=False')
+                ax_iter_all[row, col].set_title('dt={}'.format(dt_list[col]))
+                ax_iter_all[row, col].set_ylim(1, maxiter)
+
+            else:
+                # SE = True
+                ax_iter_all[row, col].plot(times_true[col], iters_time_true[col], label='SE=True')
+                ax_iter_all[row, col].axvline(x=t_switches[col], linestyle='--', color='r', label='Switch')
+                ax_iter_all[row, col].set_xlabel('Time', fontsize=6)
+                ax_iter_all[row, col].set_ylim(1, maxiter)
+
+            if col == 0:
+                ax_iter_all[row, col].set_ylabel('Number iterations', fontsize=6)
+
+            ax_iter_all[row, col].legend(frameon=False, fontsize=6, loc='upper right')
+    plt_helper.plt.tight_layout()
+    fig_iter_all.savefig('data/iters_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig_iter_all)
 
 
 if __name__ == "__main__":
