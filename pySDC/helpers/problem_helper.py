@@ -2,25 +2,25 @@ import numpy as np
 from scipy.special import factorial
 
 
-def get_finite_difference_stencil(derivative, order, type=None, steps=None):
+def get_finite_difference_stencil(derivative, order, stencil_type=None, steps=None):
     """
     Derive general finite difference stencils from Taylor expansions
     """
 
     if steps is not None:
         n = len(steps)
-    elif type == 'center':
+    elif stencil_type == 'center':
         n = order + derivative - (derivative + 1) % 2 // 1
         steps = np.arange(n) - n // 2
-    elif type == 'forward':
+    elif stencil_type == 'forward':
         n = order + derivative
         steps = np.arange(n)
-    elif type == 'backward':
+    elif stencil_type == 'backward':
         n = order + derivative
         steps = -np.arange(n)
     else:
         raise ValueError(
-            f'Stencil must be of type "center", "forward" or "backward", not {type}. If you want something\
+            f'Stencil must be of type "center", "forward" or "backward", not {stencil_type}. If you want something\
 else, you can also give specific steps.'
         )
 
@@ -42,7 +42,7 @@ else, you can also give specific steps.'
 
 
 def get_finite_difference_matrix(
-    derivative, order, type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False
+    derivative, order, stencil_type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False
 ):
     """
     Build FD matrix from stencils, with boundary conditions
@@ -56,7 +56,7 @@ def get_finite_difference_matrix(
         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
 
     # get stencil
-    coeff, steps = get_finite_difference_stencil(derivative=derivative, order=order, type=type, steps=steps)
+    coeff, steps = get_finite_difference_stencil(derivative=derivative, order=order, stencil_type=stencil_type, steps=steps)
 
     if bc == 'dirichlet-zero':
         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')

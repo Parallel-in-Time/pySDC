@@ -19,79 +19,79 @@ class advectionNd(ptype):
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, nvars=512, c=1.0, freq=2, stencil_type='center', order=2, lintol=1e-12, liniter=10000, direct_solver=True, bc='periodic', ndim=None):
         """
         Initialization routine
 
+        Args can be set as values or as tuples, which will increase the dimension. Do, however, take care that all
+        spatial parameters have the same dimension.
+
         Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            nvars (int): Spatial resolution, can be tuple
+            c (float): Advection speed, can be tuple
+            freq (int): Spatial frequency of the initial conditions, can be tuple
+            stencil_type (str): Type of the finite difference stencil
+            order (int): Order of the finite difference discretization
+            lintol (float): Tolerance for spatial solver (GMRES)
+            liniter (int): Max. iterations for GMRES
+            direct_solver (bool): Whether to solve directly or use GMRES
+            bc (str): Boundary conditions
+            ndim (int): Number of dimensions. Is set automatically if left at None.
         """
 
-        # these parameters will be used later, so assert their existence
-
-        if 'order' not in problem_params:
-            problem_params['order'] = 2
-        if 'stencil_type' not in problem_params:
-            problem_params['stencil_type'] = 'center'
-        if 'lintol' not in problem_params:
-            problem_params['lintol'] = 1e-12
-        if 'liniter' not in problem_params:
-            problem_params['liniter'] = 10000
-        if 'direct_solver' not in problem_params:
-            problem_params['direct_solver'] = True
-
-        essential_keys = ['nvars', 'c', 'freq', 'type', 'order', 'lintol', 'liniter', 'direct_solver', 'bc']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
         # make sure parameters have the correct form
-        if not (type(problem_params['nvars']) is tuple and type(problem_params['freq']) is tuple) and not (
-            type(problem_params['nvars']) is int and type(problem_params['freq']) is int
+        if not (type(nvars) is tuple and type(freq) is tuple) and not (
+            type(nvars) is int and type(freq) is int
         ):
-            print(problem_params['nvars'], problem_params['freq'])
+            print(nvars, freq)
             raise ProblemError('Type of nvars and freq must be both either int or both tuple')
 
-        if 'ndim' not in problem_params:
-            if type(problem_params['nvars']) is int:
-                problem_params['ndim'] = 1
-            elif type(problem_params['nvars']) is tuple:
-                problem_params['ndim'] = len(problem_params['nvars'])
+        if ndim is None:
+            if type(nvars) is int:
+                ndim = 1
+            elif type(nvars) is tuple:
+                ndim = len(nvars)
 
-        if problem_params['ndim'] > 3:
-            raise ProblemError(f'can work with up to three dimensions, got {problem_params["ndim"]}')
+        if ndim > 3:
+            raise ProblemError(f'can work with up to three dimensions, got {ndim}')
 
-        if type(problem_params['freq']) is tuple:
-            for freq in problem_params['freq']:
-                if freq % 2 != 0 and problem_params['bc'] == 'periodic':
+        if type(freq) is tuple:
+            for f in freq:
+                if f % 2 != 0 and bc == 'periodic':
                     raise ProblemError('need even number of frequencies due to periodic BCs')
         else:
-            if problem_params['freq'] % 2 != 0 and problem_params['bc'] == 'periodic':
+            if freq % 2 != 0 and bc == 'periodic':
                 raise ProblemError('need even number of frequencies due to periodic BCs')
 
-        if type(problem_params['nvars']) is tuple:
-            for nvars in problem_params['nvars']:
-                if nvars % 2 != 0 and problem_params['bc'] == 'periodic':
+        if type(nvars) is tuple:
+            for nvar in nvars:
+                if nvar % 2 != 0 and bc == 'periodic':
                     raise ProblemError('the setup requires nvars = 2^p per dimension')
-                if (nvars + 1) % 2 != 0 and problem_params['bc'] == 'dirichlet-zero':
+                if (nvar + 1) % 2 != 0 and bc == 'dirichlet-zero':
                     raise ProblemError('setup requires nvars = 2^p - 1')
-            if problem_params['nvars'][1:] != problem_params['nvars'][:-1]:
-                raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
+            if nvars[1:] != nvars[:-1]:
+                raise ProblemError('need a square domain, got %s' % nvars)
         else:
-            if problem_params['nvars'] % 2 != 0 and problem_params['bc'] == 'periodic':
+            if nvars % 2 != 0 and bc == 'periodic':
                 raise ProblemError('the setup requires nvars = 2^p per dimension')
-            if (problem_params['nvars'] + 1) % 2 != 0 and problem_params['bc'] == 'dirichlet-zero':
+            if (nvars + 1) % 2 != 0 and bc == 'dirichlet-zero':
                 raise ProblemError('setup requires nvars = 2^p - 1')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(advectionNd, self).__init__(
-            init=(problem_params['nvars'], None, np.dtype('float64')),
-            dtype_u=dtype_u,
-            dtype_f=dtype_f,
-            params=problem_params,
+            init=(nvars, None, np.dtype('float64')),
+            dtype_u=mesh,
+            dtype_f=mesh,
+            nvars=nvars,
+            c=c,
+            freq=freq,
+            stencil_type=stencil_type,
+            order=order,
+            lintol=lintol,
+            liniter=liniter,
+            direct_solver=direct_solver,
+            bc=bc,
+            ndim=ndim,
         )
 
         if self.params.ndim == 1:
@@ -113,7 +113,7 @@ class advectionNd(ptype):
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=1,
             order=self.params.order,
-            type=self.params.stencil_type,
+            stencil_type=self.params.stencil_type,
             dx=self.dx,
             size=self.params.nvars[0],
             dim=self.params.ndim,
