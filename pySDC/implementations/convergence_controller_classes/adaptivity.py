@@ -137,14 +137,6 @@ class AdaptivityBase(ConvergenceController):
 
         return None
 
-    def check_iteration_status(self, controller, S, **kwargs):
-        """
-        Check if the step has converged
-        """
-        if self.params.get('wiggleroom') and S.status.force_continue:
-            e_est = self.get_local_error_estimate(controller, S)
-            S.status.force_continue = e_est > self.params.e_tol
-
 class Adaptivity(AdaptivityBase):
     """
     Class to compute time step size adaptively based on embedded error estimate.
@@ -153,7 +145,7 @@ class Adaptivity(AdaptivityBase):
     which you can also know for block-Jacobi, but it works differently and it is only implemented for block
     Gauss-Seidel so far.
 
-    There is an option to applow a "wiggleroom" for iterations meaning if adaptivity decides we need a restart, we can
+    There is an option to allow a "wiggleroom" for iterations meaning if adaptivity decides we need a restart, we can
     optionally estimate if continuing to iterate would lead to convergence in fewer iterations than a restart. Since
     often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly. Notice that
     the computed step size is not effected.
