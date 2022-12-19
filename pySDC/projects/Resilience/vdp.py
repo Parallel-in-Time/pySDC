@@ -1,21 +1,22 @@
 # script to run a van der Pol problem
 import numpy as np
+import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.core.Hooks import hooks
 from pySDC.core.Errors import ProblemError
+from pySDC.projects.Resilience.hook import log_error_estimates
 
 
 def plot_step_sizes(stats, ax):
 
     # convert filtered statistics to list of iterations count, sorted by process
-    u = np.array(get_sorted(stats, type='u', recomputed=False, sortby='time'))[:, 1]
-    p = np.array(get_sorted(stats, type='p', recomputed=False, sortby='time'))[:, 1]
-    t = np.array(get_sorted(stats, type='p', recomputed=False, sortby='time'))[:, 0]
+    u = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    p = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    t = np.array(get_sorted(stats, type='u', recomputed=False, sortby='time'))[:, 0]
 
     e_em = np.array(get_sorted(stats, type='e_em', recomputed=False, sortby='time'))[:, 1]
     dt = np.array(get_sorted(stats, type='dt', recomputed=False, sortby='time'))
@@ -42,86 +43,11 @@ def plot_step_sizes(stats, ax):
     ax.set_xlabel('time')
 
 
-class log_data(hooks):
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='p',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_em',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_ex',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.restart),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='k',
-            value=step.status.iter,
-        )
-
-
 def run_vdp(
     custom_description=None,
     num_procs=1,
     Tend=10.0,
-    hook_class=log_data,
+    hook_class=log_error_estimates,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -228,7 +154,7 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
     Returns:
         dict: Key values to perform tests on
     """
-    types = ['e_em', 'restart', 'dt', 'k', 'residual_post_step']
+    types = ['e_embedded', 'restart', 'dt', 'sweeps', 'residual_post_step']
     data = {}
     for type in types:
         if type not in get_list_of_types(stats):
@@ -301,6 +227,23 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         check_if_tests_match(data[1], data[0])
 
 
+def check_adaptivity_with_wiggleroom():
+    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.}}
+    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggle':True}
+    size=1
+    custom_controller_params = {'logger_level': 15}
+    stats, controller, Tend = run_vdp(
+        custom_description=custom_description,
+        num_procs=size,
+        use_MPI=False,
+        custom_controller_params=custom_controller_params,
+        Tend=3.0e-1,
+        comm=comm,
+    )
+    fig, ax = plt.subplots()
+    plot_step_sizes(stats, ax)
+    plt.show()
+
 if __name__ in "__main__":
     try:
         from mpi4py import MPI
@@ -311,3 +254,4 @@ if __name__ in "__main__":
         MPI_ready = False
         comm = None
     mpi_vs_nonMPI(MPI_ready, comm)
+    #check_adaptivity_with_wiggleroom()
