@@ -65,6 +65,7 @@ class BasicRestarting(ConvergenceController):
         """
         defaults = {
             "control_order": 95,
+            "max_restarts": 10,
         }
 
         if 'max_restarts' in description.keys():
@@ -190,7 +191,6 @@ class BasicRestartingNonMPI(BasicRestarting):
             (dict): The updated params dictionary
         """
         defaults = {
-            "max_restarts": 1 if len(controller.MS) == 1 else 2,
             "step_size_spreader": SpreadStepSizesBlockwiseNonMPI,
         }
         return {
@@ -251,7 +251,6 @@ class BasicRestartingMPI(BasicRestarting):
             (dict): The updated params dictionary
         """
         defaults = {
-            "max_restarts": 2,
             "step_size_spreader": SpreadStepSizesBlockwiseMPI,
         }
         return {
