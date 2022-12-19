@@ -18,7 +18,7 @@ def plot_step_sizes(stats, ax):
     p = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     t = np.array(get_sorted(stats, type='u', recomputed=False, sortby='time'))[:, 0]
 
-    e_em = np.array(get_sorted(stats, type='e_em', recomputed=False, sortby='time'))[:, 1]
+    e_em = np.array(get_sorted(stats, type='e_embedded', recomputed=False, sortby='time'))[:, 1]
     dt = np.array(get_sorted(stats, type='dt', recomputed=False, sortby='time'))
     restart = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
 
@@ -41,6 +41,23 @@ def plot_step_sizes(stats, ax):
     ax.legend(frameon=False)
 
     ax.set_xlabel('time')
+
+
+def plot_wiggleroom(stats, ax, wiggle):
+    sweeps = get_sorted(stats, type='sweeps', recomputed=None)
+    restarts = get_sorted(stats, type='restart', recomputed=None)
+
+    color = 'blue' if wiggle else 'red'
+    ls = ':' if not wiggle else '-.'
+    label = 'with' if wiggle else 'without'
+     
+    ax.plot([me[0] for me in sweeps], np.cumsum([me[1] for me in sweeps]), color=color, label=f'{label} wiggleroom')
+    [ax.axvline(me[0], color=color, ls=ls) for me in restarts if me[1]]
+
+    ax.set_xlabel(r'$t$')
+    ax.set_ylabel(r'$k$')
+    ax.legend(frameon=False)
+
 
 
 def run_vdp(
@@ -204,7 +221,7 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         print(f"Running with {size} ranks")
 
     custom_description = {'convergence_controllers': {}}
-    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggle':False}
+    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggleroom': False}
 
     custom_controller_params = {'logger_level': 30}
 
@@ -227,23 +244,56 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         check_if_tests_match(data[1], data[0])
 
 
-def check_adaptivity_with_wiggleroom():
-    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.}}
-    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggle':True}
-    size=1
-    custom_controller_params = {'logger_level': 15}
-    stats, controller, Tend = run_vdp(
-        custom_description=custom_description,
-        num_procs=size,
-        use_MPI=False,
-        custom_controller_params=custom_controller_params,
-        Tend=3.0e-1,
-        comm=comm,
-    )
+def check_adaptivity_with_wiggleroom(comm=None, size=1):
     fig, ax = plt.subplots()
-    plot_step_sizes(stats, ax)
-    plt.show()
+    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.e-2}}
+    custom_controller_params = {'logger_level': 15, 'all_to_done': True}
+    results = {'e': {}, 'sweeps': {}, 'restarts': {}}
+    size = comm.size if comm is not None else size
+     
+    for wiggle in [True, False]:
+        custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggleroom': wiggle}
+        stats, controller, Tend = run_vdp(
+            custom_description=custom_description,
+            num_procs=size,
+            use_MPI=comm is not None,
+            custom_controller_params=custom_controller_params,
+            Tend=10.0e0,
+            comm=comm,
+        )
+        plot_wiggleroom(stats, ax, wiggle)
 
+        # check error
+        u = get_sorted(stats, type='u', recomputed=False)[-1]
+        if comm is None:
+            u_exact = controller.MS[0].levels[0].prob.u_exact(t=u[0])
+        else:
+            u_exact = controller.S.levels[0].prob.u_exact(t=u[0])
+        results['e'][wiggle] = abs(u[1] - u_exact)
+
+        # check iteration counts
+        results['sweeps'][wiggle] = sum([me[1] for me in get_sorted(stats, type='sweeps', recomputed=None, comm=comm)])
+        results['restarts'][wiggle] = sum([me[1] for me in get_sorted(stats, type='restart', comm=comm)])
+
+    fig.tight_layout()
+    fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-wiggleroom.png')
+
+    assert np.isclose(results['e'][True], results['e'][False], rtol=5.), 'Errors don\'t match with wiggleroom and without, got '\
+     f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
+    if size == 1:
+        assert results['sweeps'][True] - results['sweeps'][False] == 1301 - 1344, '{Expected to save 43 iterations '\
+                f"with wiggleroom, got {results['sweeps'][False] - results['sweeps'][True]}"
+        assert results['restarts'][True] - results['restarts'][False] == 0 - 10, '{Expected to save 10 restarts '\
+                f"with wiggleroom, got {results['restarts'][False] - results['restarts'][True]}"
+        print('Passed wiggleroom tests with 1 process')
+    if size == 4:
+        assert results['sweeps'][True] - results['sweeps'][False] == 2916 - 3008, '{Expected to save 92 iterations '\
+                f"with wiggleroom, got {results['sweeps'][False] - results['sweeps'][True]}"
+        assert results['restarts'][True] - results['restarts'][False] == 0 - 18, '{Expected to save 18 restarts '\
+                f"with wiggleroom, got {results['restarts'][False] - results['restarts'][True]}"
+        print('Passed wiggleroom tests with 4 processes')
+
+ 
 if __name__ in "__main__":
     try:
         from mpi4py import MPI
@@ -254,4 +304,5 @@ if __name__ in "__main__":
         MPI_ready = False
         comm = None
     mpi_vs_nonMPI(MPI_ready, comm)
-    #check_adaptivity_with_wiggleroom()
+    comm = None
+    check_adaptivity_with_wiggleroom(comm=comm, size=4)
