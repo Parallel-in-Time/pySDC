@@ -7,98 +7,14 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-from pySDC.core.Hooks import hooks
-
-
-class log_data(hooks):
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='v1',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='v2',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='p3',
-            value=L.uend[2],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_extrapolated',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.get('restart')),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='sweeps',
-            value=step.status.iter,
-        )
+from pySDC.projects.Resilience.hook import log_error_estimates
 
 
 def run_piline(
     custom_description=None,
     num_procs=1,
     Tend=20.0,
-    hook_class=log_data,
+    hook_class=log_error_estimates,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -186,10 +102,10 @@ def run_piline(
 def get_data(stats, recomputed=False):
     # convert filtered statistics to list of iterations count, sorted by process
     data = {
-        'v1': np.array(get_sorted(stats, type='v1', recomputed=recomputed))[:, 1],
-        'v2': np.array(get_sorted(stats, type='v2', recomputed=recomputed))[:, 1],
-        'p3': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 1],
-        't': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 0],
+        'v1': np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        'v2': np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        'p3': np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        't': np.array(get_sorted(stats, type='u', recomputed=recomputed))[:, 0],
         'dt': np.array(get_sorted(stats, type='dt', recomputed=recomputed)),
         'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
         'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
