@@ -125,7 +125,7 @@ class AdaptivityBase(ConvergenceController):
                     if rho > 1:
                         S.status.restart = True
                         self.log(f"Convergence factor = {rho:.2e} > 1 -> restarting", S)
-                    elif more_iter_needed > S.params.maxiter:
+                    elif S.status.iter + more_iter_needed > 2 * S.params.maxiter:
                         S.status.restart = True
                         self.log(f"{more_iter_needed} more iterations needed for convergence -> restart", S)
                     else:
@@ -160,6 +160,7 @@ class Adaptivity(AdaptivityBase):
     Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in
     more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.
     Set wiggleroom up by setting a boolean value for "wiggleroom" in the parameters for the convergence controller.
+    The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.
     """
 
     def dependencies(self, controller, description, **kwargs):

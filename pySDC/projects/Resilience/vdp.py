@@ -247,7 +247,7 @@ def mpi_vs_nonMPI(MPI_ready, comm):
 def check_adaptivity_with_wiggleroom(comm=None, size=1):
     fig, ax = plt.subplots()
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.e-2}}
-    custom_controller_params = {'logger_level': 15, 'all_to_done': True}
+    custom_controller_params = {'logger_level': 30, 'all_to_done': False}
     results = {'e': {}, 'sweeps': {}, 'restarts': {}}
     size = comm.size if comm is not None else size
      
@@ -300,9 +300,13 @@ if __name__ in "__main__":
 
         MPI_ready = True
         comm = MPI.COMM_WORLD
+        size = comm.size
     except ModuleNotFoundError:
         MPI_ready = False
         comm = None
+        size = 1
+
     mpi_vs_nonMPI(MPI_ready, comm)
-    comm = None
-    check_adaptivity_with_wiggleroom(comm=comm, size=4)
+
+    if size == 1:
+        check_adaptivity_with_wiggleroom(comm=None, size=1)

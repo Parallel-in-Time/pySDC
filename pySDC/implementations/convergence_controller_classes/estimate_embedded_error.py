@@ -13,6 +13,17 @@ class EstimateEmbeddedError(ConvergenceController):
     solutions with different order methods, meaning that in SDC we can just subtract two consecutive sweeps, as long as
     you make sure your preconditioner is compatible, which you have to just try out...
     """
+    def __init__(self, controller, params, description, **kwargs):
+        """
+        Initalization routine. Add the buffers for communication.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
+        super(EstimateEmbeddedError, self).__init__(controller, params, description, **kwargs)
+        self.buffers = Pars({'e_em_last': 0.0})
 
     @classmethod
     def get_implementation(cls, flavor):
@@ -109,17 +120,6 @@ class EstimateEmbeddedError(ConvergenceController):
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
-    def __init__(self, controller, params, description, **kwargs):
-        """
-        Initalization routine. Add the buffers for communication over the parent class.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): Parameters for the convergence controller
-            description (dict): The description object used to instantiate the controller
-        """
-        super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
-        self.buffers = Pars({'e_em_last': 0.0})
 
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
@@ -182,15 +182,16 @@ class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
 
                 # get accumulated local errors from previous steps
                 if not S.status.first:
-                    e_em_last = self.recv(comm, S.status.slot - 1)
+                    if not S.status.prev_done:
+                        self.buffers.e_em_last = self.recv(comm, S.status.slot - 1)
                 else:
-                    e_em_last = 0.0
+                    self.buffers.e_em_last = 0.0
 
                 # estimate accumulated local error
                 temp = self.estimate_embedded_error_serial(L)
 
                 # estimate local error as difference of accumulated errors
-                L.status.error_embedded_estimate = max([abs(temp - e_em_last), np.finfo(float).eps])
+                L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
                 # send the accumulated local errors forward
                 if not S.status.last:

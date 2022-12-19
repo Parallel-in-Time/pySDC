@@ -231,6 +231,18 @@ class BasicRestartingMPI(BasicRestarting):
     MPI specific version of basic restarting
     """
 
+    def __init__(self, controller, params, description, **kwargs):
+        """
+        Initialization routine. Adds a buffer.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
+        super(BasicRestartingMPI, self).__init__(controller, params, description)
+        self.buffers = Pars({"restart": False, "max_restart_reached": False, 'restart_earlier': False})
+
     def setup(self, controller, params, description, **kwargs):
         """
         Define parameters here.
@@ -275,24 +287,24 @@ class BasicRestartingMPI(BasicRestarting):
 
         if S.status.first:
             # check if we performed too many restarts
-            max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
-            restart_earlier = False  # there is no earlier step
+            self.buffers.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
+            self.buffers.restart_earlier = False  # there is no earlier step
 
-            if max_restart_reached and S.status.restart:
+            if self.buffers.max_restart_reached and S.status.restart:
                 self.log(
                     f"Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
 on...",
                     S,
                 )
-        else:
+        elif not S.status.prev_done:
             # receive information about restarts from earlier ranks
-            restart_earlier, max_restart_reached = self.recv(comm, source=S.status.slot - 1)
+            self.buffers.restart_earlier, self.buffers.max_restart_reached = self.recv(comm, source=S.status.slot - 1)
 
         # decide whether to restart
-        S.status.restart = (S.status.restart or restart_earlier) and not max_restart_reached
+        S.status.restart = (S.status.restart or self.buffers.restart_earlier) and not self.buffers.max_restart_reached
 
         # send information about restarts forward
         if not S.status.last:
-            self.send(comm, dest=S.status.slot + 1, data=(S.status.restart, max_restart_reached))
+            self.send(comm, dest=S.status.slot + 1, data=(S.status.restart, self.buffers.max_restart_reached))
 
         return None

@@ -94,10 +94,10 @@ class EstimateContractionFactor(ConvergenceController):
                     L.status.error_embedded_estimate / L.status.error_embedded_estimate_last_iter
                 )
                 if self.params.e_tol is not None:
-                    L.status.iter_to_convergence = np.ceil(
+                    L.status.iter_to_convergence = max([0, np.ceil(
                         np.log(self.params.e_tol / L.status.error_embedded_estimate)
                         / np.log(L.status.contraction_factor)
-                    )
+                    )])
 
     def pre_iteration_processing(self, controller, S, **kwargs):
         """
