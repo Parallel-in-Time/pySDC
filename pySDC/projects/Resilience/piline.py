@@ -53,7 +53,7 @@ def run_piline(
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 15
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
 
@@ -110,13 +110,15 @@ def get_data(stats, recomputed=False):
         'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
         'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
         'restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 1],
+        't_restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 0],
         'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=None))[:, 1],
     }
     data['ready'] = np.logical_and(data['e_ex'] != np.array(None), data['e_em'] != np.array(None))
+    data['restart_times'] = data['t_restarts'][data['restarts'] > 0]
     return data
 
 
-def plot_error(data, ax, use_adaptivity=True):
+def plot_error(data, ax, use_adaptivity=True, plot_restarts=False):
     setup_mpl_from_accuracy_check()
     ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
 
@@ -129,6 +131,9 @@ def plot_error(data, ax, use_adaptivity=True):
         label='difference',
         ls='-.',
     )
+
+    if plot_restarts:
+        [ax.axvline(t_restart, ls='-.', color='black', alpha=0.5) for t_restart in data['restart_times']]
 
     e_ax.plot([None, None], label=r'$\Delta t$', color='black')
     e_ax.set_yscale('log')
@@ -247,12 +252,11 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
 
 def main():
     generate_reference = False
-    wiggle = False
 
     for use_adaptivity in [True, False]:
         custom_description = {'convergence_controllers': {}}
         if use_adaptivity:
-            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggle': wiggle}
+            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7,}
 
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}

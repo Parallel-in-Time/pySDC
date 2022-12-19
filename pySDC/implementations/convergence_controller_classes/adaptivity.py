@@ -118,7 +118,7 @@ class AdaptivityBase(ConvergenceController):
             e_est = self.get_local_error_estimate(controller, S)
             if e_est >= self.params.e_tol:
                 # see if we allow any wiggle room
-                if self.params.get('wiggle'):
+                if self.params.get('wiggleroom'):
                     more_iter_needed = max([L.status.iter_to_convergence for L in S.levels])
                     rho = max([L.status.contraction_factor for L in S.levels])
 
@@ -131,13 +131,6 @@ class AdaptivityBase(ConvergenceController):
                     else:
                         S.status.force_continue = True
                         self.log(f"{more_iter_needed} more iterations needed for convergence -> no restart", S)
-                    # print(
-                    #    rho,
-                    #    e_est,
-                    #    S.levels[0].status.error_embedded_estimate_last_iter,
-                    #    self.params.e_tol,
-                    #    more_iter_needed,
-                    # )
                 else:
                     S.status.restart = True
                     self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
@@ -148,11 +141,9 @@ class AdaptivityBase(ConvergenceController):
         """
         Check if the step has converged
         """
-        if self.params.get('wiggle') and S.status.force_continue:
+        if self.params.get('wiggleroom') and S.status.force_continue:
             e_est = self.get_local_error_estimate(controller, S)
             S.status.force_continue = e_est > self.params.e_tol
-            # print('bla bla', e_est, self.params.e_tol, S.status.force_continue)
-
 
 class Adaptivity(AdaptivityBase):
     """
@@ -161,6 +152,14 @@ class Adaptivity(AdaptivityBase):
     We have a version working in non-MPI pipelined SDC, but Adaptivity requires you to know the order of the scheme,
     which you can also know for block-Jacobi, but it works differently and it is only implemented for block
     Gauss-Seidel so far.
+
+    There is an option to applow a "wiggleroom" for iterations meaning if adaptivity decides we need a restart, we can
+    optionally estimate if continuing to iterate would lead to convergence in fewer iterations than a restart. Since
+    often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly. Notice that
+    the computed step size is not effected.
+    Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in
+    more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.
+    Set wiggleroom up by setting a boolean value for "wiggleroom" in the parameters for the convergence controller.
     """
 
     def dependencies(self, controller, description, **kwargs):
@@ -184,7 +183,7 @@ class Adaptivity(AdaptivityBase):
         )
 
         # load contraction factor estimator if necessary
-        if self.params.get('wiggle'):
+        if self.params.get('wiggleroom'):
             from pySDC.implementations.convergence_controller_classes.estimate_contraction_factor import (
                 EstimateContractionFactor,
             )
