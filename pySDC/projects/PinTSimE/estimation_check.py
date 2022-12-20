@@ -77,6 +77,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description['max_restarts'] = 1
 
     if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
@@ -331,6 +332,7 @@ def differences_around_switch(dt_list, problem, restarts_true, restarts_false_ad
             if times_FF[m - 1] <= t_switch <= times_FF[m]:
                 diffs_false_before.append(diff_FF[m - 1])
                 diffs_false_after.append(diff_FF[m])
+
 
         for m in range(len(times_TT)):
             if np.round(times_TT[m], 13) == np.round(t_switch_adapt, 13):
