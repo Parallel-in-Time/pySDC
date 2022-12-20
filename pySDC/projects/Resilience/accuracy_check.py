@@ -24,6 +24,7 @@ class log_errors(hooks):
     What that means is problem specific. If an analytical solution is available, the local error is exact,
     otherwise it is estimated using a reference solution generated with scipy.
     """
+
     def post_step(self, step, level_number):
 
         super(log_errors, self).post_step(step, level_number)
@@ -171,14 +172,15 @@ def multiple_runs(
                 EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
             },
         }
-         
+
         # setup the variable we check the order against
         if var == 'dt':
             desc['level_params'] = {'dt': dt_list[i]}
         elif var == 'e_tol':
             from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
             desc['convergence_controllers'][Adaptivity] = {'e_tol': dt_list[i], 'avoid_restarts': avoid_restarts}
-         
+
         if custom_description is not None:
             desc = {**desc, **custom_description}
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
@@ -254,7 +256,7 @@ def plot(res, ax, k, var='dt'):
         order = get_accuracy_order(res, key=keys[i], var=var)
         if keys[i] == 'e_embedded':
             label = rf'$k={{{np.mean(order):.2f}}}$'
-            expect_order = k if var == 'dt' else 1.
+            expect_order = k if var == 'dt' else 1.0
             assert np.isclose(
                 np.mean(order), expect_order, atol=4e-1
             ), f'Expected embedded error estimate to have order {expect_order} \

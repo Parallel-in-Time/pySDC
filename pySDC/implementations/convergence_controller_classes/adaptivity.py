@@ -137,6 +137,7 @@ class AdaptivityBase(ConvergenceController):
 
         return None
 
+
 class Adaptivity(AdaptivityBase):
     """
     Class to compute time step size adaptively based on embedded error estimate.

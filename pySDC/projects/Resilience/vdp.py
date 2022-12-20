@@ -12,6 +12,16 @@ from pySDC.projects.Resilience.hook import log_error_estimates
 
 
 def plot_step_sizes(stats, ax):
+    """
+    Plot solution and step sizes to visualize the dynamics in the van der Pol equation.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        ax: Somewhere to plot
+
+    Returns:
+        None
+    """
 
     # convert filtered statistics to list of iterations count, sorted by process
     u = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
@@ -44,20 +54,31 @@ def plot_step_sizes(stats, ax):
 
 
 def plot_avoid_restarts(stats, ax, avoid_restarts):
+    """
+    Make a plot that shows how many iterations where required to solve to a point in time in the simulation.
+    Also restarts are shown as vertical lines.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        ax: Somewhere to plot
+        avoid_restarts (bool): Whether the `avoid_restarts` option was set in order to choose a color
+
+    Returns:
+        None
+    """
     sweeps = get_sorted(stats, type='sweeps', recomputed=None)
     restarts = get_sorted(stats, type='restart', recomputed=None)
 
     color = 'blue' if avoid_restarts else 'red'
     ls = ':' if not avoid_restarts else '-.'
     label = 'with' if avoid_restarts else 'without'
-     
+
     ax.plot([me[0] for me in sweeps], np.cumsum([me[1] for me in sweeps]), color=color, label=f'{label} avoid_restarts')
     [ax.axvline(me[0], color=color, ls=ls) for me in restarts if me[1]]
 
     ax.set_xlabel(r'$t$')
     ax.set_ylabel(r'$k$')
     ax.legend(frameon=False)
-
 
 
 def run_vdp(
@@ -71,6 +92,24 @@ def run_vdp(
     use_MPI=False,
     **kwargs,
 ):
+    """
+    Run a van der Pol problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        custom_problem_params (dict): Overwrite presets
+        use_MPI (bool): Whether or not to use MPI
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
+    """
 
     # initialize level parameters
     level_params = dict()
@@ -167,6 +206,8 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
 
     Args:
         stats (pySDC.stats): The stats object of the run
+        comm (mpi4py.MPI.Comm): MPI communicator, or `None` for the non-MPI version
+        use_MPI (bool): Whether or not MPI was used when generating stats
 
     Returns:
         dict: Key values to perform tests on
@@ -189,8 +230,8 @@ def check_if_tests_match(data_nonMPI, data_MPI):
     Check if the data matches between MPI and nonMPI versions
 
     Args:
-        data_nonMPI (dict): Key values to perform tests on
-        data_MPI (dict): Key values to perform tests on
+        data_nonMPI (dict): Key values to perform tests on obtained without MPI
+        data_MPI (dict): Key values to perform tests on obtained with MPI
 
     Returns:
         None
@@ -208,6 +249,16 @@ def check_if_tests_match(data_nonMPI, data_MPI):
 
 
 def mpi_vs_nonMPI(MPI_ready, comm):
+    """
+    Check if MPI and non-MPI versions give the same output.
+
+    Args:
+        MPI_ready (bool): Whether or not we can use MPI at all
+        comm (mpi4py.MPI.Comm): MPI communicator
+
+    Returns:
+        None
+    """
     if MPI_ready:
         size = comm.size
         rank = comm.rank
@@ -263,11 +314,11 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
         None
     """
     fig, ax = plt.subplots()
-    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.e-2}}
+    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
     custom_controller_params = {'logger_level': 30, 'all_to_done': False}
     results = {'e': {}, 'sweeps': {}, 'restarts': {}}
     size = comm.size if comm is not None else size
-     
+
     for avoid_restarts in [True, False]:
         custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': avoid_restarts}
         stats, controller, Tend = run_vdp(
@@ -289,29 +340,40 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
         results['e'][avoid_restarts] = abs(u[1] - u_exact)
 
         # check iteration counts
-        results['sweeps'][avoid_restarts] = sum([me[1] for me in get_sorted(stats, type='sweeps', recomputed=None,
-                                                                            comm=comm)])
+        results['sweeps'][avoid_restarts] = sum(
+            [me[1] for me in get_sorted(stats, type='sweeps', recomputed=None, comm=comm)]
+        )
         results['restarts'][avoid_restarts] = sum([me[1] for me in get_sorted(stats, type='restart', comm=comm)])
 
     fig.tight_layout()
     fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-avoid_restarts.png')
 
-    assert np.isclose(results['e'][True], results['e'][False], rtol=5.), 'Errors don\'t match with avoid_restarts and without, got '\
-     f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
+    assert np.isclose(results['e'][True], results['e'][False], rtol=5.0), (
+        'Errors don\'t match with avoid_restarts and without, got '
+        f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
+    )
     if size == 1:
-        assert results['sweeps'][True] - results['sweeps'][False] == 1301 - 1344, '{Expected to save 43 iterations '\
-                f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
-        assert results['restarts'][True] - results['restarts'][False] == 0 - 10, '{Expected to save 10 restarts '\
-                f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        assert results['sweeps'][True] - results['sweeps'][False] == 1301 - 1344, (
+            '{Expected to save 43 iterations '
+            f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
+        )
+        assert results['restarts'][True] - results['restarts'][False] == 0 - 10, (
+            '{Expected to save 10 restarts '
+            f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        )
         print('Passed avoid_restarts tests with 1 process')
     if size == 4:
-        assert results['sweeps'][True] - results['sweeps'][False] == 2916 - 3008, '{Expected to save 92 iterations '\
-                f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
-        assert results['restarts'][True] - results['restarts'][False] == 0 - 18, '{Expected to save 18 restarts '\
-                f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        assert results['sweeps'][True] - results['sweeps'][False] == 2916 - 3008, (
+            '{Expected to save 92 iterations '
+            f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
+        )
+        assert results['restarts'][True] - results['restarts'][False] == 0 - 18, (
+            '{Expected to save 18 restarts '
+            f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        )
         print('Passed avoid_restarts tests with 4 processes')
 
- 
+
 if __name__ in "__main__":
     try:
         from mpi4py import MPI

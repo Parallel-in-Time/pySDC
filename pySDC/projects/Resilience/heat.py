@@ -9,18 +9,6 @@ from pySDC.projects.Resilience.hook import log_error_estimates
 import numpy as np
 
 
-def plot_embedded(stats, ax):
-    u = get_sorted(stats, type='u', recomputed=False)
-    uold = get_sorted(stats, type='uold', recomputed=False)
-    t = [get_sorted(stats, type='u', recomputed=False)[i][0] for i in range(len(u))]
-    e_em = np.array(get_sorted(stats, type='e_embedded', recomputed=False))[:, 1]
-    e_em_semi_glob = [abs(u[i][1] - uold[i][1]) for i in range(len(u))]
-    ax.plot(t, e_em_semi_glob, label=r'$\|u^{\left(k-1\right)}-u^{\left(k\right)}\|$')
-    ax.plot(t, e_em, linestyle='--', label=r'$\epsilon$')
-    ax.set_xlabel(r'$t$')
-    ax.legend(frameon=False)
-
-
 def run_heat(
     custom_description=None,
     num_procs=1,
@@ -30,6 +18,23 @@ def run_heat(
     custom_controller_params=None,
     custom_problem_params=None,
 ):
+    """
+    Run a heat problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        custom_problem_params (dict): Overwrite presets
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
+    """
 
     # initialize level parameters
     level_params = dict()

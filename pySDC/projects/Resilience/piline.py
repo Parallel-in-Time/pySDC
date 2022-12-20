@@ -20,7 +20,21 @@ def run_piline(
     custom_problem_params=None,
 ):
     """
-    A simple test program to do SDC runs for Piline problem
+    Run a Piline problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        custom_problem_params (dict): Overwrite presets
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
     """
 
     # initialize level parameters
@@ -100,7 +114,16 @@ def run_piline(
 
 
 def get_data(stats, recomputed=False):
-    # convert filtered statistics to list of iterations count, sorted by process
+    """
+    Extract useful data from the stats.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        recomputed (bool): Whether to exclude values that don't contribute to the final solution or not
+
+    Returns:
+        dict: Data
+    """
     data = {
         'v1': np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
         'v2': np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
@@ -119,6 +142,17 @@ def get_data(stats, recomputed=False):
 
 
 def plot_error(data, ax, use_adaptivity=True, plot_restarts=False):
+    """
+    Plot the embedded and extrapolated error estimates.
+
+    Args:
+        data (dict): Data prepared from stats by `get_data`
+        use_adaptivity (bool): Whether adaptivity was used
+        plot_restarts (bool): Whether to plot vertical lines for restarts
+
+    Returns:
+        None
+    """
     setup_mpl_from_accuracy_check()
     ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
 
@@ -150,12 +184,25 @@ def plot_error(data, ax, use_adaptivity=True, plot_restarts=False):
 
 
 def setup_mpl_from_accuracy_check():
+    """
+    Change matplotlib parameters to conform to LaTeX style.
+    """
     from pySDC.projects.Resilience.accuracy_check import setup_mpl
 
     setup_mpl()
 
 
 def plot_solution(data, ax):
+    """
+    Plot the solution.
+
+    Args:
+        data (dict): Data prepared from stats by `get_data`
+        ax: Somewhere to plot
+
+    Returns:
+        None
+    """
     setup_mpl_from_accuracy_check()
     ax.plot(data['t'], data['v1'], label='v1', ls='-')
     ax.plot(data['t'], data['v2'], label='v2', ls='--')
@@ -165,6 +212,18 @@ def plot_solution(data, ax):
 
 
 def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
+    """
+    Check the solution against a hard coded reference.
+
+    Args:
+        data (dict): Data prepared from stats by `get_data`
+        use_adaptivity (bool): Whether adaptivity was used
+        num_procs (int): Number of steps for MSSDC
+        generate_reference (bool): Instead of comparing to reference, print a new reference to the console
+
+    Returns:
+        None
+    """
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'
         expected = {
@@ -251,12 +310,17 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
 
 
 def main():
+    """
+    Make a variety of tests to see if Hot Rod and Adaptivity work in serial as well as MSSDC.
+    """
     generate_reference = False
 
     for use_adaptivity in [True, False]:
         custom_description = {'convergence_controllers': {}}
         if use_adaptivity:
-            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7,}
+            custom_description['convergence_controllers'][Adaptivity] = {
+                'e_tol': 1e-7,
+            }
 
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}

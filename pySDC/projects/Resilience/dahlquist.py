@@ -11,6 +11,10 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class log_data(hooks):
+    """
+    Store the solution after each iteration
+    """
+
     def post_iteration(self, step, level_number):
 
         super(log_data, self).post_iteration(step, level_number)
@@ -55,6 +59,23 @@ def run_dahlquist(
     custom_problem_params=None,
     **kwargs,
 ):
+    """
+    Run a Dahlquist problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        custom_problem_params (dict): Overwrite presets
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
+    """
 
     # initialize level parameters
     level_params = dict()
@@ -131,6 +152,20 @@ def run_dahlquist(
 
 
 def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=False, **kwargs):
+    """
+    Plot the domain of stability by checking if the solution grows.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        ax: Somewhere to plot
+        iter (list): Check the stability for different numbers of iterations
+        colors (list): Colors for the different iterations
+        crosshair (bool): Whether to highlight the axes
+        fill (bool): Fill the contours or not
+
+    Returns:
+        None
+    """
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     u = get_sorted(stats, type='u', sortby='iter')
 
@@ -160,6 +195,20 @@ def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=
 
 
 def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, cbar=True, **kwargs):
+    """
+    Plot the contraction of the error.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        fig: Figure of the plot, needed for a colorbar
+        ax: Somewhere to plot
+        iter (list): Plot the contraction for different numbers of iterations
+        plot_increase (bool): Whether to also include increasing errors.
+        cbar (bool): Plot a color bar or not
+
+    Returns:
+        The plot
+    """
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     real = np.unique(lambdas.real)
     imag = np.unique(lambdas.imag)
@@ -224,6 +273,19 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
 
 
 def plot_increment(stats, fig=None, ax=None, iter=None, cbar=True, **kwargs):
+    """
+    Plot the increment between iterations.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        fig: Figure of the plot, needed for a colorbar
+        ax: Somewhere to plot
+        iter (list): Plot the contraction for different numbers of iterations
+        cbar (bool): Plot a color bar or not
+
+    Returns:
+        None
+    """
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     u = get_sorted(stats, type='u', sortby='iter')
 
@@ -231,11 +293,11 @@ def plot_increment(stats, fig=None, ax=None, iter=None, cbar=True, **kwargs):
 
     # decide which iterations to look at
     iter = [0, 1] if iter is None else iter
-    assert len(iter) > 1, 'Need to compute the increment accross multiple iterations!'
+    assert len(iter) > 1, 'Need to compute the increment across multiple iterations!'
 
     # get solution for the specified iterations
     u_iter = [me[1] for me in u if me[0] in iter]
-    if 0 in iter:  # ic's are not stored in stats, so we have to add them manually
+    if 0 in iter:  # ics are not stored in stats, so we have to add them manually
         u_iter = np.append(np.ones_like(lambdas), u_iter)
     us = np.reshape(u_iter, (len(iter), len(lambdas)))
 
@@ -270,6 +332,9 @@ def plot_increment(stats, fig=None, ax=None, iter=None, cbar=True, **kwargs):
 
 
 def compare_contraction():
+    """
+    Make a plot comparing contraction factors between trapezoidal rule and implicit Euler.
+    """
     fig, axs = plt.subplots(1, 2, figsize=(12, 5.5), gridspec_kw={'width_ratios': [0.8, 1]})
     precons = ['TRAP', 'IE']
     norm = Normalize(vmin=-7, vmax=0)

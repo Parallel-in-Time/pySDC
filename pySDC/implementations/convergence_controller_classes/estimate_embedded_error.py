@@ -13,6 +13,7 @@ class EstimateEmbeddedError(ConvergenceController):
     solutions with different order methods, meaning that in SDC we can just subtract two consecutive sweeps, as long as
     you make sure your preconditioner is compatible, which you have to just try out...
     """
+
     def __init__(self, controller, params, description, **kwargs):
         """
         Initalization routine. Add the buffers for communication.
@@ -120,7 +121,6 @@ class EstimateEmbeddedError(ConvergenceController):
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
-
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
         Reset buffers for immitated communication.
