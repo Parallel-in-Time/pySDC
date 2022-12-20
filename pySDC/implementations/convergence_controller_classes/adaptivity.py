@@ -117,8 +117,8 @@ class AdaptivityBase(ConvergenceController):
         if S.status.iter >= S.params.maxiter:
             e_est = self.get_local_error_estimate(controller, S)
             if e_est >= self.params.e_tol:
-                # see if we allow any wiggle room
-                if self.params.get('wiggleroom'):
+                # see if we try to avoid restarts
+                if self.params.get('avoid_restarts'):
                     more_iter_needed = max([L.status.iter_to_convergence for L in S.levels])
                     rho = max([L.status.contraction_factor for L in S.levels])
 
@@ -145,13 +145,14 @@ class Adaptivity(AdaptivityBase):
     which you can also know for block-Jacobi, but it works differently and it is only implemented for block
     Gauss-Seidel so far.
 
-    There is an option to allow a "wiggleroom" for iterations meaning if adaptivity decides we need a restart, we can
-    optionally estimate if continuing to iterate would lead to convergence in fewer iterations than a restart. Since
-    often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly. Notice that
-    the computed step size is not effected.
+    There is an option to reduce restarts if continued iterations could yield convergence in fewer iterations than
+    restarting based on an estimate of the contraction factor.
+    Since often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly.
+    Notice that the computed step size is not effected.
     Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in
     more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.
-    Set wiggleroom up by setting a boolean value for "wiggleroom" in the parameters for the convergence controller.
+    Set the reduced restart up by setting a boolean value for "avoid_restarts" in the parameters for the convergence
+    controller.
     The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.
     """
 
@@ -176,7 +177,7 @@ class Adaptivity(AdaptivityBase):
         )
 
         # load contraction factor estimator if necessary
-        if self.params.get('wiggleroom'):
+        if self.params.get('avoid_restarts'):
             from pySDC.implementations.convergence_controller_classes.estimate_contraction_factor import (
                 EstimateContractionFactor,
             )

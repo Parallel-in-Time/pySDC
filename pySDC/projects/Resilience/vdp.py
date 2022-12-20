@@ -43,15 +43,15 @@ def plot_step_sizes(stats, ax):
     ax.set_xlabel('time')
 
 
-def plot_wiggleroom(stats, ax, wiggle):
+def plot_avoid_restarts(stats, ax, avoid_restarts):
     sweeps = get_sorted(stats, type='sweeps', recomputed=None)
     restarts = get_sorted(stats, type='restart', recomputed=None)
 
-    color = 'blue' if wiggle else 'red'
-    ls = ':' if not wiggle else '-.'
-    label = 'with' if wiggle else 'without'
+    color = 'blue' if avoid_restarts else 'red'
+    ls = ':' if not avoid_restarts else '-.'
+    label = 'with' if avoid_restarts else 'without'
      
-    ax.plot([me[0] for me in sweeps], np.cumsum([me[1] for me in sweeps]), color=color, label=f'{label} wiggleroom')
+    ax.plot([me[0] for me in sweeps], np.cumsum([me[1] for me in sweeps]), color=color, label=f'{label} avoid_restarts')
     [ax.axvline(me[0], color=color, ls=ls) for me in restarts if me[1]]
 
     ax.set_xlabel(r'$t$')
@@ -221,7 +221,7 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         print(f"Running with {size} ranks")
 
     custom_description = {'convergence_controllers': {}}
-    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggleroom': False}
+    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': False}
 
     custom_controller_params = {'logger_level': 30}
 
@@ -244,15 +244,32 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         check_if_tests_match(data[1], data[0])
 
 
-def check_adaptivity_with_wiggleroom(comm=None, size=1):
+def check_adaptivity_with_avoid_restarts(comm=None, size=1):
+    """
+    Make a test if adaptivity with the option to avoid restarts based on a contraction factor estimate works as
+    expected.
+    To this end, we run the same test of the van der Pol equation twice with the only difference being this option
+    turned off or on.
+    We recorded how many iterations we expect to avoid by avoiding restarts and check against this value.
+    Also makes a figure comparing the number of iterations over time.
+
+    In principle there is an option to test MSSDC here, but this is only preliminary and needs to be checked further.
+
+    Args:
+       comm (mpi4py.MPI.Comm): MPI communicator, or `None` for the non-MPI version
+       size (int): Number of steps for MSSDC, is overridden by communicator size if applicable
+
+    Returns:
+        None
+    """
     fig, ax = plt.subplots()
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.e-2}}
     custom_controller_params = {'logger_level': 30, 'all_to_done': False}
     results = {'e': {}, 'sweeps': {}, 'restarts': {}}
     size = comm.size if comm is not None else size
      
-    for wiggle in [True, False]:
-        custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'wiggleroom': wiggle}
+    for avoid_restarts in [True, False]:
+        custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': avoid_restarts}
         stats, controller, Tend = run_vdp(
             custom_description=custom_description,
             num_procs=size,
@@ -261,7 +278,7 @@ def check_adaptivity_with_wiggleroom(comm=None, size=1):
             Tend=10.0e0,
             comm=comm,
         )
-        plot_wiggleroom(stats, ax, wiggle)
+        plot_avoid_restarts(stats, ax, avoid_restarts)
 
         # check error
         u = get_sorted(stats, type='u', recomputed=False)[-1]
@@ -269,29 +286,30 @@ def check_adaptivity_with_wiggleroom(comm=None, size=1):
             u_exact = controller.MS[0].levels[0].prob.u_exact(t=u[0])
         else:
             u_exact = controller.S.levels[0].prob.u_exact(t=u[0])
-        results['e'][wiggle] = abs(u[1] - u_exact)
+        results['e'][avoid_restarts] = abs(u[1] - u_exact)
 
         # check iteration counts
-        results['sweeps'][wiggle] = sum([me[1] for me in get_sorted(stats, type='sweeps', recomputed=None, comm=comm)])
-        results['restarts'][wiggle] = sum([me[1] for me in get_sorted(stats, type='restart', comm=comm)])
+        results['sweeps'][avoid_restarts] = sum([me[1] for me in get_sorted(stats, type='sweeps', recomputed=None,
+                                                                            comm=comm)])
+        results['restarts'][avoid_restarts] = sum([me[1] for me in get_sorted(stats, type='restart', comm=comm)])
 
     fig.tight_layout()
-    fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-wiggleroom.png')
+    fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-avoid_restarts.png')
 
-    assert np.isclose(results['e'][True], results['e'][False], rtol=5.), 'Errors don\'t match with wiggleroom and without, got '\
+    assert np.isclose(results['e'][True], results['e'][False], rtol=5.), 'Errors don\'t match with avoid_restarts and without, got '\
      f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
     if size == 1:
         assert results['sweeps'][True] - results['sweeps'][False] == 1301 - 1344, '{Expected to save 43 iterations '\
-                f"with wiggleroom, got {results['sweeps'][False] - results['sweeps'][True]}"
+                f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
         assert results['restarts'][True] - results['restarts'][False] == 0 - 10, '{Expected to save 10 restarts '\
-                f"with wiggleroom, got {results['restarts'][False] - results['restarts'][True]}"
-        print('Passed wiggleroom tests with 1 process')
+                f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        print('Passed avoid_restarts tests with 1 process')
     if size == 4:
         assert results['sweeps'][True] - results['sweeps'][False] == 2916 - 3008, '{Expected to save 92 iterations '\
-                f"with wiggleroom, got {results['sweeps'][False] - results['sweeps'][True]}"
+                f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
         assert results['restarts'][True] - results['restarts'][False] == 0 - 18, '{Expected to save 18 restarts '\
-                f"with wiggleroom, got {results['restarts'][False] - results['restarts'][True]}"
-        print('Passed wiggleroom tests with 4 processes')
+                f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        print('Passed avoid_restarts tests with 4 processes')
 
  
 if __name__ in "__main__":
@@ -309,4 +327,4 @@ if __name__ in "__main__":
     mpi_vs_nonMPI(MPI_ready, comm)
 
     if size == 1:
-        check_adaptivity_with_wiggleroom(comm=None, size=1)
+        check_adaptivity_with_avoid_restarts(comm=None, size=1)
