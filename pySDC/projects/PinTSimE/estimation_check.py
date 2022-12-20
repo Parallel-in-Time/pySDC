@@ -77,6 +77,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description['max_restarts'] = 1
 
     if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
