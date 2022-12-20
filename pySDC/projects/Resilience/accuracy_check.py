@@ -450,6 +450,11 @@ def check_order_against_step_size():
         plt.close(fig)
 
 
-if __name__ == "__main__":
+def main():
+    """Run various tests"""
     check_order_with_adaptivity()
     check_order_against_step_size()
+
+
+if __name__ == "__main__":
+    main()
