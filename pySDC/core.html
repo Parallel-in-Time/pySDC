@@ -383,23 +383,6 @@ Afterwards, the order of the convergence controllers is updated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="core.Controller.controller.check_convergence">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.check_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.check_convergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – current step</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>converged, true or false</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="core.Controller.controller.dump_setup">
 <span class="sig-name descname"><span class="pre">dump_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.dump_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.dump_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to dump the setup used for this controller</p>
@@ -2279,7 +2262,6 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#module-core.Controller">core.Controller module</a><ul>
 <li><a class="reference internal" href="#core.Controller.controller"><code class="docutils literal notranslate"><span class="pre">controller</span></code></a><ul>
 <li><a class="reference internal" href="#core.Controller.controller.add_convergence_controller"><code class="docutils literal notranslate"><span class="pre">controller.add_convergence_controller()</span></code></a></li>
-<li><a class="reference internal" href="#core.Controller.controller.check_convergence"><code class="docutils literal notranslate"><span class="pre">controller.check_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.dump_setup"><code class="docutils literal notranslate"><span class="pre">controller.dump_setup()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.hooks"><code class="docutils literal notranslate"><span class="pre">controller.hooks</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.print_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">controller.print_convergence_controllers()</span></code></a></li>

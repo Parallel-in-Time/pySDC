@@ -766,6 +766,24 @@ with the restarts and want to move on anyways.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_convergence.html#CheckConvergence.check_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the convergence of a single step.
+Test the residual and max. number of iterations as well as allowing overrides to both stop and continue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Convergence status of the step</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status">
 <span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_convergence.html#CheckConvergence.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)</p>
@@ -1870,6 +1888,7 @@ on Tend</p>
 </li>
 <li><a class="reference internal" href="#module-implementations.convergence_controller_classes.check_convergence">implementations.convergence_controller_classes.check_convergence module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence"><code class="docutils literal notranslate"><span class="pre">CheckConvergence</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence"><code class="docutils literal notranslate"><span class="pre">CheckConvergence.check_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">CheckConvergence.check_iteration_status()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence"><code class="docutils literal notranslate"><span class="pre">CheckConvergence.communicate_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup"><code class="docutils literal notranslate"><span class="pre">CheckConvergence.setup()</span></code></a></li>

@@ -247,30 +247,6 @@
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined) -- END</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="controller.check_convergence"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.check_convergence">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            S (pySDC.Step.step): current step</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: converged, true or false</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># do all this on the finest level</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1"># get residual and check against prescribed tolerance (plus check number of iterations</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
-        <span class="n">converged</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">or</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
-        <span class="k">if</span> <span class="n">converged</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="n">converged</span></div>
-
 <div class="viewcode-block" id="controller.run"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to the run() method</span>
