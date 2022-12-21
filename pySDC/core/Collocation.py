@@ -154,7 +154,7 @@ class CollBase(object):
             raise CollocationError(f"Need nodes before computing weights, got {self.nodes}")
 
         # Instantiate the Lagrange interpolator object
-        approx = LagrangeApproximation(self.nodes, weightComputation='AUTO')
+        approx = LagrangeApproximation(self.nodes)
 
         # Compute weights
         tLeft = np.ravel(self.tleft)[0]
@@ -203,7 +203,7 @@ class CollBase(object):
         Q = np.zeros([M + 1, M + 1])
 
         # Instantiate the Lagrange interpolator object
-        approx = LagrangeApproximation(self.nodes, weightComputation='AUTO')
+        approx = LagrangeApproximation(self.nodes)
 
         # Compute tleft-to-node integration matrix
         tLeft = np.ravel(self.tleft)[0]
