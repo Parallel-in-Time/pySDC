@@ -7,7 +7,14 @@ from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
 
-from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod, CrankNicholson, Cash_Karp
+from pySDC.implementations.sweeper_classes.Runge_Kutta import (
+    RK1,
+    RK4,
+    MidpointMethod,
+    CrankNicholson,
+    Cash_Karp,
+    Heun_Euler,
+)
 from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.helpers.stats_helper import get_sorted
@@ -132,8 +139,7 @@ def test_advection():
     plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod], implicit=False)
 
 
-def test_embedded_estimate_order():
-    sweeper = Cash_Karp
+def test_embedded_estimate_order(sweeper=Cash_Karp):
     fig, ax = plt.subplots(1, 1)
 
     # change only the things in the description that we need for adaptivity
@@ -152,7 +158,7 @@ def test_embedded_estimate_order():
     prob = run_vdp
     plot_all_errors(
         ax,
-        [5],
+        [5] if sweeper == Cash_Karp else [2],
         True,
         Tend_fixed=Tend,
         custom_description=description,
