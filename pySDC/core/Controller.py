@@ -205,30 +205,6 @@ class controller(object):
         out = 'Setup overview (--> user-defined) -- END\n'
         self.logger.info(out)
 
-    @staticmethod
-    def check_convergence(S):
-        """
-        Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)
-
-        Args:
-            S (pySDC.Step.step): current step
-
-        Returns:
-            bool: converged, true or false
-
-        """
-
-        # do all this on the finest level
-        L = S.levels[0]
-
-        # get residual and check against prescribed tolerance (plus check number of iterations
-        res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
-        if converged is None:
-            converged = False
-
-        return converged
-
     def run(self, u0, t0, Tend):
         """
         Abstract interface to the run() method
