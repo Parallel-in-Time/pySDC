@@ -65,9 +65,7 @@ class CollBase(object):
         left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(
-        self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type=None, **kwargs
-    ):
+    def __init__(self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type=None, **kwargs):
         """
         Initialization routine for a collocation object
 
