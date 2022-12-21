@@ -146,7 +146,7 @@ fine level are restricted as well.</p>
 <span id="core-collocation-module"></span><h2>core.Collocation module<a class="headerlink" href="#module-core.Collocation" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Collocation.CollBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Collocation.</span></span><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useSpline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Collocation.</span></span><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Generic collocation class, that contains everything to do integration over
 intervals and between nodes.
@@ -167,58 +167,43 @@ for node_type :</p>
 <p>The type of quadrature cann be GAUSS (only inner nodes), RADAU-LEFT
 (inclusion of the left boundary), RADAU-RIGHT (inclusion of the right
 boundary) and LOBATTO (inclusion of left and right boundary).</p>
-<p>Furthermore, the <code class="docutils literal notranslate"><span class="pre">useSpline</span></code> option can be activated to eventually use
-spline interpolation when computing the weights.</p>
-<p>Here is the equivalency table with the original classes implemented in
-pySDC :</p>
+<p>Here is the equivalency table with the (old) original classes implemented
+in pySDC :</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Original Class</p></th>
 <th class="head"><p>node_type</p></th>
 <th class="head"><p>quad_type</p></th>
-<th class="head"><p>useSpline</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Equidistant</p></td>
 <td><p>EQUID</p></td>
 <td><p>LOBATTO</p></td>
-<td><p>False</p></td>
 </tr>
 <tr class="row-odd"><td><p>EquidistantInner</p></td>
 <td><p>EQUID</p></td>
 <td><p>GAUSS</p></td>
-<td><p>False</p></td>
 </tr>
 <tr class="row-even"><td><p>EquidistantNoLeft</p></td>
 <td><p>EQUID</p></td>
 <td><p>RADAU-RIGHT</p></td>
-<td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>EquidistantSpline_Right</p></td>
-<td><p>EQUID</p></td>
-<td><p>RADAU-RIGHT</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-even"><td><p>CollGaussLegendre</p></td>
+<tr class="row-odd"><td><p>CollGaussLegendre</p></td>
 <td><p>LEGENDRE</p></td>
 <td><p>GAUSS</p></td>
-<td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>CollGaussLobatto</p></td>
+<tr class="row-even"><td><p>CollGaussLobatto</p></td>
 <td><p>LEGENDRE</p></td>
 <td><p>LOBATTO</p></td>
-<td><p>False</p></td>
 </tr>
-<tr class="row-even"><td><p>CollGaussRadau_Left</p></td>
+<tr class="row-odd"><td><p>CollGaussRadau_Left</p></td>
 <td><p>LEGENDRE</p></td>
 <td><p>RADAU-LEFT</p></td>
-<td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td><p>CollGaussRadau_Right</p></td>
+<tr class="row-even"><td><p>CollGaussRadau_Right</p></td>
 <td><p>LEGENDRE</p></td>
 <td><p>RADAU-RIGHT</p></td>
-<td><p>False</p></td>
 </tr>
 </tbody>
 </table>
