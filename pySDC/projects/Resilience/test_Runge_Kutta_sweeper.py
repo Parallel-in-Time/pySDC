@@ -22,13 +22,13 @@ colors = {
 }
 
 
-def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=None):
+def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=None, implicit=True):
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
     description = dict() if description is None else description
     description['sweeper_class'] = sweeper
-    description['sweeper_params'] = {'implicit': True}
+    description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
@@ -114,10 +114,10 @@ def plot_all_stability():
     fig.tight_layout()
 
 
-def plot_all_orders(prob, dt_list, Tend, sweepers):
+def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
     fig, ax = plt.subplots(1, 1)
     for i in range(len(sweepers)):
-        plot_order(sweepers[i], prob, dt_list, Tend_fixed=Tend, ax=ax)
+        plot_order(sweepers[i], prob, dt_list, Tend_fixed=Tend, ax=ax, implicit=implicit)
 
 
 def test_vdp():
@@ -126,7 +126,10 @@ def test_vdp():
 
 
 def test_advection():
-    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson])
+    plot_all_orders(
+        run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson], implicit=True
+    )
+    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod], implicit=False)
 
 
 def test_embedded_estimate_order():
