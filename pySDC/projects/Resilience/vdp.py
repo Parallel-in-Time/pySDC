@@ -374,6 +374,66 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
         print('Passed avoid_restarts tests with 4 processes')
 
 
+def check_step_size_limiter(size=4, comm=None):
+    """
+    Check the step size limiter convergence controller.
+    First we run without step size limits and then enforce limits that are slightly above and below what the usual
+    limits. Then we run again and see if we exceed the limits.
+
+    Args:
+        size (int): Number of steps for MSSDC
+        comm (mpi4py.MPI.Comm): MPI communicator, or `None` for the non-MPI version
+
+    Returns:
+        None
+    """
+    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
+    custom_controller_params = {'logger_level': 30}
+    expect = {}
+    params = {'e_tol': 1e-6}
+
+    for limit_step_sizes in [False, True]:
+        if limit_step_sizes:
+            params['dt_max'] = expect['dt_max'] * 0.9
+            params['dt_min'] = expect['dt_min'] * 1.1
+        else:
+            for k in ['dt_max', 'dt_min']:
+                if k in params.keys():
+                    params.pop(k)
+
+        custom_description['convergence_controllers'][Adaptivity] = params
+        stats, controller, Tend = run_vdp(
+            custom_description=custom_description,
+            num_procs=size,
+            use_MPI=comm is not None,
+            custom_controller_params=custom_controller_params,
+            Tend=5.0e0,
+            comm=comm,
+        )
+
+        # plot the step sizes
+        dt = get_sorted(stats, type='dt', recomputed=False, comm=comm)
+
+        if not limit_step_sizes:
+            expect['dt_max'] = max([me[1] for me in dt])
+            expect['dt_min'] = min([me[1] for me in dt])
+        else:
+            dt_max = max([me[1] for me in dt])
+            dt_min = min([me[1] for me in dt[size:-size]])  # The first and last step might fall below the limits
+            assert (
+                dt_max <= params['dt_max']
+            ), f"Exceeded maximum allowed step size! Got {dt_max:.4e}, allowed {params['dt_max']:.4e}."
+            assert (
+                dt_min >= params['dt_min']
+            ), f"Exceeded minimum allowed step size! Got {dt_min:.4e}, allowed {params['dt_min']:.4e}."
+
+    if comm == None:
+        print(f'Passed step size limiter test with {size} ranks in nonMPI implementation')
+    else:
+        if comm.rank == 0:
+            print(f'Passed step size limiter test with {size} ranks in MPI implementation')
+
+
 if __name__ in "__main__":
     try:
         from mpi4py import MPI
@@ -387,6 +447,7 @@ if __name__ in "__main__":
         size = 1
 
     mpi_vs_nonMPI(MPI_ready, comm)
+    check_step_size_limiter(size, comm)
 
     if size == 1:
         check_adaptivity_with_avoid_restarts(comm=None, size=1)
