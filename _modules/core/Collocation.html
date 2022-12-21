@@ -185,7 +185,7 @@
             <span class="k">raise</span> <span class="n">CollocationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need nodes before computing weights, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Instantiate the Lagrange interpolator object</span>
-        <span class="n">approx</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">weightComputation</span><span class="o">=</span><span class="s1">&#39;AUTO&#39;</span><span class="p">)</span>
+        <span class="n">approx</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
 
         <span class="c1"># Compute weights</span>
         <span class="n">tLeft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tleft</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -234,7 +234,7 @@
         <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">M</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">M</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># Instantiate the Lagrange interpolator object</span>
-        <span class="n">approx</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">weightComputation</span><span class="o">=</span><span class="s1">&#39;AUTO&#39;</span><span class="p">)</span>
+        <span class="n">approx</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
 
         <span class="c1"># Compute tleft-to-node integration matrix</span>
         <span class="n">tLeft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tleft</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>

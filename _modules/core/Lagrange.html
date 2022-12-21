@@ -122,10 +122,9 @@
 <span class="sd">        The interpolating points</span>
 <span class="sd">    weights : np.1darray</span>
 <span class="sd">        The associated barycentric weights</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">weightComputation</span><span class="o">=</span><span class="s1">&#39;AUTO&#39;</span><span class="p">,</span> <span class="n">scaleRef</span><span class="o">=</span><span class="s1">&#39;MAX&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Parameters</span>
@@ -133,23 +132,6 @@
 <span class="sd">        points : list, tuple or np.1darray</span>
 <span class="sd">            The given interpolation points, no specific scaling, but must be</span>
 <span class="sd">            ordered in increasing order.</span>
-<span class="sd">        weightComputation : str, optional</span>
-<span class="sd">            Algorithm used to compute the barycentric weights. Can be :</span>
-
-<span class="sd">            - &#39;FAST&#39; : uses the analytic formula (unstable for large number of points)</span>
-<span class="sd">            - &#39;STABLE&#39; : uses logarithmic difference and scaling of the weights</span>
-<span class="sd">            - &#39;CHEBFUN&#39; : uses the same approach as in the chebfun package</span>
-
-<span class="sd">            The default is &#39;AUTO&#39; : it tries the &#39;FAST&#39; algorithm, and if an</span>
-<span class="sd">            overflow is detected, it switches to the &#39;STABLE&#39; algorithm.</span>
-<span class="sd">        scaleRef : str, optional</span>
-<span class="sd">            Scaling used in the &#39;STABLE&#39; algorithm for weight computation.</span>
-<span class="sd">            Can be :</span>
-
-<span class="sd">            - &#39;ZERO&#39; : scaling based on the weight for the value closest to :math:`t=0`.</span>
-<span class="sd">            - &#39;MAX&#39; : scaling based on the maximum weight value.</span>
-
-<span class="sd">            The default is &#39;MAX&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
@@ -162,50 +144,15 @@
             <span class="n">invProd</span> <span class="o">**=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">return</span> <span class="n">invProd</span>
 
-        <span class="k">def</span> <span class="nf">logScale</span><span class="p">(</span><span class="n">diffs</span><span class="p">):</span>
-            <span class="c1"># Implementation using logarithmic difference and scaling</span>
-            <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">wLog</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diffs</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">scaleRef</span> <span class="o">==</span> <span class="s1">&#39;ZERO&#39;</span><span class="p">:</span>
-                <span class="n">wScale</span> <span class="o">=</span> <span class="n">wLog</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">points</span><span class="p">))]</span>
-            <span class="k">elif</span> <span class="n">scaleRef</span> <span class="o">==</span> <span class="s1">&#39;MAX&#39;</span><span class="p">:</span>
-                <span class="n">wScale</span> <span class="o">=</span> <span class="n">wLog</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;scaleRef=</span><span class="si">{</span><span class="n">scaleRef</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">invProd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">wLog</span> <span class="o">-</span> <span class="n">wScale</span><span class="p">)</span>
-            <span class="n">invProd</span> <span class="o">*=</span> <span class="n">sign</span>
-            <span class="k">return</span> <span class="n">invProd</span>
-
-        <span class="k">def</span> <span class="nf">chebfun</span><span class="p">(</span><span class="n">diffs</span><span class="p">):</span>
-            <span class="c1"># Implementation used in chebfun</span>
-            <span class="n">diffs</span> <span class="o">*=</span> <span class="mi">4</span> <span class="o">/</span> <span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">points</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-            <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diffs</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-            <span class="n">invProd</span> <span class="o">=</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">vv</span>
-            <span class="n">invProd</span> <span class="o">**=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">invProd</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">invProd</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">invProd</span>
-
-        <span class="k">if</span> <span class="n">weightComputation</span> <span class="o">==</span> <span class="s1">&#39;AUTO&#39;</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">over</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">invProd</span> <span class="o">=</span> <span class="n">analytic</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">FloatingPointError</span><span class="p">:</span>
-                    <span class="n">invProd</span> <span class="o">=</span> <span class="n">logScale</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">weightComputation</span> <span class="o">==</span> <span class="s1">&#39;FAST&#39;</span><span class="p">:</span>
-            <span class="n">invProd</span> <span class="o">=</span> <span class="n">analytic</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">weightComputation</span> <span class="o">==</span> <span class="s1">&#39;STABLE&#39;</span><span class="p">:</span>
-            <span class="n">invProd</span> <span class="o">=</span> <span class="n">logScale</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">weightComputation</span> <span class="o">==</span> <span class="s1">&#39;CHEBFUN&#39;</span><span class="p">:</span>
-            <span class="n">invProd</span> <span class="o">=</span> <span class="n">chebfun</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;weightComputation=</span><span class="si">{</span><span class="n">weightComputation</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">invProd</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">over</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">weights</span> <span class="o">=</span> <span class="n">analytic</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FloatingPointError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Lagrange formula unstable for that much nodes&#39;</span><span class="p">)</span>
 
         <span class="c1"># Store attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">points</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weightComputation</span> <span class="o">=</span> <span class="n">weightComputation</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
