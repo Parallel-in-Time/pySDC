@@ -67,7 +67,12 @@
 
 <div class="viewcode-block" id="StepSizeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Enforce an upper and lower limit to the step size here</span>
+<span class="sd">        Enforce an upper and lower limit to the step size here.</span>
+<span class="sd">        Be aware that this is only tested when a new step size has been determined. That means if you set an initial</span>
+<span class="sd">        value for the step size outside of the limits, and you don&#39;t do any further step size control, that value will</span>
+<span class="sd">        go through.</span>
+<span class="sd">        Also, the final step is adjusted such that we reach Tend as best as possible, which might give step sizes below</span>
+<span class="sd">        the lower limit set here.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
