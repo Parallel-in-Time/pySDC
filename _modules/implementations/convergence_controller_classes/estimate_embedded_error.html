@@ -56,6 +56,18 @@
 <span class="sd">    you make sure your preconditioner is compatible, which you have to just try out...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initalization routine. Add the buffers for communication.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s1">&#39;e_em_last&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
+
 <div class="viewcode-block" id="EstimateEmbeddedError.get_implementation"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.get_implementation">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flavor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -151,18 +163,6 @@
 
 
 <div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorNonMPI</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initalization routine. Add the buffers for communication over the parent class.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): Parameters for the convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EstimateEmbeddedErrorNonMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s1">&#39;e_em_last&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
-
 <div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI.reset_buffers_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset buffers for immitated communication.</span>
@@ -194,7 +194,7 @@
 <span class="s2">level&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sweeper_type</span> <span class="o">==</span> <span class="s2">&quot;RK&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sweeper_type</span> <span class="o">==</span> <span class="s2">&quot;RK&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
                 <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_embedded_error_serial</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">e_em_last</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">])</span>
@@ -219,20 +219,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">comm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sweeper_type</span> <span class="o">==</span> <span class="s2">&quot;RK&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sweeper_type</span> <span class="o">==</span> <span class="s2">&quot;RK&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
 
                 <span class="c1"># get accumulated local errors from previous steps</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-                    <span class="n">e_em_last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">e_em_last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">e_em_last</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">e_em_last</span> <span class="o">=</span> <span class="mf">0.0</span>
 
                 <span class="c1"># estimate accumulated local error</span>
                 <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_embedded_error_serial</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
 
                 <span class="c1"># estimate local error as difference of accumulated errors</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="n">e_em_last</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">])</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">e_em_last</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">])</span>
 
                 <span class="c1"># send the accumulated local errors forward</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span><span class="p">:</span>

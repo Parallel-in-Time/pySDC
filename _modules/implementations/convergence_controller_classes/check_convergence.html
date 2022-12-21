@@ -86,18 +86,23 @@
 
         <span class="c1"># get residual and check against prescribed tolerance (plus check number of iterations</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
-        <span class="n">converged</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">or</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
+        <span class="n">converged</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">or</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
+        <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_continue</span>
+
         <span class="k">if</span> <span class="n">converged</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">converged</span>
 
         <span class="k">if</span> <span class="s2">&quot;comm&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">communicate_convergence</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_continue</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="CheckConvergence.communicate_convergence"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">[docs]</a>    <span class="k">def</span> <span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Communicate the convergence status</span>
+<span class="sd">        Communicate the convergence status during `check_iteration_status` if MPI is used.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>

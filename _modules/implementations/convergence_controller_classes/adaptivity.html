@@ -156,11 +156,26 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
             <span class="n">e_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">e_est</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restarting: e=</span><span class="si">{</span><span class="n">e_est</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> &gt;= e_tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+                <span class="c1"># see if we try to avoid restarts</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;avoid_restarts&#39;</span><span class="p">):</span>
+                    <span class="n">more_iter_needed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter_to_convergence</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">])</span>
+                    <span class="n">rho</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">contraction_factor</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">])</span>
+
+                    <span class="k">if</span> <span class="n">rho</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Convergence factor = </span><span class="si">{</span><span class="n">rho</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> &gt; 1 -&gt; restarting&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+</span> <span class="n">more_iter_needed</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
+                        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">more_iter_needed</span><span class="si">}</span><span class="s2"> more iterations needed for convergence -&gt; restart&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_continue</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">more_iter_needed</span><span class="si">}</span><span class="s2"> more iterations needed for convergence -&gt; no restart&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restarting: e=</span><span class="si">{</span><span class="n">e_est</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> &gt;= e_tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div></div>
 
@@ -172,6 +187,16 @@
 <span class="sd">    We have a version working in non-MPI pipelined SDC, but Adaptivity requires you to know the order of the scheme,</span>
 <span class="sd">    which you can also know for block-Jacobi, but it works differently and it is only implemented for block</span>
 <span class="sd">    Gauss-Seidel so far.</span>
+
+<span class="sd">    There is an option to reduce restarts if continued iterations could yield convergence in fewer iterations than</span>
+<span class="sd">    restarting based on an estimate of the contraction factor.</span>
+<span class="sd">    Since often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly.</span>
+<span class="sd">    Notice that the computed step size is not effected.</span>
+<span class="sd">    Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in</span>
+<span class="sd">    more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.</span>
+<span class="sd">    Set the reduced restart up by setting a boolean value for &quot;avoid_restarts&quot; in the parameters for the convergence</span>
+<span class="sd">    controller.</span>
+<span class="sd">    The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Adaptivity.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.adaptivity.Adaptivity.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -194,6 +219,14 @@
             <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
         <span class="p">)</span>
 
+        <span class="c1"># load contraction factor estimator if necessary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;avoid_restarts&#39;</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_contraction_factor</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">EstimateContractionFactor</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;e_tol&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">}</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">EstimateContractionFactor</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Adaptivity.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

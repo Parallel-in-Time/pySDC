@@ -36,6 +36,14 @@ implementations.convergence\_controller\_classes.check\_iteration\_estimator mod
    :undoc-members:
    :show-inheritance:
 
+implementations.convergence\_controller\_classes.estimate\_contraction\_factor module
+-------------------------------------------------------------------------------------
+
+.. automodule:: implementations.convergence_controller_classes.estimate_contraction_factor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.convergence\_controller\_classes.estimate\_embedded\_error module
 ---------------------------------------------------------------------------------
 

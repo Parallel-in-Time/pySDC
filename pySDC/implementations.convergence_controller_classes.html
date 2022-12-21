@@ -63,6 +63,15 @@
 <p>We have a version working in non-MPI pipelined SDC, but Adaptivity requires you to know the order of the scheme,
 which you can also know for block-Jacobi, but it works differently and it is only implemented for block
 Gauss-Seidel so far.</p>
+<p>There is an option to reduce restarts if continued iterations could yield convergence in fewer iterations than
+restarting based on an estimate of the contraction factor.
+Since often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly.
+Notice that the computed step size is not effected.
+Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in
+more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.
+Set the reduced restart up by setting a boolean value for “avoid_restarts” in the parameters for the convergence
+controller.
+The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters">
 <span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters" title="Permalink to this definition">¶</a></dt>
@@ -776,7 +785,7 @@ with the restarts and want to move on anyways.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">
 <span class="sig-name descname"><span class="pre">communicate_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_convergence.html#CheckConvergence.communicate_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Communicate the convergence status</p>
+<dd><p>Communicate the convergence status during <cite>check_iteration_status</cite> if MPI is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -916,6 +925,117 @@ str: The error message</p>
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup_status_variables">
 <span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_iteration_estimator.html#CheckIterationEstimatorNonMPI.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup_status_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup storage variables for the differences between sweeps for all steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-implementations.convergence_controller_classes.estimate_contraction_factor">
+<span id="implementations-convergence-controller-classes-estimate-contraction-factor-module"></span><h2>implementations.convergence_controller_classes.estimate_contraction_factor module<a class="headerlink" href="#module-implementations.convergence_controller_classes.estimate_contraction_factor" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.convergence_controller_classes.estimate_contraction_factor.</span></span><span class="sig-name descname"><span class="pre">EstimateContractionFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<p>Estimate the contraction factor by using the evolution of the embedded error estimate across iterations.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load estimator of embedded error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate contraction factor here as the ratio of error estimates between iterations and estimate how many more
+iterations we need.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.pre_iteration_processing">
+<span class="sig-name descname"><span class="pre">pre_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor.pre_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.pre_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the embedded error estimate of the current iteration in a different place so it doesn’t get overwritten.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reinitialize new status variables for the levels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a default value for control order to the parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_contraction_factor.html#EstimateContractionFactor.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the embedded error, contraction factor and iterations to convergence variable to the status of the levels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
@@ -1765,6 +1885,18 @@ on Tend</p>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">CheckIterationEstimatorNonMPI.reset_buffers_nonMPI()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup"><code class="docutils literal notranslate"><span class="pre">CheckIterationEstimatorNonMPI.setup()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">CheckIterationEstimatorNonMPI.setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.convergence_controller_classes.estimate_contraction_factor">implementations.convergence_controller_classes.estimate_contraction_factor module</a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.dependencies"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor.dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor.post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.pre_iteration_processing"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor.pre_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor.reset_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor.setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">EstimateContractionFactor.setup_status_variables()</span></code></a></li>
 </ul>
 </li>
 </ul>
