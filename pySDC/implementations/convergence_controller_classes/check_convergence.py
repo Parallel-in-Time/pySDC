@@ -44,18 +44,23 @@ class CheckConvergence(ConvergenceController):
 
         # get residual and check against prescribed tolerance (plus check number of iterations
         res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
+        converged = (
+            S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
+        ) and not S.status.force_continue
+
         if converged is not None:
             S.status.done = converged
 
         if "comm" in kwargs.keys():
             self.communicate_convergence(controller, S, **kwargs)
 
+        S.status.force_continue = False
+
         return None
 
     def communicate_convergence(self, controller, S, comm):
         """
-        Communicate the convergence status
+        Communicate the convergence status during `check_iteration_status` if MPI is used.
 
         Args:
             controller (pySDC.Controller): The controller

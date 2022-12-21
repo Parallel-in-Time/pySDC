@@ -610,6 +610,8 @@ class controller_MPI(controller):
             self.S.status.iter += 1
 
             self.hooks.pre_iteration(step=self.S, level_number=0)
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.pre_iteration_processing(self, self.S, comm=comm)
 
             if self.params.use_iteration_estimator:
                 # store pervious iterate to compute difference later on

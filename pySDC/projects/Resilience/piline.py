@@ -7,104 +7,34 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-from pySDC.core.Hooks import hooks
-
-
-class log_data(hooks):
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='v1',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='v2',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='p3',
-            value=L.uend[2],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_extrapolated',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.get('restart')),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='sweeps',
-            value=step.status.iter,
-        )
+from pySDC.projects.Resilience.hook import log_error_estimates
 
 
 def run_piline(
     custom_description=None,
     num_procs=1,
     Tend=20.0,
-    hook_class=log_data,
+    hook_class=log_error_estimates,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
 ):
     """
-    A simple test program to do SDC runs for Piline problem
+    Run a Piline problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        custom_problem_params (dict): Overwrite presets
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
     """
 
     # initialize level parameters
@@ -184,23 +114,45 @@ def run_piline(
 
 
 def get_data(stats, recomputed=False):
-    # convert filtered statistics to list of iterations count, sorted by process
+    """
+    Extract useful data from the stats.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        recomputed (bool): Whether to exclude values that don't contribute to the final solution or not
+
+    Returns:
+        dict: Data
+    """
     data = {
-        'v1': np.array(get_sorted(stats, type='v1', recomputed=recomputed))[:, 1],
-        'v2': np.array(get_sorted(stats, type='v2', recomputed=recomputed))[:, 1],
-        'p3': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 1],
-        't': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 0],
+        'v1': np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        'v2': np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        'p3': np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        't': np.array(get_sorted(stats, type='u', recomputed=recomputed))[:, 0],
         'dt': np.array(get_sorted(stats, type='dt', recomputed=recomputed)),
         'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
         'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
         'restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 1],
+        't_restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 0],
         'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=None))[:, 1],
     }
     data['ready'] = np.logical_and(data['e_ex'] != np.array(None), data['e_em'] != np.array(None))
+    data['restart_times'] = data['t_restarts'][data['restarts'] > 0]
     return data
 
 
-def plot_error(data, ax, use_adaptivity=True):
+def plot_error(data, ax, use_adaptivity=True, plot_restarts=False):
+    """
+    Plot the embedded and extrapolated error estimates.
+
+    Args:
+        data (dict): Data prepared from stats by `get_data`
+        use_adaptivity (bool): Whether adaptivity was used
+        plot_restarts (bool): Whether to plot vertical lines for restarts
+
+    Returns:
+        None
+    """
     setup_mpl_from_accuracy_check()
     ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
 
@@ -213,6 +165,9 @@ def plot_error(data, ax, use_adaptivity=True):
         label='difference',
         ls='-.',
     )
+
+    if plot_restarts:
+        [ax.axvline(t_restart, ls='-.', color='black', alpha=0.5) for t_restart in data['restart_times']]
 
     e_ax.plot([None, None], label=r'$\Delta t$', color='black')
     e_ax.set_yscale('log')
@@ -229,12 +184,25 @@ def plot_error(data, ax, use_adaptivity=True):
 
 
 def setup_mpl_from_accuracy_check():
+    """
+    Change matplotlib parameters to conform to LaTeX style.
+    """
     from pySDC.projects.Resilience.accuracy_check import setup_mpl
 
     setup_mpl()
 
 
 def plot_solution(data, ax):
+    """
+    Plot the solution.
+
+    Args:
+        data (dict): Data prepared from stats by `get_data`
+        ax: Somewhere to plot
+
+    Returns:
+        None
+    """
     setup_mpl_from_accuracy_check()
     ax.plot(data['t'], data['v1'], label='v1', ls='-')
     ax.plot(data['t'], data['v2'], label='v2', ls='--')
@@ -244,6 +212,18 @@ def plot_solution(data, ax):
 
 
 def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
+    """
+    Check the solution against a hard coded reference.
+
+    Args:
+        data (dict): Data prepared from stats by `get_data`
+        use_adaptivity (bool): Whether adaptivity was used
+        num_procs (int): Number of steps for MSSDC
+        generate_reference (bool): Instead of comparing to reference, print a new reference to the console
+
+    Returns:
+        None
+    """
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'
         expected = {
@@ -330,12 +310,17 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
 
 
 def main():
+    """
+    Make a variety of tests to see if Hot Rod and Adaptivity work in serial as well as MSSDC.
+    """
     generate_reference = False
 
     for use_adaptivity in [True, False]:
         custom_description = {'convergence_controllers': {}}
         if use_adaptivity:
-            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+            custom_description['convergence_controllers'][Adaptivity] = {
+                'e_tol': 1e-7,
+            }
 
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
