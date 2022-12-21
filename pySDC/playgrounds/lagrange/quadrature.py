@@ -74,7 +74,6 @@ nNodes = np.arange(3, nMax + 1)
 
 nInterTest = 10
 nPolyTest = 20
-baryWeightComputation = 'FAST'
 
 
 QMatrixOrder = lambda n: n - 1 - (n % 2)
@@ -160,7 +159,7 @@ def computeQuadratureErrors(nodeType, quadType, numQuad):
                 nodes *= b - a
                 nodes += a
                 # Set-up Lagrange interpolation polynomial
-                approx = LagrangeApproximation(nodes, weightComputation=baryWeightComputation)
+                approx = LagrangeApproximation(nodes)
                 # Compute quadrature weights for the whole interval
                 weights = approx.getIntegrationMatrix([[tLeft, tRight]], numQuad=numQuad)
                 # Compute quadrature weights for the Q matrix
