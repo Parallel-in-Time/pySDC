@@ -33,9 +33,8 @@ class StoreUOld(ConvergenceController):
         Return:
             None
         """
-        if S.status.iter < S.params.maxiter:
-            for L in S.levels:
-                L.uold[:] = L.u[:]
+        for L in S.levels:
+            L.uold[:] = L.u[:]
 
         return None
 

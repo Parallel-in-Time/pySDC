@@ -1,23 +1,34 @@
 # script to run a van der Pol problem
 import numpy as np
+import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.core.Hooks import hooks
 from pySDC.core.Errors import ProblemError
+from pySDC.projects.Resilience.hook import log_error_estimates
 
 
 def plot_step_sizes(stats, ax):
+    """
+    Plot solution and step sizes to visualize the dynamics in the van der Pol equation.
+
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        ax: Somewhere to plot
+
+    Returns:
+        None
+    """
 
     # convert filtered statistics to list of iterations count, sorted by process
-    u = np.array(get_sorted(stats, type='u', recomputed=False, sortby='time'))[:, 1]
-    p = np.array(get_sorted(stats, type='p', recomputed=False, sortby='time'))[:, 1]
-    t = np.array(get_sorted(stats, type='p', recomputed=False, sortby='time'))[:, 0]
+    u = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    p = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    t = np.array(get_sorted(stats, type='u', recomputed=False, sortby='time'))[:, 0]
 
-    e_em = np.array(get_sorted(stats, type='e_em', recomputed=False, sortby='time'))[:, 1]
+    e_em = np.array(get_sorted(stats, type='e_embedded', recomputed=False, sortby='time'))[:, 1]
     dt = np.array(get_sorted(stats, type='dt', recomputed=False, sortby='time'))
     restart = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
 
@@ -42,92 +53,63 @@ def plot_step_sizes(stats, ax):
     ax.set_xlabel('time')
 
 
-class log_data(hooks):
-    def post_step(self, step, level_number):
+def plot_avoid_restarts(stats, ax, avoid_restarts):
+    """
+    Make a plot that shows how many iterations where required to solve to a point in time in the simulation.
+    Also restarts are shown as vertical lines.
 
-        super(log_data, self).post_step(step, level_number)
+    Args:
+        stats (pySDC.stats): The stats object of the run
+        ax: Somewhere to plot
+        avoid_restarts (bool): Whether the `avoid_restarts` option was set in order to choose a color
 
-        # some abbreviations
-        L = step.levels[level_number]
+    Returns:
+        None
+    """
+    sweeps = get_sorted(stats, type='sweeps', recomputed=None)
+    restarts = get_sorted(stats, type='restart', recomputed=None)
 
-        L.sweep.compute_end_point()
+    color = 'blue' if avoid_restarts else 'red'
+    ls = ':' if not avoid_restarts else '-.'
+    label = 'with' if avoid_restarts else 'without'
 
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='p',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_em',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_ex',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.restart),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='k',
-            value=step.status.iter,
-        )
+    ax.plot([me[0] for me in sweeps], np.cumsum([me[1] for me in sweeps]), color=color, label=f'{label} avoid_restarts')
+    [ax.axvline(me[0], color=color, ls=ls) for me in restarts if me[1]]
+
+    ax.set_xlabel(r'$t$')
+    ax.set_ylabel(r'$k$')
+    ax.legend(frameon=False)
 
 
 def run_vdp(
     custom_description=None,
     num_procs=1,
     Tend=10.0,
-    hook_class=log_data,
+    hook_class=log_error_estimates,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
     use_MPI=False,
     **kwargs,
 ):
+    """
+    Run a van der Pol problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        custom_problem_params (dict): Overwrite presets
+        use_MPI (bool): Whether or not to use MPI
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
+    """
 
     # initialize level parameters
     level_params = dict()
@@ -224,11 +206,13 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
 
     Args:
         stats (pySDC.stats): The stats object of the run
+        comm (mpi4py.MPI.Comm): MPI communicator, or `None` for the non-MPI version
+        use_MPI (bool): Whether or not MPI was used when generating stats
 
     Returns:
         dict: Key values to perform tests on
     """
-    types = ['e_em', 'restart', 'dt', 'k', 'residual_post_step']
+    types = ['e_embedded', 'restart', 'dt', 'sweeps', 'residual_post_step']
     data = {}
     for type in types:
         if type not in get_list_of_types(stats):
@@ -246,8 +230,8 @@ def check_if_tests_match(data_nonMPI, data_MPI):
     Check if the data matches between MPI and nonMPI versions
 
     Args:
-        data_nonMPI (dict): Key values to perform tests on
-        data_MPI (dict): Key values to perform tests on
+        data_nonMPI (dict): Key values to perform tests on obtained without MPI
+        data_MPI (dict): Key values to perform tests on obtained with MPI
 
     Returns:
         None
@@ -265,6 +249,16 @@ def check_if_tests_match(data_nonMPI, data_MPI):
 
 
 def mpi_vs_nonMPI(MPI_ready, comm):
+    """
+    Check if MPI and non-MPI versions give the same output.
+
+    Args:
+        MPI_ready (bool): Whether or not we can use MPI at all
+        comm (mpi4py.MPI.Comm): MPI communicator
+
+    Returns:
+        None
+    """
     if MPI_ready:
         size = comm.size
         rank = comm.rank
@@ -278,7 +272,7 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         print(f"Running with {size} ranks")
 
     custom_description = {'convergence_controllers': {}}
-    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+    custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': False}
 
     custom_controller_params = {'logger_level': 30}
 
@@ -301,13 +295,98 @@ def mpi_vs_nonMPI(MPI_ready, comm):
         check_if_tests_match(data[1], data[0])
 
 
+def check_adaptivity_with_avoid_restarts(comm=None, size=1):
+    """
+    Make a test if adaptivity with the option to avoid restarts based on a contraction factor estimate works as
+    expected.
+    To this end, we run the same test of the van der Pol equation twice with the only difference being this option
+    turned off or on.
+    We recorded how many iterations we expect to avoid by avoiding restarts and check against this value.
+    Also makes a figure comparing the number of iterations over time.
+
+    In principle there is an option to test MSSDC here, but this is only preliminary and needs to be checked further.
+
+    Args:
+       comm (mpi4py.MPI.Comm): MPI communicator, or `None` for the non-MPI version
+       size (int): Number of steps for MSSDC, is overridden by communicator size if applicable
+
+    Returns:
+        None
+    """
+    fig, ax = plt.subplots()
+    custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
+    custom_controller_params = {'logger_level': 30, 'all_to_done': False}
+    results = {'e': {}, 'sweeps': {}, 'restarts': {}}
+    size = comm.size if comm is not None else size
+
+    for avoid_restarts in [True, False]:
+        custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': avoid_restarts}
+        stats, controller, Tend = run_vdp(
+            custom_description=custom_description,
+            num_procs=size,
+            use_MPI=comm is not None,
+            custom_controller_params=custom_controller_params,
+            Tend=10.0e0,
+            comm=comm,
+        )
+        plot_avoid_restarts(stats, ax, avoid_restarts)
+
+        # check error
+        u = get_sorted(stats, type='u', recomputed=False)[-1]
+        if comm is None:
+            u_exact = controller.MS[0].levels[0].prob.u_exact(t=u[0])
+        else:
+            u_exact = controller.S.levels[0].prob.u_exact(t=u[0])
+        results['e'][avoid_restarts] = abs(u[1] - u_exact)
+
+        # check iteration counts
+        results['sweeps'][avoid_restarts] = sum(
+            [me[1] for me in get_sorted(stats, type='sweeps', recomputed=None, comm=comm)]
+        )
+        results['restarts'][avoid_restarts] = sum([me[1] for me in get_sorted(stats, type='restart', comm=comm)])
+
+    fig.tight_layout()
+    fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-avoid_restarts.png')
+
+    assert np.isclose(results['e'][True], results['e'][False], rtol=5.0), (
+        'Errors don\'t match with avoid_restarts and without, got '
+        f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
+    )
+    if size == 1:
+        assert results['sweeps'][True] - results['sweeps'][False] == 1301 - 1344, (
+            '{Expected to save 43 iterations '
+            f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
+        )
+        assert results['restarts'][True] - results['restarts'][False] == 0 - 10, (
+            '{Expected to save 10 restarts '
+            f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        )
+        print('Passed avoid_restarts tests with 1 process')
+    if size == 4:
+        assert results['sweeps'][True] - results['sweeps'][False] == 2916 - 3008, (
+            '{Expected to save 92 iterations '
+            f"with avoid_restarts, got {results['sweeps'][False] - results['sweeps'][True]}"
+        )
+        assert results['restarts'][True] - results['restarts'][False] == 0 - 18, (
+            '{Expected to save 18 restarts '
+            f"with avoid_restarts, got {results['restarts'][False] - results['restarts'][True]}"
+        )
+        print('Passed avoid_restarts tests with 4 processes')
+
+
 if __name__ in "__main__":
     try:
         from mpi4py import MPI
 
         MPI_ready = True
         comm = MPI.COMM_WORLD
+        size = comm.size
     except ModuleNotFoundError:
         MPI_ready = False
         comm = None
+        size = 1
+
     mpi_vs_nonMPI(MPI_ready, comm)
+
+    if size == 1:
+        check_adaptivity_with_avoid_restarts(comm=None, size=1)
