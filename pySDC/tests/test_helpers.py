@@ -7,6 +7,9 @@ import importlib
 import inspect
 import os
 
+from pySDC.helpers.problem_helper import test_fd_stencils
+import pytest
+
 
 def get_modules_in_path(base_package):
     """
@@ -81,3 +84,12 @@ def get_derived_from_in_package(base_class, base_package):
                 derived.append(cls)
 
     return derived
+
+
+@pytest.mark.base
+def test_problem_helper():
+    test_fd_stencils()
+
+
+if __name__ == '__main__':
+    test_problem_helper
