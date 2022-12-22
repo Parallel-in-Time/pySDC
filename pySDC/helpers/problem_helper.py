@@ -247,6 +247,10 @@ def test_fd_stencils():
         coeff, expect_coeff
     ), f"Error in second order backward stencil for 2nd derivative! Expected {expect_coeff}, got {coeff}."
 
+    # test if we get the correct result when we put in steps rather than a type
+    new_coeff, _ = get_finite_difference_stencil(derivative=2, order=2, steps=steps)
+    assert np.allclose(coeff, new_coeff), f"Error when setting steps yourself! Expected {expect_coeff}, got {coeff}."
+
 
 if __name__ == '__main__':
     test_fd_stencils()
