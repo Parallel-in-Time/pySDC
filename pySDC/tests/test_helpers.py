@@ -87,8 +87,7 @@ def get_derived_from_in_package(base_class, base_package):
     return derived
 
 
-@pytest.mark.skip(reason="This function is called from a different test with the desired parameters")
-def test_fd_stencil_single(derivative, order, type):
+def fd_stencil_single(derivative, order, type):
     """
     Make a single tests where we generate a finite difference stencil using the generic framework above and compare to
     harscoded stencils that were implemented in a previous version of the code.
@@ -192,11 +191,11 @@ def test_fd_stencils():
     """
     # Make tests to things that were previously implemented in the code
     for order in [1, 2, 3, 4, 5]:
-        test_fd_stencil_single(1, order, 'upwind')
+        fd_stencil_single(1, order, 'upwind')
     for order in [2, 4, 6]:
-        test_fd_stencil_single(1, order, 'center')
+        fd_stencil_single(1, order, 'center')
     for order in [2, 4, 6, 8]:
-        test_fd_stencil_single(2, order, 'center')
+        fd_stencil_single(2, order, 'center')
 
     # Make some tests comparing to Wikipedia at https://en.wikipedia.org/wiki/Finite_difference_coefficient
     coeff, steps = get_finite_difference_stencil(derivative=1, order=3, type='forward')
@@ -214,7 +213,3 @@ def test_fd_stencils():
     # test if we get the correct result when we put in steps rather than a type
     new_coeff, _ = get_finite_difference_stencil(derivative=2, order=2, steps=steps)
     assert np.allclose(coeff, new_coeff), f"Error when setting steps yourself! Expected {expect_coeff}, got {coeff}."
-
-
-if __name__ == '__main__':
-    test_fd_stencils()
