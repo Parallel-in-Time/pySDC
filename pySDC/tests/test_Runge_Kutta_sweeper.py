@@ -24,7 +24,6 @@ colors = {
 }
 
 
-@pytest.mark.skip(reason="This function is called by other tests and does not need to be tested separately")
 def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=None, implicit=True):
     """
     Make a plot of the order of the scheme and test if it has the correct order
@@ -87,7 +86,6 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     ax.legend(frameon=False)
 
 
-@pytest.mark.skip(reason="This is just a utility function to be called from somewhere else")
 def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=None, im=None, crosshair=True):
     """
     Plot the domain of stability for a single RK rule.
@@ -159,7 +157,6 @@ def plot_all_stability():
     fig.tight_layout()
 
 
-@pytest.mark.skip(reason="This function is called by other tests and does not need to be tested separately")
 def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
     """
     Make a plot with various sweepers and check their order.
