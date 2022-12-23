@@ -26,7 +26,7 @@ def plot_step_sizes(stats, ax):
     # convert filtered statistics to list of iterations count, sorted by process
     u = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     p = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
-    t = np.array(get_sorted(stats, type='u', recomputed=False, sortby='time'))[:, 0]
+    t = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
 
     e_em = np.array(get_sorted(stats, type='e_embedded', recomputed=False, sortby='time'))[:, 1]
     dt = np.array(get_sorted(stats, type='dt', recomputed=False, sortby='time'))
@@ -434,7 +434,7 @@ def check_step_size_limiter(size=4, comm=None):
             print(f'Passed step size limiter test with {size} ranks in MPI implementation')
 
 
-if __name__ in "__main__":
+if __name__ == "__main__":
     try:
         from mpi4py import MPI
 
