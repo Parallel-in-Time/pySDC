@@ -60,6 +60,9 @@ jobs:
 
       - name: Run pytest for CPU stuff
         run: |
+          echo "print("Loading sitecustomize.py...")
+          import coverage
+          coverage.process_startup() " > sitecustomize.py
           coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
           mv data data_${{ matrix.python }}
           coverage combine
