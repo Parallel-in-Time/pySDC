@@ -40,7 +40,7 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     Returns:
         None
     """
-    from pySDC.projects.Resilience.accuracy_check import plot_orders, plot_all_errors
+    from pySDC.projects.Resilience.accuracy_check import plot_orders
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
@@ -185,7 +185,7 @@ def test_vdp():
     Returns:
         None
     """
-    from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
+    from pySDC.projects.Resilience.vdp import run_vdp
 
     Tend = 7e-2
     plot_all_orders(run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4, Cash_Karp])
@@ -220,6 +220,9 @@ def test_embedded_estimate_order(sweeper):
     Returns:
         None
     """
+    from pySDC.projects.Resilience.vdp import run_vdp
+    from pySDC.projects.Resilience.accuracy_check import plot_all_errors
+
     fig, ax = plt.subplots(1, 1)
 
     # change only the things in the description that we need for adaptivity
@@ -256,6 +259,8 @@ def test_embedded_method():
     Returns:
         None
     """
+    from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
+
     sweeper = Cash_Karp
     fig, ax = plt.subplots(1, 1)
 
