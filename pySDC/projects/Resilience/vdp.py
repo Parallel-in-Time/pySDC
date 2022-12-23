@@ -434,7 +434,7 @@ def check_step_size_limiter(size=4, comm=None):
             print(f'Passed step size limiter test with {size} ranks in MPI implementation')
 
 
-if __name__ in "__main__":
+if __name__ == "__main__":
     try:
         from mpi4py import MPI
 

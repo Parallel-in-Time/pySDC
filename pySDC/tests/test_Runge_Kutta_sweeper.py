@@ -2,12 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from pySDC.projects.Resilience.accuracy_check import plot_orders, plot_all_errors
-from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
-
-from pySDC.projects.Resilience.advection import run_advection
-from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
-
 from pySDC.implementations.sweeper_classes.Runge_Kutta import (
     RK1,
     RK4,
@@ -47,6 +41,8 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     Returns:
         None
     """
+    from pySDC.projects.Resilience.accuracy_check import plot_orders, plot_all_errors
+
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
@@ -108,6 +104,8 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
     Returns:
         None
     """
+    from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
+
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
@@ -190,6 +188,8 @@ def test_vdp():
     Returns:
         None
     """
+    from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
+
     Tend = 7e-2
     plot_all_orders(run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4, Cash_Karp])
 
@@ -202,6 +202,8 @@ def test_advection():
     Returns:
         None
     """
+    from pySDC.projects.Resilience.advection import run_advection
+
     plot_all_orders(
         run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson], implicit=True
     )
