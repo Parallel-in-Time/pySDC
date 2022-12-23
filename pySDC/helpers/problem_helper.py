@@ -2,14 +2,21 @@ import numpy as np
 from scipy.special import factorial
 
 
-def get_finite_difference_stencil(derivative, order, type=None, steps=None):
+def get_steps(derivative, order, type):
     """
-    Derive general finite difference stencils from Taylor expansions
-    """
+    Get the offsets for the FD stencil.
 
-    if steps is not None:
-        n = len(steps)
-    elif type == 'center':
+    Args:
+        derivative (int): Order of the derivative
+        order (int): Order of accuracy
+        type (str): Type of the stencil
+        steps (list): Provide specific steps, overrides `type`
+
+    Returns:
+        int: The number of elements in the stencil
+        numpy.ndarray: The offsets for the stencil
+    """
+    if type == 'center':
         n = order + derivative - (derivative + 1) % 2 // 1
         steps = np.arange(n) - n // 2
     elif type == 'forward':
@@ -18,11 +25,40 @@ def get_finite_difference_stencil(derivative, order, type=None, steps=None):
     elif type == 'backward':
         n = order + derivative
         steps = -np.arange(n)
+    elif type == 'upwind':
+        n = order + derivative
+
+        if n <= 3:
+            n, steps = get_steps(derivative, order, 'backward')
+        else:
+            steps = np.append(-np.arange(n - 1)[::-1], [1])
     else:
         raise ValueError(
-            f'Stencil must be of type "center", "forward" or "backward", not {type}. If you want something\
-else, you can also give specific steps.'
+            f'Stencil must be of type "center", "forward", "backward" or "upwind", not {type}. If you want something\
+, you can also give specific steps.'
         )
+    return n, steps
+
+
+def get_finite_difference_stencil(derivative, order, type=None, steps=None):
+    """
+    Derive general finite difference stencils from Taylor expansions
+
+    Args:
+        derivative (int): Order of the derivative
+        order (int): Order of accuracy
+        type (str): Type of the stencil
+        steps (list): Provide specific steps, overrides `type`
+
+    Returns:
+        numpy.ndarray: The weights of the stencil
+        numpy.ndarray: The offsets for the stencil
+    """
+
+    if steps is not None:
+        n = len(steps)
+    else:
+        n, steps = get_steps(derivative, order, type)
 
     # make a matrix that contains the Taylor coefficients
     A = np.zeros((n, n))
