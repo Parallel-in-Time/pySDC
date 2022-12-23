@@ -60,8 +60,10 @@ jobs:
 
       - name: Run pytest for CPU stuff
         run: |
-          coverage run --data-file=coverage_${{ matrix.env }}_${{ matrix.python }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
           mv data data_${{ matrix.python }}
+          coverage combine
+          mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
 
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3

@@ -25,6 +25,7 @@ def test_C_1x1():
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
+    # my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     fname = 'step_7_C_out_1x1.txt'
     cwd = '.'
     num_procs = 1
@@ -54,6 +55,7 @@ def test_C_1x2():
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     cwd = '.'
     fname = 'step_7_C_out_1x2.txt'
     num_procs = 2
@@ -83,6 +85,7 @@ def test_C_2x2():
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     cwd = '.'
     fname = 'step_7_C_out_2x2.txt'
     num_procs = 4
