@@ -114,14 +114,24 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
 <p>Runge-Kutta scheme that fits the interface of a sweeper.
 Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
-at the nodes are succesively computed from earlier nodes. However, we only perform a single iteration of this.</p>
+at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</p>
 <p>We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = &lt;Butcher tableau&gt;, but in this
 implementation, that would lead to a lot of wasted FLOPS from integrating with Q and then with Q_Delta and
 subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.</p>
-<p>This class only supports lower triangular Butcher tableaus such that the system can be solved with forward
-subsitution. In this way, we don’t get the maximum order that we could for the number of stages, but computing the
-stages is much cheaper. In particular, if the Butcher tableaus is strictly lower trianglar, we get an explicit
+<p>This class only supports lower triangular Butcher tableaux such that the system can be solved with forward
+substitution. In this way, we don’t get the maximum order that we could for the number of stages, but computing the
+stages is much cheaper. In particular, if the Butcher tableaux is strictly lower triangular, we get an explicit
 method, which does not require us to solve a system of equations to compute the stages.</p>
+<dl class="simple">
+<dt>Please be aware that all fundamental parameters of the Sweeper are ignored. These include</dt><dd><ul class="simple">
+<li><p>num_nodes</p></li>
+<li><p>collocation_class</p></li>
+<li><p>initial_guess</p></li>
+<li><p>QI</p></li>
+</ul>
+</dd>
+</dl>
+<p>All of these variables are either determined by the RK rule, or are not part of an RK scheme.</p>
 <dl class="simple">
 <dt>Attribues:</dt><dd><p>butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</p>
 </dd>

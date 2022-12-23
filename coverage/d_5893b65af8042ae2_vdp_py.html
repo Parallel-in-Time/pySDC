@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/Resilience/vdp.py: 91%</title>
+    <title>Coverage for pySDC/projects/Resilience/vdp.py: 92%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/projects/Resilience/vdp.py</b>:
-            <span class="pc_cov">91%</span>
+            <span class="pc_cov">92%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,18 +54,18 @@
             </div>
         </aside>
         <h2>
-            <span class="text">193 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">175<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">18<span class="text"> missing</span></button>
-            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">6<span class="text"> excluded</span></button>
+            <span class="text">179 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">165<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">14<span class="text"> missing</span></button>
+            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">20<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_test_Runge_Kutta_sweeper_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_piline_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_327f90590a9d3ec6_SDC_timing_Fisher_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.0</a>,
-            created at 2022-12-23 14:58 +0000
+            created at 2022-12-23 17:19 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -108,7 +108,7 @@
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">    <span class="com"># convert filtered statistics to list of iterations count, sorted by process</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">    <span class="nam">u</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="op">[</span><span class="nam">me</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'u'</span><span class="op">,</span> <span class="nam">recomputed</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">    <span class="nam">p</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="op">[</span><span class="nam">me</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'u'</span><span class="op">,</span> <span class="nam">recomputed</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">    <span class="nam">t</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'u'</span><span class="op">,</span> <span class="nam">recomputed</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">:</span><span class="op">,</span> <span class="num">0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">    <span class="nam">t</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="op">[</span><span class="nam">me</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'u'</span><span class="op">,</span> <span class="nam">recomputed</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">    <span class="nam">e_em</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'e_embedded'</span><span class="op">,</span> <span class="nam">recomputed</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">:</span><span class="op">,</span> <span class="num">1</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">    <span class="nam">dt</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">array</span><span class="op">(</span><span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'dt'</span><span class="op">,</span> <span class="nam">recomputed</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">'time'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -516,33 +516,33 @@
     <p class="run"><span class="n"><a id="t434" href="#t434">434</a></span><span class="t">            <span class="nam">print</span><span class="op">(</span><span class="str">f'Passed step size limiter test with {size} ranks in MPI implementation'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t435" href="#t435">435</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t436" href="#t436">436</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t437" href="#t437">437</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="key">in</span> <span class="str">"__main__"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t438" href="#t438">438</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t439" href="#t439">439</a></span><span class="t">        <span class="key">from</span> <span class="nam">mpi4py</span> <span class="key">import</span> <span class="nam">MPI</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t437" href="#t437">437</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">"__main__"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t438" href="#t438">438</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t439" href="#t439">439</a></span><span class="t">        <span class="key">from</span> <span class="nam">mpi4py</span> <span class="key">import</span> <span class="nam">MPI</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t440" href="#t440">440</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t441" href="#t441">441</a></span><span class="t">        <span class="nam">MPI_ready</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t442" href="#t442">442</a></span><span class="t">        <span class="nam">comm</span> <span class="op">=</span> <span class="nam">MPI</span><span class="op">.</span><span class="nam">COMM_WORLD</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t443" href="#t443">443</a></span><span class="t">        <span class="nam">size</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">size</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t444" href="#t444">444</a></span><span class="t">    <span class="key">except</span> <span class="nam">ModuleNotFoundError</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t445" href="#t445">445</a></span><span class="t">        <span class="nam">MPI_ready</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t446" href="#t446">446</a></span><span class="t">        <span class="nam">comm</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t447" href="#t447">447</a></span><span class="t">        <span class="nam">size</span> <span class="op">=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t441" href="#t441">441</a></span><span class="t">        <span class="nam">MPI_ready</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t442" href="#t442">442</a></span><span class="t">        <span class="nam">comm</span> <span class="op">=</span> <span class="nam">MPI</span><span class="op">.</span><span class="nam">COMM_WORLD</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t443" href="#t443">443</a></span><span class="t">        <span class="nam">size</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">size</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t444" href="#t444">444</a></span><span class="t">    <span class="key">except</span> <span class="nam">ModuleNotFoundError</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t445" href="#t445">445</a></span><span class="t">        <span class="nam">MPI_ready</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t446" href="#t446">446</a></span><span class="t">        <span class="nam">comm</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t447" href="#t447">447</a></span><span class="t">        <span class="nam">size</span> <span class="op">=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t448" href="#t448">448</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t449" href="#t449">449</a></span><span class="t">    <span class="nam">mpi_vs_nonMPI</span><span class="op">(</span><span class="nam">MPI_ready</span><span class="op">,</span> <span class="nam">comm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t450" href="#t450">450</a></span><span class="t">    <span class="nam">check_step_size_limiter</span><span class="op">(</span><span class="nam">size</span><span class="op">,</span> <span class="nam">comm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t449" href="#t449">449</a></span><span class="t">    <span class="nam">mpi_vs_nonMPI</span><span class="op">(</span><span class="nam">MPI_ready</span><span class="op">,</span> <span class="nam">comm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t450" href="#t450">450</a></span><span class="t">    <span class="nam">check_step_size_limiter</span><span class="op">(</span><span class="nam">size</span><span class="op">,</span> <span class="nam">comm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t451" href="#t451">451</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t452" href="#t452">452</a></span><span class="t">    <span class="key">if</span> <span class="nam">size</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t453" href="#t453">453</a></span><span class="t">        <span class="nam">check_adaptivity_with_avoid_restarts</span><span class="op">(</span><span class="nam">comm</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="nam">size</span><span class="op">=</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t452" href="#t452">452</a></span><span class="t">    <span class="key">if</span> <span class="nam">size</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t453" href="#t453">453</a></span><span class="t">        <span class="nam">check_adaptivity_with_avoid_restarts</span><span class="op">(</span><span class="nam">comm</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="nam">size</span><span class="op">=</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_test_Runge_Kutta_sweeper_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_piline_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_327f90590a9d3ec6_SDC_timing_Fisher_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.0</a>,
-            created at 2022-12-23 14:58 +0000
+            created at 2022-12-23 17:19 +0000
         </p>
     </div>
 </footer>
