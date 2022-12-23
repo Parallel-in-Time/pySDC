@@ -83,6 +83,46 @@
 <dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_stencil">
 <span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_stencil" title="Permalink to this definition">¶</a></dt>
 <dd><p>Derive general finite difference stencils from Taylor expansions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – Type of the stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>type</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The weights of the stencil
+numpy.ndarray: The offsets for the stencil</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_steps">
+<span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_steps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the offsets for the FD stencil.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – Type of the stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>type</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of elements in the stencil
+numpy.ndarray: The offsets for the stencil</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -402,6 +442,7 @@ in the vector ps and the points which are found periodically.</p>
 <li><a class="reference internal" href="#module-helpers.problem_helper">helpers.problem_helper module</a><ul>
 <li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_matrix"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_stencil"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_stencil()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.problem_helper.get_steps"><code class="docutils literal notranslate"><span class="pre">get_steps()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-helpers.pysdc_helper">helpers.pysdc_helper module</a><ul>

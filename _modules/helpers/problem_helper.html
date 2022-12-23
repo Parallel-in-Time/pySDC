@@ -44,14 +44,21 @@
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">factorial</span>
 
 
-<div class="viewcode-block" id="get_finite_difference_stencil"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.problem_helper.get_finite_difference_stencil">[docs]</a><span class="k">def</span> <span class="nf">get_finite_difference_stencil</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_steps"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.problem_helper.get_steps">[docs]</a><span class="k">def</span> <span class="nf">get_steps</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Derive general finite difference stencils from Taylor expansions</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Get the offsets for the FD stencil.</span>
 
-    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        derivative (int): Order of the derivative</span>
+<span class="sd">        order (int): Order of accuracy</span>
+<span class="sd">        type (str): Type of the stencil</span>
+<span class="sd">        steps (list): Provide specific steps, overrides `type`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The number of elements in the stencil</span>
+<span class="sd">        numpy.ndarray: The offsets for the stencil</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span> <span class="o">-</span> <span class="p">(</span><span class="n">derivative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">//</span> <span class="mi">1</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span>
     <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
@@ -60,11 +67,40 @@
     <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;upwind&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">n</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="n">get_steps</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="s1">&#39;backward&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;Stencil must be of type &quot;center&quot;, &quot;forward&quot; or &quot;backward&quot;, not </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s1">. If you want something</span><span class="se">\</span>
-<span class="s1">else, you can also give specific steps.&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;Stencil must be of type &quot;center&quot;, &quot;forward&quot;, &quot;backward&quot; or &quot;upwind&quot;, not </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s1">. If you want something</span><span class="se">\</span>
+<span class="s1">, you can also give specific steps.&#39;</span>
         <span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">steps</span></div>
+
+
+<div class="viewcode-block" id="get_finite_difference_stencil"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.problem_helper.get_finite_difference_stencil">[docs]</a><span class="k">def</span> <span class="nf">get_finite_difference_stencil</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Derive general finite difference stencils from Taylor expansions</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        derivative (int): Order of the derivative</span>
+<span class="sd">        order (int): Order of accuracy</span>
+<span class="sd">        type (str): Type of the stencil</span>
+<span class="sd">        steps (list): Provide specific steps, overrides `type`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The weights of the stencil</span>
+<span class="sd">        numpy.ndarray: The offsets for the stencil</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="n">get_steps</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
 
     <span class="c1"># make a matrix that contains the Taylor coefficients</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
