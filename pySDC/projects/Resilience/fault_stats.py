@@ -163,14 +163,14 @@ class Strategy:
 
     def get_custom_description(self, problem, num_procs):
         '''
-        Routine to get a custom description that realizes the resilience strategy and taylors it to the problem at hand
+        Routine to get a custom description that realizes the resilience strategy and tailors it to the problem at hand
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
-            dict: The custom desciptions you can supply to the problem when running it
+            dict: The custom descriptions you can supply to the problem when running it
         '''
 
         return self.custom_description
@@ -181,7 +181,7 @@ class Strategy:
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
             dict: Arguments for the faults that are exempt from randomization
@@ -195,7 +195,7 @@ class Strategy:
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
             dict: Randomization parameters
@@ -241,10 +241,10 @@ class AdaptivityStrategy(Strategy):
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
-            The custom desciptions you can supply to the problem when running it
+            The custom descriptions you can supply to the problem when running it
         '''
         if problem == run_piline:
             e_tol = 1e-7
@@ -284,10 +284,10 @@ class AdaptiveHotRodStrategy(Strategy):
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
-            The custom desciptions you can supply to the problem when running it
+            The custom description you can supply to the problem when running it
         '''
         if problem == run_vdp:
             e_tol = 3e-7
@@ -334,10 +334,10 @@ class IterateStrategy(Strategy):
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
-            The custom desciptions you can supply to the problem when running it
+            The custom description you can supply to the problem when running it
         '''
         if problem == run_piline:
             restol = 2.3e-8
@@ -378,10 +378,10 @@ class HotRodStrategy(Strategy):
 
         Args:
             problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processses you intend to run with
+            num_procs (int): Number of processes you intend to run with
 
         Returns:
-            The custom desciptions you can supply to the problem when running it
+            The custom description you can supply to the problem when running it
         '''
         if problem == run_vdp:
             HotRod_tol = 5e-7
@@ -424,7 +424,7 @@ class FaultStats:
             prob: A function that runs a pySDC problem, see imports for available problems
             strategies (list): List of resilience strategies
             faults (list): List of booleans that describe whether to use faults or not
-            reload (bool): Load previously computed statisitics and continue from there or start from scratch
+            reload (bool): Load previously computed statistics and continue from there or start from scratch
             recovery_thresh (float): Relative threshold for recovery
             num_procs (int): Number of processes
             mode (str): Mode for fault generation: Either 'random' or 'combination'
@@ -523,7 +523,7 @@ class FaultStats:
         Args:
             strategy (Strategy): Resilience strategy
             runs (int): Number of runs you want to do
-            reload (bool): Load previously computed statisitics and continue from there or start from scratch
+            reload (bool): Load previously computed statistics and continue from there or start from scratch
             faults (bool): Whether to do stats with faults or without
 
         Returns:
@@ -897,7 +897,7 @@ class FaultStats:
             faults (bool): Whether or not faults where inserted
 
         Returns:
-            dict: Data from previous run or if it is not avalable a placeholder dictionary
+            dict: Data from previous run or if it is not available a placeholder dictionary
         '''
         if strategy is None:
             strategy = self.strategies[MPI.COMM_WORLD.rank % len(self.strategies)]
@@ -1184,7 +1184,7 @@ class FaultStats:
             run (int): The run you want to know about
 
         Returns:
-            list: Embedded error with fault and without for the last interation in the step with a fault
+            list: Embedded error with fault and without for the last iteration in the step with a fault
             list: Global error with and without fault at the end of the run
         '''
         # perform one run with and one without faults
@@ -1253,8 +1253,8 @@ class FaultStats:
             run (int): The run you want to know about
 
         Returns:
-            list: Embedded error with fault and without for the last interation in the step with a fault
-            list: Extrapolation error with fault and without for the last interation in the step with a fault
+            list: Embedded error with fault and without for the last iteration in the step with a fault
+            list: Extrapolation error with fault and without for the last iteration in the step with a fault
             list: Global error with and without fault at the end of the run
         '''
         # perform one run with and one without faults
@@ -1536,7 +1536,7 @@ class FaultStats:
             thing (str): Some key stored in the stats that will go on the y-axis
             mask (Numpy.ndarray of shape (n)): The mask you want to apply before plotting
             store (bool): Store the plot at a predefined path or not (for jupyter notebooks)
-            faults (bool): Whether to load stats with faults or whithout
+            faults (bool): Whether to load stats with faults or without
             name (str): Optional name for the plot
             op (function): Operation that is applied to thing before plotting default is recovery rate
             args (dict): Parameters for how the plot should look

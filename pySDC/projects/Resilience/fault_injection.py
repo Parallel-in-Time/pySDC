@@ -68,15 +68,16 @@ class Fault(FrozenClass):
         Classmethod to initialize a fault based on an index to translate to a combination of fault parameters, in order
         to loop through all combinations. Probably only makes sense for ODEs.
 
-        First, we get the number of possible combinations m, and then get a value for each fault paramter as
+        First, we get the number of possible combinations m, and then get a value for each fault parameter as
         i = m % i_max (plus modifications to make sure we get a sensible value)
 
         Args:
             args (dict): Supply variables that will be exempt from randomization here.
             rnd_params (dict): Supply attributes to the randomization such as maximum values here
-            generator (int): Index for specific combinatino
+            generator (int): Index for specific combination
 
-        Returns Fault: Generated fro a specific combination of parameters
+        Returns:
+            Fault: Generated from a specific combination of parameters
         '''
 
         ranges = [
@@ -92,7 +93,7 @@ class Fault(FrozenClass):
 
         if len(np.unique(mods)) < len(mods):
             raise NotImplementedError(
-                'I can\'t deal with combinations when parameters have the same admissable number\
+                'I can\'t deal with combinations when parameters have the same admissible number\
  of values yet!'
             )
 
@@ -238,7 +239,7 @@ class FaultInjector(hooks):
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
             L.sweep.compute_residual()
         else:
-            raise NotImplementedError(f'Target {f.target} for faults not impelented!')
+            raise NotImplementedError(f'Target {f.target} for faults not implemented!')
 
         # log what happened to stats and screen
         self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
