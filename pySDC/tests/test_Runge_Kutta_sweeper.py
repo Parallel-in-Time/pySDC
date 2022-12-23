@@ -126,14 +126,22 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
         custom_problem_params=custom_problem_params,
         custom_controller_params=custom_controller_params,
     )
-    plot_stability(stats, ax=ax, iter=[1], colors=[colors.get(sweeper, 'black')], crosshair=crosshair, fill=True)
+    Astable = plot_stability(
+        stats, ax=ax, iter=[1], colors=[colors.get(sweeper, 'black')], crosshair=crosshair, fill=True
+    )
+
+    # check if we think the method should be A-stable
+    Astable_methods = [RK1, CrankNicholson, MidpointMethod]  # only the implicit versions are A-stable
+    assert (
+        implicit and sweeper in Astable_methods
+    ) == Astable, f"Unexpected region of stability for {sweeper.__name__} sweeper!"
 
     ax.get_lines()[-1].set_label(sweeper.__name__)
     ax.legend(frameon=False)
 
 
-@pytest.mark.skip(reason="This test can only be evaluated optically by humans so far")
-def plot_all_stability():
+@pytest.mark.base
+def test_all_stability():
     """
     Make a figure showing domains of stability for a range of RK rules, both implicit and explicit.
 
@@ -295,5 +303,5 @@ if __name__ == '__main__':
     test_embedded_estimate_order(Cash_Karp)
     test_vdp()
     test_advection()
-    plot_all_stability()
+    test_all_stability()
     plt.show()
