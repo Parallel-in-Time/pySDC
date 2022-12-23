@@ -89,6 +89,7 @@ exclude = '''playgrounds/'''
 [tool.coverage.run]
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
 relative_files = true
+concurrency = ['multiprocessing']
 
 [tool.coverage.report]
 skip_empty = true

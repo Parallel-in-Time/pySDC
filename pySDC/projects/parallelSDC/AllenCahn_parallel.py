@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 import numpy as np
 from mpi4py import MPI
@@ -171,6 +172,10 @@ def main():
     print()
     run_variant(variant='ml_serial')
     print()
+
+    my_env = os.environ.copy()
+    my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
 
     cmd = (
         "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "

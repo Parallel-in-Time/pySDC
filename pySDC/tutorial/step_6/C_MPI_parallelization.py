@@ -15,6 +15,7 @@ def main(cwd):
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
 
     # set list of number of parallel steps (even)
     num_procs_list = [1, 2, 4, 8]
