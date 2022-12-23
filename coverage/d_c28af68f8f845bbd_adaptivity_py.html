@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/convergence_controller_classes/adaptivity.py: 68%</title>
+    <title>Coverage for pySDC/implementations/convergence_controller_classes/adaptivity.py: 72%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/convergence_controller_classes/adaptivity.py</b>:
-            <span class="pc_cov">68%</span>
+            <span class="pc_cov">72%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">110 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">75<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">35<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">79<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">31<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">8<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_basic_restarting_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.0</a>,
-            created at 2022-12-21 19:33 +0000
+            created at 2022-12-23 07:55 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -132,10 +132,10 @@
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">        <span class="key">if</span> <span class="str">"dt_min"</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">__dict__</span><span class="op">.</span><span class="nam">keys</span><span class="op">(</span><span class="op">)</span> <span class="key">or</span> <span class="str">"dt_max"</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">__dict__</span><span class="op">.</span><span class="nam">keys</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">            <span class="nam">step_limiter_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">            <span class="nam">step_limiter_params</span><span class="op">[</span><span class="str">"dt_min"</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">__dict__</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"dt_min"</span><span class="op">,</span> <span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">            <span class="nam">step_limiter_params</span><span class="op">[</span><span class="str">"dt_max"</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">__dict__</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"dt_max"</span><span class="op">,</span> <span class="nam">np</span><span class="op">.</span><span class="nam">inf</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">            <span class="nam">controller</span><span class="op">.</span><span class="nam">add_convergence_controller</span><span class="op">(</span><span class="nam">StepSizeLimiter</span><span class="op">,</span> <span class="nam">params</span><span class="op">=</span><span class="nam">step_limiter_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">=</span><span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">            <span class="nam">step_limiter_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">            <span class="nam">step_limiter_params</span><span class="op">[</span><span class="str">"dt_min"</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">__dict__</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"dt_min"</span><span class="op">,</span> <span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">            <span class="nam">step_limiter_params</span><span class="op">[</span><span class="str">"dt_max"</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">__dict__</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"dt_max"</span><span class="op">,</span> <span class="nam">np</span><span class="op">.</span><span class="nam">inf</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">            <span class="nam">controller</span><span class="op">.</span><span class="nam">add_convergence_controller</span><span class="op">(</span><span class="nam">StepSizeLimiter</span><span class="op">,</span> <span class="nam">params</span><span class="op">=</span><span class="nam">step_limiter_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">=</span><span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -535,7 +535,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_basic_restarting_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.0</a>,
-            created at 2022-12-21 19:33 +0000
+            created at 2022-12-23 07:55 +0000
         </p>
     </div>
 </footer>

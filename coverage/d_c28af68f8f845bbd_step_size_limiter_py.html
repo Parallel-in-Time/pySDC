@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/convergence_controller_classes/step_size_limiter.py: 33%</title>
+    <title>Coverage for pySDC/implementations/convergence_controller_classes/step_size_limiter.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/convergence_controller_classes/step_size_limiter.py</b>:
-            <span class="pc_cov">33%</span>
+            <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">15 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">5<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">10<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">15<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">1<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_store_uold_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.0</a>,
-            created at 2022-12-21 19:33 +0000
+            created at 2022-12-23 07:55 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -103,7 +103,7 @@
     <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">        Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="str">            (dict): The updated params dictionary</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="key">return</span> <span class="op">{</span><span class="str">"control_order"</span><span class="op">:</span> <span class="op">+</span><span class="num">92</span><span class="op">,</span> <span class="str">"dt_min"</span><span class="op">:</span> <span class="num">0</span><span class="op">,</span> <span class="str">"dt_max"</span><span class="op">:</span> <span class="nam">np</span><span class="op">.</span><span class="nam">inf</span><span class="op">,</span> <span class="op">**</span><span class="nam">params</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="key">return</span> <span class="op">{</span><span class="str">"control_order"</span><span class="op">:</span> <span class="op">+</span><span class="num">92</span><span class="op">,</span> <span class="str">"dt_min"</span><span class="op">:</span> <span class="num">0</span><span class="op">,</span> <span class="str">"dt_max"</span><span class="op">:</span> <span class="nam">np</span><span class="op">.</span><span class="nam">inf</span><span class="op">,</span> <span class="op">**</span><span class="nam">params</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">    <span class="key">def</span> <span class="nam">get_new_step_size</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">controller</span><span class="op">,</span> <span class="nam">S</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -121,24 +121,24 @@
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t"><span class="str">        Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t"><span class="str">            None</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">        <span class="key">for</span> <span class="nam">L</span> <span class="key">in</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">            <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">                <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">&lt;</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_min</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">                    <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">        <span class="key">for</span> <span class="nam">L</span> <span class="key">in</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">            <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">                <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">&lt;</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_min</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">                    <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">                        <span class="str">f"Step size is below minimum, increasing from {L.status.dt_new:.2e} to \</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t"><span class="str">{self.params.dt_min:.2e}"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">                        <span class="nam">S</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">                    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">                    <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_min</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">                <span class="key">elif</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">></span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_max</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">                    <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">                    <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_min</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">                <span class="key">elif</span> <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">></span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_max</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">                    <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">                        <span class="str">f"Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to \</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t"><span class="str">{self.params.dt_max:.2e}"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">                        <span class="nam">S</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">                    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">                    <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_max</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">                    <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">dt_new</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">dt_max</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -148,7 +148,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_store_uold_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.0</a>,
-            created at 2022-12-21 19:33 +0000
+            created at 2022-12-23 07:55 +0000
         </p>
     </div>
 </footer>
