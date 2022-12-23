@@ -172,7 +172,6 @@ class RungeKutta(generic_implicit):
         params['collocation_class'] = type(params['butcher_tableau'])
         params['num_nodes'] = params['butcher_tableau'].num_nodes
 
-
         self.params = _Pars(params)
 
         self.coll = params['butcher_tableau']
