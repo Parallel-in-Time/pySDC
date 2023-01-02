@@ -39,6 +39,10 @@ class controller_MPI(controller):
         # insert data on time communicator to the steps (helpful here and there)
         self.S.status.time_size = num_procs
 
+        self.base_convergence_controllers += [BasicRestarting.get_implementation("MPI")]
+        for convergence_controller in self.base_convergence_controllers:
+            self.add_convergence_controller(convergence_controller, description)
+
         if self.params.dump_setup and rank == 0:
             self.dump_setup(step=self.S, controller_params=controller_params, description=description)
 
@@ -60,8 +64,6 @@ class controller_MPI(controller):
             self.logger.warning(
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
-
-        self.add_convergence_controller(BasicRestarting.get_implementation('MPI'), description)
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.setup_status_variables(self, comm=comm)
