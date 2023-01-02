@@ -164,6 +164,7 @@ def test_fault_stats():
     for strategy in vdp_stats.strategies:
         dat = vdp_stats.load(strategy, True)
         recovered = len(dat['recovered'][dat['recovered'] == True])
+        print(strategy.name, dat['recovered'])
         assert (
             recovered == recovered_reference[strategy.name]
         ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
