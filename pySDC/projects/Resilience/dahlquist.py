@@ -164,7 +164,7 @@ def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=
         fill (bool): Fill the contours or not
 
     Returns:
-        None
+        bool: If the method is A-stable or not
     """
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     u = get_sorted(stats, type='u', sortby='iter')
@@ -191,7 +191,13 @@ def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=
         ax.contour(X, Y, abs(U), levels=[1], colors=colors[i - 1])
         ax.plot([None], [None], color=colors[i - 1], label=f'k={i}')
 
+    # check if the method is A-stable
+    unstable = abs(U) > 1.0
+    Astable = not any(X[unstable] < 0)
+
     ax.legend(frameon=False)
+
+    return Astable
 
 
 def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, cbar=True, **kwargs):
