@@ -116,6 +116,18 @@ def test_fault_injection():
 
 @pytest.mark.mpi4py
 def test_fault_stats():
+    """
+    Test generation of fault statistics and their recovery rates
+    """
+    from pySDC.projects.Resilience.fault_stats import (
+        FaultStats,
+        BaseStrategy,
+        AdaptivityStrategy,
+        IterateStrategy,
+        HotRodStrategy,
+        run_vdp,
+    )
+
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
@@ -131,40 +143,12 @@ def test_fault_stats():
         4,
     )
 
-
-def fault_stats_help_function():
-    """
-    Test generation of fault statistics and their recovery rates
-    """
-    from pySDC.projects.Resilience.fault_stats import (
-        FaultStats,
-        BaseStrategy,
-        AdaptivityStrategy,
-        IterateStrategy,
-        HotRodStrategy,
-        run_vdp,
-        MPI,
-    )
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    vdp_stats = FaultStats(
-        prob=run_vdp,
-        faults=[False, True],
-        reload=False,
-        recovery_thresh=1.1,
-        num_procs=1,
-        mode='random',
-        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
-        stats_path='data',
-    )
+    vdp_stats = generate_stats(True)
 
     # test number of possible combinations for faults
     assert (
         vdp_stats.get_max_combinations() == 1536
     ), f"Expected 1536 possible combinations for faults in van der Pol problem, but got {vdp_stats.get_max_combinations()}!"
-
-    assert MPI.COMM_WORLD.size == 4, f"This test is meant to be run with 4 processes, not {MPI.COMM_WORLD.size}!"
 
     # test recovery rate
     vdp_stats.run_stats_generation(runs=4, step=2)
@@ -176,17 +160,52 @@ def fault_stats_help_function():
     }
     vdp_stats.get_recovered()
 
-    strategy = vdp_stats.strategies[MPI.COMM_WORLD.rank]
-    dat = vdp_stats.load(strategy, True)
-    recovered = len(dat['recovered'][dat['recovered'] == True])
-    assert (
-        recovered == recovered_reference[strategy.name]
-    ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
+    for strategy in vdp_stats.strategies:
+        dat = vdp_stats.load(strategy, True)
+        recovered = len(dat['recovered'][dat['recovered'] == True])
+        assert (
+            recovered == recovered_reference[strategy.name]
+        ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
+
+
+def generate_stats(load=False):
+    """
+    Generate stats to check the recovery rate
+
+    Args:
+        load: Load the stats or generate them from scratch
+
+    Returns:
+        Object containing the stats
+    """
+    from pySDC.projects.Resilience.fault_stats import (
+        FaultStats,
+        BaseStrategy,
+        AdaptivityStrategy,
+        IterateStrategy,
+        HotRodStrategy,
+        run_vdp,
+    )
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    vdp_stats = FaultStats(
+        prob=run_vdp,
+        faults=[False, True],
+        reload=load,
+        recovery_thresh=1.1,
+        num_procs=1,
+        mode='random',
+        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        stats_path='data',
+    )
+    vdp_stats.run_stats_generation(runs=4, step=2)
+    return vdp_stats
 
 
 if __name__ == "__main__":
     if '--test-fault-stats' in sys.argv:
-        fault_stats_help_function()
+        generate_stats()
     else:
         test_fault_injection()
         test_float_conversion()
