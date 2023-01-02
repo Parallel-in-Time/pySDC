@@ -54,7 +54,7 @@ class controller(object):
         if self.params.use_iteration_estimator and self.params.all_to_done:
             self.logger.warning('all_to_done and use_iteration_estimator set, will ignore all_to_done')
 
-        self.base_convergence_controllers = []  # use this to mark user added convergence controllers in the log file
+        self.base_convergence_controllers = [CheckConvergence]
         self.setup_convergence_controllers(description)
 
     @staticmethod
@@ -247,7 +247,6 @@ class controller(object):
         self.convergence_controllers = []
         self.convergence_controller_order = []
         conv_classes = description.get('convergence_controllers', {})
-        conv_classes[CheckConvergence] = {}  # don't need special params for this, hence the {}
 
         # instantiate the convergence controllers
         for conv_class, params in conv_classes.items():
@@ -282,7 +281,7 @@ class controller(object):
 
         return None
 
-    def get_convergence_controllers_as_table(self, description=None):
+    def get_convergence_controllers_as_table(self, description):
         '''
         This function is for debugging purposes to keep track of the different convergence controllers and their order.
 
@@ -292,9 +291,6 @@ class controller(object):
         Returns:
             str: Table of convergence controllers as a string
         '''
-        if description is None:
-            description = {'convergence_controllers': {}}
-
         out = 'Active convergence controllers:'
         out += '\n    |  # | order | convergence controller'
         out += '\n----+----+-------+---------------------------------------------------------------------------------------'
@@ -302,7 +298,7 @@ class controller(object):
             C = self.convergence_controllers[self.convergence_controller_order[i]]
 
             # figure out how the convergence controller was added
-            if type(C) in description['convergence_controllers']:  # added by user
+            if type(C) in description.get('convergence_controllers', {}).keys():  # added by user
                 user_added = '--> '
             elif type(C) in self.base_convergence_controllers:  # added by default
                 user_added = '    '
