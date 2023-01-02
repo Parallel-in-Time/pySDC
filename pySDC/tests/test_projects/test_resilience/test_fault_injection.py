@@ -1,4 +1,7 @@
 import pytest
+import os
+import sys
+import subprocess
 
 
 @pytest.mark.base
@@ -38,9 +41,98 @@ def test_float_conversion():
         print(f'When flipping bits, we got nan {nan_counter} times out of {num_tests} tests')
 
 
-@pytest.mark.slow
 @pytest.mark.base
+def test_fault_injection():
+    from pySDC.projects.Resilience.fault_injection import FaultInjector
+
+    # setup arguments for fault generation for van der Pol problem
+    rnd_args = {'iteration': 3}
+    args = {'time': 1.0, 'target': 0}
+    injector = FaultInjector()
+    injector.rnd_params = {
+        'level_number': 1,
+        'node': 3,
+        'iteration': 3,
+        'problem_pos': (2,),
+        'bit': 64,
+    }
+
+    reference = {
+        0: {
+            'time': 1.0,
+            'timestep': None,
+            'level_number': 0,
+            'iteration': 3,
+            'node': 0,
+            'problem_pos': [1],
+            'bit': 48,
+            'target': 0,
+            'when': 'after',
+        },
+        1: {
+            'time': 1.0,
+            'timestep': None,
+            'level_number': 0,
+            'iteration': 3,
+            'node': 3,
+            'problem_pos': [0],
+            'bit': 26,
+            'target': 0,
+            'when': 'after',
+        },
+        2: {
+            'time': 1.0,
+            'timestep': None,
+            'level_number': 0,
+            'iteration': 1,
+            'node': 0,
+            'problem_pos': [0],
+            'bit': 0,
+            'target': 0,
+            'when': 'after',
+        },
+        3: {
+            'time': 1.0,
+            'timestep': None,
+            'level_number': 0,
+            'iteration': 1,
+            'node': 1,
+            'problem_pos': [0],
+            'bit': 0,
+            'target': 0,
+            'when': 'after',
+        },
+    }
+
+    # inject the faults
+    for i in range(4):
+        injector.add_fault(args=args, rnd_args=rnd_args)
+        if i >= 1:  # switch to combination based adding
+            injector.random_generator = i - 1
+        assert (
+            injector.faults[i].__dict__ == reference[i]
+        ), f'Expected fault with parameters {reference[i]}, got {injector.faults[i].__dict__}!'
+
+
+@pytest.mark.mpi4py
 def test_fault_stats():
+    # Set python path once
+    my_env = os.environ.copy()
+    my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
+
+    cmd = f"mpirun -np {4} python {__file__} --test-fault-stats".split()
+
+    p = subprocess.Popen(cmd, env=my_env, cwd=".")
+
+    p.wait()
+    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
+        p.returncode,
+        4,
+    )
+
+
+def fault_stats_help_function():
     """
     Test generation of fault statistics and their recovery rates
     """
@@ -51,6 +143,7 @@ def test_fault_stats():
         IterateStrategy,
         HotRodStrategy,
         run_vdp,
+        MPI,
     )
     import matplotlib.pyplot as plt
     import numpy as np
@@ -71,8 +164,10 @@ def test_fault_stats():
         vdp_stats.get_max_combinations() == 1536
     ), f"Expected 1536 possible combinations for faults in van der Pol problem, but got {vdp_stats.get_max_combinations()}!"
 
+    assert MPI.COMM_WORLD.size == 4, f"This test is meant to be run with 4 processes, not {MPI.COMM_WORLD.size}!"
+
     # test recovery rate
-    vdp_stats.run_stats_generation(runs=4, step=4)
+    vdp_stats.run_stats_generation(runs=4, step=2)
     recovered_reference = {
         'base': 1,
         'adaptivity': 2,
@@ -81,14 +176,18 @@ def test_fault_stats():
     }
     vdp_stats.get_recovered()
 
-    for strategy in vdp_stats.strategies:
-        dat = vdp_stats.load(strategy, True)
-        recovered = len(dat['recovered'][dat['recovered'] == True])
-        assert (
-            recovered == recovered_reference[strategy.name]
-        ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
+    strategy = vdp_stats.strategies[MPI.COMM_WORLD.rank]
+    dat = vdp_stats.load(strategy, True)
+    recovered = len(dat['recovered'][dat['recovered'] == True])
+    assert (
+        recovered == recovered_reference[strategy.name]
+    ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
 
 
 if __name__ == "__main__":
-    test_fault_stats()
-    test_float_conversion()
+    if '--test-fault-stats' in sys.argv:
+        fault_stats_help_function()
+    else:
+        test_fault_injection()
+        test_float_conversion()
+        test_fault_stats()
