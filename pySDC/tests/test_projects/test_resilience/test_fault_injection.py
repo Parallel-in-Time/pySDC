@@ -126,7 +126,6 @@ def test_fault_stats():
         IterateStrategy,
         HotRodStrategy,
         run_vdp,
-        MPI,
     )
 
     # Set python path once
@@ -144,8 +143,6 @@ def test_fault_stats():
         4,
     )
 
-    MPI.COMM_WORLD.Barrier()
-
     vdp_stats = generate_stats(True)
 
     # test number of possible combinations for faults
@@ -160,6 +157,7 @@ def test_fault_stats():
         'Hot Rod': 2,
     }
     vdp_stats.get_recovered()
+    vdp_stats.scrutinize(vdp_stats.strategies[-1], 3)
 
     for strategy in vdp_stats.strategies:
         dat = vdp_stats.load(strategy, True)
