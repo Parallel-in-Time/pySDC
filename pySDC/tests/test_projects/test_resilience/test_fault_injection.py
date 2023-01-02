@@ -126,6 +126,7 @@ def test_fault_stats():
         IterateStrategy,
         HotRodStrategy,
         run_vdp,
+        MPI,
     )
 
     # Set python path once
@@ -143,6 +144,8 @@ def test_fault_stats():
         4,
     )
 
+    MPI.COMM_WORLD.Barrier()
+
     vdp_stats = generate_stats(True)
 
     # test number of possible combinations for faults
@@ -150,8 +153,6 @@ def test_fault_stats():
         vdp_stats.get_max_combinations() == 1536
     ), f"Expected 1536 possible combinations for faults in van der Pol problem, but got {vdp_stats.get_max_combinations()}!"
 
-    # test recovery rate
-    vdp_stats.run_stats_generation(runs=4, step=2)
     recovered_reference = {
         'base': 1,
         'adaptivity': 2,
