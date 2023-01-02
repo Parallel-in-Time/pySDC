@@ -325,6 +325,7 @@ class AdaptivityResidual(AdaptivityBase):
     rule to update the step size. Instead of giving a local tolerance that we try to hit as closely as possible, we set
     two thresholds for the residual. When we exceed the upper one, we reduce the step size by a factor of 2 and if the
     residual falls below the lower threshold, we double the step size.
+    Please setup these parameters as "e_tol" and "e_tol_low".
     """
 
     def setup(self, controller, params, description, **kwargs):
@@ -349,7 +350,7 @@ class AdaptivityResidual(AdaptivityBase):
             "control_order": -45,
             "e_tol_low": 0,
             "e_tol": np.inf,
-            "max_restarts": 2 if "e_tol_low" in params else None,
+            "max_restarts": 99 if "e_tol_low" in params else None,
         }
         return {**defaults, **params}
 
