@@ -8,7 +8,7 @@ import subprocess
 def test_float_conversion():
     '''
     Method to test the float conversion by converting to bytes and back and by flipping bits where we know what the
-    impact is. We try with 1000 random numbers, so we don't know how many times we get nan before hand.
+    impact is. We try with 1000 random numbers, so we don't know how many times we get nan beforehand.
     '''
     import numpy as np
     from pySDC.projects.Resilience.fault_injection import FaultInjector
