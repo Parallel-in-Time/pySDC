@@ -38,5 +38,57 @@ def test_float_conversion():
         print(f'When flipping bits, we got nan {nan_counter} times out of {num_tests} tests')
 
 
+@pytest.mark.slow
+@pytest.mark.base
+def test_fault_stats():
+    """
+    Test generation of fault statistics and their recovery rates
+    """
+    from pySDC.projects.Resilience.fault_stats import (
+        FaultStats,
+        BaseStrategy,
+        AdaptivityStrategy,
+        IterateStrategy,
+        HotRodStrategy,
+        run_vdp,
+    )
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    vdp_stats = FaultStats(
+        prob=run_vdp,
+        faults=[False, True],
+        reload=False,
+        recovery_thresh=1.1,
+        num_procs=1,
+        mode='random',
+        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        stats_path='data',
+    )
+
+    # test number of possible combinations for faults
+    assert (
+        vdp_stats.get_max_combinations() == 1536
+    ), f"Expected 1536 possible combinations for faults in van der Pol problem, but got {vdp_stats.get_max_combinations()}!"
+
+    # test recovery rate
+    vdp_stats.run_stats_generation(runs=4, step=4)
+    recovered_reference = {
+        'base': 1,
+        'adaptivity': 2,
+        'iterate': 1,
+        'Hot Rod': 2,
+    }
+    vdp_stats.get_recovered()
+
+    for strategy in vdp_stats.strategies:
+        dat = vdp_stats.load(strategy, True)
+        recovered = len(dat['recovered'][dat['recovered'] == True])
+        assert (
+            recovered == recovered_reference[strategy.name]
+        ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
+
+
 if __name__ == "__main__":
+    test_fault_stats()
     test_float_conversion()

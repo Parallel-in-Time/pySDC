@@ -8,7 +8,7 @@ import sys
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
 
-from fault_injection import FaultInjector
+from pySDC.projects.Resilience.fault_injection import FaultInjector
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
@@ -416,6 +416,7 @@ class FaultStats:
         recovery_thresh=1 + 1e-3,
         num_procs=1,
         mode='combination',
+        stats_path='data/stats',
     ):
         '''
         Initialization routine
@@ -436,6 +437,7 @@ class FaultStats:
         self.recovery_thresh = recovery_thresh
         self.num_procs = num_procs
         self.mode = mode
+        self.stats_path = stats_path
 
     def get_Tend(self):
         '''
@@ -836,7 +838,7 @@ class FaultStats:
         Returns:
             str: The path to what you are looking for
         '''
-        return f'data/stats/{self.get_name(strategy, faults)}.pickle'
+        return f'{self.stats_path}/{self.get_name(strategy, faults)}.pickle'
 
     def get_name(self, strategy=None, faults=False):
         '''
@@ -1279,7 +1281,7 @@ class FaultStats:
 
         return [e_em[i][-1] for i in [0, 1]], [e_ex[i][-1] for i in [0, 1]], e_glob
 
-    def print_faults(self, mask):
+    def print_faults(self, mask=None):
         '''
         Print all faults that happened within a certain mask
 
@@ -1352,7 +1354,7 @@ class FaultStats:
         else:
             return mask
 
-    def get_index(self, mask):
+    def get_index(self, mask=None):
         '''
         Get the indeces of all runs in mask
 
@@ -1362,7 +1364,11 @@ class FaultStats:
         Returns:
             Numpy.ndarray: Array of indeces
         '''
-        return np.arange(len(mask))[mask]
+        if mask is None:
+            dat = self.load()
+            return np.arange(len(dat['iteration']))
+        else:
+            return np.arange(len(mask))[mask]
 
     def get_statistics_info(self, mask=None, strategy=None, print_all=False, ax=None):
         '''
