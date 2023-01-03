@@ -157,7 +157,6 @@ def test_fault_stats():
         'Hot Rod': 2,
     }
     vdp_stats.get_recovered()
-    vdp_stats.scrutinize(vdp_stats.strategies[-1], 3)
 
     for strategy in vdp_stats.strategies:
         dat = vdp_stats.load(strategy, True)
@@ -188,6 +187,8 @@ def generate_stats(load=False):
     )
     import matplotlib.pyplot as plt
     import numpy as np
+
+    np.seterr(all='warn')  # get consistent behaviour accross platforms
 
     vdp_stats = FaultStats(
         prob=run_vdp,
