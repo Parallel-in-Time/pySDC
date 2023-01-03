@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -48,14 +45,14 @@
 
 
 <div class="viewcode-block" id="battery"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery">[docs]</a><span class="k">class</span> <span class="nc">battery</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the battery drain model as in the description in the PinTSimE project</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        A: system matrix, representing the 2 ODEs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 <span class="sd">        Args:</span>
 <span class="sd">            problem_params (dict): custom parameters for the example</span>
@@ -83,7 +80,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <div class="viewcode-block" id="battery.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 <span class="sd">        Args:</span>
 <span class="sd">            u (dtype_u): current values</span>
@@ -113,7 +110,7 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="battery.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for (I-factor*A)u = rhs</span>
 <span class="sd">        Args:</span>
 <span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
@@ -145,7 +142,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="battery.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 <span class="sd">        Args:</span>
 <span class="sd">            t (float): current time</span>
@@ -163,14 +160,14 @@
 
 
 <div class="viewcode-block" id="battery_implicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery_implicit">[docs]</a><span class="k">class</span> <span class="nc">battery_implicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the battery drain model as in the description in the PinTSimE project</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        A: system matrix, representing the 2 ODEs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 <span class="sd">        Args:</span>
 <span class="sd">            problem_params (dict): custom parameters for the example</span>
@@ -214,7 +211,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="battery_implicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery_implicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 <span class="sd">        Args:</span>
 <span class="sd">            u (dtype_u): current values</span>
@@ -250,7 +247,7 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="battery_implicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery_implicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver</span>
 <span class="sd">        Args:</span>
 <span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
@@ -323,7 +320,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="battery_implicit.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery.battery_implicit.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 <span class="sd">        Args:</span>
 <span class="sd">            t (float): current time</span>
@@ -376,7 +373,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

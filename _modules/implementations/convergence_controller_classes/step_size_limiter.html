@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -45,14 +42,14 @@
 
 
 <div class="viewcode-block" id="StepSizeLimiter"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter">[docs]</a><span class="k">class</span> <span class="nc">StepSizeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to set limits to adaptive step size computation during run time</span>
 
 <span class="sd">    Please supply dt_min or dt_max in the params to limit in either direction</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="StepSizeLimiter.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here</span>
 
 <span class="sd">        Args:</span>
@@ -66,7 +63,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">92</span><span class="p">,</span> <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dt_max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="StepSizeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enforce an upper and lower limit to the step size here.</span>
 <span class="sd">        Be aware that this is only tested when a new step size has been determined. That means if you set an initial</span>
 <span class="sd">        value for the step size outside of the limits, and you don&#39;t do any further step size control, that value will</span>
@@ -137,7 +134,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

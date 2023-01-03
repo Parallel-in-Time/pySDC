@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -62,7 +59,7 @@
         <span class="k">return</span> <span class="n">obj</span>
 
     <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the abs operator</span>
 
 <span class="sd">        Returns:</span>
@@ -72,7 +69,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
 <div class="viewcode-block" id="petsc_vec.isend"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.isend">[docs]</a>    <span class="k">def</span> <span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for sending data forward in time (non-blocking)</span>
 
 <span class="sd">        Args:</span>
@@ -86,7 +83,7 @@
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Issend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getArray</span><span class="p">(),</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="petsc_vec.irecv"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.irecv">[docs]</a>    <span class="k">def</span> <span class="nf">irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for receiving in time</span>
 
 <span class="sd">        Args:</span>
@@ -100,7 +97,7 @@
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Irecv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getArray</span><span class="p">(),</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="petsc_vec.bcast"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.bcast">[docs]</a>    <span class="k">def</span> <span class="nf">bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for broadcasting values</span>
 
 <span class="sd">        Args:</span>
@@ -115,7 +112,7 @@
 
 
 <div class="viewcode-block" id="petsc_vec_imex"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec_imex">[docs]</a><span class="k">class</span> <span class="nc">petsc_vec_imex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RHS data type for Vec with implicit and explicit components</span>
 
 <span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
@@ -126,7 +123,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -149,7 +146,7 @@
 
 
 <div class="viewcode-block" id="petsc_vec_comp2"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2">[docs]</a><span class="k">class</span> <span class="nc">petsc_vec_comp2</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RHS data type for Vec with implicit and explicit components</span>
 
 <span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
@@ -160,7 +157,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -218,7 +215,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

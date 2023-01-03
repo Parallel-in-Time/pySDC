@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -44,7 +41,7 @@
 
 
 <div class="viewcode-block" id="filter_stats"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.filter_stats">[docs]</a><span class="k">def</span> <span class="nf">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_restarts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to extract data from the dictrionary of statistics</span>
 
 <span class="sd">    Args:</span>
@@ -77,7 +74,7 @@
 
 
 <div class="viewcode-block" id="sort_stats"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.sort_stats">[docs]</a><span class="k">def</span> <span class="nf">sort_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to transform stats dictionary to sorted list of tuples</span>
 
 <span class="sd">    Args:</span>
@@ -106,7 +103,7 @@
 
 
 <div class="viewcode-block" id="filter_recomputed"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.filter_recomputed">[docs]</a><span class="k">def</span> <span class="nf">filter_recomputed</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Filter recomputed values from the stats and remove them.</span>
 
 <span class="sd">    Args:</span>
@@ -132,7 +129,7 @@
 
 
 <div class="viewcode-block" id="get_list_of_types"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.get_list_of_types">[docs]</a><span class="k">def</span> <span class="nf">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to get list of types registered in stats</span>
 
 <span class="sd">    Args:</span>
@@ -151,7 +148,7 @@
 
 
 <div class="viewcode-block" id="get_sorted"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.stats_helper.get_sorted">[docs]</a><span class="k">def</span> <span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.</span>
 <span class="sd">    Keyword arguments are passed to `filter_stats` for filtering.</span>
 
@@ -206,7 +203,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -48,7 +45,7 @@
 
 
 <div class="viewcode-block" id="BasicRestarting"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting">[docs]</a><span class="k">class</span> <span class="nc">BasicRestarting</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class with some utilities for restarting. The specific functions are:</span>
 <span class="sd">     - Telling each step after one that requested a restart to get restarted as well</span>
 <span class="sd">     - Allowing each step to be restarted a limited number of times in a row before just moving on anyways</span>
@@ -58,7 +55,7 @@
 
 <div class="viewcode-block" id="BasicRestarting.get_implementation"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.get_implementation">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flavor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the implementation for a specific flavor of this class.</span>
 
 <span class="sd">        Args:</span>
@@ -75,7 +72,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Flavor </span><span class="si">{</span><span class="n">flavor</span><span class="si">}</span><span class="s1"> of BasicRestarting is not implemented!&#39;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -87,7 +84,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
 <div class="viewcode-block" id="BasicRestarting.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here.</span>
 
 <span class="sd">        Default parameters are:</span>
@@ -116,7 +113,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="BasicRestarting.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add status variables for whether to restart now and how many times the step has been restarted in a row to the</span>
 <span class="sd">        Steps</span>
 
@@ -132,7 +129,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BasicRestarting.reset_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.reset_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add status variables for whether to restart now and how many times the step has been restarted in a row to the</span>
 <span class="sd">        Steps</span>
 
@@ -147,7 +144,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_variable</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BasicRestarting.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a convergence controller that spreads the step sizes between steps.</span>
 
 <span class="sd">        Args:</span>
@@ -161,7 +158,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="BasicRestarting.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
 
@@ -175,7 +172,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Please implement a function to determine if we need a restart here!&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BasicRestarting.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update restarts in a row for all steps.</span>
 
 <span class="sd">        Args:</span>
@@ -194,12 +191,12 @@
 
 
 <div class="viewcode-block" id="BasicRestartingNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI">[docs]</a><span class="k">class</span> <span class="nc">BasicRestartingNonMPI</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Non-MPI specific version of basic restarting</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BasicRestartingNonMPI.reset_buffers_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset all variables with are used to simulate communication here</span>
 
 <span class="sd">        Args:</span>
@@ -214,7 +211,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="BasicRestartingNonMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here.</span>
 
 <span class="sd">        Default parameters are:</span>
@@ -241,7 +238,7 @@
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="BasicRestartingNonMPI.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
 
@@ -269,12 +266,12 @@
 
 
 <div class="viewcode-block" id="BasicRestartingMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI">[docs]</a><span class="k">class</span> <span class="nc">BasicRestartingMPI</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    MPI specific version of basic restarting</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine. Adds a buffer.</span>
 
 <span class="sd">        Args:</span>
@@ -286,7 +283,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;restart_earlier&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
 <div class="viewcode-block" id="BasicRestartingMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here.</span>
 
 <span class="sd">        Default parameters are:</span>
@@ -313,7 +310,7 @@
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="BasicRestartingMPI.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
 
@@ -388,7 +385,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

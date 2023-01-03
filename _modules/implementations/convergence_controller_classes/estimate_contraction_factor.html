@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -48,12 +45,12 @@
 
 
 <div class="viewcode-block" id="EstimateContractionFactor"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor">[docs]</a><span class="k">class</span> <span class="nc">EstimateContractionFactor</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Estimate the contraction factor by using the evolution of the embedded error estimate across iterations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="EstimateContractionFactor.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a default value for control order to the parameters.</span>
 
 <span class="sd">        Args:</span>
@@ -67,7 +64,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span> <span class="s2">&quot;e_tol&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="EstimateContractionFactor.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load estimator of embedded error.</span>
 
 <span class="sd">        Args:</span>
@@ -83,7 +80,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateContractionFactor.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the embedded error, contraction factor and iterations to convergence variable to the status of the levels.</span>
 
 <span class="sd">        Args:</span>
@@ -107,7 +104,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;iter_to_convergence&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateContractionFactor.reset_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.reset_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reinitialize new status variables for the levels.</span>
 
 <span class="sd">        Args:</span>
@@ -119,7 +116,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateContractionFactor.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate contraction factor here as the ratio of error estimates between iterations and estimate how many more</span>
 <span class="sd">        iterations we need.</span>
 
@@ -147,7 +144,7 @@
                     <span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateContractionFactor.pre_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.pre_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">pre_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the embedded error estimate of the current iteration in a different place so it doesn&#39;t get overwritten.</span>
 
 <span class="sd">        Args:</span>
@@ -198,7 +195,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

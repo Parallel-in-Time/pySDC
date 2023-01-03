@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -52,7 +49,7 @@
 
 
 <div class="viewcode-block" id="allencahn_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex">[docs]</a><span class="k">class</span> <span class="nc">allencahn_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping</span>
 
 <span class="sd">    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/</span>
@@ -66,7 +63,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -140,7 +137,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
 <div class="viewcode-block" id="allencahn_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -178,7 +175,7 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="allencahn_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple FFT solver for the diffusion part</span>
 
 <span class="sd">        Args:</span>
@@ -205,7 +202,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="allencahn_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
 <span class="sd">        Args:</span>
@@ -255,13 +252,13 @@
 
 
 <div class="viewcode-block" id="allencahn_imex_timeforcing"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing">[docs]</a><span class="k">class</span> <span class="nc">allencahn_imex_timeforcing</span><span class="p">(</span><span class="n">allencahn_imex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping,</span>
 <span class="sd">    time-dependent forcing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="allencahn_imex_timeforcing.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -379,7 +376,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -51,7 +48,7 @@
 
 
 <div class="viewcode-block" id="CollBase"><a class="viewcode-back" href="../../pySDC/core.html#core.Collocation.CollBase">[docs]</a><span class="k">class</span> <span class="nc">CollBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic collocation class, that contains everything to do integration over</span>
 <span class="sd">    intervals and between nodes.</span>
 <span class="sd">    It can be used to produce many kind of quadrature nodes from various</span>
@@ -108,7 +105,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for a collocation object</span>
 
 <span class="sd">        Args:</span>
@@ -155,7 +152,7 @@
 
 <div class="viewcode-block" id="CollBase.evaluate"><a class="viewcode-back" href="../../pySDC/core.html#core.Collocation.CollBase.evaluate">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the quadrature over the full interval</span>
 
 <span class="sd">        Args:</span>
@@ -171,7 +168,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_getWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes weights using barycentric interpolation</span>
 
 <span class="sd">        Args:</span>
@@ -196,7 +193,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_getNodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes nodes using an internal NodesGenerator object</span>
 
 <span class="sd">        Returns:</span>
@@ -222,7 +219,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_gen_Qmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute tleft-to-node integration matrix for later use in collocation formulation</span>
 
 <span class="sd">        Returns:</span>
@@ -248,7 +245,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_gen_Smatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute node-to-node integration matrix for later use in collocation formulation</span>
 
 <span class="sd">        Returns:</span>
@@ -266,7 +263,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_gen_deltas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute distances between the nodes</span>
 
 <span class="sd">        Returns:</span>
@@ -317,7 +314,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

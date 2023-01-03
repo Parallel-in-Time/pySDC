@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -56,7 +53,7 @@
 
 
 <div class="viewcode-block" id="ptype"><a class="viewcode-back" href="../../pySDC/core.html#core.Problem.ptype">[docs]</a><span class="k">class</span> <span class="nc">ptype</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prototype class for problems, just defines the attributes essential to get started</span>
 
 <span class="sd">    Attributes:</span>
@@ -68,7 +65,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -89,13 +86,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">dtype_f</span>
 
 <div class="viewcode-block" id="ptype.eval_f"><a class="viewcode-back" href="../../pySDC/core.html#core.Problem.ptype.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to RHS computation of the ODE</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: problem has to implement eval_f(self, u, t)&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ptype.apply_mass_matrix"><a class="viewcode-back" href="../../pySDC/core.html#core.Problem.ptype.apply_mass_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to apply mass matrix (only needed for FEM)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: if you want a mass matrix, implement apply_mass_matrix(u)&#39;</span><span class="p">)</span></div></div>
@@ -137,7 +134,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

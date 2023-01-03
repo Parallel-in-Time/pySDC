@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -49,7 +46,7 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="advectiondiffusion1d_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex">[docs]</a><span class="k">class</span> <span class="nc">advectiondiffusion1d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,</span>
 <span class="sd">    IMEX time-stepping</span>
 
@@ -62,7 +59,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -105,7 +102,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">kx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
 <div class="viewcode-block" id="advectiondiffusion1d_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -126,7 +123,7 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="advectiondiffusion1d_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple FFT solver for the diffusion part</span>
 
 <span class="sd">        Args:</span>
@@ -146,7 +143,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="advectiondiffusion1d_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
 <span class="sd">        Args:</span>
@@ -177,13 +174,13 @@
 
 
 <div class="viewcode-block" id="advectiondiffusion1d_implicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit">[docs]</a><span class="k">class</span> <span class="nc">advectiondiffusion1d_implicit</span><span class="p">(</span><span class="n">advectiondiffusion1d_imex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,</span>
 <span class="sd">    fully-implicit time-stepping</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -198,7 +195,7 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="advectiondiffusion1d_implicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -217,7 +214,7 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="advectiondiffusion1d_implicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple FFT solver for the diffusion and advection part (both are linear!)</span>
 
 <span class="sd">        Args:</span>
@@ -273,7 +270,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -50,7 +47,7 @@
 
 
 <div class="viewcode-block" id="mesh_to_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh">[docs]</a><span class="k">class</span> <span class="nc">mesh_to_mesh</span><span class="p">(</span><span class="n">space_transfer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custon base_transfer class, implements Transfer.py</span>
 
 <span class="sd">    This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries</span>
@@ -62,7 +59,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -204,7 +201,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span><span class="p">,</span> <span class="n">Rspace</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="mesh_to_mesh.restrict"><a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.restrict">[docs]</a>    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restriction implementation</span>
 <span class="sd">        Args:</span>
 <span class="sd">            F: the fine level data (easier to access than via the fine attribute)</span>
@@ -259,7 +256,7 @@
         <span class="k">return</span> <span class="n">G</span></div>
 
 <div class="viewcode-block" id="mesh_to_mesh.prolong"><a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.prolong">[docs]</a>    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prolongation implementation</span>
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data (easier to access than via the coarse attribute)</span>
@@ -350,7 +347,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -60,7 +57,7 @@
 
 <span class="c1"># short helper class to bundle all status variables</span>
 <span class="k">class</span> <span class="nc">_Status</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class carries the status of the step. All variables that the core SDC / PFASST functionality depend on are</span>
 <span class="sd">    initialized here, while the convergence controllers are allowed to add more variables in a controlled fashion</span>
 <span class="sd">    later on using the `add_variable` function.</span>
@@ -85,7 +82,7 @@
 
 
 <div class="viewcode-block" id="step"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step">[docs]</a><span class="k">class</span> <span class="nc">step</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Step class, referencing most of the structure needed for the time-stepping</span>
 
 <span class="sd">    This class bundles multiple levels and the corresponding transfer operators and is used by the controller</span>
@@ -99,7 +96,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -127,7 +124,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__generate_hierarchy</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__generate_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descr</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to generate the level hierarchy for a single step</span>
 
 <span class="sd">        This makes the explicit generation of levels in the frontend obsolete and hides a few dirty hacks here and</span>
@@ -216,7 +213,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__dict_to_list</span><span class="p">(</span><span class="n">in_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Straightforward helper function to convert dictionary of list to list of dictionaries</span>
 
 <span class="sd">        Args:</span>
@@ -250,7 +247,7 @@
         <span class="n">fine_level</span><span class="p">,</span>
         <span class="n">coarse_level</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to couple levels with base_transfer operators</span>
 
 <span class="sd">        Args:</span>
@@ -275,7 +272,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__transfer_dict</span><span class="p">[(</span><span class="n">coarse_level</span><span class="p">,</span> <span class="n">fine_level</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="n">prolong</span></div>
 
 <div class="viewcode-block" id="step.transfer"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.transfer">[docs]</a>    <span class="k">def</span> <span class="nf">transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wrapper routine to ease the call of the transfer functions</span>
 
 <span class="sd">        This function can be called in the multilevel stepper (e.g. MLSDC), passing a source and a target level.</span>
@@ -289,7 +286,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__transfer_dict</span><span class="p">[(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)]()</span></div>
 
 <div class="viewcode-block" id="step.reset_step"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.reset_step">[docs]</a>    <span class="k">def</span> <span class="nf">reset_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine so clean-up step structure and the corresp. levels for further uses</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># reset all levels</span>
@@ -297,7 +294,7 @@
             <span class="n">l</span><span class="o">.</span><span class="n">reset_level</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="step.init_step"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.init_step">[docs]</a>    <span class="k">def</span> <span class="nf">init_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for a new step.</span>
 
 <span class="sd">        This routine uses initial values u0 to set up the u[0] values at the finest level</span>
@@ -315,7 +312,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for previous step</span>
 
 <span class="sd">        Returns:</span>
@@ -325,7 +322,7 @@
 
     <span class="nd">@prev</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">prev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter for previous step</span>
 
 <span class="sd">        Args:</span>
@@ -335,7 +332,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for next step</span>
 
 <span class="sd">        Returns:</span>
@@ -345,7 +342,7 @@
 
     <span class="nd">@next</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter for next step</span>
 
 <span class="sd">        Args:</span>
@@ -355,7 +352,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for current time-step size</span>
 
 <span class="sd">        Returns:</span>
@@ -365,7 +362,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for current time</span>
 
 <span class="sd">        Returns:</span>
@@ -410,7 +407,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

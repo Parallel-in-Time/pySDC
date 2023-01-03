@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -49,12 +46,12 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="outer_solar_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system">[docs]</a><span class="k">class</span> <span class="nc">outer_solar_system</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the outer solar system problem</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">acceleration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -80,7 +77,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="mf">2.95912208286e-4</span>
 
 <div class="viewcode-block" id="outer_solar_system.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -115,7 +112,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="outer_solar_system.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact/initial trajectory at time t</span>
 
 <span class="sd">        Args:</span>
@@ -150,7 +147,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="outer_solar_system.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the Hamiltonian</span>
 
 <span class="sd">        Args:</span>
@@ -209,7 +206,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

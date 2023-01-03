@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -60,7 +57,7 @@
 
 
 <div class="viewcode-block" id="base_transfer"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer">[docs]</a><span class="k">class</span> <span class="nc">base_transfer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Standard base_transfer class</span>
 
 <span class="sd">    Attributes:</span>
@@ -71,7 +68,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">,</span> <span class="n">base_transfer_params</span><span class="p">,</span> <span class="n">space_transfer_class</span><span class="p">,</span> <span class="n">space_transfer_params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -108,7 +105,7 @@
 
 <div class="viewcode-block" id="base_transfer.get_transfer_matrix_Q"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.get_transfer_matrix_Q">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">,</span> <span class="n">c_nodes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper routine to quickly define transfer matrices from a coarse set</span>
 <span class="sd">        to a fine set of nodes (fully Lagrangian)</span>
 <span class="sd">        Args:</span>
@@ -122,7 +119,7 @@
         <span class="k">return</span> <span class="n">approx</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="base_transfer.restrict"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.restrict">[docs]</a>    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Space-time restriction routine</span>
 
 <span class="sd">        The routine applies the spatial restriction operator to teh fine values on the fine nodes, then reevaluates f</span>
@@ -207,7 +204,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="base_transfer.prolong"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.prolong">[docs]</a>    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Space-time prolongation routine</span>
 
 <span class="sd">        This routine applies the spatial prolongation routine to the difference between the computed and the restricted</span>
@@ -246,7 +243,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="base_transfer.prolong_f"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.prolong_f">[docs]</a>    <span class="k">def</span> <span class="nf">prolong_f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Space-time prolongation routine w.r.t. the rhs f</span>
 
 <span class="sd">        This routine applies the spatial prolongation routine to the difference between the computed and the restricted</span>
@@ -318,7 +315,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

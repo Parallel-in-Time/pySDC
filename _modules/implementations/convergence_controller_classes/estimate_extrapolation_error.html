@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -49,7 +46,7 @@
 
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">[docs]</a><span class="k">class</span> <span class="nc">EstimateExtrapolationErrorBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for extrapolated error estimates</span>
 <span class="sd">    ----------------------------------------------------</span>
 <span class="sd">    This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.</span>
@@ -58,7 +55,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -71,7 +68,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving</span>
 <span class="sd">        a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are</span>
 <span class="sd">        initialized which are needed for this process.</span>
@@ -112,7 +109,7 @@
         <span class="k">return</span> <span class="n">new_params</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize coefficient variables and add variable to the levels for extrapolated error</span>
 
 <span class="sd">        Args:</span>
@@ -128,7 +125,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.reset_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add variable for extrapolated error</span>
 
 <span class="sd">        Args:</span>
@@ -149,7 +146,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;error_extrapolation_estimate&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
 
 <span class="sd">        Args:</span>
@@ -178,7 +175,7 @@
         <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.store_values"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values">[docs]</a>    <span class="k">def</span> <span class="nf">store_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the required attributes of the step to do the extrapolation. We only care about the last collocation</span>
 <span class="sd">        node on the finest level at the moment.</span>
 
@@ -214,7 +211,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.get_extrapolation_coefficients"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.get_extrapolation_coefficients">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolation_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function solves a linear system where in the matrix A, the row index reflects the order of the derivative</span>
 <span class="sd">        in the Taylor expansion and the column index reflects the particular step and whether its u or f from that</span>
 <span class="sd">        step. The vector b on the other hand, contains a 1 in the first entry and zeros elsewhere, since we want to</span>
@@ -288,12 +285,12 @@
 
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateExtrapolationErrorNonMPI</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implementation of the extrapolation error estimate for the non-MPI controller.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a no parameter &#39;no_storage&#39; which decides whether the standart or the no-memory-overhead version is run,</span>
 <span class="sd">        where only values are used for extrapolation which are in memory of other processes</span>
 
@@ -314,7 +311,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">non_mpi_defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">default_params</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize storage variables.</span>
 
 <span class="sd">        Args:</span>
@@ -333,7 +330,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        We perform three key operations here in the last iteration:</span>
 <span class="sd">         - Compute the error estimate</span>
 <span class="sd">         - Compute the coefficients if needed</span>
@@ -368,7 +365,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If the no-memory-overhead version is used, we need to delete stuff that shouldn&#39;t be available. Otherwise, we</span>
 <span class="sd">        need to store all the stuff that we can.</span>
 
@@ -402,7 +399,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_solution"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine values from previous steps to extrapolate.</span>
 
 <span class="sd">        Args:</span>
@@ -434,7 +431,7 @@
         <span class="k">return</span> <span class="n">u_ex</span></div>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolated_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
 <span class="sd">        solution obtained by the time marching scheme.</span>
 
@@ -489,7 +486,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

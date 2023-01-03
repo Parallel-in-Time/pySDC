@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -49,12 +46,12 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="henon_heiles"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HenonHeiles.henon_heiles">[docs]</a><span class="k">class</span> <span class="nc">henon_heiles</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the harmonic oscillator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">acceleration</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -74,7 +71,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">henon_heiles</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">)</span>
 
 <div class="viewcode-block" id="henon_heiles.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HenonHeiles.henon_heiles.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -89,7 +86,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="henon_heiles.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HenonHeiles.henon_heiles.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact/initial trajectory at time t</span>
 
 <span class="sd">        Args:</span>
@@ -113,7 +110,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 <div class="viewcode-block" id="henon_heiles.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the Hamiltonian</span>
 
 <span class="sd">        Args:</span>
@@ -164,7 +161,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

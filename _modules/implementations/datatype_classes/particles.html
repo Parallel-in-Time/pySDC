@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -52,7 +49,7 @@
 
 
 <div class="viewcode-block" id="particles"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles">[docs]</a><span class="k">class</span> <span class="nc">particles</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Particle data type for particles in 3 dimensions</span>
 
 <span class="sd">    This data type can be used for particles in 3 dimensions with 3 position and 3 velocity values per particle</span>
@@ -69,7 +66,7 @@
         <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -120,7 +117,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the addition operator for particles types</span>
 
 <span class="sd">        Args:</span>
@@ -143,7 +140,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the subtraction operator for particles types</span>
 
 <span class="sd">        Args:</span>
@@ -166,7 +163,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the right multiply by factor operator for particles types</span>
 
 <span class="sd">        Args:</span>
@@ -189,7 +186,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the abs operator for particles types</span>
 
 <span class="sd">        Returns:</span>
@@ -200,7 +197,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">((</span><span class="n">abspos</span><span class="p">,</span> <span class="n">absvel</span><span class="p">))</span>
 
 <div class="viewcode-block" id="particles.send"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for sending data forward in time (blocking)</span>
 
 <span class="sd">        Args:</span>
@@ -216,7 +213,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="particles.isend"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.isend">[docs]</a>    <span class="k">def</span> <span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for sending data forward in time (non-blocking)</span>
 
 <span class="sd">        Args:</span>
@@ -230,7 +227,7 @@
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="particles.recv"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for receiving in time</span>
 
 <span class="sd">        Args:</span>
@@ -254,7 +251,7 @@
 
 
 <div class="viewcode-block" id="fields"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.fields">[docs]</a><span class="k">class</span> <span class="nc">fields</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Field data type for 3 dimensions</span>
 
 <span class="sd">    This data type can be used for electric and magnetic fields in 3 dimensions</span>
@@ -271,7 +268,7 @@
         <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -304,7 +301,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the addition operator for fields types</span>
 
 <span class="sd">        Args:</span>
@@ -325,7 +322,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the subtraction operator for fields types</span>
 
 <span class="sd">        Args:</span>
@@ -346,7 +343,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">&quot;Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the multiply with factor from right operator for fields types</span>
 
 <span class="sd">        Args:</span>
@@ -403,7 +400,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

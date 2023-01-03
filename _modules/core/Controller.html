@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -70,12 +67,12 @@
 
 
 <div class="viewcode-block" id="controller"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller">[docs]</a><span class="k">class</span> <span class="nc">controller</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base abstract controller class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for the base controller</span>
 
 <span class="sd">        Args:</span>
@@ -100,7 +97,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__setup_custom_logger</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to set main parameters for the logging facility</span>
 
 <span class="sd">        Args:</span>
@@ -167,7 +164,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="controller.dump_setup"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.dump_setup">[docs]</a>    <span class="k">def</span> <span class="nf">dump_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to dump the setup used for this controller</span>
 
 <span class="sd">        Args:</span>
@@ -248,7 +245,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="controller.run"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to the run() method</span>
 
 <span class="sd">        Args:</span>
@@ -260,7 +257,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for the hooks</span>
 
 <span class="sd">        Returns:</span>
@@ -269,7 +266,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span>
 
 <div class="viewcode-block" id="controller.setup_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.setup_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">setup_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup variables needed for convergence controllers, notably a list containing all of them and a list containing</span>
 <span class="sd">        their order. Also, we add the `CheckConvergence` convergence controller, which takes care of maximum iteration</span>
 <span class="sd">        count or a residual based stopping criterion, as well as all convergence controllers added to the description.</span>
@@ -292,7 +289,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="controller.add_convergence_controller"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.add_convergence_controller">[docs]</a>    <span class="k">def</span> <span class="nf">add_convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_double</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Add an individual convergence controller to the list of convergence controllers and instantiate it.</span>
 <span class="sd">        Afterwards, the order of the convergence controllers is updated.</span>
 
@@ -319,7 +316,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="controller.print_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.print_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">print_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    | order | convergence controller&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -365,7 +362,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

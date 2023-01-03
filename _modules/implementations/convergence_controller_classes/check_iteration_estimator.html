@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -47,7 +44,7 @@
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI">[docs]</a><span class="k">class</span> <span class="nc">CheckIterationEstimatorNonMPI</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initalization routine</span>
 
 <span class="sd">        Args:</span>
@@ -60,7 +57,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">&quot;diff_old_loc&quot;</span><span class="p">,</span> <span class="s2">&quot;diff_first_loc&quot;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
 <span class="sd">        In this case, we need the user to supply a tolerance.</span>
 
@@ -82,7 +79,7 @@
         <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup parameters. Here we only give a default value for the control order.</span>
 
 <span class="sd">        Args:</span>
@@ -96,7 +93,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Need to store the solution of previous iterations.</span>
 
 <span class="sd">        Args:</span>
@@ -110,7 +107,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI.reset_buffers_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset buffers used to immitate communication in non MPI version.</span>
 
 <span class="sd">        Args:</span>
@@ -124,7 +121,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">Ltilde_loc</span> <span class="o">=</span> <span class="mf">0.0</span></div>
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup storage variables for the differences between sweeps for all steps.</span>
 
 <span class="sd">        Args:</span>
@@ -138,7 +135,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI.check_iteration_status"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.check_iteration_status">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            S (pySDC.step): The current step</span>
@@ -168,7 +165,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;LOCAL: </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="si">:</span><span class="s1">8.4f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">Kest_loc</span><span class="p">))</span><span class="si">}</span><span class="s1">, &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">Ltilde_loc</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">Kest_loc</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">, </span><span class="se">\</span>
-<span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">Ltilde_loc</span> <span class="o">**</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">*</span> <span class="n">alpha</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">Ltilde_loc</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">alpha</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="p">)</span>
 
             <span class="c1"># set global Kest as last local one, force stop if done</span>
@@ -214,7 +211,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

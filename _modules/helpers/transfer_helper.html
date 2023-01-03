@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -47,7 +44,7 @@
 
 
 <div class="viewcode-block" id="next_neighbors_periodic"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.transfer_helper.next_neighbors_periodic">[docs]</a><span class="k">def</span> <span class="nf">next_neighbors_periodic</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to find the next neighbors for a periodic setup</span>
 
 <span class="sd">    This function gives for a value p the k points next to it which are found in</span>
@@ -78,7 +75,7 @@
 
 
 <div class="viewcode-block" id="next_neighbors"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.transfer_helper.next_neighbors">[docs]</a><span class="k">def</span> <span class="nf">next_neighbors</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to find the next neighbors for a non-periodic setup</span>
 
 <span class="sd">    This function gives for a value p the k points next to it which are found in</span>
@@ -104,7 +101,7 @@
 
 
 <div class="viewcode-block" id="continue_periodic_array"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.transfer_helper.continue_periodic_array">[docs]</a><span class="k">def</span> <span class="nf">continue_periodic_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">nn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to append an array for nn neighbors for periodicity</span>
 
 <span class="sd">    Args:</span>
@@ -131,7 +128,7 @@
 
 
 <div class="viewcode-block" id="restriction_matrix_1d"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.transfer_helper.restriction_matrix_1d">[docs]</a><span class="k">def</span> <span class="nf">restriction_matrix_1d</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to contruct the restriction matrix in 1d using barycentric interpolation</span>
 
 <span class="sd">    Args:</span>
@@ -179,7 +176,7 @@
 
 
 <div class="viewcode-block" id="interpolation_matrix_1d"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.transfer_helper.interpolation_matrix_1d">[docs]</a><span class="k">def</span> <span class="nf">interpolation_matrix_1d</span><span class="p">(</span><span class="n">fine_grid</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">equidist_nested</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to contruct the restriction matrix in 1d using barycentric interpolation</span>
 
 <span class="sd">    Args:</span>
@@ -299,7 +296,7 @@
 
 
 <div class="viewcode-block" id="border_padding"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.transfer_helper.border_padding">[docs]</a><span class="k">def</span> <span class="nf">border_padding</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">pad_type</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to pad/embed an array at the boundaries</span>
 
 <span class="sd">    Args:</span>
@@ -360,7 +357,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

@@ -11,9 +11,6 @@
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     
@@ -52,7 +49,7 @@
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple tets program to retrieve user-defined statistics from a run</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -82,7 +79,7 @@
 
 
 <span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to run IMEX SDC for a single time step of the penning trap example</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
@@ -148,7 +145,7 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-12-23 17:12:19,707 - controller - Controller - welcome_message - 125 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2023-01-03 09:27:01,673 - controller - Controller - welcome_message - 125 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
                                  _____ _____   _____ 
                                 / ____|  __ \ / ____|
                     _ __  _   _| (___ | |  | | |     
@@ -158,8 +155,8 @@
                    | |     __/ |                     
                    |_|    |___/                      
                                                      
-2022-12-23 17:12:19,707 - controller - Controller - dump_setup - 139 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2022-12-23 17:12:19,707 - controller - Controller - dump_setup - 202 - INFO: ----------------------------------------------------------------------------------------------------
+2023-01-03 09:27:01,674 - controller - Controller - dump_setup - 139 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2023-01-03 09:27:01,674 - controller - Controller - dump_setup - 202 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     mssdc_jac = True
@@ -198,20 +195,20 @@ Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
                     QE = EE
 --&gt;                 Collocation: &lt;class &#39;pySDC.core.Collocation.CollBase&#39;&gt;
 
-2022-12-23 17:12:19,707 - controller - Controller - dump_setup - 204 - INFO: ----------------------------------------------------------------------------------------------------
-2022-12-23 17:12:19,707 - controller - Controller - dump_setup - 206 - INFO: Setup overview (--&gt; user-defined) -- END
+2023-01-03 09:27:01,674 - controller - Controller - dump_setup - 204 - INFO: ----------------------------------------------------------------------------------------------------
+2023-01-03 09:27:01,674 - controller - Controller - dump_setup - 206 - INFO: Setup overview (--&gt; user-defined) -- END
 
-2022-12-23 17:12:20,897 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2022-12-23 17:12:20,906 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2022-12-23 17:12:20,915 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2022-12-23 17:12:20,924 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2022-12-23 17:12:20,933 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2022-12-23 17:12:20,942 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2022-12-23 17:12:20,951 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2022-12-23 17:12:20,960 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
-2022-12-23 17:12:20,969 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2022-12-23 17:12:20,977 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
-2022-12-23 17:12:20,986 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2023-01-03 09:27:03,133 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2023-01-03 09:27:03,144 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2023-01-03 09:27:03,155 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2023-01-03 09:27:03,165 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2023-01-03 09:27:03,176 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2023-01-03 09:27:03,187 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2023-01-03 09:27:03,197 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2023-01-03 09:27:03,208 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
+2023-01-03 09:27:03,219 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
+2023-01-03 09:27:03,229 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
+2023-01-03 09:27:03,240 - hooks - Hooks - post_sweep - 249 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>
@@ -260,7 +257,7 @@ Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

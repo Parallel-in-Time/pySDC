@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -45,7 +42,7 @@
 
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseBase"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Take the step size from the last step in the block and spread it to all steps in the next block such that every step</span>
 <span class="sd">    in a block always has the same step size.</span>
 <span class="sd">    By block we refer to a composite collocation problem, which is solved in pipelined SDC parallel-in-time.</span>
@@ -55,7 +52,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here</span>
 
 <span class="sd">        Args:</span>
@@ -74,12 +71,12 @@
 
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseNonMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwiseBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Non-MPI version</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based</span>
 <span class="sd">        on Tend</span>
 
@@ -122,7 +119,7 @@
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwiseBase</span><span class="p">):</span>
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based</span>
 <span class="sd">        on Tend</span>
 
@@ -208,7 +205,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

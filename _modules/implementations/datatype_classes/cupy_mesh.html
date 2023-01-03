@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -50,12 +47,12 @@
 
 
 <div class="viewcode-block" id="cupy_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh">[docs]</a><span class="k">class</span> <span class="nc">cupy_mesh</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    CuPy-based datatype for serial or parallel meshes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.</span>
 
 <span class="sd">        Args:</span>
@@ -84,13 +81,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for the communicator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm</span>
 
     <span class="k">def</span> <span class="nf">__array_finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finalizing the datatype. Without this, new datatypes do not &#39;inherit&#39; the communicator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -98,7 +95,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_comm</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;_comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__array_ufunc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
@@ -115,7 +112,7 @@
         <span class="k">return</span> <span class="n">results</span>
 
     <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Overloading the abs operator</span>
 
 <span class="sd">        Returns:</span>
@@ -136,7 +133,7 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">global_absval</span><span class="p">)</span>
 
 <div class="viewcode-block" id="cupy_mesh.isend"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">[docs]</a>    <span class="k">def</span> <span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for sending data forward in time (non-blocking)</span>
 
 <span class="sd">        Args:</span>
@@ -150,7 +147,7 @@
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Issend</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="cupy_mesh.irecv"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv">[docs]</a>    <span class="k">def</span> <span class="nf">irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for receiving in time</span>
 
 <span class="sd">        Args:</span>
@@ -164,7 +161,7 @@
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="cupy_mesh.bcast"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast">[docs]</a>    <span class="k">def</span> <span class="nf">bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for broadcasting values</span>
 
 <span class="sd">        Args:</span>
@@ -179,7 +176,7 @@
 
 
 <div class="viewcode-block" id="imex_cupy_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh">[docs]</a><span class="k">class</span> <span class="nc">imex_cupy_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RHS data type for cupy_meshes with implicit and explicit components</span>
 
 <span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
@@ -190,7 +187,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -217,7 +214,7 @@
 
 
 <div class="viewcode-block" id="comp2_cupy_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh">[docs]</a><span class="k">class</span> <span class="nc">comp2_cupy_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RHS data type for cupy_meshes with 2 components</span>
 
 <span class="sd">    Attributes:</span>
@@ -226,7 +223,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -287,7 +284,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

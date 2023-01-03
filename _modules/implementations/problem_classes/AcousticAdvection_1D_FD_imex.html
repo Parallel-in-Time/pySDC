@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -54,7 +51,7 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="acoustic_1d_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex">[docs]</a><span class="k">class</span> <span class="nc">acoustic_1d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the one-dimensional IMEX acoustic-advection</span>
 
 <span class="sd">    Attributes:</span>
@@ -67,7 +64,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
 <span class="sd">        Args:</span>
@@ -96,7 +93,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cs</span> <span class="o">*</span> <span class="n">A</span>
 
 <div class="viewcode-block" id="acoustic_1d_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for (I-dtA)u = rhs</span>
 
 <span class="sd">        Args:</span>
@@ -121,7 +118,7 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
     <span class="k">def</span> <span class="nf">__eval_fexpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper routine to evaluate the explicit part of the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -141,7 +138,7 @@
         <span class="k">return</span> <span class="n">fexpl</span>
 
     <span class="k">def</span> <span class="nf">__eval_fimpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper routine to evaluate the implicit part of the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -161,7 +158,7 @@
         <span class="k">return</span> <span class="n">fimpl</span>
 
 <div class="viewcode-block" id="acoustic_1d_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate both parts of the RHS</span>
 
 <span class="sd">        Args:</span>
@@ -178,7 +175,7 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="acoustic_1d_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
 <span class="sd">        Args:</span>
@@ -237,7 +234,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

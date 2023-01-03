@@ -11,9 +11,6 @@
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     
@@ -67,16 +64,16 @@ New ideas like e.g. sweepers or predictors can be tested and first toy problems 
 While using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pySDC</span></code> will give you a core version of <cite>pySDC</cite> to work with, working with the developer version
 is most often the better choice. We thus recommend to checkout the code from GitHub and install the dependencies e.g. by using a <a class="reference external" href="https://conda.io/en/latest/">conda</a> environment.
 For this, <cite>pySDC</cite> ships with environment files which can be found in the folder <code class="docutils literal notranslate"><span class="pre">etc/</span></code>. Use these as e.g.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda env create --yes -f etc/environment-base.yml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--yes<span class="w"> </span>-f<span class="w"> </span>etc/environment-base.yml
 </pre></div>
 </div>
 <p>To check your installation, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest pySDC/tests -m NAME
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>pySDC/tests<span class="w"> </span>-m<span class="w"> </span>NAME
 </pre></div>
 </div>
 <p>where <code class="docutils literal notranslate"><span class="pre">NAME</span></code> corresponds to the environment you chose (<code class="docutils literal notranslate"><span class="pre">base</span></code> in the example above).
 You may need to update your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> by running</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:/path/to/pySDC/root/folder
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:/path/to/pySDC/root/folder
 </pre></div>
 </div>
 <p>in particular if you want to run any of the playgrounds, projects or tutorials.
@@ -378,7 +375,7 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>
