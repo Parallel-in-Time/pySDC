@@ -93,6 +93,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_to_done</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;all_to_done and use_iteration_estimator set, will ignore all_to_done&#39;</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span> <span class="o">=</span> <span class="p">[</span><span class="n">CheckConvergence</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_convergence_controllers</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
@@ -174,7 +175,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">welcome_message</span><span class="p">()</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined) -- BEGIN&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;----------------------------------------------------------------------------------------------------</span><span class="se">\n\n</span><span class="s1">&#39;</span>
         <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;Controller: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
@@ -238,10 +239,15 @@
                         <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;--&gt;         </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;            </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_convergence_controllers_as_table</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;----------------------------------------------------------------------------------------------------&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined) -- END</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined, -&gt; dependency) -- END</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="controller.run"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
@@ -280,7 +286,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">conv_classes</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">conv_classes</span><span class="p">[</span><span class="n">CheckConvergence</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># don&#39;t need special params for this, hence the {}</span>
 
         <span class="c1"># instantiate the convergence controllers</span>
         <span class="k">for</span> <span class="n">conv_class</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">conv_classes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -315,15 +320,33 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="controller.print_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.print_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">print_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.get_convergence_controllers_as_table"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.get_convergence_controllers_as_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_convergence_controllers_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            description (dict): Description of the problem</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Table of convergence controllers as a string</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    | order | convergence controller&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;----+-------+-------------------------------------------------------------------&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Active convergence controllers:&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">    |  # | order | convergence controller&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">----+----+-------+---------------------------------------------------------------------------------------&#39;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">)):</span>
             <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s1">3</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span><span class="si">:</span><span class="s1">5</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+            <span class="c1"># figure out how the convergence controller was added</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>  <span class="c1"># added by user</span>
+                <span class="n">user_added</span> <span class="o">=</span> <span class="s1">&#39;--&gt; &#39;</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span><span class="p">:</span>  <span class="c1"># added by default</span>
+                <span class="n">user_added</span> <span class="o">=</span> <span class="s1">&#39;    &#39;</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># added as dependency</span>
+                <span class="n">user_added</span> <span class="o">=</span> <span class="s1">&#39; -&gt; &#39;</span>
+
+            <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">user_added</span><span class="si">}</span><span class="s1">|</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s1">3</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span><span class="si">:</span><span class="s1">5</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

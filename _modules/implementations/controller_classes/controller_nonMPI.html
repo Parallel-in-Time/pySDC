@@ -83,6 +83,10 @@
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_procs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepclass</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">description</span><span class="p">))</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span> <span class="o">+=</span> <span class="p">[</span><span class="n">BasicRestarting</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="s2">&quot;nonMPI&quot;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">convergence_controller</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_convergence_controllers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dump_setup</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dump_setup</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
@@ -113,8 +117,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s1">&#39;you have specified a predictor type but only a single level.. &#39;</span> <span class="s1">&#39;predictor will be ignored&#39;</span>
             <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="s2">&quot;nonMPI&quot;</span><span class="p">),</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
             <span class="n">C</span><span class="o">.</span><span class="n">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>

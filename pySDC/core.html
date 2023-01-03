@@ -379,6 +379,23 @@ Afterwards, the order of the convergence controllers is updated.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Controller.controller.get_convergence_controllers_as_table">
+<span class="sig-name descname"><span class="pre">get_convergence_controllers_as_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.get_convergence_controllers_as_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.get_convergence_controllers_as_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is for debugging purposes to keep track of the different convergence controllers and their order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>description</strong> (<em>dict</em>) – Description of the problem</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Table of convergence controllers as a string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Controller.controller.hooks">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hooks</span></span><a class="headerlink" href="#core.Controller.controller.hooks" title="Permalink to this definition">¶</a></dt>
@@ -391,12 +408,6 @@ Afterwards, the order of the convergence controllers is updated.</p>
 <dd class="field-even"><p>pySDC.Hooks.hooks</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.Controller.controller.print_convergence_controllers">
-<span class="sig-name descname"><span class="pre">print_convergence_controllers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.print_convergence_controllers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.print_convergence_controllers" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function is for debugging purposes to keep track of the different convergence controllers and their order.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2245,8 +2256,8 @@ and evaluates the RHS of the ODE there</p>
 <li><a class="reference internal" href="#core.Controller.controller"><code class="docutils literal notranslate"><span class="pre">controller</span></code></a><ul>
 <li><a class="reference internal" href="#core.Controller.controller.add_convergence_controller"><code class="docutils literal notranslate"><span class="pre">controller.add_convergence_controller()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.dump_setup"><code class="docutils literal notranslate"><span class="pre">controller.dump_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.get_convergence_controllers_as_table"><code class="docutils literal notranslate"><span class="pre">controller.get_convergence_controllers_as_table()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.hooks"><code class="docutils literal notranslate"><span class="pre">controller.hooks</span></code></a></li>
-<li><a class="reference internal" href="#core.Controller.controller.print_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">controller.print_convergence_controllers()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.run"><code class="docutils literal notranslate"><span class="pre">controller.run()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.setup_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">controller.setup_convergence_controllers()</span></code></a></li>
 <li><a class="reference internal" href="#core.Controller.controller.welcome_message"><code class="docutils literal notranslate"><span class="pre">controller.welcome_message()</span></code></a></li>
