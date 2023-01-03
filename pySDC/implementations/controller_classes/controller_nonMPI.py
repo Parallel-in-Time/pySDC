@@ -44,6 +44,10 @@ class controller_nonMPI(controller):
             for _ in range(num_procs - 1):
                 self.MS.append(stepclass.step(description))
 
+        self.base_convergence_controllers += [BasicRestarting.get_implementation("nonMPI")]
+        for convergence_controller in self.base_convergence_controllers:
+            self.add_convergence_controller(convergence_controller, description)
+
         if self.params.dump_setup:
             self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
 
@@ -74,8 +78,6 @@ class controller_nonMPI(controller):
             self.logger.warning(
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
-
-        self.add_convergence_controller(BasicRestarting.get_implementation("nonMPI"), description)
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
