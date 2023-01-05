@@ -34,50 +34,50 @@ stages:
 #    - mv data data_${PYTHON}
 
 
-test_kit_bare:
-  stage: test
-  rules:
-    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-GPU\].*/
-  tags:
-    - kit
-  parallel:
-    matrix:
-      - PYTHON: [ '3.7', '3.9', '3.10' ]
-  artifacts:
-    name: "gpu_$PYTHON"
-    paths:
-      - coverage_cupy_3.10.dat
-      - data_3.10
-  before_script:
-    - module load devel/cuda
-    - curl micro.mamba.pm/install.sh | bash
-    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
-    - micromamba activate pySDC
-  script:
-    - srun -p dev_accelerated -t 00:20:00 -N1 --gres gpu:1 coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
-    - coverage combine
-    - mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
-    - mv data data_${PYTHON}
-    - chmod +rwx data_${PYTHON}
-    - cat coverage_cupy_${PYTHON}.dat
-
-#benchmark:
-#  image: mambaorg/micromamba
-#  stage: benchmark
+#test_kit_bare:
+#  stage: test
 #  rules:
-#    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+#    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-GPU\].*/
+#  tags:
+#    - kit
+#  parallel:
+#    matrix:
+#      - PYTHON: [ '3.7', '3.9', '3.10' ]
 #  artifacts:
+#    name: "gpu_$PYTHON"
 #    paths:
-#      - benchmarks
+#      - coverage_cupy_3.10.dat
+#      - data_3.10
 #  before_script:
-#    - micromamba create --yes -f etc/environment-base.yml
-#    - eval "$(micromamba shell hook --shell=bash)"
+#    - module load devel/cuda
+#    - curl micro.mamba.pm/install.sh | bash
+#    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
 #    - micromamba activate pySDC
-#    - micromamba install -c conda-forge git
-#    - git config --global --add safe.directory '*'
 #  script:
-#    - mkdir -p benchmarks
-#    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
+#    - srun -p dev_accelerated -t 00:20:00 -N1 --gres gpu:1 coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
+#    - coverage combine
+#    - mv .coverage coverage_${{ matrix.env }}_${{ matrix.python }}.dat
+#    - mv data data_${PYTHON}
+#    - chmod +rwx data_${PYTHON}
+#    - cat coverage_cupy_${PYTHON}.dat
+
+benchmark:
+  image: mambaorg/micromamba
+  stage: benchmark
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  artifacts:
+    paths:
+      - benchmarks
+  before_script:
+    - micromamba create --yes -f etc/environment-base.yml
+    - eval "$(micromamba shell hook --shell=bash)"
+    - micromamba activate pySDC
+    - micromamba install -c conda-forge git
+    - git config --global --add safe.directory '*'
+  script:
+    - mkdir -p benchmarks
+    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
 #benchmark_kit:
 #  image: rcaspart/micromamba
@@ -104,21 +104,21 @@ test_kit_bare:
 #    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
 
-bundle:
-  image: mambaorg/micromamba
-  stage: upload
-  artifacts:
-    paths:
-      - data
-      - coverage.xml
-      - benchmarks
-      - htmlcov
-  before_script:
-    - micromamba create --yes -f etc/environment-base.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-  script:
-    - cp data_3.10/* data/.
-    - python -m coverage combine coverage_*_3.10.dat
-    - python -m coverage xml
-    - python -m coverage html
+#bundle:
+#  image: mambaorg/micromamba
+#  stage: upload
+#  artifacts:
+#    paths:
+#      - data
+#      - coverage.xml
+#      - benchmarks
+#      - htmlcov
+#  before_script:
+#    - micromamba create --yes -f etc/environment-base.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#  script:
+#    - cp data_3.10/* data/.
+#    - python -m coverage combine coverage_*_3.10.dat
+#    - python -m coverage xml
+#    - python -m coverage html
