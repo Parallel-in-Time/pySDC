@@ -2,30 +2,30 @@ import numpy as np
 from scipy.special import factorial
 
 
-def get_steps(derivative, order, type):
+def get_steps(derivative, order, stencil_type):
     """
     Get the offsets for the FD stencil.
 
     Args:
         derivative (int): Order of the derivative
         order (int): Order of accuracy
-        type (str): Type of the stencil
-        steps (list): Provide specific steps, overrides `type`
+        stencil_type (str): Type of the stencil
+        steps (list): Provide specific steps, overrides `stencil_type`
 
     Returns:
         int: The number of elements in the stencil
         numpy.ndarray: The offsets for the stencil
     """
-    if type == 'center':
+    if stencil_type == 'center':
         n = order + derivative - (derivative + 1) % 2 // 1
         steps = np.arange(n) - n // 2
-    elif type == 'forward':
+    elif stencil_type == 'forward':
         n = order + derivative
         steps = np.arange(n)
-    elif type == 'backward':
+    elif stencil_type == 'backward':
         n = order + derivative
         steps = -np.arange(n)
-    elif type == 'upwind':
+    elif stencil_type == 'upwind':
         n = order + derivative
 
         if n <= 3:
@@ -34,21 +34,20 @@ def get_steps(derivative, order, type):
             steps = np.append(-np.arange(n - 1)[::-1], [1])
     else:
         raise ValueError(
-            f'Stencil must be of type "center", "forward", "backward" or "upwind", not {type}. If you want something\
-, you can also give specific steps.'
+            f'Stencil must be of type "center", "forward", "backward" or "upwind", not {stencil_type}. If you want something else you can also give specific steps.'
         )
     return n, steps
 
 
-def get_finite_difference_stencil(derivative, order, type=None, steps=None):
+def get_finite_difference_stencil(derivative, order, stencil_type=None, steps=None):
     """
     Derive general finite difference stencils from Taylor expansions
 
     Args:
         derivative (int): Order of the derivative
         order (int): Order of accuracy
-        type (str): Type of the stencil
-        steps (list): Provide specific steps, overrides `type`
+        stencil_type (str): Type of the stencil
+        steps (list): Provide specific steps, overrides `stencil_type`
 
     Returns:
         numpy.ndarray: The weights of the stencil
@@ -58,7 +57,7 @@ def get_finite_difference_stencil(derivative, order, type=None, steps=None):
     if steps is not None:
         n = len(steps)
     else:
-        n, steps = get_steps(derivative, order, type)
+        n, steps = get_steps(derivative, order, stencil_type)
 
     # make a matrix that contains the Taylor coefficients
     A = np.zeros((n, n))
@@ -78,7 +77,7 @@ def get_finite_difference_stencil(derivative, order, type=None, steps=None):
 
 
 def get_finite_difference_matrix(
-    derivative, order, type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False
+    derivative, order, stencil_type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False
 ):
     """
     Build FD matrix from stencils, with boundary conditions
@@ -92,7 +91,9 @@ def get_finite_difference_matrix(
         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
 
     # get stencil
-    coeff, steps = get_finite_difference_stencil(derivative=derivative, order=order, type=type, steps=steps)
+    coeff, steps = get_finite_difference_stencil(
+        derivative=derivative, order=order, stencil_type=stencil_type, steps=steps
+    )
 
     if bc == 'dirichlet-zero':
         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')

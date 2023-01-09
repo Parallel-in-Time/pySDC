@@ -25,18 +25,17 @@ class ptype(object):
         dtype_f: RHS data type
     """
 
-    def __init__(self, init, dtype_u, dtype_f, params):
+    def __init__(self, init, dtype_u, dtype_f, **kwargs):
         """
-        Initialization routine
+        Initialization routine.
+        Add the problem parameters as keyword arguments.
 
         Args:
             init: number of degrees-of-freedom (whatever this may represent)
             dtype_u: variable data type
             dtype_f: RHS data type
-            params (dict): set or parameters
         """
-
-        self.params = _Pars(params)
+        self.params = _Pars(kwargs)
 
         # set up logger
         self.logger = logging.getLogger('problem')
