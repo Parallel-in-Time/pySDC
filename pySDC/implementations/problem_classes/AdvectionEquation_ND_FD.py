@@ -92,47 +92,49 @@ class advectionNd(ptype):
             init=(nvars, None, np.dtype('float64')),
             dtype_u=mesh,
             dtype_f=mesh,
-            nvars=nvars,
-            c=c,
-            freq=freq,
-            stencil_type=stencil_type,
-            order=order,
-            lintol=lintol,
-            liniter=liniter,
-            direct_solver=direct_solver,
-            bc=bc,
-            ndim=ndim,
         )
 
-        if self.params.ndim == 1:
-            if type(self.params.nvars) is not tuple:
-                self.params.nvars = (self.params.nvars,)
-            if type(self.params.freq) is not tuple:
-                self.params.freq = (self.params.freq,)
+        # store parameters
+        self.nvars = nvars
+        self.c = c
+        self.freq = freq
+        self.stencil_type = stencil_type
+        self.order = order
+        self.lintol = lintol
+        self.liniter = liniter
+        self.direct_solver = direct_solver
+        self.bc = bc
+        self.ndim = ndim
+
+        if self.ndim == 1:
+            if type(self.nvars) is not tuple:
+                self.nvars = (self.nvars,)
+            if type(self.freq) is not tuple:
+                self.freq = (self.freq,)
 
         # compute dx (equal in both dimensions) and get discretization matrix A
-        if self.params.bc == 'periodic':
-            self.dx = 1.0 / self.params.nvars[0]
-            xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
-        elif self.params.bc == 'dirichlet-zero':
-            self.dx = 1.0 / (self.params.nvars[0] + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars[0])])
+        if self.bc == 'periodic':
+            self.dx = 1.0 / self.nvars[0]
+            xvalues = np.array([i * self.dx for i in range(self.nvars[0])])
+        elif self.bc == 'dirichlet-zero':
+            self.dx = 1.0 / (self.nvars[0] + 1)
+            xvalues = np.array([(i + 1) * self.dx for i in range(self.nvars[0])])
         else:
-            raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
+            raise ProblemError(f'Boundary conditions {self.bc} not implemented.')
 
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=1,
-            order=self.params.order,
-            stencil_type=self.params.stencil_type,
+            order=self.order,
+            stencil_type=self.stencil_type,
             dx=self.dx,
-            size=self.params.nvars[0],
-            dim=self.params.ndim,
-            bc=self.params.bc,
+            size=self.nvars[0],
+            dim=self.ndim,
+            bc=self.bc,
         )
-        self.A *= -self.params.c
+        self.A *= -self.c
 
-        self.xv = np.meshgrid(*[xvalues for _ in range(self.params.ndim)])
-        self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
+        self.xv = np.meshgrid(*[xvalues for _ in range(self.ndim)])
+        self.Id = sp.eye(np.prod(self.nvars), format='csc')
 
     def eval_f(self, u, t):
         """
@@ -147,7 +149,7 @@ class advectionNd(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -166,17 +168,17 @@ class advectionNd(ptype):
 
         me = self.dtype_u(self.init)
 
-        if self.params.direct_solver:
-            me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
+        if self.direct_solver:
+            me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.nvars)
         else:
             me[:] = gmres(
                 self.Id - factor * self.A,
                 rhs.flatten(),
                 x0=u0.flatten(),
-                tol=self.params.lintol,
-                maxiter=self.params.liniter,
+                tol=self.lintol,
+                maxiter=self.liniter,
                 atol=0,
-            )[0].reshape(self.params.nvars)
+            )[0].reshape(self.nvars)
         return me
 
     def u_exact(self, t, **kwargs):
@@ -191,20 +193,20 @@ class advectionNd(ptype):
         """
 
         me = self.dtype_u(self.init)
-        if self.params.ndim == 1:
-            if self.params.freq[0] >= 0:
-                me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
-            elif self.params.freq[0] == -1:
-                me[:] = np.exp(-0.5 * (((self.xv[0] - (self.params.c * t)) % 1.0 - 0.5) / self.params.sigma) ** 2)
+        if self.ndim == 1:
+            if self.freq[0] >= 0:
+                me[:] = np.sin(np.pi * self.freq[0] * (self.xv[0] - self.c * t))
+            elif self.freq[0] == -1:
+                me[:] = np.exp(-0.5 * (((self.xv[0] - (self.c * t)) % 1.0 - 0.5) / self.sigma) ** 2)
 
-        elif self.params.ndim == 2:
-            me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * np.sin(
-                np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t)
+        elif self.ndim == 2:
+            me[:] = np.sin(np.pi * self.freq[0] * (self.xv[0] - self.c * t)) * np.sin(
+                np.pi * self.freq[1] * (self.xv[1] - self.c * t)
             )
-        elif self.params.ndim == 3:
+        elif self.ndim == 3:
             me[:] = (
-                np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
-                * np.sin(np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t))
-                * np.sin(np.pi * self.params.freq[2] * (self.xv[2] - self.params.c * t))
+                np.sin(np.pi * self.freq[0] * (self.xv[0] - self.c * t))
+                * np.sin(np.pi * self.freq[1] * (self.xv[1] - self.c * t))
+                * np.sin(np.pi * self.freq[2] * (self.xv[2] - self.c * t))
             )
         return me

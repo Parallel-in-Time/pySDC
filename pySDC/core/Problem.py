@@ -1,17 +1,5 @@
 import logging
 
-from pySDC.helpers.pysdc_helper import FrozenClass
-
-
-# short helper class to add params as attributes
-class _Pars(FrozenClass):
-    def __init__(self, pars):
-
-        for k, v in pars.items():
-            setattr(self, k, v)
-
-        self._freeze()
-
 
 class ptype(object):
     """
@@ -25,18 +13,15 @@ class ptype(object):
         dtype_f: RHS data type
     """
 
-    def __init__(self, init, dtype_u, dtype_f, **kwargs):
+    def __init__(self, init, dtype_u, dtype_f):
         """
         Initialization routine.
-        Add the problem parameters as keyword arguments.
 
         Args:
             init: number of degrees-of-freedom (whatever this may represent)
             dtype_u: variable data type
             dtype_f: RHS data type
         """
-        self.params = _Pars(kwargs)
-
         # set up logger
         self.logger = logging.getLogger('problem')
 
