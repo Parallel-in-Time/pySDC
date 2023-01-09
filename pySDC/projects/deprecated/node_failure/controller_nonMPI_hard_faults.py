@@ -1,4 +1,5 @@
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
 from pySDC.projects.node_failure.emulate_hard_faults import hard_fault_injection
 
@@ -152,7 +153,7 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
 
             self.hooks.post_iteration(step=S, level_number=0)
 
-            S.status.done = self.check_convergence(S)
+            S.status.done = CheckConvergence.check_convergence(S)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
             if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):

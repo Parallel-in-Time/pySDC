@@ -33,6 +33,7 @@ class _Status(FrozenClass):
         self.pred_cnt = None
         self.done = None
         self.force_done = None
+        self.force_continue = False
         self.prev_done = None
         self.time_size = None
         self.diff_old_loc = None

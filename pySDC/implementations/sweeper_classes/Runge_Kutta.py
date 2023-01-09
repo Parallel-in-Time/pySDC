@@ -123,16 +123,23 @@ class RungeKutta(generic_implicit):
     """
     Runge-Kutta scheme that fits the interface of a sweeper.
     Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
-    at the nodes are succesively computed from earlier nodes. However, we only perform a single iteration of this.
+    at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.
 
     We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = <Butcher tableau>, but in this
     implementation, that would lead to a lot of wasted FLOPS from integrating with Q and then with Q_Delta and
     subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.
 
-    This class only supports lower triangular Butcher tableaus such that the system can be solved with forward
-    subsitution. In this way, we don't get the maximum order that we could for the number of stages, but computing the
-    stages is much cheaper. In particular, if the Butcher tableaus is strictly lower trianglar, we get an explicit
+    This class only supports lower triangular Butcher tableaux such that the system can be solved with forward
+    substitution. In this way, we don't get the maximum order that we could for the number of stages, but computing the
+    stages is much cheaper. In particular, if the Butcher tableaux is strictly lower triangular, we get an explicit
     method, which does not require us to solve a system of equations to compute the stages.
+
+    Please be aware that all fundamental parameters of the Sweeper are ignored. These include
+     - num_nodes
+     - collocation_class
+     - initial_guess
+     - QI
+    All of these variables are either determined by the RK rule, or are not part of an RK scheme.
 
     Attribues:
         butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want
@@ -155,20 +162,19 @@ class RungeKutta(generic_implicit):
                 self.logger.error(msg)
                 raise ParameterError(msg)
 
+        # check if some parameters are set which only apply to actual sweepers
+        for key in ['initial_guess', 'collocation_class', 'num_nodes']:
+            if key in params:
+                self.logger.warning(f'"{key}" will be ignored by Runge-Kutta sweeper')
+
+        # set parameters to their actual values
+        params['initial_guess'] = 'zero'
+        params['collocation_class'] = type(params['butcher_tableau'])
+        params['num_nodes'] = params['butcher_tableau'].num_nodes
+
         self.params = _Pars(params)
 
-        if 'collocation_class' in params or 'num_nodes' in params:
-            self.logger.warning(
-                'You supplied parameters to setup a collocation problem to the Runge-Kutta sweeper. \
-Please be aware that they are ignored since the quadrature matrix is entirely determined by the Butcher tableau.'
-            )
         self.coll = params['butcher_tableau']
-
-        if not self.coll.right_is_node and not self.params.do_coll_update:
-            self.logger.warning(
-                'we need to do a collocation update here, since the right end point is not a node. ' 'Changing this!'
-            )
-            self.params.do_coll_update = True
 
         # This will be set as soon as the sweeper is instantiated at the level
         self.__level = None

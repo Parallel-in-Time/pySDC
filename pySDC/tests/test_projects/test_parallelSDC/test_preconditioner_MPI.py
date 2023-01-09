@@ -9,6 +9,7 @@ def test_preconditioner_playground_MPI_5():
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     cwd = '.'
     num_procs = 5
     cmd = (
@@ -29,6 +30,7 @@ def test_preconditioner_playground_MPI_3():
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
+    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
     cwd = '.'
     num_procs = 3
     cmd = (

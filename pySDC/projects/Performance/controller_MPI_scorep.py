@@ -4,6 +4,7 @@ from mpi4py import MPI
 from pySDC.core.Controller import controller
 from pySDC.core.Errors import ControllerError
 from pySDC.core.Step import step
+from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
 import scorep.user as spu
 
@@ -372,7 +373,7 @@ class controller_MPI(controller):
             self.hooks.post_comm(step=self.S, level_number=0)
 
             self.S.levels[0].sweep.compute_residual()
-            self.S.status.done = self.check_convergence(self.S)
+            self.S.status.done = CheckConvergence.check_convergence(self.S)
 
             if self.params.all_to_done:
 
