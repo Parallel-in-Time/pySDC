@@ -91,7 +91,9 @@ def get_finite_difference_matrix(
         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
 
     # get stencil
-    coeff, steps = get_finite_difference_stencil(derivative=derivative, order=order, stencil_type=stencil_type, steps=steps)
+    coeff, steps = get_finite_difference_stencil(
+        derivative=derivative, order=order, stencil_type=stencil_type, steps=steps
+    )
 
     if bc == 'dirichlet-zero':
         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')

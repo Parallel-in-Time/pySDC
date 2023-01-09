@@ -19,7 +19,19 @@ class advectionNd(ptype):
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
 
-    def __init__(self, nvars=512, c=1.0, freq=2, stencil_type='center', order=2, lintol=1e-12, liniter=10000, direct_solver=True, bc='periodic', ndim=None):
+    def __init__(
+        self,
+        nvars=512,
+        c=1.0,
+        freq=2,
+        stencil_type='center',
+        order=2,
+        lintol=1e-12,
+        liniter=10000,
+        direct_solver=True,
+        bc='periodic',
+        ndim=None,
+    ):
         """
         Initialization routine
 
@@ -40,9 +52,7 @@ class advectionNd(ptype):
         """
 
         # make sure parameters have the correct form
-        if not (type(nvars) is tuple and type(freq) is tuple) and not (
-            type(nvars) is int and type(freq) is int
-        ):
+        if not (type(nvars) is tuple and type(freq) is tuple) and not (type(nvars) is int and type(freq) is int):
             print(nvars, freq)
             raise ProblemError('Type of nvars and freq must be both either int or both tuple')
 

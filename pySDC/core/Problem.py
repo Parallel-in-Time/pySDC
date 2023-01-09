@@ -25,7 +25,7 @@ class ptype(object):
         dtype_f: RHS data type
     """
 
-    def __init__(self, init, dtype_u, dtype_f, **kwargs):
+    def __init__(self, init, dtype_u, dtype_f):
         """
         Initialization routine.
         Add the problem parameters as keyword arguments.
