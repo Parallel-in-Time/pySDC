@@ -26,6 +26,31 @@ class CheckConvergence(ConvergenceController):
         """
         return {"control_order": +200, **params}
 
+    @staticmethod
+    def check_convergence(S):
+        """
+        Check the convergence of a single step.
+        Test the residual and max. number of iterations as well as allowing overrides to both stop and continue.
+
+        Args:
+            S (pySDC.Step): The current step
+
+        Returns:
+            bool: Convergence status of the step
+        """
+        # do all this on the finest level
+        L = S.levels[0]
+        L.sweep.compute_residual()
+
+        # get residual and check against prescribed tolerance (plus check number of iterations
+        res = L.status.residual
+        converged = (
+            S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
+        ) and not S.status.force_continue
+        if converged is None:
+            converged = False
+        return converged
+
     def check_iteration_status(self, controller, S, **kwargs):
         """
         Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)
@@ -37,25 +62,18 @@ class CheckConvergence(ConvergenceController):
         Returns:
             None
         """
-
-        # do all this on the finest level
-        L = S.levels[0]
-        L.sweep.compute_residual()
-
-        # get residual and check against prescribed tolerance (plus check number of iterations
-        res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
-        if converged is not None:
-            S.status.done = converged
+        S.status.done = self.check_convergence(S)
 
         if "comm" in kwargs.keys():
             self.communicate_convergence(controller, S, **kwargs)
+
+        S.status.force_continue = False
 
         return None
 
     def communicate_convergence(self, controller, S, comm):
         """
-        Communicate the convergence status
+        Communicate the convergence status during `check_iteration_status` if MPI is used.
 
         Args:
             controller (pySDC.Controller): The controller

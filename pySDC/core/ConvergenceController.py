@@ -198,6 +198,19 @@ class ConvergenceController(object):
         """
         pass
 
+    def pre_iteration_processing(self, controller, S, **kwargs):
+        """
+        Do whatever you want to before each iteration here.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        pass
+
     def post_iteration_processing(self, controller, S, **kwargs):
         """
         Do whatever you want to after each iteration here.

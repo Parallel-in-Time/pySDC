@@ -25,7 +25,12 @@ class StepSizeLimiter(ConvergenceController):
 
     def get_new_step_size(self, controller, S, **kwargs):
         """
-        Enforce an upper and lower limit to the step size here
+        Enforce an upper and lower limit to the step size here.
+        Be aware that this is only tested when a new step size has been determined. That means if you set an initial
+        value for the step size outside of the limits, and you don't do any further step size control, that value will
+        go through.
+        Also, the final step is adjusted such that we reach Tend as best as possible, which might give step sizes below
+        the lower limit set here.
 
         Args:
             controller (pySDC.Controller): The controller

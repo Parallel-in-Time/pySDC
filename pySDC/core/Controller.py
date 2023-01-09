@@ -54,6 +54,7 @@ class controller(object):
         if self.params.use_iteration_estimator and self.params.all_to_done:
             self.logger.warning('all_to_done and use_iteration_estimator set, will ignore all_to_done')
 
+        self.base_convergence_controllers = [CheckConvergence]
         self.setup_convergence_controllers(description)
 
     @staticmethod
@@ -135,7 +136,7 @@ class controller(object):
         """
 
         self.welcome_message()
-        out = 'Setup overview (--> user-defined) -- BEGIN'
+        out = 'Setup overview (--> user-defined, -> dependency) -- BEGIN'
         self.logger.info(out)
         out = '----------------------------------------------------------------------------------------------------\n\n'
         out += 'Controller: %s\n' % self.__class__
@@ -199,35 +200,16 @@ class controller(object):
                         out += '-->         %s = %s\n' % (k, v)
                     else:
                         out += '            %s = %s\n' % (k, v)
+
+        out += '\n'
+        out += self.get_convergence_controllers_as_table(description)
+        out += '\n'
         self.logger.info(out)
+
         out = '----------------------------------------------------------------------------------------------------'
         self.logger.info(out)
-        out = 'Setup overview (--> user-defined) -- END\n'
+        out = 'Setup overview (--> user-defined, -> dependency) -- END\n'
         self.logger.info(out)
-
-    @staticmethod
-    def check_convergence(S):
-        """
-        Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)
-
-        Args:
-            S (pySDC.Step.step): current step
-
-        Returns:
-            bool: converged, true or false
-
-        """
-
-        # do all this on the finest level
-        L = S.levels[0]
-
-        # get residual and check against prescribed tolerance (plus check number of iterations
-        res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
-        if converged is None:
-            converged = False
-
-        return converged
 
     def run(self, u0, t0, Tend):
         """
@@ -265,7 +247,6 @@ class controller(object):
         self.convergence_controllers = []
         self.convergence_controller_order = []
         conv_classes = description.get('convergence_controllers', {})
-        conv_classes[CheckConvergence] = {}  # don't need special params for this, hence the {}
 
         # instantiate the convergence controllers
         for conv_class, params in conv_classes.items():
@@ -300,12 +281,30 @@ class controller(object):
 
         return None
 
-    def print_convergence_controllers(self):
+    def get_convergence_controllers_as_table(self, description):
         '''
         This function is for debugging purposes to keep track of the different convergence controllers and their order.
+
+        Args:
+            description (dict): Description of the problem
+
+        Returns:
+            str: Table of convergence controllers as a string
         '''
-        print('    | order | convergence controller', flush=True)
-        print('----+-------+-------------------------------------------------------------------', flush=True)
+        out = 'Active convergence controllers:'
+        out += '\n    |  # | order | convergence controller'
+        out += '\n----+----+-------+---------------------------------------------------------------------------------------'
         for i in range(len(self.convergence_controllers)):
             C = self.convergence_controllers[self.convergence_controller_order[i]]
-            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}', flush=True)
+
+            # figure out how the convergence controller was added
+            if type(C) in description.get('convergence_controllers', {}).keys():  # added by user
+                user_added = '--> '
+            elif type(C) in self.base_convergence_controllers:  # added by default
+                user_added = '    '
+            else:  # added as dependency
+                user_added = ' -> '
+
+            out += f'\n{user_added}|{i:3} | {C.params.control_order:5} | {type(C).__name__}'
+
+        return out

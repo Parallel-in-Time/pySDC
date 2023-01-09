@@ -90,7 +90,7 @@ def test_partialquadraturewithQ(node_type, quad_type):
     for M in range(2, 13):
         coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
         Q = coll.Qmat[1:, 1:]
-        # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1 (or less for splines)
+        # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
         degree = min(coll.order, M - 1)
         poly_coeff = np.random.rand(degree)
         poly_vals = np.polyval(poly_coeff, coll.nodes)
@@ -112,7 +112,7 @@ def test_partialquadraturewithS(node_type, quad_type):
     for M in range(2, 13):
         coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
         S = coll.Smat[1:, 1:]
-        # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1 (or less for splines)
+        # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
         degree = min(coll.order, M - 1)
         poly_coeff = np.random.rand(degree)
         poly_vals = np.polyval(poly_coeff, coll.nodes)
