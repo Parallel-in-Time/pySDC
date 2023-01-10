@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/core/Sweeper.py: 68%</title>
+    <title>Coverage for pySDC/core/Sweeper.py: 70%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/core/Sweeper.py</b>:
-            <span class="pc_cov">68%</span>
+            <span class="pc_cov">70%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">181 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">123<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">58<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">126<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">55<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">10<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_41564483689e14fd_plot_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.3</a>,
-            created at 2023-01-05 10:28 +0000
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.4</a>,
+            created at 2023-01-10 14:05 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -171,9 +171,9 @@
     <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">            <span class="op">[</span><span class="nam">_</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">U</span><span class="op">]</span> <span class="op">=</span> <span class="nam">scipy</span><span class="op">.</span><span class="nam">linalg</span><span class="op">.</span><span class="nam">lu</span><span class="op">(</span><span class="nam">QT</span><span class="op">,</span> <span class="nam">overwrite_a</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">            <span class="nam">QDmat</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">,</span> <span class="num">1</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">U</span><span class="op">.</span><span class="nam">T</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t">        <span class="key">elif</span> <span class="nam">qd_type</span> <span class="op">==</span> <span class="str">'LU2'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">            <span class="nam">QT</span> <span class="op">=</span> <span class="nam">coll</span><span class="op">.</span><span class="nam">Qmat</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">,</span> <span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="op">.</span><span class="nam">T</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">            <span class="op">[</span><span class="nam">_</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">U</span><span class="op">]</span> <span class="op">=</span> <span class="nam">scipy</span><span class="op">.</span><span class="nam">linalg</span><span class="op">.</span><span class="nam">lu</span><span class="op">(</span><span class="nam">QT</span><span class="op">,</span> <span class="nam">overwrite_a</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t">            <span class="nam">QDmat</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">,</span> <span class="num">1</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="num">2</span> <span class="op">*</span> <span class="nam">U</span><span class="op">.</span><span class="nam">T</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">            <span class="nam">QT</span> <span class="op">=</span> <span class="nam">coll</span><span class="op">.</span><span class="nam">Qmat</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">,</span> <span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="op">.</span><span class="nam">T</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">            <span class="op">[</span><span class="nam">_</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">U</span><span class="op">]</span> <span class="op">=</span> <span class="nam">scipy</span><span class="op">.</span><span class="nam">linalg</span><span class="op">.</span><span class="nam">lu</span><span class="op">(</span><span class="nam">QT</span><span class="op">,</span> <span class="nam">overwrite_a</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t">            <span class="nam">QDmat</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">,</span> <span class="num">1</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="num">2</span> <span class="op">*</span> <span class="nam">U</span><span class="op">.</span><span class="nam">T</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t95" href="#t95">95</a></span><span class="t">        <span class="key">elif</span> <span class="nam">qd_type</span> <span class="op">==</span> <span class="str">'TRAP'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">            <span class="key">for</span> <span class="nam">m</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">coll</span><span class="op">.</span><span class="nam">num_nodes</span> <span class="op">+</span> <span class="num">1</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">                <span class="nam">QDmat</span><span class="op">[</span><span class="nam">m</span><span class="op">,</span> <span class="num">1</span> <span class="op">:</span> <span class="nam">m</span> <span class="op">+</span> <span class="num">1</span><span class="op">]</span> <span class="op">=</span> <span class="nam">coll</span><span class="op">.</span><span class="nam">delta_m</span><span class="op">[</span><span class="num">0</span><span class="op">:</span><span class="nam">m</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
@@ -501,8 +501,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_41564483689e14fd_plot_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.3</a>,
-            created at 2023-01-05 10:28 +0000
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.4</a>,
+            created at 2023-01-10 14:05 +0000
         </p>
     </div>
 </footer>
