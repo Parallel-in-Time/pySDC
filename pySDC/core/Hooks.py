@@ -26,7 +26,7 @@ class hooks(object):
         __num_restarts (int): number of restarts of the current step
         logger: logger instance for output
         __stats (dict): dictionary for gathering the statistics of a run
-        __entry (namedtuple): statistics entry containign all information to identify the value
+        __entry (namedtuple): statistics entry containing all information to identify the value
     """
 
     def __init__(self):
