@@ -124,6 +124,8 @@ jobs:
   wait_for_gitlab:
     runs-on: ubuntu-latest
 
+    if: ${{ github.repository_owner == 'Parallel-in-Time'}}
+
     needs:
       - mirror_to_gitlab
 
