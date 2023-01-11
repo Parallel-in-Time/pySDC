@@ -11,7 +11,7 @@ from pySDC.tutorial.step_3.HookClass_Particles import particle_hook
 
 def main():
     """
-    A simple tets program to retrieve user-defined statistics from a run
+    A simple test program to retrieve user-defined statistics from a run
     """
     Path("data").mkdir(parents=True, exist_ok=True)
 

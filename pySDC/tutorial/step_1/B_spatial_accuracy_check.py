@@ -150,7 +150,7 @@ def plot_accuracy(results):
 
     # create new figure
     plt.figure()
-    # take x-axis limits from nvars_list + some spacning left and right
+    # take x-axis limits from nvars_list + some spacing left and right
     plt.xlim([min(nvars_list) / 2, max(nvars_list) * 2])
     plt.xlabel('nvars')
     plt.ylabel('abs. error')
