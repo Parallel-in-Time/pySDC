@@ -176,7 +176,7 @@
         <span class="c1"># generate list of dictionaries out of the description</span>
         <span class="n">descr_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict_to_list</span><span class="p">(</span><span class="n">descr_new</span><span class="p">)</span>
 
-        <span class="c1"># sanity check: is there a base_transfer class? is there one even if only a single level is specified?</span>
+        <span class="c1"># sanity check: is there a base_transfer class? Is there one even if only a single level is specified?</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">descr_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate step, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">descr_new</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>

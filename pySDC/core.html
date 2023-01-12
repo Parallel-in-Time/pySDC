@@ -130,7 +130,7 @@ values on the coarse level and then adds this difference to the fine values as c
 <dt class="sig sig-object py" id="core.BaseTransfer.base_transfer.restrict">
 <span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/BaseTransfer.html#base_transfer.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.BaseTransfer.base_transfer.restrict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Space-time restriction routine</p>
-<p>The routine applies the spatial restriction operator to teh fine values on the fine nodes, then reevaluates f
+<p>The routine applies the spatial restriction operator to the fine values on the fine nodes, then reevaluates f
 on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part
 is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the
 fine level are restricted as well.</p>
@@ -354,7 +354,7 @@ Afterwards, the order of the convergence controllers is updated.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>convergence_controller</strong> (<em>pySDC.ConvergenceController</em>) – The convergence controller to be added</p></li>
 <li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
-<li><p><strong>params</strong> (<em>dict</em>) – Parametes for the convergence controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
 <li><p><strong>allow_double</strong> (<em>bool</em>) – Allow adding the same convergence controller multiple times</p></li>
 </ul>
 </dd>
@@ -1124,7 +1124,7 @@ relevant information about the controller are known.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.hooks.__entry">
 <span class="sig-name descname"><span class="pre">__entry</span></span><a class="headerlink" href="#core.Hooks.hooks.__entry" title="Permalink to this definition">¶</a></dt>
-<dd><p>statistics entry containign all information to identify the value</p>
+<dd><p>statistics entry containing all information to identify the value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>namedtuple</p>

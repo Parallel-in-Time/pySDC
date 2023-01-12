@@ -313,7 +313,7 @@ the data! Also, use headers to store meta-information.</p></li>
 
     <span class="c1"># create new figure</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-    <span class="c1"># take x-axis limits from nvars_list + some spacning left and right</span>
+    <span class="c1"># take x-axis limits from nvars_list + some spacing left and right</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;abs. error&#39;</span><span class="p">)</span>
@@ -491,7 +491,7 @@ collocation problem and look at the error.</p>
 order in time with a 2nd order stencil in space.</p></li>
 <li><p>Orders of convergence are not as stable as for the space-only test.
 One of the problems of this example is that we are actually trying to
-compute 0 very, very thorougly…</p></li>
+compute 0 very, very thoroughly…</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/D_collocation_accuracy_check.py">pySDC/tutorial/step_1/D_collocation_accuracy_check.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>

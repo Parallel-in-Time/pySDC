@@ -79,7 +79,7 @@
 <span class="sd">            controller_params (dict): parameter set for the controller and the steps</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># check if we have a hook on this list. if not, use default class.</span>
+        <span class="c1"># check if we have a hook on this list. If not, use default class.</span>
         <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hook_class&#39;</span><span class="p">,</span> <span class="n">hookclass</span><span class="o">.</span><span class="n">hooks</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">=</span> <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]()</span>
 
@@ -301,7 +301,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            convergence_controller (pySDC.ConvergenceController): The convergence controller to be added</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">            params (dict): Parametes for the convergence controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            allow_double (bool): Allow adding the same convergence controller multiple times</span>
 
 <span class="sd">        Returns:</span>
