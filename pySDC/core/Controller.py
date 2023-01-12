@@ -40,7 +40,7 @@ class controller(object):
             controller_params (dict): parameter set for the controller and the steps
         """
 
-        # check if we have a hook on this list. if not, use default class.
+        # check if we have a hook on this list. If not, use default class.
         controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
         self.__hooks = controller_params['hook_class']()
 
@@ -262,7 +262,7 @@ class controller(object):
         Args:
             convergence_controller (pySDC.ConvergenceController): The convergence controller to be added
             description (dict): The description object used to instantiate the controller
-            params (dict): Parametes for the convergence controller
+            params (dict): Parameters for the convergence controller
             allow_double (bool): Allow adding the same convergence controller multiple times
 
         Returns:
