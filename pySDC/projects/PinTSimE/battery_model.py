@@ -79,7 +79,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'zero'
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()
@@ -92,8 +92,6 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     problem_params['L'] = 1.0
     problem_params['alpha'] = 1.2
     problem_params['V_ref'] = 1.0
-    problem_params['set_switch'] = np.array([False], dtype=bool)
-    problem_params['t_switch'] = np.zeros(1)
 
     # initialize step parameters
     step_params = dict()
@@ -113,7 +111,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
 
     if use_adaptivity:
         adaptivity_params = dict()
-        adaptivity_params['e_tol'] = 1e-12
+        adaptivity_params['e_tol'] = 1e-7
         convergence_controllers.update({Adaptivity: adaptivity_params})
 
     # fill description dictionary for easy step instantiation
@@ -128,7 +126,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
 
-    proof_assertions_description(description, problem_params)
+    proof_assertions_description(description, use_adaptivity, use_switch_estimator)
 
     # set time parameters
     t0 = 0.0
@@ -181,11 +179,11 @@ def run():
     as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    dt = 1e-2
+    dt = 1e-3
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
-    use_switch_estimator = [True]
-    use_adaptivity = [True]
+    use_switch_estimator = [False]
+    use_adaptivity = [False]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
@@ -223,7 +221,7 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adapt
     ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
 
     if use_switch_estimator:
-        val_switch = get_sorted(stats, type='switch1', sortby='time')
+        val_switch = get_sorted(stats, type='switch', sortby='time')
         t_switch = [v[1] for v in val_switch]
         ax.axvline(x=t_switch[-1], linestyle='--', linewidth=0.8, color='r', label='Switch')
 
@@ -245,22 +243,23 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adapt
     plt_helper.plt.close(fig)
 
 
-def proof_assertions_description(description, problem_params):
+def proof_assertions_description(description, use_adaptivity, use_switch_estimator):
     """
     Function to proof the assertions (function to get cleaner code)
     """
 
-    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
-    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-    assert type(problem_params['V_ref']) == float, '"V_ref" needs to be of type float'
-
-    assert type(problem_params['set_switch'][0]) == np.bool_, '"set_switch" has to be an bool array'
-    assert type(problem_params['t_switch']) == np.ndarray, '"t_switch" has to be an array'
-    assert problem_params['t_switch'][0] == 0, '"t_switch" is only allowed to have entry zero'
+    assert (
+        description['problem_params']['alpha'] > description['problem_params']['V_ref']
+    ), 'Please set "alpha" greater than "V_ref"'
+    assert description['problem_params']['V_ref'] > 0, 'Please set "V_ref" greater than 0'
+    assert type(description['problem_params']['V_ref']) == float, '"V_ref" needs to be of type float'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
     assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
+
+    if use_switch_estimator or use_adaptivity:
+        assert description['level_params']['restol'] == -1, "For adaptivity, please set restol to -1 or omit it"
 
 
 if __name__ == "__main__":

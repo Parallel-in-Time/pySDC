@@ -63,7 +63,8 @@ class SwitchEstimator(ConvergenceController):
         else:
             V_ref = np.array([L.prob.params.V_ref], dtype=float)
 
-        if S.status.iter > 0 and self.count_switches < np.shape(V_ref)[0]:
+        if S.status.iter == S.params.maxiter and self.count_switches < np.shape(V_ref)[0]:
+            # if S.status.iter > 0 and self.count_switches < np.shape(V_ref)[0]:
             for m in range(len(L.u)):
                 if L.u[m][self.count_switches + 1] - V_ref[self.count_switches] <= 0:
                     self.switch_detected = True
@@ -93,15 +94,14 @@ class SwitchEstimator(ConvergenceController):
                         else:
                             print('Switch located at time: {}'.format(self.t_switch))
                             dt_search = self.t_switch - L.time
-                            L.prob.params.set_switch[self.count_switches] = self.switch_detected
-                            L.prob.params.t_switch[self.count_switches] = self.t_switch
+                            L.prob.t_switch = self.t_switch
                             controller.hooks.add_to_stats(
                                 process=S.status.slot,
                                 time=L.time,
                                 level=L.level_index,
                                 iter=0,
                                 sweep=L.status.sweep,
-                                type='switch{}'.format(self.count_switches + 1),
+                                type='switch',
                                 value=self.t_switch,
                             )
 
@@ -157,9 +157,10 @@ class SwitchEstimator(ConvergenceController):
         L = S.levels[0]
 
         if self.switch_detected_step:
-            if L.prob.params.set_switch[self.count_switches] and L.time + L.dt >= self.t_switch:
+            if L.time + L.dt >= self.t_switch:
                 self.count_switches += 1
                 self.t_switch = None
+                L.prob.t_switch = self.t_switch
                 self.switch_detected_step = False
 
                 L.status.dt_new = self.dt_initial

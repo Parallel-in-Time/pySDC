@@ -71,7 +71,7 @@ def main(use_switch_estimator=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-13
+    level_params['restol'] = -1
     level_params['dt'] = 1e-2
 
     # initialize sweeper parameters
@@ -79,7 +79,7 @@ def main(use_switch_estimator=True):
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'zero'
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()
@@ -91,12 +91,10 @@ def main(use_switch_estimator=True):
     problem_params['L'] = 1.0
     problem_params['alpha'] = 5.0
     problem_params['V_ref'] = np.array([1.0, 1.0])  # [V_ref1, V_ref2]
-    problem_params['set_switch'] = np.array([False, False], dtype=bool)
-    problem_params['t_switch'] = np.zeros(np.shape(problem_params['V_ref'])[0])
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 5
 
     # initialize controller parameters
     controller_params = dict()
@@ -122,7 +120,7 @@ def main(use_switch_estimator=True):
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
-    proof_assertions_description(description, problem_params)
+    proof_assertions_description(description, use_switch_estimator)
 
     # set time parameters
     t0 = 0.0
@@ -166,7 +164,7 @@ def main(use_switch_estimator=True):
     restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
     print("Restarts for dt: ", level_params['dt'], " -- ", np.sum(restarts))
 
-    assert np.mean(niters) <= 10, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     plot_voltages(description, use_switch_estimator)
@@ -197,11 +195,11 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     ax.plot(times, [v[1] for v in vC2], label='$v_{C_2}$')
 
     if use_switch_estimator:
-        t_switch_plot = np.zeros(np.shape(description['problem_params']['t_switch'])[0])
-        for i in range(np.shape(description['problem_params']['t_switch'])[0]):
-            t_switch_plot[i] = description['problem_params']['t_switch'][i]
+        switches = get_sorted(stats, type='switch', sortby='time')
+        t_switches = [v[1] for v in switches]
 
-            ax.axvline(x=t_switch_plot[i], linestyle='--', color='k', label='Switch {}'.format(i + 1))
+        for i in range(len(t_switches)):
+            ax.axvline(x=t_switches[i], linestyle='--', color='k', label='Switch {}'.format(i + 1))
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
@@ -212,29 +210,29 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     plt_helper.plt.close(fig)
 
 
-def proof_assertions_description(description, problem_params):
+def proof_assertions_description(description, use_switch_estimator):
     """
     Function to proof the assertions (function to get cleaner code)
     """
 
-    assert problem_params['alpha'] > problem_params['V_ref'][0], 'Please set "alpha" greater than "V_ref1"'
-    assert problem_params['alpha'] > problem_params['V_ref'][1], 'Please set "alpha" greater than "V_ref2"'
+    assert (
+        description['problem_params']['alpha'] > description['problem_params']['V_ref'][0]
+    ), 'Please set "alpha" greater than "V_ref1"'
+    assert (
+        description['problem_params']['alpha'] > description['problem_params']['V_ref'][1]
+    ), 'Please set "alpha" greater than "V_ref2"'
 
-    assert problem_params['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
-    assert problem_params['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
+    assert description['problem_params']['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
+    assert description['problem_params']['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
 
-    assert type(problem_params['V_ref']) == np.ndarray, '"V_ref" needs to be an array (of type float)'
-    assert not problem_params['set_switch'][0], 'First entry of "set_switch" needs to be False'
-    assert not problem_params['set_switch'][1], 'Second entry of "set_switch" needs to be False'
-
-    assert not type(problem_params['t_switch']) == float, '"t_switch" has to be an array with entry zero'
-
-    assert problem_params['t_switch'][0] == 0, 'First entry of "t_switch" needs to be zero'
-    assert problem_params['t_switch'][1] == 0, 'Second entry of "t_switch" needs to be zero'
+    assert type(description['problem_params']['V_ref']) == np.ndarray, '"V_ref" needs to be an array (of type float)'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
     assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
+
+    if use_switch_estimator:
+        assert description['level_params']['restol'] == -1, "Please set restol to -1 or omit it"
 
 
 if __name__ == "__main__":
