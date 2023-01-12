@@ -44,7 +44,7 @@ class EstimateEmbeddedError(ConvergenceController):
         elif flavor == 'nonMPI':
             return EstimateEmbeddedErrorNonMPI
         else:
-            raise NotImplementedError(f'Flavor {flavor} of EmstimateEmbeddedError is not implemented!')
+            raise NotImplementedError(f'Flavor {flavor} of EstimateEmbeddedError is not implemented!')
 
     def setup(self, controller, params, description, **kwargs):
         """

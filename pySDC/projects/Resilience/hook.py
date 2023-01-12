@@ -2,9 +2,10 @@ from pySDC.core.Hooks import hooks
 from pySDC.implementations.hooks.log_solution import LogSolution
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtrapolationErrorEstimate
+from pySDC.implementations.hooks.log_step_size import LogStepSize
 
 
-hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate]
+hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate, LogStepSize]
 
 
 class log_data(hooks):
@@ -28,15 +29,6 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
         self.add_to_stats(
             process=step.status.slot,
             time=L.time,
