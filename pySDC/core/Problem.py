@@ -1,19 +1,19 @@
 import logging
 
-from pySDC.helpers.pysdc_helper import FrozenClass
+
+# parent class that register some class attributes in a list of paramters
+class RegisterParams(object):
+    def _register(self, *parNames):
+        if not hasattr(self, '_parNames'):
+            self._parNames = []
+        self._parNames += parNames
+
+    @property
+    def params(self):
+        return {name: getattr(self, name) for name in self._parNames}
 
 
-# short helper class to add params as attributes
-class _Pars(FrozenClass):
-    def __init__(self, pars):
-
-        for k, v in pars.items():
-            setattr(self, k, v)
-
-        self._freeze()
-
-
-class ptype(object):
+class ptype(RegisterParams):
     """
     Prototype class for problems, just defines the attributes essential to get started
 
@@ -25,7 +25,7 @@ class ptype(object):
         dtype_f: RHS data type
     """
 
-    def __init__(self, init, dtype_u, dtype_f, **kwargs):
+    def __init__(self, init, dtype_u, dtype_f):
         """
         Initialization routine.
         Add the problem parameters as keyword arguments.
@@ -35,8 +35,6 @@ class ptype(object):
             dtype_u: variable data type
             dtype_f: RHS data type
         """
-        self.params = _Pars(kwargs)
-
         # set up logger
         self.logger = logging.getLogger('problem')
 

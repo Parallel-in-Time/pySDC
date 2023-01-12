@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import gmres, spsolve
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
@@ -30,13 +30,12 @@ class advectionNd(ptype):
         liniter=10000,
         direct_solver=True,
         bc='periodic',
-        ndim=None,
     ):
         """
         Initialization routine
 
-        Args can be set as values or as tuples, which will increase the dimension. Do, however, take care that all
-        spatial parameters have the same dimension.
+        Args can be set as values or as tuples, which will increase the dimension.
+        Do, however, take care that all spatial parameters have the same dimension.
 
         Args:
             nvars (int): Spatial resolution, can be tuple
@@ -48,91 +47,87 @@ class advectionNd(ptype):
             liniter (int): Max. iterations for GMRES
             direct_solver (bool): Whether to solve directly or use GMRES
             bc (str): Boundary conditions
-            ndim (int): Number of dimensions. Is set automatically if left at None.
         """
 
-        # make sure parameters have the correct form
-        if not (type(nvars) is tuple and type(freq) is tuple) and not (type(nvars) is int and type(freq) is int):
-            print(nvars, freq)
-            raise ProblemError('Type of nvars and freq must be both either int or both tuple')
+        # make sure parameters have the correct types
+        if not type(nvars) in [int, tuple]:
+            raise ProblemError('nvars should be either tuple or int')
+        if not type(freq) in [int, tuple]:
+            raise ProblemError('freq should be either tuple or int')
 
-        if ndim is None:
-            if type(nvars) is int:
-                ndim = 1
-            elif type(nvars) is tuple:
-                ndim = len(nvars)
+        # transforms nvars into a tuple
+        if type(nvars) is int:
+            nvars = (nvars,)
 
+        # automatically determine ndim from nvars
+        ndim = len(nvars)
         if ndim > 3:
             raise ProblemError(f'can work with up to three dimensions, got {ndim}')
 
-        if type(freq) is tuple:
-            for f in freq:
-                if f % 2 != 0 and bc == 'periodic':
-                    raise ProblemError('need even number of frequencies due to periodic BCs')
-        else:
-            if freq % 2 != 0 and freq != -1 and bc == 'periodic':
-                raise ProblemError('need even number of frequencies due to periodic BCs')
+        # eventually extend freq to other dimension
+        if type(freq) is int:
+            freq = (freq,) * ndim
+        if len(freq) != ndim:
+            raise ProblemError(f'len(freq)={len(freq)}, different to ndim={ndim}')
 
-        if type(nvars) is tuple:
-            for nvar in nvars:
-                if nvar % 2 != 0 and bc == 'periodic':
-                    raise ProblemError('the setup requires nvars = 2^p per dimension')
-                if (nvar + 1) % 2 != 0 and bc == 'dirichlet-zero':
-                    raise ProblemError('setup requires nvars = 2^p - 1')
-            if nvars[1:] != nvars[:-1]:
-                raise ProblemError('need a square domain, got %s' % nvars)
-        else:
-            if nvars % 2 != 0 and bc == 'periodic':
+        # check values for freq and nvars
+        for f in freq:
+            if f % 2 != 0 and bc == 'periodic':
+                raise ProblemError('need even number of frequencies due to periodic BCs')
+        for nvar in nvars:
+            if nvar % 2 != 0 and bc == 'periodic':
                 raise ProblemError('the setup requires nvars = 2^p per dimension')
-            if (nvars + 1) % 2 != 0 and bc == 'dirichlet-zero':
+            if (nvar + 1) % 2 != 0 and bc == 'dirichlet-zero':
                 raise ProblemError('setup requires nvars = 2^p - 1')
+        if ndim > 1 and nvars[1:] != nvars[:-1]:
+            raise ProblemError('need a square domain, got %s' % nvars)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectionNd, self).__init__(
+        super().__init__(
             init=(nvars, None, np.dtype('float64')),
             dtype_u=mesh,
             dtype_f=mesh,
-            nvars=nvars,
-            c=c,
-            freq=freq,
-            stencil_type=stencil_type,
-            order=order,
-            lintol=lintol,
-            liniter=liniter,
-            direct_solver=direct_solver,
-            bc=bc,
-            ndim=ndim,
         )
 
-        if self.params.ndim == 1:
-            if type(self.params.nvars) is not tuple:
-                self.params.nvars = (self.params.nvars,)
-            if type(self.params.freq) is not tuple:
-                self.params.freq = (self.params.freq,)
-
         # compute dx (equal in both dimensions) and get discretization matrix A
-        if self.params.bc == 'periodic':
-            self.dx = 1.0 / self.params.nvars[0]
-            xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
-        elif self.params.bc == 'dirichlet-zero':
-            self.dx = 1.0 / (self.params.nvars[0] + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars[0])])
+        if bc == 'periodic':
+            xvalues = np.linspace(0, 1, num=nvars[0], endpoint=False)
+        elif bc == 'dirichlet-zero':
+            xvalues = np.linspace(0, 1, num=nvars[0] + 2)[1:-1]
         else:
             raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
+        dx = xvalues[1] - xvalues[0]
 
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=1,
-            order=self.params.order,
-            stencil_type=self.params.stencil_type,
-            dx=self.dx,
-            size=self.params.nvars[0],
-            dim=self.params.ndim,
-            bc=self.params.bc,
+            order=order,
+            stencil_type=stencil_type,
+            dx=dx,
+            size=nvars[0],
+            dim=ndim,
+            bc=bc,
         )
-        self.A *= -self.params.c
+        self.A *= -c
 
-        self.xv = np.meshgrid(*[xvalues for _ in range(self.params.ndim)])
-        self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
+        self.xv = np.meshgrid(*[xvalues for _ in range(ndim)])
+        self.Id = sp.eye(np.prod(nvars), format='csc')
+
+        # store relevant attributes
+        self.c, self.freq, self.dx = c, freq, dx
+        self.stencil_type, self.order = stencil_type, order
+        self.lintol, self.liniter = lintol, liniter
+        self.direct_solver, self.bc = direct_solver, bc
+
+        # register parameters
+        self._register('nvars', 'c', 'freq', 'stencil_type', 'order', 'lintol', 'liniter', 'direct_solver', 'bc')
+
+    @property
+    def ndim(self):
+        return len(self.xv)
+
+    @property
+    def nvars(self):
+        return self.xv[0].shape
 
     def eval_f(self, u, t):
         """
