@@ -4,7 +4,7 @@ from scipy.special import factorial
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Errors import DataError
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
-from pySDC.implementations.hooks.log_extrapolated_error_estimate import log_extrapolated_error_estimate
+from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtrapolationErrorEstimate
 
 
 class EstimateExtrapolationErrorBase(ConvergenceController):
@@ -28,7 +28,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         self.prev = Status(["t", "u", "f", "dt"])  # store solutions etc. of previous steps here
         self.coeff = Status(["u", "f", "prefactor"])  # store coefficients for extrapolation here
         super(EstimateExtrapolationErrorBase, self).__init__(controller, params, description)
-        controller.add_hook(log_extrapolated_error_estimate)
+        controller.add_hook(LogExtrapolationErrorEstimate)
 
     def setup(self, controller, params, description, **kwargs):
         """
@@ -254,7 +254,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
     def setup(self, controller, params, description, **kwargs):
         """
-        Add a no parameter 'no_storage' which decides whether the standart or the no-memory-overhead version is run,
+        Add a no parameter 'no_storage' which decides whether the standard or the no-memory-overhead version is run,
         where only values are used for extrapolation which are in memory of other processes
 
         Args:

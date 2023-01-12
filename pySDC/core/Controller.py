@@ -6,7 +6,7 @@ import numpy as np
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
-from pySDC.implementations.hooks.default_hook import default_hooks
+from pySDC.implementations.hooks.default_hook import DefaultHooks
 
 
 # short helper class to add params as attributes
@@ -42,7 +42,7 @@ class controller(object):
 
         # check if we have a hook on this list. If not, use default class.
         self.__hooks = []
-        hook_classes = [default_hooks]
+        hook_classes = [DefaultHooks]
         user_hooks = controller_params.get('hook_class', [])
         hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
         [self.add_hook(hook) for hook in hook_classes]

@@ -2,7 +2,7 @@ import time
 from pySDC.core.Hooks import hooks
 
 
-class default_hooks(hooks):
+class DefaultHooks(hooks):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 
@@ -27,7 +27,7 @@ class default_hooks(hooks):
     """
 
     def __init__(self):
-        super(default_hooks, self).__init__()
+        super(DefaultHooks, self).__init__()
         self.__t0_setup = None
         self.__t0_run = None
         self.__t0_predict = None

@@ -1,10 +1,10 @@
 from pySDC.core.Hooks import hooks
-from pySDC.implementations.hooks.log_solution import log_solution
-from pySDC.implementations.hooks.log_embedded_error_estimate import log_embedded_error_estimate
-from pySDC.implementations.hooks.log_extrapolated_error_estimate import log_extrapolated_error_estimate
+from pySDC.implementations.hooks.log_solution import LogSolution
+from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtrapolationErrorEstimate
 
 
-hook_collection = [log_solution, log_embedded_error_estimate, log_extrapolated_error_estimate]
+hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate]
 
 
 class log_data(hooks):

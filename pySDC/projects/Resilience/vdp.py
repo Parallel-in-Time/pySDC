@@ -8,8 +8,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ProblemError
-from pySDC.projects.Resilience.hook import log_data
-from pySDC.implementations.hooks.log_solution import log_solution
+from pySDC.projects.Resilience.hook import log_data, hook_collection
 
 
 def plot_step_sizes(stats, ax):
@@ -29,7 +28,7 @@ def plot_step_sizes(stats, ax):
     p = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     t = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
 
-    e_em = np.array(get_sorted(stats, type='e_embedded', recomputed=False, sortby='time'))[:, 1]
+    e_em = np.array(get_sorted(stats, type='error_embedded_estimate', recomputed=False, sortby='time'))[:, 1]
     dt = np.array(get_sorted(stats, type='dt', recomputed=False, sortby='time'))
     restart = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
 
@@ -139,7 +138,7 @@ def run_vdp(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = [hook_class, log_solution]
+    controller_params['hook_class'] = hook_collection + [hook_class]
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
