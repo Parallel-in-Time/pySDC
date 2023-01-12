@@ -3,10 +3,10 @@ import os
 import sys
 import numpy as np
 
-from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.implementations.hooks.default_hook import default_hooks
 
 
 # short helper class to add params as attributes
@@ -41,10 +41,16 @@ class controller(object):
         """
 
         # check if we have a hook on this list. If not, use default class.
-        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
-        self.__hooks = controller_params['hook_class']()
+        self.__hooks = []
+        self.hook_classes = [default_hooks]
+        user_hooks = controller_params.get('hook_class', [])
+        self.hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
+        for hook in self.hook_classes:
+            self.__hooks += [hook()]
+        controller_params['hook_class'] = controller_params.get('hook_class', self.hook_classes)
 
-        self.hooks.pre_setup(step=None, level_number=None)
+        for hook in self.hooks:
+            hook.pre_setup(step=None, level_number=None)
 
         self.params = _Pars(controller_params)
 
@@ -308,3 +314,15 @@ class controller(object):
             out += f'\n{user_added}|{i:3} | {C.params.control_order:5} | {type(C).__name__}'
 
         return out
+
+    def return_stats(self):
+        """
+        Return the merged stats from all hooks
+
+        Returns:
+            dict: Merged stats from all hooks
+        """
+        stats = {}
+        for hook in self.hooks:
+            stats = {**stats, **hook.return_stats()}
+        return stats
