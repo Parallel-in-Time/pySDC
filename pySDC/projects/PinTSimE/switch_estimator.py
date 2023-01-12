@@ -95,7 +95,7 @@ class SwitchEstimator(ConvergenceController):
                             dt_search = self.t_switch - L.time
                             L.prob.params.set_switch[self.count_switches] = self.switch_detected
                             L.prob.params.t_switch[self.count_switches] = self.t_switch
-                            controller.hooks.add_to_stats(
+                            controller.hooks[0].add_to_stats(
                                 process=S.status.slot,
                                 time=L.time,
                                 level=L.level_index,

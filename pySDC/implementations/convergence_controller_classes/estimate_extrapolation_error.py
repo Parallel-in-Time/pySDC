@@ -4,6 +4,7 @@ from scipy.special import factorial
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Errors import DataError
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
+from pySDC.implementations.hooks.log_extrapolated_error_estimate import log_extrapolated_error_estimate
 
 
 class EstimateExtrapolationErrorBase(ConvergenceController):
@@ -27,6 +28,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         self.prev = Status(["t", "u", "f", "dt"])  # store solutions etc. of previous steps here
         self.coeff = Status(["u", "f", "prefactor"])  # store coefficients for extrapolation here
         super(EstimateExtrapolationErrorBase, self).__init__(controller, params, description)
+        controller.add_hook(log_extrapolated_error_estimate)
 
     def setup(self, controller, params, description, **kwargs):
         """

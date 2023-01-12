@@ -2,6 +2,7 @@ import numpy as np
 
 from pySDC.core.ConvergenceController import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
+from pySDC.implementations.hooks.log_embedded_error_estimate import log_embedded_error_estimate
 
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta
 
@@ -16,7 +17,7 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def __init__(self, controller, params, description, **kwargs):
         """
-        Initalization routine. Add the buffers for communication.
+        Initialisation routine. Add the buffers for communication.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -25,6 +26,7 @@ class EstimateEmbeddedError(ConvergenceController):
         """
         super(EstimateEmbeddedError, self).__init__(controller, params, description, **kwargs)
         self.buffers = Pars({'e_em_last': 0.0})
+        controller.add_hook(log_embedded_error_estimate)
 
     @classmethod
     def get_implementation(cls, flavor):
@@ -123,7 +125,7 @@ class EstimateEmbeddedError(ConvergenceController):
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
-        Reset buffers for immitated communication.
+        Reset buffers for imitated communication.
 
         Args:
             controller (pySDC.controller): The controller

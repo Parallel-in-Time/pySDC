@@ -42,12 +42,11 @@ class controller(object):
 
         # check if we have a hook on this list. If not, use default class.
         self.__hooks = []
-        self.hook_classes = [default_hooks]
+        hook_classes = [default_hooks]
         user_hooks = controller_params.get('hook_class', [])
-        self.hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
-        for hook in self.hook_classes:
-            self.__hooks += [hook()]
-        controller_params['hook_class'] = controller_params.get('hook_class', self.hook_classes)
+        hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
+        [self.add_hook(hook) for hook in hook_classes]
+        controller_params['hook_class'] = controller_params.get('hook_class', hook_classes)
 
         for hook in self.hooks:
             hook.pre_setup(step=None, level_number=None)
@@ -106,6 +105,20 @@ class controller(object):
             logger.addHandler(file_handler)
         else:
             pass
+
+    def add_hook(self, hook):
+        """
+        Add a hook to the controller which will be called in addition to all other hooks whenever something happens.
+        The hook is only added if a hook of the same class is not already present.
+
+        Args:
+            hook (pySDC.Hook): A hook class that is derived from the core hook class
+
+        Returns:
+            None
+        """
+        if hook not in [type(me) for me in self.hooks]:
+            self.__hooks += [hook()]
 
     def welcome_message(self):
         out = (

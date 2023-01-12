@@ -1,5 +1,4 @@
 import logging
-import time
 from collections import namedtuple
 
 
@@ -9,20 +8,6 @@ class hooks(object):
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 
     Attributes:
-        __t0_setup (float): private variable to get starting time of setup
-        __t0_run (float): private variable to get starting time of the run
-        __t0_predict (float): private variable to get starting time of the predictor
-        __t0_step (float): private variable to get starting time of the step
-        __t0_iteration (float): private variable to get starting time of the iteration
-        __t0_sweep (float): private variable to get starting time of the sweep
-        __t0_comm (list): private variable to get starting time of the communication
-        __t1_run (float): private variable to get end time of the run
-        __t1_predict (float): private variable to get end time of the predictor
-        __t1_step (float): private variable to get end time of the step
-        __t1_iteration (float): private variable to get end time of the iteration
-        __t1_sweep (float): private variable to get end time of the sweep
-        __t1_setup (float): private variable to get end time of setup
-        __t1_comm (list): private variable to hold timing of the communication (!)
         __num_restarts (int): number of restarts of the current step
         logger: logger instance for output
         __stats (dict): dictionary for gathering the statistics of a run

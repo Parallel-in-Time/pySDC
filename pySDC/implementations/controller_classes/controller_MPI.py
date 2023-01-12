@@ -807,7 +807,7 @@ class controller_MPI(controller):
                     self.S.levels[l - 1].sweep.update_nodes()
                     self.S.levels[l - 1].sweep.compute_residual()
                     for hook in self.hooks:
-                        hooks.post_sweep(step=self.S, level_number=l - 1)
+                        hook.post_sweep(step=self.S, level_number=l - 1)
 
         # update stage
         self.S.status.stage = 'IT_FINE'

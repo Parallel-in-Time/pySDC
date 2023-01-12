@@ -8,7 +8,8 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ProblemError
-from pySDC.projects.Resilience.hook import log_error_estimates
+from pySDC.projects.Resilience.hook import log_data
+from pySDC.implementations.hooks.log_solution import log_solution
 
 
 def plot_step_sizes(stats, ax):
@@ -85,7 +86,7 @@ def run_vdp(
     custom_description=None,
     num_procs=1,
     Tend=10.0,
-    hook_class=log_error_estimates,
+    hook_class=log_data,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -138,7 +139,7 @@ def run_vdp(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_class
+    controller_params['hook_class'] = [hook_class, log_solution]
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -212,7 +213,7 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
     Returns:
         dict: Key values to perform tests on
     """
-    types = ['e_embedded', 'restart', 'dt', 'sweeps', 'residual_post_step']
+    types = ['error_embedded_estimate', 'restart', 'dt', 'sweeps', 'residual_post_step']
     data = {}
     for type in types:
         if type not in get_list_of_types(stats):
