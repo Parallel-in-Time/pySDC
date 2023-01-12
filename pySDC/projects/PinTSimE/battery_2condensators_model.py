@@ -78,7 +78,7 @@ def main(use_switch_estimator=True):
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
-    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
@@ -98,7 +98,7 @@ def main(use_switch_estimator=True):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = log_data
 
     # convergence controllers
@@ -164,7 +164,7 @@ def main(use_switch_estimator=True):
     restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
     print("Restarts for dt: ", level_params['dt'], " -- ", np.sum(restarts))
 
-    assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     plot_voltages(description, use_switch_estimator)

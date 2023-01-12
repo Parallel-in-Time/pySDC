@@ -19,15 +19,15 @@ def run(dt, use_switch_estimator=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-13
+    level_params['restol'] = -1
     level_params['dt'] = dt
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
-    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'zero'
+    # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()
@@ -39,16 +39,14 @@ def run(dt, use_switch_estimator=True):
     problem_params['L'] = 1.0
     problem_params['alpha'] = 5.0
     problem_params['V_ref'] = np.array([1.0, 1.0])  # [V_ref1, V_ref2]
-    problem_params['set_switch'] = np.array([False, False], dtype=bool)
-    problem_params['t_switch'] = np.zeros(np.shape(problem_params['V_ref'])[0])
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 4
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = log_data
 
     # convergence controllers
@@ -111,7 +109,7 @@ def run(dt, use_switch_estimator=True):
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
 
-    assert np.mean(niters) <= 12, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     return stats, description
@@ -122,7 +120,7 @@ def check(cwd='./'):
     Routine to check the differences between using a switch estimator or not
     """
 
-    dt_list = [4e-1, 4e-2, 4e-3]
+    dt_list = [1e-1, 1e-2, 1e-3]
     use_switch_estimator = [True, False]
     restarts_all = []
     restarts_dict = dict()
@@ -161,15 +159,15 @@ def check(cwd='./'):
         stats_false = dill.load(f2)
         f2.close()
 
-        val_switch1 = get_sorted(stats_true, type='switch1', sortby='time')
-        val_switch2 = get_sorted(stats_true, type='switch2', sortby='time')
-        t_switch1 = [v[1] for v in val_switch1]
-        t_switch2 = [v[1] for v in val_switch2]
+        val_switch = get_sorted(stats_true, type='switch', sortby='time')
+        #val_switch2 = get_sorted(stats_true, type='switch2', sortby='time')
+        t_switch = [v[1] for v in val_switch]
+        #t_switch2 = [v[1] for v in val_switch2]
 
-        t_switch1 = t_switch1[-1]
-        t_switch2 = t_switch2[-1]
+        #t_switch1 = t_switch1[-1]
+        #t_switch2 = t_switch2[-1]
 
-        val_switch_all.append([t_switch1, t_switch2])
+        val_switch_all.append([t_switch[0], t_switch[1]])
 
         vC1_true = get_sorted(stats_true, type='voltage C1', recomputed=False, sortby='time')
         vC2_true = get_sorted(stats_true, type='voltage C2', recomputed=False, sortby='time')
@@ -187,29 +185,29 @@ def check(cwd='./'):
         times_false2 = [v[0] for v in vC2_false]
 
         for m in range(len(times_true1)):
-            if np.round(times_true1[m], 15) == np.round(t_switch1, 15):
+            if np.round(times_true1[m], 15) == np.round(t_switch[0], 15):
                 diff_true_all1.append(diff_true1[m])
 
         for m in range(len(times_true2)):
-            if np.round(times_true2[m], 15) == np.round(t_switch2, 15):
+            if np.round(times_true2[m], 15) == np.round(t_switch[1], 15):
                 diff_true_all2.append(diff_true2[m])
 
         for m in range(1, len(times_false1)):
-            if times_false1[m - 1] < t_switch1 < times_false1[m]:
+            if times_false1[m - 1] < t_switch[0] < times_false1[m]:
                 diff_false_all_before1.append(diff_false1[m - 1])
                 diff_false_all_after1.append(diff_false1[m])
 
         for m in range(1, len(times_false2)):
-            if times_false2[m - 1] < t_switch2 < times_false2[m]:
+            if times_false2[m - 1] < t_switch[1] < times_false2[m]:
                 diff_false_all_before2.append(diff_false2[m - 1])
                 diff_false_all_after2.append(diff_false2[m])
 
         restarts_dt = restarts_dict[dt_item]
         for i in range(len(restarts_dt[:, 0])):
-            if round(restarts_dt[i, 0], 13) == round(t_switch1, 13):
+            if round(restarts_dt[i, 0], 13) == round(t_switch[0], 13):
                 restarts_dt_switch1.append(np.sum(restarts_dt[0:i, 1]))
 
-            if round(restarts_dt[i, 0], 13) == round(t_switch2, 13):
+            if round(restarts_dt[i, 0], 13) == round(t_switch[1], 13):
                 restarts_dt_switch2.append(np.sum(restarts_dt[i - 1 :, 1]))
 
         setup_mpl()
@@ -217,7 +215,7 @@ def check(cwd='./'):
         ax1.set_title('Time evolution of $v_{C_{1}}-V_{ref1}$')
         ax1.plot(times_true1, diff_true1, label='SE=True', color='#ff7f0e')
         ax1.plot(times_false1, diff_false1, label='SE=False', color='#1f77b4')
-        ax1.axvline(x=t_switch1, linestyle='--', color='k', label='Switch1')
+        ax1.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch1')
         ax1.legend(frameon=False, fontsize=10, loc='lower left')
         ax1.set_yscale('symlog', linthresh=1e-5)
         ax1.set_xlabel('Time')
@@ -230,7 +228,7 @@ def check(cwd='./'):
         ax2.set_title('Time evolution of $v_{C_{2}}-V_{ref2}$')
         ax2.plot(times_true2, diff_true2, label='SE=True', color='#ff7f0e')
         ax2.plot(times_false2, diff_false2, label='SE=False', color='#1f77b4')
-        ax2.axvline(x=t_switch2, linestyle='--', color='k', label='Switch2')
+        ax2.axvline(x=t_switch[1], linestyle='--', color='k', label='Switch2')
         ax2.legend(frameon=False, fontsize=10, loc='lower left')
         ax2.set_yscale('symlog', linthresh=1e-5)
         ax2.set_xlabel('Time')

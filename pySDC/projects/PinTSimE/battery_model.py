@@ -2,7 +2,7 @@ import numpy as np
 import dill
 from pathlib import Path
 
-from pySDC.helpers.stats_helper import get_sorted
+from pySDC.helpers.stats_helper import sort_stats, filter_stats, get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -99,7 +99,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = log_data
     controller_params['mssdc_jac'] = False
 
@@ -182,7 +182,7 @@ def run():
     dt = 1e-3
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
-    use_switch_estimator = [False]
+    use_switch_estimator = [True]
     use_adaptivity = [False]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
@@ -241,6 +241,33 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adapt
 
     fig.savefig('data/{}_model_solution_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
+    
+def get_recomputed(stats, type, sortby):
+    """
+    Function that filters statistics after a recomputation
+    Args:
+        stats (dict): Raw statistics from a controller run
+        type (str): the type the be filtered
+        sortby (str): string to specify which key to use for sorting
+    Returns:
+        sorted_list (list): list of filtered statistics
+    """
+
+    sorted_nested_list = []
+    times_unique = np.unique([me[0] for me in get_sorted(stats, type=type)])
+    filtered_list = [
+        filter_stats(
+            stats,
+            time=t_unique,
+            num_restarts=max([me.num_restarts for me in filter_stats(stats, type=type, time=t_unique).keys()]),
+            type=type,
+        )
+        for t_unique in times_unique
+    ]
+    for item in filtered_list:
+        sorted_nested_list.append(sort_stats(item, sortby=sortby))
+    sorted_list = [item for sub_item in sorted_nested_list for item in sub_item]
+    return sorted_list
 
 
 def proof_assertions_description(description, use_adaptivity, use_switch_estimator):

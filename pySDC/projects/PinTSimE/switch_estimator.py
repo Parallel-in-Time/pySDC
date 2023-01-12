@@ -60,30 +60,14 @@ class SwitchEstimator(ConvergenceController):
 
         L = S.levels[0]
 
-        if not type(L.prob.params.V_ref) == int and not type(L.prob.params.V_ref) == float:
-            # if V_ref is not a scalar, but an (np.)array
-            V_ref = np.zeros(np.shape(L.prob.params.V_ref)[0], dtype=float)
-            for m in range(np.shape(L.prob.params.V_ref)[0]):
-                V_ref[m] = L.prob.params.V_ref[m]
-        else:
-            V_ref = np.array([L.prob.params.V_ref], dtype=float)
+        if S.status.iter == S.params.maxiter:
 
-        if S.status.iter == S.params.maxiter and self.count_switches < np.shape(V_ref)[0]:
-            # if S.status.iter > 0 and self.count_switches < np.shape(V_ref)[0]:
-            for m in range(len(L.u)):
-                if L.u[m][self.params.count_switches + 1] - V_ref[self.params.count_switches] <= 0:
-                    self.params.switch_detected = True
-                    m_guess = m - 1
-                    break
+            self.params.switch_detected, m_guess, vC_switch = L.prob.get_switching_info(L.u, L.time)
 
             if self.params.switch_detected:
                 t_interp = [
                     L.time + L.dt * self.params.coll_nodes_local[m] for m in range(len(self.params.coll_nodes_local))
                 ]
-
-                vC_switch = []
-                for m in range(1, len(L.u)):
-                    vC_switch.append(L.u[m][self.params.count_switches + 1] - V_ref[self.params.count_switches])
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
@@ -102,6 +86,7 @@ class SwitchEstimator(ConvergenceController):
 
                         else:
                             dt_switch = self.params.t_switch - L.time
+                            L.prob.set_counter()
                             self.log(
                                 f"Switch located at time {self.params.t_switch:.6f} inside tol={self.params.tol:.4f}", S
                             )
@@ -169,9 +154,8 @@ class SwitchEstimator(ConvergenceController):
 
         if self.params.switch_detected_step:
             if L.time + L.dt >= self.params.t_switch:
-                self.count_switches += 1
+                self.params.count_switches += 1
                 self.params.t_switch = None
-                L.prob.t_switch = self.params.t_switch
                 self.params.switch_detected_step = False
 
                 dt_planned = L.status.dt_new if L.status.dt_new is not None else self.params.dt_initial
