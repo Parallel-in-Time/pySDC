@@ -1,3 +1,6 @@
+|badge-ga|
+|badge-ossf|
+
 Welcome to pySDC!
 =================
 
@@ -74,3 +77,9 @@ This project has received funding from the `European High-Performance Computing 
 The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_ (BMBF) grant 16HPC047.
 The project also received help from the `Helmholtz Platform for Research Software Engineering - Preparatory Study (HiRSE_PS) <https://www.helmholtz-hirse.de/>`_.
+
+
+.. |badge-ga| image:: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg
+    :target: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml
+.. |badge-ossf| image:: https://bestpractices.coreinfrastructure.org/projects/6909/badge
+    :target: https://bestpractices.coreinfrastructure.org/projects/6909
