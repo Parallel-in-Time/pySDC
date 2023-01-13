@@ -114,25 +114,42 @@ class advectionNd(ptype):
         )
         self.A *= -c
 
-        self.xv = np.meshgrid(*[xvalues for _ in range(ndim)])
+        self.xvalues = xvalues
         self.Id = sp.eye(np.prod(nvars), format='csc')
 
         # store relevant attributes
-        self.c, self.freq, self.sigma, self.dx = c, freq, sigma, dx
-        self.stencil_type, self.order = stencil_type, order
-        self.lintol, self.liniter = lintol, liniter
-        self.direct_solver, self.bc = direct_solver, bc
+        self.freq, self.sigma = freq, sigma
+        self.lintol, self.liniter, self.direct_solve = lintol, liniter, direct_solver
+
+        # read-only attributes
+        self._readOnly = [ndim, c, stencil_type, order]
 
         # register parameters
         self._register('nvars', 'c', 'freq', 'stencil_type', 'order', 'lintol', 'liniter', 'direct_solver', 'bc')
 
     @property
     def ndim(self):
-        return len(self.xv)
+        return self._readOnly[0]
+
+    @property
+    def c(self):
+        return self._readOnly[1]
+
+    @property
+    def stencil_type(self):
+        return self._readOnly[2]
+
+    @property
+    def order(self):
+        return self._readOnly[3]
 
     @property
     def nvars(self):
-        return self.xv[0].shape
+        return (self.xvalues.size,) * self.ndim
+
+    @property
+    def bc(self):
+        return 'periodic' if self.xvalue[0] == 0 else 'dirichlet-zero'
 
     def eval_f(self, u, t):
         """
@@ -193,23 +210,24 @@ class advectionNd(ptype):
             me: exact solution
         """
         # Initialize pointers and variables
-        ndim, freq, xv, c, sigma = self.ndim, self.freq, self.xv, self.c, self.sigma
+        ndim, freq, x, c, sigma = self.ndim, self.freq, self.xvalues, self.c, self.sigma
         me = self.dtype_u(self.init)
 
         if ndim == 1:
             if freq[0] >= 0:
-                me[:] = np.sin(np.pi * freq[0] * (xv[0] - c * t))
+                me[:] = np.sin(np.pi * freq[0] * (x - c * t))
             elif freq[0] == -1:
                 # Gaussian initial solution
-                me[:] = np.exp(-0.5 * (((xv[0] - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
+                me[:] = np.exp(-0.5 * (((x - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
 
         elif ndim == 2:
-            me[:] = np.sin(np.pi * freq[0] * (xv[0] - c * t)) * np.sin(np.pi * freq[1] * (xv[1] - c * t))
+            me[:] = np.sin(np.pi * freq[0] * (x[None, :] - c * t)) * np.sin(np.pi * freq[1] * (x[:, None] - c * t))
+
         elif ndim == 3:
             me[:] = (
-                np.sin(np.pi * freq[0] * (xv[0] - c * t))
-                * np.sin(np.pi * freq[1] * (xv[1] - c * t))
-                * np.sin(np.pi * freq[2] * (xv[2] - c * t))
+                np.sin(np.pi * freq[0] * (x[None, :, None] - c * t))
+                * np.sin(np.pi * freq[1] * (x[:, None, None] - c * t))
+                * np.sin(np.pi * freq[2] * (x[None, None, :] - c * t))
             )
 
         return me
