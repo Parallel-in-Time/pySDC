@@ -17,7 +17,8 @@ class LogEmbeddedErrorEstimate(hooks):
         Returns:
             None
         """
-        # some abbreviations
+        super().post_step(step, level_number)
+
         L = step.levels[level_number]
 
         self.add_to_stats(

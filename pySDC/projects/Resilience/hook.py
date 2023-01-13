@@ -17,6 +17,8 @@ class log_data(hooks):
         """
         Record los conditiones initiales
         """
+        super().pre_run(step, level_number)
+
         L = step.levels[level_number]
         self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='u0', value=L.u[0])
 
@@ -24,10 +26,9 @@ class log_data(hooks):
         """
         Record final solutions as well as step size and error estimates
         """
-        # some abbreviations
-        L = step.levels[level_number]
+        super().post_step(step, level_number)
 
-        L.sweep.compute_end_point()
+        L = step.levels[level_number]
 
         self.add_to_stats(
             process=step.status.slot,

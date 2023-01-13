@@ -21,13 +21,10 @@ class DefaultHooks(hooks):
         __t1_sweep (float): private variable to get end time of the sweep
         __t1_setup (float): private variable to get end time of setup
         __t1_comm (list): private variable to hold timing of the communication (!)
-        logger: logger instance for output
-        __stats (dict): dictionary for gathering the statistics of a run
-        __entry (namedtuple): statistics entry containing all information to identify the value
     """
 
     def __init__(self):
-        super(DefaultHooks, self).__init__()
+        super().__init__()
         self.__t0_setup = None
         self.__t0_run = None
         self.__t0_predict = None
@@ -51,6 +48,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_setup(step, level_number)
         self.__t0_setup = time.perf_counter()
 
     def pre_run(self, step, level_number):
@@ -61,6 +59,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_run(step, level_number)
         self.__t0_run = time.perf_counter()
 
     def pre_predict(self, step, level_number):
@@ -71,6 +70,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_predict(step, level_number)
         self.__t0_predict = time.perf_counter()
 
     def pre_step(self, step, level_number):
@@ -81,6 +81,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_step(step, level_number)
         self.__t0_step = time.perf_counter()
 
     def pre_iteration(self, step, level_number):
@@ -91,6 +92,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_iteration(step, level_number)
         self.__t0_iteration = time.perf_counter()
 
     def pre_sweep(self, step, level_number):
@@ -101,6 +103,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_sweep(step, level_number)
         self.__t0_sweep = time.perf_counter()
 
     def pre_comm(self, step, level_number):
@@ -111,6 +114,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().pre_comm(step, level_number)
         if len(self.__t0_comm) >= level_number + 1:
             self.__t0_comm[level_number] = time.perf_counter()
         else:
@@ -131,6 +135,7 @@ class DefaultHooks(hooks):
             level_number (int): the current level number
             add_to_stats (bool): set if result should go to stats object
         """
+        super().post_comm(step, level_number)
         assert len(self.__t1_comm) >= level_number + 1
         self.__t1_comm[level_number] += time.perf_counter() - self.__t0_comm[level_number]
 
@@ -156,6 +161,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_sweep(step, level_number)
         self.__t1_sweep = time.perf_counter()
 
         L = step.levels[level_number]
@@ -198,6 +204,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_iteration(step, level_number)
         self.__t1_iteration = time.perf_counter()
 
         L = step.levels[level_number]
@@ -229,6 +236,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_step(step, level_number)
         self.__t1_step = time.perf_counter()
 
         L = step.levels[level_number]
@@ -275,6 +283,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_predict(step, level_number)
         self.__t1_predict = time.perf_counter()
 
         L = step.levels[level_number]
@@ -297,6 +306,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_run(step, level_number)
         self.__t1_run = time.perf_counter()
 
         L = step.levels[level_number]
@@ -319,6 +329,7 @@ class DefaultHooks(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_setup(step, level_number)
         self.__t1_setup = time.perf_counter()
 
         self.add_to_stats(

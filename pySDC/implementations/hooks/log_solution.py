@@ -17,7 +17,8 @@ class LogSolution(hooks):
         Returns:
             None
         """
-        # some abbreviations
+        super().post_step(step, level_number)
+
         L = step.levels[level_number]
         L.sweep.compute_end_point()
 

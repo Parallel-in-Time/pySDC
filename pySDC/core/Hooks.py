@@ -7,9 +7,13 @@ class hooks(object):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 
+    When deriving a custom hook from this class make sure to always call the parent method using e.g.
+    `super().post_step(step, level_number)`. Otherwise bugs may arise when using `filer_recomputed` from the stats
+    helper for post processing.
+
     Attributes:
-        __num_restarts (int): number of restarts of the current step
         logger: logger instance for output
+        __num_restarts (int): number of restarts of the current step
         __stats (dict): dictionary for gathering the statistics of a run
         __entry (namedtuple): statistics entry containing all information to identify the value
     """
@@ -120,7 +124,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        pass
+        self.__num_restarts = step.status.get('restarts_in_a_row') if step is not None else 0
 
     def pre_step(self, step, level_number):
         """

@@ -17,6 +17,8 @@ class LogExtrapolationErrorEstimate(hooks):
         Returns:
             None
         """
+        super().post_step(step, level_number)
+
         # some abbreviations
         L = step.levels[level_number]
 
