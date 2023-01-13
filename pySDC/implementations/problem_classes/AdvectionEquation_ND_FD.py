@@ -122,8 +122,9 @@ class advectionNd(ptype):
         self.lintol, self.liniter, self.direct_solve = lintol, liniter, direct_solver
 
         # read-only attributes
-        self._readOnly = dict(
-            ndim=ndim, c=c, stencil_type=stencil_type, order=order)
+        self._readOnly = {
+            name: eval(name)
+            for name in ['ndim', 'c', 'stencil_type', 'order']}
 
         # register parameters
         self._register('nvars', 'c', 'freq', 'stencil_type', 'order', 'lintol', 'liniter', 'direct_solver', 'bc')
