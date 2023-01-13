@@ -41,7 +41,12 @@ class battery_2condensators(ptype):
         )
 
         self.A = np.zeros((3, 3))
+        self.SV = 0
+        self.SC1 = 1
+        self.SC2 = 0
         self.t_switch = None
+        self.count_switches = 0
+        self.diff = 0.0
 
     def eval_f(self, u, t):
         """
@@ -57,15 +62,29 @@ class battery_2condensators(ptype):
         f.impl[:] = self.A.dot(u)
 
         if u[2] > self.params.V_ref[1]:
-            if t >= self.t_switch if self.t_switch is not None else u[1] <= self.params.V_ref[0]:
-                # switch to C2
-                f.expl[0] = 0
-
-            elif u[1] > self.params.V_ref[0]:
-                # C1 supplies energy
-                f.expl[0] = 0
-
-        elif t >= self.t_switch if self.t_switch is not None else u[2] <= self.params.V_ref[1]:
+            if self.t_switch is not None:
+                if t >= self.t_switch:
+                    if self.count_switches == 1:
+                        # switch to C2
+                        f.expl[0] = 0
+                    elif self.count_switches == 2:
+                        # switch to Vs
+                        f.expl[0] = self.params.Vs / self.params.L
+                else:
+                    if self.count_switches == 1:
+                        # C1 supplies energy
+                        f.expl[0] = 0
+                    elif self.count_switches == 2:
+                        # C2 supplies energy
+                        f.expl[0] = 0
+            else:
+                if u[1] > self.params.V_ref[0]:
+                    # C1 supplies energy
+                    f.expl[0] = 0
+                else:
+                    # switch to C2
+                    f.expl[0] = 0
+        else:
             # switch to Vs
             f.expl[0] = self.params.Vs / self.params.L
 
@@ -85,15 +104,33 @@ class battery_2condensators(ptype):
         self.A = np.zeros((3, 3))
 
         if rhs[2] > self.params.V_ref[1]:
-            if t >= self.t_switch if self.t_switch is not None else rhs[1] <= self.params.V_ref[0]:
-                # switch to C2
-                self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
+            if self.t_switch is not None:
+                if t >= self.t_switch:
+                    if self.count_switches == 1:
+                        # switch to C2
+                        self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
+                    elif self.count_switches == 2:
+                        # switch to Vs
+                        self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
-            elif rhs[1] > self.params.V_ref[0]:
-                # C1 supplies energy
-                self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
+                else:
+                    if self.count_switches == 1:
+                        # C1 supplies energy
+                        self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
+                    elif self.count_switches == 2:
+                        # C2 supplies energy
+                        self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
 
-        elif t >= self.t_switch if self.t_switch is not None else rhs[2] <= self.params.V_ref[1]:
+            else:
+                if rhs[1] > self.params.V_ref[0]:
+                    # C1 supplies energy
+                    self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
+
+                else:
+                    # switch to C2
+                    self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
+
+        else:
             # switch to Vs
             self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
@@ -117,3 +154,44 @@ class battery_2condensators(ptype):
         me[1] = self.params.alpha * self.params.V_ref[0]  # vC1
         me[2] = self.params.alpha * self.params.V_ref[1]  # vC2
         return me
+
+    def get_switching_info(self, u, t):
+        """
+        Provides information about a discrete event for one subinterval.
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+        Returns:
+            switch_detected (bool): Indicates if a switch is found or not
+            m_guess (np.int): Index of where the discrete event would found
+            vC_switch (list): Contains function values of switching condition (for interpolation)
+        """
+
+        switch_detected = False
+        m_guess = -100
+
+        for m in range(len(u)):
+            for k in range(1, self.params.nvars):
+                if u[m][k] - self.params.V_ref[k - 1] <= 0:
+                    switch_detected = True
+                    m_guess = m - 1
+                    k_detected = k
+                    break
+
+                if k == self.params.nvars and switch_detected and u[m][k] - self.params.V_ref[k - 1] <= 0:
+                    msg = 'A discrete event is already found! Multiple switching handling in the same interval is not yet implemented!'
+                    raise AssertionError(msg)
+
+        vC_switch = []
+        if switch_detected:
+            for m in range(1, len(u)):
+                vC_switch.append(u[m][k_detected] - self.params.V_ref[k_detected - 1])
+
+        return switch_detected, m_guess, vC_switch
+
+    def set_counter(self):
+        """
+        Counts the number of switches found.
+        """
+
+        self.count_switches += 1

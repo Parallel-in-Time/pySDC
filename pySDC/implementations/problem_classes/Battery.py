@@ -40,6 +40,7 @@ class battery(ptype):
 
         self.A = np.zeros((2, 2))
         self.t_switch = None
+        self.count_switches = 0
 
     def eval_f(self, u, t):
         """
@@ -54,11 +55,21 @@ class battery(ptype):
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
 
-        if t >= self.t_switch if self.t_switch is not None else u[1] <= self.params.V_ref:
-            f.expl[0] = self.params.Vs / self.params.L
+        if self.t_switch is not None:
+            if t >= self.t_switch:
+                f.expl[0] = self.params.Vs / self.params.L
+                print('Vs')
+            else:
+                f.expl[0] = 0
+                print('C1')
 
         else:
-            f.expl[0] = 0
+            if u[1] <= self.params.V_ref:
+                f.expl[0] = self.params.Vs / self.params.L
+                print("Vs")
+            else:
+                f.expl[0] = 0
+                print("C1")
 
         return f
 
@@ -75,11 +86,17 @@ class battery(ptype):
         """
         self.A = np.zeros((2, 2))
 
-        if t >= self.t_switch if self.t_switch is not None else rhs[1] <= self.params.V_ref:
-            self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+        if self.t_switch is not None:
+            if t >= self.t_switch:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+            else:
+                self.A[1, 1] = -1 / (self.params.C * self.params.R)
 
         else:
-            self.A[1, 1] = -1 / (self.params.C * self.params.R)
+            if rhs[1] <= self.params.V_ref:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+            else:
+                self.A[1, 1] = -1 / (self.params.C * self.params.R)
 
         me = self.dtype_u(self.init)
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
@@ -101,6 +118,41 @@ class battery(ptype):
         me[1] = self.params.alpha * self.params.V_ref  # vC
 
         return me
+
+    def get_switching_info(self, u, t):
+        """
+        Provides information about a discrete event for one subinterval.
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+        Returns:
+            switch_detected (bool): Indicates if a switch is found or not
+            m_guess (np.int): Index of where the discrete event would found
+            vC_switch (list): Contains function values of switching condition (for interpolation)
+        """
+
+        switch_detected = False
+        m_guess = -100
+
+        for m in range(len(u)):
+            if u[m][1] - self.params.V_ref <= 0:
+                switch_detected = True
+                m_guess = m - 1
+                break
+
+        vC_switch = []
+        if switch_detected:
+            for m in range(1, len(u)):
+                vC_switch.append(u[m][1] - self.params.V_ref)
+
+        return switch_detected, m_guess, vC_switch
+
+    def set_counter(self):
+        """
+        Counts the number of switches found.
+        """
+
+        self.count_switches += 1
 
 
 class battery_implicit(ptype):
@@ -148,6 +200,7 @@ class battery_implicit(ptype):
 
         self.A = np.zeros((2, 2))
         self.t_switch = None
+        self.count_switches = 0
         self.newton_itercount = 0
         self.lin_itercount = 0
         self.newton_ncalls = 0
@@ -166,13 +219,21 @@ class battery_implicit(ptype):
         f = self.dtype_f(self.init, val=0.0)
         non_f = np.zeros(2)
 
-        if t >= self.t_switch if self.t_switch is not None else u[1] <= self.params.V_ref:
-            self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
-            non_f[0] = self.params.Vs / self.params.L
+        if self.t_switch is not None:
+            if t >= self.t_switch:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+                non_f[0] = self.params.Vs / self.params.L
+            else:
+                self.A[1, 1] = -1 / (self.params.C * self.params.R)
+                non_f[0] = 0
 
         else:
-            self.A[1, 1] = -1 / (self.params.C * self.params.R)
-            non_f[0] = 0
+            if u[1] <= self.params.V_ref:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+                non_f[0] = self.params.Vs / self.params.L
+            else:
+                self.A[1, 1] = -1 / (self.params.C * self.params.R)
+                non_f[0] = 0
 
         f[:] = self.A.dot(u) + non_f
 
@@ -194,13 +255,21 @@ class battery_implicit(ptype):
         non_f = np.zeros(2)
         self.A = np.zeros((2, 2))
 
-        if t >= self.t_switch if self.t_switch is not None else rhs[1] <= self.params.V_ref:
-            self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
-            non_f[0] = self.params.Vs / self.params.L
+        if self.t_switch is not None:
+            if t >= self.t_switch:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+                non_f[0] = self.params.Vs / self.params.L
+            else:
+                self.A[1, 1] = -1 / (self.params.C * self.params.R)
+                non_f[0] = 0
 
         else:
-            self.A[1, 1] = -1 / (self.params.C * self.params.R)
-            non_f[0] = 0
+            if rhs[1] <= self.params.V_ref:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+                non_f[0] = self.params.Vs / self.params.L
+            else:
+                self.A[1, 1] = -1 / (self.params.C * self.params.R)
+                non_f[0] = 0
 
         # start newton iteration
         n = 0
@@ -256,3 +325,38 @@ class battery_implicit(ptype):
         me[1] = self.params.alpha * self.params.V_ref  # vC
 
         return me
+
+    def get_switching_info(self, u, t):
+        """
+        Provides information about a discrete event for one subinterval.
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+        Returns:
+            switch_detected (bool): Indicates if a switch is found or not
+            m_guess (np.int): Index of where the discrete event would found
+            vC_switch (list): Contains function values of switching condition (for interpolation)
+        """
+
+        switch_detected = False
+        m_guess = -100
+
+        for m in range(len(u)):
+            if u[m][1] - self.params.V_ref <= 0:
+                switch_detected = True
+                m_guess = m - 1
+                break
+
+        vC_switch = []
+        if switch_detected:
+            for m in range(1, len(u)):
+                vC_switch.append(u[m][1] - self.params.V_ref)
+
+        return switch_detected, m_guess, vC_switch
+
+    def set_counter(self):
+        """
+        Counts the number of switches found.
+        """
+
+        self.count_switches += 1

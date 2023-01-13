@@ -94,7 +94,7 @@ def main(use_switch_estimator=True):
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 5
+    step_params['maxiter'] = 4
 
     # initialize controller parameters
     controller_params = dict()

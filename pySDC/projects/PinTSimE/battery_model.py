@@ -183,7 +183,7 @@ def run():
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
     use_switch_estimator = [True]
-    use_adaptivity = [False]
+    use_adaptivity = [True]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
