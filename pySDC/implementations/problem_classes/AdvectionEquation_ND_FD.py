@@ -122,30 +122,26 @@ class advectionNd(ptype):
         self.lintol, self.liniter, self.direct_solve = lintol, liniter, direct_solver
 
         # read-only attributes
-        self._readOnly = [ndim, c, stencil_type, order]
+        self._readOnly = dict(
+            ndim=ndim, c=c, stencil_type=stencil_type, order=order)
 
         # register parameters
         self._register('nvars', 'c', 'freq', 'stencil_type', 'order', 'lintol', 'liniter', 'direct_solver', 'bc')
 
     @property
-    def ndim(self):
-        return self._readOnly[0]
+    def ndim(self): return self._readOnly['ndim']
 
     @property
-    def c(self):
-        return self._readOnly[1]
+    def c(self): return self._readOnly['c']
 
     @property
-    def stencil_type(self):
-        return self._readOnly[2]
+    def stencil_type(self): return self._readOnly['stencil_type']
 
     @property
-    def order(self):
-        return self._readOnly[3]
+    def order(self): return self._readOnly['order']
 
     @property
-    def nvars(self):
-        return (self.xvalues.size,) * self.ndim
+    def nvars(self): return (self.xvalues.size,) * self.ndim
 
     @property
     def bc(self):
