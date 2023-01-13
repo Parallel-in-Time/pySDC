@@ -30,6 +30,7 @@ class advectionNd(ptype):
         liniter=10000,
         direct_solver=True,
         bc='periodic',
+        sigma=6e-2,
     ):
         """
         Initialization routine
@@ -72,6 +73,10 @@ class advectionNd(ptype):
 
         # check values for freq and nvars
         for f in freq:
+            if ndim == 1 and f == -1:
+                # use Gaussian initial solution in 1D
+                bc == 'periodic'
+                break
             if f % 2 != 0 and bc == 'periodic':
                 raise ProblemError('need even number of frequencies due to periodic BCs')
         for nvar in nvars:
@@ -113,7 +118,7 @@ class advectionNd(ptype):
         self.Id = sp.eye(np.prod(nvars), format='csc')
 
         # store relevant attributes
-        self.c, self.freq, self.dx = c, freq, dx
+        self.c, self.freq, self.sigma, self.dx = c, freq, sigma, dx
         self.stencil_type, self.order = stencil_type, order
         self.lintol, self.liniter = lintol, liniter
         self.direct_solver, self.bc = direct_solver, bc
@@ -142,7 +147,7 @@ class advectionNd(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -158,20 +163,23 @@ class advectionNd(ptype):
         Returns:
             dtype_u: solution as mesh
         """
-
+        direct_solver, Id, A, nvars, lintol, liniter = (
+            self.direct_solver,
+            self.Id,
+            self.A,
+            self.nvars,
+            self.lintol,
+            self.liniter,
+        )
         me = self.dtype_u(self.init)
 
-        if self.params.direct_solver:
-            me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
+        if direct_solver:
+            me[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
         else:
-            me[:] = gmres(
-                self.Id - factor * self.A,
-                rhs.flatten(),
-                x0=u0.flatten(),
-                tol=self.params.lintol,
-                maxiter=self.params.liniter,
-                atol=0,
-            )[0].reshape(self.params.nvars)
+            me[:] = gmres(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
+                0
+            ].reshape(nvars)
+
         return me
 
     def u_exact(self, t, **kwargs):
@@ -182,24 +190,26 @@ class advectionNd(ptype):
             t (float): current time
 
         Returns:
-            dtype_u: exact solution
+            me: exact solution
         """
-
+        # Initialize pointers and variables
+        ndim, freq, xv, c, sigma = self.ndim, self.freq, self.xv, self.c, self.sigma
         me = self.dtype_u(self.init)
-        if self.params.ndim == 1:
-            if self.params.freq[0] >= 0:
-                me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
-            elif self.params.freq[0] == -1:
-                me[:] = np.exp(-0.5 * (((self.xv[0] - (self.params.c * t)) % 1.0 - 0.5) / self.params.sigma) ** 2)
 
-        elif self.params.ndim == 2:
-            me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * np.sin(
-                np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t)
-            )
-        elif self.params.ndim == 3:
+        if ndim == 1:
+            if freq[0] >= 0:
+                me[:] = np.sin(np.pi * freq[0] * (xv[0] - c * t))
+            elif freq[0] == -1:
+                # Gaussian initial solution
+                me[:] = np.exp(-0.5 * (((xv[0] - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
+
+        elif ndim == 2:
+            me[:] = np.sin(np.pi * freq[0] * (xv[0] - c * t)) * np.sin(np.pi * freq[1] * (xv[1] - c * t))
+        elif ndim == 3:
             me[:] = (
-                np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
-                * np.sin(np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t))
-                * np.sin(np.pi * self.params.freq[2] * (self.xv[2] - self.params.c * t))
+                np.sin(np.pi * freq[0] * (xv[0] - c * t))
+                * np.sin(np.pi * freq[1] * (xv[1] - c * t))
+                * np.sin(np.pi * freq[2] * (xv[2] - c * t))
             )
+
         return me
