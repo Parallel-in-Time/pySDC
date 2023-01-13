@@ -75,7 +75,7 @@ class advectionNd(ptype):
         for f in freq:
             if ndim == 1 and f == -1:
                 # use Gaussian initial solution in 1D
-                bc == 'periodic'
+                bc = 'periodic'
                 break
             if f % 2 != 0 and bc == 'periodic':
                 raise ProblemError('need even number of frequencies due to periodic BCs')
