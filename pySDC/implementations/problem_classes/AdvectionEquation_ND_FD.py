@@ -118,35 +118,14 @@ class advectionNd(ptype):
         self.Id = sp.eye(np.prod(nvars), format='csc')
 
         # store relevant attributes
+        self.ndim, self.c = ndim, c
+        self.stencil_type, self.order, self.bc = stencil_type, order, bc
         self.freq, self.sigma = freq, sigma
-        self.lintol, self.liniter, self.direct_solve = lintol, liniter, direct_solver
-
-        # read-only attributes
-        self._readOnly = {
-            name: eval(name)
-            for name in ['ndim', 'c', 'stencil_type', 'order']}
+        self.lintol, self.liniter, self.direct_solver = lintol, liniter, direct_solver
 
         # register parameters
-        self._register('nvars', 'c', 'freq', 'stencil_type', 'order', 'lintol', 'liniter', 'direct_solver', 'bc')
-
-    @property
-    def ndim(self): return self._readOnly['ndim']
-
-    @property
-    def c(self): return self._readOnly['c']
-
-    @property
-    def stencil_type(self): return self._readOnly['stencil_type']
-
-    @property
-    def order(self): return self._readOnly['order']
-
-    @property
-    def nvars(self): return (self.xvalues.size,) * self.ndim
-
-    @property
-    def bc(self):
-        return 'periodic' if self.xvalue[0] == 0 else 'dirichlet-zero'
+        self._register('nvars', 'ndim', 'c', 'stencil_type', 'order', 'bc', readOnly=True)
+        self._register('freq', 'gamma', 'lintol', 'liniter', 'direct_solver')
 
     def eval_f(self, u, t):
         """
