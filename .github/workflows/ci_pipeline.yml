@@ -3,6 +3,7 @@ name: CI pipeline for pySDC
 on:
   push:
   pull_request_target:
+    types: [opened, edited, closed, reopened, synchronize, ready_for_review, review_requested , review_request_removed, auto_merge_enabled,  auto_merge_disabled]
   schedule:
     - cron: '1 5 * * 1'
 
