@@ -130,7 +130,9 @@ def check(cwd='./'):
             stats, description = run(dt=dt_item, use_switch_estimator=use_SE)
 
             if use_SE:
-                assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found for dt={}!'.format(dt_item)
+                assert (
+                    len(get_recomputed(stats, type='switch', sortby='time')) >= 1
+                ), 'No switches found for dt={}!'.format(dt_item)
 
             fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, use_SE)
             f = open(fname, 'wb')

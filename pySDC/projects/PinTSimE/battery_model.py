@@ -247,6 +247,7 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     fig.savefig('data/{}_model_solution_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
+
 def get_recomputed(stats, type, sortby):
     """
     Function that filters statistics after a recomputation

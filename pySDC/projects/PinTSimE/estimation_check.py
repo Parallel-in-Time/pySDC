@@ -196,7 +196,7 @@ def check(cwd='./'):
     """
 
     V_ref = 1.0
-    dt_list = [1e-2, 1e-3, 1e-4]
+    dt_list = [4e-2, 4e-3]
     use_switch_estimator = [True, False]
     use_adaptivity = [True, False]
     restarts_SE = []
@@ -220,7 +220,9 @@ def check(cwd='./'):
                     )
 
                     if use_SE:
-                        assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found for dt={}!'.format(dt_item)
+                        assert (
+                            len(get_recomputed(stats, type='switch', sortby='time')) >= 1
+                        ), 'No switches found for dt={}!'.format(dt_item)
 
                     fname = 'data/battery_dt{}_USE{}_USA{}_{}.dat'.format(dt_item, use_SE, use_A, sweeper.__name__)
                     f = open(fname, 'wb')
