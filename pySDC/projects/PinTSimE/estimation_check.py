@@ -11,10 +11,68 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import get_recomputed, log_data, proof_assertions_description
 import pySDC.helpers.plot_helper as plt_helper
+from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+
+
+class log_data_adaptivity(hooks):
+    def post_step(self, step, level_number):
+
+        super(log_data_adaptivity, self).post_step(step, level_number)
+
+        # some abbreviations
+        L = step.levels[level_number]
+
+        L.sweep.compute_end_point()
+
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C',
+            value=L.uend[1],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=int(step.status.get('restart')),
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.error_embedded_estimate,
+        )
 
 
 def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
@@ -63,7 +121,10 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 15
-    controller_params['hook_class'] = log_data
+    if use_adaptivity:
+        controller_params['hook_class'] = log_data_adaptivity
+    else:
+        controller_params['hook_class'] = log_data
     controller_params['mssdc_jac'] = False
 
     # convergence controllers
@@ -158,7 +219,8 @@ def check(cwd='./'):
                         V_ref=V_ref,
                     )
 
-                    assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found!'
+                    if use_SE:
+                        assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found for dt={}!'.format(dt_item)
 
                     fname = 'data/battery_dt{}_USE{}_USA{}_{}.dat'.format(dt_item, use_SE, use_A, sweeper.__name__)
                     f = open(fname, 'wb')

@@ -181,7 +181,7 @@ def run():
     as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    dt = 1e-3
+    dt = 1e-2
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
     recomputed = False
