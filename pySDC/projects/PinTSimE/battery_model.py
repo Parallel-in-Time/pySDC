@@ -132,6 +132,8 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     t0 = 0.0
     Tend = 0.3
 
+    assert dt < Tend, "Time step is too large for the time domain!"
+
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
@@ -167,7 +169,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
 
-    assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     return description
@@ -182,6 +184,7 @@ def run():
     dt = 1e-3
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
+    recomputed = False
     use_switch_estimator = [True]
     use_adaptivity = [True]
 
@@ -196,10 +199,10 @@ def run():
                     use_adaptivity=use_A,
                 )
 
-            plot_voltages(description, problem.__name__, sweeper.__name__, use_SE, use_A)
+            plot_voltages(description, problem.__name__, sweeper.__name__, recomputed, use_SE, use_A)
 
 
-def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adaptivity, cwd='./'):
+def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimator, use_adaptivity, cwd='./'):
     """
     Routine to plot the numerical solution of the model
     """
@@ -221,8 +224,10 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adapt
     ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
 
     if use_switch_estimator:
-        val_switch = get_sorted(stats, type='switch', sortby='time')
-        t_switch = [v[1] for v in val_switch]
+        switches = get_recomputed(stats, type='switch', sortby='time')
+
+        assert len(switches) >= 1, 'No switches found!'
+        t_switch = [v[1] for v in switches]
         ax.axvline(x=t_switch[-1], linestyle='--', linewidth=0.8, color='r', label='Switch')
 
     if use_adaptivity:
@@ -241,7 +246,7 @@ def plot_voltages(description, problem, sweeper, use_switch_estimator, use_adapt
 
     fig.savefig('data/{}_model_solution_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
-    
+
 def get_recomputed(stats, type, sortby):
     """
     Function that filters statistics after a recomputation

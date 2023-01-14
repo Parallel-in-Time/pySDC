@@ -35,11 +35,10 @@ class SwitchEstimator(ConvergenceController):
         defaults = {
             'control_order': 100,
             'tol': description['level_params']['dt'],
-            'coll_nodes_local': coll.nodes,
+            'coll_nodes': coll.nodes,
             'switch_detected': False,
             'switch_detected_step': False,
             't_switch': None,
-            'count_switches': 0,
             'dt_initial': description['level_params']['dt'],
         }
         return {**defaults, **params}
@@ -66,7 +65,7 @@ class SwitchEstimator(ConvergenceController):
 
             if self.params.switch_detected:
                 t_interp = [
-                    L.time + L.dt * self.params.coll_nodes_local[m] for m in range(len(self.params.coll_nodes_local))
+                    L.time + L.dt * self.params.coll_nodes[m] for m in range(len(self.params.coll_nodes))
                 ]
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
@@ -158,7 +157,7 @@ class SwitchEstimator(ConvergenceController):
                 self.params.t_switch = None
                 self.params.switch_detected_step = False
 
-                dt_planned = L.status.dt_new if L.status.dt_new is not None else self.params.dt_initial
+                dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
                 L.status.dt_new = dt_planned
 
         super(SwitchEstimator, self).post_step_processing(controller, S)

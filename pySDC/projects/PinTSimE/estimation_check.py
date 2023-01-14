@@ -96,6 +96,8 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     t0 = 0.0
     Tend = 0.3
 
+    assert dt < Tend, "Time step is too large for the time domain!"
+
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
@@ -155,6 +157,8 @@ def check(cwd='./'):
                         use_adaptivity=use_A,
                         V_ref=V_ref,
                     )
+
+                    assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found!'
 
                     fname = 'data/battery_dt{}_USE{}_USA{}_{}.dat'.format(dt_item, use_SE, use_A, sweeper.__name__)
                     f = open(fname, 'wb')
@@ -225,8 +229,8 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
         stats_adapt = dill.load(f4)
         f4.close()
 
-        val_switch_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
-        t_switch_SE_adapt = [v[1] for v in val_switch_SE_adapt]
+        switches_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
+        t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switch_SE_adapt = t_switch_SE_adapt[-1]
 
         dt_SE_adapt_val = get_sorted(stats_SE_adapt, type='dt', recomputed=False)
@@ -349,12 +353,12 @@ def differences_around_switch(
         stats_adapt = dill.load(f4)
         f4.close()
 
-        val_switch_SE = get_recomputed(stats_SE, type='switch', sortby='time')
-        t_switch = [v[1] for v in val_switch_SE]
+        switches_SE = get_recomputed(stats_SE, type='switch', sortby='time')
+        t_switch = [v[1] for v in switches_SE]
         t_switch = t_switch[-1]  # battery has only one single switch
 
-        val_switch_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
-        t_switch_SE_adapt = [v[1] for v in val_switch_SE_adapt]
+        switches_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
+        t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switch_SE_adapt = t_switch_SE_adapt[-1]
 
         vC_SE = get_sorted(stats_SE, type='voltage C', recomputed=False, sortby='time')
@@ -493,12 +497,12 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
         stats_adapt = dill.load(f4)
         f4.close()
 
-        val_switch_SE = get_recomputed(stats_SE, type='switch', sortby='time')
-        t_switch_SE = [v[1] for v in val_switch_SE]
+        switches_SE = get_recomputed(stats_SE, type='switch', sortby='time')
+        t_switch_SE = [v[1] for v in switches_SE]
         t_switch_SE = t_switch_SE[-1]  # battery has only one single switch
 
-        val_switch_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
-        t_switch_SE_adapt = [v[1] for v in val_switch_SE_adapt]
+        switches_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
+        t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switch_SE_adapt = t_switch_SE_adapt[-1]
 
         dt_adapt = np.array(get_sorted(stats_adapt, type='dt', recomputed=False, sortby='time'))
@@ -654,12 +658,12 @@ def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
         times_adapt.append([v[0] for v in iter_counts_adapt_val])
         times.append([v[0] for v in iter_counts_val])
 
-        val_switch_SE = get_recomputed(stats_SE, type='switch', sortby='time')
-        t_switch_SE = [v[1] for v in val_switch_SE]
+        switches_SE = get_recomputed(stats_SE, type='switch', sortby='time')
+        t_switch_SE = [v[1] for v in switches_SE]
         t_switches_SE.append(t_switch_SE[-1])
 
-        val_switch_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
-        t_switch_SE_adapt = [v[1] for v in val_switch_SE_adapt]
+        switches_SE_adapt = get_recomputed(stats_SE_adapt, type='switch', sortby='time')
+        t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switches_SE_adapt.append(t_switch_SE_adapt[-1])
 
     if len(dt_list) > 1:

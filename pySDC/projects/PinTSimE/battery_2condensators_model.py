@@ -8,6 +8,7 @@ from pySDC.implementations.problem_classes.Battery_2Condensators import battery_
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.projects.PinTSimE.battery_model import get_recomputed
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
@@ -167,12 +168,14 @@ def main(use_switch_estimator=True):
     assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    plot_voltages(description, use_switch_estimator)
+    recomputed = False
+
+    plot_voltages(description, recomputed, use_switch_estimator)
 
     return np.mean(niters)
 
 
-def plot_voltages(description, use_switch_estimator, cwd='./'):
+def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
     """
     Routine to plot the numerical solution of the model
     """
@@ -182,9 +185,9 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = get_sorted(stats, type='current L', sortby='time')
-    vC1 = get_sorted(stats, type='voltage C1', sortby='time')
-    vC2 = get_sorted(stats, type='voltage C2', sortby='time')
+    cL = get_sorted(stats, type='current L', recomputed=recomputed, sortby='time')
+    vC1 = get_sorted(stats, type='voltage C1', recomputed=recomputed, sortby='time')
+    vC2 = get_sorted(stats, type='voltage C2', recomputed=recomputed, sortby='time')
 
     times = [v[0] for v in cL]
 
@@ -195,7 +198,10 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     ax.plot(times, [v[1] for v in vC2], label='$v_{C_2}$')
 
     if use_switch_estimator:
-        switches = get_sorted(stats, type='switch', sortby='time')
+        switches = get_recomputed(stats, type='switch', sortby='time')
+
+        if recomputed is not None:
+            assert len(switches) >= 1 and len(switches) >= 2, "No switches found"
         t_switches = [v[1] for v in switches]
 
         for i in range(len(t_switches)):
@@ -222,10 +228,10 @@ def proof_assertions_description(description, use_switch_estimator):
         description['problem_params']['alpha'] > description['problem_params']['V_ref'][1]
     ), 'Please set "alpha" greater than "V_ref2"'
 
+    assert type(description['problem_params']['V_ref']) == np.ndarray, '"V_ref" needs to be an array (of type float)'
+
     assert description['problem_params']['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
     assert description['problem_params']['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
-
-    assert type(description['problem_params']['V_ref']) == np.ndarray, '"V_ref" needs to be an array (of type float)'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'

@@ -8,6 +8,7 @@ from pySDC.implementations.problem_classes.Battery_2Condensators import battery_
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.projects.PinTSimE.battery_model import get_recomputed
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_2condensators_model import log_data, proof_assertions_description
 import pySDC.helpers.plot_helper as plt_helper
@@ -128,6 +129,8 @@ def check(cwd='./'):
         for item in use_switch_estimator:
             stats, description = run(dt=dt_item, use_switch_estimator=item)
 
+            assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found!'
+
             fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, item)
             f = open(fname, 'wb')
             dill.dump(stats, f)
@@ -159,13 +162,8 @@ def check(cwd='./'):
         stats_false = dill.load(f2)
         f2.close()
 
-        val_switch = get_sorted(stats_true, type='switch', sortby='time')
-        #val_switch2 = get_sorted(stats_true, type='switch2', sortby='time')
-        t_switch = [v[1] for v in val_switch]
-        #t_switch2 = [v[1] for v in val_switch2]
-
-        #t_switch1 = t_switch1[-1]
-        #t_switch2 = t_switch2[-1]
+        switches = get_recomputed(stats_true, type='switch', sortby='time')
+        t_switch = [v[1] for v in switches]
 
         val_switch_all.append([t_switch[0], t_switch[1]])
 
