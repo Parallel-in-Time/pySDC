@@ -121,22 +121,23 @@ def check(cwd='./'):
     Routine to check the differences between using a switch estimator or not
     """
 
-    dt_list = [1e-1, 1e-2, 1e-3]
+    dt_list = [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
     restarts_all = []
     restarts_dict = dict()
     for dt_item in dt_list:
-        for item in use_switch_estimator:
-            stats, description = run(dt=dt_item, use_switch_estimator=item)
+        for use_SE in use_switch_estimator:
+            stats, description = run(dt=dt_item, use_switch_estimator=use_SE)
 
-            assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found!'
+            if use_SE:
+                assert len(get_recomputed(stats, type='switch', sortby='time')) >= 1, 'No switches found for dt={}!'.format(dt_item)
 
-            fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, item)
+            fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, use_SE)
             f = open(fname, 'wb')
             dill.dump(stats, f)
             f.close()
 
-            if item:
+            if use_SE:
                 restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
                 restarts = restarts_dict[dt_item][:, 1]
                 restarts_all.append(np.sum(restarts))
@@ -203,10 +204,10 @@ def check(cwd='./'):
         restarts_dt = restarts_dict[dt_item]
         for i in range(len(restarts_dt[:, 0])):
             if round(restarts_dt[i, 0], 13) == round(t_switch[0], 13):
-                restarts_dt_switch1.append(np.sum(restarts_dt[0:i, 1]))
+                restarts_dt_switch1.append(np.sum(restarts_dt[0 : i - 1, 1]))
 
             if round(restarts_dt[i, 0], 13) == round(t_switch[1], 13):
-                restarts_dt_switch2.append(np.sum(restarts_dt[i - 1 :, 1]))
+                restarts_dt_switch2.append(np.sum(restarts_dt[i - 2 :, 1]))
 
         setup_mpl()
         fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
