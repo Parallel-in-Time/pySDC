@@ -153,7 +153,6 @@ class SwitchEstimator(ConvergenceController):
 
         if self.params.switch_detected_step:
             if L.time + L.dt >= self.params.t_switch:
-                self.params.count_switches += 1
                 self.params.t_switch = None
                 self.params.switch_detected_step = False
 
