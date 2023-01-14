@@ -58,18 +58,16 @@ class battery(ptype):
         if self.t_switch is not None:
             if t >= self.t_switch:
                 f.expl[0] = self.params.Vs / self.params.L
-                print('Vs')
+
             else:
                 f.expl[0] = 0
-                print('C1')
 
         else:
             if u[1] <= self.params.V_ref:
                 f.expl[0] = self.params.Vs / self.params.L
-                print("Vs")
+
             else:
                 f.expl[0] = 0
-                print("C1")
 
         return f
 
