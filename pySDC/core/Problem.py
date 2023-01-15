@@ -1,37 +1,6 @@
 import logging
 
-
-class ReadOnlyError(Exception):
-    """Exception class thrown when setting read-only parameters"""
-
-    def __init__(self, name):
-        super().__init__(f'cannot set read-only attribute {name}')
-
-
-class RegisterParams(object):
-    """Base class to register parameters"""
-
-    def _register(self, *names, readOnly=False):
-        if readOnly:
-            if not hasattr(self, '_readOnly'):
-                self._readOnly = set()
-            self._readOnly = self._readOnly.union(names)
-        else:
-            if not hasattr(self, '_parNames'):
-                self._parNames = set()
-            self._parNames = self._parNames.union(names)
-
-    @property
-    def params(self):
-        return {name: getattr(self, name) for name in self._readOnly.union(self._parNames)}
-
-    def __setattr__(self, name, value):
-        try:
-            if name in self._readOnly:
-                raise ReadOnlyError(name)
-        except AttributeError:
-            pass
-        super().__setattr__(name, value)
+from pySDC.core.Common import RegisterParams
 
 
 class ptype(RegisterParams):
