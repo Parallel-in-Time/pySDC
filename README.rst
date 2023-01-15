@@ -76,7 +76,7 @@ Contributing
 `pySDC` code was originaly developped by Robert Speck (@pancetta),
 and is now maintained and developed by a small community of scientists interested in SDC methods,
 that dearly welcomes any contribution.
-If you want to take part of this, please take the time to read our `Contribution Guidelines <CONTRIBUTING.md>`_.
+If you want to take part of this, please take the time to read our `Contribution Guidelines <https://github.com/tlunet/pySDC/blob/contrib/CONTRIBUTING.md>`_.
 
 
 Acknowledgements
