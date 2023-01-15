@@ -139,7 +139,7 @@ class advectionNd(ptype):
             dtype_f: the RHS
         """
 
-        f = self.dtype_f(self.init)
+        f = self.f_init
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 

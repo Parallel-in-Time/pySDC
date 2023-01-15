@@ -33,6 +33,14 @@ class ptype(RegisterParams):
         self.dtype_u = dtype_u
         self.dtype_f = dtype_f
 
+    @property
+    def u_init(self):
+        return self.dtype_u(self.init)
+
+    @property
+    def f_init(self):
+        return self.dtype_f(self.init)
+
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE
