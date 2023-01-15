@@ -125,7 +125,7 @@ class advectionNd(ptype):
 
         # register parameters
         self._register('nvars', 'ndim', 'c', 'stencil_type', 'order', 'bc', readOnly=True)
-        self._register('freq', 'gamma', 'lintol', 'liniter', 'direct_solver')
+        self._register('freq', 'sigma', 'lintol', 'liniter', 'direct_solver')
 
     def eval_f(self, u, t):
         """
