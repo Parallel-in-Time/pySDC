@@ -39,3 +39,6 @@ Additional branches starting with the prefix `dev/[...]` can be used to add new 
 Those could eventually be merged into master if they don't break the API, or to the next release branch if they do.
 
 > :scroll: Pull request to those branches can be done from fork branches using the **same name** as the feature branche.
+
+[:arrow_left: Back to Contributing Summary](./../../CONTRIBUTING.md) ---
+[:arrow_right: Next to Continuous Integration](./02_continuous_integration.md)
