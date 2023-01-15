@@ -35,23 +35,23 @@ jobs:
         run: |
           flakeheaven lint --benchmark pySDC
 
-  mirror_to_gitlab:
+#   mirror_to_gitlab:
 
-    runs-on: ubuntu-latest
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v1
 
-      - name: Mirror
-        uses: jakob-fritz/github2lab_action@main
-        env:
-          MODE: 'mirror' # Either 'mirror', 'get_status', or 'both'
-          GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET_H }}
-          FORCE_PUSH: "true"
-          GITLAB_HOSTNAME: "codebase.helmholtz.cloud"
-          GITLAB_PROJECT_ID: "3525"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Mirror
+#         uses: jakob-fritz/github2lab_action@main
+#         env:
+#           MODE: 'mirror' # Either 'mirror', 'get_status', or 'both'
+#           GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET_H }}
+#           FORCE_PUSH: "true"
+#           GITLAB_HOSTNAME: "codebase.helmholtz.cloud"
+#           GITLAB_PROJECT_ID: "3525"
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
@@ -121,31 +121,31 @@ jobs:
           pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
 
 
-  wait_for_gitlab:
-    runs-on: ubuntu-latest
+#   wait_for_gitlab:
+#     runs-on: ubuntu-latest
 
-    needs:
-      - mirror_to_gitlab
+#     needs:
+#       - mirror_to_gitlab
 
-    steps:
-      - name: Wait
-        uses: jakob-fritz/github2lab_action@main
-        env:
-          MODE: 'get_status' # Either 'mirror', 'get_status', or 'both'
-          GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET_H }}
-          FORCE_PUSH: "true"
-          GITLAB_HOSTNAME: "codebase.helmholtz.cloud"
-          GITLAB_PROJECT_ID: "3525"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#     steps:
+#       - name: Wait
+#         uses: jakob-fritz/github2lab_action@main
+#         env:
+#           MODE: 'get_status' # Either 'mirror', 'get_status', or 'both'
+#           GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET_H }}
+#           FORCE_PUSH: "true"
+#           GITLAB_HOSTNAME: "codebase.helmholtz.cloud"
+#           GITLAB_PROJECT_ID: "3525"
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-#      - name: Get and prepare artifacts
-#        run: |
-#          pipeline_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/repository/commits/${{ github.head_ref || github.ref_name }}" | jq '.last_pipeline.id')
-#          job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/pipelines/$pipeline_id/jobs" |  jq '.[] | select( .name == "bundle" ) | select( .status == "success" ) | .id')
-#          curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
-#          rm -rf data
-#          unzip artifacts.zip
-#          ls -ratl
+# #      - name: Get and prepare artifacts
+# #        run: |
+# #          pipeline_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/repository/commits/${{ github.head_ref || github.ref_name }}" | jq '.last_pipeline.id')
+# #          job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/pipelines/$pipeline_id/jobs" |  jq '.[] | select( .name == "bundle" ) | select( .status == "success" ) | .id')
+# #          curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
+# #          rm -rf data
+# #          unzip artifacts.zip
+# #          ls -ratl
 
 
   post-processing:
@@ -156,7 +156,7 @@ jobs:
     needs:
       - lint
       - user_cpu_tests_linux
-      - wait_for_gitlab
+#       - wait_for_gitlab
 
     defaults:
       run:
