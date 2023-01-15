@@ -11,6 +11,8 @@ class battery_2condensators(ptype):
     project
     Attributes:
         A: system matrix, representing the 3 ODEs
+        t_switch: time point of the switch
+        SV, SC1, SC2: states of switching (important for switch estimator)
     """
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
@@ -41,12 +43,10 @@ class battery_2condensators(ptype):
         )
 
         self.A = np.zeros((3, 3))
+        self.t_switch = None
         self.SV = 0
         self.SC1 = 1
         self.SC2 = 0
-        self.t_switch = None
-        self.count_switches = 0
-        self.diff = 0.0
 
     def eval_f(self, u, t):
         """
@@ -61,32 +61,25 @@ class battery_2condensators(ptype):
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
 
-        if u[2] > self.params.V_ref[1]:
-            if self.t_switch is not None:
+        if self.t_switch is not None:
+            if self.SV == 0 and self.SC1 == 0 and self.SC2 == 1:
                 if t >= self.t_switch:
-                    if self.count_switches == 1:
-                        # switch to C2
-                        f.expl[0] = 0
-                    elif self.count_switches == 2:
-                        # switch to Vs
-                        f.expl[0] = self.params.Vs / self.params.L
-                else:
-                    if self.count_switches == 1:
-                        # C1 supplies energy
-                        f.expl[0] = 0
-                    elif self.count_switches == 2:
-                        # C2 supplies energy
-                        f.expl[0] = 0
-            else:
-                if u[1] > self.params.V_ref[0]:
-                    # C1 supplies energy
                     f.expl[0] = 0
                 else:
-                    # switch to C2
                     f.expl[0] = 0
+            elif self.SV == 1 and self.SC1 == 0 and self.SC2 == 0:
+                if t >= self.t_switch:
+                    f.expl[0] = self.params.Vs / self.params.L
+                else:
+                    f.expl[0] = 0
+
         else:
-            # switch to Vs
-            f.expl[0] = self.params.Vs / self.params.L
+            if u[1] > self.params.V_ref[0] and u[2] > self.params.V_ref[1]:
+                f.expl[0] = 0
+            elif u[1] <= self.params.V_ref[0] and u[2] > self.params.V_ref[1]:
+                f.expl[0] = 0
+            elif u[1] <= self.params.V_ref[0] and u[2] <= self.params.V_ref[1]:
+                f.expl[0] = self.params.Vs / self.params.L
 
         return f
 
@@ -103,36 +96,25 @@ class battery_2condensators(ptype):
         """
         self.A = np.zeros((3, 3))
 
-        if rhs[2] > self.params.V_ref[1]:
-            if self.t_switch is not None:
+        if self.t_switch is not None:
+            if self.SV == 0 and self.SC1 == 0 and self.SC2 == 1:
                 if t >= self.t_switch:
-                    if self.count_switches == 1:
-                        # switch to C2
-                        self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
-                    elif self.count_switches == 2:
-                        # switch to Vs
-                        self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
-
+                    self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
                 else:
-                    if self.count_switches == 1:
-                        # C1 supplies energy
-                        self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
-                    elif self.count_switches == 2:
-                        # C2 supplies energy
-                        self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
-
-            else:
-                if rhs[1] > self.params.V_ref[0]:
-                    # C1 supplies energy
                     self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
-
+            elif self.SV == 1 and self.SC1 == 0 and self.SC2 == 0:
+                if t >= self.t_switch:
+                    self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
                 else:
-                    # switch to C2
                     self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
 
         else:
-            # switch to Vs
-            self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+            if rhs[1] > self.params.V_ref[0] and rhs[2] > self.params.V_ref[1]:
+                self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
+            elif rhs[1] <= self.params.V_ref[0] and rhs[2] > self.params.V_ref[1]:
+                self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
+            elif rhs[1] <= self.params.V_ref[0] and rhs[2] <= self.params.V_ref[1]:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
         me = self.dtype_u(self.init)
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
@@ -189,9 +171,12 @@ class battery_2condensators(ptype):
 
         return switch_detected, m_guess, vC_switch
 
-    def set_counter(self):
+    def flip_switches(self):
         """
-        Counts the number of switches found.
+        Flips the switches of the circuit to its new state
         """
 
-        self.count_switches += 1
+        if self.SV == 0 and self.SC1 == 1 and self.SC2 == 0:
+            self.SV, self.SC1, self.SC2 = 0, 0, 1
+        elif self.SV == 0 and self.SC1 == 0 and self.SC2 == 1:
+            self.SV, self.SC1, self.SC2 = 1, 0, 0
