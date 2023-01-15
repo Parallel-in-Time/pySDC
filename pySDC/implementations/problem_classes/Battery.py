@@ -10,6 +10,8 @@ class battery(ptype):
     Example implementing the battery drain model as in the description in the PinTSimE project
     Attributes:
         A: system matrix, representing the 2 ODEs
+        t_switch: time point of the switch
+        SV, SC: states of switching (important for switch estimator)
     """
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
@@ -40,7 +42,8 @@ class battery(ptype):
 
         self.A = np.zeros((2, 2))
         self.t_switch = None
-        self.count_switches = 0
+        self.SV = 0
+        self.SC = 1
 
     def eval_f(self, u, t):
         """
@@ -145,44 +148,20 @@ class battery(ptype):
 
         return switch_detected, m_guess, vC_switch
 
-    def set_counter(self):
+    def flip_switches(self):
         """
-        Counts the number of switches found.
+        Flips the switches of the circuit to its new state
         """
 
-        self.count_switches += 1
+        if self.SV == 0 and self.SC == 1:
+            self.SV, self.SC = 1, 0
 
 
-class battery_implicit(ptype):
-    """
-    Example implementing the battery drain model as in the description in the PinTSimE project
-    Attributes:
-        A: system matrix, representing the 2 ODEs
-    """
+class battery_implicit(battery):
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type for solution
-            dtype_f: mesh data type for RHS
-        """
 
-        problem_params['nvars'] = 2
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = [
-            'newton_maxiter',
-            'newton_tol',
-            'Vs',
-            'Rs',
-            'C',
-            'R',
-            'L',
-            'alpha',
-            'V_ref',
-        ]
+        essential_keys = ['newton_maxiter', 'newton_tol']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -196,9 +175,6 @@ class battery_implicit(ptype):
             params=problem_params,
         )
 
-        self.A = np.zeros((2, 2))
-        self.t_switch = None
-        self.count_switches = 0
         self.newton_itercount = 0
         self.lin_itercount = 0
         self.newton_ncalls = 0
@@ -234,7 +210,6 @@ class battery_implicit(ptype):
                 non_f[0] = 0
 
         f[:] = self.A.dot(u) + non_f
-
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -306,55 +281,3 @@ class battery_implicit(ptype):
         me[:] = u[:]
 
         return me
-
-    def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact solution
-        """
-        assert t == 0, 'ERROR: u_exact only valid for t=0'
-
-        me = self.dtype_u(self.init)
-
-        me[0] = 0.0  # cL
-        me[1] = self.params.alpha * self.params.V_ref  # vC
-
-        return me
-
-    def get_switching_info(self, u, t):
-        """
-        Provides information about a discrete event for one subinterval.
-        Args:
-            u (dtype_u): current values
-            t (float): current time
-        Returns:
-            switch_detected (bool): Indicates if a switch is found or not
-            m_guess (np.int): Index of where the discrete event would found
-            vC_switch (list): Contains function values of switching condition (for interpolation)
-        """
-
-        switch_detected = False
-        m_guess = -100
-
-        for m in range(len(u)):
-            if u[m][1] - self.params.V_ref <= 0:
-                switch_detected = True
-                m_guess = m - 1
-                break
-
-        vC_switch = []
-        if switch_detected:
-            for m in range(1, len(u)):
-                vC_switch.append(u[m][1] - self.params.V_ref)
-
-        return switch_detected, m_guess, vC_switch
-
-    def set_counter(self):
-        """
-        Counts the number of switches found.
-        """
-
-        self.count_switches += 1
