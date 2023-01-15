@@ -83,7 +83,7 @@ class SwitchEstimator(ConvergenceController):
 
                         else:
                             dt_switch = self.params.t_switch - L.time
-                            L.prob.set_counter()
+
                             self.log(
                                 f"Switch located at time {self.params.t_switch:.6f} inside tol={self.params.tol:.4f}", S
                             )
@@ -99,6 +99,7 @@ class SwitchEstimator(ConvergenceController):
                                 value=self.params.t_switch,
                             )
 
+                            L.prob.flip_switches()
                             self.params.switch_detected_step = True
 
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
