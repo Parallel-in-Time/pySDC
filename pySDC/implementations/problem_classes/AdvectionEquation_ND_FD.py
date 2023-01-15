@@ -118,7 +118,7 @@ class advectionNd(ptype):
         self.Id = sp.eye(np.prod(nvars), format='csc')
 
         # store relevant attributes
-        self.ndim, self.c = ndim, c
+        self.nvars, self.ndim, self.c = nvars, ndim, c
         self.stencil_type, self.order, self.bc = stencil_type, order, bc
         self.freq, self.sigma = freq, sigma
         self.lintol, self.liniter, self.direct_solver = lintol, liniter, direct_solver
