@@ -80,3 +80,6 @@ Examples :
 NODE_TYPES = ['EQUID', 'LEGENDRE', 'CHEBY-1', 'CHEBY-2', 'CHEBY-3', 'CHEBY-4']
 QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
 ```
+
+[:arrow_left: Back to Continuous Integration](./02_continuous_integration.md) ---
+[:arrow_right: Next to Custom Implementations](./04_custom_implementations.md)
