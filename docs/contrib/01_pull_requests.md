@@ -25,6 +25,17 @@ some_feature  # to add a new feature (implementation, ...)
 
 Those changes should be compatible with the existing API (_i.e_ not break it), and **avoid any change** in the current user interface. In particular, it should not modify default values for parameters or remove attributes of existing classes. But new attributes or parameters can be added with pre-set default values, and new classes can be added in the `pySDC.implementations` module.
 
+> :bell: During the revision of your pull request, it can happen that additional changes are done to the `upstream/master` branch (in parallel-in-time/pySDC repo). In that case, don't hesitate to regularly merge the it into your local branch to solve eventual conflicts, for instance : 
+> 
+> ```bash
+> # On your local repo, with the "my_feature" branch
+> $ git fetch upstream  # synchronize with parallel-in-time/pySDC
+> $ git merge upstream/master  # merge into my_feature
+> $ git push  # push local merges to your repository
+> ```
+> 
+> The pull request will be updated with any merge changes on the `my_feature` branch of your repository.
+
 
 ## Release development branches
 
@@ -33,12 +44,17 @@ Such branches are merged to `master` when ready.
 
 > :scroll: Pull request to those branches can be done from fork branches using the **same name** as the release branch.
 
+> :bell: **Never** merge modifications on the `upstream/master` branch into your own local release branch. If some commit on the master branch have to be taken into account in the release branch (for instance, v6), then first request a merge of `upstream/master` into `upstream/v6`, merge `upstream/v6` into your local `v6` branch, then push into your own repository to update the pull request.
+
 ## Feature development branches
 
 Additional branches starting with the prefix `dev/[...]` can be used to add new features, that cannot be added with only one pull request (for instance, when several developers work on it).
 Those could eventually be merged into master if they don't break the API, or to the next release branch if they do.
 
 > :scroll: Pull request to those branches can be done from fork branches using the **same name** as the feature branch.
+
+> :bell: **Never** merge modifications on `upstream/master` or any release branch into your own local development branch (same comment and solution as for the release branches above).
+
 
 [:arrow_left: Back to Contributing Summary](./../../CONTRIBUTING.md) ---
 [:arrow_right: Next to Continuous Integration](./02_continuous_integration.md)
