@@ -85,6 +85,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
         use_adaptivity (bool): flag if the adaptivity wants to be used or not
 
     Returns:
+        stats (dict): Raw statistics from a controller run
         description (dict): contains all information for a controller run
     """
 
@@ -146,13 +147,18 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
 
-    proof_assertions_description(description, use_adaptivity, use_switch_estimator)
-
     # set time parameters
     t0 = 0.0
     Tend = 0.3
 
+    proof_assertions_description(description, use_adaptivity, use_switch_estimator)
+
     assert dt < Tend, "Time step is too large for the time domain!"
+
+    assert (
+        Tend == 0.3 and description['problem_params']['V_ref'] == 1.0 and description['problem_params']['alpha'] == 1.2
+    ), "Error! Do not use other parameters for V_ref != 1.0, alpha != 1.2, Tend != 0.3 due to hardcoded reference!"
+    assert description['level_params']['dt'] == 1e-2, "Error! Do not use another time step dt!= 1e-2!"
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -192,7 +198,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    return description
+    return stats, description
 
 
 def run():
@@ -201,7 +207,7 @@ def run():
     as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    dt = 4e-3
+    dt = 1e-2
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
     recomputed = False
@@ -211,13 +217,15 @@ def run():
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
             for use_A in use_adaptivity:
-                description = main(
+                stats, description = main(
                     dt=dt,
                     problem=problem,
                     sweeper=sweeper,
                     use_switch_estimator=use_SE,
                     use_adaptivity=use_A,
                 )
+
+            check_solution(stats, problem.__name__, use_adaptivity, use_switch_estimator)
 
             plot_voltages(description, problem.__name__, sweeper.__name__, recomputed, use_SE, use_A)
 
@@ -261,6 +269,7 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 
     if use_adaptivity:
         dt = np.array(get_sorted(stats, type='dt', recomputed=False))
+
         dt_ax = ax.twinx()
         dt_ax.plot(dt[:, 0], dt[:, 1], linestyle='-', linewidth=0.8, color='k', label=r'$\Delta t$')
         dt_ax.set_ylabel(r'$\Delta t$', fontsize=8)
@@ -277,9 +286,90 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     plt_helper.plt.close(fig)
 
 
+def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
+    """
+    Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+        problem (problem_class.__name__): the problem_class that is numerically solved
+        use_adaptivity (bool): flag if adaptivity wants to be used or not
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+    """
+
+    data = get_data_dict(stats, use_adaptivity, use_switch_estimator)
+
+    if use_switch_estimator and use_adaptivity:
+        if problem == 'battery':
+            msg = 'Error when using switch estimator and adaptivity for battery'
+            expected = {
+                'cL': 0.5474500710994862,
+                'vC': 1.0019332967173764,
+                'dt': 0.011761752270047832,
+                'e_em': 8.001793672107738e-10,
+                'switches': 0.18232155791181945,
+                'restarts': 3.0,
+            }
+        elif problem == 'battery_implicit':
+            msg = 'Error when using switch estimator and adaptivity for battery_implicit'
+            expected = {
+                'cL': 0.5424577937840791,
+                'vC': 1.0001051105894005,
+                'dt': 0.01,
+                'e_em': 2.220446049250313e-16,
+                'switches': 0.1822923488448394,
+                'restarts': 6.0,
+            }
+
+    got = {
+        'cL': data['cL'][-1],
+        'vC': data['vC'][-1],
+        'dt': data['dt'][-1],
+        'e_em': data['e_em'][-1],
+        'switches': data['switches'][-1],
+        'restarts': data['restarts'],
+    }
+
+    for key in expected.keys():
+        assert np.isclose(
+            expected[key], got[key], rtol=1e-4
+        ), f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
+
+
+def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False):
+    """
+    Converts the statistics in a useful data dictionary so that it can be easily checked in the check_solution function.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+        use_adaptivity (bool): flag if adaptivity wants to be used or not
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        recomputed (bool): flag if the values after a restart are used or before
+
+    Return:
+        data (dict): contains all information as the statistics dict
+    """
+
+    data = dict()
+
+    data['cL'] = np.array(get_sorted(stats, type='current L', recomputed=recomputed, sortby='time'))[:, 1]
+    data['vC'] = np.array(get_sorted(stats, type='voltage C', recomputed=recomputed, sortby='time'))[:, 1]
+    if use_adaptivity:
+        data['dt'] = np.array(get_sorted(stats, type='dt', recomputed=recomputed, sortby='time'))[:, 1]
+        data['e_em'] = np.array(
+            get_sorted(stats, type='error_embedded_estimate', recomputed=recomputed, sortby='time')
+        )[:, 1]
+    if use_switch_estimator:
+        data['switches'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[:, 1]
+    if use_adaptivity or use_switch_estimator:
+        data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
+
+    return data
+
+
 def get_recomputed(stats, type, sortby):
     """
-    Function that filters statistics after a recomputation
+    Function that filters statistics after a recomputation.
 
     Args:
         stats (dict): Raw statistics from a controller run

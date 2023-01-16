@@ -9,7 +9,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
-from pySDC.projects.PinTSimE.battery_model import get_recomputed, log_data, proof_assertions_description
+from pySDC.projects.PinTSimE.battery_model import get_recomputed, get_data_dict, log_data, proof_assertions_description
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
@@ -101,6 +101,11 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
 
     assert dt < Tend, "Time step is too large for the time domain!"
 
+    assert (
+        Tend == 0.3 and description['problem_params']['V_ref'] == 1.0 and description['problem_params']['alpha'] == 1.2
+    ), "Error! Do not use other parameters for V_ref != 1.0, alpha != 1.2, Tend != 0.3 due to hardcoded reference!"
+    assert dt == 4e-2 or dt == 4e-3, "Error! Do not use another time step dt!= 1e-2!"
+
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
@@ -161,6 +166,9 @@ def check(cwd='./'):
                         use_adaptivity=use_A,
                         V_ref=V_ref,
                     )
+
+                    if use_A or use_SE:
+                        check_solution(stats, dt_item, problem.__name__, use_A, use_SE)
 
                     if use_SE:
                         assert (
@@ -316,6 +324,188 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
 
     fig_acc.savefig('data/embedded_error_adaptivity_{}.png'.format(sweeper), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig_acc)
+
+
+def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
+    """
+    Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+        dt (float): initial time step
+        problem (problem_class.__name__): the problem_class that is numerically solved
+        use_switch_estimator (bool):
+        use_adaptivity (bool):
+    """
+
+    data = get_data_dict(stats, use_adaptivity, use_switch_estimator)
+
+    if problem == 'battery':
+        if use_switch_estimator and use_adaptivity:
+            msg = 'Error when using switch estimator and adaptivity for battery for dt={}'.format(dt)
+            if dt == 4e-2:
+                expected = {
+                    'cL': 0.5525783945667581,
+                    'vC': 1.00001743462299,
+                    'dt': 0.03550610373897258,
+                    'e_em': 6.21240694442804e-08,
+                    'switches': 0.18231603298272345,
+                    'restarts': 4.0,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5395601429161445,
+                    'vC': 1.0000413761942089,
+                    'dt': 0.028281271825675414,
+                    'e_em': 2.5628611677319668e-08,
+                    'switches': 0.18230920573953438,
+                    'restarts': 3.0,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+            }
+        elif use_switch_estimator and not use_adaptivity:
+            msg = 'Error when using switch estimator for battery for dt={}'.format(dt)
+            if dt == 4e-2:
+                expected = {
+                    'cL': 0.6139093327509394,
+                    'vC': 1.0010140038721593,
+                    'switches': 0.1824302065533169,
+                    'restarts': 1.0,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5429509935448258,
+                    'vC': 1.0001158309787614,
+                    'switches': 0.18232183080236553,
+                    'restarts': 1.0,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+            }
+
+        elif not use_switch_estimator and use_adaptivity:
+            msg = 'Error when using adaptivity for battery for dt={}'.format(dt)
+            if dt == 4e-2:
+                expected = {
+                    'cL': 0.5966289599915113,
+                    'vC': 0.9923148791604984,
+                    'dt': 0.03564958366355817,
+                    'e_em': 6.210964231812e-08,
+                    'restarts': 1.0,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5431613774808756,
+                    'vC': 0.9934307674636834,
+                    'dt': 0.022880524075396924,
+                    'e_em': 1.1130212751453428e-08,
+                    'restarts': 3.0,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'restarts': data['restarts'],
+            }
+
+    elif problem == 'battery_implicit':
+        if use_switch_estimator and use_adaptivity:
+            msg = 'Error when using switch estimator and adaptivity for battery_implicit for dt={}'.format(dt)
+            if dt == 4e-2:
+                expected = {
+                    'cL': 0.6717104472882885,
+                    'vC': 1.0071670698947914,
+                    'dt': 0.035896059229296486,
+                    'e_em': 6.208836400567463e-08,
+                    'switches': 0.18232158833761175,
+                    'restarts': 3.0,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5396216192241711,
+                    'vC': 1.0000561014463172,
+                    'dt': 0.009904645972832471,
+                    'e_em': 2.220446049250313e-16,
+                    'switches': 0.18230549652342606,
+                    'restarts': 4.0,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+            }
+        elif use_switch_estimator and not use_adaptivity:
+            msg = 'Error when using switch estimator for battery_implicit for dt={}'.format(dt)
+            if dt == 4e-2:
+                expected = {
+                    'cL': 0.613909968362315,
+                    'vC': 1.0010140112484431,
+                    'switches': 0.18243023230469263,
+                    'restarts': 1.0,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5429616576526073,
+                    'vC': 1.0001158454740509,
+                    'switches': 0.1823218812753008,
+                    'restarts': 1.0,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+            }
+
+        elif not use_switch_estimator and use_adaptivity:
+            msg = 'Error when using adaptivity for battery_implicit for dt={}'.format(dt)
+            if dt == 4e-2:
+                expected = {
+                    'cL': 0.5556563012729733,
+                    'vC': 0.9930947318467772,
+                    'dt': 0.035507110551631804,
+                    'e_em': 6.2098696185231e-08,
+                    'restarts': 6.0,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5401117929618637,
+                    'vC': 0.9933888475391347,
+                    'dt': 0.03176025170463925,
+                    'e_em': 4.0386798239033794e-08,
+                    'restarts': 8.0,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'restarts': data['restarts'],
+            }
+
+    for key in expected.keys():
+        assert np.isclose(
+            expected[key], got[key], rtol=1e-4
+        ), f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
 
 
 def differences_around_switch(
