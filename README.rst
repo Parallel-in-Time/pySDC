@@ -1,6 +1,7 @@
 |badge-ga|
 |badge-ossf|
 |badge-cc|
+|zenodo|
 
 Welcome to pySDC!
 =================
