@@ -46,8 +46,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
 
     @property
     def params(self):
-        return {name: getattr(self, name)
-                for name in self._parNamesReadOnly.union(self._parNames)}
+        return {name: getattr(self, name) for name in self._parNamesReadOnly.union(self._parNames)}
 
     def __setattr__(self, name, value):
         if name in self._parNamesReadOnly:
