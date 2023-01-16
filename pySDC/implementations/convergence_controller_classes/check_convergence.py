@@ -87,13 +87,16 @@ class CheckConvergence(ConvergenceController):
         if controller.params.all_to_done:
             from mpi4py.MPI import LAND
 
-            controller.hooks.pre_comm(step=S, level_number=0)
+            for hook in controller.hooks:
+                hook.pre_comm(step=S, level_number=0)
             S.status.done = comm.allreduce(sendobj=S.status.done, op=LAND)
-            controller.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
+            for hook in controller.hooks:
+                hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
         else:
 
-            controller.hooks.pre_comm(step=S, level_number=0)
+            for hook in controller.hooks:
+                hook.pre_comm(step=S, level_number=0)
 
             # check if an open request of the status send is pending
             controller.wait_with_interrupt(request=controller.req_status)
@@ -109,4 +112,5 @@ class CheckConvergence(ConvergenceController):
             if not S.status.last:
                 self.send(comm, dest=S.status.slot + 1, data=S.status.done)
 
-            controller.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
+            for hook in controller.hooks:
+                hook.post_comm(step=S, level_number=0, add_to_stats=True)

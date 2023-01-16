@@ -5,7 +5,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.projects.Resilience.hook import log_error_estimates
+from pySDC.projects.Resilience.hook import log_data
 import numpy as np
 
 
@@ -13,7 +13,7 @@ def run_heat(
     custom_description=None,
     num_procs=1,
     Tend=2e-1,
-    hook_class=log_error_estimates,
+    hook_class=log_data,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
