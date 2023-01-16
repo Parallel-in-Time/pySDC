@@ -133,7 +133,8 @@ class controller_matrix_nonMPI(controller_nonMPI):
         # some initializations and reset of statistics
         uend = None
         num_procs = len(self.MS)
-        self.hooks.reset_stats()
+        for hook in self.hooks:
+            hook.reset_stats()
 
         assert (
             (Tend - t0) / self.dt
@@ -152,7 +153,8 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         # call pre-run hook
         for S in self.MS:
-            self.hooks.pre_run(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_run(step=S, level_number=0)
 
         nblocks = int((Tend - t0) / self.dt / num_procs)
 
@@ -169,9 +171,10 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         # call post-run hook
         for S in self.MS:
-            self.hooks.post_run(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.post_run(step=S, level_number=0)
 
-        return uend, self.hooks.return_stats()
+        return uend, self.return_stats()
 
     def build_propagation_matrix(self, niter):
         """
@@ -302,7 +305,8 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_STEP')
         for S in MS:
-            self.hooks.pre_step(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_step(step=S, level_number=0)
 
         while np.linalg.norm(self.res, np.inf) > self.tol and niter < self.maxiter:
 
@@ -310,14 +314,16 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_ITERATION')
             for S in MS:
-                self.hooks.pre_iteration(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.pre_iteration(step=S, level_number=0)
 
             if self.nlevels > 1:
                 for _ in range(MS[0].levels[1].params.nsweeps):
 
                     MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=1, stage='PRE_COARSE_SWEEP')
                     for S in MS:
-                        self.hooks.pre_sweep(step=S, level_number=1)
+                        for hook in self.hooks:
+                            hook.pre_sweep(step=S, level_number=1)
 
                     self.u += self.Tcf.dot(np.linalg.solve(self.Pc, self.Tfc.dot(self.res)))
                     self.res = self.u0 - self.C.dot(self.u)
@@ -326,27 +332,32 @@ class controller_matrix_nonMPI(controller_nonMPI):
                         MS=MS, u=self.u, res=self.res, niter=niter, level=1, stage='POST_COARSE_SWEEP'
                     )
                     for S in MS:
-                        self.hooks.post_sweep(step=S, level_number=1)
+                        for hook in self.hooks:
+                            hook.post_sweep(step=S, level_number=1)
 
             for _ in range(MS[0].levels[0].params.nsweeps):
 
                 MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_FINE_SWEEP')
                 for S in MS:
-                    self.hooks.pre_sweep(step=S, level_number=0)
+                    for hook in self.hooks:
+                        hook.pre_sweep(step=S, level_number=0)
 
                 self.u += np.linalg.solve(self.P, self.res)
                 self.res = self.u0 - self.C.dot(self.u)
 
                 MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')
                 for S in MS:
-                    self.hooks.post_sweep(step=S, level_number=0)
+                    for hook in self.hooks:
+                        hook.post_sweep(step=S, level_number=0)
 
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_ITERATION')
             for S in MS:
-                self.hooks.post_iteration(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.post_iteration(step=S, level_number=0)
 
         MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_STEP')
         for S in MS:
-            self.hooks.post_step(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.post_step(step=S, level_number=0)
 
         return MS

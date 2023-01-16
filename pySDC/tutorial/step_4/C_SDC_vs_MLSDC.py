@@ -73,7 +73,7 @@ def main():
     description_mlsdc['level_params'] = level_params  # pass level parameters
     description_mlsdc['step_params'] = step_params  # pass step parameters
     description_mlsdc['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    description_mlsdc['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description_mlsdc['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
 
     # instantiate the controller (no controller parameters used here)
     controller_sdc = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description_sdc)

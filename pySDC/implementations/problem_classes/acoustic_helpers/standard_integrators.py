@@ -15,17 +15,10 @@ class rk_imex:
         assert np.shape(M_slow)[0] == np.shape(M_slow)[1], "A_slow must be square"
         assert np.shape(M_fast)[0] == np.shape(M_slow)[0], "A_fast and A_slow must be of the same size"
 
-        assert order in [1, 2, 3, 4, 5], "Order must be between 1 and 5"
+        assert order in [1, 2, 3, 4, 5], "Order must be between 2 and 5"
         self.order = order
 
-        if self.order == 1:
-            self.A = np.array([[0, 0], [0, 1]])
-            self.A_hat = np.array([[0, 0], [1, 0]])
-            self.b = np.array([0, 1])
-            self.b_hat = np.array([1, 0])
-            self.nstages = 2
-
-        elif self.order == 2:
+        if self.order == 2:
             self.A = np.array([[0, 0], [0, 0.5]])
             self.A_hat = np.array([[0, 0], [0.5, 0]])
             self.b = np.array([0, 1])
