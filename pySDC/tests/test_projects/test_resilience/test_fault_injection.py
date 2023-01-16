@@ -188,7 +188,7 @@ def generate_stats(load=False):
     import matplotlib.pyplot as plt
     import numpy as np
 
-    np.seterr(all='warn')  # get consistent behaviour accross platforms
+    np.seterr(all='warn')  # get consistent behaviour across platforms
 
     vdp_stats = FaultStats(
         prob=run_vdp,

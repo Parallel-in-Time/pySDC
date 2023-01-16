@@ -357,7 +357,7 @@ class FaultStats:
         custom_params = {}
         if self.prob == run_vdp:
             custom_params = {
-                'u0': np.array([0.99995, -0.00999985]),
+                'u0': np.array([0.99995, -0.00999985], dtype=np.float64),
                 'crash_at_maxiter': False,
             }
         return custom_params

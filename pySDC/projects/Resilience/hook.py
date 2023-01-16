@@ -15,7 +15,7 @@ class log_data(hooks):
 
     def pre_run(self, step, level_number):
         """
-        Record los conditiones initiales
+        Record initial conditions
         """
         super().pre_run(step, level_number)
 
@@ -39,86 +39,17 @@ class log_data(hooks):
             type='restart',
             value=int(step.status.get('restart')),
         )
-        # add the following with two names because I use both in different projects
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='sweeps',
-            value=step.status.iter,
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='k',
-            value=step.status.iter,
-        )
-
-
-class log_fault_stats_data(hooks):
-    '''
-    This class stores all relevant information and allows fault injection
-    '''
-
-    def post_step(self, step, level_number):
-
-        super(log_fault_stats_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=-1,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=-1,
-            sweep=L.status.sweep,
-            type='e_em',
-            value=L.status.get('error_embedded_estimate'),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='k',
-            value=step.status.iter,
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restarts',
-            value=int(step.status.restart),
-        )
+        # add the following with two names because I use both in different projects -.-
+        for k in ['sweeps', 'k']:
+            self.increment_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=L.level_index,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type=k,
+                value=step.status.iter,
+            )
 
 
 class LogUAllIter(hooks):
@@ -149,7 +80,7 @@ class LogUAllIter(hooks):
             iter=iter,
             sweep=L.status.sweep,
             type='e_em',
-            value=L.status.error_embedded_estimate,
+            value=L.status.get('error_embedded_estimate'),
         )
         self.add_to_stats(
             process=step.status.slot,
