@@ -10,7 +10,17 @@ classes.
 from pySDC.core.Errors import ReadOnlyError
 
 
-class RegisterParams(object):
+class _MetaRegisterParams(type):
+    """Metaclass for RegisterParams base class"""
+
+    def __new__(cls, name, bases, dct):
+        obj = super().__new__(cls, name, bases, dct)
+        obj._parNamesReadOnly = set()
+        obj._parNames = set()
+        return obj
+
+
+class RegisterParams(metaclass=_MetaRegisterParams):
     """Base class to register parameters"""
 
     def _register(self, *names, readOnly=False):
@@ -30,22 +40,16 @@ class RegisterParams(object):
 
         """
         if readOnly:
-            if not hasattr(self, '_readOnly'):
-                self._readOnly = set()
-            self._readOnly = self._readOnly.union(names)
+            self._parNamesReadOnly = self._parNamesReadOnly.union(names)
         else:
-            if not hasattr(self, '_parNames'):
-                self._parNames = set()
             self._parNames = self._parNames.union(names)
 
     @property
     def params(self):
-        return {name: getattr(self, name) for name in self._readOnly.union(self._parNames)}
+        return {name: getattr(self, name)
+                for name in self._parNamesReadOnly.union(self._parNames)}
 
     def __setattr__(self, name, value):
-        try:
-            if name in self._readOnly:
-                raise ReadOnlyError(name)
-        except AttributeError:
-            pass
+        if name in self._parNamesReadOnly:
+            raise ReadOnlyError(name)
         super().__setattr__(name, value)
