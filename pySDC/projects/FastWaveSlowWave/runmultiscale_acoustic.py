@@ -126,6 +126,10 @@ def compute_and_plot_solutions():
     x_0 = 0.75
     # x_1 = 0.25
 
+    assert np.isclose(np.linalg.norm(uend[1, :], np.inf), 8.489e-01, 1e-03)
+    assert np.isclose(np.linalg.norm(pnew_dirk, np.inf), 1.003e00, 1e-03)
+    assert np.isclose(np.linalg.norm(pnew_imex, np.inf), 2.762e21, 1e-03)
+
     print('Maximum pressure in SDC: %5.3e' % np.linalg.norm(uend[1, :], np.inf))
     print('Maximum pressure in DIRK: %5.3e' % np.linalg.norm(pnew_dirk, np.inf))
     print('Maximum pressure in RK-IMEX: %5.3e' % np.linalg.norm(pnew_imex, np.inf))

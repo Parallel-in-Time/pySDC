@@ -39,6 +39,10 @@ class controller_MPI(controller):
         # insert data on time communicator to the steps (helpful here and there)
         self.S.status.time_size = num_procs
 
+        self.base_convergence_controllers += [BasicRestarting.get_implementation("MPI")]
+        for convergence_controller in self.base_convergence_controllers:
+            self.add_convergence_controller(convergence_controller, description)
+
         if self.params.dump_setup and rank == 0:
             self.dump_setup(step=self.S, controller_params=controller_params, description=description)
 
@@ -61,8 +65,6 @@ class controller_MPI(controller):
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
 
-        self.add_convergence_controller(BasicRestarting.get_implementation('MPI'), description)
-
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.setup_status_variables(self, comm=comm)
 
@@ -81,7 +83,8 @@ class controller_MPI(controller):
         """
 
         # reset stats to prevent double entries from old runs
-        self.hooks.reset_stats()
+        for hook in self.hooks:
+            hook.reset_stats()
 
         # find active processes and put into new communicator
         rank = self.comm.Get_rank()
@@ -109,10 +112,12 @@ class controller_MPI(controller):
         uend = u0
 
         # call post-setup hook
-        self.hooks.post_setup(step=None, level_number=None)
+        for hook in self.hooks:
+            hook.post_setup(step=None, level_number=None)
 
         # call pre-run hook
-        self.hooks.pre_run(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.pre_run(step=self.S, level_number=0)
 
         comm_active.Barrier()
 
@@ -160,11 +165,12 @@ class controller_MPI(controller):
             self.restart_block(num_procs, time, uend, comm=comm_active)
 
         # call post-run hook
-        self.hooks.post_run(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.post_run(step=self.S, level_number=0)
 
         comm_active.Free()
 
-        return uend, self.hooks.return_stats()
+        return uend, self.return_stats()
 
     def restart_block(self, size, time, u0, comm):
         """
@@ -241,7 +247,8 @@ class controller_MPI(controller):
             level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
-        self.hooks.pre_comm(step=self.S, level_number=level)
+        for hook in self.hooks:
+            hook.pre_comm(step=self.S, level_number=level)
 
         if not blocking:
             self.wait_with_interrupt(request=self.req_send[level])
@@ -270,7 +277,8 @@ class controller_MPI(controller):
                 if self.S.status.force_done:
                     return None
 
-        self.hooks.post_comm(step=self.S, level_number=level, add_to_stats=add_to_stats)
+        for hook in self.hooks:
+            hook.post_comm(step=self.S, level_number=level, add_to_stats=add_to_stats)
 
     def recv_full(self, comm, level=None, add_to_stats=False):
         """
@@ -282,7 +290,8 @@ class controller_MPI(controller):
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
 
-        self.hooks.pre_comm(step=self.S, level_number=level)
+        for hook in self.hooks:
+            hook.pre_comm(step=self.S, level_number=level)
         if not self.S.status.first and not self.S.status.prev_done:
             self.logger.debug(
                 'recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s'
@@ -297,7 +306,8 @@ class controller_MPI(controller):
             )
             self.recv(target=self.S.levels[level], source=self.S.prev, tag=level * 100 + self.S.status.iter, comm=comm)
 
-        self.hooks.post_comm(step=self.S, level_number=level, add_to_stats=add_to_stats)
+        for hook in self.hooks:
+            hook.post_comm(step=self.S, level_number=level, add_to_stats=add_to_stats)
 
     def wait_with_interrupt(self, request):
         """
@@ -332,7 +342,8 @@ class controller_MPI(controller):
             diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
 
         # Send forward diff
-        self.hooks.pre_comm(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.pre_comm(step=self.S, level_number=0)
 
         self.wait_with_interrupt(request=self.req_diff)
         if self.S.status.force_done:
@@ -358,7 +369,8 @@ class controller_MPI(controller):
             tmp = np.array(diff_new, dtype=float)
             self.req_diff = comm.Issend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
 
-        self.hooks.post_comm(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.post_comm(step=self.S, level_number=0)
 
         # Store values from first iteration
         if self.S.status.iter == 1:
@@ -380,14 +392,18 @@ class controller_MPI(controller):
             if np.ceil(Kest_glob) <= self.S.status.iter:
                 if self.S.status.last:
                     self.logger.debug(f'{self.S.status.slot} is done, broadcasting..')
-                    self.hooks.pre_comm(step=self.S, level_number=0)
+                    for hook in self.hooks:
+                        hook.pre_comm(step=self.S, level_number=0)
                     comm.Ibcast((np.array([1]), MPI.INT), root=self.S.status.slot).Wait()
-                    self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
+                    for hook in self.hooks:
+                        hook.post_comm(step=self.S, level_number=0, add_to_stats=True)
                     self.logger.debug(f'{self.S.status.slot} is done, broadcasting done')
                     self.S.status.done = True
                 else:
-                    self.hooks.pre_comm(step=self.S, level_number=0)
-                    self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
+                    for hook in self.hooks:
+                        hook.pre_comm(step=self.S, level_number=0)
+                    for hook in self.hooks:
+                        hook.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
     def pfasst(self, comm, num_procs):
         """
@@ -418,7 +434,8 @@ class controller_MPI(controller):
                 self.logger.debug(f'Rewinding {self.S.status.slot} after {stage}..')
                 self.S.levels[0].u[1:] = self.S.levels[0].uold[1:]
 
-            self.hooks.post_iteration(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.post_iteration(step=self.S, level_number=0)
 
             for req in self.req_send:
                 if req is not None and req != MPI.REQUEST_NULL:
@@ -429,7 +446,8 @@ class controller_MPI(controller):
                 self.req_diff.Cancel()
 
             self.S.status.stage = 'DONE'
-            self.hooks.post_step(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.post_step(step=self.S, level_number=0)
 
         else:
             # Start cycling, if not interrupted
@@ -451,7 +469,8 @@ class controller_MPI(controller):
         """
 
         # first stage: spread values
-        self.hooks.pre_step(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.pre_step(step=self.S, level_number=0)
 
         # call predictor from sweeper
         self.S.levels[0].sweep.predict()
@@ -474,7 +493,8 @@ class controller_MPI(controller):
         Predictor phase
         """
 
-        self.hooks.pre_predict(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.pre_predict(step=self.S, level_number=0)
 
         if self.params.predict_type is None:
             pass
@@ -566,7 +586,8 @@ class controller_MPI(controller):
         else:
             raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
-        self.hooks.post_predict(step=self.S, level_number=0)
+        for hook in self.hooks:
+            hook.post_predict(step=self.S, level_number=0)
 
         # update stage
         self.S.status.stage = 'IT_CHECK'
@@ -596,7 +617,8 @@ class controller_MPI(controller):
             return None
 
         if self.S.status.iter > 0:
-            self.hooks.post_iteration(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.post_iteration(step=self.S, level_number=0)
 
         # decide if the step is done, needs to be restarted and other things convergence related
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
@@ -609,7 +631,8 @@ class controller_MPI(controller):
             # increment iteration count here (and only here)
             self.S.status.iter += 1
 
-            self.hooks.pre_iteration(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_iteration(step=self.S, level_number=0)
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.pre_iteration_processing(self, self.S, comm=comm)
 
@@ -646,7 +669,8 @@ class controller_MPI(controller):
                 if self.req_diff is not None:
                     self.req_diff.Cancel()
 
-            self.hooks.post_step(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
 
     def it_fine(self, comm, num_procs):
@@ -673,10 +697,12 @@ class controller_MPI(controller):
             if self.S.status.force_done:
                 return None
 
-            self.hooks.pre_sweep(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_sweep(step=self.S, level_number=0)
             self.S.levels[0].sweep.update_nodes()
             self.S.levels[0].sweep.compute_residual()
-            self.hooks.post_sweep(step=self.S, level_number=0)
+            for hook in self.hooks:
+                hook.post_sweep(step=self.S, level_number=0)
 
         # update stage
         self.S.status.stage = 'IT_CHECK'
@@ -703,10 +729,12 @@ class controller_MPI(controller):
                 if self.S.status.force_done:
                     return None
 
-                self.hooks.pre_sweep(step=self.S, level_number=l)
+                for hook in self.hooks:
+                    hook.pre_sweep(step=self.S, level_number=l)
                 self.S.levels[l].sweep.update_nodes()
                 self.S.levels[l].sweep.compute_residual()
-                self.hooks.post_sweep(step=self.S, level_number=l)
+                for hook in self.hooks:
+                    hook.post_sweep(step=self.S, level_number=l)
 
             # transfer further down the hierarchy
             self.S.transfer(source=self.S.levels[l], target=self.S.levels[l + 1])
@@ -725,14 +753,16 @@ class controller_MPI(controller):
             return None
 
         # do the sweep
-        self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
+        for hook in self.hooks:
+            hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
         assert self.S.levels[-1].params.nsweeps == 1, (
             'ERROR: this controller can only work with one sweep on the coarse level, got %s'
             % self.S.levels[-1].params.nsweeps
         )
         self.S.levels[-1].sweep.update_nodes()
         self.S.levels[-1].sweep.compute_residual()
-        self.hooks.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
+        for hook in self.hooks:
+            hook.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
         self.S.levels[-1].sweep.compute_end_point()
 
         # send to next step
@@ -772,10 +802,12 @@ class controller_MPI(controller):
                     if self.S.status.force_done:
                         return None
 
-                    self.hooks.pre_sweep(step=self.S, level_number=l - 1)
+                    for hook in self.hooks:
+                        hook.pre_sweep(step=self.S, level_number=l - 1)
                     self.S.levels[l - 1].sweep.update_nodes()
                     self.S.levels[l - 1].sweep.compute_residual()
-                    self.hooks.post_sweep(step=self.S, level_number=l - 1)
+                    for hook in self.hooks:
+                        hook.post_sweep(step=self.S, level_number=l - 1)
 
         # update stage
         self.S.status.stage = 'IT_FINE'

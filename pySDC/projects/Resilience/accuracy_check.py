@@ -36,24 +36,6 @@ class log_errors(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_extrapolated',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
             time=L.time,
             level=L.level_index,
             iter=0,
@@ -105,8 +87,8 @@ def get_results_from_stats(stats, var, val, hook_class=log_errors):
     }
 
     if hook_class == log_errors:
-        e_extrapolated = np.array(get_sorted(stats, type='e_extrapolated'))[:, 1]
-        e_embedded = np.array(get_sorted(stats, type='e_embedded'))[:, 1]
+        e_extrapolated = np.array(get_sorted(stats, type='error_extrapolation_estimate'))[:, 1]
+        e_embedded = np.array(get_sorted(stats, type='error_embedded_estimate'))[:, 1]
         e_loc = np.array(get_sorted(stats, type='e_loc'))[:, 1]
 
         if len(e_extrapolated[e_extrapolated != [None]]) > 0:

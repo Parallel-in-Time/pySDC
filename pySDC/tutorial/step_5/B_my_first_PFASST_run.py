@@ -55,7 +55,7 @@ def main():
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
 
     # set time parameters
     t0 = 0.0
@@ -119,7 +119,7 @@ def main():
 
         assert err < 1.3505e-04, "ERROR: error is too high, got %s" % err
         assert np.ptp(niters) <= 1, "ERROR: range of number of iterations is too high, got %s" % np.ptp(niters)
-        assert np.mean(niters) <= 5.0, "ERROR: mean number of iteratiobs is too high, got %s" % np.mean(niters)
+        assert np.mean(niters) <= 5.0, "ERROR: mean number of iterations is too high, got %s" % np.mean(niters)
 
     f.close()
 

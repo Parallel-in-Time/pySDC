@@ -91,6 +91,6 @@ Important things to note:
    order in time with a 2nd order stencil in space.
 -  Orders of convergence are not as stable as for the space-only test.
    One of the problems of this example is that we are actually trying to
-   compute 0 very, very thorougly...
+   compute 0 very, very thoroughly...
 
 .. include:: doc_step_1_D.rst

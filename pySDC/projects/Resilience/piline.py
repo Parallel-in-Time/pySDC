@@ -7,14 +7,14 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-from pySDC.projects.Resilience.hook import log_error_estimates
+from pySDC.projects.Resilience.hook import log_data, hook_collection
 
 
 def run_piline(
     custom_description=None,
     num_procs=1,
     Tend=20.0,
-    hook_class=log_error_estimates,
+    hook_class=log_data,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -68,7 +68,7 @@ def run_piline(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_class
+    controller_params['hook_class'] = hook_collection + [hook_class]
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -128,10 +128,11 @@ def get_data(stats, recomputed=False):
         'v1': np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
         'v2': np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
         'p3': np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
-        't': np.array(get_sorted(stats, type='u', recomputed=recomputed))[:, 0],
-        'dt': np.array(get_sorted(stats, type='dt', recomputed=recomputed)),
-        'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
-        'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
+        't': np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
+        'dt': np.array([me[1] for me in get_sorted(stats, type='dt', recomputed=recomputed)]),
+        't_dt': np.array([me[0] for me in get_sorted(stats, type='dt', recomputed=recomputed)]),
+        'e_em': np.array(get_sorted(stats, type='error_embedded_estimate', recomputed=recomputed))[:, 1],
+        'e_ex': np.array(get_sorted(stats, type='error_extrapolation_estimate', recomputed=recomputed))[:, 1],
         'restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 1],
         't_restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 0],
         'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=None))[:, 1],
@@ -154,7 +155,7 @@ def plot_error(data, ax, use_adaptivity=True, plot_restarts=False):
         None
     """
     setup_mpl_from_accuracy_check()
-    ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
+    ax.plot(data['t_dt'], data['dt'], color='black')
 
     e_ax = ax.twinx()
     e_ax.plot(data['t'], data['e_em'], label=r'$\epsilon_\mathrm{embedded}$')
@@ -286,7 +287,7 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
         'p3': data['p3'][-1],
         'e_em': data['e_em'][-1],
         'e_ex': data['e_ex'][data['e_ex'] != [None]][-1],
-        'dt': data['dt'][-1][1],
+        'dt': data['dt'][-1],
         'restarts': data['restarts'].sum(),
         'sweeps': data['sweeps'].sum(),
         't': data['t'][-1],
@@ -307,6 +308,37 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
         assert np.isclose(
             expected[k], got[k], rtol=1e-4
         ), f'{error_msg} Expected {k}={expected[k]:.4e}, got {k}={got[k]:.4e}'
+
+
+def residual_adaptivity(plot=False):
+    """
+    Make a run with adaptivity based on the residual.
+    """
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityResidual
+
+    max_res = 1e-8
+    custom_description = {'convergence_controllers': {}}
+    custom_description['convergence_controllers'][AdaptivityResidual] = {
+        'e_tol': max_res,
+        'e_tol_low': max_res / 10,
+    }
+    stats, _, _ = run_piline(custom_description, num_procs=1)
+
+    residual = get_sorted(stats, type='residual_post_step', recomputed=False)
+    dt = get_sorted(stats, type='dt', recomputed=False)
+
+    if plot:
+        fig, ax = plt.subplots()
+        dt_ax = ax.twinx()
+
+        ax.plot([me[0] for me in residual], [me[1] for me in residual])
+        dt_ax.plot([me[0] for me in dt], [me[1] for me in dt], color='black')
+        plt.show()
+
+    max_residual = max([me[1] for me in residual])
+    assert max_residual < max_res, f'Max. allowed residual is {max_res:.2e}, but got {max_residual:.2e}!'
+    dt_std = np.std([me[1] for me in dt])
+    assert dt_std != 0, f'Expected the step size to change, but standard deviation is {dt_std:.2e}!'
 
 
 def main():
@@ -342,4 +374,5 @@ def main():
 
 
 if __name__ == "__main__":
+    residual_adaptivity()
     main()

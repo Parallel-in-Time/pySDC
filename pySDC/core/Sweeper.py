@@ -67,7 +67,7 @@ class sweeper(object):
 
         if not coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning(
-                'we need to do a collocation update here, since the right end point is not a node. ' 'Changing this!'
+                'we need to do a collocation update here, since the right end point is not a node. Changing this!'
             )
             self.params.do_coll_update = True
 

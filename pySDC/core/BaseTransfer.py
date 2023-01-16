@@ -83,7 +83,7 @@ class base_transfer(object):
         """
         Space-time restriction routine
 
-        The routine applies the spatial restriction operator to teh fine values on the fine nodes, then reevaluates f
+        The routine applies the spatial restriction operator to the fine values on the fine nodes, then reevaluates f
         on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part
         is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the
         fine level are restricted as well.

@@ -44,6 +44,10 @@ class controller_nonMPI(controller):
             for _ in range(num_procs - 1):
                 self.MS.append(stepclass.step(description))
 
+        self.base_convergence_controllers += [BasicRestarting.get_implementation("nonMPI")]
+        for convergence_controller in self.base_convergence_controllers:
+            self.add_convergence_controller(convergence_controller, description)
+
         if self.params.dump_setup:
             self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
 
@@ -75,8 +79,6 @@ class controller_nonMPI(controller):
                 'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
             )
 
-        self.add_convergence_controller(BasicRestarting.get_implementation("nonMPI"), description)
-
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
             C.setup_status_variables(self)
@@ -98,7 +100,8 @@ class controller_nonMPI(controller):
         # some initializations and reset of statistics
         uend = None
         num_procs = len(self.MS)
-        self.hooks.reset_stats()
+        for hook in self.hooks:
+            hook.reset_stats()
 
         # initial ordering of the steps: 0,1,...,Np-1
         slots = list(range(num_procs))
@@ -118,11 +121,13 @@ class controller_nonMPI(controller):
         # initialize block of steps with u0
         self.restart_block(active_slots, time, u0)
 
-        self.hooks.post_setup(step=None, level_number=None)
+        for hook in self.hooks:
+            hook.post_setup(step=None, level_number=None)
 
         # call pre-run hook
         for S in self.MS:
-            self.hooks.pre_run(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_run(step=S, level_number=0)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -166,9 +171,10 @@ class controller_nonMPI(controller):
 
         # call post-run hook
         for S in self.MS:
-            self.hooks.post_run(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.post_run(step=S, level_number=0)
 
-        return uend, self.hooks.return_stats()
+        return uend, self.return_stats()
 
     def restart_block(self, active_slots, time, u0):
         """
@@ -239,13 +245,16 @@ class controller_nonMPI(controller):
             source.sweep.compute_end_point()
             source.tag = cp.deepcopy(tag)
 
-        self.hooks.pre_comm(step=S, level_number=level)
+        for hook in self.hooks:
+            hook.pre_comm(step=S, level_number=level)
         if not S.status.last:
             self.logger.debug(
                 'Process %2i provides data on level %2i with tag %s' % (S.status.slot, level, S.status.iter)
             )
             send(S.levels[level], tag=(level, S.status.iter, S.status.slot))
-        self.hooks.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
+
+        for hook in self.hooks:
+            hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
 
     def recv_full(self, S, level=None, add_to_stats=False):
         """
@@ -274,14 +283,16 @@ class controller_nonMPI(controller):
             # re-evaluate f on left interval boundary
             target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
-        self.hooks.pre_comm(step=S, level_number=level)
+        for hook in self.hooks:
+            hook.pre_comm(step=S, level_number=level)
         if not S.status.prev_done and not S.status.first:
             self.logger.debug(
                 'Process %2i receives from %2i on level %2i with tag %s'
                 % (S.status.slot, S.prev.status.slot, level, S.status.iter)
             )
             recv(S.levels[level], S.prev.levels[level], tag=(level, S.status.iter, S.prev.status.slot))
-        self.hooks.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
+        for hook in self.hooks:
+            hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
 
     def pfasst(self, local_MS_active):
         """
@@ -331,7 +342,8 @@ class controller_nonMPI(controller):
         for S in local_MS_running:
 
             # first stage: spread values
-            self.hooks.pre_step(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_step(step=S, level_number=0)
 
             # call predictor from sweeper
             S.levels[0].sweep.predict()
@@ -354,7 +366,8 @@ class controller_nonMPI(controller):
         """
 
         for S in local_MS_running:
-            self.hooks.pre_predict(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.pre_predict(step=S, level_number=0)
 
         if self.params.predict_type is None:
             pass
@@ -462,7 +475,8 @@ class controller_nonMPI(controller):
             raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
         for S in local_MS_running:
-            self.hooks.post_predict(step=S, level_number=0)
+            for hook in self.hooks:
+                hook.post_predict(step=S, level_number=0)
 
         for S in local_MS_running:
             # update stage
@@ -488,7 +502,8 @@ class controller_nonMPI(controller):
         for S in local_MS_running:
 
             if S.status.iter > 0:
-                self.hooks.post_iteration(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.post_iteration(step=S, level_number=0)
 
             # decide if the step is done, needs to be restarted and other things convergence related
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
@@ -497,20 +512,25 @@ class controller_nonMPI(controller):
 
         for S in local_MS_running:
             if not S.status.first:
-                self.hooks.pre_comm(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.pre_comm(step=S, level_number=0)
                 S.status.prev_done = S.prev.status.done  # "communicate"
-                self.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
+                for hook in self.hooks:
+                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
                 S.status.done = S.status.done and S.status.prev_done
 
             if self.params.all_to_done:
-                self.hooks.pre_comm(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.pre_comm(step=S, level_number=0)
                 S.status.done = all([T.status.done for T in local_MS_running])
-                self.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
+                for hook in self.hooks:
+                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
             if not S.status.done:
                 # increment iteration count here (and only here)
                 S.status.iter += 1
-                self.hooks.pre_iteration(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.pre_iteration(step=S, level_number=0)
                 for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                     C.pre_iteration_processing(self, S)
 
@@ -523,7 +543,8 @@ class controller_nonMPI(controller):
                         S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
             else:
                 S.levels[0].sweep.compute_end_point()
-                self.hooks.post_step(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.post_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
@@ -553,10 +574,12 @@ class controller_nonMPI(controller):
 
             for S in local_MS_running:
                 # standard sweep workflow: update nodes, compute residual, log progress
-                self.hooks.pre_sweep(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.pre_sweep(step=S, level_number=0)
                 S.levels[0].sweep.update_nodes()
                 S.levels[0].sweep.compute_residual()
-                self.hooks.post_sweep(step=S, level_number=0)
+                for hook in self.hooks:
+                    hook.post_sweep(step=S, level_number=0)
 
         for S in local_MS_running:
             # update stage
@@ -587,10 +610,12 @@ class controller_nonMPI(controller):
                     self.recv_full(S, level=l)
 
                 for S in local_MS_running:
-                    self.hooks.pre_sweep(step=S, level_number=l)
+                    for hook in self.hooks:
+                        hook.pre_sweep(step=S, level_number=l)
                     S.levels[l].sweep.update_nodes()
                     S.levels[l].sweep.compute_residual()
-                    self.hooks.post_sweep(step=S, level_number=l)
+                    for hook in self.hooks:
+                        hook.post_sweep(step=S, level_number=l)
 
             for S in local_MS_running:
                 # transfer further down the hierarchy
@@ -614,10 +639,12 @@ class controller_nonMPI(controller):
             self.recv_full(S, level=len(S.levels) - 1)
 
             # do the sweep
-            self.hooks.pre_sweep(step=S, level_number=len(S.levels) - 1)
+            for hook in self.hooks:
+                hook.pre_sweep(step=S, level_number=len(S.levels) - 1)
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
-            self.hooks.post_sweep(step=S, level_number=len(S.levels) - 1)
+            for hook in self.hooks:
+                hook.post_sweep(step=S, level_number=len(S.levels) - 1)
 
             # send to succ step
             self.send_full(S, level=len(S.levels) - 1, add_to_stats=True)
@@ -655,10 +682,12 @@ class controller_nonMPI(controller):
                         self.recv_full(S, level=l - 1, add_to_stats=(k == self.nsweeps[l - 1] - 1))
 
                     for S in local_MS_running:
-                        self.hooks.pre_sweep(step=S, level_number=l - 1)
+                        for hook in self.hooks:
+                            hook.pre_sweep(step=S, level_number=l - 1)
                         S.levels[l - 1].sweep.update_nodes()
                         S.levels[l - 1].sweep.compute_residual()
-                        self.hooks.post_sweep(step=S, level_number=l - 1)
+                        for hook in self.hooks:
+                            hook.post_sweep(step=S, level_number=l - 1)
 
         for S in local_MS_running:
             # update stage
