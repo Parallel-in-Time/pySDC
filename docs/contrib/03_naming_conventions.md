@@ -106,6 +106,8 @@ class ChuckNorris():
         print('*?%&$?*§"$*$*§#{*')
 ```
 
+:scroll: In general, variable name starting with double underscore `__` are usually left for Python built-in names, _e.g_ `__dict__`, `__init__`, ...
+
 ## Constants
 
 Constants are usually defined on a module level and written in all-uppercase with underscores (all-uppercase with minus are not allowed by Python syntax). Examples :
