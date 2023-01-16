@@ -11,7 +11,7 @@ The most important idea at the end is to find a optimal compromise between
 - readability : _Can someone else easily read and understand my code ?_
 - effectiveness : _Does my code avoid kilometers-long lines to do simple things ?_
 
-Both aspects are interdependant to ease maintaning/development of any code and improve its attractivity to potential users.
+Both aspects are interdependent to ease maintaining/development of any code and improve its attractiveness to potential users.
 
 ## Packages and modules names
 
@@ -19,7 +19,7 @@ Modules should have short, all-lowercase names. Underscores can be used in the m
 
 ## Class names
 
-Class names should use PascalCase formating, for instance :
+Class names should use PascalCase formatting, for instance :
 
 ```python
 class AdvectionDiffusion(Problem):
