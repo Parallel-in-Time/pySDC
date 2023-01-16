@@ -137,7 +137,7 @@ class step(FrozenClass):
         # generate list of dictionaries out of the description
         descr_list = self.__dict_to_list(descr_new)
 
-        # sanity check: is there a base_transfer class? is there one even if only a single level is specified?
+        # sanity check: is there a base_transfer class? Is there one even if only a single level is specified?
         if len(descr_list) > 1 and not descr_new['space_transfer_class']:
             msg = 'need %s to instantiate step, only got %s' % ('space_transfer_class', str(descr_new.keys()))
             self.logger.error(msg)

@@ -43,7 +43,7 @@ def computeFejerRule(n):
     v1 = np.empty(len(v0) - 1, dtype=complex)
     np.conjugate(v0[:0:-1], out=v1)
     v1 += v0[:-1]
-    # -- Compute inverse fourier transform
+    # -- Compute inverse Fourier transform
     w = np.fft.ifft(v1)
     if max(w.imag) > 1.0e-15:
         raise ValueError(f'Max imaginary value to important for ifft: {max(w.imag)}')

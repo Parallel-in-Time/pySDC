@@ -53,7 +53,7 @@ def main():
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
 
     # set up parameters for PFASST run
     problem_params['nvars'] = [63, 31]

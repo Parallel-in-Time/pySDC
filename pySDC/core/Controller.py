@@ -3,10 +3,10 @@ import os
 import sys
 import numpy as np
 
-from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.implementations.hooks.default_hook import DefaultHooks
 
 
 # short helper class to add params as attributes
@@ -40,11 +40,16 @@ class controller(object):
             controller_params (dict): parameter set for the controller and the steps
         """
 
-        # check if we have a hook on this list. if not, use default class.
-        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
-        self.__hooks = controller_params['hook_class']()
+        # check if we have a hook on this list. If not, use default class.
+        self.__hooks = []
+        hook_classes = [DefaultHooks]
+        user_hooks = controller_params.get('hook_class', [])
+        hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
+        [self.add_hook(hook) for hook in hook_classes]
+        controller_params['hook_class'] = controller_params.get('hook_class', hook_classes)
 
-        self.hooks.pre_setup(step=None, level_number=None)
+        for hook in self.hooks:
+            hook.pre_setup(step=None, level_number=None)
 
         self.params = _Pars(controller_params)
 
@@ -100,6 +105,20 @@ class controller(object):
             logger.addHandler(file_handler)
         else:
             pass
+
+    def add_hook(self, hook):
+        """
+        Add a hook to the controller which will be called in addition to all other hooks whenever something happens.
+        The hook is only added if a hook of the same class is not already present.
+
+        Args:
+            hook (pySDC.Hook): A hook class that is derived from the core hook class
+
+        Returns:
+            None
+        """
+        if hook not in [type(me) for me in self.hooks]:
+            self.__hooks += [hook()]
 
     def welcome_message(self):
         out = (
@@ -261,7 +280,7 @@ class controller(object):
         Args:
             convergence_controller (pySDC.ConvergenceController): The convergence controller to be added
             description (dict): The description object used to instantiate the controller
-            params (dict): Parametes for the convergence controller
+            params (dict): Parameters for the convergence controller
             allow_double (bool): Allow adding the same convergence controller multiple times
 
         Returns:
@@ -307,3 +326,15 @@ class controller(object):
             out += f'\n{user_added}|{i:3} | {C.params.control_order:5} | {type(C).__name__}'
 
         return out
+
+    def return_stats(self):
+        """
+        Return the merged stats from all hooks
+
+        Returns:
+            dict: Merged stats from all hooks
+        """
+        stats = {}
+        for hook in self.hooks:
+            stats = {**stats, **hook.return_stats()}
+        return stats

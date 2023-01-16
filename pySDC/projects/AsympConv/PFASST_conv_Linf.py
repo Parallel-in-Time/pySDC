@@ -30,12 +30,13 @@ def main():
     plot_results()
 
 
-def run_diffusion(QI):
+def run_diffusion(QI, max_proc_exp=13):
     """
     A simple test program to test PFASST convergence for the heat equation with random initial data
 
     Args:
         QI: preconditioner
+        max_proc_exp: max number of processors will be 2^max_proc_exp
     """
 
     # initialize level parameters
@@ -53,7 +54,7 @@ def run_diffusion(QI):
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = -1  # frequency for the test value
+    problem_params['freq'] = 2  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
@@ -93,7 +94,7 @@ def run_diffusion(QI):
     writer.writerow(('num_proc', 'niter'))
     file.close()
 
-    for i in range(0, 13):
+    for i in range(0, max_proc_exp):
 
         num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
@@ -131,12 +132,13 @@ def run_diffusion(QI):
     assert os.path.isfile(fname), 'ERROR: pickle did not create file'
 
 
-def run_advection(QI):
+def run_advection(QI, max_proc_exp=7):
     """
     A simple test program to test PFASST convergence for the periodic advection equation
 
     Args:
         QI: preconditioner
+        max_proc_exp: max number of processors will be 2^max_proc_exp
     """
 
     # initialize level parameters
@@ -196,7 +198,7 @@ def run_advection(QI):
     writer.writerow(('num_proc', 'niter'))
     file.close()
 
-    for i in range(0, 7):
+    for i in range(0, max_proc_exp):
 
         num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc

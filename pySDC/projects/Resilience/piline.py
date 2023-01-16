@@ -7,14 +7,14 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-from pySDC.projects.Resilience.hook import log_error_estimates
+from pySDC.projects.Resilience.hook import log_data, hook_collection
 
 
 def run_piline(
     custom_description=None,
     num_procs=1,
     Tend=20.0,
-    hook_class=log_error_estimates,
+    hook_class=log_data,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -68,7 +68,7 @@ def run_piline(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_class
+    controller_params['hook_class'] = hook_collection + [hook_class]
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -131,8 +131,8 @@ def get_data(stats, recomputed=False):
         't': np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)]),
         'dt': np.array([me[1] for me in get_sorted(stats, type='dt', recomputed=recomputed)]),
         't_dt': np.array([me[0] for me in get_sorted(stats, type='dt', recomputed=recomputed)]),
-        'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
-        'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
+        'e_em': np.array(get_sorted(stats, type='error_embedded_estimate', recomputed=recomputed))[:, 1],
+        'e_ex': np.array(get_sorted(stats, type='error_extrapolation_estimate', recomputed=recomputed))[:, 1],
         'restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 1],
         't_restarts': np.array(get_sorted(stats, type='restart', recomputed=None))[:, 0],
         'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=None))[:, 1],
