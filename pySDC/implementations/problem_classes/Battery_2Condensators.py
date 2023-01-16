@@ -164,10 +164,9 @@ class battery_2condensators(ptype):
                     msg = 'A discrete event is already found! Multiple switching handling in the same interval is not yet implemented!'
                     raise AssertionError(msg)
 
-        vC_switch = []
-        if switch_detected:
-            for m in range(1, len(u)):
-                vC_switch.append(u[m][k_detected] - self.params.V_ref[k_detected - 1])
+        vC_switch = (
+            [u[m][k_detected] - self.params.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
+        )
 
         return switch_detected, m_guess, vC_switch
 

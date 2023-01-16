@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 
 from pySDC.core.Collocation import CollBase
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.ConvergenceController import ConvergenceController, Status
 
 
 class SwitchEstimator(ConvergenceController):
@@ -36,12 +36,29 @@ class SwitchEstimator(ConvergenceController):
             'control_order': 100,
             'tol': description['level_params']['dt'],
             'coll_nodes': coll.nodes,
-            'switch_detected': False,
-            'switch_detected_step': False,
-            't_switch': None,
             'dt_initial': description['level_params']['dt'],
         }
         return {**defaults, **params}
+
+    def setup_status_variables(self, controller, **kwargs):
+        """
+        Adds switching specific variables to status variables.
+
+        Args:
+            controller (pySDC.Controller): The controller
+        """
+
+        self.status = Status(['t_switch', 'switch_detected', 'switch_detected_step'])
+
+    def reset_status_variables(self, controller, **kwargs):
+        """
+        Resets status variables.
+
+        Args:
+            controller (pySDC.Controller): The controller
+        """
+
+        self.setup_status_variables(controller, **kwargs)
 
     def get_new_step_size(self, controller, S):
         """
@@ -55,40 +72,35 @@ class SwitchEstimator(ConvergenceController):
             None
         """
 
-        self.params.switch_detected = False  # reset between steps
-
         L = S.levels[0]
 
         if S.status.iter == S.params.maxiter:
 
-            self.params.switch_detected, m_guess, vC_switch = L.prob.get_switching_info(L.u, L.time)
+            self.status.switch_detected, m_guess, vC_switch = L.prob.get_switching_info(L.u, L.time)
 
-            if self.params.switch_detected:
+            if self.status.switch_detected:
                 t_interp = [L.time + L.dt * self.params.coll_nodes[m] for m in range(len(self.params.coll_nodes))]
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
 
-                    self.params.t_switch = self.get_switch(t_interp, vC_switch, m_guess)
+                    self.status.t_switch = self.get_switch(t_interp, vC_switch, m_guess)
 
-                    # if the switch is not find, we need to do ... ?
-                    if L.time < self.params.t_switch < L.time + L.dt:
+                    if L.time < self.status.t_switch < L.time + L.dt:
 
-                        if not np.isclose(self.params.t_switch - L.time, L.dt, atol=self.params.tol):
-                            dt_switch = self.params.t_switch - L.time
+                        dt_switch = self.status.t_switch - L.time
+                        if not np.isclose(self.status.t_switch - L.time, L.dt, atol=self.params.tol):
                             self.log(
-                                f"Located Switch at time {self.params.t_switch:.6f} is outside the range of tol={self.params.tol:.4f}",
+                                f"Located Switch at time {self.status.t_switch:.6f} is outside the range of tol={self.params.tol:.4e}",
                                 S,
                             )
 
                         else:
-                            dt_switch = self.params.t_switch - L.time
-
                             self.log(
-                                f"Switch located at time {self.params.t_switch:.6f} inside tol={self.params.tol:.4f}", S
+                                f"Switch located at time {self.status.t_switch:.6f} inside tol={self.params.tol:.4e}", S
                             )
 
-                            L.prob.t_switch = self.params.t_switch
+                            L.prob.t_switch = self.status.t_switch
                             controller.hooks.add_to_stats(
                                 process=S.status.slot,
                                 time=L.time,
@@ -96,26 +108,26 @@ class SwitchEstimator(ConvergenceController):
                                 iter=0,
                                 sweep=L.status.sweep,
                                 type='switch',
-                                value=self.params.t_switch,
+                                value=self.status.t_switch,
                             )
 
                             L.prob.flip_switches()
-                            self.params.switch_detected_step = True
+                            self.status.switch_detected_step = True
 
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
                         # when a switch is found, time step to match with switch should be preferred
-                        if self.params.switch_detected:
+                        if self.status.switch_detected:
                             L.status.dt_new = dt_switch
 
                         else:
                             L.status.dt_new = min([dt_planned, dt_switch])
 
                     else:
-                        self.params.switch_detected = False
+                        self.status.switch_detected = False
 
                 else:
-                    self.params.switch_detected = False
+                    self.status.switch_detected = False
 
     def determine_restart(self, controller, S):
         """
@@ -129,7 +141,7 @@ class SwitchEstimator(ConvergenceController):
             None
         """
 
-        if self.params.switch_detected:
+        if self.status.switch_detected:
             S.status.restart = True
             S.status.force_done = True
 
@@ -150,13 +162,9 @@ class SwitchEstimator(ConvergenceController):
 
         L = S.levels[0]
 
-        if self.params.switch_detected_step:
+        if self.status.switch_detected_step:
             if L.time + L.dt >= self.params.t_switch:
-                self.params.t_switch = None
-                self.params.switch_detected_step = False
-
-                dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
-                L.status.dt_new = dt_planned
+                L.status.dt_new = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
         super(SwitchEstimator, self).post_step_processing(controller, S)
 

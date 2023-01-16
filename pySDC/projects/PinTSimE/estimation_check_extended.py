@@ -7,7 +7,6 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery_2Condensators import battery_2condensators
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.projects.PinTSimE.battery_model import get_recomputed
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_2condensators_model import log_data, proof_assertions_description
@@ -17,6 +16,17 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
 def run(dt, use_switch_estimator=True):
+    """
+    A simple test program to do SDC/PFASST runs for the battery drain model using 2 condensators
+
+    Args:
+        dt (float): time step that wants to be used for the computation
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+
+    Returns:
+        stats (dict): all statistics from a controller run
+        description (dict): contains all information for a controller run
+    """
 
     # initialize level parameters
     level_params = dict()
@@ -32,6 +42,7 @@ def run(dt, use_switch_estimator=True):
 
     # initialize problem parameters
     problem_params = dict()
+    problem_params['ncondensators'] = 2
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C1'] = 1.0
@@ -47,7 +58,7 @@ def run(dt, use_switch_estimator=True):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 15
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
 
     # convergence controllers
@@ -64,7 +75,6 @@ def run(dt, use_switch_estimator=True):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
 
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
@@ -119,6 +129,9 @@ def run(dt, use_switch_estimator=True):
 def check(cwd='./'):
     """
     Routine to check the differences between using a switch estimator or not
+
+    Args:
+        cwd: current working directory
     """
 
     dt_list = [4e-1, 4e-2, 4e-3]

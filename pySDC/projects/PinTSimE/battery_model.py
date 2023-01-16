@@ -62,11 +62,30 @@ class log_data(hooks):
             type='dt',
             value=L.dt,
         )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.get('error_embedded_estimate'),
+        )
 
 
 def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
+
+    Args:
+        dt (float): time step for computation
+        problem (problem_class.__name__): problem class that wants to be simulated
+        sweeper (sweeper_class.__name__): sweeper class for solving the problem class numerically
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        use_adaptivity (bool): flag if the adaptivity wants to be used or not
+
+    Returns:
+        description (dict): contains all information for a controller run
     """
 
     # initialize level parameters
@@ -85,6 +104,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     problem_params = dict()
     problem_params['newton_maxiter'] = 200
     problem_params['newton_tol'] = 1e-08
+    problem_params['ncondensators'] = 1  # number of condensators
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = 1.0
@@ -99,7 +119,7 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 15
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
     controller_params['mssdc_jac'] = False
 
@@ -181,7 +201,7 @@ def run():
     as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    dt = 1e-2
+    dt = 4e-3
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
     recomputed = False
@@ -205,6 +225,15 @@ def run():
 def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimator, use_adaptivity, cwd='./'):
     """
     Routine to plot the numerical solution of the model
+
+    Args:
+        description(dict): contains all information for a controller run
+        problem (problem_class.__name__): problem class that wants to be simulated
+        sweeper (sweeper_class.__name__): sweeper class for solving the problem class numerically
+        recomputed (bool): flag if the values after a restart are used or before
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        use_adaptivity (bool): flag if adaptivity wants to be used or not
+        cwd: current working directory
     """
 
     f = open(cwd + 'data/battery_{}_USE{}_USA{}.dat'.format(sweeper, use_switch_estimator, use_adaptivity), 'rb')
@@ -251,10 +280,12 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 def get_recomputed(stats, type, sortby):
     """
     Function that filters statistics after a recomputation
+
     Args:
         stats (dict): Raw statistics from a controller run
         type (str): the type the be filtered
         sortby (str): string to specify which key to use for sorting
+
     Returns:
         sorted_list (list): list of filtered statistics
     """
@@ -279,6 +310,11 @@ def get_recomputed(stats, type, sortby):
 def proof_assertions_description(description, use_adaptivity, use_switch_estimator):
     """
     Function to proof the assertions (function to get cleaner code)
+
+    Args:
+        description(dict): contains all information for a controller run
+        use_adaptivity (bool): flag if adaptivity wants to be used or not
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
     """
 
     assert (

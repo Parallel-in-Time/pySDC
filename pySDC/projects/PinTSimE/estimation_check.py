@@ -15,69 +15,12 @@ from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
-
-
-class log_data_adaptivity(hooks):
-    def post_step(self, step, level_number):
-
-        super(log_data_adaptivity, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='current L',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='voltage C',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.get('restart')),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.error_embedded_estimate,
-        )
 
 
 def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
+
     Args:
         dt (np.float): (initial) time step
         problem (problem_class): the considered problem class (here: battery or battery_implicit)
@@ -85,6 +28,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
         use_switch_estimator (bool): Switch estimator should be used or not
         use_adaptivity (bool): Adaptivity should be used or not
         V_ref (np.float): reference value for the switch
+
     Returns:
         description (dict): contains all the information for the controller
         stats (dict): includes the statistics of the solve
@@ -106,6 +50,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     problem_params = dict()
     problem_params['newton_maxiter'] = 200
     problem_params['newton_tol'] = 1e-08
+    problem_params['ncondensators'] = 1
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = 1.0
@@ -120,11 +65,8 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 15
-    if use_adaptivity:
-        controller_params['hook_class'] = log_data_adaptivity
-    else:
-        controller_params['hook_class'] = log_data
+    controller_params['logger_level'] = 30
+    controller_params['hook_class'] = log_data
     controller_params['mssdc_jac'] = False
 
     # convergence controllers
@@ -191,6 +133,7 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
 def check(cwd='./'):
     """
     Routine to check the differences between using a switch estimator or not
+
     Args:
         cwd: current working directory
     """
@@ -265,6 +208,7 @@ def check(cwd='./'):
 def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
     """
     Routine to check accuracy for different step sizes in case of using adaptivity
+
     Args:
         dt_list (list): list of considered (initial) step sizes
         problem (problem.__name__): Problem class used to consider (the class name)
@@ -379,6 +323,7 @@ def differences_around_switch(
 ):
     """
     Routine to plot the differences before, at, and after the switch. Produces the diffs_estimation_<sweeper_class>.png file
+
     Args:
         dt_list (list): list of considered (initial) step sizes
         problem (problem.__name__): Problem class used to consider (the class name)
@@ -525,6 +470,7 @@ def differences_around_switch(
 def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
     """
     Routine to plot the differences in time using the switch estimator or not. Produces the difference_estimation_<sweeper_class>.png file
+
     Args:
         dt_list (list): list of considered (initial) step sizes
         problem (problem.__name__): Problem class used to consider (the class name)
@@ -670,6 +616,7 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
 def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
     """
     Routine  to plot the number of iterations over time using switch estimator or not. Produces the iters_<sweeper_class>.png file
+
     Args:
         dt_list (list): list of considered (initial) step sizes
         maxiter (np.int): maximum number of iterations

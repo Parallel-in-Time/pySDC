@@ -67,6 +67,12 @@ class log_data(hooks):
 def main(use_switch_estimator=True):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model using 2 condensators
+
+    Args:
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+
+    Returns:
+        description (dict): contains all information for a controller run
     """
 
     # initialize level parameters
@@ -83,6 +89,7 @@ def main(use_switch_estimator=True):
 
     # initialize problem parameters
     problem_params = dict()
+    problem_params['ncondensators'] = 2
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C1'] = 1.0
@@ -98,7 +105,7 @@ def main(use_switch_estimator=True):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 15
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
 
     # convergence controllers
@@ -171,12 +178,18 @@ def main(use_switch_estimator=True):
 
     plot_voltages(description, recomputed, use_switch_estimator)
 
-    return np.mean(niters)
+    return description
 
 
 def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
     """
     Routine to plot the numerical solution of the model
+
+    Args:
+        description(dict): contains all information for a controller run
+        recomputed (bool): flag if the values after a restart are used or before
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        cwd: current working directory
     """
 
     f = open(cwd + 'data/battery_2condensators.dat', 'rb')
@@ -200,7 +213,7 @@ def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
         switches = get_recomputed(stats, type='switch', sortby='time')
 
         if recomputed is not None:
-            assert len(switches) >= 1 and len(switches) >= 2, "No switches found"
+            assert len(switches) >= 2, f"Expected at least 2 switches, got {len(switches)}!"
         t_switches = [v[1] for v in switches]
 
         for i in range(len(t_switches)):
@@ -218,6 +231,10 @@ def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
 def proof_assertions_description(description, use_switch_estimator):
     """
     Function to proof the assertions (function to get cleaner code)
+
+    Args:
+        description(dict): contains all information for a controller run
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
     """
 
     assert (
@@ -227,7 +244,13 @@ def proof_assertions_description(description, use_switch_estimator):
         description['problem_params']['alpha'] > description['problem_params']['V_ref'][1]
     ), 'Please set "alpha" greater than "V_ref2"'
 
-    assert type(description['problem_params']['V_ref']) == np.ndarray, '"V_ref" needs to be an array (of type float)'
+    if description['problem_params']['ncondensators'] > 1:
+        assert (
+            type(description['problem_params']['V_ref']) == np.ndarray
+        ), '"V_ref" needs to be an array (of type float)'
+        assert (
+            description['problem_params']['ncondensators'] == np.shape(description['problem_params']['V_ref'])[0]
+        ), 'Number of reference values needs to be equal to number of condensators'
 
     assert description['problem_params']['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
     assert description['problem_params']['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
