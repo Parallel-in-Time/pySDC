@@ -1,5 +1,6 @@
 |badge-ga|
 |badge-ossf|
+|badge-cc|
 
 Welcome to pySDC!
 =================
@@ -83,3 +84,5 @@ The project also received help from the `Helmholtz Platform for Research Softwar
     :target: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml
 .. |badge-ossf| image:: https://bestpractices.coreinfrastructure.org/projects/6909/badge
     :target: https://bestpractices.coreinfrastructure.org/projects/6909
+.. |badge-cc| image:: https://codecov.io/gh/Parallel-in-Time/pySDC/branch/master/graph/badge.svg?token=hpP18dmtgS 
+    :target: https://codecov.io/gh/Parallel-in-Time/pySDC
