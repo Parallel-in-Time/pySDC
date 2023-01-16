@@ -188,7 +188,10 @@ jobs:
         run: |
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
-
+          
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
 #        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}
