@@ -42,10 +42,10 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">Hooks</span> <span class="k">as</span> <span class="n">hookclass</span>
 <span class="kn">from</span> <span class="nn">pySDC.core.BaseTransfer</span> <span class="kn">import</span> <span class="n">base_transfer</span>
 <span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.default_hook</span> <span class="kn">import</span> <span class="n">DefaultHooks</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
@@ -80,10 +80,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># check if we have a hook on this list. If not, use default class.</span>
-        <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hook_class&#39;</span><span class="p">,</span> <span class="n">hookclass</span><span class="o">.</span><span class="n">hooks</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">=</span> <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">hook_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">DefaultHooks</span><span class="p">]</span>
+        <span class="n">user_hooks</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hook_class&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">hook_classes</span> <span class="o">+=</span> <span class="n">user_hooks</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">user_hooks</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="k">else</span> <span class="p">[</span><span class="n">user_hooks</span><span class="p">]</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">hook</span><span class="p">)</span> <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">hook_classes</span><span class="p">]</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hook_class&#39;</span><span class="p">,</span> <span class="n">hook_classes</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">pre_setup</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">pre_setup</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">controller_params</span><span class="p">)</span>
 
@@ -139,6 +144,20 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">pass</span>
+
+<div class="viewcode-block" id="controller.add_hook"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.add_hook">[docs]</a>    <span class="k">def</span> <span class="nf">add_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a hook to the controller which will be called in addition to all other hooks whenever something happens.</span>
+<span class="sd">        The hook is only added if a hook of the same class is not already present.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            hook (pySDC.Hook): A hook class that is derived from the core hook class</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">hook</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hook</span><span class="p">()]</span></div>
 
 <div class="viewcode-block" id="controller.welcome_message"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.welcome_message">[docs]</a>    <span class="k">def</span> <span class="nf">welcome_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
@@ -346,7 +365,19 @@
 
             <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">user_added</span><span class="si">}</span><span class="s1">|</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s1">3</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span><span class="si">:</span><span class="s1">5</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span>
 
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="controller.return_stats"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.return_stats">[docs]</a>    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the merged stats from all hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Merged stats from all hooks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">stats</span><span class="p">,</span> <span class="o">**</span><span class="n">hook</span><span class="o">.</span><span class="n">return_stats</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">stats</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

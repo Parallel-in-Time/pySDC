@@ -38,7 +38,6 @@
             
   <h1>Source code for core.Hooks</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
 
@@ -47,23 +46,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)</span>
 
+<span class="sd">    When deriving a custom hook from this class make sure to always call the parent method using e.g.</span>
+<span class="sd">    `super().post_step(step, level_number)`. Otherwise bugs may arise when using `filer_recomputed` from the stats</span>
+<span class="sd">    helper for post processing.</span>
+
 <span class="sd">    Attributes:</span>
-<span class="sd">        __t0_setup (float): private variable to get starting time of setup</span>
-<span class="sd">        __t0_run (float): private variable to get starting time of the run</span>
-<span class="sd">        __t0_predict (float): private variable to get starting time of the predictor</span>
-<span class="sd">        __t0_step (float): private variable to get starting time of the step</span>
-<span class="sd">        __t0_iteration (float): private variable to get starting time of the iteration</span>
-<span class="sd">        __t0_sweep (float): private variable to get starting time of the sweep</span>
-<span class="sd">        __t0_comm (list): private variable to get starting time of the communication</span>
-<span class="sd">        __t1_run (float): private variable to get end time of the run</span>
-<span class="sd">        __t1_predict (float): private variable to get end time of the predictor</span>
-<span class="sd">        __t1_step (float): private variable to get end time of the step</span>
-<span class="sd">        __t1_iteration (float): private variable to get end time of the iteration</span>
-<span class="sd">        __t1_sweep (float): private variable to get end time of the sweep</span>
-<span class="sd">        __t1_setup (float): private variable to get end time of setup</span>
-<span class="sd">        __t1_comm (list): private variable to hold timing of the communication (!)</span>
-<span class="sd">        __num_restarts (int): number of restarts of the current step</span>
 <span class="sd">        logger: logger instance for output</span>
+<span class="sd">        __num_restarts (int): number of restarts of the current step</span>
 <span class="sd">        __stats (dict): dictionary for gathering the statistics of a run</span>
 <span class="sd">        __entry (namedtuple): statistics entry containing all information to identify the value</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -72,20 +61,6 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_setup</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_run</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_predict</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_step</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_iteration</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_sweep</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_run</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_predict</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_step</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_iteration</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_sweep</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_setup</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;hooks&#39;</span><span class="p">)</span>
@@ -168,8 +143,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_setup</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.pre_run"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.pre_run">[docs]</a>    <span class="k">def</span> <span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -179,8 +153,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_run</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.pre_predict"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.pre_predict">[docs]</a>    <span class="k">def</span> <span class="nf">pre_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -190,7 +163,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_predict</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.pre_step"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.pre_step">[docs]</a>    <span class="k">def</span> <span class="nf">pre_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -200,8 +173,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_step</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.pre_iteration"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.pre_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">pre_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -211,8 +183,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_iteration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.pre_sweep"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.pre_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">pre_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -222,8 +193,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t0_sweep</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.pre_comm"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.pre_comm">[docs]</a>    <span class="k">def</span> <span class="nf">pre_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -233,17 +203,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">level_number</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">())</span>
-            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">level_number</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">)</span> <span class="o">==</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">)</span> <span class="o">==</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_comm"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_comm">[docs]</a>    <span class="k">def</span> <span class="nf">post_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -254,23 +214,7 @@
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">            add_to_stats (bool): set if result should go to stats object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">add_to_stats</span><span class="p">:</span>
-            <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-                <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-                <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-                <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-                <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-                <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-                <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_comm&#39;</span><span class="p">,</span>
-                <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">],</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__t1_comm</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_sweep"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">post_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -280,40 +224,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_sweep</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s1">&#39;Process </span><span class="si">%2i</span><span class="s1"> on time </span><span class="si">%8.6f</span><span class="s1"> at stage </span><span class="si">%15s</span><span class="s1">: Level: </span><span class="si">%s</span><span class="s1"> -- Iteration: </span><span class="si">%2i</span><span class="s1"> -- Sweep: </span><span class="si">%2i</span><span class="s1"> -- &#39;</span> <span class="s1">&#39;residual: </span><span class="si">%12.8e</span><span class="s1">&#39;</span><span class="p">,</span>
-            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_sweep&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_sweep&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_sweep</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_sweep</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_iteration"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -323,30 +234,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_iteration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_iteration&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_iteration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_iteration</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_step"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_step">[docs]</a>    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -356,45 +244,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_step</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_step&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_step</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_step&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="c1"># record the recomputed quantities at weird positions to make sure there is only one value for each step</span>
-        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-                <span class="n">process</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;_recomputed&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restart&#39;</span><span class="p">)</span>
-            <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_predict"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_predict">[docs]</a>    <span class="k">def</span> <span class="nf">post_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -404,20 +254,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_predict</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_predictor&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_predict</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_predict</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_run"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_run">[docs]</a>    <span class="k">def</span> <span class="nf">post_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -427,20 +264,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_run</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_run</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_run</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="hooks.post_setup"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.post_setup">[docs]</a>    <span class="k">def</span> <span class="nf">post_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -450,18 +274,7 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__t1_setup</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_setup&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__t1_setup</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__t0_setup</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

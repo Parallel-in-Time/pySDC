@@ -41,6 +41,7 @@
 
 <span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.store_uold</span> <span class="kn">import</span> <span class="n">StoreUOld</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span> <span class="kn">import</span> <span class="n">RungeKutta</span>
 
@@ -55,7 +56,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initalization routine. Add the buffers for communication.</span>
+<span class="sd">        Initialisation routine. Add the buffers for communication.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -64,6 +65,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s1">&#39;e_em_last&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogEmbeddedErrorEstimate</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EstimateEmbeddedError.get_implementation"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.get_implementation">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flavor</span><span class="p">):</span>
@@ -81,7 +83,7 @@
         <span class="k">elif</span> <span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;nonMPI&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">EstimateEmbeddedErrorNonMPI</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Flavor </span><span class="si">{</span><span class="n">flavor</span><span class="si">}</span><span class="s1"> of EmstimateEmbeddedError is not implemented!&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Flavor </span><span class="si">{</span><span class="n">flavor</span><span class="si">}</span><span class="s1"> of EstimateEmbeddedError is not implemented!&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateEmbeddedError.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -162,7 +164,7 @@
 <div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorNonMPI</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">):</span>
 <div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI.reset_buffers_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reset buffers for immitated communication.</span>
+<span class="sd">        Reset buffers for imitated communication.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.controller): The controller</span>
