@@ -21,23 +21,29 @@ class _MetaRegisterParams(type):
 
 
 class RegisterParams(metaclass=_MetaRegisterParams):
-    """Base class to register parameters"""
+    """
+    Base class to register parameters.
+
+    Attributes
+    ----------
+    params : dict (property)
+        Dictionnary containing names and values of registered parameters.
+    _parNames : set of str
+        Names of all the registered parameters.
+    _parNamesReadOnly : set of str
+        Names of all the parameters registered as read-only.
+    """
 
     def _register(self, *names, readOnly=False):
         """
-        Register class attributes as
+        Register a list of attribute name as parameters of the class.
 
         Parameters
         ----------
-        *names : TYPE
-            DESCRIPTION.
-        readOnly : TYPE, optional
-            DESCRIPTION. The default is False.
-
-        Returns
-        -------
-        None.
-
+        *names : list of str
+            The name of the parameters to be registered (should be class attributes).
+        readOnly : bool, optional
+            Wether or not store the parameters as read-only attributes
         """
         if readOnly:
             self._parNamesReadOnly = self._parNamesReadOnly.union(names)
@@ -46,6 +52,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
 
     @property
     def params(self):
+        """Dictionnary containing names and values of registered parameters"""
         return {name: getattr(self, name) for name in self._parNamesReadOnly.union(self._parNames)}
 
     def __setattr__(self, name, value):

@@ -10,13 +10,64 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 # noinspection PyUnusedLocal
 class advectionNd(ptype):
-    """
-    Example implementing the unforced ND advection equation with periodic BCs in [0,1]^N,
-    discretized using central finite differences
+    r"""
+    Example implementing the unforced ND advection equation with periodic
+    or Dirichlet boundary conditions in :math:`[0,1]^N`,
+    and initial solution of the form
 
-    Attributes:
-        A: FD discretization of the ND grad operator
-        dx: distance between two spatial nodes (here: being the same in all dimensions)
+    .. math::
+        u({\bf x},0) = \prod_{i=1}^N \sin(f\pi x_i),
+
+    with :math:`x_i` the coordinate in :math:`i^{th}` dimension.
+    Discretization uses central finite differences.
+
+    Parameters
+    ----------
+    nvars : int of tuple, optional
+        Spatial resolution (same in all dimensions). Using a tuple allows to
+        consider several dimensions, e.g nvars=(16,16) for a 2D problem.
+    c : float, optional
+        Advection speed (same in all dimensions).
+    freq : int of tuple, optional
+        Spatial frequency :math:`f` of the initial conditions, can be tuple.
+    stencil_type : str, optional
+        Type of the finite difference stencil.
+    order : int, optional
+        Order of the finite difference discretization.
+    lintol : float, optional
+        Tolerance for spatial solver (GMRES).
+    liniter : int, optional
+        Max. iterations number for GMRES.
+    direct_solver : bool, optional
+        Whether to solve directly or use GMRES.
+    bc : str, optional
+        Boundary conditions, either "periodic" or "dirichlet".
+    sigma : float, optional
+        If freq=-1 and ndim=1, uses a Gaussian initial solution of the form
+
+    .. math::
+        u(x,0) = e^{
+            \frac{\displaystyle 1}{\displaystyle 2}
+            \left(
+                \frac{\displaystyle x-1/2}{\displaystyle \sigma}
+            \right)^2
+            }
+
+    Attributes
+    ----------
+    A: sparse matrix (CSC)
+        FD discretization matrix of the ND grad operator.
+    ndim: int
+        Number of space dimensions.
+    dx: float
+        Distance between two spatial nodes (here: being the same in all dimensions).
+    Id: sparse matrix (CSC)
+        Identity matrix of the same dimension as A
+
+    Notes
+    -----
+    Args can be set as values or as tuples, which will increase the dimension.
+    Do, however, take care that all spatial parameters have the same dimension.
     """
 
     def __init__(
@@ -32,24 +83,6 @@ class advectionNd(ptype):
         bc='periodic',
         sigma=6e-2,
     ):
-        """
-        Initialization routine
-
-        Args can be set as values or as tuples, which will increase the dimension.
-        Do, however, take care that all spatial parameters have the same dimension.
-
-        Args:
-            nvars (int): Spatial resolution, can be tuple
-            c (float): Advection speed, can be tuple
-            freq (int): Spatial frequency of the initial conditions, can be tuple
-            stencil_type (str): Type of the finite difference stencil
-            order (int): Order of the finite difference discretization
-            lintol (float): Tolerance for spatial solver (GMRES)
-            liniter (int): Max. iterations for GMRES
-            direct_solver (bool): Whether to solve directly or use GMRES
-            bc (str): Boundary conditions
-        """
-
         # make sure parameters have the correct types
         if not type(nvars) in [int, tuple]:
             raise ProblemError('nvars should be either tuple or int')
@@ -129,85 +162,107 @@ class advectionNd(ptype):
 
     @property
     def ndim(self):
+        """Number of dimensions of the spatial problem"""
         return len(self.nvars)
+
+    @property
+    def dx(self):
+        """Size of the mesh (in all dimensions)"""
+        return self.xvalues[1] - self.xvalues[0]
 
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values.
+        t : float
+            Current time.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The RHS values.
         """
-
         f = self.f_init
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple linear solver for (I-factor*A)u = rhs
+        Simple linear solver for (I-factor*A)u = rhs.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        sol : dtype_u
+            The solution of the linear solver.
         """
-        direct_solver, Id, A, nvars, lintol, liniter = (
+        direct_solver, Id, A, nvars, lintol, liniter, sol = (
             self.direct_solver,
             self.Id,
             self.A,
             self.nvars,
             self.lintol,
             self.liniter,
+            self.u_init,
         )
-        me = self.dtype_u(self.init)
 
         if direct_solver:
-            me[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
+            sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
         else:
-            me[:] = gmres(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
+            sol[:] = gmres(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
                 0
             ].reshape(nvars)
 
-        return me
+        return sol
 
     def u_exact(self, t, **kwargs):
         """
         Routine to compute the exact solution at time t
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+        **kwargs : dict
+            Additional arguments (that won't be used).
 
-        Returns:
-            me: exact solution
+        Returns
+        -------
+        sol : dtype_u
+            The exact solution.
         """
         # Initialize pointers and variables
-        ndim, freq, x, c, sigma = self.ndim, self.freq, self.xvalues, self.c, self.sigma
-        me = self.dtype_u(self.init)
+        ndim, freq, x, c, sigma, sol = self.ndim, self.freq, self.xvalues, self.c, self.sigma, self.u_init
 
         if ndim == 1:
             if freq[0] >= 0:
-                me[:] = np.sin(np.pi * freq[0] * (x - c * t))
+                sol[:] = np.sin(np.pi * freq[0] * (x - c * t))
             elif freq[0] == -1:
                 # Gaussian initial solution
-                me[:] = np.exp(-0.5 * (((x - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
+                sol[:] = np.exp(-0.5 * (((x - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
 
         elif ndim == 2:
-            me[:] = np.sin(np.pi * freq[0] * (x[None, :] - c * t)) * np.sin(np.pi * freq[1] * (x[:, None] - c * t))
+            sol[:] = np.sin(np.pi * freq[0] * (x[None, :] - c * t)) * np.sin(np.pi * freq[1] * (x[:, None] - c * t))
 
         elif ndim == 3:
-            me[:] = (
+            sol[:] = (
                 np.sin(np.pi * freq[0] * (x[None, :, None] - c * t))
                 * np.sin(np.pi * freq[1] * (x[:, None, None] - c * t))
                 * np.sin(np.pi * freq[2] * (x[None, None, :] - c * t))
             )
 
-        return me
+        return sol
