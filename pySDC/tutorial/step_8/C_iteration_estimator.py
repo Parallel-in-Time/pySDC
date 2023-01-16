@@ -75,7 +75,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     description['convergence_controllers'] = convergence_controllers
     if ml:
         description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-        description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+        description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
 
     return description, controller_params
 
@@ -141,7 +141,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
     description['convergence_controllers'] = convergence_controllers
     if ml:
         description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-        description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+        description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
 
     return description, controller_params
 

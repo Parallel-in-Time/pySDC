@@ -10,7 +10,7 @@ from pySDC.tutorial.step_3.HookClass_Particles import particle_hook
 
 def main():
     """
-    A simple test program to show th eenergy deviation for different quadrature nodes
+    A simple test program to show the energy deviation for different quadrature nodes
     """
     stats_dict = run_simulation()
 

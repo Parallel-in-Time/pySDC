@@ -86,6 +86,6 @@ Important things to note:
    iteration counts for now. We will deal with these later.
 -  This example is the prototype for a user to work with pySDC. Most of
    the logic and most of the data structures are hidden, but all
-   relevant parameters are accessable using the ``description``.
+   relevant parameters are accessible using the ``description``.
 
 .. include:: doc_step_2_C.rst

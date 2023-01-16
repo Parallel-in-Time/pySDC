@@ -85,7 +85,7 @@ def main():
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh_petsc_dmda  # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
 
     # set time parameters
     t0 = 0.0

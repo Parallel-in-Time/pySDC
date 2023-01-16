@@ -90,7 +90,7 @@ class CollBase(object):
         self.node_type = node_type
         self.quad_type = quad_type
 
-        # Instanciate attributes
+        # Instantiate attributes
         self.nodeGenerator = NodesGenerator(self.node_type, self.quad_type)
         if self.node_type == 'EQUID':
             self.order = num_nodes

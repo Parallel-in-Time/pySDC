@@ -34,7 +34,14 @@ def findomega(stab_fh):
     return sol
 
 
-def compute_and_plot_dispersion():
+def compute_and_plot_dispersion(Nsamples=15, K=3):
+    """
+    Function to compute and plot the dispersion relation
+
+    Args:
+        Nsamples: number of samples for testing
+        K: number of iterations as well as order
+    """
     problem_params = dict()
     # SET VALUE FOR lambda_slow AND VALUES FOR lambda_fast ###
     problem_params['lambda_s'] = np.array([0.0])
@@ -61,9 +68,6 @@ def compute_and_plot_dispersion():
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = dict()  # pass step parameters
 
-    # SET NUMBER OF ITERATIONS ###
-    K = 3
-
     # ORDER OF DIRK/IMEX IS EQUAL TO NUMBER OF ITERATIONS AND THUS ORDER OF SDC ###
     dirk_order = K
 
@@ -83,7 +87,6 @@ def compute_and_plot_dispersion():
     nnodes = L.sweep.coll.num_nodes
     dt = L.params.dt
 
-    Nsamples = 15
     k_vec = np.linspace(0, np.pi, Nsamples + 1, endpoint=False)
     k_vec = k_vec[1:]
     phase = np.zeros((3, Nsamples))

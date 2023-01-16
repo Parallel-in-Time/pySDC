@@ -52,3 +52,6 @@ def test_dispersion():
     compute_and_plot_dispersion()
     assert os.path.isfile('data/phase-K3-M3.png'), 'ERROR: phase plot has not been created'
     assert os.path.isfile('data/ampfactor-K3-M3.png'), 'ERROR: phase plot has not been created'
+
+    compute_and_plot_dispersion(Nsamples=3, K=4)
+    compute_and_plot_dispersion(Nsamples=3, K=5)
