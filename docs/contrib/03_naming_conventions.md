@@ -13,9 +13,22 @@ The most important idea at the end is to find a optimal compromise between
 
 Both aspects are interdependent to ease maintaining/development of any code and improve its attractiveness to potential users.
 
+## First definitions
+
+Possible Naming formats :
+
+- all-lowercase : `variablenamelikethis`
+- snake_case : `variable_name_like_this`
+- PascalCase : `VariableNameLikeThis`
+- camelCase : `variableNameLikeThis`
+- all-uppercase with underscore : `VARIABLE_NAME_LIKE_THIS`
+- all-uppercase with minus : `VARIABLE-NAME-LIKE-THIS`
+
 ## Packages and modules names
 
-Modules should have short, all-lowercase names. Underscores can be used in the module name if it improves readability. Python packages should also have short, all-lowercase names, although the use of underscores is discouraged.
+Modules should have short, all-lowercase names. Underscores can be used in the module name if it improves readability (_i.e_ use snake_case only if it helps,
+else try to stick to all-lowercase). 
+Python packages should also have short, all-lowercase names, although the use of underscores is discouraged.
 
 ## Class names
 
@@ -35,26 +48,48 @@ class ParameterError(Exception):
 
 ## Function and variables names
 
-Function (or method) and variable names should be lowercase, with words separated by underscores as necessary to improve readability.
-Same goes for function arguments. For instance :
+Function (or method) and variable names should use camelCase formatting, and same goes for function arguments. For instance :
 
 ```python
-tleft = 1
-quad_type = 'LEGENDRE'
+tLeft = 1
+quadType = 'LEGENDRE'
 
-def compute_fejer_rule(num_nodes):
+def computeFejerRule(nNodes):
     # ...
 
 class NodeGenerator():
-    def get_orthog_poly_coefficients(self, num_coeff):
+    def getOrthogPolyCoeffs(self, nCoeffs):
         # ...
 ```
 
-> :bell: In general, shorter name should be favored, **as long as it does not deteriorate understandability**. For instance, using `get_orthog_poly_coeffs` rather than `get_orthogonal_polynomial_coefficients`. Acronyms can also be used, but with caution (for instance, `mssdc_jac` may not be very explicit for `multistep_sdc_jacobian`).
+:scroll: A few additional notes :
+
+1. In general, shorter name (eventually with abbreviations) should be favored, **as long as it does not deteriorate understandability**. For instance `getOrthogPolyCoeffs` rather than `getOrthogonalPolynomialCoefficients`.
+2. Suffix `s` for plural should be used even with abbreviations for consistency (_e.g_ `nCoeffs`, `nNodes`, ...).
+3. Acronyms can be used to simplify variable names, but **try not to start with it**. For instance, favor `jacobiMSSDC` or `multiStepSDCJacobi` rather than `MSSDCJacobi`. In general, acronyms should be put at the end of variable names.
+4. Underscore can exceptionally be used at the end of variable names when it make readability better and ease further developments. In that case, the characters after the underscore **should be all-uppercase with underscore** (minus is not allowed by Python syntax). For instance when defining the same method with different specializations :
+
+```python
+class MySweeper(Sweeper):
+
+    def __init__(self, initSweep):
+        try:
+            self.initSweep = getattr(self, f'_initSweep_{initSweep}')
+        except AttributeError:
+            raise NotImplementedError(f'initSweep={initSweep}')
+
+    def _initSweep_COPY(self):
+        pass
+
+    def _initSweep_SPREAD(self):
+        pass
+
+    # ... other implementations for initSweep
+```
 
 ## Private and public attributes
 
-There is no such thing as private or public attributes in Python. But some attributes, if uses only within the object method, can be indicated as private using the `_` prefix. For instance :
+There is no such thing as private or public attributes in Python. But some attributes, if uses only within the object methods, can be indicated as private using the `_` prefix. For instance :
 
 ```python
 class ChuckNorris():
@@ -73,12 +108,33 @@ class ChuckNorris():
 
 ## Constants
 
-Constants are usually defined on a module level and written in all capital letters with underscores separating words.
-Examples :
+Constants are usually defined on a module level and written in all-uppercase with underscores (all-uppercase with minus are not allowed by Python syntax). Examples :
 
 ```python
 NODE_TYPES = ['EQUID', 'LEGENDRE', 'CHEBY-1', 'CHEBY-2', 'CHEBY-3', 'CHEBY-4']
 QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
+```
+
+For _constant string values_, however, favor the use of all uppercase with minus, _e.g_ `RADAU-RIGHT`, `LEGENDRE-NUMPY` to distinguish those from constants names.
+
+:bell: When constants are used, for instance, to select method specializations (with suffix using all-uppercase with underscore), it is probably better to keep all-uppercase with minus for constant string values and add a character replacement in between, for instance :
+
+```python
+class MySweeper(Sweeper):
+
+    def __init__(self, initSweep):
+        try:
+            self.initSweep = getattr(self, f'_initSweep_{initSweep.replace('-','_')}')
+        except AttributeError:
+            raise NotImplementedError(f'initSweep={initSweep}')
+
+    def _initSweep_COPY_PASTE(self):
+        pass
+
+    def _initSweep_SPREAD_OUT(self):
+        pass
+
+    # ... other implementations for initSweep
 ```
 
 [:arrow_left: Back to Continuous Integration](./02_continuous_integration.md) ---
