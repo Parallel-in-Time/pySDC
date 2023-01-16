@@ -6,7 +6,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
-from pySDC.projects.Resilience.hook import log_data
+from pySDC.projects.Resilience.hook import log_data, hook_collection
 from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
 
