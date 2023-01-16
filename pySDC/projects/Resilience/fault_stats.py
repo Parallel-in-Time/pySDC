@@ -8,9 +8,11 @@ import sys
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Resilience.fault_injection import FaultInjector
+from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter
+from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.hooks.log_errors import LogLocalError
 
 # these problems are available for testing
 from pySDC.projects.Resilience.advection import run_advection
@@ -19,126 +21,6 @@ from pySDC.projects.Resilience.piline import run_piline
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
-
-
-class log_fault_stats_data(FaultInjector):
-    '''
-    This class stores all relevant information and allows fault injection
-    '''
-
-    def post_step(self, step, level_number):
-
-        super(log_fault_stats_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=-1,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=-1,
-            sweep=L.status.sweep,
-            type='e_em',
-            value=L.status.get('error_embedded_estimate'),
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='k',
-            value=step.status.iter,
-        )
-        self.increment_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restarts',
-            value=int(step.status.restart),
-        )
-
-
-class log_local_error(log_fault_stats_data):
-    '''
-    This class stores the "true" local error (may be approximated with scipy reference solution)
-    '''
-
-    def post_step(self, step, level_number):
-
-        super(log_local_error, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_loc',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]),
-        )
-
-
-class log_all_iterates(log_fault_stats_data):
-    def post_iteration(self, step, level_number):
-        super(log_all_iterates, self).post_iteration(step, level_number)
-        # some abbreviations
-        L = step.levels[level_number]
-        iter = step.status.iter
-
-        L.sweep.compute_end_point()
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=iter,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=iter,
-            sweep=L.status.sweep,
-            type='e_em',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=iter,
-            sweep=L.status.sweep,
-            type='e_ex',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
 
 
 class Strategy:
@@ -608,7 +490,7 @@ class FaultStats:
 
         return None
 
-    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=log_fault_stats_data):
+    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=hook_collection):
         '''
         Run the problem once with the specified parameters
 
@@ -716,7 +598,11 @@ class FaultStats:
         force_params = dict()
 
         stats, controller, Tend = self.single_run(
-            strategy=strategy, run=run, faults=faults, force_params=force_params, hook_class=log_local_error
+            strategy=strategy,
+            run=run,
+            faults=faults,
+            force_params=force_params,
+            hook_class=hook_collection + [LogLocalError],
         )
 
         # plot the local error
@@ -1194,7 +1080,7 @@ class FaultStats:
         controllers = []
         for faults in [True, False]:
             s, c, _ = self.single_run(
-                strategy=AdaptivityStrategy(), run=run, faults=faults, hook_class=log_all_iterates
+                strategy=AdaptivityStrategy(), run=run, faults=faults, hook_class=hook_collection + [LogUAllIter]
             )
             stats += [s]
             controllers += [c]
@@ -1263,7 +1149,9 @@ class FaultStats:
         stats = []
         controllers = []
         for faults in [True, False]:
-            s, c, _ = self.single_run(strategy=HotRodStrategy(), run=run, faults=faults, hook_class=log_all_iterates)
+            s, c, _ = self.single_run(
+                strategy=HotRodStrategy(), run=run, faults=faults, hook_class=hook_collection + [LogUAllIter]
+            )
             stats += [s]
             controllers += [c]
 
@@ -1478,13 +1366,14 @@ class FaultStats:
             int: Number of possible combinations
         '''
         stats, controller, Tend = self.single_run(strategy=self.strategies[0], run=0, faults=True)
+        faultHook = get_fault_injector_hook(controller)
         ranges = [
-            (0, controller.hooks.rnd_params['level_number']),
-            (0, controller.hooks.rnd_params['node'] + 1),
-            (1, controller.hooks.rnd_params['iteration'] + 1),
-            (0, controller.hooks.rnd_params['bit']),
+            (0, faultHook.rnd_params['level_number']),
+            (0, faultHook.rnd_params['node'] + 1),
+            (1, faultHook.rnd_params['iteration'] + 1),
+            (0, faultHook.rnd_params['bit']),
         ]
-        ranges += [(0, i) for i in controller.hooks.rnd_params['problem_pos']]
+        ranges += [(0, i) for i in faultHook.rnd_params['problem_pos']]
         return np.prod([me[1] - me[0] for me in ranges], dtype=int)
 
     def get_combination_counts(self, dat, keys, mask):

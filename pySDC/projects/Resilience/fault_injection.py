@@ -436,3 +436,47 @@ class FaultInjector(hooks):
         '''
         binary = self.to_binary(target)
         return self.to_float(f'{binary[:bit]}{int(binary[bit]) ^ 1}{binary[bit+1:]}')
+
+
+def prepare_controller_for_faults(controller, fault_stuff, rnd_args, args):
+    """
+    Prepare the controller for a run with faults. That means the fault injection hook is added and supplied with the
+    relevant parameters.
+
+    Args:
+        controller (pySDC.controller): The controller
+        fault_stuff (dict): A dictionary with information on how to add faults
+        rnd_args (dict): Default arguments for how to add random faults in a specific problem
+        args (dict): Default arguments for where to add faults in a specific problem
+
+    Returns:
+        None
+    """
+    faultHook = get_fault_injector_hook(controller)
+    faultHook.random_generator = fault_stuff['rng']
+    faultHook.add_fault(
+        rnd_args={**rnd_args, **fault_stuff.get('rnd_params', {})},
+        args={**args, **fault_stuff.get('args', {})},
+    )
+
+
+def get_fault_injector_hook(controller):
+    """
+    Get the fault injector hook from the list of hooks in the controller.
+    If there is not one already, it is added here.
+
+    Args:
+        controller (pySDC.controller): The controller
+
+    Returns:
+        pySDC.hook.FaultInjector: The fault injecting hook
+    """
+    hook_types = [type(me) for me in controller.hooks]
+
+    if FaultInjector not in hook_types:
+        controller.add_hook(FaultInjector)
+        return get_fault_injector_hook(controller)
+    else:
+        hook_idx = [i for i in range(len(hook_types)) if hook_types[i] == FaultInjector]
+        assert len(hook_idx) == 1, f'Expected exactly one FaultInjector, got {len(hook_idx)}!'
+        return controller.hooks[hook_idx[0]]

@@ -208,6 +208,6 @@ if __name__ == "__main__":
     if '--test-fault-stats' in sys.argv:
         generate_stats()
     else:
+        test_fault_stats()
         test_fault_injection()
         test_float_conversion()
-        test_fault_stats()

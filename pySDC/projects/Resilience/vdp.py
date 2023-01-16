@@ -138,7 +138,7 @@ def run_vdp(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_collection + [hook_class]
+    controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -185,11 +185,11 @@ def run_vdp(
 
     # insert faults
     if fault_stuff is not None:
-        controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(
-            rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
-            args={'time': 1.0, 'target': 0, **fault_stuff.get('args', {})},
-        )
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        rnd_args = {'iteration': 3}
+        args = {'time': 1.0, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # call main function to get things done...
     try:

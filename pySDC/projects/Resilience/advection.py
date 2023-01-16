@@ -7,6 +7,7 @@ from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
 from pySDC.projects.Resilience.hook import log_data
+from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
 
 def plot_embedded(stats, ax):
@@ -19,22 +20,6 @@ def plot_embedded(stats, ax):
     ax.plot(t, e_em, linestyle='--', label=r'$\epsilon$')
     ax.set_xlabel(r'$t$')
     ax.legend(frameon=False)
-
-
-class log_every_iteration(hooks):
-    def post_iteration(self, step, level_number):
-        if step.status.iter == step.params.maxiter - 1:
-            L = step.levels[level_number]
-            L.sweep.compute_end_point()
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time + L.dt,
-                level=L.level_index,
-                iter=0,
-                sweep=L.status.sweep,
-                type='uold',
-                value=L.uold[-1],
-            )
 
 
 def run_advection(
@@ -69,7 +54,7 @@ def run_advection(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_class
+    controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -99,11 +84,14 @@ def run_advection(
 
     # insert faults
     if fault_stuff is not None:
-        controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(
-            rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
-            args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})},
-        )
+        rnd_args = {
+            'iteration': 5,
+        }
+        args = {
+            'time': 1e-1,
+            'target': 0,
+        }
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
