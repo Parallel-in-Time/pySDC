@@ -87,11 +87,10 @@ class LogUAllIter(hooks):
 
     def post_iteration(self, step, level_number):
         super(LogUAllIter, self).post_iteration(step, level_number)
-        # some abbreviations
-        L = step.levels[level_number]
-        iter = step.status.iter
 
+        L = step.levels[level_number]
         L.sweep.compute_end_point()
+
         self.add_to_stats(
             process=step.status.slot,
             time=L.time,
