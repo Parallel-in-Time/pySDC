@@ -47,5 +47,5 @@ pytest -v pySDC/tests
 > pytest -v pySDC/tests/test_nodes.py  # only test nodes generation
 > ```
 
-[:arrow_left: Back to Pull Request Recommendation](./01_pull_requests.md) ---
-[:arrow_right: Next to Naming Conventions](./03_naming_conventions.md)
+:arrow_left: [Back to Pull Request Recommendation](./01_pull_requests.md) ---
+:arrow_right: [Next to Naming Conventions](./03_naming_conventions.md)
