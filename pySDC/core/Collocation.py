@@ -1,7 +1,5 @@
 import logging
-
 import numpy as np
-import scipy.interpolate as intpl
 
 from pySDC.core.Nodes import NodesGenerator
 from pySDC.core.Errors import CollocationError
