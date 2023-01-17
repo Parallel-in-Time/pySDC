@@ -195,7 +195,7 @@ def run_vdp(
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     except ProblemError:
-        stats = controller.hooks.return_stats()
+        stats = controller.return_stats()
 
     return stats, controller, Tend
 
