@@ -24,7 +24,7 @@ class LogGlobalError(hooks):
             iter=step.status.iter,
             sweep=L.status.sweep,
             type='e_global',
-            value=abs(L.prob.u_exact(t=L.time + L.dt) - L.u[-1]),
+            value=abs(L.prob.u_exact(t=L.time + L.dt) - L.uend),
         )
 
 
@@ -51,5 +51,5 @@ class LogLocalError(hooks):
             iter=step.status.iter,
             sweep=L.status.sweep,
             type='e_local',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]),
+            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.uend),
         )

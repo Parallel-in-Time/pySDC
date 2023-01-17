@@ -8,7 +8,7 @@ import sys
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter
+from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -490,7 +490,7 @@ class FaultStats:
 
         return None
 
-    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=hook_collection):
+    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None):
         '''
         Run the problem once with the specified parameters
 
@@ -505,6 +505,7 @@ class FaultStats:
             pySDC.Controller: The controller of the run
             float: The time the problem should have run to
         '''
+        hook_class = hook_collection + [LogData] if hook_class is None else hook_class
         force_params = {} if force_params is None else force_params
 
         # build the custom description
@@ -653,6 +654,7 @@ class FaultStats:
 
         t, u = get_sorted(stats, type='u')[-1]
         k = [me[1] for me in get_sorted(stats, type='k')]
+        print(k)
 
         print(f'\nOverview for {strategy.name} strategy')
 
@@ -1089,7 +1091,10 @@ class FaultStats:
         t_fault = get_sorted(stats[0], type='bitflip')[0][0]
 
         # get embedded error
-        e_em = [[me[1] for me in get_sorted(stat, type='e_em', time=t_fault, sortby='iter')] for stat in stats]
+        e_em = [
+            [me[1] for me in get_sorted(stat, type='error_embedded_estimate', time=t_fault, sortby='iter')]
+            for stat in stats
+        ]
 
         # compute the global error
         u_end = [get_sorted(stat, type='u')[-1] for stat in stats]
@@ -1159,9 +1164,15 @@ class FaultStats:
         t_fault = get_sorted(stats[0], type='bitflip')[0][0]
 
         # get embedded error
-        e_em = [[me[1] for me in get_sorted(stat, type='e_em', time=t_fault, sortby='iter')] for stat in stats]
+        e_em = [
+            [me[1] for me in get_sorted(stat, type='error_embedded_estimate', time=t_fault, sortby='iter')]
+            for stat in stats
+        ]
         # get extrapolated error
-        e_ex = [[me[1] for me in get_sorted(stat, type='e_ex', time=t_fault, sortby='iter')] for stat in stats]
+        e_ex = [
+            [me[1] for me in get_sorted(stat, type='error_extrapolation_estimate', time=t_fault, sortby='iter')]
+            for stat in stats
+        ]
 
         # compute the global error
         u_end = [get_sorted(stat, type='u')[-1] for stat in stats]

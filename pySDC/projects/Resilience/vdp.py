@@ -8,7 +8,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ProblemError
-from pySDC.projects.Resilience.hook import log_data, hook_collection
+from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
 def plot_step_sizes(stats, ax):
@@ -85,7 +85,7 @@ def run_vdp(
     custom_description=None,
     num_procs=1,
     Tend=10.0,
-    hook_class=log_data,
+    hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,

@@ -7,14 +7,14 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-from pySDC.projects.Resilience.hook import log_data, hook_collection
+from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
 def run_piline(
     custom_description=None,
     num_procs=1,
     Tend=20.0,
-    hook_class=log_data,
+    hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,

@@ -8,7 +8,7 @@ from pySDC.implementations.hooks.log_step_size import LogStepSize
 hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate, LogStepSize]
 
 
-class log_data(hooks):
+class LogData(hooks):
     """
     Record data required for analysis of problems in the resilience project
     """
@@ -34,7 +34,7 @@ class log_data(hooks):
             process=step.status.slot,
             time=L.time,
             level=L.level_index,
-            iter=0,
+            iter=step.status.iter,
             sweep=L.status.sweep,
             type='restart',
             value=int(step.status.get('restart')),
@@ -50,6 +50,26 @@ class log_data(hooks):
                 type=k,
                 value=step.status.iter,
             )
+
+
+class LogUold(hooks):
+    """
+    Log last iterate at the end of the step. Since the hook comes after override of uold, we need to do this in each
+    iteration. But we don't know which will be the last, so we just do `iter=-1` to override the previous value.
+    """
+
+    def post_iteration(self, step, level_number):
+        super().post_iteration(step, level_number)
+        L = step.levels[level_number]
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=-1,
+            sweep=L.status.sweep,
+            type='uold',
+            value=L.uold[-1],
+        )
 
 
 class LogUAllIter(hooks):
@@ -68,7 +88,7 @@ class LogUAllIter(hooks):
             process=step.status.slot,
             time=L.time,
             level=L.level_index,
-            iter=iter,
+            iter=step.status.iter,
             sweep=L.status.sweep,
             type='u',
             value=L.uend,
@@ -77,17 +97,17 @@ class LogUAllIter(hooks):
             process=step.status.slot,
             time=L.time,
             level=L.level_index,
-            iter=iter,
+            iter=step.status.iter,
             sweep=L.status.sweep,
-            type='e_em',
+            type='error_embedded_estimate',
             value=L.status.get('error_embedded_estimate'),
         )
         self.add_to_stats(
             process=step.status.slot,
             time=L.time,
             level=L.level_index,
-            iter=iter,
+            iter=step.status.iter,
             sweep=L.status.sweep,
-            type='e_ex',
+            type='error_extrapolation_estimate',
             value=L.status.get('error_extrapolation_estimate'),
         )

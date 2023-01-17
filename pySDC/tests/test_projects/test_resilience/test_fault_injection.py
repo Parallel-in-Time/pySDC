@@ -162,8 +162,7 @@ def test_fault_stats():
     for strategy in vdp_stats.strategies:
         dat = vdp_stats.load(strategy, True)
         recovered = len(dat['recovered'][dat['recovered'] == True])
-        crashed = len(dat['error'][dat['error'] == np.inf])
-        print(strategy.name, dat['recovered'], dat['error'])
+        crashed = len(dat['error'][dat['error'] == np.inf])  # on some systems the last run crashes...
         assert (
             recovered >= recovered_reference[strategy.name] - crashed
         ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
