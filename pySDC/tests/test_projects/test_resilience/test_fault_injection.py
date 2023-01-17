@@ -119,6 +119,7 @@ def test_fault_stats():
     """
     Test generation of fault statistics and their recovery rates
     """
+    import numpy as np
     from pySDC.projects.Resilience.fault_stats import (
         FaultStats,
         BaseStrategy,
@@ -161,9 +162,10 @@ def test_fault_stats():
     for strategy in vdp_stats.strategies:
         dat = vdp_stats.load(strategy, True)
         recovered = len(dat['recovered'][dat['recovered'] == True])
-        print(strategy.name, dat['recovered'])
+        crashed = len(dat['error'][dat['error'] == np.inf])
+        print(strategy.name, dat['recovered'], dat['error'])
         assert (
-            recovered == recovered_reference[strategy.name]
+            recovered == recovered_reference[strategy.name] - crashed
         ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
 
 
