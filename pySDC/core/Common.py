@@ -34,7 +34,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         Names of all the parameters registered as read-only.
     """
 
-    def _register(self, *names, readOnly=False):
+    def _makeAttributeAndRegister(self, *names, localVars=None, readOnly=False):
         """
         Register a list of attribute name as parameters of the class.
 
@@ -45,6 +45,15 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         readOnly : bool, optional
             Wether or not store the parameters as read-only attributes
         """
+        if len(names) > 1 and localVars is None:
+            raise ValueError("a dictionnary must be provided in localVars with parameters values")
+        # Set parameters as attributes
+        for name in names:
+            try:
+                super().__setattr__(name, localVars[name])
+            except KeyError:
+                raise ValueError(f'value for {name} not given in localVars')
+        # Register as class parameter
         if readOnly:
             self._parNamesReadOnly = self._parNamesReadOnly.union(names)
         else:
