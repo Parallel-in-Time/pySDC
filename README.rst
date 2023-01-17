@@ -63,7 +63,7 @@ How to cite
 
 If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation of `this paper <https://doi.org/10.1145/3310410>`_:
 
-   Robert Speck, **Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections**, 
+   Robert Speck, **Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections**,
    ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019,
    `https://doi.org/10.1145/3310410 <https://doi.org/10.1145/3310410>`_
 
@@ -71,6 +71,15 @@ The current software release can be cited using Zenodo: |zenodo|
 
 .. |zenodo| image:: https://zenodo.org/badge/26165004.svg
    :target: https://zenodo.org/badge/latestdoi/26165004
+
+Contributing
+------------
+
+`pySDC` code was originaly developped by Robert Speck (@pancetta),
+and is now maintained and developed by a small community of scientists interested in SDC methods,
+that dearly welcomes any contribution.
+If you want to take part of this, please take the time to read our `Contribution Guidelines <https://github.com/tlunet/pySDC/blob/contrib/CONTRIBUTING.md>`_.
+
 
 Acknowledgements
 ----------------
