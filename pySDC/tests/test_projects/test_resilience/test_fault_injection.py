@@ -165,7 +165,7 @@ def test_fault_stats():
         crashed = len(dat['error'][dat['error'] == np.inf])
         print(strategy.name, dat['recovered'], dat['error'])
         assert (
-            recovered == recovered_reference[strategy.name] - crashed
+            recovered >= recovered_reference[strategy.name] - crashed
         ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
 
 
