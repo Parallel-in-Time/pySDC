@@ -100,34 +100,6 @@ def run(dt, use_switch_estimator=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/battery_2condensators.dat'
-    f = open(fname, 'wb')
-    dill.dump(stats, f)
-    f.close()
-
-    # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', sortby='time')
-
-    # compute and print statistics
-    min_iter = 20
-    max_iter = 0
-
-    f = open('data/battery_2condensators_out.txt', 'w')
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    f.write(out + '\n')
-    print(out)
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %1i' % item
-        f.write(out + '\n')
-        # print(out)
-        min_iter = min(min_iter, item[1])
-        max_iter = max(max_iter, item[1])
-
-    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
-    f.close()
-
     return stats, description
 
 
@@ -327,6 +299,7 @@ def check_solution(stats, dt, use_switch_estimator):
                 'switch1': 1.607586793484041,
                 'switch2': 3.216645438176962,
                 'restarts': 2.0,
+                'sum_niters': 2604,
             }
         elif dt == 4e-2:
             expected = {
@@ -336,6 +309,7 @@ def check_solution(stats, dt, use_switch_estimator):
                 'switch1': 1.6094074085596919,
                 'switch2': 3.2183750611596893,
                 'restarts': 2.0,
+                'sum_niters': 4608,
             }
         elif dt == 4e-3:
             expected = {
@@ -345,6 +319,7 @@ def check_solution(stats, dt, use_switch_estimator):
                 'switch1': 1.6093728710270498,
                 'switch2': 3.218742142249058,
                 'restarts': 2.0,
+                'sum_niters': 9400,
             }
 
     got = {
@@ -354,6 +329,7 @@ def check_solution(stats, dt, use_switch_estimator):
         'switch1': data['switch1'],
         'switch2': data['switch2'],
         'restarts': data['restarts'],
+        'sum_niters': data['sum_niters'],
     }
 
     for key in expected.keys():

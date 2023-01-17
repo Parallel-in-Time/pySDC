@@ -170,32 +170,10 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', recomputed=False, sortby='time')
-
-    # compute and print statistics
-    min_iter = 20
-    max_iter = 0
-
     Path("data").mkdir(parents=True, exist_ok=True)
     fname = 'data/battery_{}_USE{}_USA{}.dat'.format(sweeper.__name__, use_switch_estimator, use_adaptivity)
     f = open(fname, 'wb')
     dill.dump(stats, f)
-    f.close()
-
-    f = open('data/battery_out.txt', 'w')
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    f.write(out + '\n')
-    print(out)
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %1i' % item
-        f.write(out + '\n')
-        print(out)
-        min_iter = min(min_iter, item[1])
-        max_iter = max(max_iter, item[1])
-
-    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     return stats, description
@@ -301,7 +279,7 @@ def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
 
     if use_switch_estimator and use_adaptivity:
         if problem == 'battery':
-            msg = 'Error when using switch estimator and adaptivity for battery'
+            msg = 'Error when using switch estimator and adaptivity for battery:'
             expected = {
                 'cL': 0.5474500710994862,
                 'vC': 1.0019332967173764,
@@ -309,9 +287,10 @@ def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
                 'e_em': 8.001793672107738e-10,
                 'switches': 0.18232155791181945,
                 'restarts': 3.0,
+                'sum_niters': 44,
             }
         elif problem == 'battery_implicit':
-            msg = 'Error when using switch estimator and adaptivity for battery_implicit'
+            msg = 'Error when using switch estimator and adaptivity for battery_implicit:'
             expected = {
                 'cL': 0.5424577937840791,
                 'vC': 1.0001051105894005,
@@ -319,6 +298,7 @@ def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
                 'e_em': 2.220446049250313e-16,
                 'switches': 0.1822923488448394,
                 'restarts': 6.0,
+                'sum_niters': 60,
             }
 
     got = {
@@ -328,6 +308,7 @@ def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
         'e_em': data['e_em'][-1],
         'switches': data['switches'][-1],
         'restarts': data['restarts'],
+        'sum_niters': data['sum_niters'],
     }
 
     for key in expected.keys():
@@ -364,6 +345,7 @@ def get_data_dict(stats, use_adaptivity=True, use_switch_estimator=True, recompu
         data['switches'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[:, 1]
     if use_adaptivity or use_switch_estimator:
         data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
+    data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
 
     return data
 

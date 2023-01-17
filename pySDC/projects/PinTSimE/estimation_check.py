@@ -116,22 +116,6 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/battery.dat'
-    f = open(fname, 'wb')
-    dill.dump(stats, f)
-    f.close()
-
-    # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', recomputed=False, sortby='time')
-
-    # compute and print statistics
-    f = open('data/battery_out.txt', 'w')
-    niters = np.array([item[1] for item in iter_counts])
-
-    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
-    f.close()
-
     return description, stats
 
 
@@ -182,7 +166,6 @@ def check(cwd='./'):
 
                     if use_SE or use_A:
                         restarts_sorted = np.array(get_sorted(stats, type='restart', recomputed=None))[:, 1]
-                        print('Restarts for dt={}: {}'.format(dt_item, np.sum(restarts_sorted)))
                         if use_SE and not use_A:
                             restarts_SE.append(np.sum(restarts_sorted))
 
@@ -342,7 +325,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
 
     if problem == 'battery':
         if use_switch_estimator and use_adaptivity:
-            msg = 'Error when using switch estimator and adaptivity for battery for dt={}'.format(dt)
+            msg = f'Error when using switch estimator and adaptivity for battery for dt={dt:.1e}:'
             if dt == 4e-2:
                 expected = {
                     'cL': 0.5525783945667581,
@@ -351,6 +334,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'e_em': 6.21240694442804e-08,
                     'switches': 0.18231603298272345,
                     'restarts': 4.0,
+                    'sum_niters': 56,
                 }
             elif dt == 4e-3:
                 expected = {
@@ -360,6 +344,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'e_em': 2.5628611677319668e-08,
                     'switches': 0.18230920573953438,
                     'restarts': 3.0,
+                    'sum_niters': 48,
                 }
 
             got = {
@@ -369,15 +354,17 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'e_em': data['e_em'][-1],
                 'switches': data['switches'][-1],
                 'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
         elif use_switch_estimator and not use_adaptivity:
-            msg = 'Error when using switch estimator for battery for dt={}'.format(dt)
+            msg = f'Error when using switch estimator for battery for dt={dt:.1e}:'
             if dt == 4e-2:
                 expected = {
                     'cL': 0.6139093327509394,
                     'vC': 1.0010140038721593,
                     'switches': 0.1824302065533169,
                     'restarts': 1.0,
+                    'sum_niters': 48,
                 }
             elif dt == 4e-3:
                 expected = {
@@ -385,6 +372,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'vC': 1.0001158309787614,
                     'switches': 0.18232183080236553,
                     'restarts': 1.0,
+                    'sum_niters': 392,
                 }
 
             got = {
@@ -392,10 +380,11 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'vC': data['vC'][-1],
                 'switches': data['switches'][-1],
                 'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
 
         elif not use_switch_estimator and use_adaptivity:
-            msg = 'Error when using adaptivity for battery for dt={}'.format(dt)
+            msg = f'Error when using adaptivity for battery for dt={dt:.1e}:'
             if dt == 4e-2:
                 expected = {
                     'cL': 0.5966289599915113,
@@ -403,6 +392,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'dt': 0.03564958366355817,
                     'e_em': 6.210964231812e-08,
                     'restarts': 1.0,
+                    'sum_niters': 36,
                 }
             elif dt == 4e-3:
                 expected = {
@@ -411,6 +401,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'dt': 0.022880524075396924,
                     'e_em': 1.1130212751453428e-08,
                     'restarts': 3.0,
+                    'sum_niters': 52,
                 }
 
             got = {
@@ -419,11 +410,12 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'dt': data['dt'][-1],
                 'e_em': data['e_em'][-1],
                 'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
 
     elif problem == 'battery_implicit':
         if use_switch_estimator and use_adaptivity:
-            msg = 'Error when using switch estimator and adaptivity for battery_implicit for dt={}'.format(dt)
+            msg = f'Error when using switch estimator and adaptivity for battery_implicit for dt={dt:.1e}:'
             if dt == 4e-2:
                 expected = {
                     'cL': 0.6717104472882885,
@@ -432,6 +424,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'e_em': 6.208836400567463e-08,
                     'switches': 0.18232158833761175,
                     'restarts': 3.0,
+                    'sum_niters': 36,
                 }
             elif dt == 4e-3:
                 expected = {
@@ -441,6 +434,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'e_em': 2.220446049250313e-16,
                     'switches': 0.18230549652342606,
                     'restarts': 4.0,
+                    'sum_niters': 44,
                 }
 
             got = {
@@ -450,15 +444,17 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'e_em': data['e_em'][-1],
                 'switches': data['switches'][-1],
                 'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
         elif use_switch_estimator and not use_adaptivity:
-            msg = 'Error when using switch estimator for battery_implicit for dt={}'.format(dt)
+            msg = f'Error when using switch estimator for battery_implicit for dt={dt:.1e}:'
             if dt == 4e-2:
                 expected = {
                     'cL': 0.613909968362315,
                     'vC': 1.0010140112484431,
                     'switches': 0.18243023230469263,
                     'restarts': 1.0,
+                    'sum_niters': 48,
                 }
             elif dt == 4e-3:
                 expected = {
@@ -466,6 +462,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'vC': 1.0001158454740509,
                     'switches': 0.1823218812753008,
                     'restarts': 1.0,
+                    'sum_niters': 392,
                 }
 
             got = {
@@ -473,10 +470,11 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'vC': data['vC'][-1],
                 'switches': data['switches'][-1],
                 'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
 
         elif not use_switch_estimator and use_adaptivity:
-            msg = 'Error when using adaptivity for battery_implicit for dt={}'.format(dt)
+            msg = f'Error when using adaptivity for battery_implicit for dt={dt:.1e}:'
             if dt == 4e-2:
                 expected = {
                     'cL': 0.5556563012729733,
@@ -484,6 +482,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'dt': 0.035507110551631804,
                     'e_em': 6.2098696185231e-08,
                     'restarts': 6.0,
+                    'sum_niters': 64,
                 }
             elif dt == 4e-3:
                 expected = {
@@ -492,6 +491,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                     'dt': 0.03176025170463925,
                     'e_em': 4.0386798239033794e-08,
                     'restarts': 8.0,
+                    'sum_niters': 80,
                 }
 
             got = {
@@ -500,6 +500,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'dt': data['dt'][-1],
                 'e_em': data['e_em'][-1],
                 'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
 
     for key in expected.keys():

@@ -149,31 +149,6 @@ def main(use_switch_estimator=True):
     dill.dump(stats, f)
     f.close()
 
-    # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', sortby='time')
-
-    # compute and print statistics
-    min_iter = 20
-    max_iter = 0
-
-    f = open('battery_2condensators_out.txt', 'w')
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    f.write(out + '\n')
-    print(out)
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %1i' % item
-        f.write(out + '\n')
-        # print(out)
-        min_iter = min(min_iter, item[1])
-        max_iter = max(max_iter, item[1])
-
-    restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
-    print("Restarts for dt: ", level_params['dt'], " -- ", np.sum(restarts))
-
-    assert np.mean(niters) <= 4, "Mean number of iterations is too high, got %s" % np.mean(niters)
-    f.close()
-
     recomputed = False
 
     check_solution(stats, use_switch_estimator)
@@ -250,6 +225,7 @@ def check_solution(stats, use_switch_estimator):
             'switch1': 1.6094379124373626,
             'switch2': 3.2184040405613974,
             'restarts': 2.0,
+            'sum_niters': 1588,
         }
 
     got = {
@@ -259,6 +235,7 @@ def check_solution(stats, use_switch_estimator):
         'switch1': data['switch1'],
         'switch2': data['switch2'],
         'restarts': data['restarts'],
+        'sum_niters': data['sum_niters'],
     }
 
     for key in expected.keys():
@@ -288,6 +265,7 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     data['switch1'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[0, 1]
     data['switch2'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[-1, 1]
     data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
+    data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
 
     return data
 
