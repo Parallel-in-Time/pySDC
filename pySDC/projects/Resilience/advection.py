@@ -6,7 +6,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
-from pySDC.projects.Resilience.hook import log_error_estimates
+from pySDC.projects.Resilience.hook import log_data
 
 
 def plot_embedded(stats, ax):
@@ -21,17 +21,8 @@ def plot_embedded(stats, ax):
     ax.legend(frameon=False)
 
 
-class log_data(hooks):
-    def pre_run(self, step, level_number):
-        """
-        Record los conditiones initiales
-        """
-        super(log_data, self).pre_run(step, level_number)
-        L = step.levels[level_number]
-        self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='u0', value=L.u[0])
-
+class log_every_iteration(hooks):
     def post_iteration(self, step, level_number):
-        super(log_data, self).post_iteration(step, level_number)
         if step.status.iter == step.params.maxiter - 1:
             L = step.levels[level_number]
             L.sweep.compute_end_point()
@@ -45,58 +36,12 @@ class log_data(hooks):
                 value=L.uold[-1],
             )
 
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.get('error_embedded_estimate'),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_extrapolated',
-            value=L.status.get('error_extrapolation_estimate'),
-        )
-
 
 def run_advection(
     custom_description=None,
     num_procs=1,
     Tend=2e-1,
-    hook_class=log_error_estimates,
+    hook_class=log_data,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,

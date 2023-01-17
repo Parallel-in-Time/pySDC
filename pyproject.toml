@@ -78,7 +78,7 @@ pyflakes = [
     '-E203', '-E741', '-E402', '-W504', '-W605', '-F401'
     ]
 #flake8-black = ["+*"]
-flake8-bugbear = ["+*", '-B023']
+flake8-bugbear = ["+*", '-B023', '-B028']
 flake8-comprehensions = ["+*", '-C408', '-C417']
 
 [tool.black]
@@ -90,6 +90,7 @@ exclude = '''playgrounds/'''
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
 relative_files = true
 concurrency = ['multiprocessing']
+source = ['pySDC']
 
 [tool.coverage.report]
 skip_empty = true
