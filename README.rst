@@ -1,5 +1,7 @@
 |badge-ga|
 |badge-ossf|
+|badge-cc|
+|zenodo|
 
 Welcome to pySDC!
 =================
@@ -79,7 +81,9 @@ This project also received funding from the `German Federal Ministry of Educatio
 The project also received help from the `Helmholtz Platform for Research Software Engineering - Preparatory Study (HiRSE_PS) <https://www.helmholtz-hirse.de/>`_.
 
 
-.. |badge-ga| image:: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg
+.. |badge-ga| image:: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg?branch=master
     :target: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml
 .. |badge-ossf| image:: https://bestpractices.coreinfrastructure.org/projects/6909/badge
     :target: https://bestpractices.coreinfrastructure.org/projects/6909
+.. |badge-cc| image:: https://codecov.io/gh/Parallel-in-Time/pySDC/branch/master/graph/badge.svg?token=hpP18dmtgS 
+    :target: https://codecov.io/gh/Parallel-in-Time/pySDC
