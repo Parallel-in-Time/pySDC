@@ -149,7 +149,7 @@ def check(cwd='./'):
 
             if use_SE:
                 switches = get_recomputed(stats, type='switch', sortby='time')
-                assert (len(switches) >= 2), f"Expected at least 2 switches for dt: {dt_item}, got {len(switches)}!"
+                assert len(switches) >= 2, f"Expected at least 2 switches for dt: {dt_item}, got {len(switches)}!"
 
                 check_solution(stats, dt_item, use_SE)
 

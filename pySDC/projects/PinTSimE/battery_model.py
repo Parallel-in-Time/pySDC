@@ -370,7 +370,8 @@ def get_data_dict(stats, use_adaptivity=True, use_switch_estimator=True, recompu
 
 def get_recomputed(stats, type, sortby):
     """
-    Function that filters statistics after a recomputation.
+    Function that filters statistics after a recomputation. It stores all value of a type before restart. If there are multiple values
+    with same time point, it only stores the elements with unique times.
 
     Args:
         stats (dict): Raw statistics from a controller run
