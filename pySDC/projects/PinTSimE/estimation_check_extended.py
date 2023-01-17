@@ -8,6 +8,7 @@ from pySDC.implementations.problem_classes.Battery_2Condensators import battery_
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.battery_model import get_recomputed
+from pySDC.projects.PinTSimE.battery_2condensators_model import get_data_dict
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_2condensators_model import log_data, proof_assertions_description
 import pySDC.helpers.plot_helper as plt_helper
@@ -32,6 +33,10 @@ def run(dt, use_switch_estimator=True):
     level_params = dict()
     level_params['restol'] = -1
     level_params['dt'] = dt
+
+    assert (
+        dt == 4e-1 or dt == 4e-2 or dt == 4e-3
+    ), "Error! Do not use other time steps dt != 4e-1 or dt != 4e-2 or dt != 4e-3 due to hardcoded references!"
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -143,9 +148,10 @@ def check(cwd='./'):
             stats, description = run(dt=dt_item, use_switch_estimator=use_SE)
 
             if use_SE:
-                assert (
-                    len(get_recomputed(stats, type='switch', sortby='time')) >= 1
-                ), 'No switches found for dt={}!'.format(dt_item)
+                switches = get_recomputed(stats, type='switch', sortby='time')
+                assert (len(switches) >= 2), f"Expected at least 2 switches for dt: {dt_item}, got {len(switches)}!"
+
+                check_solution(stats, dt_item, use_SE)
 
             fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, use_SE)
             f = open(fname, 'wb')
@@ -297,6 +303,63 @@ def check(cwd='./'):
 
     fig2.savefig('data/diffs_estimation_vC2.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig2)
+
+
+def check_solution(stats, dt, use_switch_estimator):
+    """
+    Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+        dt (float): initial time step
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+    """
+
+    data = get_data_dict(stats, use_switch_estimator)
+
+    if use_switch_estimator:
+        msg = f'Error when using the switch estimator for battery_2condensators for dt={dt:.1e}:'
+        if dt == 4e-1:
+            expected = {
+                'cL': 1.1556732037544801,
+                'vC1': 1.002239522400514,
+                'vC2': 1.0000329223874842,
+                'switch1': 1.607586793484041,
+                'switch2': 3.216645438176962,
+                'restarts': 2.0,
+            }
+        elif dt == 4e-2:
+            expected = {
+                'cL': 1.1492603893091364,
+                'vC1': 1.0005011122241925,
+                'vC2': 1.000015039670507,
+                'switch1': 1.6094074085596919,
+                'switch2': 3.2183750611596893,
+                'restarts': 2.0,
+            }
+        elif dt == 4e-3:
+            expected = {
+                'cL': 1.1476283937778273,
+                'vC1': 1.0001336962511904,
+                'vC2': 1.0000182217245925,
+                'switch1': 1.6093728710270498,
+                'switch2': 3.218742142249058,
+                'restarts': 2.0,
+            }
+
+    got = {
+        'cL': data['cL'][-1],
+        'vC1': data['vC1'][-1],
+        'vC2': data['vC2'][-1],
+        'switch1': data['switch1'],
+        'switch2': data['switch2'],
+        'restarts': data['restarts'],
+    }
+
+    for key in expected.keys():
+        assert np.isclose(
+            expected[key], got[key], rtol=1e-4
+        ), f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
 
 
 if __name__ == "__main__":

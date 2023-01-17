@@ -336,9 +336,10 @@ def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
         ), f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
 
 
-def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False):
+def get_data_dict(stats, use_adaptivity=True, use_switch_estimator=True, recomputed=False):
     """
     Converts the statistics in a useful data dictionary so that it can be easily checked in the check_solution function.
+    Based on @brownbaerchen's get_data function.
 
     Args:
         stats (dict): Raw statistics from a controller run

@@ -7,7 +7,6 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery_2Condensators import battery_2condensators
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.projects.PinTSimE.battery_model import get_recomputed
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
@@ -80,6 +79,8 @@ def main(use_switch_estimator=True):
     level_params['restol'] = -1
     level_params['dt'] = 1e-2
 
+    assert level_params['dt'] == 1e-2, 'Error! Do not use the time step dt != 1e-2!'
+
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'LOBATTO'
@@ -122,7 +123,6 @@ def main(use_switch_estimator=True):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
 
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
@@ -176,6 +176,8 @@ def main(use_switch_estimator=True):
 
     recomputed = False
 
+    check_solution(stats, use_switch_estimator)
+
     plot_voltages(description, recomputed, use_switch_estimator)
 
     return description
@@ -226,6 +228,68 @@ def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
 
     fig.savefig('data/battery_2condensators_model_solution.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
+
+
+def check_solution(stats, use_switch_estimator):
+    """
+    Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+    """
+
+    data = get_data_dict(stats, use_switch_estimator)
+
+    if use_switch_estimator:
+        msg = 'Error when using the switch estimator for battery_2condensators:'
+        expected = {
+            'cL': 1.1597046304825833,
+            'vC1': 1.000472118416924,
+            'vC2': 1.000226101799117,
+            'switch1': 1.6094379124373626,
+            'switch2': 3.2184040405613974,
+            'restarts': 2.0,
+        }
+
+    got = {
+        'cL': data['cL'][-1],
+        'vC1': data['vC1'][-1],
+        'vC2': data['vC2'][-1],
+        'switch1': data['switch1'],
+        'switch2': data['switch2'],
+        'restarts': data['restarts'],
+    }
+
+    for key in expected.keys():
+        assert np.isclose(
+            expected[key], got[key], rtol=1e-4
+        ), f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
+
+
+def get_data_dict(stats, use_switch_estimator, recomputed=False):
+    """
+    Converts the statistics in a useful data dictionary so that it can be easily checked in the check_solution function.
+    Based on @brownbaerchen's get_data function.
+
+    Args:
+        stats (dict): Raw statistics from a controller run
+        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        recomputed (bool): flag if the values after a restart are used or before
+
+    Return:
+        data (dict): contains all information as the statistics dict
+    """
+
+    data = dict()
+    data['cL'] = np.array(get_sorted(stats, type='current L', recomputed=recomputed, sortby='time'))[:, 1]
+    data['vC1'] = np.array(get_sorted(stats, type='voltage C1', recomputed=recomputed, sortby='time'))[:, 1]
+    data['vC2'] = np.array(get_sorted(stats, type='voltage C2', recomputed=recomputed, sortby='time'))[:, 1]
+    data['switch1'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[0, 1]
+    data['switch2'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[-1, 1]
+    data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
+
+    return data
 
 
 def proof_assertions_description(description, use_switch_estimator):
