@@ -42,6 +42,11 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         ----------
         *names : list of str
             The name of the parameters to be registered (should be class attributes).
+        localVars : dict
+            Dictionnary containing key=names and values=paramValues for each
+            parNames given in names. Can be provided, for instance, using
+            `locals()` built-in dictionary. MUST BE provided as soon as
+            names contains anything.
         readOnly : bool, optional
             Wether or not store the parameters as read-only attributes
         """
