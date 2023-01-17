@@ -19,7 +19,7 @@ class LogGlobalError(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
-            time=L.time,
+            time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
@@ -46,7 +46,7 @@ class LogLocalError(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
-            time=L.time,
+            time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,

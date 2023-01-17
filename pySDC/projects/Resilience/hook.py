@@ -40,16 +40,24 @@ class LogData(hooks):
             value=int(step.status.get('restart')),
         )
         # add the following with two names because I use both in different projects -.-
-        for k in ['sweeps', 'k']:
-            self.increment_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=L.level_index,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type=k,
-                value=step.status.iter,
-            )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='sweeps',
+            value=step.status.iter,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='k',
+            value=step.status.iter,
+        )
 
 
 class LogUold(hooks):

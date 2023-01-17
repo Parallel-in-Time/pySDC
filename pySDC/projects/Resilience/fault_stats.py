@@ -603,11 +603,11 @@ class FaultStats:
             run=run,
             faults=faults,
             force_params=force_params,
-            hook_class=hook_collection + [LogLocalError],
+            hook_class=hook_collection + [LogLocalError, LogData],
         )
 
         # plot the local error
-        e_loc = get_sorted(stats, type='e_loc', recomputed=False)
+        e_loc = get_sorted(stats, type='e_local', recomputed=False)
         ax.plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=strategy.color, ls=ls)
 
         # plot the iterations
@@ -1505,6 +1505,7 @@ def main():
     stats_analyser.run_stats_generation(runs=5000, step=50)
     mask = None
 
+    stats_analyser.compare_strategies()
     stats_analyser.plot_things_per_things(
         'recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
@@ -1536,7 +1537,6 @@ def main():
     )
 
     stats_analyser.plot_recovery_thresholds()
-    stats_analyser.compare_strategies()
 
 
 if __name__ == "__main__":
