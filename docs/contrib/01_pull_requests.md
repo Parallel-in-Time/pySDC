@@ -25,15 +25,15 @@ some_feature  # to add a new feature (implementation, ...)
 
 Those changes should be compatible with the existing API (_i.e_ not break it), and **avoid any change** in the current user interface. In particular, it should not modify default values for parameters or remove attributes of existing classes. But new attributes or parameters can be added with pre-set default values, and new classes can be added in the `pySDC.implementations` module.
 
-> :bell: During the revision of your pull request, it can happen that additional changes are done to the `upstream/master` branch (in parallel-in-time/pySDC repo). In that case, don't hesitate to regularly merge them into your local branch to solve eventual conflicts, for instance : 
-> 
+> :bell: During the revision of your pull request, it can happen that additional changes are done to the `upstream/master` branch (in parallel-in-time/pySDC repo). In that case, don't hesitate to regularly merge them into your local branch to solve eventual conflicts, for instance :
+>
 > ```bash
 > # On your local repo, with the "my_feature" branch
 > $ git fetch upstream  # synchronize with parallel-in-time/pySDC
 > $ git merge upstream/master  # merge into my_feature
 > $ git push  # push local merges to your repository
 > ```
-> 
+>
 > The pull request will be updated with any merge changes on the `my_feature` branch of your repository.
 
 
@@ -56,5 +56,5 @@ Those could eventually be merged into master if they don't break the API, or to 
 > :bell: **Never** merge modifications on `upstream/master` or any release branch into your own local development branch (same comment and solution as for the release branches above).
 
 
-[:arrow_left: Back to Contributing Summary](./../../CONTRIBUTING.md) ---
-[:arrow_right: Next to Continuous Integration](./02_continuous_integration.md)
+:arrow_left: [Back to Contributing Summary](./../../CONTRIBUTING.md) ---
+:arrow_right: [Next to Continuous Integration](./02_continuous_integration.md)

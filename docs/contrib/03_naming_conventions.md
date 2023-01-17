@@ -27,7 +27,7 @@ Possible Naming formats :
 ## Packages and modules names
 
 Modules should have short, all-lowercase names. Underscores can be used in the module name if it improves readability (_i.e_ use snake_case only if it helps,
-else try to stick to all-lowercase). 
+else try to stick to all-lowercase).
 Python packages should also have short, all-lowercase names, although the use of underscores is discouraged.
 
 ## Class names
@@ -139,5 +139,5 @@ class MySweeper(Sweeper):
     # ... other implementations for initSweep
 ```
 
-[:arrow_left: Back to Continuous Integration](./02_continuous_integration.md) ---
-[:arrow_right: Next to Custom Implementations](./04_custom_implementations.md)
+:arrow_left: [Back to Continuous Integration](./02_continuous_integration.md) ---
+:arrow_right: [Next to Custom Implementations](./04_custom_implementations.md)
