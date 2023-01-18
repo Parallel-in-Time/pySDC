@@ -12,4 +12,4 @@ Additionally, a _few_ rules are set to enforce code readability, consistency and
 Others are specific conventions chosen for the pySDC library, that may follow Python standards (or not ...), detailed in the [naming conventions page](./docs/contrib/03_naming_conventions.md).
 
 Finally, while `pySDC` provides many base functionalities that implement classical flavors of SDC, it also allows problem-specific applications through Object-Oriented Programming (OOP) and the implementation of custom inherited classes.
-This follows a specific OOP framework, for which more details are given [here](.(docs/contrib/../../docs/contrib/04_custom_implementations.md)).
+This follows a specific OOP framework, for which more details are given [here](./docs/contrib/04_custom_implementations.md).
