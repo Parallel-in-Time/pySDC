@@ -176,6 +176,9 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     dill.dump(stats, f)
     f.close()
 
+    iter_counts = get_sorted(stats, type='niter', recomputed=None, sortby='time')
+    print(np.sum([v[1] for v in iter_counts]))
+
     return stats, description
 
 
@@ -189,7 +192,7 @@ def run():
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
     recomputed = False
-    use_switch_estimator = [True]
+    use_switch_estimator = [False]
     use_adaptivity = [True]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
@@ -203,7 +206,7 @@ def run():
                     use_adaptivity=use_A,
                 )
 
-            check_solution(stats, problem.__name__, use_adaptivity, use_switch_estimator)
+            check_solution(stats, dt, problem.__name__, use_A, use_SE)
 
             plot_voltages(description, problem.__name__, sweeper.__name__, recomputed, use_SE, use_A)
 
@@ -229,6 +232,8 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     # convert filtered statistics to list of iterations count, sorted by process
     cL = get_sorted(stats, type='current L', recomputed=False, sortby='time')
     vC = get_sorted(stats, type='voltage C', recomputed=False, sortby='time')
+    print('cL:', [v[1] for v in cL][-1])
+    print('vC:', [v[1] for v in vC][-1])
 
     times = [v[0] for v in cL]
 
@@ -243,16 +248,19 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 
         assert len(switches) >= 1, 'No switches found!'
         t_switch = [v[1] for v in switches]
+        print('switches:', t_switch)
         ax.axvline(x=t_switch[-1], linestyle='--', linewidth=0.8, color='r', label='Switch')
 
     if use_adaptivity:
         dt = np.array(get_sorted(stats, type='dt', recomputed=False))
-
+        e_em = np.array(get_sorted(stats, type='error_embedded_estimate', recomputed=False, sortby='time'))
+        print('dt:', dt[-1, 1])
+        print('e_em:', e_em[-1, 1])
         dt_ax = ax.twinx()
         dt_ax.plot(dt[:, 0], dt[:, 1], linestyle='-', linewidth=0.8, color='k', label=r'$\Delta t$')
         dt_ax.set_ylabel(r'$\Delta t$', fontsize=8)
         dt_ax.legend(frameon=False, fontsize=8, loc='center right')
-
+    print('restarts:', np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1]))
     ax.axhline(y=1.0, linestyle='--', linewidth=0.8, color='g', label='$V_{ref}$')
 
     ax.legend(frameon=False, fontsize=8, loc='upper right')
@@ -264,52 +272,253 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     plt_helper.plt.close(fig)
 
 
-def check_solution(stats, problem, use_adaptivity, use_switch_estimator):
+def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
     """
     Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
 
     Args:
         stats (dict): Raw statistics from a controller run
+        dt (float): initial time step
         problem (problem_class.__name__): the problem_class that is numerically solved
-        use_adaptivity (bool): flag if adaptivity wants to be used or not
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        use_switch_estimator (bool):
+        use_adaptivity (bool):
     """
 
     data = get_data_dict(stats, use_adaptivity, use_switch_estimator)
 
-    if use_switch_estimator and use_adaptivity:
-        if problem == 'battery':
-            msg = 'Error when using switch estimator and adaptivity for battery:'
-            expected = {
-                'cL': 0.5474500710994862,
-                'vC': 1.0019332967173764,
-                'dt': 0.011761752270047832,
-                'e_em': 8.001793672107738e-10,
-                'switches': 0.18232155791181945,
-                'restarts': 3.0,
-                'sum_niters': 44,
+    if problem == 'battery':
+        if use_switch_estimator and use_adaptivity:
+            msg = f'Error when using switch estimator and adaptivity for battery for dt={dt:.1e}:'
+            if dt == 1e-2:
+                expected = {
+                    'cL': 0.5474500710994862,
+                    'vC': 1.0019332967173764,
+                    'dt': 0.011761752270047832,
+                    'e_em': 8.001793672107738e-10,
+                    'switches': 0.18232155791181945,
+                    'restarts': 3.0,
+                    'sum_niters': 44,
+                }
+            elif dt == 4e-2:
+                expected = {
+                    'cL': 0.5525783945667581,
+                    'vC': 1.00001743462299,
+                    'dt': 0.03550610373897258,
+                    'e_em': 6.21240694442804e-08,
+                    'switches': 0.18231603298272345,
+                    'restarts': 4.0,
+                    'sum_niters': 56,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5395601429161445,
+                    'vC': 1.0000413761942089,
+                    'dt': 0.028281271825675414,
+                    'e_em': 2.5628611677319668e-08,
+                    'switches': 0.18230920573953438,
+                    'restarts': 3.0,
+                    'sum_niters': 48,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
-        elif problem == 'battery_implicit':
-            msg = 'Error when using switch estimator and adaptivity for battery_implicit:'
-            expected = {
-                'cL': 0.5424577937840791,
-                'vC': 1.0001051105894005,
-                'dt': 0.01,
-                'e_em': 2.220446049250313e-16,
-                'switches': 0.1822923488448394,
-                'restarts': 6.0,
-                'sum_niters': 60,
+        elif use_switch_estimator and not use_adaptivity:
+            msg = f'Error when using switch estimator for battery for dt={dt:.1e}:'
+            if dt == 1e-2:
+                expected = {
+                    'cL': 0.5423033461806986,
+                    'vC': 1.000118710428906,
+                    'switches': 0.1823188001399631,
+                    'restarts': 1.0,
+                    'sum_niters': 284,
+                }
+            elif dt == 4e-2:
+                expected = {
+                    'cL': 0.6139093327509394,
+                    'vC': 1.0010140038721593,
+                    'switches': 0.1824302065533169,
+                    'restarts': 1.0,
+                    'sum_niters': 48,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5429509935448258,
+                    'vC': 1.0001158309787614,
+                    'switches': 0.18232183080236553,
+                    'restarts': 1.0,
+                    'sum_niters': 392,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
             }
 
-    got = {
-        'cL': data['cL'][-1],
-        'vC': data['vC'][-1],
-        'dt': data['dt'][-1],
-        'e_em': data['e_em'][-1],
-        'switches': data['switches'][-1],
-        'restarts': data['restarts'],
-        'sum_niters': data['sum_niters'],
-    }
+        elif not use_switch_estimator and use_adaptivity:
+            msg = f'Error when using adaptivity for battery for dt={dt:.1e}:'
+            if dt == 1e-2:
+                expected = {
+                    'cL': 0.5413318777113352,
+                    'vC': 0.9963444569399663,
+                    'dt': 0.020451912195976252,
+                    'e_em': 7.157646031430431e-09,
+                    'restarts': 4.0,
+                    'sum_niters': 56,
+                }
+            elif dt == 4e-2:
+                expected = {
+                    'cL': 0.5966289599915113,
+                    'vC': 0.9923148791604984,
+                    'dt': 0.03564958366355817,
+                    'e_em': 6.210964231812e-08,
+                    'restarts': 1.0,
+                    'sum_niters': 36,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5431613774808756,
+                    'vC': 0.9934307674636834,
+                    'dt': 0.022880524075396924,
+                    'e_em': 1.1130212751453428e-08,
+                    'restarts': 3.0,
+                    'sum_niters': 52,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
+            }
+
+    elif problem == 'battery_implicit':
+        if use_switch_estimator and use_adaptivity:
+            msg = f'Error when using switch estimator and adaptivity for battery_implicit for dt={dt:.1e}:'
+            if dt == 1e-2:
+                expected = {
+                    'cL': 0.5424577937840791,
+                    'vC': 1.0001051105894005,
+                    'dt': 0.01,
+                    'e_em': 2.220446049250313e-16,
+                    'switches': 0.1822923488448394,
+                    'restarts': 6.0,
+                    'sum_niters': 60,
+                }
+            elif dt == 4e-2:
+                expected = {
+                    'cL': 0.6717104472882885,
+                    'vC': 1.0071670698947914,
+                    'dt': 0.035896059229296486,
+                    'e_em': 6.208836400567463e-08,
+                    'switches': 0.18232158833761175,
+                    'restarts': 3.0,
+                    'sum_niters': 36,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5396216192241711,
+                    'vC': 1.0000561014463172,
+                    'dt': 0.009904645972832471,
+                    'e_em': 2.220446049250313e-16,
+                    'switches': 0.18230549652342606,
+                    'restarts': 4.0,
+                    'sum_niters': 44,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
+            }
+        elif use_switch_estimator and not use_adaptivity:
+            msg = f'Error when using switch estimator for battery_implicit for dt={dt:.1e}:'
+            if dt == 1e-2:
+                expected = {
+                    'cL': 0.5423033363981951,
+                    'vC': 1.000118715162845,
+                    'switches': 0.18231880065636324,
+                    'restarts': 1.0,
+                    'sum_niters': 284,
+                }
+            elif dt == 4e-2:
+                expected = {
+                    'cL': 0.613909968362315,
+                    'vC': 1.0010140112484431,
+                    'switches': 0.18243023230469263,
+                    'restarts': 1.0,
+                    'sum_niters': 48,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5429616576526073,
+                    'vC': 1.0001158454740509,
+                    'switches': 0.1823218812753008,
+                    'restarts': 1.0,
+                    'sum_niters': 392,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'switches': data['switches'][-1],
+                'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
+            }
+
+        elif not use_switch_estimator and use_adaptivity:
+            msg = f'Error when using adaptivity for battery_implicit for dt={dt:.1e}:'
+            if dt == 1e-2:
+                expected = {
+                    'cL': 0.5490142863996689,
+                    'vC': 0.997253099984895,
+                    'dt': 0.024243123245133835,
+                    'e_em': 1.4052013885823555e-08,
+                    'restarts': 11.0,
+                    'sum_niters': 96,
+                }
+            elif dt == 4e-2:
+                expected = {
+                    'cL': 0.5556563012729733,
+                    'vC': 0.9930947318467772,
+                    'dt': 0.035507110551631804,
+                    'e_em': 6.2098696185231e-08,
+                    'restarts': 6.0,
+                    'sum_niters': 64,
+                }
+            elif dt == 4e-3:
+                expected = {
+                    'cL': 0.5401117929618637,
+                    'vC': 0.9933888475391347,
+                    'dt': 0.03176025170463925,
+                    'e_em': 4.0386798239033794e-08,
+                    'restarts': 8.0,
+                    'sum_niters': 80,
+                }
+
+            got = {
+                'cL': data['cL'][-1],
+                'vC': data['vC'][-1],
+                'dt': data['dt'][-1],
+                'e_em': data['e_em'][-1],
+                'restarts': data['restarts'],
+                'sum_niters': data['sum_niters'],
+            }
 
     for key in expected.keys():
         assert np.isclose(

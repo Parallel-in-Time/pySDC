@@ -271,7 +271,7 @@ class battery_implicit(battery):
         return me
 
 
-class battery_n_condensators(ptype):
+class battery_n_capacitors(ptype):
     """
     Example implementing the battery drain model with N capacitors, where N is an arbitrary integer greater than 0.
     Attributes:
@@ -299,7 +299,7 @@ class battery_n_condensators(ptype):
         problem_params['nvars'] = n + 1
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(battery_n_condensators, self).__init__(
+        super(battery_n_capacitors, self).__init__(
             init=(problem_params['nvars'], None, np.dtype('float64')),
             dtype_u=dtype_u,
             dtype_f=dtype_f,

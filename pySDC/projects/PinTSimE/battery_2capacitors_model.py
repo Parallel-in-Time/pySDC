@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.problem_classes.Battery import battery_n_condensators
+from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.battery_model import get_recomputed
@@ -116,7 +116,7 @@ def main(use_switch_estimator=True):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery_n_condensators  # pass problem class
+    description['problem_class'] = battery_n_capacitors  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -150,7 +150,7 @@ def main(use_switch_estimator=True):
 
     recomputed = False
 
-    check_solution(stats, use_switch_estimator)
+    check_solution(stats, level_params['dt'], use_switch_estimator)
 
     plot_voltages(description, recomputed, use_switch_estimator)
 
@@ -203,28 +203,60 @@ def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
     plt_helper.plt.close(fig)
 
 
-def check_solution(stats, use_switch_estimator):
+def check_solution(stats, dt, use_switch_estimator):
     """
     Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
 
     Args:
         stats (dict): Raw statistics from a controller run
+        dt (float): initial time step
         use_switch_estimator (bool): flag if the switch estimator wants to be used or not
     """
 
     data = get_data_dict(stats, use_switch_estimator)
 
     if use_switch_estimator:
-        msg = 'Error when using the switch estimator for battery_2condensators:'
-        expected = {
-            'cL': 1.2065280755094876,
-            'vC1': 1.0094825899806945,
-            'vC2': 1.0050052828742688,
-            'switch1': 1.6094379124373626,
-            'switch2': 3.209437912457051,
-            'restarts': 2.0,
-            'sum_niters': 1568,
-        }
+        msg = f'Error when using the switch estimator for battery_2condensators for dt={dt:.1e}:'
+        if dt == 1e-2:
+            expected = {
+                'cL': 1.2065280755094876,
+                'vC1': 1.0094825899806945,
+                'vC2': 1.0050052828742688,
+                'switch1': 1.6094379124373626,
+                'switch2': 3.209437912457051,
+                'restarts': 2.0,
+                'sum_niters': 1568,
+            }
+        elif dt == 4e-1:
+            expected = {
+                'cL': 1.1842780233981391,
+                'vC1': 1.0094891393319418,
+                'vC2': 1.00103823232433,
+                'switch1': 1.6075867934844466,
+                'switch2': 3.209437912436633,
+                'restarts': 2.0,
+                'sum_niters': 2000,
+            }
+        elif dt == 4e-2:
+            expected = {
+                'cL': 1.180493652021971,
+                'vC1': 1.0094825917376264,
+                'vC2': 1.0007713468084405,
+                'switch1': 1.6094074085553605,
+                'switch2': 3.209437912440314,
+                'restarts': 2.0,
+                'sum_niters': 2364,
+            }
+        elif dt == 4e-3:
+            expected = {
+                'cL': 1.1537529501025199,
+                'vC1': 1.001438946726028,
+                'vC2': 1.0004331625246141,
+                'switch1': 1.6093728710270467,
+                'switch2': 3.217437912434171,
+                'restarts': 2.0,
+                'sum_niters': 8920,
+            }
 
     got = {
         'cL': data['cL'][-1],
