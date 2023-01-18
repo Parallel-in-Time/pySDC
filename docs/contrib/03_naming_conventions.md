@@ -140,4 +140,5 @@ class MySweeper(Sweeper):
 ```
 
 :arrow_left: [Back to Continuous Integration](./02_continuous_integration.md) ---
+:arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
 :arrow_right: [Next to Custom Implementations](./04_custom_implementations.md)

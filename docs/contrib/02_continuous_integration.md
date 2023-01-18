@@ -6,7 +6,7 @@ Finally, the CI also build artifacts that are used to generate the documentation
 
 ## Code linting
 
-Code style linting is performed using [`black`](https://black.readthedocs.io/en/stable/) and [`flakeheaven`](https://flakeheaven.readthedocs.io/en/latest/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
+Code style linting is performed using [black](https://black.readthedocs.io/en/stable/) and [flakeheaven](https://flakeheaven.readthedocs.io/en/latest/) for code syntax checking. In particular, `black` is used to check compliance with (most of) [PEP-8 guidelines](https://peps.python.org/pep-0008/).
 
 Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of `pySDC` before pushing any commit :
 
@@ -32,7 +32,7 @@ Some style rules that are automatically enforced :
 
 ## Code testing
 
-This is done using[ `pytest`](https://docs.pytest.org/en/7.2.x/), and runs all the tests written in the `pySDC/tests` folder. You can run those locally in the root folder of `pySDC` using :
+This is done using [pytest](https://docs.pytest.org/en/7.2.x/), and runs all the tests written in the `pySDC/tests` folder. You can run those locally in the root folder of `pySDC` using :
 
 ```bash
 # Install required packages (works also with conda/mamba)
@@ -50,7 +50,10 @@ pytest -v pySDC/tests
 
 ## Documentation generation
 
-To check the documentation generation, you can wait for all the CI tasks to download the `docs` artifacts, unzip it and open the `index.html` file there with you favorite browser. However, when you are working on documentation (of the project, of the code, etc ...), you can already build and check the website locally :
+Documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/).
+To check its generation, you can wait for all the CI tasks to download the `docs` artifacts, unzip it and open the `index.html` file there with you favorite browser. 
+
+However, when you are working on documentation (of the project, of the code, etc ...), you can already build and check the website locally :
 
 ```bash
 # Run all tests, continuing even with errors
@@ -68,4 +71,5 @@ Then you can open `docs/build/html/index.html` using you favorite browser and ch
 > This approach can be considered for local testing of your contribution when it does not concern parts containing images (_i.e_ project or code documentation).
 
 :arrow_left: [Back to Pull Request Recommendation](./01_pull_requests.md) ---
+:arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
 :arrow_right: [Next to Naming Conventions](./03_naming_conventions.md)

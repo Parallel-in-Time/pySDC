@@ -61,22 +61,29 @@ def completeRefLinks(rst, baseName):
             i += 6
     return rst
 
-def convert(md):
+def addOrphanTag(rst):
+    return '\n:orphan:\n'+rst
+
+def convert(md, orphan=False, sectionRefs=True):
     baseName = os.path.splitext(md)[0]
     rst = m2r2.parse_from_file(md, parse_relative_links=True)
     rst = wrappEmojis(rst)
-    rst = addSectionRefs(rst, baseName)
+    if sectionRefs:
+        rst = addSectionRefs(rst, baseName)
     rst = completeRefLinks(rst, baseName)
+    if orphan:
+        rst = addOrphanTag(rst)
     with open(f'{docSources}/{baseName}.rst', 'w') as f:
         f.write(rst)
     print(f'Converted {md} to {docSources}/{baseName}.rst')
 
 for md in mdFiles:
     if os.path.isfile(md):
-        convert(md)
+        isNotMain = (md != 'README.md')
+        convert(md, orphan=isNotMain, sectionRefs=isNotMain)
     elif os.path.isdir(md):
         os.makedirs(f'{docSources}/{md}', exist_ok=True)
         for f in glob.glob(f'{md}/*.md'):
-            convert(f)
+            convert(f, orphan=True)
     else:
         raise ValueError('{md} is not a md file or a folder')
