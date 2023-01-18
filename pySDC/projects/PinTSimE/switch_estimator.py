@@ -111,7 +111,7 @@ class SwitchEstimator(ConvergenceController):
                                 value=self.status.t_switch,
                             )
 
-                            L.prob.flip_switches()
+                            L.prob.count_switches()
                             self.status.switch_detected_step = True
 
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt

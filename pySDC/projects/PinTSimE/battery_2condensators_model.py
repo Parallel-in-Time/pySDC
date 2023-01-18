@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.problem_classes.Battery_2Condensators import battery_2condensators
+from pySDC.implementations.problem_classes.Battery import battery_n_condensators
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.battery_model import get_recomputed
@@ -93,8 +93,7 @@ def main(use_switch_estimator=True):
     problem_params['ncondensators'] = 2
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C1'] = 1.0
-    problem_params['C2'] = 1.0
+    problem_params['C'] = np.array([1.0, 1.0])
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
     problem_params['alpha'] = 5.0
@@ -117,7 +116,7 @@ def main(use_switch_estimator=True):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery_2condensators  # pass problem class
+    description['problem_class'] = battery_n_condensators  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -188,7 +187,6 @@ def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
 
     if use_switch_estimator:
         switches = get_recomputed(stats, type='switch', sortby='time')
-
         if recomputed is not None:
             assert len(switches) >= 2, f"Expected at least 2 switches, got {len(switches)}!"
         t_switches = [v[1] for v in switches]
@@ -219,13 +217,13 @@ def check_solution(stats, use_switch_estimator):
     if use_switch_estimator:
         msg = 'Error when using the switch estimator for battery_2condensators:'
         expected = {
-            'cL': 1.1597046304825833,
-            'vC1': 1.000472118416924,
-            'vC2': 1.000226101799117,
+            'cL': 1.2065280755094876,
+            'vC1': 1.0094825899806945,
+            'vC2': 1.0050052828742688,
             'switch1': 1.6094379124373626,
-            'switch2': 3.2184040405613974,
+            'switch2': 3.209437912457051,
             'restarts': 2.0,
-            'sum_niters': 1588,
+            'sum_niters': 1568,
         }
 
     got = {
@@ -293,6 +291,9 @@ def proof_assertions_description(description, use_switch_estimator):
         assert (
             description['problem_params']['ncondensators'] == np.shape(description['problem_params']['V_ref'])[0]
         ), 'Number of reference values needs to be equal to number of condensators'
+        assert (
+            description['problem_params']['ncondensators'] == np.shape(description['problem_params']['C'])[0]
+        ), 'Number of capacitance values needs to be equal to number of condensators'
 
     assert description['problem_params']['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
     assert description['problem_params']['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'

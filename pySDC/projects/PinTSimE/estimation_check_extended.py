@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.problem_classes.Battery_2Condensators import battery_2condensators
+from pySDC.implementations.problem_classes.Battery import battery_n_condensators
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.battery_model import get_recomputed
@@ -50,8 +50,7 @@ def run(dt, use_switch_estimator=True):
     problem_params['ncondensators'] = 2
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C1'] = 1.0
-    problem_params['C2'] = 1.0
+    problem_params['C'] = np.array([1.0, 1.0])
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
     problem_params['alpha'] = 5.0
@@ -74,7 +73,7 @@ def run(dt, use_switch_estimator=True):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery_2condensators  # pass problem class
+    description['problem_class'] = battery_n_condensators  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -293,33 +292,33 @@ def check_solution(stats, dt, use_switch_estimator):
         msg = f'Error when using the switch estimator for battery_2condensators for dt={dt:.1e}:'
         if dt == 4e-1:
             expected = {
-                'cL': 1.1556732037544801,
-                'vC1': 1.002239522400514,
-                'vC2': 1.0000329223874842,
-                'switch1': 1.607586793484041,
-                'switch2': 3.216645438176962,
+                'cL': 1.1842780233981391,
+                'vC1': 1.0094891393319418,
+                'vC2': 1.00103823232433,
+                'switch1': 1.6075867934844466,
+                'switch2': 3.209437912436633,
                 'restarts': 2.0,
-                'sum_niters': 2604,
+                'sum_niters': 2000,
             }
         elif dt == 4e-2:
             expected = {
-                'cL': 1.1492603893091364,
-                'vC1': 1.0005011122241925,
-                'vC2': 1.000015039670507,
-                'switch1': 1.6094074085596919,
-                'switch2': 3.2183750611596893,
+                'cL': 1.180493652021971,
+                'vC1': 1.0094825917376264,
+                'vC2': 1.0007713468084405,
+                'switch1': 1.6094074085553605,
+                'switch2': 3.209437912440314,
                 'restarts': 2.0,
-                'sum_niters': 4608,
+                'sum_niters': 2364,
             }
         elif dt == 4e-3:
             expected = {
-                'cL': 1.1476283937778273,
-                'vC1': 1.0001336962511904,
-                'vC2': 1.0000182217245925,
-                'switch1': 1.6093728710270498,
-                'switch2': 3.218742142249058,
+                'cL': 1.1537529501025199,
+                'vC1': 1.001438946726028,
+                'vC2': 1.0004331625246141,
+                'switch1': 1.6093728710270467,
+                'switch2': 3.217437912434171,
                 'restarts': 2.0,
-                'sum_niters': 9400,
+                'sum_niters': 8920,
             }
 
     got = {
