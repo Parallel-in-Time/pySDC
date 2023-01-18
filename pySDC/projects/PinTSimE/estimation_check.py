@@ -17,7 +17,7 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
-def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
+def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
 
@@ -53,11 +53,11 @@ def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity, V_ref):
     problem_params['ncondensators'] = 1
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C'] = 1.0
+    problem_params['C'] = np.array([1.0])
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
     problem_params['alpha'] = 1.2
-    problem_params['V_ref'] = V_ref
+    problem_params['V_ref'] = np.array([1.0])
 
     # initialize step parameters
     step_params = dict()
@@ -127,7 +127,6 @@ def check(cwd='./'):
         cwd: current working directory
     """
 
-    V_ref = 1.0
     dt_list = [4e-2, 4e-3]
     use_switch_estimator = [True, False]
     use_adaptivity = [True, False]
@@ -148,8 +147,9 @@ def check(cwd='./'):
                         sweeper=sweeper,
                         use_switch_estimator=use_SE,
                         use_adaptivity=use_A,
-                        V_ref=V_ref,
                     )
+
+                    V_ref = description['problem_params']['V_ref'][0]
 
                     if use_A or use_SE:
                         check_solution(stats, dt_item, problem.__name__, use_A, use_SE)

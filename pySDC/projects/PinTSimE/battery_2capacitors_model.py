@@ -7,7 +7,7 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.battery_model import get_recomputed
+from pySDC.projects.PinTSimE.battery_model import get_recomputed, proof_assertions_description
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
@@ -126,7 +126,7 @@ def main(use_switch_estimator=True):
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
-    proof_assertions_description(description, use_switch_estimator)
+    proof_assertions_description(description, False, use_switch_estimator)
 
     # set time parameters
     t0 = 0.0
@@ -298,44 +298,6 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
 
     return data
-
-
-def proof_assertions_description(description, use_switch_estimator):
-    """
-    Function to proof the assertions (function to get cleaner code)
-
-    Args:
-        description(dict): contains all information for a controller run
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-    """
-
-    assert (
-        description['problem_params']['alpha'] > description['problem_params']['V_ref'][0]
-    ), 'Please set "alpha" greater than "V_ref1"'
-    assert (
-        description['problem_params']['alpha'] > description['problem_params']['V_ref'][1]
-    ), 'Please set "alpha" greater than "V_ref2"'
-
-    if description['problem_params']['ncondensators'] > 1:
-        assert (
-            type(description['problem_params']['V_ref']) == np.ndarray
-        ), '"V_ref" needs to be an array (of type float)'
-        assert (
-            description['problem_params']['ncondensators'] == np.shape(description['problem_params']['V_ref'])[0]
-        ), 'Number of reference values needs to be equal to number of condensators'
-        assert (
-            description['problem_params']['ncondensators'] == np.shape(description['problem_params']['C'])[0]
-        ), 'Number of capacitance values needs to be equal to number of condensators'
-
-    assert description['problem_params']['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
-    assert description['problem_params']['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
-
-    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
-    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
-    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
-
-    if use_switch_estimator:
-        assert description['level_params']['restol'] == -1, "Please set restol to -1 or omit it"
 
 
 if __name__ == "__main__":

@@ -63,7 +63,7 @@ class battery(ptype):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if u[1] <= self.params.V_ref or t >= t_switch:
+        if u[1] <= self.params.V_ref[0] or t >= t_switch:
             f.expl[0] = self.params.Vs / self.params.L
 
         else:
@@ -88,11 +88,11 @@ class battery(ptype):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if rhs[1] <= self.params.V_ref or t >= t_switch:
+        if rhs[1] <= self.params.V_ref[0] or t >= t_switch:
             self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
         else:
-            self.A[1, 1] = -1 / (self.params.C * self.params.R)
+            self.A[1, 1] = -1 / (self.params.C[0] * self.params.R)
 
         me = self.dtype_u(self.init)
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
@@ -113,7 +113,7 @@ class battery(ptype):
         me = self.dtype_u(self.init)
 
         me[0] = 0.0  # cL
-        me[1] = self.params.alpha * self.params.V_ref  # vC
+        me[1] = self.params.alpha * self.params.V_ref[0]  # vC
 
         return me
 
@@ -135,12 +135,12 @@ class battery(ptype):
         m_guess = -100
 
         for m in range(len(u)):
-            if u[m][1] - self.params.V_ref <= 0:
+            if u[m][1] - self.params.V_ref[0] <= 0:
                 switch_detected = True
                 m_guess = m - 1
                 break
 
-        vC_switch = [u[m][1] - self.params.V_ref for m in range(1, len(u))] if switch_detected else []
+        vC_switch = [u[m][1] - self.params.V_ref[0] for m in range(1, len(u))] if switch_detected else []
 
         return switch_detected, m_guess, vC_switch
 
@@ -193,12 +193,12 @@ class battery_implicit(battery):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if u[1] <= self.params.V_ref or t >= t_switch:
+        if u[1] <= self.params.V_ref[0] or t >= t_switch:
             self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
             non_f[0] = self.params.Vs
 
         else:
-            self.A[1, 1] = -1 / (self.params.C * self.params.R)
+            self.A[1, 1] = -1 / (self.params.C[0] * self.params.R)
             non_f[0] = 0
 
         f[:] = self.A.dot(u) + non_f
@@ -224,12 +224,12 @@ class battery_implicit(battery):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if rhs[1] <= self.params.V_ref or t >= t_switch:
+        if rhs[1] <= self.params.V_ref[0] or t >= t_switch:
             self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
             non_f[0] = self.params.Vs
 
         else:
-            self.A[1, 1] = -1 / (self.params.C * self.params.R)
+            self.A[1, 1] = -1 / (self.params.C[0] * self.params.R)
             non_f[0] = 0
 
         # start newton iteration

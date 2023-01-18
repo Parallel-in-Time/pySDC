@@ -108,11 +108,11 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     problem_params['ncondensators'] = 1  # number of condensators
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C'] = 1.0
+    problem_params['C'] = np.array([1.0])
     problem_params['R'] = 1.0
     problem_params['L'] = 1.0
     problem_params['alpha'] = 1.2
-    problem_params['V_ref'] = 1.0
+    problem_params['V_ref'] = np.array([1.0])
 
     # initialize step parameters
     step_params = dict()
@@ -600,18 +600,29 @@ def proof_assertions_description(description, use_adaptivity, use_switch_estimat
         use_switch_estimator (bool): flag if the switch estimator wants to be used or not
     """
 
+    n = description['problem_params']['ncondensators']
     assert (
-        description['problem_params']['alpha'] > description['problem_params']['V_ref']
-    ), 'Please set "alpha" greater than "V_ref"'
-    assert description['problem_params']['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-    assert type(description['problem_params']['V_ref']) == float, '"V_ref" needs to be of type float'
+        description['problem_params']['alpha'] > description['problem_params']['V_ref'][k] for k in range(n)
+    ), 'Please set "alpha" greater than values of "V_ref"'
+    assert type(description['problem_params']['V_ref']) == np.ndarray, '"V_ref" needs to be an np.ndarray'
+    assert type(description['problem_params']['C']) == np.ndarray, '"C" needs to be an np.ndarray '
+    assert (
+        description['problem_params']['ncondensators'] == np.shape(description['problem_params']['V_ref'])[0]
+    ), 'Number of reference values needs to be equal to number of condensators'
+    assert (
+        description['problem_params']['ncondensators'] == np.shape(description['problem_params']['C'])[0]
+    ), 'Number of capacitance values needs to be equal to number of condensators'
+
+    assert (
+        description['problem_params']['V_ref'][k] > 0 for k in range(n)
+    ), 'Please set values of "V_ref" greater than 0'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
     assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
 
     if use_switch_estimator or use_adaptivity:
-        assert description['level_params']['restol'] == -1, "For adaptivity, please set restol to -1 or omit it"
+        assert description['level_params']['restol'] == -1, "Please set restol to -1 or omit it"
 
 
 if __name__ == "__main__":

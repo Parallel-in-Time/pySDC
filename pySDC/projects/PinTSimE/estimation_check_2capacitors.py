@@ -82,7 +82,7 @@ def run(dt, use_switch_estimator=True):
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
-    proof_assertions_description(description, problem_params)
+    proof_assertions_description(description, False, use_switch_estimator)
 
     # set time parameters
     t0 = 0.0
