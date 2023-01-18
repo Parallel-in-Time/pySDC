@@ -9,6 +9,7 @@ import os
 import glob
 import json
 import m2r2
+import shutil
 import numpy as np
 
 mdFiles = [
@@ -19,6 +20,10 @@ mdFiles = [
     'docs/contrib']
 
 docSources = 'docs/source'
+
+# Move already images in the future build directory
+os.makedirs('docs/build/html/_images/', exist_ok=True)
+shutil.copytree('docs/img', 'docs/build/html/_images/docs/img', dirs_exist_ok=True)
 
 counter = np.array(0)
 
@@ -64,6 +69,15 @@ def completeRefLinks(rst, baseName):
 def addOrphanTag(rst):
     return '\n:orphan:\n'+rst
 
+def setImgPath(rst):
+    i = 0
+    while i != -1:
+        i = rst.find('<img src=".', i)
+        if i != -1:
+            rst = rst[:i+11]+'/_images'+rst[i+11:]
+            i += 16
+    return rst
+
 def convert(md, orphan=False, sectionRefs=True):
     baseName = os.path.splitext(md)[0]
     rst = m2r2.parse_from_file(md, parse_relative_links=True)
@@ -73,6 +87,7 @@ def convert(md, orphan=False, sectionRefs=True):
     rst = completeRefLinks(rst, baseName)
     if orphan:
         rst = addOrphanTag(rst)
+    rst = setImgPath(rst)
     with open(f'{docSources}/{baseName}.rst', 'w') as f:
         f.write(rst)
     print(f'Converted {md} to {docSources}/{baseName}.rst')

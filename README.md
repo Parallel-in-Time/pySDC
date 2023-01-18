@@ -108,3 +108,9 @@ Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html)
 (BMBF) grant 16HPC047. The project also received help from the
 [Helmholtz Platform for Research Software Engineering - Preparatory
 Study (HiRSE_PS)](https://www.helmholtz-hirse.de/).
+
+<p align="center">
+  <img src="./docs/img/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./docs/img/LogoTime-X.png" height="105" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./docs/img/BMBF_gefoerdert_2017_en.jpg" height="105" />
+</p>
