@@ -78,6 +78,9 @@ def setImgPath(rst):
             i += 16
     return rst
 
+def linkReadmeToIndex(rst):
+    return rst.replace('<./README>', '<./index>')
+
 def convert(md, orphan=False, sectionRefs=True):
     baseName = os.path.splitext(md)[0]
     rst = m2r2.parse_from_file(md, parse_relative_links=True)
@@ -88,6 +91,7 @@ def convert(md, orphan=False, sectionRefs=True):
     if orphan:
         rst = addOrphanTag(rst)
     rst = setImgPath(rst)
+    rst = linkReadmeToIndex(rst)
     with open(f'{docSources}/{baseName}.rst', 'w') as f:
         f.write(rst)
     print(f'Converted {md} to {docSources}/{baseName}.rst')

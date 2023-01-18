@@ -1,5 +1,7 @@
 # Changelog
 
+:arrow_left: [Back to main page](./README.md)
+
 -   October 7, 2022: Version 5 comes with many changes, both visible and
     invisible ones. Some of those break the existing API, but if you are
     using tests, you should be fine. Major changes include:
@@ -224,3 +226,5 @@
             expected
         -   Reworked many of the internal structures for consistency and
             simplicity
+
+:arrow_left: [Back to main page](./README.md)

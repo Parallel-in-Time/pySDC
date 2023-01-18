@@ -14,3 +14,5 @@ This follows a specific OOP framework, you can look at the page on [custom imple
 3. [Continuous Integration](./docs/contrib/02_continuous_integration.md)
 4. [Naming Conventions](./docs/contrib/03_naming_conventions.md)
 5. [Custom Implementations](./docs/contrib/04_custom_implementations.md)
+
+:arrow_left: [Back to main page](./README.md)
