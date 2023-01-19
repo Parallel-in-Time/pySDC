@@ -68,7 +68,7 @@ which can be found in the folder ``etc/``. Use these as e.g.
 
 .. code-block:: bash
 
-   conda env create --yes -f etc/environment-base.yml
+   conda env create -f etc/environment-base.yml
 
 To check your installation, run
 
