@@ -45,27 +45,23 @@ class advectionNd(ptype):
     sigma : float, optional
         If freq=-1 and ndim=1, uses a Gaussian initial solution of the form
 
-    .. math::
-        u(x,0) = e^{
-            \frac{\displaystyle 1}{\displaystyle 2}
-            \left(
-                \frac{\displaystyle x-1/2}{\displaystyle \sigma}
-            \right)^2
-            }
+        .. math::
+            u(x,0) = e^{
+                \frac{\displaystyle 1}{\displaystyle 2}
+                \left(
+                    \frac{\displaystyle x-1/2}{\displaystyle \sigma}
+                \right)^2
+                }
 
     Attributes
     ----------
     A: sparse matrix (CSC)
         FD discretization matrix of the ND grad operator.
-    ndim: int
-        Number of space dimensions.
-    dx: float
-        Distance between two spatial nodes (here: being the same in all dimensions).
     Id: sparse matrix (CSC)
         Identity matrix of the same dimension as A
 
-    Notes
-    -----
+    Note
+    ----
     Args can be set as values or as tuples, which will increase the dimension.
     Do, however, take care that all spatial parameters have the same dimension.
     """
