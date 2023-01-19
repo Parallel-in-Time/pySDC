@@ -135,10 +135,12 @@ class RungeKutta(generic_implicit):
     method, which does not require us to solve a system of equations to compute the stages.
 
     Please be aware that all fundamental parameters of the Sweeper are ignored. These include
+
      - num_nodes
      - collocation_class
      - initial_guess
      - QI
+
     All of these variables are either determined by the RK rule, or are not part of an RK scheme.
 
     Attribues:
@@ -245,9 +247,9 @@ class RK1(RungeKutta):
 
 
 class CrankNicholson(RungeKutta):
-    '''
+    """
     Implicit Runge-Kutta method of second order
-    '''
+    """
 
     def __init__(self, params):
         nodes = np.array([0, 1])
@@ -260,9 +262,9 @@ class CrankNicholson(RungeKutta):
 
 
 class MidpointMethod(RungeKutta):
-    '''
+    """
     Runge-Kutta method of second order
-    '''
+    """
 
     def __init__(self, params):
         implicit = params.get('implicit', False)
@@ -281,9 +283,9 @@ class MidpointMethod(RungeKutta):
 
 
 class RK4(RungeKutta):
-    '''
+    """
     Explicit Runge-Kutta of fourth order: Everybodies darling.
-    '''
+    """
 
     def __init__(self, params):
         nodes = np.array([0, 0.5, 0.5, 1])
@@ -297,9 +299,9 @@ class RK4(RungeKutta):
 
 
 class Heun_Euler(RungeKutta):
-    '''
+    """
     Second order explicit embedded Runge-Kutta
-    '''
+    """
 
     def __init__(self, params):
         nodes = np.array([0, 1])
@@ -311,9 +313,9 @@ class Heun_Euler(RungeKutta):
 
 
 class Cash_Karp(RungeKutta):
-    '''
+    """
     Fifth order explicit embedded Runge-Kutta
-    '''
+    """
 
     def __init__(self, params):
         nodes = np.array([0, 0.2, 0.3, 0.6, 1.0, 7.0 / 8.0])
