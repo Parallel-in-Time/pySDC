@@ -1,0 +1,7 @@
+implementations.problem\_classes.GeneralizedFisher\_1D\_PETSc module
+====================================================================
+
+.. automodule:: implementations.problem_classes.GeneralizedFisher_1D_PETSc
+   :members:
+   :undoc-members:
+   :show-inheritance:

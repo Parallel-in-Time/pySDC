@@ -1,0 +1,7 @@
+implementations.sweeper\_classes.boris\_2nd\_order module
+=========================================================
+
+.. automodule:: implementations.sweeper_classes.boris_2nd_order
+   :members:
+   :undoc-members:
+   :show-inheritance:

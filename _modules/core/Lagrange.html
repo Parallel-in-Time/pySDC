@@ -8,6 +8,7 @@
     <title>core.Lagrange &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -41,7 +42,7 @@
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">roots_legendre</span>
 
 
-<div class="viewcode-block" id="computeFejerRule"><a class="viewcode-back" href="../../pySDC/core.html#core.Lagrange.computeFejerRule">[docs]</a><span class="k">def</span> <span class="nf">computeFejerRule</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="computeFejerRule"><a class="viewcode-back" href="../../pySDC/core.Lagrange.html#core.Lagrange.computeFejerRule">[docs]</a><span class="k">def</span> <span class="nf">computeFejerRule</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a Fejer rule of the first kind, using DFT (Waldvogel 2006)</span>
 <span class="sd">    Inspired from quadpy (https://github.com/nschloe/quadpy @Nico_Schlömer)</span>
@@ -92,7 +93,7 @@
     <span class="k">return</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span></div>
 
 
-<div class="viewcode-block" id="LagrangeApproximation"><a class="viewcode-back" href="../../pySDC/core.html#core.Lagrange.LagrangeApproximation">[docs]</a><span class="k">class</span> <span class="nc">LagrangeApproximation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="LagrangeApproximation"><a class="viewcode-back" href="../../pySDC/core.Lagrange.html#core.Lagrange.LagrangeApproximation">[docs]</a><span class="k">class</span> <span class="nc">LagrangeApproximation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class approximating any function on a given set of points using barycentric</span>
 <span class="sd">    Lagrange interpolation.</span>
@@ -155,7 +156,7 @@
     <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">size</span>
 
-<div class="viewcode-block" id="LagrangeApproximation.getInterpolationMatrix"><a class="viewcode-back" href="../../pySDC/core.html#core.Lagrange.LagrangeApproximation.getInterpolationMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getInterpolationMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+<div class="viewcode-block" id="LagrangeApproximation.getInterpolationMatrix"><a class="viewcode-back" href="../../pySDC/core.Lagrange.html#core.Lagrange.LagrangeApproximation.getInterpolationMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getInterpolationMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the interpolation matrix for a given set of discrete &quot;time&quot;</span>
 <span class="sd">        points.</span>
@@ -202,7 +203,7 @@
 
         <span class="k">return</span> <span class="n">PInter</span></div>
 
-<div class="viewcode-block" id="LagrangeApproximation.getIntegrationMatrix"><a class="viewcode-back" href="../../pySDC/core.html#core.Lagrange.LagrangeApproximation.getIntegrationMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getIntegrationMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals</span><span class="p">,</span> <span class="n">numQuad</span><span class="o">=</span><span class="s1">&#39;LEGENDRE_NUMPY&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="LagrangeApproximation.getIntegrationMatrix"><a class="viewcode-back" href="../../pySDC/core.Lagrange.html#core.Lagrange.LagrangeApproximation.getIntegrationMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getIntegrationMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals</span><span class="p">,</span> <span class="n">numQuad</span><span class="o">=</span><span class="s1">&#39;LEGENDRE_NUMPY&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the integration matrix for a given set of intervals.</span>
 

@@ -1,0 +1,7 @@
+implementations.problem\_classes.boussinesq\_helpers.buildFDMatrix module
+=========================================================================
+
+.. automodule:: implementations.problem_classes.boussinesq_helpers.buildFDMatrix
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+implementations.controller\_classes.controller\_nonMPI module
+=============================================================
+
+.. automodule:: implementations.controller_classes.controller_nonMPI
+   :members:
+   :undoc-members:
+   :show-inheritance:

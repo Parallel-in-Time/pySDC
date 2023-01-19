@@ -8,6 +8,7 @@
     <title>core.Step &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -81,7 +82,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="step"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step">[docs]</a><span class="k">class</span> <span class="nc">step</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+<div class="viewcode-block" id="step"><a class="viewcode-back" href="../../pySDC/core.Step.html#core.Step.step">[docs]</a><span class="k">class</span> <span class="nc">step</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Step class, referencing most of the structure needed for the time-stepping</span>
 
@@ -238,7 +239,7 @@
                     <span class="n">ld</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">ld</span>
 
-<div class="viewcode-block" id="step.connect_levels"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.connect_levels">[docs]</a>    <span class="k">def</span> <span class="nf">connect_levels</span><span class="p">(</span>
+<div class="viewcode-block" id="step.connect_levels"><a class="viewcode-back" href="../../pySDC/core.Step.html#core.Step.step.connect_levels">[docs]</a>    <span class="k">def</span> <span class="nf">connect_levels</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_transfer_class</span><span class="p">,</span>
         <span class="n">base_transfer_params</span><span class="p">,</span>
@@ -271,7 +272,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__transfer_dict</span><span class="p">[(</span><span class="n">coarse_level</span><span class="p">,</span> <span class="n">fine_level</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="n">prolong</span></div>
 
-<div class="viewcode-block" id="step.transfer"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.transfer">[docs]</a>    <span class="k">def</span> <span class="nf">transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<div class="viewcode-block" id="step.transfer"><a class="viewcode-back" href="../../pySDC/core.Step.html#core.Step.step.transfer">[docs]</a>    <span class="k">def</span> <span class="nf">transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wrapper routine to ease the call of the transfer functions</span>
 
@@ -285,7 +286,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__transfer_dict</span><span class="p">[(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)]()</span></div>
 
-<div class="viewcode-block" id="step.reset_step"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.reset_step">[docs]</a>    <span class="k">def</span> <span class="nf">reset_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="step.reset_step"><a class="viewcode-back" href="../../pySDC/core.Step.html#core.Step.step.reset_step">[docs]</a>    <span class="k">def</span> <span class="nf">reset_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine so clean-up step structure and the corresp. levels for further uses</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -293,7 +294,7 @@
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
             <span class="n">l</span><span class="o">.</span><span class="n">reset_level</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="step.init_step"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.init_step">[docs]</a>    <span class="k">def</span> <span class="nf">init_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<div class="viewcode-block" id="step.init_step"><a class="viewcode-back" href="../../pySDC/core.Step.html#core.Step.step.init_step">[docs]</a>    <span class="k">def</span> <span class="nf">init_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for a new step.</span>
 

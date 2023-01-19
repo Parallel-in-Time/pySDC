@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>implementations.problem_classes.GrayScott_MPIFFT module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.HarmonicOscillator module" href="implementations.problem_classes.HarmonicOscillator.html" />
+    <link rel="prev" title="implementations.problem_classes.GrayScott_2D_PETSc_periodic module" href="implementations.problem_classes.GrayScott_2D_PETSc_periodic.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HarmonicOscillator.html" title="implementations.problem_classes.HarmonicOscillator module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.GrayScott_2D_PETSc_periodic.html" title="implementations.problem_classes.GrayScott_2D_PETSc_periodic module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GrayScott_MPIFFT module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.GrayScott_MPIFFT">
+<span id="implementations-problem-classes-grayscott-mpifft-module"></span><h1>implementations.problem_classes.GrayScott_MPIFFT module<a class="headerlink" href="#module-implementations.problem_classes.GrayScott_MPIFFT" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grayscott_imex_diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<p>Example implementing the Gray-Scott equation in 2-3D using mpi4py-fft for solving linear parts,
+IMEX time-stepping (implicit diffusion, explicit reaction)</p>
+<p>mpi4py-fft: <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.fft">
+<span class="sig-name descname"><span class="pre">fft</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>fft object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.X">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.X" title="Permalink to this definition">¶</a></dt>
+<dd><p>grid coordinates in real space</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.ndim">
+<span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.ndim" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of spatial dimensions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Ku">
+<span class="sig-name descname"><span class="pre">Ku</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Ku" title="Permalink to this definition">¶</a></dt>
+<dd><p>Laplace operator in spectral space (u component)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Kv">
+<span class="sig-name descname"><span class="pre">Kv</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Kv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Laplace operator in spectral space (v component)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple FFT solver for the diffusion part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t=0, see <a class="reference external" href="https://www.chebfun.org/examples/pde/GrayScott.html">https://www.chebfun.org/examples/pde/GrayScott.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grayscott_imex_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion" title="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion"><code class="xref py py-class docutils literal notranslate"><span class="pre">grayscott_imex_diffusion</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_linear.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grayscott_mi_diffusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.comp2_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_diffusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion" title="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion"><code class="xref py py-class docutils literal notranslate"><span class="pre">grayscott_imex_diffusion</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_diffusion.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_1">
+<span class="sig-name descname"><span class="pre">solve_system_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_diffusion.solve_system_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solver for the first component, can just call the super function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_2">
+<span class="sig-name descname"><span class="pre">solve_system_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_diffusion.solve_system_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Newton-Solver for the second component</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grayscott_mi_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.comp2_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear" title="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear"><code class="xref py py-class docutils literal notranslate"><span class="pre">grayscott_imex_linear</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_linear.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_1">
+<span class="sig-name descname"><span class="pre">solve_system_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_linear.solve_system_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solver for the first component, can just call the super function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_2">
+<span class="sig-name descname"><span class="pre">solve_system_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_mi_linear.solve_system_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Newton-Solver for the second component</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.GrayScott_MPIFFT module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion"><code class="docutils literal notranslate"><span class="pre">grayscott_imex_diffusion</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.fft"><code class="docutils literal notranslate"><span class="pre">fft</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.X"><code class="docutils literal notranslate"><span class="pre">X</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.ndim"><code class="docutils literal notranslate"><span class="pre">ndim</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Ku"><code class="docutils literal notranslate"><span class="pre">Ku</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Kv"><code class="docutils literal notranslate"><span class="pre">Kv</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear"><code class="docutils literal notranslate"><span class="pre">grayscott_imex_linear</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion"><code class="docutils literal notranslate"><span class="pre">grayscott_mi_diffusion</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_1"><code class="docutils literal notranslate"><span class="pre">solve_system_1()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_2"><code class="docutils literal notranslate"><span class="pre">solve_system_2()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear"><code class="docutils literal notranslate"><span class="pre">grayscott_mi_linear</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_1"><code class="docutils literal notranslate"><span class="pre">solve_system_1()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_2"><code class="docutils literal notranslate"><span class="pre">solve_system_2()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.GrayScott_2D_PETSc_periodic.html"
+                          title="previous chapter">implementations.problem_classes.GrayScott_2D_PETSc_periodic module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.HarmonicOscillator.html"
+                          title="next chapter">implementations.problem_classes.HarmonicOscillator module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.GrayScott_MPIFFT.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HarmonicOscillator.html" title="implementations.problem_classes.HarmonicOscillator module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.GrayScott_2D_PETSc_periodic.html" title="implementations.problem_classes.GrayScott_2D_PETSc_periodic module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GrayScott_MPIFFT module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

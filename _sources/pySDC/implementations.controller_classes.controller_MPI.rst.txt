@@ -1,0 +1,7 @@
+implementations.controller\_classes.controller\_MPI module
+==========================================================
+
+.. automodule:: implementations.controller_classes.controller_MPI
+   :members:
+   :undoc-members:
+   :show-inheritance:

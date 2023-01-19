@@ -1,0 +1,306 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module" href="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html" />
+    <link rel="prev" title="implementations.problem_classes.HarmonicOscillator module" href="implementations.problem_classes.HarmonicOscillator.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html" title="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HarmonicOscillator.html" title="implementations.problem_classes.HarmonicOscillator module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced">
+<span id="implementations-problem-classes-heatequation-1d-fenics-matrix-forced-module"></span><h1>implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module<a class="headerlink" href="#module-implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fenics_heat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.V">
+<span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>function space</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.M">
+<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass matrix for FEM</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K">
+<span class="sig-name descname"><span class="pre">K</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K" title="Permalink to this definition">¶</a></dt>
+<dd><p>stiffness matrix incl. diffusion coefficient (and correct sign)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g">
+<span class="sig-name descname"><span class="pre">g</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>forcing term</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc">
+<span class="sig-name descname"><span class="pre">bc</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc" title="Permalink to this definition">¶</a></dt>
+<dd><p>boundary conditions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix">
+<span class="sig-name descname"><span class="pre">apply_mass_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.apply_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to apply mass matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – current values</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>M*u</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s linear solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fenics_heat_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat"><code class="xref py py-class docutils literal notranslate"><span class="pre">fenics_heat</span></code></a></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], expects mass matrix sweeper</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s linear solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat"><code class="docutils literal notranslate"><span class="pre">fenics_heat</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.V"><code class="docutils literal notranslate"><span class="pre">V</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.M"><code class="docutils literal notranslate"><span class="pre">M</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K"><code class="docutils literal notranslate"><span class="pre">K</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g"><code class="docutils literal notranslate"><span class="pre">g</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc"><code class="docutils literal notranslate"><span class="pre">bc</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix"><code class="docutils literal notranslate"><span class="pre">apply_mass_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass"><code class="docutils literal notranslate"><span class="pre">fenics_heat_mass</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.HarmonicOscillator.html"
+                          title="previous chapter">implementations.problem_classes.HarmonicOscillator module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html"
+                          title="next chapter">implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html" title="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.HarmonicOscillator.html" title="implementations.problem_classes.HarmonicOscillator module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>core.Nodes module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core.Problem module" href="core.Problem.html" />
+    <link rel="prev" title="core.Level module" href="core.Level.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Problem.html" title="core.Problem module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.Level.html" title="core.Level module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.Nodes module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.Nodes">
+<span id="core-nodes-module"></span><h1>core.Nodes module<a class="headerlink" href="#module-core.Nodes" title="Permalink to this heading">¶</a></h1>
+<dl class="py exception">
+<dt class="sig sig-object py" id="core.Nodes.NodesError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NodesError</span></span><a class="reference internal" href="../_modules/core/Nodes.html#NodesError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception class to handle error in NodesGenerator class</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NodesGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that can be used to generate generic distribution of nodes derived
+from Gauss quadrature rule.
+Its implementation is fully inspired from a <a class="reference external" href="https://doi.org/10.1093/oso/9780198506720.001.0001">book of W. Gautschi</a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.node_type">
+<span class="sig-name descname"><span class="pre">node_type</span></span><a class="headerlink" href="#core.Nodes.NodesGenerator.node_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of node distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.quad_type">
+<span class="sig-name descname"><span class="pre">quad_type</span></span><a class="headerlink" href="#core.Nodes.NodesGenerator.quad_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The quadrature type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.evalOrthogPoly">
+<span class="sig-name descname"><span class="pre">evalOrthogPoly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.evalOrthogPoly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.evalOrthogPoly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the two higher order orthogonal polynomials corresponding
+to the given (alpha,beta) coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em><em> or </em><em>np.1darray</em>) – The point where to evaluate the orthogonal polynomials.</p></li>
+<li><p><strong>alpha</strong> (<em>np.1darray</em>) – The alpha coefficients of the three-term recurrence.</p></li>
+<li><p><strong>beta</strong> (<em>np.1darray</em>) – The beta coefficients of the three-term recurrence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>pi[0]</strong> (<em>float or np.1darray</em>) – The second higher order orthogonal polynomial evaluation.</p></li>
+<li><p><strong>pi[1]</strong> (<em>float or np.1darray</em>) – The higher oder orthogonal polynomial evaluation.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getNodes">
+<span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getNodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes a given number of quadrature nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – Number of nodes to compute.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>nodes</strong> – Nodes located in [-1, 1], in increasing order.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getOrthogPolyCoefficients">
+<span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getOrthogPolyCoefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a given number of analytic three-term recurrence coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_coeff</strong> (<em>int</em>) – Number of coefficients to compute.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alpha</strong> (<em>np.1darray</em>) – The alpha coefficients of the three-term recurrence.</p></li>
+<li><p><strong>beta</strong> (<em>np.1darray</em>) – The beta coefficients of the three-term recurrence.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getTridiagCoefficients">
+<span class="sig-name descname"><span class="pre">getTridiagCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getTridiagCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getTridiagCoefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes recurrence coefficients for the tridiagonal Jacobian matrix,
+taking into account the quadrature type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – Number of nodes that should be computed from those coefficients.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alpha</strong> (<em>np.1darray</em>) – The modified alpha coefficients of the three-term recurrence.</p></li>
+<li><p><strong>beta</strong> (<em>np.1darray</em>) – The modified beta coefficients of the three-term recurrence.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.Nodes module</a><ul>
+<li><a class="reference internal" href="#core.Nodes.NodesError"><code class="docutils literal notranslate"><span class="pre">NodesError</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator"><code class="docutils literal notranslate"><span class="pre">NodesGenerator</span></code></a><ul>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.node_type"><code class="docutils literal notranslate"><span class="pre">node_type</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.quad_type"><code class="docutils literal notranslate"><span class="pre">quad_type</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.evalOrthogPoly"><code class="docutils literal notranslate"><span class="pre">evalOrthogPoly()</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.getNodes"><code class="docutils literal notranslate"><span class="pre">getNodes()</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.getOrthogPolyCoefficients"><code class="docutils literal notranslate"><span class="pre">getOrthogPolyCoefficients()</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.getTridiagCoefficients"><code class="docutils literal notranslate"><span class="pre">getTridiagCoefficients()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.Level.html"
+                          title="previous chapter">core.Level module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="core.Problem.html"
+                          title="next chapter">core.Problem module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.Nodes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Problem.html" title="core.Problem module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.Level.html" title="core.Level module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.Nodes module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

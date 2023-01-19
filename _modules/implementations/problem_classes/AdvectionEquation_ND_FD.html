@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.AdvectionEquation_ND_FD &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -48,7 +49,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="advectionNd"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">[docs]</a><span class="k">class</span> <span class="nc">advectionNd</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="advectionNd"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">[docs]</a><span class="k">class</span> <span class="nc">advectionNd</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the unforced ND advection equation with periodic BCs in [0,1]^N,</span>
 <span class="sd">    discretized using central finite differences</span>
@@ -163,7 +164,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">xvalues</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">ndim</span><span class="p">)])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="advectionNd.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="advectionNd.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -179,7 +180,7 @@
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="advectionNd.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="advectionNd.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for (I-factor*A)u = rhs</span>
 
@@ -208,7 +209,7 @@
             <span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="advectionNd.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="advectionNd.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 

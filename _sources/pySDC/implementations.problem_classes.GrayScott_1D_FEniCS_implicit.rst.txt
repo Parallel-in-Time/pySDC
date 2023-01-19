@@ -1,0 +1,7 @@
+implementations.problem\_classes.GrayScott\_1D\_FEniCS\_implicit module
+=======================================================================
+
+.. automodule:: implementations.problem_classes.GrayScott_1D_FEniCS_implicit
+   :members:
+   :undoc-members:
+   :show-inheritance:

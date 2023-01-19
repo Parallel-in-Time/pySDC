@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>core.Collocation module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core.Controller module" href="core.Controller.html" />
+    <link rel="prev" title="core.BaseTransfer module" href="core.BaseTransfer.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Controller.html" title="core.Controller module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.BaseTransfer.html" title="core.BaseTransfer module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.Collocation module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.Collocation">
+<span id="core-collocation-module"></span><h1>core.Collocation module<a class="headerlink" href="#module-core.Collocation" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.Collocation.CollBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Generic collocation class, that contains everything to do integration over
+intervals and between nodes.
+It can be used to produce many kind of quadrature nodes from various
+distribution (awesome!).</p>
+<p>It is based on the two main parameters that define the nodes :</p>
+<ul class="simple">
+<li><p>node_type : the node distribution used for the collocation method</p></li>
+<li><p>quad_type : the type of quadrature used (inclusion of not of boundary)</p></li>
+</ul>
+<p>Current implementation provides the following available parameter values
+for node_type :</p>
+<ul class="simple">
+<li><p>EQUID : equidistant node distribution</p></li>
+<li><p>LEGENDRE : distribution from Legendre polynomials</p></li>
+<li><p>CHEBY-{1,2,3,4} : distribution from Chebyshev polynomials of a given kind</p></li>
+</ul>
+<p>The type of quadrature cann be GAUSS (only inner nodes), RADAU-LEFT
+(inclusion of the left boundary), RADAU-RIGHT (inclusion of the right
+boundary) and LOBATTO (inclusion of left and right boundary).</p>
+<p>Here is the equivalency table with the (old) original classes implemented
+in pySDC :</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original Class</p></th>
+<th class="head"><p>node_type</p></th>
+<th class="head"><p>quad_type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Equidistant</p></td>
+<td><p>EQUID</p></td>
+<td><p>LOBATTO</p></td>
+</tr>
+<tr class="row-odd"><td><p>EquidistantInner</p></td>
+<td><p>EQUID</p></td>
+<td><p>GAUSS</p></td>
+</tr>
+<tr class="row-even"><td><p>EquidistantNoLeft</p></td>
+<td><p>EQUID</p></td>
+<td><p>RADAU-RIGHT</p></td>
+</tr>
+<tr class="row-odd"><td><p>CollGaussLegendre</p></td>
+<td><p>LEGENDRE</p></td>
+<td><p>GAUSS</p></td>
+</tr>
+<tr class="row-even"><td><p>CollGaussLobatto</p></td>
+<td><p>LEGENDRE</p></td>
+<td><p>LOBATTO</p></td>
+</tr>
+<tr class="row-odd"><td><p>CollGaussRadau_Left</p></td>
+<td><p>LEGENDRE</p></td>
+<td><p>RADAU-LEFT</p></td>
+</tr>
+<tr class="row-even"><td><p>CollGaussRadau_Right</p></td>
+<td><p>LEGENDRE</p></td>
+<td><p>RADAU-RIGHT</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.num_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of collocation nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.tleft">
+<span class="sig-name descname"><span class="pre">tleft</span></span><a class="headerlink" href="#core.Collocation.CollBase.tleft" title="Permalink to this definition">¶</a></dt>
+<dd><p>left interval point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.tright">
+<span class="sig-name descname"><span class="pre">tright</span></span><a class="headerlink" href="#core.Collocation.CollBase.tright" title="Permalink to this definition">¶</a></dt>
+<dd><p>right interval point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of quadrature nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Collocation.CollBase.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of quadrature weights for the full interval</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.Qmat">
+<span class="sig-name descname"><span class="pre">Qmat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Qmat" title="Permalink to this definition">¶</a></dt>
+<dd><p>matrix containing the weights for tleft to node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.Smat">
+<span class="sig-name descname"><span class="pre">Smat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Smat" title="Permalink to this definition">¶</a></dt>
+<dd><p>matrix containing the weights for node to node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.delta_m">
+<span class="sig-name descname"><span class="pre">delta_m</span></span><a class="headerlink" href="#core.Collocation.CollBase.delta_m" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of distances between nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.right_is_node">
+<span class="sig-name descname"><span class="pre">right_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.right_is_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>flag to indicate whether right point is collocation node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.left_is_node">
+<span class="sig-name descname"><span class="pre">left_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.left_is_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>flag to indicate whether left point is collocation node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Collocation.CollBase.evaluate">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the quadrature over the full interval</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>numpy.ndarray</em>) – array of quadrature weights for the full interval</p></li>
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – f(x) to be integrated</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>integral over f(x) between tleft and tright</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.Collocation module</a><ul>
+<li><a class="reference internal" href="#core.Collocation.CollBase"><code class="docutils literal notranslate"><span class="pre">CollBase</span></code></a><ul>
+<li><a class="reference internal" href="#core.Collocation.CollBase.num_nodes"><code class="docutils literal notranslate"><span class="pre">num_nodes</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.tleft"><code class="docutils literal notranslate"><span class="pre">tleft</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.tright"><code class="docutils literal notranslate"><span class="pre">tright</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.nodes"><code class="docutils literal notranslate"><span class="pre">nodes</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.Qmat"><code class="docutils literal notranslate"><span class="pre">Qmat</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.Smat"><code class="docutils literal notranslate"><span class="pre">Smat</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.delta_m"><code class="docutils literal notranslate"><span class="pre">delta_m</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.right_is_node"><code class="docutils literal notranslate"><span class="pre">right_is_node</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.left_is_node"><code class="docutils literal notranslate"><span class="pre">left_is_node</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.BaseTransfer.html"
+                          title="previous chapter">core.BaseTransfer module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="core.Controller.html"
+                          title="next chapter">core.Controller module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.Collocation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Controller.html" title="core.Controller module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.BaseTransfer.html" title="core.BaseTransfer module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.Collocation module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

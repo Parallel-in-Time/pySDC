@@ -8,6 +8,7 @@
     <title>core.Collocation &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -47,7 +48,7 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.Lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
 
-<div class="viewcode-block" id="CollBase"><a class="viewcode-back" href="../../pySDC/core.html#core.Collocation.CollBase">[docs]</a><span class="k">class</span> <span class="nc">CollBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="CollBase"><a class="viewcode-back" href="../../pySDC/core.Collocation.html#core.Collocation.CollBase">[docs]</a><span class="k">class</span> <span class="nc">CollBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic collocation class, that contains everything to do integration over</span>
 <span class="sd">    intervals and between nodes.</span>
@@ -150,7 +151,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Smat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_Smatrix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_deltas</span>
 
-<div class="viewcode-block" id="CollBase.evaluate"><a class="viewcode-back" href="../../pySDC/core.html#core.Collocation.CollBase.evaluate">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CollBase.evaluate"><a class="viewcode-back" href="../../pySDC/core.Collocation.html#core.Collocation.CollBase.evaluate">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the quadrature over the full interval</span>

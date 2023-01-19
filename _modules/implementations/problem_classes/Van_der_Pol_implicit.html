@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.Van_der_Pol_implicit &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -46,7 +47,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="vanderpol"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol">[docs]</a><span class="k">class</span> <span class="nc">vanderpol</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="vanderpol"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol">[docs]</a><span class="k">class</span> <span class="nc">vanderpol</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the van der pol oscillator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -79,7 +80,7 @@
             <span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="vanderpol.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="vanderpol.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at t=0</span>
 
@@ -116,7 +117,7 @@
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u0</span><span class="p">[:]</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="vanderpol.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="vanderpol.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the RHS for both components simultaneously</span>
 
@@ -134,7 +135,7 @@
         <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">mu</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="vanderpol.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="vanderpol.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear system</span>
 

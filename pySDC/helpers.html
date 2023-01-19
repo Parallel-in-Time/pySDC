@@ -9,6 +9,7 @@
     <title>helpers package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -16,7 +17,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="implementations.transfer_classes package" href="implementations.transfer_classes.html" /> 
+    <link rel="next" title="helpers.plot_helper module" href="helpers.plot_helper.html" />
+    <link rel="prev" title="implementations.transfer_classes.TransferParticles_NoCoarse module" href="implementations.transfer_classes.TransferParticles_NoCoarse.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -28,7 +30,10 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+          <a href="helpers.plot_helper.html" title="helpers.plot_helper module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.TransferParticles_NoCoarse.html" title="implementations.transfer_classes.TransferParticles_NoCoarse module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers package</a></li> 
@@ -44,373 +49,48 @@
 <h1>helpers package<a class="headerlink" href="#helpers-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-</section>
-<section id="module-helpers.plot_helper">
-<span id="helpers-plot-helper-module"></span><h2>helpers.plot_helper module<a class="headerlink" href="#module-helpers.plot_helper" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.plot_helper.figsize">
-<span class="sig-prename descclassname"><span class="pre">helpers.plot_helper.</span></span><span class="sig-name descname"><span class="pre">figsize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textwidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#figsize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.figsize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.plot_helper.newfig">
-<span class="sig-prename descclassname"><span class="pre">helpers.plot_helper.</span></span><span class="sig-name descname"><span class="pre">newfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textwidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6180339887</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#newfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.newfig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.plot_helper.savefig">
-<span class="sig-prename descclassname"><span class="pre">helpers.plot_helper.</span></span><span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_pdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_pgf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_png</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#savefig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.savefig" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.plot_helper.setup_mpl">
-<span class="sig-prename descclassname"><span class="pre">helpers.plot_helper.</span></span><span class="sig-name descname"><span class="pre">setup_mpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#setup_mpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.setup_mpl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
-<section id="module-helpers.problem_helper">
-<span id="helpers-problem-helper-module"></span><h2>helpers.problem_helper module<a class="headerlink" href="#module-helpers.problem_helper" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_matrix">
-<span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_finite_difference_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cupy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build FD matrix from stencils, with boundary conditions</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_stencil">
-<span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_stencil" title="Permalink to this definition">¶</a></dt>
-<dd><p>Derive general finite difference stencils from Taylor expansions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
-<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – Type of the stencil</p></li>
-<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>type</cite></p></li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="helpers.plot_helper.html">helpers.plot_helper module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.plot_helper.html#helpers.plot_helper.figsize"><code class="docutils literal notranslate"><span class="pre">figsize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.plot_helper.html#helpers.plot_helper.newfig"><code class="docutils literal notranslate"><span class="pre">newfig()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.plot_helper.html#helpers.plot_helper.savefig"><code class="docutils literal notranslate"><span class="pre">savefig()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.plot_helper.html#helpers.plot_helper.setup_mpl"><code class="docutils literal notranslate"><span class="pre">setup_mpl()</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The weights of the stencil
-numpy.ndarray: The offsets for the stencil</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.problem_helper.get_steps">
-<span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_steps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the offsets for the FD stencil.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
-<li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – Type of the stencil</p></li>
-<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>type</cite></p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.problem_helper.html">helpers.problem_helper module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.problem_helper.html#helpers.problem_helper.get_finite_difference_matrix"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.problem_helper.html#helpers.problem_helper.get_finite_difference_stencil"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_stencil()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.problem_helper.html#helpers.problem_helper.get_steps"><code class="docutils literal notranslate"><span class="pre">get_steps()</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The number of elements in the stencil
-numpy.ndarray: The offsets for the stencil</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-helpers.pysdc_helper">
-<span id="helpers-pysdc-helper-module"></span><h2>helpers.pysdc_helper module<a class="headerlink" href="#module-helpers.pysdc_helper" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="helpers.pysdc_helper.FrozenClass">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helpers.pysdc_helper.</span></span><span class="sig-name descname"><span class="pre">FrozenClass</span></span><a class="reference internal" href="../_modules/helpers/pysdc_helper.html#FrozenClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.pysdc_helper.FrozenClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Helper class to freeze a class, i.e. to avoid adding more attributes</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="helpers.pysdc_helper.FrozenClass.__isfrozen">
-<span class="sig-name descname"><span class="pre">__isfrozen</span></span><a class="headerlink" href="#helpers.pysdc_helper.FrozenClass.__isfrozen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flag to freeze a class</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="helpers.pysdc_helper.FrozenClass.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/pysdc_helper.html#FrozenClass.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.pysdc_helper.FrozenClass.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrapper for <cite>__dict__.get</cite> to use when reading variables that might not exist, depending on the configuration</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<em>str</em>) – Name of the variable you wish to read</p></li>
-<li><p><strong>default</strong> – Value to be returned if the variable does not exist</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.pysdc_helper.html">helpers.pysdc_helper module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.pysdc_helper.html#helpers.pysdc_helper.FrozenClass"><code class="docutils literal notranslate"><span class="pre">FrozenClass</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>__dict__.get(key, default)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-helpers.stats_helper">
-<span id="helpers-stats-helper-module"></span><h2>helpers.stats_helper module<a class="headerlink" href="#module-helpers.stats_helper" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.stats_helper.filter_recomputed">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">filter_recomputed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_recomputed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_recomputed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter recomputed values from the stats and remove them.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>stats</strong> (<em>dict</em>) – Raw statistics from a controller run</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The filtered stats dict</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.stats_helper.filter_stats">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">filter_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to extract data from the dictrionary of statistics</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>stats</strong> (<em>dict</em>) – raw statistics from a controller run</p></li>
-<li><p><strong>process</strong> (<em>int</em>) – process number</p></li>
-<li><p><strong>time</strong> (<em>float</em>) – the requested simulation time</p></li>
-<li><p><strong>level</strong> (<em>int</em>) – the requested level index</p></li>
-<li><p><strong>iter</strong> (<em>int</em>) – the requested iteration count</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – string to describe the requested type of value</p></li>
-<li><p><strong>recomputed</strong> (<em>bool</em>) – filter recomputed values from stats if set to anything other than None</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.stats_helper.html">helpers.stats_helper module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.stats_helper.html#helpers.stats_helper.filter_recomputed"><code class="docutils literal notranslate"><span class="pre">filter_recomputed()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.stats_helper.html#helpers.stats_helper.filter_stats"><code class="docutils literal notranslate"><span class="pre">filter_stats()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.stats_helper.html#helpers.stats_helper.get_list_of_types"><code class="docutils literal notranslate"><span class="pre">get_list_of_types()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.stats_helper.html#helpers.stats_helper.get_sorted"><code class="docutils literal notranslate"><span class="pre">get_sorted()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.stats_helper.html#helpers.stats_helper.sort_stats"><code class="docutils literal notranslate"><span class="pre">sort_stats()</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>dictionary containing only the entries corresponding to the filter</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.stats_helper.get_list_of_types">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">get_list_of_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_list_of_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_list_of_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to get list of types registered in stats</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>stats</strong> (<em>dict</em>) – dictionary with statistics</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of types registered</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.stats_helper.get_sorted">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">get_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_sorted" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
-Keyword arguments are passed to <cite>filter_stats</cite> for filtering.</p>
-<p>stats (dict): raw statistics from a controller run
-sortby (str): string to specify which key to use for sorting
-comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of tuples containing the sortby item and the value</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.stats_helper.sort_stats">
-<span class="sig-prename descclassname"><span class="pre">helpers.stats_helper.</span></span><span class="sig-name descname"><span class="pre">sort_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#sort_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.sort_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to transform stats dictionary to sorted list of tuples</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>stats</strong> (<em>dict</em>) – dictionary of statistics</p></li>
-<li><p><strong>sortby</strong> (<em>str</em>) – string to specify which key to use for sorting</p></li>
-<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator (or None if not applicable)</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.transfer_helper.html">helpers.transfer_helper module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.transfer_helper.html#helpers.transfer_helper.border_padding"><code class="docutils literal notranslate"><span class="pre">border_padding()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.transfer_helper.html#helpers.transfer_helper.continue_periodic_array"><code class="docutils literal notranslate"><span class="pre">continue_periodic_array()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.transfer_helper.html#helpers.transfer_helper.interpolation_matrix_1d"><code class="docutils literal notranslate"><span class="pre">interpolation_matrix_1d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors"><code class="docutils literal notranslate"><span class="pre">next_neighbors()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors_periodic"><code class="docutils literal notranslate"><span class="pre">next_neighbors_periodic()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.transfer_helper.html#helpers.transfer_helper.restriction_matrix_1d"><code class="docutils literal notranslate"><span class="pre">restriction_matrix_1d()</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of tuples containing the sortby item and the value</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-helpers.transfer_helper">
-<span id="helpers-transfer-helper-module"></span><h2>helpers.transfer_helper module<a class="headerlink" href="#module-helpers.transfer_helper" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.transfer_helper.border_padding">
-<span class="sig-prename descclassname"><span class="pre">helpers.transfer_helper.</span></span><span class="sig-name descname"><span class="pre">border_padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mirror'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/transfer_helper.html#border_padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.transfer_helper.border_padding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to pad/embed an array at the boundaries</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>grid</strong> (<em>np.npdarray</em>) – the input array</p></li>
-<li><p><strong>l</strong> – left boundary</p></li>
-<li><p><strong>r</strong> – right boundary</p></li>
-<li><p><strong>pad_type</strong> – type of padding</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helpers.visualization_tools.html">helpers.visualization_tools module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers.visualization_tools.html#helpers.visualization_tools.show_residual_across_simulation"><code class="docutils literal notranslate"><span class="pre">show_residual_across_simulation()</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the padded array</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.npdarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.transfer_helper.continue_periodic_array">
-<span class="sig-prename descclassname"><span class="pre">helpers.transfer_helper.</span></span><span class="sig-name descname"><span class="pre">continue_periodic_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/transfer_helper.html#continue_periodic_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.transfer_helper.continue_periodic_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to append an array for nn neighbors for periodicity</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>arr</strong> (<em>np.ndarray</em>) – the input array</p></li>
-<li><p><strong>nn</strong> (<em>list</em>) – the neighbors</p></li>
+</li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the continued array</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.transfer_helper.interpolation_matrix_1d">
-<span class="sig-prename descclassname"><span class="pre">helpers.transfer_helper.</span></span><span class="sig-name descname"><span class="pre">interpolation_matrix_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equidist_nested</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/transfer_helper.html#interpolation_matrix_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.transfer_helper.interpolation_matrix_1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to contruct the restriction matrix in 1d using barycentric interpolation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fine_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the fine grid</p></li>
-<li><p><strong>coarse_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the coarse grid</p></li>
-<li><p><strong>k</strong> (<em>int</em>) – order of the restriction</p></li>
-<li><p><strong>periodic</strong> (<em>bool</em>) – flag to indicate periodicity</p></li>
-<li><p><strong>pad</strong> (<em>int</em>) – padding parameter for boundaries</p></li>
-<li><p><strong>equidist_nested</strong> (<em>bool</em>) – shortcut possible, if nodes are equidistant and nested</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>interpolation matrix</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>sprs.csc_matrix</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.transfer_helper.next_neighbors">
-<span class="sig-prename descclassname"><span class="pre">helpers.transfer_helper.</span></span><span class="sig-name descname"><span class="pre">next_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/transfer_helper.html#next_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.transfer_helper.next_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to find the next neighbors for a non-periodic setup</p>
-<p>This function gives for a value p the k points next to it which are found in
-in the vector ps</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – the current point</p></li>
-<li><p><strong>ps</strong> (<em>np.ndarray</em>) – the grid with the potential neighbors</p></li>
-<li><p><strong>k</strong> (<em>int</em>) – number of neighbors to find</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the k next neighbors</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.transfer_helper.next_neighbors_periodic">
-<span class="sig-prename descclassname"><span class="pre">helpers.transfer_helper.</span></span><span class="sig-name descname"><span class="pre">next_neighbors_periodic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/transfer_helper.html#next_neighbors_periodic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.transfer_helper.next_neighbors_periodic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to find the next neighbors for a periodic setup</p>
-<p>This function gives for a value p the k points next to it which are found in
-in the vector ps and the points which are found periodically.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – the current point</p></li>
-<li><p><strong>ps</strong> (<em>np.ndarray</em>) – the grid with the potential neighbors</p></li>
-<li><p><strong>k</strong> (<em>int</em>) – number of neighbors to find</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the k next neighbors</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.transfer_helper.restriction_matrix_1d">
-<span class="sig-prename descclassname"><span class="pre">helpers.transfer_helper.</span></span><span class="sig-name descname"><span class="pre">restriction_matrix_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/transfer_helper.html#restriction_matrix_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.transfer_helper.restriction_matrix_1d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to contruct the restriction matrix in 1d using barycentric interpolation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fine_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the fine grid</p></li>
-<li><p><strong>coarse_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the coarse grid</p></li>
-<li><p><strong>k</strong> (<em>int</em>) – order of the restriction</p></li>
-<li><p><strong>periodic</strong> (<em>bool</em>) – flag to indicate periodicity</p></li>
-<li><p><strong>pad</strong> (<em>int</em>) – padding parameter for boundaries</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>restriction matrix</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>sprs.csc_matrix</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-helpers.visualization_tools">
-<span id="helpers-visualization-tools-module"></span><h2>helpers.visualization_tools module<a class="headerlink" href="#module-helpers.visualization_tools" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="helpers.visualization_tools.show_residual_across_simulation">
-<span class="sig-prename descclassname"><span class="pre">helpers.visualization_tools.</span></span><span class="sig-name descname"><span class="pre">show_residual_across_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'residuals.png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/visualization_tools.html#show_residual_across_simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.visualization_tools.show_residual_across_simulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper routine to visualize the residuals across the simulation (one block of PFASST)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>stats</strong> (<em>dict</em>) – statistics object from a PFASST run</p></li>
-<li><p><strong>fname</strong> (<em>str</em>) – filename</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+</div>
 </section>
 <section id="module-helpers">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-helpers" title="Permalink to this heading">¶</a></h2>
@@ -429,48 +109,6 @@ in the vector ps and the points which are found periodically.</p>
     <ul>
 <li><a class="reference internal" href="#">helpers package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-helpers.plot_helper">helpers.plot_helper module</a><ul>
-<li><a class="reference internal" href="#helpers.plot_helper.figsize"><code class="docutils literal notranslate"><span class="pre">figsize()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.plot_helper.newfig"><code class="docutils literal notranslate"><span class="pre">newfig()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.plot_helper.savefig"><code class="docutils literal notranslate"><span class="pre">savefig()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.plot_helper.setup_mpl"><code class="docutils literal notranslate"><span class="pre">setup_mpl()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-helpers.problem_helper">helpers.problem_helper module</a><ul>
-<li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_matrix"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_matrix()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_stencil"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_stencil()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.problem_helper.get_steps"><code class="docutils literal notranslate"><span class="pre">get_steps()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-helpers.pysdc_helper">helpers.pysdc_helper module</a><ul>
-<li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass"><code class="docutils literal notranslate"><span class="pre">FrozenClass</span></code></a><ul>
-<li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass.__isfrozen"><code class="docutils literal notranslate"><span class="pre">FrozenClass.__isfrozen</span></code></a></li>
-<li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass.get"><code class="docutils literal notranslate"><span class="pre">FrozenClass.get()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-helpers.stats_helper">helpers.stats_helper module</a><ul>
-<li><a class="reference internal" href="#helpers.stats_helper.filter_recomputed"><code class="docutils literal notranslate"><span class="pre">filter_recomputed()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.stats_helper.filter_stats"><code class="docutils literal notranslate"><span class="pre">filter_stats()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.stats_helper.get_list_of_types"><code class="docutils literal notranslate"><span class="pre">get_list_of_types()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.stats_helper.get_sorted"><code class="docutils literal notranslate"><span class="pre">get_sorted()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.stats_helper.sort_stats"><code class="docutils literal notranslate"><span class="pre">sort_stats()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-helpers.transfer_helper">helpers.transfer_helper module</a><ul>
-<li><a class="reference internal" href="#helpers.transfer_helper.border_padding"><code class="docutils literal notranslate"><span class="pre">border_padding()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.transfer_helper.continue_periodic_array"><code class="docutils literal notranslate"><span class="pre">continue_periodic_array()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.transfer_helper.interpolation_matrix_1d"><code class="docutils literal notranslate"><span class="pre">interpolation_matrix_1d()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.transfer_helper.next_neighbors"><code class="docutils literal notranslate"><span class="pre">next_neighbors()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.transfer_helper.next_neighbors_periodic"><code class="docutils literal notranslate"><span class="pre">next_neighbors_periodic()</span></code></a></li>
-<li><a class="reference internal" href="#helpers.transfer_helper.restriction_matrix_1d"><code class="docutils literal notranslate"><span class="pre">restriction_matrix_1d()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-helpers.visualization_tools">helpers.visualization_tools module</a><ul>
-<li><a class="reference internal" href="#helpers.visualization_tools.show_residual_across_simulation"><code class="docutils literal notranslate"><span class="pre">show_residual_across_simulation()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#module-helpers">Module contents</a></li>
 </ul>
 </li>
@@ -479,8 +117,13 @@ in the vector ps and the points which are found periodically.</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.transfer_classes.html"
-                          title="previous chapter">implementations.transfer_classes package</a></p>
+    <p class="topless"><a href="implementations.transfer_classes.TransferParticles_NoCoarse.html"
+                          title="previous chapter">implementations.transfer_classes.TransferParticles_NoCoarse module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="helpers.plot_helper.html"
+                          title="next chapter">helpers.plot_helper module</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -513,7 +156,10 @@ in the vector ps and the points which are found periodically.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+          <a href="helpers.plot_helper.html" title="helpers.plot_helper module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.TransferParticles_NoCoarse.html" title="implementations.transfer_classes.TransferParticles_NoCoarse module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers package</a></li> 

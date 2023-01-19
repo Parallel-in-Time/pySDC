@@ -1,0 +1,7 @@
+implementations.problem\_classes.Auzinger\_implicit module
+==========================================================
+
+.. automodule:: implementations.problem_classes.Auzinger_implicit
+   :members:
+   :undoc-members:
+   :show-inheritance:

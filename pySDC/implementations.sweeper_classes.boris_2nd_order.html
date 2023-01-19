@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>implementations.sweeper_classes.boris_2nd_order module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.explicit module" href="implementations.sweeper_classes.explicit.html" />
+    <link rel="prev" title="implementations.sweeper_classes.Runge_Kutta module" href="implementations.sweeper_classes.Runge_Kutta.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.explicit.html" title="implementations.sweeper_classes.explicit module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.boris_2nd_order module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.sweeper_classes.boris_2nd_order">
+<span id="implementations-sweeper-classes-boris-2nd-order-module"></span><h1>implementations.sweeper_classes.boris_2nd_order module<a class="headerlink" href="#module-implementations.sweeper_classes.boris_2nd_order" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boris_2nd_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
+<p>Custom sweeper class, implements Sweeper.py</p>
+<p>Second-order sweeper using velocity-Verlet with Boris scheme as base integrator</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S">
+<span class="sig-name descname"><span class="pre">S</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S" title="Permalink to this definition">¶</a></dt>
+<dd><p>node-to-node collocation matrix (first order)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ">
+<span class="sig-name descname"><span class="pre">SQ</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>node-to-node collocation matrix (second order)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST">
+<span class="sig-name descname"><span class="pre">ST</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST" title="Permalink to this definition">¶</a></dt>
+<dd><p>node-to-node trapezoidal matrix</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx">
+<span class="sig-name descname"><span class="pre">Sx</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx" title="Permalink to this definition">¶</a></dt>
+<dd><p>node-to-node Euler half-step for position update</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point">
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute u at the right point of the interval</p>
+<p>The value uend computed here is a full evaluation of the Picard formulation (always!)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">
+<span class="sig-name descname"><span class="pre">get_scalar_problems_manysweep_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_manysweep_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a scalar problem, K sweeps of SDC can be written in matrix form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
+<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">
+<span class="sig-name descname"><span class="pre">get_scalar_problems_picardsweep_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_picardsweep_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a scalar problem, K sweeps of SDC can be written in matrix form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
+<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">
+<span class="sig-name descname"><span class="pre">get_scalar_problems_sweeper_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the corresponding matrices of an SDC sweep matrix formulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lambdas</strong> (<em>numpy.narray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats">
+<span class="sig-name descname"><span class="pre">get_sweeper_mats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the matrices Q, QQ, Qx, QT which define the sweeper.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrates the right-hand side</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>containing the integral as values</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes">
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.boris_2nd_order module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S"><code class="docutils literal notranslate"><span class="pre">S</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ"><code class="docutils literal notranslate"><span class="pre">SQ</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST"><code class="docutils literal notranslate"><span class="pre">ST</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx"><code class="docutils literal notranslate"><span class="pre">Sx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats"><code class="docutils literal notranslate"><span class="pre">get_scalar_problems_manysweep_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats"><code class="docutils literal notranslate"><span class="pre">get_scalar_problems_picardsweep_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">get_scalar_problems_sweeper_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">get_sweeper_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.Runge_Kutta.html"
+                          title="previous chapter">implementations.sweeper_classes.Runge_Kutta module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.explicit.html"
+                          title="next chapter">implementations.sweeper_classes.explicit module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.boris_2nd_order.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.explicit.html" title="implementations.sweeper_classes.explicit module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.boris_2nd_order module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

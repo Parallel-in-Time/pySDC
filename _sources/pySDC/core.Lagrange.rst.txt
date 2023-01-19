@@ -1,0 +1,7 @@
+core.Lagrange module
+====================
+
+.. automodule:: core.Lagrange
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.PenningTrap_3D &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -46,7 +47,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="penningtrap"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap">[docs]</a><span class="k">class</span> <span class="nc">penningtrap</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap">[docs]</a><span class="k">class</span> <span class="nc">penningtrap</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing particles in a penning trap</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -73,7 +74,7 @@
             <span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nparts&#39;</span><span class="p">]),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="penningtrap.fast_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="penningtrap.fast_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nogil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">fast_interactions</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
 
@@ -98,7 +99,7 @@
 
         <span class="k">return</span> <span class="n">Efield</span></div>
 
-<div class="viewcode-block" id="penningtrap.get_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">[docs]</a>    <span class="k">def</span> <span class="nf">get_interactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap.get_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">[docs]</a>    <span class="k">def</span> <span class="nf">get_interactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the particle-particle interaction, assuming q = 1 for all particles</span>
 
@@ -115,7 +116,7 @@
 
         <span class="k">return</span> <span class="n">Efield</span></div>
 
-<div class="viewcode-block" id="penningtrap.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the E and B fields (named f for consistency with the original PEPC version)</span>
 
@@ -139,7 +140,7 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="penningtrap.u_init"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_init">[docs]</a>    <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap.u_init"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_init">[docs]</a>    <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the starting values for the particles</span>
 
@@ -198,7 +199,7 @@
 
         <span class="k">return</span> <span class="n">u</span></div>
 
-<div class="viewcode-block" id="penningtrap.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact trajectory at time t (only for single-particle setup)</span>
 
@@ -246,7 +247,7 @@
 
         <span class="k">return</span> <span class="n">u</span></div>
 
-<div class="viewcode-block" id="penningtrap.build_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.build_f">[docs]</a>    <span class="k">def</span> <span class="nf">build_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap.build_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.build_f">[docs]</a>    <span class="k">def</span> <span class="nf">build_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to assemble the correct right-hand side out of B and E field</span>
 
@@ -270,7 +271,7 @@
         <span class="k">return</span> <span class="n">rhs</span></div>
 
     <span class="c1"># noinspection PyTypeChecker</span>
-<div class="viewcode-block" id="penningtrap.boris_solver"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver">[docs]</a>    <span class="k">def</span> <span class="nf">boris_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">old_fields</span><span class="p">,</span> <span class="n">new_fields</span><span class="p">,</span> <span class="n">old_parts</span><span class="p">):</span>
+<div class="viewcode-block" id="penningtrap.boris_solver"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver">[docs]</a>    <span class="k">def</span> <span class="nf">boris_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">old_fields</span><span class="p">,</span> <span class="n">new_fields</span><span class="p">,</span> <span class="n">old_parts</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The actual Boris solver for static (!) B fields, extended by the c-term</span>
 

@@ -1,0 +1,7 @@
+core.Collocation module
+=======================
+
+.. automodule:: core.Collocation
+   :members:
+   :undoc-members:
+   :show-inheritance:

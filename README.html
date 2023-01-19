@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Welcome to pySDC! &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to pySDC!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <a class="reference external image-reference" href="https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml"><img alt="badge-ga" src="https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://bestpractices.coreinfrastructure.org/projects/6909"><img alt="badge-ossf" src="https://bestpractices.coreinfrastructure.org/projects/6909/badge" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/Parallel-in-Time/pySDC"><img alt="badge-cc" src="https://codecov.io/gh/Parallel-in-Time/pySDC/branch/master/graph/badge.svg?token=hpP18dmtgS" /></a>
+<a class="reference external image-reference" href="https://zenodo.org/badge/latestdoi/26165004"><img alt="zenodo" src="https://zenodo.org/badge/26165004.svg" /></a>
+<section id="welcome-to-pysdc">
+<h1>Welcome to pySDC!<a class="headerlink" href="#welcome-to-pysdc" title="Permalink to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> project is a Python implementation of the
+spectral deferred correction (SDC) approach and its flavors, esp. the
+multilevel extension MLSDC and PFASST. It is intended for rapid
+prototyping and educational purposes. New ideas like e.g. sweepers or
+predictors can be tested and first toy problems can be easily
+implemented.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet,
+multi-level, diagonal, multi-step</p></li>
+<li><p>Variants of PFASST: virtual parallel or MPI-based parallel,
+classical of multigrid perspective</p></li>
+<li><p>8 tutorials: from setting up a first collocation problem to SDC,
+PFASST and advanced topics</p></li>
+<li><p>Projects: many documented projects with defined and tested outcomes</p></li>
+<li><p>Many different examples, collocation types, data types already
+implemented</p></li>
+<li><p>Works with <a class="reference external" href="https://fenicsproject.org/">FEniCS</a>,
+<a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a> and
+<a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> (through
+<a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>)</p></li>
+<li><p>Continuous integration via <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">GitHub
+Actions</a> and
+<a class="reference external" href="https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines">Gitlab CI</a></p></li>
+<li><p>Fully compatible with Python 3.7 - 3.10, runs at least on Ubuntu and
+MacOS</p></li>
+</ul>
+</section>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h2>
+<p>The code is hosted on GitHub, see
+<a class="reference external" href="https://github.com/Parallel-in-Time/pySDC">https://github.com/Parallel-in-Time/pySDC</a>, and PyPI, see
+<a class="reference external" href="https://pypi.python.org/pypi/pySDC">https://pypi.python.org/pypi/pySDC</a>. While using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pySDC</span></code>
+will give you a core version of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> to work with,
+working with the developer version is most often the better choice. We
+thus recommend to checkout the code from GitHub and install the
+dependencies e.g. by using a <a class="reference external" href="https://conda.io/en/latest/">conda</a>
+environment. For this, <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> ships with environment files
+which can be found in the folder <code class="docutils literal notranslate"><span class="pre">etc/</span></code>. Use these as e.g.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--yes<span class="w"> </span>-f<span class="w"> </span>etc/environment-base.yml
+</pre></div>
+</div>
+<p>To check your installation, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>pySDC/tests<span class="w"> </span>-m<span class="w"> </span>NAME
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">NAME</span></code> corresponds to the environment you chose (<code class="docutils literal notranslate"><span class="pre">base</span></code> in the
+example above). You may need to update your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> by running</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:/path/to/pySDC/root/folder
+</pre></div>
+</div>
+<p>in particular if you want to run any of the playgrounds, projects or
+tutorials. All <code class="docutils literal notranslate"><span class="pre">import</span></code> statements there assume that the
+<code class="docutils literal notranslate"><span class="pre">pySDC</span></code>'s base directory is part of <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p>
+<p>For many examples, <code class="docutils literal notranslate"><span class="pre">LaTeX</span></code> is used for the plots, i.e. a
+decent installation of this is needed in order to run those examples.
+When using <code class="docutils literal notranslate"><span class="pre">fenics</span></code> or <code class="docutils literal notranslate"><span class="pre">petsc4py</span></code>, a C++
+compiler is required (although installation may go through at first).</p>
+<p>For more details on <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>, check out <a class="reference external" href="http://www.parallel-in-time.org/pySDC">http://www.parallel-in-time.org/pySDC</a>.</p>
+</section>
+<section id="how-to-cite">
+<h2>How to cite<a class="headerlink" href="#how-to-cite" title="Permalink to this heading">¶</a></h2>
+<p>If you use pySDC or parts of it for your work, great! Let us know if we
+can help you with this. Also, we would greatly appreciate a citation of
+<a class="reference external" href="https://doi.org/10.1145/3310410">this paper</a>:</p>
+<blockquote>
+<div><p>Robert Speck, <strong>Algorithm 997: pySDC - Prototyping Spectral Deferred
+Corrections</strong>, ACM Transactions on Mathematical Software (TOMS),
+Volume 45 Issue 3, August 2019, <a class="reference external" href="https://doi.org/10.1145/3310410">https://doi.org/10.1145/3310410</a></p>
+</div></blockquote>
+<p>The current software release can be cited using Zenodo:</p>
+<a class="reference external image-reference" href="https://zenodo.org/badge/latestdoi/26165004"><img alt="zenodo" src="https://zenodo.org/badge/26165004.svg" /></a>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pySDC</span></code> code was originally developed by <a class="reference external" href="https://github.com/pancetta">Robert Speck (&#64;pancetta)</a>,
+and is now maintained and developed by a small community of scientists interested in SDC methods.
+Checkout the <a class="reference internal" href="CHANGELOG.html"><span class="doc">Changelog</span></a> to see pySDC’s evolution since 2016.</p>
+<p>Any contribution is dearly welcome ! If you want to take part of this, please take the time to read our <a class="reference internal" href="CONTRIBUTING.html"><span class="doc">Contribution Guidelines</span></a>
+(and don’t forget to take a pick at our nice <a class="reference internal" href="CODE_OF_CONDUCT.html"><span class="doc">Code of Conduct</span></a> 😉).</p>
+</section>
+<section id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this heading">¶</a></h2>
+<p>This project has received funding from the <a class="reference external" href="https://eurohpc-ju.europa.eu/">European High-Performance
+Computing Joint Undertaking</a> (JU) under
+grant agreement No 955701 (<a class="reference external" href="https://www.time-x-eurohpc.eu/">TIME-X</a>).
+The JU receives support from the European Union’s Horizon 2020 research
+and innovation programme and Belgium, France, Germany, and Switzerland.
+This project also received funding from the <a class="reference external" href="https://www.bmbf.de/bmbf/en/home/home_node.html">German Federal Ministry of
+Education and Research</a>
+(BMBF) grant 16HPC047. The project also received help from the
+<a class="reference external" href="https://www.helmholtz-hirse.de/">Helmholtz Platform for Research Software Engineering - Preparatory
+Study (HiRSE_PS)</a>.</p>
+<p align="center">
+  <img src="./_images/docs/img/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./_images/docs/img/LogoTime-X.png" height="105" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./_images/docs/img/BMBF_gefoerdert_2017_en.jpg" height="105" />
+</p></section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Welcome to pySDC!</a><ul>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li><a class="reference internal" href="#how-to-cite">How to cite</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/README.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to pySDC!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

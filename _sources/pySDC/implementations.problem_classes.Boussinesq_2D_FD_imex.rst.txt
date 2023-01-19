@@ -1,0 +1,7 @@
+implementations.problem\_classes.Boussinesq\_2D\_FD\_imex module
+================================================================
+
+.. automodule:: implementations.problem_classes.Boussinesq_2D_FD_imex
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+implementations.problem\_classes.LogisticEquation module
+========================================================
+
+.. automodule:: implementations.problem_classes.LogisticEquation
+   :members:
+   :undoc-members:
+   :show-inheritance:

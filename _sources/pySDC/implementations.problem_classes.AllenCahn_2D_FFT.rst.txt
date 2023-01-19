@@ -1,0 +1,7 @@
+implementations.problem\_classes.AllenCahn\_2D\_FFT module
+==========================================================
+
+.. automodule:: implementations.problem_classes.AllenCahn_2D_FFT
+   :members:
+   :undoc-members:
+   :show-inheritance:

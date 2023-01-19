@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>implementations.convergence_controller_classes.estimate_extrapolation_error module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.convergence_controller_classes.hotrod module" href="implementations.convergence_controller_classes.hotrod.html" />
+    <link rel="prev" title="implementations.convergence_controller_classes.estimate_embedded_error module" href="implementations.convergence_controller_classes.estimate_embedded_error.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.hotrod.html" title="implementations.convergence_controller_classes.hotrod module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.estimate_embedded_error.html" title="implementations.convergence_controller_classes.estimate_embedded_error module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" accesskey="U">implementations.convergence_controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_extrapolation_error module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.convergence_controller_classes.estimate_extrapolation_error">
+<span id="implementations-convergence-controller-classes-estimate-extrapolation-error-module"></span><h1>implementations.convergence_controller_classes.estimate_extrapolation_error module<a class="headerlink" href="#module-implementations.convergence_controller_classes.estimate_extrapolation_error" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimateExtrapolationErrorBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<section id="abstract-base-class-for-extrapolated-error-estimates">
+<h2>Abstract base class for extrapolated error estimates<a class="headerlink" href="#abstract-base-class-for-extrapolated-error-estimates" title="Permalink to this heading">¶</a></h2>
+<p>This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.
+In particular, child classes need to implement how to make these solutions available, which works differently for
+MPI and non-MPI versions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the parameters are compatible
+str: Error message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.get_extrapolation_coefficients">
+<span class="sig-name descname"><span class="pre">get_extrapolation_coefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_eval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.get_extrapolation_coefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.get_extrapolation_coefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function solves a linear system where in the matrix A, the row index reflects the order of the derivative
+in the Taylor expansion and the column index reflects the particular step and whether its u or f from that
+step. The vector b on the other hand, contains a 1 in the first entry and zeros elsewhere, since we want to
+compute the value itself and all the derivatives should vanish after combining the Taylor expansions. This
+works to the order of the number of rows and since we want a square matrix for solving, we need the same amount
+of columns, which determines the memory overhead, since it is equal to the solutions / rhs that we need in
+memory at the time of evaluation.</p>
+<p>This is enough to get the extrapolated solution, but if we want to compute the local error, we have to compute
+a prefactor. This is based on error accumulation between steps (first step’s solution is exact plus 1 LTE,
+second solution is exact plus 2 LTE and so on), which can be computed for adaptive step sizes as well. However,
+this is only true for linear problems, which means we expect the error estimate to work less well for non-linear
+problems.</p>
+<p>Since only time differences are important for computing the coefficients, we need to compute this only once when
+using constant step sizes. When we allow the step size to change, however, we need to recompute this in every
+step, which is activated by the <cite>use_adaptivity</cite> parameter.</p>
+<p>Solving for the coefficients requires solving a dense linear system of equations. The number of unknowns is
+equal to the order of the Taylor expansion, so this step should be cheap compared to the solves in each SDC
+iteration.</p>
+<p>The function stores the computed coefficients in the <cite>self.coeff</cite> variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>list</em>) – The list of times at which we have solutions available</p></li>
+<li><p><strong>dt</strong> (<em>list</em>) – The step sizes used for computing these solutions (needed for the prefactor)</p></li>
+<li><p><strong>t_eval</strong> (<em>float</em>) – The time we want to extrapolate to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add variable for extrapolated error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving
+a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are
+initialized which are needed for this process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters with default values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize coefficient variables and add variable to the levels for extrapolated error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values">
+<span class="sig-name descname"><span class="pre">store_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase.store_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the required attributes of the step to do the extrapolation. We only care about the last collocation
+node on the finest level at the moment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimateExtrapolationErrorNonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase</span></code></a></p>
+<p>Implementation of the extrapolation error estimate for the non-MPI controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">
+<span class="sig-name descname"><span class="pre">get_extrapolated_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
+solution obtained by the time marching scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">
+<span class="sig-name descname"><span class="pre">get_extrapolated_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.get_extrapolated_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine values from previous steps to extrapolate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extrapolated solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>We perform three key operations here in the last iteration:</dt><dd><ul class="simple">
+<li><p>Compute the error estimate</p></li>
+<li><p>Compute the coefficients if needed</p></li>
+<li><p>Store the values of the step if we pretend not to for the no-memory overhead version</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI">
+<span class="sig-name descname"><span class="pre">prepare_next_block_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the no-memory-overhead version is used, we need to delete stuff that shouldn’t be available. Otherwise, we
+need to store all the stuff that we can.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>MS</strong> (<em>list</em>) – All steps of the controller</p></li>
+<li><p><strong>active_slots</strong> (<em>list</em>) – Index list of active steps</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – The current time</p></li>
+<li><p><strong>Tend</strong> (<em>float</em>) – The final time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a no parameter ‘no_storage’ which decides whether the standard or the no-memory-overhead version is run,
+where only values are used for extrapolation which are in memory of other processes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters with default values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize storage variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.convergence_controller_classes.estimate_extrapolation_error module</a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.get_extrapolation_coefficients"><code class="docutils literal notranslate"><span class="pre">get_extrapolation_coefficients()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values"><code class="docutils literal notranslate"><span class="pre">store_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorNonMPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><code class="docutils literal notranslate"><span class="pre">get_extrapolated_error()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution"><code class="docutils literal notranslate"><span class="pre">get_extrapolated_solution()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><code class="docutils literal notranslate"><span class="pre">prepare_next_block_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.convergence_controller_classes.estimate_embedded_error.html"
+                          title="previous chapter">implementations.convergence_controller_classes.estimate_embedded_error module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.convergence_controller_classes.hotrod.html"
+                          title="next chapter">implementations.convergence_controller_classes.hotrod module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.hotrod.html" title="implementations.convergence_controller_classes.hotrod module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.estimate_embedded_error.html" title="implementations.convergence_controller_classes.estimate_embedded_error module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" >implementations.convergence_controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_extrapolation_error module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

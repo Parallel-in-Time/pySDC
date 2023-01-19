@@ -4,109 +4,22 @@ core package
 Submodules
 ----------
 
-core.BaseTransfer module
-------------------------
+.. toctree::
+   :maxdepth: 2
 
-.. automodule:: core.BaseTransfer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Collocation module
------------------------
-
-.. automodule:: core.Collocation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Controller module
-----------------------
-
-.. automodule:: core.Controller
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.ConvergenceController module
----------------------------------
-
-.. automodule:: core.ConvergenceController
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Errors module
-------------------
-
-.. automodule:: core.Errors
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Hooks module
------------------
-
-.. automodule:: core.Hooks
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Lagrange module
---------------------
-
-.. automodule:: core.Lagrange
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Level module
------------------
-
-.. automodule:: core.Level
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Nodes module
------------------
-
-.. automodule:: core.Nodes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Problem module
--------------------
-
-.. automodule:: core.Problem
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.SpaceTransfer module
--------------------------
-
-.. automodule:: core.SpaceTransfer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Step module
-----------------
-
-.. automodule:: core.Step
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.Sweeper module
--------------------
-
-.. automodule:: core.Sweeper
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   core.BaseTransfer
+   core.Collocation
+   core.Controller
+   core.ConvergenceController
+   core.Errors
+   core.Hooks
+   core.Lagrange
+   core.Level
+   core.Nodes
+   core.Problem
+   core.SpaceTransfer
+   core.Step
+   core.Sweeper
 
 Module contents
 ---------------

@@ -1,0 +1,7 @@
+core.SpaceTransfer module
+=========================
+
+.. automodule:: core.SpaceTransfer
+   :members:
+   :undoc-members:
+   :show-inheritance:

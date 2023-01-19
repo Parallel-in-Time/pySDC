@@ -1,0 +1,7 @@
+implementations.problem\_classes.GeneralizedFisher\_1D\_FD\_implicit module
+===========================================================================
+
+.. automodule:: implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+implementations.datatype\_classes.particles module
+==================================================
+
+.. automodule:: implementations.datatype_classes.particles
+   :members:
+   :undoc-members:
+   :show-inheritance:

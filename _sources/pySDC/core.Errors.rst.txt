@@ -1,0 +1,7 @@
+core.Errors module
+==================
+
+.. automodule:: core.Errors
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.FermiPastaUlamTsingou &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -45,7 +46,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="fermi_pasta_ulam_tsingou"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">[docs]</a><span class="k">class</span> <span class="nc">fermi_pasta_ulam_tsingou</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="fermi_pasta_ulam_tsingou"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">[docs]</a><span class="k">class</span> <span class="nc">fermi_pasta_ulam_tsingou</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the outer solar system problem</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -76,7 +77,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">npart</span><span class="p">)])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">npart</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
 
-<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the RHS</span>
 
@@ -103,7 +104,7 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact/initial trajectory at time t</span>
 
@@ -121,7 +122,7 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the Hamiltonian</span>
 
@@ -140,7 +141,7 @@
         <span class="n">ham</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">3</span>
         <span class="k">return</span> <span class="n">ham</span></div>
 
-<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_mode_energy"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">[docs]</a>    <span class="k">def</span> <span class="nf">eval_mode_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_mode_energy"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">[docs]</a>    <span class="k">def</span> <span class="nf">eval_mode_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the energy following</span>
 <span class="sd">        http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</span>

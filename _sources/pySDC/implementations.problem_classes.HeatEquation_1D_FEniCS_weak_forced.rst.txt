@@ -1,0 +1,7 @@
+implementations.problem\_classes.HeatEquation\_1D\_FEniCS\_weak\_forced module
+==============================================================================
+
+.. automodule:: implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced
+   :members:
+   :undoc-members:
+   :show-inheritance:

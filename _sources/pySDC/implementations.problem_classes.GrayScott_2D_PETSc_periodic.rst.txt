@@ -1,0 +1,7 @@
+implementations.problem\_classes.GrayScott\_2D\_PETSc\_periodic module
+======================================================================
+
+.. automodule:: implementations.problem_classes.GrayScott_2D_PETSc_periodic
+   :members:
+   :undoc-members:
+   :show-inheritance:

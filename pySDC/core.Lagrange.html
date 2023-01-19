@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>core.Lagrange module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core.Level module" href="core.Level.html" />
+    <link rel="prev" title="core.Hooks module" href="core.Hooks.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Level.html" title="core.Level module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.Hooks.html" title="core.Hooks module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.Lagrange module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.Lagrange">
+<span id="core-lagrange-module"></span><h1>core.Lagrange module<a class="headerlink" href="#module-core.Lagrange" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LagrangeApproximation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class approximating any function on a given set of points using barycentric
+Lagrange interpolation.</p>
+<p>Let note <span class="math notranslate nohighlight">\((t_j)_{0\leq j&lt;n}\)</span> the set of points, then any scalar
+function <span class="math notranslate nohighlight">\(f\)</span> can be approximated by the barycentric formula :</p>
+<div class="math notranslate nohighlight">
+\[p(x) =
+\frac{\displaystyle \sum_{j=0}^{n-1}\frac{w_j}{x-x_j}f_j}
+{\displaystyle \sum_{j=0}^{n-1}\frac{w_j}{x-x_j}},\]</div>
+<p>where <span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> and</p>
+<div class="math notranslate nohighlight">
+\[w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}\]</div>
+<p>are the barycentric weights.
+The theory and implementation is inspired from <a class="reference external" href="http://dx.doi.org/10.1137/S0036144502417715">this paper</a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.points">
+<span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.points" title="Permalink to this definition">¶</a></dt>
+<dd><p>The interpolating points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>The associated barycentric weights</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.getIntegrationMatrix">
+<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the integration matrix for a given set of intervals.</p>
+<p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
+<span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> values, and
+<span class="math notranslate nohighlight">\((\tau_{m,left}, \tau_{m,right})_{0\leq m&lt;M}\)</span> the different
+interval where the function should be integrated using the barycentric
+interpolant polynomial.
+Then <span class="math notranslate nohighlight">\(\Delta[\vec{f}]\)</span>, the vector containing the approximations
+of</p>
+<div class="math notranslate nohighlight">
+\[\int_{\tau_{m,left}}^{\tau_{m,right}} f(t)dt,\]</div>
+<p>can be obtained using :</p>
+<div class="math notranslate nohighlight">
+\[\Delta[\vec{f}] = P_{Integ} \vec{f},\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_{Integ}\)</span> is the interpolation matrix returned by this
+method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>intervals</strong> (<em>list</em><em> of </em><em>pairs</em>) – A list of all integration intervals.</p></li>
+<li><p><strong>numQuad</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Quadrature rule used to integrate the interpolant barycentric
+polynomial. Can be :</p>
+<ul>
+<li><p>’LEGENDRE_NUMPY’ : Gauss-Legendre rule from Numpy</p></li>
+<li><p>’LEGENDRE_SCIPY’ : Gauss-Legendre rule from Scipy</p></li>
+<li><p>’FEJER’ : internaly implemented Fejer-I rule</p></li>
+</ul>
+<p>The default is ‘LEGENDRE_NUMPY’.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>PInter</strong> – The integration matrix, with <span class="math notranslate nohighlight">\(M\)</span> rows (number of intervals)
+and <span class="math notranslate nohighlight">\(n\)</span> columns.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.2darray(M, n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.getInterpolationMatrix">
+<span class="sig-name descname"><span class="pre">getInterpolationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getInterpolationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getInterpolationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the interpolation matrix for a given set of discrete “time”
+points.</p>
+<p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
+<span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> values, and <span class="math notranslate nohighlight">\((\tau_m)_{0\leq m&lt;M}\)</span>
+the “time” points where to interpolate.
+Then <span class="math notranslate nohighlight">\(I[\vec{f}]\)</span>, the vector containing the interpolated
+<span class="math notranslate nohighlight">\(f(\tau_m)\)</span> values, can be obtained using :</p>
+<div class="math notranslate nohighlight">
+\[I[\vec{f}] = P_{Inter} \vec{f},\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_{Inter}\)</span> is the interpolation matrix returned by this
+method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>times</strong> (<em>list-like</em><em> or </em><em>np.1darray</em>) – The discrete “time” points where to interpolate the function.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>PInter</strong> – The interpolation matrix, with <span class="math notranslate nohighlight">\(M\)</span> rows (size of the <strong>times</strong>
+parameter) and <span class="math notranslate nohighlight">\(n\)</span> columns.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.2darray(M, n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.n">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.Lagrange.computeFejerRule">
+<span class="sig-name descname"><span class="pre">computeFejerRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#computeFejerRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.computeFejerRule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a Fejer rule of the first kind, using DFT (Waldvogel 2006)
+Inspired from quadpy (<a class="reference external" href="https://github.com/nschloe/quadpy">https://github.com/nschloe/quadpy</a> &#64;Nico_Schlömer)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – Number of points for the quadrature rule.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>nodes</strong> (<em>np.1darray(n)</em>) – The nodes of the quadrature rule</p></li>
+<li><p><strong>weights</strong> (<em>np.1darray(n)</em>) – The weights of the quadrature rule.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.Lagrange module</a><ul>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation</span></code></a><ul>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.points"><code class="docutils literal notranslate"><span class="pre">points</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.weights"><code class="docutils literal notranslate"><span class="pre">weights</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix"><code class="docutils literal notranslate"><span class="pre">getIntegrationMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.getInterpolationMatrix"><code class="docutils literal notranslate"><span class="pre">getInterpolationMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.n"><code class="docutils literal notranslate"><span class="pre">n</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.Lagrange.computeFejerRule"><code class="docutils literal notranslate"><span class="pre">computeFejerRule()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.Hooks.html"
+                          title="previous chapter">core.Hooks module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="core.Level.html"
+                          title="next chapter">core.Level module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.Lagrange.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Level.html" title="core.Level module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.Hooks.html" title="core.Hooks module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.Lagrange module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

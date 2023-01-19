@@ -1,0 +1,7 @@
+implementations.problem\_classes.PenningTrap\_3D module
+=======================================================
+
+.. automodule:: implementations.problem_classes.PenningTrap_3D
+   :members:
+   :undoc-members:
+   :show-inheritance:

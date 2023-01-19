@@ -1,0 +1,7 @@
+implementations.problem\_classes.AdvectionDiffusionEquation\_1D\_FFT module
+===========================================================================
+
+.. automodule:: implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT
+   :members:
+   :undoc-members:
+   :show-inheritance:

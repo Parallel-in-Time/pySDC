@@ -1,0 +1,7 @@
+implementations.problem\_classes.Piline module
+==============================================
+
+.. automodule:: implementations.problem_classes.Piline
+   :members:
+   :undoc-members:
+   :show-inheritance:

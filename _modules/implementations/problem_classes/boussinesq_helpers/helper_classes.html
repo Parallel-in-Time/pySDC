@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.boussinesq_helpers.helper_classes &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
     
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -37,22 +38,22 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.problem_classes.boussinesq_helpers.helper_classes</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="logging"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging">[docs]</a><span></span><span class="k">class</span> <span class="nc">logging</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="logging"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging">[docs]</a><span></span><span class="k">class</span> <span class="nc">logging</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">solver_calls</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nsmall</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="logging.add"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">):</span>
+<div class="viewcode-block" id="logging.add"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">solver_calls</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">+=</span> <span class="n">iterations</span></div></div>
 
 
-<div class="viewcode-block" id="Callback"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback">[docs]</a><span class="k">class</span> <span class="nc">Callback</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<div class="viewcode-block" id="Callback.getresidual"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual">[docs]</a>    <span class="k">def</span> <span class="nf">getresidual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Callback"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback">[docs]</a><span class="k">class</span> <span class="nc">Callback</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Callback.getresidual"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual">[docs]</a>    <span class="k">def</span> <span class="nf">getresidual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual</span></div>
 
-<div class="viewcode-block" id="Callback.getcounter"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getcounter">[docs]</a>    <span class="k">def</span> <span class="nf">getcounter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Callback.getcounter"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getcounter">[docs]</a>    <span class="k">def</span> <span class="nf">getcounter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span></div>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -1,0 +1,13 @@
+
+:orphan:
+
+.. _docs/contrib/04_custom_implementations/custom-implementation-guidelines:
+
+Custom implementation guidelines
+================================
+
+... in construction ...
+
+|:arrow_left:| :doc:`Back to Naming Conventions <./03_naming_conventions>` ---
+|:arrow_up:| :doc:`Contributing Summary <./../../CONTRIBUTING>` ---
+|:arrow_right:| `Next to a cute picture of cat <https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background>`_

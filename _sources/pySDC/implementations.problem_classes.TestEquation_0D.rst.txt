@@ -1,0 +1,7 @@
+implementations.problem\_classes.TestEquation\_0D module
+========================================================
+
+.. automodule:: implementations.problem_classes.TestEquation_0D
+   :members:
+   :undoc-members:
+   :show-inheritance:

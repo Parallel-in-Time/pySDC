@@ -1,0 +1,7 @@
+implementations.problem\_classes.HeatEquation\_ND\_FD module
+============================================================
+
+.. automodule:: implementations.problem_classes.HeatEquation_ND_FD
+   :members:
+   :undoc-members:
+   :show-inheritance:

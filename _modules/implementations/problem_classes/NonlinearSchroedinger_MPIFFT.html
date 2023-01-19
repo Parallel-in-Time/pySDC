@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.NonlinearSchroedinger_MPIFFT &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -48,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">newDistArray</span>
 
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">[docs]</a><span class="k">class</span> <span class="nc">nonlinearschroedinger_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">[docs]</a><span class="k">class</span> <span class="nc">nonlinearschroedinger_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the nonlinear Schrödinger equation in 2-3D using mpi4py-fft for solving linear parts,</span>
 <span class="sd">    IMEX time-stepping</span>
@@ -140,7 +141,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -170,7 +171,7 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple FFT solver for the diffusion part</span>
 
@@ -197,7 +198,7 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t, see (1.3) https://arxiv.org/pdf/nlin/0702010.pdf for details</span>
 

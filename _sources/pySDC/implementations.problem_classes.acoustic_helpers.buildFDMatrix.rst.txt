@@ -1,0 +1,7 @@
+implementations.problem\_classes.acoustic\_helpers.buildFDMatrix module
+=======================================================================
+
+.. automodule:: implementations.problem_classes.acoustic_helpers.buildFDMatrix
+   :members:
+   :undoc-members:
+   :show-inheritance:

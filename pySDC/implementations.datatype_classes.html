@@ -9,6 +9,7 @@
     <title>implementations.datatype_classes package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -16,8 +17,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="implementations.problem_classes package" href="implementations.problem_classes.html" />
-    <link rel="prev" title="implementations.convergence_controller_classes package" href="implementations.convergence_controller_classes.html" /> 
+    <link rel="next" title="implementations.datatype_classes.cupy_mesh module" href="implementations.datatype_classes.cupy_mesh.html" />
+    <link rel="prev" title="implementations.convergence_controller_classes.store_uold module" href="implementations.convergence_controller_classes.store_uold.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -29,10 +30,10 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.html" title="implementations.problem_classes package"
+          <a href="implementations.datatype_classes.cupy_mesh.html" title="implementations.datatype_classes.cupy_mesh module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
+          <a href="implementations.convergence_controller_classes.store_uold.html" title="implementations.convergence_controller_classes.store_uold module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li>
@@ -49,569 +50,39 @@
 <h1>implementations.datatype_classes package<a class="headerlink" href="#implementations-datatype-classes-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-</section>
-<section id="module-implementations.datatype_classes.cupy_mesh">
-<span id="implementations-datatype-classes-cupy-mesh-module"></span><h2>implementations.datatype_classes.cupy_mesh module<a class="headerlink" href="#module-implementations.datatype_classes.cupy_mesh" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.cupy_mesh.</span></span><span class="sig-name descname"><span class="pre">comp2_cupy_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#comp2_cupy_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for cupy_meshes with 2 components</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp1">
-<span class="sig-name descname"><span class="pre">comp1</span></span><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp1" title="Permalink to this definition">¶</a></dt>
-<dd><p>first part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh" title="implementations.datatype_classes.cupy_mesh.cupy_mesh">cupy_mesh.cupy_mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp2">
-<span class="sig-name descname"><span class="pre">comp2</span></span><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp2" title="Permalink to this definition">¶</a></dt>
-<dd><p>second part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh" title="implementations.datatype_classes.cupy_mesh.cupy_mesh">cupy_mesh.cupy_mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.cupy_mesh.</span></span><span class="sig-name descname"><span class="pre">cupy_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
-<p>CuPy-based datatype for serial or parallel meshes.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast">
-<span class="sig-name descname"><span class="pre">bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for broadcasting values</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>root</strong> (<em>int</em>) – process with value to broadcast</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementations.datatype_classes.cupy_mesh.html">implementations.datatype_classes.cupy_mesh module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh"><code class="docutils literal notranslate"><span class="pre">comp2_cupy_mesh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh"><code class="docutils literal notranslate"><span class="pre">cupy_mesh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh"><code class="docutils literal notranslate"><span class="pre">imex_cupy_mesh</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>broadcasted values</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.comm">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Getter for the communicator</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv">
-<span class="sig-name descname"><span class="pre">irecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.irecv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for receiving in time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.datatype_classes.fenics_mesh.html">implementations.datatype_classes.fenics_mesh module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.fenics_mesh"><code class="docutils literal notranslate"><span class="pre">fenics_mesh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh"><code class="docutils literal notranslate"><span class="pre">rhs_fenics_mesh</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">
-<span class="sig-name descname"><span class="pre">isend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#cupy_mesh.isend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for sending data forward in time (non-blocking)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.datatype_classes.mesh.html">implementations.datatype_classes.mesh module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh"><code class="docutils literal notranslate"><span class="pre">comp2_mesh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh"><code class="docutils literal notranslate"><span class="pre">imex_mesh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh"><code class="docutils literal notranslate"><span class="pre">mesh</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>request handle</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.imex_cupy_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.cupy_mesh.</span></span><span class="sig-name descname"><span class="pre">imex_cupy_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/cupy_mesh.html#imex_cupy_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for cupy_meshes with implicit and explicit components</p>
-<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.impl">
-<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.impl" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh" title="implementations.datatype_classes.cupy_mesh.cupy_mesh">cupy_mesh.cupy_mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.expl">
-<span class="sig-name descname"><span class="pre">expl</span></span><a class="headerlink" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.expl" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh" title="implementations.datatype_classes.cupy_mesh.cupy_mesh">cupy_mesh.cupy_mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.datatype_classes.fenics_mesh">
-<span id="implementations-datatype-classes-fenics-mesh-module"></span><h2>implementations.datatype_classes.fenics_mesh module<a class="headerlink" href="#module-implementations.datatype_classes.fenics_mesh" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.fenics_mesh.fenics_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.fenics_mesh.</span></span><span class="sig-name descname"><span class="pre">fenics_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/fenics_mesh.html#fenics_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>FEniCS Function data type with arbitrary dimensions</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.fenics_mesh.fenics_mesh.values">
-<span class="sig-name descname"><span class="pre">values</span></span><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh.values" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains the ndarray of the values</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.fenics_mesh.</span></span><span class="sig-name descname"><span class="pre">rhs_fenics_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/fenics_mesh.html#rhs_fenics_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for fenics_meshes with implicit and explicit components</p>
-<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.impl">
-<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.impl" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh" title="implementations.datatype_classes.fenics_mesh.fenics_mesh">fenics_mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl">
-<span class="sig-name descname"><span class="pre">expl</span></span><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh" title="implementations.datatype_classes.fenics_mesh.fenics_mesh">fenics_mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.datatype_classes.mesh">
-<span id="implementations-datatype-classes-mesh-module"></span><h2>implementations.datatype_classes.mesh module<a class="headerlink" href="#module-implementations.datatype_classes.mesh" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.mesh.</span></span><span class="sig-name descname"><span class="pre">comp2_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#comp2_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for meshes with 2 components</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh.comp1">
-<span class="sig-name descname"><span class="pre">comp1</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.comp1" title="Permalink to this definition">¶</a></dt>
-<dd><p>first part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.comp2_mesh.comp2">
-<span class="sig-name descname"><span class="pre">comp2</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.comp2" title="Permalink to this definition">¶</a></dt>
-<dd><p>second part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.mesh.</span></span><span class="sig-name descname"><span class="pre">imex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#imex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for meshes with implicit and explicit components</p>
-<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh.impl">
-<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.impl" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.imex_mesh.expl">
-<span class="sig-name descname"><span class="pre">expl</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.expl" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.mesh.</span></span><span class="sig-name descname"><span class="pre">mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
-<p>Numpy-based datatype for serial or parallel meshes.
-Can include a communicator and expects a dtype to allow complex data.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh._comm">
-<span class="sig-name descname"><span class="pre">_comm</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh._comm" title="Permalink to this definition">¶</a></dt>
-<dd><p>MPI communicator or None</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.bcast">
-<span class="sig-name descname"><span class="pre">bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh.bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.bcast" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for broadcasting values</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>root</strong> (<em>int</em>) – process with value to broadcast</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.datatype_classes.particles.html">implementations.datatype_classes.particles module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.acceleration"><code class="docutils literal notranslate"><span class="pre">acceleration</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.fields"><code class="docutils literal notranslate"><span class="pre">fields</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.particles"><code class="docutils literal notranslate"><span class="pre">particles</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>broadcasted values</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.comm">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.comm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Getter for the communicator</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.irecv">
-<span class="sig-name descname"><span class="pre">irecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh.irecv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.irecv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for receiving in time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.datatype_classes.petsc_vec.html">implementations.datatype_classes.petsc_vec module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec"><code class="docutils literal notranslate"><span class="pre">petsc_vec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2"><code class="docutils literal notranslate"><span class="pre">petsc_vec_comp2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_imex"><code class="docutils literal notranslate"><span class="pre">petsc_vec_imex</span></code></a></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.mesh.mesh.isend">
-<span class="sig-name descname"><span class="pre">isend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh.isend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.isend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for sending data forward in time (non-blocking)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
+</li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>request handle</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.datatype_classes.particles">
-<span id="implementations-datatype-classes-particles-module"></span><h2>implementations.datatype_classes.particles module<a class="headerlink" href="#module-implementations.datatype_classes.particles" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.acceleration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.particles.</span></span><span class="sig-name descname"><span class="pre">acceleration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#acceleration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.acceleration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.particles.</span></span><span class="sig-name descname"><span class="pre">fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Field data type for 3 dimensions</p>
-<p>This data type can be used for electric and magnetic fields in 3 dimensions</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.elec">
-<span class="sig-name descname"><span class="pre">elec</span></span><a class="headerlink" href="#implementations.datatype_classes.particles.fields.elec" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains the electric field</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.magn">
-<span class="sig-name descname"><span class="pre">magn</span></span><a class="headerlink" href="#implementations.datatype_classes.particles.fields.magn" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains the magnetic field</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.electric">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">electric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields.electric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields.electric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.magnetic">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields.magnetic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields.magnetic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.particles.</span></span><span class="sig-name descname"><span class="pre">particles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Particle data type for particles in 3 dimensions</p>
-<p>This data type can be used for particles in 3 dimensions with 3 position and 3 velocity values per particle</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.pos">
-<span class="sig-name descname"><span class="pre">pos</span></span><a class="headerlink" href="#implementations.datatype_classes.particles.particles.pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains the positions of all particles</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.vel">
-<span class="sig-name descname"><span class="pre">vel</span></span><a class="headerlink" href="#implementations.datatype_classes.particles.particles.vel" title="Permalink to this definition">¶</a></dt>
-<dd><p>contains the velocities of all particles</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.isend">
-<span class="sig-name descname"><span class="pre">isend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.isend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.isend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for sending data forward in time (non-blocking)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>request handle</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.position">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.recv">
-<span class="sig-name descname"><span class="pre">recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for receiving in time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.send">
-<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for sending data forward in time (blocking)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.particles.velocity">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.velocity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.datatype_classes.petsc_vec">
-<span id="implementations-datatype-classes-petsc-vec-module"></span><h2>implementations.datatype_classes.petsc_vec module<a class="headerlink" href="#module-implementations.datatype_classes.petsc_vec" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.petsc_vec.</span></span><span class="sig-name descname"><span class="pre">petsc_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/petsc_vec.html#petsc_vec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Vec</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec.bcast">
-<span class="sig-name descname"><span class="pre">bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/petsc_vec.html#petsc_vec.bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec.bcast" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for broadcasting values</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>root</strong> (<em>int</em>) – process with value to broadcast</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>broadcasted values</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec.irecv">
-<span class="sig-name descname"><span class="pre">irecv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/petsc_vec.html#petsc_vec.irecv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec.irecv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for receiving in time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec.isend">
-<span class="sig-name descname"><span class="pre">isend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/petsc_vec.html#petsc_vec.isend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec.isend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for sending data forward in time (non-blocking)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
-<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
-<li><p><strong>comm</strong> – communicator</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>request handle</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec_comp2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.petsc_vec.</span></span><span class="sig-name descname"><span class="pre">petsc_vec_comp2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/petsc_vec.html#petsc_vec_comp2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec_comp2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for Vec with implicit and explicit components</p>
-<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec_comp2.impl">
-<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.impl" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec" title="implementations.datatype_classes.petsc_vec.petsc_vec">petsc_vec</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec_comp2.expl">
-<span class="sig-name descname"><span class="pre">expl</span></span><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.expl" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec" title="implementations.datatype_classes.petsc_vec.petsc_vec">petsc_vec</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.datatype_classes.petsc_vec.</span></span><span class="sig-name descname"><span class="pre">petsc_vec_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/petsc_vec.html#petsc_vec_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec_imex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>RHS data type for Vec with implicit and explicit components</p>
-<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec_imex.impl">
-<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec_imex.impl" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec" title="implementations.datatype_classes.petsc_vec.petsc_vec">petsc_vec</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.datatype_classes.petsc_vec.petsc_vec_imex.expl">
-<span class="sig-name descname"><span class="pre">expl</span></span><a class="headerlink" href="#implementations.datatype_classes.petsc_vec.petsc_vec_imex.expl" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit part</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec" title="implementations.datatype_classes.petsc_vec.petsc_vec">petsc_vec</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+</div>
 </section>
 <section id="module-implementations.datatype_classes">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.datatype_classes" title="Permalink to this heading">¶</a></h2>
@@ -630,99 +101,6 @@ Can include a communicator and expects a dtype to allow complex data.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.datatype_classes package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-implementations.datatype_classes.cupy_mesh">implementations.datatype_classes.cupy_mesh module</a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh"><code class="docutils literal notranslate"><span class="pre">comp2_cupy_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp1"><code class="docutils literal notranslate"><span class="pre">comp2_cupy_mesh.comp1</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp2"><code class="docutils literal notranslate"><span class="pre">comp2_cupy_mesh.comp2</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh"><code class="docutils literal notranslate"><span class="pre">cupy_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.bcast"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.bcast()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.comm</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.irecv"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.irecv()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend"><code class="docutils literal notranslate"><span class="pre">cupy_mesh.isend()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh"><code class="docutils literal notranslate"><span class="pre">imex_cupy_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.impl"><code class="docutils literal notranslate"><span class="pre">imex_cupy_mesh.impl</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.cupy_mesh.imex_cupy_mesh.expl"><code class="docutils literal notranslate"><span class="pre">imex_cupy_mesh.expl</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.datatype_classes.fenics_mesh">implementations.datatype_classes.fenics_mesh module</a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh"><code class="docutils literal notranslate"><span class="pre">fenics_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh.values"><code class="docutils literal notranslate"><span class="pre">fenics_mesh.values</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh"><code class="docutils literal notranslate"><span class="pre">rhs_fenics_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.impl"><code class="docutils literal notranslate"><span class="pre">rhs_fenics_mesh.impl</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl"><code class="docutils literal notranslate"><span class="pre">rhs_fenics_mesh.expl</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.datatype_classes.mesh">implementations.datatype_classes.mesh module</a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh"><code class="docutils literal notranslate"><span class="pre">comp2_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh.comp1"><code class="docutils literal notranslate"><span class="pre">comp2_mesh.comp1</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.comp2_mesh.comp2"><code class="docutils literal notranslate"><span class="pre">comp2_mesh.comp2</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh"><code class="docutils literal notranslate"><span class="pre">imex_mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh.impl"><code class="docutils literal notranslate"><span class="pre">imex_mesh.impl</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.imex_mesh.expl"><code class="docutils literal notranslate"><span class="pre">imex_mesh.expl</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh"><code class="docutils literal notranslate"><span class="pre">mesh</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh._comm"><code class="docutils literal notranslate"><span class="pre">mesh._comm</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.bcast"><code class="docutils literal notranslate"><span class="pre">mesh.bcast()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.comm"><code class="docutils literal notranslate"><span class="pre">mesh.comm</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.irecv"><code class="docutils literal notranslate"><span class="pre">mesh.irecv()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh.isend"><code class="docutils literal notranslate"><span class="pre">mesh.isend()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.datatype_classes.particles">implementations.datatype_classes.particles module</a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.acceleration"><code class="docutils literal notranslate"><span class="pre">acceleration</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields"><code class="docutils literal notranslate"><span class="pre">fields</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.elec"><code class="docutils literal notranslate"><span class="pre">fields.elec</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.magn"><code class="docutils literal notranslate"><span class="pre">fields.magn</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.electric"><code class="docutils literal notranslate"><span class="pre">fields.electric</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.magnetic"><code class="docutils literal notranslate"><span class="pre">fields.magnetic</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles"><code class="docutils literal notranslate"><span class="pre">particles</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.pos"><code class="docutils literal notranslate"><span class="pre">particles.pos</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.vel"><code class="docutils literal notranslate"><span class="pre">particles.vel</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.isend"><code class="docutils literal notranslate"><span class="pre">particles.isend()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.position"><code class="docutils literal notranslate"><span class="pre">particles.position</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.recv"><code class="docutils literal notranslate"><span class="pre">particles.recv()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.send"><code class="docutils literal notranslate"><span class="pre">particles.send()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.particles.velocity"><code class="docutils literal notranslate"><span class="pre">particles.velocity</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.datatype_classes.petsc_vec">implementations.datatype_classes.petsc_vec module</a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec"><code class="docutils literal notranslate"><span class="pre">petsc_vec</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec.bcast"><code class="docutils literal notranslate"><span class="pre">petsc_vec.bcast()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec.irecv"><code class="docutils literal notranslate"><span class="pre">petsc_vec.irecv()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec.isend"><code class="docutils literal notranslate"><span class="pre">petsc_vec.isend()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec_comp2"><code class="docutils literal notranslate"><span class="pre">petsc_vec_comp2</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.impl"><code class="docutils literal notranslate"><span class="pre">petsc_vec_comp2.impl</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec_comp2.expl"><code class="docutils literal notranslate"><span class="pre">petsc_vec_comp2.expl</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec_imex"><code class="docutils literal notranslate"><span class="pre">petsc_vec_imex</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec_imex.impl"><code class="docutils literal notranslate"><span class="pre">petsc_vec_imex.impl</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.petsc_vec.petsc_vec_imex.expl"><code class="docutils literal notranslate"><span class="pre">petsc_vec_imex.expl</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li><a class="reference internal" href="#module-implementations.datatype_classes">Module contents</a></li>
 </ul>
 </li>
@@ -731,13 +109,13 @@ Can include a communicator and expects a dtype to allow complex data.</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.convergence_controller_classes.html"
-                          title="previous chapter">implementations.convergence_controller_classes package</a></p>
+    <p class="topless"><a href="implementations.convergence_controller_classes.store_uold.html"
+                          title="previous chapter">implementations.convergence_controller_classes.store_uold module</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="implementations.problem_classes.html"
-                          title="next chapter">implementations.problem_classes package</a></p>
+    <p class="topless"><a href="implementations.datatype_classes.cupy_mesh.html"
+                          title="next chapter">implementations.datatype_classes.cupy_mesh module</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -770,10 +148,10 @@ Can include a communicator and expects a dtype to allow complex data.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.html" title="implementations.problem_classes package"
+          <a href="implementations.datatype_classes.cupy_mesh.html" title="implementations.datatype_classes.cupy_mesh module"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
+          <a href="implementations.convergence_controller_classes.store_uold.html" title="implementations.convergence_controller_classes.store_uold module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>

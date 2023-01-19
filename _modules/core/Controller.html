@@ -8,6 +8,7 @@
     <title>core.Controller &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -66,7 +67,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="controller"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller">[docs]</a><span class="k">class</span> <span class="nc">controller</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="controller"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller">[docs]</a><span class="k">class</span> <span class="nc">controller</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base abstract controller class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -145,7 +146,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">pass</span>
 
-<div class="viewcode-block" id="controller.add_hook"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.add_hook">[docs]</a>    <span class="k">def</span> <span class="nf">add_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.add_hook"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.add_hook">[docs]</a>    <span class="k">def</span> <span class="nf">add_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a hook to the controller which will be called in addition to all other hooks whenever something happens.</span>
 <span class="sd">        The hook is only added if a hook of the same class is not already present.</span>
@@ -159,7 +160,7 @@
         <span class="k">if</span> <span class="n">hook</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hook</span><span class="p">()]</span></div>
 
-<div class="viewcode-block" id="controller.welcome_message"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.welcome_message">[docs]</a>    <span class="k">def</span> <span class="nf">welcome_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.welcome_message"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.welcome_message">[docs]</a>    <span class="k">def</span> <span class="nf">welcome_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;Welcome to the one and only, really very astonishing and 87.3% bug free&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -183,7 +184,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="controller.dump_setup"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.dump_setup">[docs]</a>    <span class="k">def</span> <span class="nf">dump_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.dump_setup"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.dump_setup">[docs]</a>    <span class="k">def</span> <span class="nf">dump_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to dump the setup used for this controller</span>
 
@@ -269,7 +270,7 @@
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined, -&gt; dependency) -- END</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="controller.run"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.run"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to the run() method</span>
 
@@ -290,7 +291,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span>
 
-<div class="viewcode-block" id="controller.setup_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.setup_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">setup_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.setup_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.setup_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">setup_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup variables needed for convergence controllers, notably a list containing all of them and a list containing</span>
 <span class="sd">        their order. Also, we add the `CheckConvergence` convergence controller, which takes care of maximum iteration</span>
@@ -312,7 +313,7 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="controller.add_convergence_controller"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.add_convergence_controller">[docs]</a>    <span class="k">def</span> <span class="nf">add_convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_double</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.add_convergence_controller"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.add_convergence_controller">[docs]</a>    <span class="k">def</span> <span class="nf">add_convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_double</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Add an individual convergence controller to the list of convergence controllers and instantiate it.</span>
 <span class="sd">        Afterwards, the order of the convergence controllers is updated.</span>
@@ -339,7 +340,7 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="controller.get_convergence_controllers_as_table"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.get_convergence_controllers_as_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_convergence_controllers_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.get_convergence_controllers_as_table"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.get_convergence_controllers_as_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_convergence_controllers_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order.</span>
 
@@ -367,7 +368,7 @@
 
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="controller.return_stats"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.return_stats">[docs]</a>    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="controller.return_stats"><a class="viewcode-back" href="../../pySDC/core.Controller.html#core.Controller.controller.return_stats">[docs]</a>    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the merged stats from all hooks</span>
 

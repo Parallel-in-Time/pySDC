@@ -1,0 +1,7 @@
+helpers.stats\_helper module
+============================
+
+.. automodule:: helpers.stats_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:

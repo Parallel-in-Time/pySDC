@@ -1,0 +1,7 @@
+implementations.problem\_classes.AllenCahn\_2D\_FD\_gpu module
+==============================================================
+
+.. automodule:: implementations.problem_classes.AllenCahn_2D_FD_gpu
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.Battery_2Condensators &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -44,7 +45,7 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
 
-<div class="viewcode-block" id="battery_2condensators"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators">[docs]</a><span class="k">class</span> <span class="nc">battery_2condensators</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="battery_2condensators"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery_2Condensators.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators">[docs]</a><span class="k">class</span> <span class="nc">battery_2condensators</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the battery drain model using two capacitors as in the description in the PinTSimE</span>
 <span class="sd">    project</span>
@@ -81,7 +82,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
-<div class="viewcode-block" id="battery_2condensators.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="battery_2condensators.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery_2Condensators.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 <span class="sd">        Args:</span>
@@ -135,7 +136,7 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="battery_2condensators.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="battery_2condensators.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery_2Condensators.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for (I-factor*A)u = rhs</span>
 <span class="sd">        Args:</span>
@@ -189,7 +190,7 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="battery_2condensators.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="battery_2condensators.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery_2Condensators.html#implementations.problem_classes.Battery_2Condensators.battery_2condensators.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 <span class="sd">        Args:</span>

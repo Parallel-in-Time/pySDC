@@ -8,6 +8,7 @@
     <title>implementations.convergence_controller_classes.spread_step_sizes &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -41,7 +42,7 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
 
 
-<div class="viewcode-block" id="SpreadStepSizesBlockwiseBase"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseBase"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Take the step size from the last step in the block and spread it to all steps in the next block such that every step</span>
 <span class="sd">    in a block always has the same step size.</span>
@@ -51,7 +52,7 @@
 <span class="sd">    step otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SpreadStepSizesBlockwiseBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here</span>
 
@@ -70,12 +71,12 @@
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div></div>
 
 
-<div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseNonMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwiseBase</span><span class="p">):</span>
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseNonMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwiseBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Non-MPI version</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based</span>
 <span class="sd">        on Tend</span>
@@ -117,8 +118,8 @@
         <span class="k">return</span> <span class="kc">None</span></div></div>
 
 
-<div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwiseBase</span><span class="p">):</span>
-<div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwiseBase</span><span class="p">):</span>
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based</span>
 <span class="sd">        on Tend</span>

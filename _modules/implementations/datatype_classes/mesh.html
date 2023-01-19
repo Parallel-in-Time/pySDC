@@ -8,6 +8,7 @@
     <title>implementations.datatype_classes.mesh &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -47,7 +48,7 @@
     <span class="n">MPI</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh">[docs]</a><span class="k">class</span> <span class="nc">mesh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<div class="viewcode-block" id="mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh">[docs]</a><span class="k">class</span> <span class="nc">mesh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Numpy-based datatype for serial or parallel meshes.</span>
 <span class="sd">    Can include a communicator and expects a dtype to allow complex data.</span>
@@ -141,7 +142,7 @@
 
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">global_absval</span><span class="p">)</span>
 
-<div class="viewcode-block" id="mesh.isend"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.isend">[docs]</a>    <span class="k">def</span> <span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="mesh.isend"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.isend">[docs]</a>    <span class="k">def</span> <span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for sending data forward in time (non-blocking)</span>
 
@@ -155,7 +156,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Issend</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="mesh.irecv"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.irecv">[docs]</a>    <span class="k">def</span> <span class="nf">irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="mesh.irecv"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.irecv">[docs]</a>    <span class="k">def</span> <span class="nf">irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for receiving in time</span>
 
@@ -169,7 +170,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">comm</span><span class="o">.</span><span class="n">Irecv</span><span class="p">(</span><span class="bp">self</span><span class="p">[:],</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="mesh.bcast"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.bcast">[docs]</a>    <span class="k">def</span> <span class="nf">bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="mesh.bcast"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.bcast">[docs]</a>    <span class="k">def</span> <span class="nf">bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine for broadcasting values</span>
 
@@ -184,7 +185,7 @@
         <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
-<div class="viewcode-block" id="imex_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.imex_mesh">[docs]</a><span class="k">class</span> <span class="nc">imex_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="imex_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.imex_mesh">[docs]</a><span class="k">class</span> <span class="nc">imex_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RHS data type for meshes with implicit and explicit components</span>
 
@@ -222,7 +223,7 @@
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">&#39;something went wrong during </span><span class="si">%s</span><span class="s1"> initialization&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="comp2_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.comp2_mesh">[docs]</a><span class="k">class</span> <span class="nc">comp2_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="comp2_mesh"><a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.comp2_mesh">[docs]</a><span class="k">class</span> <span class="nc">comp2_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    RHS data type for meshes with 2 components</span>
 

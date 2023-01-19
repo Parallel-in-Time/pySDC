@@ -1,0 +1,7 @@
+implementations.problem\_classes.GrayScott\_MPIFFT module
+=========================================================
+
+.. automodule:: implementations.problem_classes.GrayScott_MPIFFT
+   :members:
+   :undoc-members:
+   :show-inheritance:

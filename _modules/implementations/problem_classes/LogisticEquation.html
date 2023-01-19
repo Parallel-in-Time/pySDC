@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.LogisticEquation &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -45,7 +46,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="logistics_equation"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.LogisticEquation.logistics_equation">[docs]</a><span class="k">class</span> <span class="nc">logistics_equation</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="logistics_equation"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation">[docs]</a><span class="k">class</span> <span class="nc">logistics_equation</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the logistic equation, taken from</span>
 <span class="sd">    &lt;https://www-users.cse.umn.edu/~olver/ln\_/odq.pdf&gt; (Example 2.2)</span>
@@ -77,7 +78,7 @@
             <span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="logistics_equation.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.LogisticEquation.logistics_equation.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="logistics_equation.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Exact solution</span>
 
@@ -95,7 +96,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="logistics_equation.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.LogisticEquation.logistics_equation.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="logistics_equation.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the RHS</span>
 
@@ -110,7 +111,7 @@
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lam</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="logistics_equation.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.LogisticEquation.logistics_equation.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="logistics_equation.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear equation</span>
 

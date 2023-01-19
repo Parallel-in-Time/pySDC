@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>core.ConvergenceController module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core.Errors module" href="core.Errors.html" />
+    <link rel="prev" title="core.Controller module" href="core.Controller.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Errors.html" title="core.Errors module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.Controller.html" title="core.Controller module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.ConvergenceController module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-core.ConvergenceController">
+<span id="core-convergencecontroller-module"></span><h1>core.ConvergenceController module<a class="headerlink" href="#module-core.ConvergenceController" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ConvergenceController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
+count and time step size.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.add_variable">
+<span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.add_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.add_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a variable to a frozen class.</p>
+<p>This function goes through the path to the destination of the variable recursively and adds it to all instances
+that are possible in the path. For example, giving <cite>where = [“MS”, “levels”, “status”]</cite> will result in adding a
+variable to the status object of all levels of all steps of the controller.</p>
+<p>Part of the functionality of the frozen class is to separate initialization and setting of variables. By
+enforcing this, you can make sure not to overwrite already existing variables. Since this function is called
+outside of the <cite>__init__</cite> function of the status objects, this can otherwise lead to bugs that are hard to find.
+For this reason, you need to specifically set <cite>allow_overwrite = True</cite> if you want to forgo the check if the
+variable already exists. This can be useful when resetting variables between steps, but make sure to set it to
+<cite>allow_overwrite = False</cite> the first time you add a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the variable</p></li>
+<li><p><strong>MPI</strong> (<em>bool</em>) – Whether to use MPI controller</p></li>
+<li><p><strong>place</strong> (<em>object</em>) – The object you want to add the variable to</p></li>
+<li><p><strong>where</strong> (<em>list</em>) – List of strings containing a path to where you want to add the variable</p></li>
+<li><p><strong>init</strong> – Initial value of the variable</p></li>
+<li><p><strong>allow_overwrite</strong> (<em>bool</em>) – Allow overwriting the variables if they already exist or raise an exception</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_iteration_status">
+<span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_iteration_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether to keep iterating or not in this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the parameters are compatible
+str: The error message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.convergence_control">
+<span class="sig-name descname"><span class="pre">convergence_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.convergence_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.convergence_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call all the functions related to convergence control.
+This is called in <cite>it_check</cite> in the controller after every iteration just after <cite>post_iteration_processing</cite>.
+:param controller: The controller
+:type controller: pySDC.Controller
+:param S: The current step
+:type S: pySDC.Step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load dependencies on other convergence controllers here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.determine_restart">
+<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.determine_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine for each step separately if it wants to be restarted for whatever reason.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function allows to set a step size with arbitrary criteria.
+Make sure to give an order to the convergence controller by setting the <cite>control_order</cite> variable in the params.
+This variable is an integer and you can see what the current order is by using
+<cite>controller.print_convergence_controllers()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut that has a default level for the logger. 15 is above debug but below info.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>str</em>) – Message you want to log</p></li>
+<li><p><strong>S</strong> (<em>pySDC.step</em>) – The current step</p></li>
+<li><p><strong>level</strong> (<em>int</em>) – the level passed to the logger</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do whatever you want to after each iteration here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_spread_processing">
+<span class="sig-name descname"><span class="pre">post_spread_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_spread_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_spread_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is called at the end of the <cite>SPREAD</cite> stage in the controller</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_step_processing">
+<span class="sig-name descname"><span class="pre">post_step_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_step_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_step_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do whatever you want to after each step here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.pre_iteration_processing">
+<span class="sig-name descname"><span class="pre">pre_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.pre_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.pre_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do whatever you want to before each iteration here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_next_block">
+<span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare stuff like spreading step sizes or whatever.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – The number of ranks</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – The current time</p></li>
+<li><p><strong>Tend</strong> (<em>float</em>) – The final time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI">
+<span class="sig-name descname"><span class="pre">prepare_next_block_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an extension to the function <cite>prepare_next_block</cite>, which is only called in the non MPI controller and
+is needed because there is no chance to communicate backwards otherwise. While you should not do this in the
+first place, the first step in the new block comes after the last step in the last block, such that it is still
+in fact forwards communication, even though it looks backwards.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>MS</strong> (<em>list</em>) – All steps of the controller</p></li>
+<li><p><strong>active_slots</strong> (<em>list</em>) – Index list of active steps</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – The current time</p></li>
+<li><p><strong>Tend</strong> (<em>float</em>) – The final time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.recv">
+<span class="sig-name descname"><span class="pre">recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive some data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>source</strong> (<em>int</em>) – Where to look for receiving</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whatever has been received</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI">
+<span class="sig-name descname"><span class="pre">reset_buffers_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_buffers_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
+imitate communication in non MPI versions. These have to be reset in order to replicate availability of
+variables in MPI versions.</p>
+<p>For instance, if step 0 sets self.buffers.x = 1 from self.buffers.x = 0, when the same MPI rank uses the
+variable with step 1, it will still carry the value of self.buffers.x = 1, equivalent to a send from the rank
+computing step 0 to the rank computing step 1.</p>
+<p>However, you can only receive what somebody sent and in order to make sure that is true for the non MPI
+versions, we reset after each iteration so you cannot use this function to communicate backwards from the last
+step to the first one for instance.</p>
+<p>This function is called both at the end of instantiating the controller, as well as after each iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset status variables.
+This is called in the <cite>restart_block</cite> function.
+:param controller: The controller
+:type controller: pySDC.Controller</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_variable">
+<span class="sig-name descname"><span class="pre">reset_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for resetting variables. This function will call the <cite>add_variable</cite> function with all the same
+arguments, but with <cite>allow_overwrite = True</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the variable</p></li>
+<li><p><strong>MPI</strong> (<em>bool</em>) – Whether to use MPI controller</p></li>
+<li><p><strong>place</strong> (<em>object</em>) – The object you want to reset the variable of</p></li>
+<li><p><strong>where</strong> (<em>list</em>) – List of strings containing a path to where you want to reset the variable</p></li>
+<li><p><strong>init</strong> – Initial value of the variable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.send">
+<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send data to a different rank</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>dest</strong> (<em>int</em>) – The target rank</p></li>
+<li><p><strong>data</strong> – Data to be sent</p></li>
+<li><p><strong>blocking</strong> (<em>bool</em>) – Whether the communication is blocking or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>request handle of the communication</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup various variables that only need to be set once in the beginning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary after setup</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup status variables.
+This is not done at the time of instantiation, since the controller is not fully instantiated at that time and
+hence not all information are available. Instead, this function is called after the controller has been fully
+instantiated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.ConvergenceController.Pars">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#Pars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.Pars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenClass</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.ConvergenceController.Status">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status_variabes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#Status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.Status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenClass</span></code></p>
+<p>Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all
+relevant information about the controller are known.</p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">core.ConvergenceController module</a><ul>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController"><code class="docutils literal notranslate"><span class="pre">ConvergenceController</span></code></a><ul>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.add_variable"><code class="docutils literal notranslate"><span class="pre">add_variable()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">check_iteration_status()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.convergence_control"><code class="docutils literal notranslate"><span class="pre">convergence_control()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_spread_processing"><code class="docutils literal notranslate"><span class="pre">post_spread_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_step_processing"><code class="docutils literal notranslate"><span class="pre">post_step_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.pre_iteration_processing"><code class="docutils literal notranslate"><span class="pre">pre_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">prepare_next_block()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI"><code class="docutils literal notranslate"><span class="pre">prepare_next_block_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.recv"><code class="docutils literal notranslate"><span class="pre">recv()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">reset_buffers_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_variable"><code class="docutils literal notranslate"><span class="pre">reset_variable()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.send"><code class="docutils literal notranslate"><span class="pre">send()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.ConvergenceController.Pars"><code class="docutils literal notranslate"><span class="pre">Pars</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.Status"><code class="docutils literal notranslate"><span class="pre">Status</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="core.Controller.html"
+                          title="previous chapter">core.Controller module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="core.Errors.html"
+                          title="next chapter">core.Errors module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.ConvergenceController.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="core.Errors.html" title="core.Errors module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.Controller.html" title="core.Controller module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">core.ConvergenceController module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

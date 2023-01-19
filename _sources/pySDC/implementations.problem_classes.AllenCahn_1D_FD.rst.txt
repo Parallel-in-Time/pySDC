@@ -1,0 +1,7 @@
+implementations.problem\_classes.AllenCahn\_1D\_FD module
+=========================================================
+
+.. automodule:: implementations.problem_classes.AllenCahn_1D_FD
+   :members:
+   :undoc-members:
+   :show-inheritance:

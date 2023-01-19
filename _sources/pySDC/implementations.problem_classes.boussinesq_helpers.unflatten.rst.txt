@@ -1,0 +1,7 @@
+implementations.problem\_classes.boussinesq\_helpers.unflatten module
+=====================================================================
+
+.. automodule:: implementations.problem_classes.boussinesq_helpers.unflatten
+   :members:
+   :undoc-members:
+   :show-inheritance:

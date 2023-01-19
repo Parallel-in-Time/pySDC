@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Naming conventions in pySDC &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Naming conventions in pySDC</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="naming-conventions-in-pysdc">
+<span id="docs-contrib-03-naming-conventions-naming-conventions-in-pysdc"></span><h1>Naming conventions in pySDC<a class="headerlink" href="#naming-conventions-in-pysdc" title="Permalink to this heading">¶</a></h1>
+<blockquote>
+<div><p>📜 Those rules may not be enforced by the current implementation of pySDC. However, they should be enforced for any contribution.</p>
+</div></blockquote>
+<p>Naming convention are mostly inspired from the <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>, even if some of them may be different. Of course, strictly following those rules is not always the best solution, as Guido Von Rossum’s key insight states :</p>
+<blockquote>
+<div><p><em>A Foolish Consistency is the Hobgoblin of Little Minds</em></p>
+</div></blockquote>
+<p>The most important idea at the end is to find a optimal compromise between</p>
+<ul class="simple">
+<li><p>readability : <em>Can someone else easily read and understand my code ?</em></p></li>
+<li><p>effectiveness : <em>Does my code avoid kilometers-long lines to do simple things ?</em></p></li>
+</ul>
+<p>Both aspects are interdependent to ease maintaining/development of any code and improve its attractiveness to potential users.</p>
+<section id="first-definitions">
+<span id="docs-contrib-03-naming-conventions-first-definitions"></span><h2>First definitions<a class="headerlink" href="#first-definitions" title="Permalink to this heading">¶</a></h2>
+<p>Possible Naming formats :</p>
+<ul class="simple">
+<li><p>all-lowercase : <code class="docutils literal notranslate"><span class="pre">variablenamelikethis</span></code></p></li>
+<li><p>snake_case : <code class="docutils literal notranslate"><span class="pre">variable_name_like_this</span></code></p></li>
+<li><p>PascalCase : <code class="docutils literal notranslate"><span class="pre">VariableNameLikeThis</span></code></p></li>
+<li><p>camelCase : <code class="docutils literal notranslate"><span class="pre">variableNameLikeThis</span></code></p></li>
+<li><p>all-uppercase with underscore : <code class="docutils literal notranslate"><span class="pre">VARIABLE_NAME_LIKE_THIS</span></code></p></li>
+<li><p>all-uppercase with minus : <code class="docutils literal notranslate"><span class="pre">VARIABLE-NAME-LIKE-THIS</span></code></p></li>
+</ul>
+</section>
+<section id="packages-and-modules-names">
+<span id="docs-contrib-03-naming-conventions-packages-and-modules-names"></span><h2>Packages and modules names<a class="headerlink" href="#packages-and-modules-names" title="Permalink to this heading">¶</a></h2>
+<p>Modules should have short, all-lowercase names. Underscores can be used in the module name if it improves readability (<em>i.e</em> use snake_case only if it helps,
+else try to stick to all-lowercase).
+Python packages should also have short, all-lowercase names, although the use of underscores is discouraged.</p>
+</section>
+<section id="class-names">
+<span id="docs-contrib-03-naming-conventions-class-names"></span><h2>Class names<a class="headerlink" href="#class-names" title="Permalink to this heading">¶</a></h2>
+<p>Class names should use PascalCase formatting, for instance :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AdvectionDiffusion</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>The shorter, the better. Also, exception class names should end with the suffix <code class="docutils literal notranslate"><span class="pre">Error</span></code>, for instance</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ParameterError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="function-and-variables-names">
+<span id="docs-contrib-03-naming-conventions-function-and-variables-names"></span><h2>Function and variables names<a class="headerlink" href="#function-and-variables-names" title="Permalink to this heading">¶</a></h2>
+<p>Function (or method) and variable names should use camelCase formatting, and same goes for function arguments. For instance :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tLeft</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">quadType</span> <span class="o">=</span> <span class="s1">&#39;LEGENDRE&#39;</span>
+
+<span class="k">def</span> <span class="nf">computeFejerRule</span><span class="p">(</span><span class="n">nNodes</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+<span class="k">class</span> <span class="nc">NodeGenerator</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">getOrthogPolyCoeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nCoeffs</span><span class="p">):</span>
+        <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>📜 A few additional notes :</p>
+<ol class="arabic simple">
+<li><p>In general, shorter name (eventually with abbreviations) should be favored, <strong>as long as it does not deteriorate understandability</strong>. For instance <code class="docutils literal notranslate"><span class="pre">getOrthogPolyCoeffs</span></code> rather than <code class="docutils literal notranslate"><span class="pre">getOrthogonalPolynomialCoefficients</span></code>.</p></li>
+<li><p>Suffix <code class="docutils literal notranslate"><span class="pre">s</span></code> for plural should be used even with abbreviations for consistency (<em>e.g</em> <code class="docutils literal notranslate"><span class="pre">nCoeffs</span></code>, <code class="docutils literal notranslate"><span class="pre">nNodes</span></code>, …).</p></li>
+<li><p>Acronyms can be used to simplify variable names, but <strong>try not to start with it</strong>. For instance, favor <code class="docutils literal notranslate"><span class="pre">jacobiMSSDC</span></code> or <code class="docutils literal notranslate"><span class="pre">multiStepSDCJacobi</span></code> rather than <code class="docutils literal notranslate"><span class="pre">MSSDCJacobi</span></code>. In general, acronyms should be put at the end of variable names.</p></li>
+<li><p>Underscore can exceptionally be used at the end of variable names when it make readability better and ease further developments. In that case, the characters after the underscore <strong>should be all-uppercase with underscore</strong> (minus is not allowed by Python syntax). For instance when defining the same method with different specializations :</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySweeper</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_initSweep_COPY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_initSweep_SPREAD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># ... other implementations for initSweep</span>
+</pre></div>
+</div>
+</section>
+<section id="private-and-public-attributes">
+<span id="docs-contrib-03-naming-conventions-private-and-public-attributes"></span><h2>Private and public attributes<a class="headerlink" href="#private-and-public-attributes" title="Permalink to this heading">¶</a></h2>
+<p>There is no such thing as private or public attributes in Python. But some attributes, if uses only within the object methods, can be indicated as private using the <code class="docutils literal notranslate"><span class="pre">_</span></code> prefix. For instance :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ChuckNorris</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">param</span>
+
+    <span class="k">def</span> <span class="nf">_think</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;doubt&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_think</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*?%&amp;$?*§&quot;$*$*§#{*&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>📜 In general, variable name starting with double underscore <code class="docutils literal notranslate"><span class="pre">__</span></code> are usually left for Python built-in names, <em>e.g</em> <code class="docutils literal notranslate"><span class="pre">__dict__</span></code>, <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, …</p>
+</section>
+<section id="constants">
+<span id="docs-contrib-03-naming-conventions-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this heading">¶</a></h2>
+<p>Constants are usually defined on a module level and written in all-uppercase with underscores (all-uppercase with minus are not allowed by Python syntax). Examples :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NODE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EQUID&#39;</span><span class="p">,</span> <span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-1&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-2&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-3&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-4&#39;</span><span class="p">]</span>
+<span class="n">QUAD_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GAUSS&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-LEFT&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;LOBATTO&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>For <em>constant string values</em>, however, favor the use of all uppercase with minus, <em>e.g</em> <code class="docutils literal notranslate"><span class="pre">RADAU-RIGHT</span></code>, <code class="docutils literal notranslate"><span class="pre">LEGENDRE-NUMPY</span></code> to distinguish those from constants names.</p>
+<p>🔔 When constants are used, for instance, to select method specializations (with suffix using all-uppercase with underscore), it is probably better to keep all-uppercase with minus for constant string values and add a character replacement in between, for instance :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySweeper</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initSweep</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initSweep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_initSweep_</span><span class="si">{</span><span class="n">initSweep</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;initSweep=</span><span class="si">{</span><span class="n">initSweep</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_initSweep_COPY_PASTE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_initSweep_SPREAD_OUT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># ... other implementations for initSweep</span>
+</pre></div>
+</div>
+<p>⬅️ <a class="reference internal" href="02_continuous_integration.html"><span class="doc">Back to Continuous Integration</span></a> —
+⬆️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Contributing Summary</span></a> —
+➡️ <a class="reference internal" href="04_custom_implementations.html"><span class="doc">Next to Custom Implementations</span></a></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Naming conventions in pySDC</a><ul>
+<li><a class="reference internal" href="#first-definitions">First definitions</a></li>
+<li><a class="reference internal" href="#packages-and-modules-names">Packages and modules names</a></li>
+<li><a class="reference internal" href="#class-names">Class names</a></li>
+<li><a class="reference internal" href="#function-and-variables-names">Function and variables names</a></li>
+<li><a class="reference internal" href="#private-and-public-attributes">Private and public attributes</a></li>
+<li><a class="reference internal" href="#constants">Constants</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/docs/contrib/03_naming_conventions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Naming conventions in pySDC</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

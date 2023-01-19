@@ -1,0 +1,7 @@
+core.Nodes module
+=================
+
+.. automodule:: core.Nodes
+   :members:
+   :undoc-members:
+   :show-inheritance:

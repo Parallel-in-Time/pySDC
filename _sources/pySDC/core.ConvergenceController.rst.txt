@@ -1,0 +1,7 @@
+core.ConvergenceController module
+=================================
+
+.. automodule:: core.ConvergenceController
+   :members:
+   :undoc-members:
+   :show-inheritance:

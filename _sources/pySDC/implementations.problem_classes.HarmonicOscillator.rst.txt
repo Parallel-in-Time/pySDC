@@ -1,0 +1,7 @@
+implementations.problem\_classes.HarmonicOscillator module
+==========================================================
+
+.. automodule:: implementations.problem_classes.HarmonicOscillator
+   :members:
+   :undoc-members:
+   :show-inheritance:

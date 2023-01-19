@@ -1,0 +1,7 @@
+implementations.problem\_classes.AllenCahn\_MPIFFT module
+=========================================================
+
+.. automodule:: implementations.problem_classes.AllenCahn_MPIFFT
+   :members:
+   :undoc-members:
+   :show-inheritance:

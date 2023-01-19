@@ -1,0 +1,7 @@
+implementations.problem\_classes.FermiPastaUlamTsingou module
+=============================================================
+
+.. automodule:: implementations.problem_classes.FermiPastaUlamTsingou
+   :members:
+   :undoc-members:
+   :show-inheritance:

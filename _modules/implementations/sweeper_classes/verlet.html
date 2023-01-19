@@ -8,6 +8,7 @@
     <title>implementations.sweeper_classes.verlet &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -42,7 +43,7 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.Sweeper</span> <span class="kn">import</span> <span class="n">sweeper</span>
 
 
-<div class="viewcode-block" id="verlet"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet">[docs]</a><span class="k">class</span> <span class="nc">verlet</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
+<div class="viewcode-block" id="verlet"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet">[docs]</a><span class="k">class</span> <span class="nc">verlet</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
@@ -118,7 +119,7 @@
 
         <span class="k">return</span> <span class="p">[</span><span class="n">QT</span><span class="p">,</span> <span class="n">Qx</span><span class="p">,</span> <span class="n">QQ</span><span class="p">]</span>
 
-<div class="viewcode-block" id="verlet.update_nodes"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.update_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="verlet.update_nodes"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.update_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
@@ -190,7 +191,7 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="verlet.integrate"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="verlet.integrate"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Integrates the right-hand side</span>
 
@@ -216,7 +217,7 @@
 
         <span class="k">return</span> <span class="n">p</span></div>
 
-<div class="viewcode-block" id="verlet.compute_end_point"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.compute_end_point">[docs]</a>    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="verlet.compute_end_point"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.compute_end_point">[docs]</a>    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 

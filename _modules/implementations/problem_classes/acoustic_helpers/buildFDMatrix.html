@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.acoustic_helpers.buildFDMatrix &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
     
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -43,7 +44,7 @@
 
 
 <span class="c1"># Only for periodic BC because we have advection only in x direction</span>
-<div class="viewcode-block" id="getHorizontalDx"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx">[docs]</a><span class="k">def</span> <span class="nf">getHorizontalDx</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<div class="viewcode-block" id="getHorizontalDx"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx">[docs]</a><span class="k">def</span> <span class="nf">getHorizontalDx</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">stencil</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
         <span class="n">zero_pos</span> <span class="o">=</span> <span class="mi">2</span>
@@ -82,7 +83,7 @@
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">coeff</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="n">la</span><span class="o">.</span><span class="n">circulant</span><span class="p">(</span><span class="n">first_col</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="getMatrix"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix">[docs]</a><span class="k">def</span> <span class="nf">getMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">,</span> <span class="n">bc_right</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<div class="viewcode-block" id="getMatrix"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix">[docs]</a><span class="k">def</span> <span class="nf">getMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">,</span> <span class="n">bc_right</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">bc_left</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span> <span class="s2">&quot;Unknown type of BC&quot;</span>
 
     <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -186,7 +187,7 @@
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="getBCLeft"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft">[docs]</a><span class="k">def</span> <span class="nf">getBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<div class="viewcode-block" id="getBCLeft"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft">[docs]</a><span class="k">def</span> <span class="nf">getBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span> <span class="s2">&quot;Unknown type of BC&quot;</span>
 
     <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -215,7 +216,7 @@
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="getBCRight"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCRight">[docs]</a><span class="k">def</span> <span class="nf">getBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<div class="viewcode-block" id="getBCRight"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCRight">[docs]</a><span class="k">def</span> <span class="nf">getBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span> <span class="s2">&quot;Unknown type of BC&quot;</span>
 
     <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>

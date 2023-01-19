@@ -1,0 +1,552 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>implementations.convergence_controller_classes.adaptivity module &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.convergence_controller_classes.basic_restarting module" href="implementations.convergence_controller_classes.basic_restarting.html" />
+    <link rel="prev" title="implementations.convergence_controller_classes package" href="implementations.convergence_controller_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.basic_restarting.html" title="implementations.convergence_controller_classes.basic_restarting module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" accesskey="U">implementations.convergence_controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.adaptivity module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.convergence_controller_classes.adaptivity">
+<span id="implementations-convergence-controller-classes-adaptivity-module"></span><h1>implementations.convergence_controller_classes.adaptivity module<a class="headerlink" href="#module-implementations.convergence_controller_classes.adaptivity" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Adaptivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a></p>
+<p>Class to compute time step size adaptively based on embedded error estimate.</p>
+<p>We have a version working in non-MPI pipelined SDC, but Adaptivity requires you to know the order of the scheme,
+which you can also know for block-Jacobi, but it works differently and it is only implemented for block
+Gauss-Seidel so far.</p>
+<p>There is an option to reduce restarts if continued iterations could yield convergence in fewer iterations than
+restarting based on an estimate of the contraction factor.
+Since often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly.
+Notice that the computed step size is not effected.
+Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in
+more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.
+Set the reduced restart up by setting a boolean value for “avoid_restarts” in the parameters for the convergence
+controller.
+The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+For adaptivity, we need to know the order of the scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the parameters are compatible
+str: The error message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the embedded error estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity.get_local_error_estimate">
+<span class="sig-name descname"><span class="pre">get_local_error_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity.get_local_error_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_local_error_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the embedded error estimate of the finest level of the step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Embedded error estimate</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine a step size for the next step from an embedded estimate of the local error of the current step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<p>Abstract base class for convergence controllers that implement adaptivity based on arbitrary local error estimates
+and update rules.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size">
+<span class="sig-name descname"><span class="pre">compute_optimal_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_est</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase.compute_optimal_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the optimal step size for the current step based on the order of the scheme.
+This function can be called from <cite>get_new_step_size</cite> for various implementations of adaptivity, but notably not
+all! We require to know the order of the error estimate and if we do adaptivity based on the residual, for
+instance, we do not know that and we can’t use this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<em>float</em>) – Safety factor</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Current step size</p></li>
+<li><p><strong>e_tol</strong> (<em>float</em>) – The desired tolerance</p></li>
+<li><p><strong>e_est</strong> (<em>float</em>) – The estimated local error</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – The order of the local error estimate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The optimal step size</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load step size limiters here, if they are desired.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase.determine_restart">
+<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.determine_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_local_error_estimate">
+<span class="sig-name descname"><span class="pre">get_local_error_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase.get_local_error_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_local_error_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the local error estimate for updating the step size.
+It does not have to be an error estimate, but could be the residual or something else.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The error estimate</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine a step size for the next step from an estimate of the local error of the current step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityBase.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityBase.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define default parameters here.</p>
+<dl class="simple">
+<dt>Default parameters are:</dt><dd><ul class="simple">
+<li><p>control_order (int): The order relative to other convergence controllers</p></li>
+<li><p>beta (float): The safety factor</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityRK">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityRK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityRK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity" title="implementations.convergence_controller_classes.adaptivity.Adaptivity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Adaptivity</span></code></a></p>
+<p>Adaptivity for Runge-Kutta methods. Basically, we need to change the order in the step size update</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityRK.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityRK.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+For adaptivity, we need to know the order of the scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the parameters are compatible
+str: The error message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityRK.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityRK.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine a step size for the next step from an embedded estimate of the local error of the current step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityResidual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a></p>
+<p>Do adaptivity based on residual.</p>
+<p>Since we don’t know a correlation between the residual and the error (for nonlinear problems), we employ a simpler
+rule to update the step size. Instead of giving a local tolerance that we try to hit as closely as possible, we set
+two thresholds for the residual. When we exceed the upper one, we reduce the step size by a factor of 2 and if the
+residual falls below the lower threshold, we double the step size.
+Please setup these parameters as “e_tol” and “e_tol_low”.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+For adaptivity, we want a fixed order of the scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the parameters are compatible
+str: The error message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_local_error_estimate">
+<span class="sig-name descname"><span class="pre">get_local_error_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual.get_local_error_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_local_error_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the residual of the finest level of the step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Embedded error estimate</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine a step size for the next step.
+If we exceed the absolute tolerance of the residual in either direction, we either double or halve the step
+size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define default parameters here.</p>
+<dl class="simple">
+<dt>Default parameters are:</dt><dd><ul class="simple">
+<li><p>control_order (int): The order relative to other convergence controllers</p></li>
+<li><p>e_tol_low (float): Lower absolute threshold for the residual</p></li>
+<li><p>e_tol (float): Upper absolute threshold for the residual</p></li>
+<li><p>max_restarts: Override maximum number of restarts</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change maximum number of allowed restarts here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Reutrns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.convergence_controller_classes.adaptivity module</a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity"><code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size"><code class="docutils literal notranslate"><span class="pre">compute_optimal_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK"><code class="docutils literal notranslate"><span class="pre">AdaptivityRK</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual"><code class="docutils literal notranslate"><span class="pre">AdaptivityResidual</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.convergence_controller_classes.html"
+                          title="previous chapter">implementations.convergence_controller_classes package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.convergence_controller_classes.basic_restarting.html"
+                          title="next chapter">implementations.convergence_controller_classes.basic_restarting module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.convergence_controller_classes.adaptivity.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.basic_restarting.html" title="implementations.convergence_controller_classes.basic_restarting module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" >implementations.convergence_controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.adaptivity module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

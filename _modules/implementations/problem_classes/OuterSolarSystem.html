@@ -8,6 +8,7 @@
     <title>implementations.problem_classes.OuterSolarSystem &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -45,7 +46,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="outer_solar_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system">[docs]</a><span class="k">class</span> <span class="nc">outer_solar_system</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="outer_solar_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system">[docs]</a><span class="k">class</span> <span class="nc">outer_solar_system</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the outer solar system problem</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -76,7 +77,7 @@
         <span class="c1"># gravitational constant</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="mf">2.95912208286e-4</span>
 
-<div class="viewcode-block" id="outer_solar_system.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="outer_solar_system.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the RHS</span>
 
@@ -111,7 +112,7 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="outer_solar_system.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="outer_solar_system.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact/initial trajectory at time t</span>
 
@@ -146,7 +147,7 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="outer_solar_system.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<div class="viewcode-block" id="outer_solar_system.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the Hamiltonian</span>
 

@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Continuous Integration in pySDC &#8212; pySDC 5.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Continuous Integration in pySDC</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="continuous-integration-in-pysdc">
+<span id="docs-contrib-02-continuous-integration-continuous-integration-in-pysdc"></span><h1>Continuous Integration in pySDC<a class="headerlink" href="#continuous-integration-in-pysdc" title="Permalink to this heading">¶</a></h1>
+<p>Any commit in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> are tested within by GitHub continuous integration (CI). You can see in in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">action panel</a> the tests for each branches.
+Those tests can be divided in two main categories : <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting"><span class="std std-ref">code linting</span></a> and <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing</span></a>.
+Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation"><span class="std std-ref">documentation generation</span></a> section.</p>
+<section id="code-linting">
+<span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Permalink to this heading">¶</a></h2>
+<p>Code style linting is performed using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a> and <a class="reference external" href="https://flakeheaven.readthedocs.io/en/latest/">flakeheaven</a> for code syntax checking. In particular, <code class="docutils literal notranslate"><span class="pre">black</span></code> is used to check compliance with (most of) <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>.</p>
+<p>Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> before pushing any commit :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
+pip<span class="w"> </span>install<span class="w"> </span>black<span class="w"> </span>flakeheaven<span class="w"> </span>flake8-comprehensions<span class="w"> </span>flake8-bugbear
+<span class="c1"># First : test code style linting with black</span>
+black<span class="w"> </span>pySDC<span class="w"> </span>--check<span class="w"> </span>--diff<span class="w"> </span>--color
+<span class="c1"># Second : test code syntax with flakeheaven</span>
+flakeheaven<span class="w"> </span>lint<span class="w"> </span>--benchmark<span class="w"> </span>pySDC
+</pre></div>
+</div>
+<blockquote>
+<div><p>🔔 To avoid any error about formatting (<code class="docutils literal notranslate"><span class="pre">black</span></code>), you can simply use this program to reformat directly your code using the command :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>black<span class="w"> </span>pySDC
+</pre></div>
+</div>
+</div></blockquote>
+<p>Some style rules that are automatically enforced :</p>
+<ul class="simple">
+<li><p>lines should be not longer than 120 characters</p></li>
+<li><p>arithmetic operators (<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, …) should be separated with variables by one empty space</p></li>
+</ul>
+</section>
+<section id="code-testing">
+<span id="docs-contrib-02-continuous-integration-code-testing"></span><h2>Code testing<a class="headerlink" href="#code-testing" title="Permalink to this heading">¶</a></h2>
+<p>This is done using <a class="reference external" href="https://docs.pytest.org/en/7.2.x/">pytest</a>, and runs all the tests written in the <code class="docutils literal notranslate"><span class="pre">pySDC/tests</span></code> folder. You can run those locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> using :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
+pip<span class="w"> </span>install<span class="w"> </span>pytest&lt;<span class="m">7</span>.2.0<span class="w"> </span>pytest-benchmark<span class="w"> </span>coverage<span class="o">[</span>toml<span class="o">]</span>
+<span class="c1"># Run tests</span>
+pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests
+</pre></div>
+</div>
+<blockquote>
+<div><p>🔔 Many components are tested (core, implementations, projects, tutorials, etc …) which make the testing quite long.
+When working on a single part of the code, you can run only the corresponding part of the test by specifying the test path, for instance :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.py<span class="w">  </span><span class="c1"># only test nodes generation</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="documentation-generation">
+<span id="docs-contrib-02-continuous-integration-documentation-generation"></span><h2>Documentation generation<a class="headerlink" href="#documentation-generation" title="Permalink to this heading">¶</a></h2>
+<p>Documentation is built using <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a>.
+To check its generation, you can wait for all the CI tasks to download the <code class="docutils literal notranslate"><span class="pre">docs</span></code> artifacts, unzip it and open the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file there with you favorite browser.</p>
+<p>However, when you are working on documentation (of the project, of the code, etc …), you can already build and check the website locally :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all tests, continuing even with errors</span>
+pytest<span class="w"> </span>--continue-on-collection-errors<span class="w"> </span>-v<span class="w"> </span>--durations<span class="o">=</span><span class="m">0</span><span class="w"> </span>pySDC/tests
+<span class="c1"># Generate rst files for sphinx</span>
+./docs/update_apidocs.sh
+<span class="c1"># Generate html documentation</span>
+sphinx-build<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>docs/source<span class="w"> </span>docs/build/html
+</pre></div>
+</div>
+<p>Then you can open <code class="docutils literal notranslate"><span class="pre">docs/build/html/index.html</span></code> using you favorite browser and check how your own documentation looks like on the website.</p>
+<blockquote>
+<div><p>🔔 <strong>Important</strong> : running all the tests is necessary to generate graphs and images used by the website.
+But you can still generate the website without it : just all images for the tutorials, projects and playgrounds will be missing.
+This approach can be considered for local testing of your contribution when it does not concern parts containing images (<em>i.e</em> project or code documentation).</p>
+</div></blockquote>
+<p>⬅️ <a class="reference internal" href="01_pull_requests.html"><span class="doc">Back to Pull Request Recommendation</span></a> —
+⬆️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Contributing Summary</span></a> —
+➡️ <a class="reference internal" href="03_naming_conventions.html"><span class="doc">Next to Naming Conventions</span></a></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Continuous Integration in pySDC</a><ul>
+<li><a class="reference internal" href="#code-linting">Code linting</a></li>
+<li><a class="reference internal" href="#code-testing">Code testing</a></li>
+<li><a class="reference internal" href="#documentation-generation">Documentation generation</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/docs/contrib/02_continuous_integration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Continuous Integration in pySDC</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

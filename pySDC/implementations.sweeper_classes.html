@@ -9,6 +9,7 @@
     <title>implementations.sweeper_classes package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -16,8 +17,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="implementations.transfer_classes package" href="implementations.transfer_classes.html" />
-    <link rel="prev" title="implementations.problem_classes.boussinesq_helpers package" href="implementations.problem_classes.boussinesq_helpers.html" /> 
+    <link rel="next" title="implementations.sweeper_classes.Runge_Kutta module" href="implementations.sweeper_classes.Runge_Kutta.html" />
+    <link rel="prev" title="implementations.problem_classes.nonlinear_ODE_1 module" href="implementations.problem_classes.nonlinear_ODE_1.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -29,10 +30,10 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.boussinesq_helpers.html" title="implementations.problem_classes.boussinesq_helpers package"
+          <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li>
@@ -49,602 +50,54 @@
 <h1>implementations.sweeper_classes package<a class="headerlink" href="#implementations-sweeper-classes-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-</section>
-<section id="module-implementations.sweeper_classes.Runge_Kutta">
-<span id="implementations-sweeper-classes-runge-kutta-module"></span><h2>implementations.sweeper_classes.Runge_Kutta module<a class="headerlink" href="#module-implementations.sweeper_classes.Runge_Kutta" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ButcherTableau">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">ButcherTableau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ButcherTableau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">ButcherTableauEmbedded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ButcherTableauEmbedded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Cash_Karp">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">Cash_Karp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Cash_Karp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Fifth order explicit embedded Runge-Kutta</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">CrankNicholson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#CrankNicholson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Implicit Runge-Kutta method of second order</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">Heun_Euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Second order explicit embedded Runge-Kutta</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.MidpointMethod">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">MidpointMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#MidpointMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Runge-Kutta method of second order</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RK1">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">RK1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RK1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RK4">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">RK4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RK4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Explicit Runge-Kutta of fourth order: Everybodies darling.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.Runge_Kutta.</span></span><span class="sig-name descname"><span class="pre">RungeKutta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
-<p>Runge-Kutta scheme that fits the interface of a sweeper.
-Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
-at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</p>
-<p>We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = &lt;Butcher tableau&gt;, but in this
-implementation, that would lead to a lot of wasted FLOPS from integrating with Q and then with Q_Delta and
-subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.</p>
-<p>This class only supports lower triangular Butcher tableaux such that the system can be solved with forward
-substitution. In this way, we don’t get the maximum order that we could for the number of stages, but computing the
-stages is much cheaper. In particular, if the Butcher tableaux is strictly lower triangular, we get an explicit
-method, which does not require us to solve a system of equations to compute the stages.</p>
-<dl class="simple">
-<dt>Please be aware that all fundamental parameters of the Sweeper are ignored. These include</dt><dd><ul class="simple">
-<li><p>num_nodes</p></li>
-<li><p>collocation_class</p></li>
-<li><p>initial_guess</p></li>
-<li><p>QI</p></li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html">implementations.sweeper_classes.Runge_Kutta module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.MidpointMethod"><code class="docutils literal notranslate"><span class="pre">MidpointMethod</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK1"><code class="docutils literal notranslate"><span class="pre">RK1</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></li>
 </ul>
-</dd>
-</dl>
-<p>All of these variables are either determined by the RK rule, or are not part of an RK scheme.</p>
-<dl class="simple">
-<dt>Attribues:</dt><dd><p>butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.boris_2nd_order">
-<span id="implementations-sweeper-classes-boris-2nd-order-module"></span><h2>implementations.sweeper_classes.boris_2nd_order module<a class="headerlink" href="#module-implementations.sweeper_classes.boris_2nd_order" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.boris_2nd_order.</span></span><span class="sig-name descname"><span class="pre">boris_2nd_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
-<p>Custom sweeper class, implements Sweeper.py</p>
-<p>Second-order sweeper using velocity-Verlet with Boris scheme as base integrator</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S">
-<span class="sig-name descname"><span class="pre">S</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S" title="Permalink to this definition">¶</a></dt>
-<dd><p>node-to-node collocation matrix (first order)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ">
-<span class="sig-name descname"><span class="pre">SQ</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>node-to-node collocation matrix (second order)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST">
-<span class="sig-name descname"><span class="pre">ST</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST" title="Permalink to this definition">¶</a></dt>
-<dd><p>node-to-node trapezoidal matrix</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx">
-<span class="sig-name descname"><span class="pre">Sx</span></span><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx" title="Permalink to this definition">¶</a></dt>
-<dd><p>node-to-node Euler half-step for position update</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation (always!)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">
-<span class="sig-name descname"><span class="pre">get_scalar_problems_manysweep_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_manysweep_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a scalar problem, K sweeps of SDC can be written in matrix form.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
-<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.boris_2nd_order.html">implementations.sweeper_classes.boris_2nd_order module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code></a></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">
-<span class="sig-name descname"><span class="pre">get_scalar_problems_picardsweep_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_picardsweep_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a scalar problem, K sweeps of SDC can be written in matrix form.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
-<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.explicit.html">implementations.sweeper_classes.explicit module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit"><code class="docutils literal notranslate"><span class="pre">explicit</span></code></a></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">
-<span class="sig-name descname"><span class="pre">get_scalar_problems_sweeper_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the corresponding matrices of an SDC sweep matrix formulation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>lambdas</strong> (<em>numpy.narray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats">
-<span class="sig-name descname"><span class="pre">get_sweeper_mats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the matrices Q, QQ, Qx, QT which define the sweeper.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the right-hand side</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>containing the integral as values</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.explicit">
-<span id="implementations-sweeper-classes-explicit-module"></span><h2>implementations.sweeper_classes.explicit module<a class="headerlink" href="#module-implementations.sweeper_classes.explicit" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.explicit.</span></span><span class="sig-name descname"><span class="pre">explicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
-<p>Custom sweeper class, implements Sweeper.py</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit.QE">
-<span class="sig-name descname"><span class="pre">QE</span></span><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit.QE" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit Euler integration matrix</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the right-hand side</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>containing the integral as values</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.generic_LU">
-<span id="implementations-sweeper-classes-generic-lu-module"></span><h2>implementations.sweeper_classes.generic_LU module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_LU" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_LU.generic_LU">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.generic_LU.</span></span><span class="sig-name descname"><span class="pre">generic_LU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_LU.html#generic_LU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_LU.generic_LU" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
-<p>LU sweeper using LU decomposition of the Q matrix for the base integrator, special type of generic implicit sweeper</p>
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.generic_implicit">
-<span id="implementations-sweeper-classes-generic-implicit-module"></span><h2>implementations.sweeper_classes.generic_implicit module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_implicit" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.generic_implicit.</span></span><span class="sig-name descname"><span class="pre">generic_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
-<p>Generic implicit sweeper, expecting lower triangular matrix type as input</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit.QI">
-<span class="sig-name descname"><span class="pre">QI</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.QI" title="Permalink to this definition">¶</a></dt>
-<dd><p>lower triangular matrix</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the right-hand side</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>containing the integral as values</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.imex_1st_order">
-<span id="implementations-sweeper-classes-imex-1st-order-module"></span><h2>implementations.sweeper_classes.imex_1st_order module<a class="headerlink" href="#module-implementations.sweeper_classes.imex_1st_order" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.imex_1st_order.</span></span><span class="sig-name descname"><span class="pre">imex_1st_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
-<p>Custom sweeper class, implements Sweeper.py</p>
-<p>First-order IMEX sweeper using implicit/explicit Euler as base integrator</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.QI">
-<span class="sig-name descname"><span class="pre">QI</span></span><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QI" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit Euler integration matrix</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.QE">
-<span class="sig-name descname"><span class="pre">QE</span></span><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QE" title="Permalink to this definition">¶</a></dt>
-<dd><p>explicit Euler integration matrix</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat">
-<span class="sig-name descname"><span class="pre">get_scalar_problems_manysweep_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.get_scalar_problems_manysweep_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a scalar problem, K sweeps of IMEX-SDC can be written in matrix form.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
-<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is lambda_fast, the second is lambda_slow.</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.generic_LU.html">implementations.sweeper_classes.generic_LU module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.generic_LU.html#implementations.sweeper_classes.generic_LU.generic_LU"><code class="docutils literal notranslate"><span class="pre">generic_LU</span></code></a></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats">
-<span class="sig-name descname"><span class="pre">get_scalar_problems_sweeper_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.get_scalar_problems_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the corresponding matrices of an IMEX-SDC sweep in matrix formulation.</p>
-<p>See Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016 for the derivation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is lambda_fast, the second is lambda_slow.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_sweeper_mats">
-<span class="sig-name descname"><span class="pre">get_sweeper_mats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.get_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_sweeper_mats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the three matrices Q, QI, QE which define the sweeper.</p>
-<p>The first row and column, corresponding to the left starting value, are removed to correspond to the notation
-introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the right-hand side (here impl + expl)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>containing the integral as values</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.imex_1st_order_mass">
-<span id="implementations-sweeper-classes-imex-1st-order-mass-module"></span><h2>implementations.sweeper_classes.imex_1st_order_mass module<a class="headerlink" href="#module-implementations.sweeper_classes.imex_1st_order_mass" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.imex_1st_order_mass.</span></span><span class="sig-name descname"><span class="pre">imex_1st_order_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_1st_order</span></code></p>
-<p>Custom sweeper class, implements Sweeper.py</p>
-<p>First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">
-<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computation of the residual using the collocation matrix Q</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.multi_implicit">
-<span id="implementations-sweeper-classes-multi-implicit-module"></span><h2>implementations.sweeper_classes.multi_implicit module<a class="headerlink" href="#module-implementations.sweeper_classes.multi_implicit" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.multi_implicit.</span></span><span class="sig-name descname"><span class="pre">multi_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
-<p>Custom sweeper class, implements Sweeper.py</p>
-<p>First-order multi-implicit sweeper for two components</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit.Q1">
-<span class="sig-name descname"><span class="pre">Q1</span></span><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.Q1" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit integration matrix for the first component</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit.Q2">
-<span class="sig-name descname"><span class="pre">Q2</span></span><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.Q2" title="Permalink to this definition">¶</a></dt>
-<dd><p>implicit integration matrix for the second component</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the right-hand side (two components)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>containing the integral as values</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.sweeper_classes.verlet">
-<span id="implementations-sweeper-classes-verlet-module"></span><h2>implementations.sweeper_classes.verlet module<a class="headerlink" href="#module-implementations.sweeper_classes.verlet" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.verlet.</span></span><span class="sig-name descname"><span class="pre">verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
-<p>Custom sweeper class, implements Sweeper.py</p>
-<p>Second-order sweeper using velocity-Verlet as base integrator</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.QQ">
-<span class="sig-name descname"><span class="pre">QQ</span></span><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.QQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>0-to-node collocation matrix (second order)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.QT">
-<span class="sig-name descname"><span class="pre">QT</span></span><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.QT" title="Permalink to this definition">¶</a></dt>
-<dd><p>0-to-node trapezoidal matrix</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.Qx">
-<span class="sig-name descname"><span class="pre">Qx</span></span><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.Qx" title="Permalink to this definition">¶</a></dt>
-<dd><p>0-to-node Euler half-step for position update</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.qQ">
-<span class="sig-name descname"><span class="pre">qQ</span></span><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.qQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>update rule for final value (if needed)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.compute_end_point" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation (always!)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.integrate">
-<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.integrate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the right-hand side</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>containing the integral as values</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.update_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit.html">implementations.sweeper_classes.generic_implicit module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.generic_implicit.html#implementations.sweeper_classes.generic_implicit.generic_implicit"><code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order.html">implementations.sweeper_classes.imex_1st_order module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order"><code class="docutils literal notranslate"><span class="pre">imex_1st_order</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order_mass.html">implementations.sweeper_classes.imex_1st_order_mass module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.multi_implicit.html">implementations.sweeper_classes.multi_implicit module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit"><code class="docutils literal notranslate"><span class="pre">multi_implicit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.verlet.html">implementations.sweeper_classes.verlet module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet"><code class="docutils literal notranslate"><span class="pre">verlet</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
 </section>
 <section id="module-implementations.sweeper_classes">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.sweeper_classes" title="Permalink to this heading">¶</a></h2>
@@ -663,109 +116,6 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
     <ul>
 <li><a class="reference internal" href="#">implementations.sweeper_classes package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.Runge_Kutta">implementations.sweeper_classes.Runge_Kutta module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod"><code class="docutils literal notranslate"><span class="pre">MidpointMethod</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK1"><code class="docutils literal notranslate"><span class="pre">RK1</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="docutils literal notranslate"><span class="pre">RungeKutta</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes"><code class="docutils literal notranslate"><span class="pre">RungeKutta.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.boris_2nd_order">implementations.sweeper_classes.boris_2nd_order module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.S</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.SQ</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.ST</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.Sx</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_scalar_problems_manysweep_mats()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_scalar_problems_picardsweep_mats()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_scalar_problems_sweeper_mats()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_sweeper_mats()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.integrate()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.explicit">implementations.sweeper_classes.explicit module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit"><code class="docutils literal notranslate"><span class="pre">explicit</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.QE"><code class="docutils literal notranslate"><span class="pre">explicit.QE</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.compute_end_point"><code class="docutils literal notranslate"><span class="pre">explicit.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.integrate"><code class="docutils literal notranslate"><span class="pre">explicit.integrate()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.update_nodes"><code class="docutils literal notranslate"><span class="pre">explicit.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.generic_LU">implementations.sweeper_classes.generic_LU module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.generic_LU.generic_LU"><code class="docutils literal notranslate"><span class="pre">generic_LU</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.generic_implicit">implementations.sweeper_classes.generic_implicit module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit"><code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.QI"><code class="docutils literal notranslate"><span class="pre">generic_implicit.QI</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.compute_end_point"><code class="docutils literal notranslate"><span class="pre">generic_implicit.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.integrate"><code class="docutils literal notranslate"><span class="pre">generic_implicit.integrate()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.update_nodes"><code class="docutils literal notranslate"><span class="pre">generic_implicit.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.imex_1st_order">implementations.sweeper_classes.imex_1st_order module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order"><code class="docutils literal notranslate"><span class="pre">imex_1st_order</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QI"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.QI</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QE"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.QE</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.compute_end_point"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.get_scalar_problems_manysweep_mat()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.get_scalar_problems_sweeper_mats()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.get_sweeper_mats()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.integrate()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.update_nodes"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.imex_1st_order_mass">implementations.sweeper_classes.imex_1st_order_mass module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass.compute_residual()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.multi_implicit">implementations.sweeper_classes.multi_implicit module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit"><code class="docutils literal notranslate"><span class="pre">multi_implicit</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.Q1"><code class="docutils literal notranslate"><span class="pre">multi_implicit.Q1</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.Q2"><code class="docutils literal notranslate"><span class="pre">multi_implicit.Q2</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.compute_end_point"><code class="docutils literal notranslate"><span class="pre">multi_implicit.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate"><code class="docutils literal notranslate"><span class="pre">multi_implicit.integrate()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.update_nodes"><code class="docutils literal notranslate"><span class="pre">multi_implicit.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.verlet">implementations.sweeper_classes.verlet module</a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet"><code class="docutils literal notranslate"><span class="pre">verlet</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.QQ"><code class="docutils literal notranslate"><span class="pre">verlet.QQ</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.QT"><code class="docutils literal notranslate"><span class="pre">verlet.QT</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.Qx"><code class="docutils literal notranslate"><span class="pre">verlet.Qx</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.qQ"><code class="docutils literal notranslate"><span class="pre">verlet.qQ</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.compute_end_point"><code class="docutils literal notranslate"><span class="pre">verlet.compute_end_point()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.integrate"><code class="docutils literal notranslate"><span class="pre">verlet.integrate()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.update_nodes"><code class="docutils literal notranslate"><span class="pre">verlet.update_nodes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li><a class="reference internal" href="#module-implementations.sweeper_classes">Module contents</a></li>
 </ul>
 </li>
@@ -774,13 +124,13 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.problem_classes.boussinesq_helpers.html"
-                          title="previous chapter">implementations.problem_classes.boussinesq_helpers package</a></p>
+    <p class="topless"><a href="implementations.problem_classes.nonlinear_ODE_1.html"
+                          title="previous chapter">implementations.problem_classes.nonlinear_ODE_1 module</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="implementations.transfer_classes.html"
-                          title="next chapter">implementations.transfer_classes package</a></p>
+    <p class="topless"><a href="implementations.sweeper_classes.Runge_Kutta.html"
+                          title="next chapter">implementations.sweeper_classes.Runge_Kutta module</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -813,10 +163,10 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.boussinesq_helpers.html" title="implementations.problem_classes.boussinesq_helpers package"
+          <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>

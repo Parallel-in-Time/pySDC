@@ -8,6 +8,7 @@
     <title>implementations.convergence_controller_classes.store_uold &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -40,14 +41,14 @@
 <span></span><span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
 
 
-<div class="viewcode-block" id="StoreUOld"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.store_uold.StoreUOld">[docs]</a><span class="k">class</span> <span class="nc">StoreUOld</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="StoreUOld"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld">[docs]</a><span class="k">class</span> <span class="nc">StoreUOld</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to store the solution of the last iteration in a variable called &#39;uold&#39; of the levels.</span>
 
 <span class="sd">    Default control order is 90.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StoreUOld.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.store_uold.StoreUOld.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="StoreUOld.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here</span>
 
@@ -61,7 +62,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">90</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="StoreUOld.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="StoreUOld.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the solution at the current iteration</span>
 
@@ -77,7 +78,7 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="StoreUOld.post_spread_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_spread_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="StoreUOld.post_spread_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_spread_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the initial conditions in u_old in the spread phase.</span>
 

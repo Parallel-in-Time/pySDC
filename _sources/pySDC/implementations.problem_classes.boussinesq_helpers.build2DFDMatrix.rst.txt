@@ -1,0 +1,7 @@
+implementations.problem\_classes.boussinesq\_helpers.build2DFDMatrix module
+===========================================================================
+
+.. automodule:: implementations.problem_classes.boussinesq_helpers.build2DFDMatrix
+   :members:
+   :undoc-members:
+   :show-inheritance:

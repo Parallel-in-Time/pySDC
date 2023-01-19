@@ -1,0 +1,7 @@
+helpers.problem\_helper module
+==============================
+
+.. automodule:: helpers.problem_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:

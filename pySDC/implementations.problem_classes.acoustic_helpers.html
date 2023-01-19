@@ -9,6 +9,7 @@
     <title>implementations.problem_classes.acoustic_helpers package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -16,7 +17,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="implementations.problem_classes.boussinesq_helpers package" href="implementations.problem_classes.boussinesq_helpers.html" />
+    <link rel="next" title="implementations.problem_classes.acoustic_helpers.buildFDMatrix module" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html" />
     <link rel="prev" title="implementations.problem_classes package" href="implementations.problem_classes.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -29,7 +30,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.boussinesq_helpers.html" title="implementations.problem_classes.boussinesq_helpers package"
+          <a href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html" title="implementations.problem_classes.acoustic_helpers.buildFDMatrix module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="implementations.problem_classes.html" title="implementations.problem_classes package"
@@ -50,129 +51,31 @@
 <h1>implementations.problem_classes.acoustic_helpers package<a class="headerlink" href="#implementations-problem-classes-acoustic-helpers-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-</section>
-<section id="module-implementations.problem_classes.acoustic_helpers.buildFDMatrix">
-<span id="implementations-problem-classes-acoustic-helpers-buildfdmatrix-module"></span><h2>implementations.problem_classes.acoustic_helpers.buildFDMatrix module<a class="headerlink" href="#module-implementations.problem_classes.acoustic_helpers.buildFDMatrix" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildFDMatrix.</span></span><span class="sig-name descname"><span class="pre">getBCLeft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildFDMatrix.html#getBCLeft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCRight">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildFDMatrix.</span></span><span class="sig-name descname"><span class="pre">getBCRight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildFDMatrix.html#getBCRight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCRight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildFDMatrix.</span></span><span class="sig-name descname"><span class="pre">getHorizontalDx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildFDMatrix.html#getHorizontalDx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildFDMatrix.</span></span><span class="sig-name descname"><span class="pre">getMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildFDMatrix.html#getMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
-<section id="module-implementations.problem_classes.acoustic_helpers.buildWave1DMatrix">
-<span id="implementations-problem-classes-acoustic-helpers-buildwave1dmatrix-module"></span><h2>implementations.problem_classes.acoustic_helpers.buildWave1DMatrix module<a class="headerlink" href="#module-implementations.problem_classes.acoustic_helpers.buildWave1DMatrix" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.</span></span><span class="sig-name descname"><span class="pre">getWave1DAdvectionMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWave1DAdvectionMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.</span></span><span class="sig-name descname"><span class="pre">getWave1DMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWave1DMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.</span></span><span class="sig-name descname"><span class="pre">getWaveBCLeft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_left</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWaveBCLeft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight">
-<span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.</span></span><span class="sig-name descname"><span class="pre">getWaveBCRight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWaveBCRight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
-<section id="module-implementations.problem_classes.acoustic_helpers.standard_integrators">
-<span id="implementations-problem-classes-acoustic-helpers-standard-integrators-module"></span><h2>implementations.problem_classes.acoustic_helpers.standard_integrators module<a class="headerlink" href="#module-implementations.problem_classes.acoustic_helpers.standard_integrators" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.standard_integrators.</span></span><span class="sig-name descname"><span class="pre">bdf2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#bdf2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.firsttimestep">
-<span class="sig-name descname"><span class="pre">firsttimestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#bdf2.firsttimestep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.firsttimestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.timestep">
-<span class="sig-name descname"><span class="pre">timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">um1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#bdf2.timestep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.timestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.standard_integrators.</span></span><span class="sig-name descname"><span class="pre">dirk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#dirk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f">
-<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#dirk.f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f_solve">
-<span class="sig-name descname"><span class="pre">f_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#dirk.f_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f_solve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.timestep">
-<span class="sig-name descname"><span class="pre">timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#dirk.timestep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.timestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.standard_integrators.</span></span><span class="sig-name descname"><span class="pre">rk_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M_fast</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_slow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#rk_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast">
-<span class="sig-name descname"><span class="pre">f_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#rk_imex.f_fast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast_solve">
-<span class="sig-name descname"><span class="pre">f_fast_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#rk_imex.f_fast_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast_solve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_slow">
-<span class="sig-name descname"><span class="pre">f_slow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#rk_imex.f_slow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_slow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.timestep">
-<span class="sig-name descname"><span class="pre">timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#rk_imex.timestep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.timestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.acoustic_helpers.standard_integrators.</span></span><span class="sig-name descname"><span class="pre">trapezoidal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#trapezoidal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal.timestep">
-<span class="sig-name descname"><span class="pre">timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/standard_integrators.html#trapezoidal.timestep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal.timestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html">implementations.problem_classes.acoustic_helpers.buildFDMatrix module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft"><code class="docutils literal notranslate"><span class="pre">getBCLeft()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCRight"><code class="docutils literal notranslate"><span class="pre">getBCRight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx"><code class="docutils literal notranslate"><span class="pre">getHorizontalDx()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix"><code class="docutils literal notranslate"><span class="pre">getMatrix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix"><code class="docutils literal notranslate"><span class="pre">getWave1DAdvectionMatrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix"><code class="docutils literal notranslate"><span class="pre">getWave1DMatrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft"><code class="docutils literal notranslate"><span class="pre">getWaveBCLeft()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight"><code class="docutils literal notranslate"><span class="pre">getWaveBCRight()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.standard_integrators.html">implementations.problem_classes.acoustic_helpers.standard_integrators module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2"><code class="docutils literal notranslate"><span class="pre">bdf2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk"><code class="docutils literal notranslate"><span class="pre">dirk</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex"><code class="docutils literal notranslate"><span class="pre">rk_imex</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal"><code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
 </section>
 <section id="module-implementations.problem_classes.acoustic_helpers">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.problem_classes.acoustic_helpers" title="Permalink to this heading">¶</a></h2>
@@ -191,45 +94,6 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.acoustic_helpers package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.acoustic_helpers.buildFDMatrix">implementations.problem_classes.acoustic_helpers.buildFDMatrix module</a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft"><code class="docutils literal notranslate"><span class="pre">getBCLeft()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCRight"><code class="docutils literal notranslate"><span class="pre">getBCRight()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx"><code class="docutils literal notranslate"><span class="pre">getHorizontalDx()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix"><code class="docutils literal notranslate"><span class="pre">getMatrix()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.acoustic_helpers.buildWave1DMatrix">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix module</a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix"><code class="docutils literal notranslate"><span class="pre">getWave1DAdvectionMatrix()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix"><code class="docutils literal notranslate"><span class="pre">getWave1DMatrix()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft"><code class="docutils literal notranslate"><span class="pre">getWaveBCLeft()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight"><code class="docutils literal notranslate"><span class="pre">getWaveBCRight()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.acoustic_helpers.standard_integrators">implementations.problem_classes.acoustic_helpers.standard_integrators module</a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2"><code class="docutils literal notranslate"><span class="pre">bdf2</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.firsttimestep"><code class="docutils literal notranslate"><span class="pre">bdf2.firsttimestep()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.timestep"><code class="docutils literal notranslate"><span class="pre">bdf2.timestep()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk"><code class="docutils literal notranslate"><span class="pre">dirk</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f"><code class="docutils literal notranslate"><span class="pre">dirk.f()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f_solve"><code class="docutils literal notranslate"><span class="pre">dirk.f_solve()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.timestep"><code class="docutils literal notranslate"><span class="pre">dirk.timestep()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex"><code class="docutils literal notranslate"><span class="pre">rk_imex</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast"><code class="docutils literal notranslate"><span class="pre">rk_imex.f_fast()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast_solve"><code class="docutils literal notranslate"><span class="pre">rk_imex.f_fast_solve()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_slow"><code class="docutils literal notranslate"><span class="pre">rk_imex.f_slow()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.timestep"><code class="docutils literal notranslate"><span class="pre">rk_imex.timestep()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal"><code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal.timestep"><code class="docutils literal notranslate"><span class="pre">trapezoidal.timestep()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.acoustic_helpers">Module contents</a></li>
 </ul>
 </li>
@@ -243,8 +107,8 @@
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="implementations.problem_classes.boussinesq_helpers.html"
-                          title="next chapter">implementations.problem_classes.boussinesq_helpers package</a></p>
+    <p class="topless"><a href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html"
+                          title="next chapter">implementations.problem_classes.acoustic_helpers.buildFDMatrix module</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -277,7 +141,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.boussinesq_helpers.html" title="implementations.problem_classes.boussinesq_helpers package"
+          <a href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html" title="implementations.problem_classes.acoustic_helpers.buildFDMatrix module"
              >next</a> |</li>
         <li class="right" >
           <a href="implementations.problem_classes.html" title="implementations.problem_classes package"
