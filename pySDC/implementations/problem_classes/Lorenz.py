@@ -8,7 +8,7 @@ class LorenzAttractor(ptype):
     Simple script to run a Lorenz attractor problem.
 
     The Lorenz attractor is a system of three ordinary differential equations that exhibits some chaotic behaviour.
-    It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to Tend = 100) or
+    It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to Tend = 100 or
     so to see this with these initial conditions) and because of the chaotic nature.
 
     Since the problem is non-linear, we need to use a Newton solver.
