@@ -46,7 +46,7 @@ environment. For this, `pySDC` ships with environment files
 which can be found in the folder `etc/`. Use these as e.g.
 
 ``` bash
-conda env create --yes -f etc/environment-base.yml
+conda env create -f etc/environment-base.yml
 ```
 
 To check your installation, run
