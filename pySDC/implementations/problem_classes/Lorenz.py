@@ -13,7 +13,7 @@ class LorenzAttractor(ptype):
 
     Since the problem is non-linear, we need to use a Newton solver.
 
-    Problem and initial conditions does not originate from, but was taken from doi.org/10.2140/camcos.2015.10.1
+    Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1
     """
 
     def __init__(self, problem_params):
@@ -93,7 +93,7 @@ class LorenzAttractor(ptype):
         # start Newton iterations
         u = self.dtype_u(u0)
         res = np.inf
-        for n in range(0, self.params.newton_maxiter):
+        for _n in range(0, self.params.newton_maxiter):
 
             # assemble G such that G(u) = 0 at the solution to the step
             G = np.array(

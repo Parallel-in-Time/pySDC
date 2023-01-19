@@ -5,4 +5,4 @@ import pytest
 def test_main():
     from pySDC.projects.Resilience.Lorentz import main
 
-    main(False)
+    main(plotting=False)

@@ -66,7 +66,7 @@ def run_Lorenz(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_collection + [hook_class]
+    controller_params['hook_class'] = hook_collection + hook_class if type(hook_class) == list else [hook_class]
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -148,6 +148,7 @@ def plot_solution(stats):
 def check_solution(stats, controller, thresh=5e-4):
     """
     Check if the global error solution wrt. a scipy reference solution is tolerable.
+    This is also a check for the global error hook.
 
     Args:
         stats (dict): The stats object of the run
@@ -159,8 +160,12 @@ def check_solution(stats, controller, thresh=5e-4):
     """
     u = get_sorted(stats, type='u')
     u_exact = controller.MS[0].levels[0].prob.u_exact(t=u[-1][0])
-    error = np.linalg.norm(u[-1][1] - u_exact)
+    error = np.linalg.norm(u[-1][1] - u_exact, np.inf)
+    error_hook = get_sorted(stats, type='e_global')[-1][1]
 
+    dt = get_sorted(stats, type='dt')
+
+    assert error == error_hook, f'Expected errors to match, got {error:.2e} and {error_hook:.2e}!'
     assert error < thresh, f"Error too large, got e={error:.2e}"
 
 
@@ -174,11 +179,16 @@ def main(plotting=True):
     Returns:
         None
     """
+    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
+
     custom_description = {}
     custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-5}}
-    custom_controller_params = {'logger_level': 30}
+    custom_controller_params = {'logger_level': 15}
     stats, controller, _ = run_Lorenz(
-        custom_description=custom_description, custom_controller_params=custom_controller_params, Tend=10
+        custom_description=custom_description,
+        custom_controller_params=custom_controller_params,
+        Tend=10,
+        hook_class=[log_data, LogGlobalErrorPostRun],
     )
     check_solution(stats, controller, 5e-4)
     if plotting:
