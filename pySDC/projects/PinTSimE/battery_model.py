@@ -176,9 +176,6 @@ def main(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
     dill.dump(stats, f)
     f.close()
 
-    iter_counts = get_sorted(stats, type='niter', recomputed=None, sortby='time')
-    print(np.sum([v[1] for v in iter_counts]))
-
     return stats, description
 
 
@@ -232,8 +229,6 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     # convert filtered statistics to list of iterations count, sorted by process
     cL = get_sorted(stats, type='current L', recomputed=False, sortby='time')
     vC = get_sorted(stats, type='voltage C', recomputed=False, sortby='time')
-    print('cL:', [v[1] for v in cL][-1])
-    print('vC:', [v[1] for v in vC][-1])
 
     times = [v[0] for v in cL]
 
@@ -248,19 +243,16 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 
         assert len(switches) >= 1, 'No switches found!'
         t_switch = [v[1] for v in switches]
-        print('switches:', t_switch)
         ax.axvline(x=t_switch[-1], linestyle='--', linewidth=0.8, color='r', label='Switch')
 
     if use_adaptivity:
         dt = np.array(get_sorted(stats, type='dt', recomputed=False))
-        e_em = np.array(get_sorted(stats, type='error_embedded_estimate', recomputed=False, sortby='time'))
-        print('dt:', dt[-1, 1])
-        print('e_em:', e_em[-1, 1])
+
         dt_ax = ax.twinx()
         dt_ax.plot(dt[:, 0], dt[:, 1], linestyle='-', linewidth=0.8, color='k', label=r'$\Delta t$')
         dt_ax.set_ylabel(r'$\Delta t$', fontsize=8)
         dt_ax.legend(frameon=False, fontsize=8, loc='center right')
-    print('restarts:', np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1]))
+
     ax.axhline(y=1.0, linestyle='--', linewidth=0.8, color='g', label='$V_{ref}$')
 
     ax.legend(frameon=False, fontsize=8, loc='upper right')
