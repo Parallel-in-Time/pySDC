@@ -7,14 +7,14 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-from pySDC.projects.Resilience.hook import log_data, hook_collection
+from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
 def run_piline(
     custom_description=None,
     num_procs=1,
     Tend=20.0,
-    hook_class=log_data,
+    hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -68,7 +68,7 @@ def run_piline(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_collection + [hook_class]
+    controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -98,11 +98,11 @@ def run_piline(
 
     # insert faults
     if fault_stuff is not None:
-        controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(
-            rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
-            args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})},
-        )
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        rnd_args = {'iteration': 4}
+        args = {'time': 2.5, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

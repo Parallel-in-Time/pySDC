@@ -5,7 +5,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.projects.Resilience.hook import log_data
+from pySDC.projects.Resilience.hook import hook_collection, LogData
 import numpy as np
 
 
@@ -13,7 +13,7 @@ def run_heat(
     custom_description=None,
     num_procs=1,
     Tend=2e-1,
-    hook_class=log_data,
+    hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -68,7 +68,7 @@ def run_heat(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_class
+    controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -99,11 +99,6 @@ def run_heat(
     # insert faults
     if fault_stuff is not None:
         raise NotImplementedError("The parameters have not been adapted to this equation yet!")
-        controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(
-            rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
-            args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})},
-        )
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

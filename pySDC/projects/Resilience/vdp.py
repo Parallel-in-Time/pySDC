@@ -8,7 +8,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ProblemError
-from pySDC.projects.Resilience.hook import log_data, hook_collection
+from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
 def plot_step_sizes(stats, ax):
@@ -85,7 +85,7 @@ def run_vdp(
     custom_description=None,
     num_procs=1,
     Tend=10.0,
-    hook_class=log_data,
+    hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
@@ -138,7 +138,7 @@ def run_vdp(
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_collection + [hook_class]
+    controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
     if custom_controller_params is not None:
@@ -185,17 +185,17 @@ def run_vdp(
 
     # insert faults
     if fault_stuff is not None:
-        controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(
-            rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
-            args={'time': 1.0, 'target': 0, **fault_stuff.get('args', {})},
-        )
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        rnd_args = {'iteration': 3}
+        args = {'time': 1.0, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # call main function to get things done...
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     except ProblemError:
-        stats = controller.hooks.return_stats()
+        stats = controller.return_stats()
 
     return stats, controller, Tend
 
