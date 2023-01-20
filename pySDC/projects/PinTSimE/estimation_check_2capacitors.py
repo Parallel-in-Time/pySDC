@@ -7,101 +7,20 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.battery_model import get_recomputed
+from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
-from pySDC.projects.PinTSimE.battery_2capacitors_model import check_solution, log_data, proof_assertions_description
+from pySDC.projects.PinTSimE.battery_2capacitors_model import (
+    check_solution,
+    log_data,
+    proof_assertions_description,
+    proof_assertions_time,
+)
 import pySDC.helpers.plot_helper as plt_helper
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
-def run(dt, use_switch_estimator=True):
-    """
-    A simple test program to do SDC/PFASST runs for the battery drain model using 2 condensators
-
-    Args:
-        dt (float): time step that wants to be used for the computation
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-
-    Returns:
-        stats (dict): all statistics from a controller run
-        description (dict): contains all information for a controller run
-    """
-
-    # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = -1
-    level_params['dt'] = dt
-
-    assert (
-        dt == 4e-1 or dt == 4e-2 or dt == 4e-3
-    ), "Error! Do not use other time steps dt != 4e-1 or dt != 4e-2 or dt != 4e-3 due to hardcoded references!"
-
-    # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 5
-    # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'spread'
-
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['ncondensators'] = 2
-    problem_params['Vs'] = 5.0
-    problem_params['Rs'] = 0.5
-    problem_params['C'] = np.array([1.0, 1.0])
-    problem_params['R'] = 1.0
-    problem_params['L'] = 1.0
-    problem_params['alpha'] = 5.0
-    problem_params['V_ref'] = np.array([1.0, 1.0])  # [V_ref1, V_ref2]
-
-    # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = 4
-
-    # initialize controller parameters
-    controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
-
-    # convergence controllers
-    convergence_controllers = dict()
-    if use_switch_estimator:
-        switch_estimator_params = {}
-        convergence_controllers[SwitchEstimator] = switch_estimator_params
-
-    # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = battery_n_capacitors  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params
-
-    if use_switch_estimator:
-        description['convergence_controllers'] = convergence_controllers
-
-    proof_assertions_description(description, False, use_switch_estimator)
-
-    # set time parameters
-    t0 = 0.0
-    Tend = 3.5
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-    return stats, description
-
-
-def check(cwd='./'):
+def run(cwd='./'):
     """
     Routine to check the differences between using a switch estimator or not
 
@@ -110,29 +29,59 @@ def check(cwd='./'):
     """
 
     dt_list = [4e-1, 4e-2, 4e-3]
+    t0 = 0.0
+    Tend = 3.5
+
+    problem_classes = [battery_n_capacitors]
+    sweeper_classes = [imex_1st_order]
+
+    ncapacitors = 2
+    alpha = 5.0
+    V_ref = np.array([1.0, 1.0])
+    C = np.array([1.0, 1.0])
+
     use_switch_estimator = [True, False]
     restarts_all = []
     restarts_dict = dict()
-    for dt_item in dt_list:
-        for use_SE in use_switch_estimator:
-            stats, description = run(dt=dt_item, use_switch_estimator=use_SE)
+    for problem, sweeper in zip(problem_classes, sweeper_classes):
+        for dt_item in dt_list:
+            for use_SE in use_switch_estimator:
+                description, controller_params = generate_description(
+                    dt_item,
+                    problem,
+                    sweeper,
+                    log_data,
+                    False,
+                    use_SE,
+                    ncapacitors,
+                    alpha,
+                    V_ref,
+                    C,
+                )
 
-            if use_SE:
-                switches = get_recomputed(stats, type='switch', sortby='time')
-                assert len(switches) >= 2, f"Expected at least 2 switches for dt: {dt_item}, got {len(switches)}!"
+                # Assertions
+                proof_assertions_description(description, False, use_SE)
 
-                check_solution(stats, dt_item, use_SE)
+                proof_assertions_time(dt_item, Tend, V_ref, alpha)
 
-            fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, use_SE)
-            f = open(fname, 'wb')
-            dill.dump(stats, f)
-            f.close()
+                stats = controller_run(description, controller_params, False, use_SE, t0, Tend)
 
-            if use_SE:
-                restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
-                restarts = restarts_dict[dt_item][:, 1]
-                restarts_all.append(np.sum(restarts))
-                print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
+                if use_SE:
+                    switches = get_recomputed(stats, type='switch', sortby='time')
+                    assert len(switches) >= 2, f"Expected at least 2 switches for dt: {dt_item}, got {len(switches)}!"
+
+                    check_solution(stats, dt_item, use_SE)
+
+                fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, use_SE)
+                f = open(fname, 'wb')
+                dill.dump(stats, f)
+                f.close()
+
+                if use_SE:
+                    restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
+                    restarts = restarts_dict[dt_item][:, 1]
+                    restarts_all.append(np.sum(restarts))
+                    print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
 
     V_ref = description['problem_params']['V_ref']
 
@@ -276,4 +225,4 @@ def check(cwd='./'):
 
 
 if __name__ == "__main__":
-    check()
+    run()

@@ -7,7 +7,12 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.battery_model import get_recomputed, proof_assertions_description
+from pySDC.projects.PinTSimE.battery_model import (
+    controller_run,
+    generate_description,
+    get_recomputed,
+    proof_assertions_description,
+)
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
@@ -63,112 +68,60 @@ class log_data(hooks):
         )
 
 
-def main(use_switch_estimator=True):
+def run():
     """
-    A simple test program to do SDC/PFASST runs for the battery drain model using 2 condensators
-
-    Args:
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-
-    Returns:
-        description (dict): contains all information for a controller run
+    Executes the simulation for the battery model using the IMEX sweeper and plot the results
+    as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = -1
-    level_params['dt'] = 1e-2
-
-    assert level_params['dt'] == 1e-2, 'Error! Do not use the time step dt != 1e-2!'
-
-    # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 5
-    # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'spread'
-
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['ncondensators'] = 2
-    problem_params['Vs'] = 5.0
-    problem_params['Rs'] = 0.5
-    problem_params['C'] = np.array([1.0, 1.0])
-    problem_params['R'] = 1.0
-    problem_params['L'] = 1.0
-    problem_params['alpha'] = 5.0
-    problem_params['V_ref'] = np.array([1.0, 1.0])  # [V_ref1, V_ref2]
-
-    # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = 4
-
-    # initialize controller parameters
-    controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
-
-    # convergence controllers
-    convergence_controllers = dict()
-    if use_switch_estimator:
-        switch_estimator_params = {}
-        convergence_controllers[SwitchEstimator] = switch_estimator_params
-
-    # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = battery_n_capacitors  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params
-
-    if use_switch_estimator:
-        description['convergence_controllers'] = convergence_controllers
-
-    proof_assertions_description(description, False, use_switch_estimator)
-
-    # set time parameters
+    dt = 1e-2
     t0 = 0.0
     Tend = 3.5
 
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    problem_classes = [battery_n_capacitors]
+    sweeper_classes = [imex_1st_order]
 
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-    Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/battery_2condensators.dat'
-    f = open(fname, 'wb')
-    dill.dump(stats, f)
-    f.close()
+    ncapacitors = 2
+    alpha = 5.0
+    V_ref = np.array([1.0, 1.0])
+    C = np.array([1.0, 1.0])
 
     recomputed = False
+    use_switch_estimator = [True]
 
-    check_solution(stats, level_params['dt'], use_switch_estimator)
+    for problem, sweeper in zip(problem_classes, sweeper_classes):
+        for use_SE in use_switch_estimator:
+            description, controller_params = generate_description(
+                dt, problem, sweeper, log_data, False, use_SE, ncapacitors, alpha, V_ref, C
+            )
 
-    plot_voltages(description, recomputed, use_switch_estimator)
+            # Assertions
+            proof_assertions_description(description, False, use_SE)
 
-    return description
+            proof_assertions_time(dt, Tend, V_ref, alpha)
+
+            stats = controller_run(description, controller_params, False, use_SE, t0, Tend)
+
+            check_solution(stats, dt, use_SE)
+
+            plot_voltages(description, problem.__name__, sweeper.__name__, recomputed, use_SE, False)
 
 
-def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
+def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimator, use_adaptivity, cwd='./'):
     """
     Routine to plot the numerical solution of the model
 
     Args:
         description(dict): contains all information for a controller run
+        problem (problem_class.__name__): problem class that wants to be simulated
+        sweeper (sweeper_class.__name__): sweeper class for solving the problem class numerically
         recomputed (bool): flag if the values after a restart are used or before
         use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+        use_adaptivity (bool): flag if adaptivity wants to be used or not
         cwd: current working directory
     """
 
-    f = open(cwd + 'data/battery_2condensators.dat', 'rb')
+    f = open(cwd + 'data/{}_{}_USE{}_USA{}.dat'.format(problem, sweeper, use_switch_estimator, use_adaptivity), 'rb')
     stats = dill.load(f)
     f.close()
 
@@ -199,7 +152,7 @@ def plot_voltages(description, recomputed, use_switch_estimator, cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    fig.savefig('data/battery_2condensators_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/battery_2capacitors_model_solution.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
 
@@ -300,5 +253,25 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     return data
 
 
+def proof_assertions_time(dt, Tend, V_ref, alpha):
+    """
+    Function to proof the assertions regarding the time domain (in combination with the specific problem):
+
+    Args:
+        dt (float): time step for computation
+        Tend (float): end time
+        V_ref (np.ndarray): Reference values (problem parameter)
+        alpha (np.float): Multiple used for initial conditions (problem_parameter)
+    """
+
+    assert (
+        Tend == 3.5 and V_ref[0] == 1.0 and V_ref[1] == 1.0 and alpha == 5.0
+    ), "Error! Do not use other parameters for V_ref[:] != 1.0, alpha != 1.2, Tend != 0.3 due to hardcoded reference!"
+
+    assert (
+        dt == 1e-2 or dt == 4e-1 or dt == 4e-2 or dt == 4e-3
+    ), "Error! Do not use other time steps dt != 4e-1 or dt != 4e-2 or dt != 4e-3 due to hardcoded references!"
+
+
 if __name__ == "__main__":
-    main()
+    run()

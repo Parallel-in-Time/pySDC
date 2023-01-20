@@ -9,7 +9,14 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
-from pySDC.projects.PinTSimE.battery_model import check_solution, get_recomputed, log_data, proof_assertions_description
+from pySDC.projects.PinTSimE.battery_model import (
+    controller_run,
+    check_solution,
+    generate_description,
+    get_recomputed,
+    log_data,
+    proof_assertions_description,
+)
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
@@ -17,109 +24,7 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
-def run(dt, problem, sweeper, use_switch_estimator, use_adaptivity):
-    """
-    A simple test program to do SDC/PFASST runs for the battery drain model
-
-    Args:
-        dt (np.float): (initial) time step
-        problem (problem_class): the considered problem class (here: battery or battery_implicit)
-        sweeper (sweeper_class): the used sweeper class to solve (here: imex_1st_order or generic_implicit)
-        use_switch_estimator (bool): Switch estimator should be used or not
-        use_adaptivity (bool): Adaptivity should be used or not
-        V_ref (np.float): reference value for the switch
-
-    Returns:
-        description (dict): contains all the information for the controller
-        stats (dict): includes the statistics of the solve
-    """
-
-    # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = -1
-    level_params['dt'] = dt
-
-    # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 5
-    # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'spread'
-
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['newton_maxiter'] = 200
-    problem_params['newton_tol'] = 1e-08
-    problem_params['ncondensators'] = 1
-    problem_params['Vs'] = 5.0
-    problem_params['Rs'] = 0.5
-    problem_params['C'] = np.array([1.0])
-    problem_params['R'] = 1.0
-    problem_params['L'] = 1.0
-    problem_params['alpha'] = 1.2
-    problem_params['V_ref'] = np.array([1.0])
-
-    # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = 4
-
-    # initialize controller parameters
-    controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
-    controller_params['mssdc_jac'] = False
-
-    # convergence controllers
-    convergence_controllers = dict()
-    if use_switch_estimator:
-        switch_estimator_params = dict()
-        convergence_controllers.update({SwitchEstimator: switch_estimator_params})
-
-    if use_adaptivity:
-        adaptivity_params = dict()
-        adaptivity_params['e_tol'] = 1e-7
-        convergence_controllers.update({Adaptivity: adaptivity_params})
-
-    # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = problem  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = sweeper  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params
-    description['max_restarts'] = 1
-
-    if use_switch_estimator or use_adaptivity:
-        description['convergence_controllers'] = convergence_controllers
-
-    proof_assertions_description(description, use_adaptivity, use_switch_estimator)
-
-    # set time parameters
-    t0 = 0.0
-    Tend = 0.3
-
-    assert dt < Tend, "Time step is too large for the time domain!"
-
-    assert (
-        Tend == 0.3 and description['problem_params']['V_ref'] == 1.0 and description['problem_params']['alpha'] == 1.2
-    ), "Error! Do not use other parameters for V_ref != 1.0, alpha != 1.2, Tend != 0.3 due to hardcoded reference!"
-    assert dt == 4e-2 or dt == 4e-3, "Error! Do not use another time step dt!= 1e-2!"
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-    return description, stats
-
-
-def check(cwd='./'):
+def run(cwd='./'):
     """
     Routine to check the differences between using a switch estimator or not
 
@@ -128,28 +33,46 @@ def check(cwd='./'):
     """
 
     dt_list = [4e-2, 4e-3]
+    t0 = 0.0
+    Tend = 0.3
+
+    problem_classes = [battery, battery_implicit]
+    sweeper_classes = [imex_1st_order, generic_implicit]
+
+    ncapacitors = 1
+    alpha = 1.2
+    V_ref = np.array([1.0])
+    C = np.array([1.0])
+
+    max_restarts = 1
     use_switch_estimator = [True, False]
     use_adaptivity = [True, False]
     restarts_SE = []
     restarts_adapt = []
     restarts_SE_adapt = []
 
-    problem_classes = [battery, battery_implicit]
-    sweeper_classes = [imex_1st_order, generic_implicit]
-
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for dt_item in dt_list:
             for use_SE in use_switch_estimator:
                 for use_A in use_adaptivity:
-                    description, stats = run(
-                        dt=dt_item,
-                        problem=problem,
-                        sweeper=sweeper,
-                        use_switch_estimator=use_SE,
-                        use_adaptivity=use_A,
+                    description, controller_params = generate_description(
+                        dt_item,
+                        problem,
+                        sweeper,
+                        log_data,
+                        use_A,
+                        use_SE,
+                        ncapacitors,
+                        alpha,
+                        V_ref,
+                        C,
+                        max_restarts,
                     )
 
-                    V_ref = description['problem_params']['V_ref'][0]
+                    # Assertions
+                    proof_assertions_description(description, use_A, use_SE)
+
+                    stats = controller_run(description, controller_params, use_A, use_SE, t0, Tend)
 
                     if use_A or use_SE:
                         check_solution(stats, dt_item, problem.__name__, use_A, use_SE)
@@ -366,10 +289,10 @@ def differences_around_switch(
         vC_SE_adapt = get_sorted(stats_SE_adapt, type='voltage C', recomputed=False, sortby='time')
         vC = get_sorted(stats, type='voltage C', sortby='time')
 
-        diff_SE, diff = [v[1] - V_ref for v in vC_SE], [v[1] - V_ref for v in vC]
+        diff_SE, diff = [v[1] - V_ref[0] for v in vC_SE], [v[1] - V_ref[0] for v in vC]
         times_SE, times = [v[0] for v in vC_SE], [v[0] for v in vC]
 
-        diff_adapt, diff_SE_adapt = [v[1] - V_ref for v in vC_adapt], [v[1] - V_ref for v in vC_SE_adapt]
+        diff_adapt, diff_SE_adapt = [v[1] - V_ref[0] for v in vC_adapt], [v[1] - V_ref[0] for v in vC_SE_adapt]
         times_adapt, times_SE_adapt = [v[0] for v in vC_adapt], [v[0] for v in vC_SE_adapt]
 
         for m in range(len(times_SE)):
@@ -517,10 +440,10 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
         vC_SE_adapt = get_sorted(stats_SE_adapt, type='voltage C', recomputed=False, sortby='time')
         vC = get_sorted(stats, type='voltage C', sortby='time')
 
-        diff_SE, diff = [v[1] - V_ref for v in vC_SE], [v[1] - V_ref for v in vC]
+        diff_SE, diff = [v[1] - V_ref[0] for v in vC_SE], [v[1] - V_ref[0] for v in vC]
         times_SE, times = [v[0] for v in vC_SE], [v[0] for v in vC]
 
-        diff_adapt, diff_SE_adapt = [v[1] - V_ref for v in vC_adapt], [v[1] - V_ref for v in vC_SE_adapt]
+        diff_adapt, diff_SE_adapt = [v[1] - V_ref[0] for v in vC_adapt], [v[1] - V_ref[0] for v in vC_SE_adapt]
         times_adapt, times_SE_adapt = [v[0] for v in vC_adapt], [v[0] for v in vC_SE_adapt]
 
         if len(dt_list) > 1:
@@ -711,4 +634,4 @@ def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
 
 
 if __name__ == "__main__":
-    check()
+    run()

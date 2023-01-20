@@ -26,13 +26,13 @@ class battery(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['ncondensators', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
+        essential_keys = ['ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        problem_params['nvars'] = problem_params['ncondensators'] + 1
+        problem_params['nvars'] = problem_params['ncapacitors'] + 1
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(battery, self).__init__(
@@ -156,13 +156,13 @@ class battery(ptype):
 class battery_implicit(battery):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
 
-        essential_keys = ['newton_maxiter', 'newton_tol', 'ncondensators', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
+        essential_keys = ['newton_maxiter', 'newton_tol', 'ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        problem_params['nvars'] = problem_params['ncondensators'] + 1
+        problem_params['nvars'] = problem_params['ncapacitors'] + 1
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(battery_implicit, self).__init__(
@@ -289,13 +289,13 @@ class battery_n_capacitors(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['ncondensators', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
+        essential_keys = ['ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        n = problem_params['ncondensators']
+        n = problem_params['ncapacitors']
         problem_params['nvars'] = n + 1
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
