@@ -47,6 +47,7 @@ Submodules
    implementations.problem_classes.HeatEquation_ND_FD_CuPy
    implementations.problem_classes.HenonHeiles
    implementations.problem_classes.LogisticEquation
+   implementations.problem_classes.Lorenz
    implementations.problem_classes.NonlinearSchroedinger_MPIFFT
    implementations.problem_classes.OuterSolarSystem
    implementations.problem_classes.PenningTrap_3D

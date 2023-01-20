@@ -1,0 +1,7 @@
+implementations.problem\_classes.Lorenz module
+==============================================
+
+.. automodule:: implementations.problem_classes.Lorenz
+   :members:
+   :undoc-members:
+   :show-inheritance:
