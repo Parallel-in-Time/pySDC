@@ -124,7 +124,7 @@ def run_Lorenz(
     return stats, controller, Tend
 
 
-def plot_solution(stats):
+def plot_solution(stats):  # pragma: no cover
     """
     Plot the solution in 3D.
 
@@ -189,7 +189,7 @@ def main(plotting=True):
         hook_class=[log_data, LogGlobalErrorPostRun],
     )
     check_solution(stats, controller, 5e-4)
-    if plotting:
+    if plotting:  # pragma: no cover
         plot_solution(stats)
 
 
