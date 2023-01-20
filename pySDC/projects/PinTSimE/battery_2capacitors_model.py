@@ -113,8 +113,8 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 
     Args:
         description(dict): contains all information for a controller run
-        problem (problem_class.__name__): problem class that wants to be simulated
-        sweeper (sweeper_class.__name__): sweeper class for solving the problem class numerically
+        problem (pySDC.core.Problem.ptype): problem class that wants to be simulated
+        sweeper (pySDC.core.Sweeper.sweeper): sweeper class for solving the problem class numerically
         recomputed (bool): flag if the values after a restart are used or before
         use_switch_estimator (bool): flag if the switch estimator wants to be used or not
         use_adaptivity (bool): flag if adaptivity wants to be used or not
