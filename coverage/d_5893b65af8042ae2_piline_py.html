@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/Resilience/piline.py: 86%</title>
+    <title>Coverage for pySDC/projects/Resilience/piline.py: 85%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/projects/Resilience/piline.py</b>:
-            <span class="pc_cov">86%</span>
+            <span class="pc_cov">85%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,9 +54,9 @@
             </div>
         </aside>
         <h2>
-            <span class="text">144 statements &nbsp;</span>
+            <span class="text">146 statements &nbsp;</span>
             <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">124<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">20<span class="text"> missing</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">22<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">8<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_vdp_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.5</a>,
-            created at 2023-01-20 09:19 +0000
+            created at 2023-01-20 10:35 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -89,14 +89,14 @@
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">controller_classes</span><span class="op">.</span><span class="nam">controller_nonMPI</span> <span class="key">import</span> <span class="nam">controller_nonMPI</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">adaptivity</span> <span class="key">import</span> <span class="nam">Adaptivity</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">hotrod</span> <span class="key">import</span> <span class="nam">HotRod</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">hook</span> <span class="key">import</span> <span class="nam">log_data</span><span class="op">,</span> <span class="nam">hook_collection</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">hook</span> <span class="key">import</span> <span class="nam">LogData</span><span class="op">,</span> <span class="nam">hook_collection</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">def</span> <span class="nam">run_piline</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="nam">custom_description</span><span class="op">=</span><span class="key">None</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">    <span class="nam">num_procs</span><span class="op">=</span><span class="num">1</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">    <span class="nam">Tend</span><span class="op">=</span><span class="num">20.0</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="nam">hook_class</span><span class="op">=</span><span class="nam">log_data</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="nam">hook_class</span><span class="op">=</span><span class="nam">LogData</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">    <span class="nam">fault_stuff</span><span class="op">=</span><span class="key">None</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">    <span class="nam">custom_controller_params</span><span class="op">=</span><span class="key">None</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">    <span class="nam">custom_problem_params</span><span class="op">=</span><span class="key">None</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -150,7 +150,7 @@
     <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">    <span class="com"># initialize controller parameters</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">    <span class="nam">controller_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">'logger_level'</span><span class="op">]</span> <span class="op">=</span> <span class="num">30</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">'hook_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">hook_collection</span> <span class="op">+</span> <span class="op">[</span><span class="nam">hook_class</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">'hook_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">hook_collection</span> <span class="op">+</span> <span class="op">(</span><span class="nam">hook_class</span> <span class="key">if</span> <span class="nam">type</span><span class="op">(</span><span class="nam">hook_class</span><span class="op">)</span> <span class="op">==</span> <span class="nam">list</span> <span class="key">else</span> <span class="op">[</span><span class="nam">hook_class</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">'mssdc_jac'</span><span class="op">]</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">    <span class="key">if</span> <span class="nam">custom_controller_params</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -180,11 +180,11 @@
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">    <span class="com"># insert faults</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">    <span class="key">if</span> <span class="nam">fault_stuff</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">        <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">random_generator</span> <span class="op">=</span> <span class="nam">fault_stuff</span><span class="op">[</span><span class="str">'rng'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">        <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">add_fault</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">            <span class="nam">rnd_args</span><span class="op">=</span><span class="op">{</span><span class="str">'iteration'</span><span class="op">:</span> <span class="num">4</span><span class="op">,</span> <span class="op">**</span><span class="nam">fault_stuff</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'rnd_params'</span><span class="op">,</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span><span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">            <span class="nam">args</span><span class="op">=</span><span class="op">{</span><span class="str">'time'</span><span class="op">:</span> <span class="num">2.5</span><span class="op">,</span> <span class="str">'target'</span><span class="op">:</span> <span class="num">0</span><span class="op">,</span> <span class="op">**</span><span class="nam">fault_stuff</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'args'</span><span class="op">,</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span><span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">fault_injection</span> <span class="key">import</span> <span class="nam">prepare_controller_for_faults</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">        <span class="nam">rnd_args</span> <span class="op">=</span> <span class="op">{</span><span class="str">'iteration'</span><span class="op">:</span> <span class="num">4</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">        <span class="nam">args</span> <span class="op">=</span> <span class="op">{</span><span class="str">'time'</span><span class="op">:</span> <span class="num">2.5</span><span class="op">,</span> <span class="str">'target'</span><span class="op">:</span> <span class="num">0</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">        <span class="nam">prepare_controller_for_faults</span><span class="op">(</span><span class="nam">controller</span><span class="op">,</span> <span class="nam">fault_stuff</span><span class="op">,</span> <span class="nam">rnd_args</span><span class="op">,</span> <span class="nam">args</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">    <span class="com"># get initial values on finest level</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">    <span class="nam">P</span> <span class="op">=</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">MS</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">prob</span>&nbsp;</span><span class="r"></span></p>
@@ -467,7 +467,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_vdp_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.5</a>,
-            created at 2023-01-20 09:19 +0000
+            created at 2023-01-20 10:35 +0000
         </p>
     </div>
 </footer>
