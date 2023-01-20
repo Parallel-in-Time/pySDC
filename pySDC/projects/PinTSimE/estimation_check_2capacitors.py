@@ -24,7 +24,7 @@ def run(cwd='./'):
     Routine to check the differences between using a switch estimator or not
 
     Args:
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     dt_list = [4e-1, 4e-2, 4e-3]

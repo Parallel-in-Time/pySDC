@@ -71,7 +71,7 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
         recomputed (bool): flag if the values after a restart are used or before
         use_switch_estimator (bool): flag if the switch estimator wants to be used or not
         use_adaptivity (bool): flag if adaptivity wants to be used or not
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     f = open(cwd + 'data/{}_{}_USE{}_USA{}.dat'.format(problem, sweeper, use_switch_estimator, use_adaptivity), 'rb')

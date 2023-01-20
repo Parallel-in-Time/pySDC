@@ -29,7 +29,7 @@ def run(cwd='./'):
     Routine to check the differences between using a switch estimator or not
 
     Args:
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     dt_list = [4e-2, 4e-3]
@@ -128,7 +128,7 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
         problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
         sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         V_ref (np.float): reference value for the switch
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     if len(dt_list) > 1:
@@ -246,7 +246,7 @@ def differences_around_switch(
         restarts_SE_adapt (list): Restarts for the solve of using both, switch estimator and adaptivity
         sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         V_ref (np.float): reference value for the switch
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     diffs_true_at = []
@@ -408,7 +408,7 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
         problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
         sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         V_ref (np.float): reference value for the switch
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     if len(dt_list) > 1:
@@ -556,7 +556,7 @@ def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
         maxiter (np.int): maximum number of iterations
         problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
         sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
-        cwd: current working directory
+        cwd (str): current working directory
     """
 
     iters_time_SE = []
