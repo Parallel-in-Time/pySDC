@@ -1,0 +1,4 @@
+*.rst
+!index.rst
+!projects/*.rst
+!tutorials/*.rst
