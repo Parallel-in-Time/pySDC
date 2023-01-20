@@ -11,6 +11,7 @@ from pySDC.projects.PinTSimE.battery_model import (
     controller_run,
     generate_description,
     get_recomputed,
+    log_data,
     proof_assertions_description,
 )
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
@@ -18,54 +19,6 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-
-
-class log_data(hooks):
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='current L',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='voltage C1',
-            value=L.uend[1],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='voltage C2',
-            value=L.uend[2],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.get('restart')),
-        )
 
 
 def run():
@@ -126,17 +79,17 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = get_sorted(stats, type='current L', recomputed=recomputed, sortby='time')
-    vC1 = get_sorted(stats, type='voltage C1', recomputed=recomputed, sortby='time')
-    vC2 = get_sorted(stats, type='voltage C2', recomputed=recomputed, sortby='time')
+    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    vC1 = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    vC2 = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
 
-    times = [v[0] for v in cL]
+    times = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in cL], label='$i_L$')
-    ax.plot(times, [v[1] for v in vC1], label='$v_{C_1}$')
-    ax.plot(times, [v[1] for v in vC2], label='$v_{C_2}$')
+    ax.plot(times, cL, label='$i_L$')
+    ax.plot(times, vC1, label='$v_{C_1}$')
+    ax.plot(times, vC2, label='$v_{C_2}$')
 
     if use_switch_estimator:
         switches = get_recomputed(stats, type='switch', sortby='time')
@@ -242,9 +195,9 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     """
 
     data = dict()
-    data['cL'] = np.array(get_sorted(stats, type='current L', recomputed=recomputed, sortby='time'))[:, 1]
-    data['vC1'] = np.array(get_sorted(stats, type='voltage C1', recomputed=recomputed, sortby='time'))[:, 1]
-    data['vC2'] = np.array(get_sorted(stats, type='voltage C2', recomputed=recomputed, sortby='time'))[:, 1]
+    data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    data['vC1'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    data['vC2'] = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['switch1'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[0, 1]
     data['switch2'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[-1, 1]
     data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])

@@ -125,8 +125,8 @@ def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
 
     Args:
         dt_list (list): list of considered (initial) step sizes
-        problem (problem.__name__): Problem class used to consider (the class name)
-        sweeper (sweeper.__name__): Sweeper used to solve (the class name)
+        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
+        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         V_ref (np.float): reference value for the switch
         cwd: current working directory
     """
@@ -240,11 +240,11 @@ def differences_around_switch(
 
     Args:
         dt_list (list): list of considered (initial) step sizes
-        problem (problem.__name__): Problem class used to consider (the class name)
+        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
         restarts_SE (list): Restarts for the solve only using the switch estimator
         restarts_adapt (list): Restarts for the solve of only using adaptivity
         restarts_SE_adapt (list): Restarts for the solve of using both, switch estimator and adaptivity
-        sweeper (sweeper.__name__): Sweeper used to solve (the class name)
+        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         V_ref (np.float): reference value for the switch
         cwd: current working directory
     """
@@ -284,16 +284,18 @@ def differences_around_switch(
         t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switch_SE_adapt = t_switch_SE_adapt[-1]
 
-        vC_SE = get_sorted(stats_SE, type='voltage C', recomputed=False, sortby='time')
-        vC_adapt = get_sorted(stats_adapt, type='voltage C', recomputed=False, sortby='time')
-        vC_SE_adapt = get_sorted(stats_SE_adapt, type='voltage C', recomputed=False, sortby='time')
-        vC = get_sorted(stats, type='voltage C', sortby='time')
+        vC_SE = [me[1][1] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
+        vC_adapt = [me[1][1] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
+        vC_SE_adapt = [me[1][1] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
+        vC = [me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
 
-        diff_SE, diff = [v[1] - V_ref[0] for v in vC_SE], [v[1] - V_ref[0] for v in vC]
-        times_SE, times = [v[0] for v in vC_SE], [v[0] for v in vC]
+        diff_SE, diff = vC_SE - V_ref[0], vC - V_ref[0]
+        times_SE = [me[0] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
+        times = [me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
 
-        diff_adapt, diff_SE_adapt = [v[1] - V_ref[0] for v in vC_adapt], [v[1] - V_ref[0] for v in vC_SE_adapt]
-        times_adapt, times_SE_adapt = [v[0] for v in vC_adapt], [v[0] for v in vC_SE_adapt]
+        diff_adapt, diff_SE_adapt = vC_adapt - V_ref[0], vC_SE_adapt - V_ref[0]
+        times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
+        times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
 
         for m in range(len(times_SE)):
             if np.round(times_SE[m], 15) == np.round(t_switch, 15):
@@ -387,8 +389,8 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
 
     Args:
         dt_list (list): list of considered (initial) step sizes
-        problem (problem.__name__): Problem class used to consider (the class name)
-        sweeper (sweeper.__name__): Sweeper used to solve (the class name)
+        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
+        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         V_ref (np.float): reference value for the switch
         cwd: current working directory
     """
@@ -435,16 +437,18 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
         restart_adapt = np.array(get_sorted(stats_adapt, type='restart', recomputed=None, sortby='time'))
         restart_SE_adapt = np.array(get_sorted(stats_SE_adapt, type='restart', recomputed=None, sortby='time'))
 
-        vC_SE = get_sorted(stats_SE, type='voltage C', recomputed=False, sortby='time')
-        vC_adapt = get_sorted(stats_adapt, type='voltage C', recomputed=False, sortby='time')
-        vC_SE_adapt = get_sorted(stats_SE_adapt, type='voltage C', recomputed=False, sortby='time')
-        vC = get_sorted(stats, type='voltage C', sortby='time')
+        vC_SE = [me[1][1] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
+        vC_adapt = [me[1][1] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
+        vC_SE_adapt = [me[1][1] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
+        vC = [me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
 
-        diff_SE, diff = [v[1] - V_ref[0] for v in vC_SE], [v[1] - V_ref[0] for v in vC]
-        times_SE, times = [v[0] for v in vC_SE], [v[0] for v in vC]
+        diff_SE, diff = vC_SE - V_ref[0], vC - V_ref[0]
+        times_SE = [me[0] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
+        times = [me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
 
-        diff_adapt, diff_SE_adapt = [v[1] - V_ref[0] for v in vC_adapt], [v[1] - V_ref[0] for v in vC_SE_adapt]
-        times_adapt, times_SE_adapt = [v[0] for v in vC_adapt], [v[0] for v in vC_SE_adapt]
+        diff_adapt, diff_SE_adapt = vC_adapt - V_ref[0], vC_SE_adapt - V_ref[0]
+        times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
+        times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
 
         if len(dt_list) > 1:
             ax_diffs[0, count_ax].set_title(r'$\Delta t$=%s' % dt_item)
@@ -534,8 +538,8 @@ def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
     Args:
         dt_list (list): list of considered (initial) step sizes
         maxiter (np.int): maximum number of iterations
-        problem (problem.__name__): Problem class used to consider (the class name)
-        sweeper (sweeper.__name__): Sweeper used to solve (the class name)
+        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
+        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
         cwd: current working directory
     """
 

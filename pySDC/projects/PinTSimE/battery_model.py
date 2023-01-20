@@ -32,17 +32,8 @@ class log_data(hooks):
             level=L.level_index,
             iter=0,
             sweep=L.status.sweep,
-            type='current L',
-            value=L.uend[0],
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='voltage C',
-            value=L.uend[1],
+            type='u',
+            value=L.uend,
         )
         self.add_to_stats(
             process=step.status.slot,
@@ -266,16 +257,16 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = get_sorted(stats, type='current L', recomputed=False, sortby='time')
-    vC = get_sorted(stats, type='voltage C', recomputed=False, sortby='time')
+    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    vC = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
 
-    times = [v[0] for v in cL]
+    times = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
     ax.set_title('Simulation of {} using {}'.format(problem, sweeper), fontsize=10)
-    ax.plot(times, [v[1] for v in cL], label=r'$i_L$')
-    ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
+    ax.plot(times, cL, label=r'$i_L$')
+    ax.plot(times, vC, label=r'$v_C$')
 
     if use_switch_estimator:
         switches = get_recomputed(stats, type='switch', sortby='time')
@@ -574,8 +565,8 @@ def get_data_dict(stats, use_adaptivity=True, use_switch_estimator=True, recompu
 
     data = dict()
 
-    data['cL'] = np.array(get_sorted(stats, type='current L', recomputed=recomputed, sortby='time'))[:, 1]
-    data['vC'] = np.array(get_sorted(stats, type='voltage C', recomputed=recomputed, sortby='time'))[:, 1]
+    data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    data['vC'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     if use_adaptivity:
         data['dt'] = np.array(get_sorted(stats, type='dt', recomputed=recomputed, sortby='time'))[:, 1]
         data['e_em'] = np.array(

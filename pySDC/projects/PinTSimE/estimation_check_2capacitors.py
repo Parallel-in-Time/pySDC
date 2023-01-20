@@ -7,11 +7,10 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed
+from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed, log_data
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_2capacitors_model import (
     check_solution,
-    log_data,
     proof_assertions_description,
     proof_assertions_time,
 )
@@ -72,13 +71,13 @@ def run(cwd='./'):
 
                     check_solution(stats, dt_item, use_SE)
 
-                fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, use_SE)
+                fname = 'data/{}_dt{}_USE{}.dat'.format(problem.__name__, dt_item, use_SE)
                 f = open(fname, 'wb')
                 dill.dump(stats, f)
                 f.close()
 
                 if use_SE:
-                    restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
+                    restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None))
                     restarts = restarts_dict[dt_item][:, 1]
                     restarts_all.append(np.sum(restarts))
                     print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
@@ -95,11 +94,11 @@ def run(cwd='./'):
     restarts_dt_switch1 = []
     restarts_dt_switch2 = []
     for dt_item in dt_list:
-        f1 = open(cwd + 'data/battery_2condensators_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'data/{}_dt{}_USETrue.dat'.format(problem.__name__, dt_item), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'data/battery_2condensators_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'data/{}_dt{}_USEFalse.dat'.format(problem.__name__, dt_item), 'rb')
         stats_false = dill.load(f2)
         f2.close()
 
@@ -108,52 +107,61 @@ def run(cwd='./'):
 
         val_switch_all.append([t_switch[0], t_switch[1]])
 
-        vC1_true = get_sorted(stats_true, type='voltage C1', recomputed=False, sortby='time')
-        vC2_true = get_sorted(stats_true, type='voltage C2', recomputed=False, sortby='time')
-        vC1_false = get_sorted(stats_false, type='voltage C1', sortby='time')
-        vC2_false = get_sorted(stats_false, type='voltage C2', sortby='time')
+        vC1_true = [me[1][1] for me in get_sorted(stats_true, type='u', recomputed=False)]
+        vC2_true = [me[1][2] for me in get_sorted(stats_true, type='u', recomputed=False)]
+        vC1_false = [me[1][1] for me in get_sorted(stats_false, type='u', recomputed=False)]
+        vC2_false = [me[1][2] for me in get_sorted(stats_false, type='u', recomputed=False)]
 
-        diff_true1 = [v[1] - V_ref[0] for v in vC1_true]
-        diff_true2 = [v[1] - V_ref[1] for v in vC2_true]
-        diff_false1 = [v[1] - V_ref[0] for v in vC1_false]
-        diff_false2 = [v[1] - V_ref[1] for v in vC2_false]
+        diff_true1 = vC1_true - V_ref[0]
+        diff_true2 = vC2_true - V_ref[1]
+        diff_false1 = vC1_false - V_ref[0]
+        diff_false2 = vC2_false - V_ref[1]
 
-        times_true1 = [v[0] for v in vC1_true]
-        times_true2 = [v[0] for v in vC2_true]
-        times_false1 = [v[0] for v in vC1_false]
-        times_false2 = [v[0] for v in vC2_false]
+        t_true = [me[0] for me in get_sorted(stats_true, type='u', recomputed=False)]
+        t_false = [me[0] for me in get_sorted(stats_false, type='u', recomputed=False)]
 
-        for m in range(len(times_true1)):
-            if np.round(times_true1[m], 15) == np.round(t_switch[0], 15):
-                diff_true_all1.append(diff_true1[m])
+        diff_true_all1.append(
+            [diff_true1[m] for m in range(len(t_true)) if np.isclose(t_true[m], t_switch[0], atol=1e-15)]
+        )
+        diff_true_all2.append(
+            [diff_true2[m] for m in range(len(t_true)) if np.isclose(t_true[m], t_switch[1], atol=1e-15)]
+        )
 
-        for m in range(len(times_true2)):
-            if np.round(times_true2[m], 15) == np.round(t_switch[1], 15):
-                diff_true_all2.append(diff_true2[m])
+        diff_false_all_before1.append(
+            [diff_false1[m - 1] for m in range(1, len(t_false)) if t_false[m - 1] < t_switch[0] < t_false[m]]
+        )
+        diff_false_all_after1.append(
+            [diff_false1[m] for m in range(1, len(t_false)) if t_false[m - 1] < t_switch[0] < t_false[m]]
+        )
 
-        for m in range(1, len(times_false1)):
-            if times_false1[m - 1] < t_switch[0] < times_false1[m]:
-                diff_false_all_before1.append(diff_false1[m - 1])
-                diff_false_all_after1.append(diff_false1[m])
-
-        for m in range(1, len(times_false2)):
-            if times_false2[m - 1] < t_switch[1] < times_false2[m]:
-                diff_false_all_before2.append(diff_false2[m - 1])
-                diff_false_all_after2.append(diff_false2[m])
+        diff_false_all_before2.append(
+            [diff_false2[m - 1] for m in range(1, len(t_false)) if t_false[m - 1] < t_switch[1] < t_false[m]]
+        )
+        diff_false_all_after2.append(
+            [diff_false2[m] for m in range(1, len(t_false)) if t_false[m - 1] < t_switch[1] < t_false[m]]
+        )
 
         restarts_dt = restarts_dict[dt_item]
-        for i in range(len(restarts_dt[:, 0])):
-            if round(restarts_dt[i, 0], 13) == round(t_switch[0], 13):
-                restarts_dt_switch1.append(np.sum(restarts_dt[0 : i - 1, 1]))
-
-            if round(restarts_dt[i, 0], 13) == round(t_switch[1], 13):
-                restarts_dt_switch2.append(np.sum(restarts_dt[i - 2 :, 1]))
+        restarts_dt_switch1.append(
+            [
+                np.sum(restarts_dt[0 : i - 1, 1])
+                for i in range(len(restarts_dt[:, 0]))
+                if np.isclose(restarts_dt[i, 0], t_switch[0], atol=1e-13)
+            ]
+        )
+        restarts_dt_switch2.append(
+            [
+                np.sum(restarts_dt[i - 2 :, 1])
+                for i in range(len(restarts_dt[:, 0]))
+                if np.isclose(restarts_dt[i, 0], t_switch[1], atol=1e-13)
+            ]
+        )
 
         setup_mpl()
         fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
         ax1.set_title('Time evolution of $v_{C_{1}}-V_{ref1}$')
-        ax1.plot(times_true1, diff_true1, label='SE=True', color='#ff7f0e')
-        ax1.plot(times_false1, diff_false1, label='SE=False', color='#1f77b4')
+        ax1.plot(t_true, diff_true1, label='SE=True', color='#ff7f0e')
+        ax1.plot(t_false, diff_false1, label='SE=False', color='#1f77b4')
         ax1.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch1')
         ax1.legend(frameon=False, fontsize=10, loc='lower left')
         ax1.set_yscale('symlog', linthresh=1e-5)
@@ -165,8 +173,8 @@ def run(cwd='./'):
         setup_mpl()
         fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
         ax2.set_title('Time evolution of $v_{C_{2}}-V_{ref2}$')
-        ax2.plot(times_true2, diff_true2, label='SE=True', color='#ff7f0e')
-        ax2.plot(times_false2, diff_false2, label='SE=False', color='#1f77b4')
+        ax2.plot(t_true, diff_true2, label='SE=True', color='#ff7f0e')
+        ax2.plot(t_false, diff_false2, label='SE=False', color='#1f77b4')
         ax2.axvline(x=t_switch[1], linestyle='--', color='k', label='Switch2')
         ax2.legend(frameon=False, fontsize=10, loc='lower left')
         ax2.set_yscale('symlog', linthresh=1e-5)
