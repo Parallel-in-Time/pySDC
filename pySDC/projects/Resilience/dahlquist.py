@@ -9,51 +9,29 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+from pySDC.implementations.hooks.log_solution import LogSolutionAfterIteration
+from pySDC.implementations.hooks.log_step_size import LogStepSize
 
-class log_data(hooks):
+
+class LogLambdas(hooks):
     """
-    Store the solution after each iteration
+    Store the lambda values at the beginning of the run
     """
-
-    def post_iteration(self, step, level_number):
-
-        super(log_data, self).post_iteration(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
 
     def pre_run(self, step, level_number):
-        super(log_data, self).pre_run(step, level_number)
+        super().pre_run(step, level_number)
         L = step.levels[level_number]
         self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='lambdas', value=L.prob.params.lambdas)
+
+
+hooks = [LogLambdas, LogSolutionAfterIteration, LogStepSize]
 
 
 def run_dahlquist(
     custom_description=None,
     num_procs=1,
     Tend=1.0,
-    hook_class=log_data,
+    hook_class=hooks,
     fault_stuff=None,
     custom_controller_params=None,
     custom_problem_params=None,
