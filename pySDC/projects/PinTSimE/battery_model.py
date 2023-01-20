@@ -257,16 +257,16 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
-    vC = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
+    vC = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)])
 
-    times = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
+    t = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
     ax.set_title('Simulation of {} using {}'.format(problem, sweeper), fontsize=10)
-    ax.plot(times, cL, label=r'$i_L$')
-    ax.plot(times, vC, label=r'$v_C$')
+    ax.plot(t, cL, label=r'$i_L$')
+    ax.plot(t, vC, label=r'$v_C$')
 
     if use_switch_estimator:
         switches = get_recomputed(stats, type='switch', sortby='time')

@@ -284,38 +284,54 @@ def differences_around_switch(
         t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switch_SE_adapt = t_switch_SE_adapt[-1]
 
-        vC_SE = [me[1][1] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
-        vC_adapt = [me[1][1] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
-        vC_SE_adapt = [me[1][1] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
-        vC = [me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
+        vC_SE = [me[1][1] for me in get_sorted(stats_SE, type='u', recomputed=False)]
+        vC_adapt = [me[1][1] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
+        vC_SE_adapt = [me[1][1] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
+        vC = [me[1][1] for me in get_sorted(stats, type='u', recomputed=False)]
 
         diff_SE, diff = vC_SE - V_ref[0], vC - V_ref[0]
-        times_SE = [me[0] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
-        times = [me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
+        times_SE = [me[0] for me in get_sorted(stats_SE, type='u', recomputed=False)]
+        times = [me[0] for me in get_sorted(stats, type='u', recomputed=False)]
 
         diff_adapt, diff_SE_adapt = vC_adapt - V_ref[0], vC_SE_adapt - V_ref[0]
-        times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
-        times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
+        times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
+        times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
 
-        for m in range(len(times_SE)):
-            if np.round(times_SE[m], 15) == np.round(t_switch, 15):
-                diffs_true_at.append(diff_SE[m])
+        diffs_true_at.append(
+            [diff_SE[m] for m in range(len(times_SE)) if np.isclose(times_SE[m], t_switch, atol=1e-15)]
+        )
 
-        for m in range(1, len(times)):
-            if times[m - 1] <= t_switch <= times[m]:
-                diffs_false_before.append(diff[m - 1])
-                diffs_false_after.append(diff[m])
+        diffs_false_before.append([diff[m - 1] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]])
+        diffs_false_after.append([diff[m] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]])
 
-        for m in range(len(times_SE_adapt)):
-            if np.round(times_SE_adapt[m], 13) == np.round(t_switch_SE_adapt, 13):
-                diffs_true_at_adapt.append(diff_SE_adapt[m])
-                diffs_true_before_adapt.append(diff_SE_adapt[m - 1])
-                diffs_true_after_adapt.append(diff_SE_adapt[m + 1])
+        diffs_true_at_adapt.append(
+            [
+                diff_SE_adapt[m]
+                for m in range(len(times_SE_adapt))
+                if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-13)
+            ]
+        )
+        diffs_true_before_adapt.append(
+            [
+                diff_SE_adapt[m - 1]
+                for m in range(len(times_SE_adapt))
+                if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-13)
+            ]
+        )
+        diffs_true_after_adapt.append(
+            [
+                diff_SE_adapt[m + 1]
+                for m in range(len(times_SE_adapt))
+                if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-13)
+            ]
+        )
 
-        for m in range(len(times_adapt)):
-            if times_adapt[m - 1] <= t_switch <= times_adapt[m]:
-                diffs_false_before_adapt.append(diff_adapt[m - 1])
-                diffs_false_after_adapt.append(diff_adapt[m])
+        diffs_false_before_adapt.append(
+            [diff_adapt[m - 1] for m in range(len(times_adapt)) if times_adapt[m - 1] <= t_switch <= times_adapt[m]]
+        )
+        diffs_false_after_adapt.append(
+            [diff_adapt[m] for m in range(len(times_adapt)) if times_adapt[m - 1] <= t_switch <= times_adapt[m]]
+        )
 
     setup_mpl()
     fig_around, ax_around = plt_helper.plt.subplots(1, 3, figsize=(9, 3), sharex='col', sharey='row')
@@ -431,24 +447,24 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
         t_switch_SE_adapt = [v[1] for v in switches_SE_adapt]
         t_switch_SE_adapt = t_switch_SE_adapt[-1]
 
-        dt_adapt = np.array(get_sorted(stats_adapt, type='dt', recomputed=False, sortby='time'))
-        dt_SE_adapt = np.array(get_sorted(stats_SE_adapt, type='dt', recomputed=False, sortby='time'))
+        dt_adapt = np.array(get_sorted(stats_adapt, type='dt', recomputed=False))
+        dt_SE_adapt = np.array(get_sorted(stats_SE_adapt, type='dt', recomputed=False))
 
-        restart_adapt = np.array(get_sorted(stats_adapt, type='restart', recomputed=None, sortby='time'))
-        restart_SE_adapt = np.array(get_sorted(stats_SE_adapt, type='restart', recomputed=None, sortby='time'))
+        restart_adapt = np.array(get_sorted(stats_adapt, type='restart', recomputed=None))
+        restart_SE_adapt = np.array(get_sorted(stats_SE_adapt, type='restart', recomputed=None))
 
-        vC_SE = [me[1][1] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
-        vC_adapt = [me[1][1] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
-        vC_SE_adapt = [me[1][1] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
-        vC = [me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
+        vC_SE = [me[1][1] for me in get_sorted(stats_SE, type='u', recomputed=False)]
+        vC_adapt = [me[1][1] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
+        vC_SE_adapt = [me[1][1] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
+        vC = [me[1][1] for me in get_sorted(stats, type='u', recomputed=False)]
 
         diff_SE, diff = vC_SE - V_ref[0], vC - V_ref[0]
-        times_SE = [me[0] for me in get_sorted(stats_SE, type='u', recomputed=False, sortby='time')]
-        times = [me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')]
+        times_SE = [me[0] for me in get_sorted(stats_SE, type='u', recomputed=False)]
+        times = [me[0] for me in get_sorted(stats, type='u', recomputed=False)]
 
         diff_adapt, diff_SE_adapt = vC_adapt - V_ref[0], vC_SE_adapt - V_ref[0]
-        times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False, sortby='time')]
-        times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False, sortby='time')]
+        times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
+        times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
 
         if len(dt_list) > 1:
             ax_diffs[0, count_ax].set_title(r'$\Delta t$=%s' % dt_item)
@@ -572,10 +588,10 @@ def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
         f4.close()
 
         # consider iterations before restarts to see what happens
-        iter_counts_SE_val = get_sorted(stats_SE, type='niter', sortby='time')
-        iter_counts_SE_adapt_val = get_sorted(stats_SE_adapt, type='niter', sortby='time')
-        iter_counts_adapt_val = get_sorted(stats_adapt, type='niter', sortby='time')
-        iter_counts_val = get_sorted(stats, type='niter', sortby='time')
+        iter_counts_SE_val = get_sorted(stats_SE, type='niter')
+        iter_counts_SE_adapt_val = get_sorted(stats_SE_adapt, type='niter')
+        iter_counts_adapt_val = get_sorted(stats_adapt, type='niter')
+        iter_counts_val = get_sorted(stats, type='niter')
 
         iters_time_SE.append([v[1] for v in iter_counts_SE_val])
         iters_time_SE_adapt.append([v[1] for v in iter_counts_SE_adapt_val])

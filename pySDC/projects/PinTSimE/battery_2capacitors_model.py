@@ -79,17 +79,17 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
-    vC1 = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
-    vC2 = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
+    vC1 = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)])
+    vC2 = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=recomputed)])
 
-    times = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+    t = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, cL, label='$i_L$')
-    ax.plot(times, vC1, label='$v_{C_1}$')
-    ax.plot(times, vC2, label='$v_{C_2}$')
+    ax.plot(t, cL, label='$i_L$')
+    ax.plot(t, vC1, label='$v_{C_1}$')
+    ax.plot(t, vC2, label='$v_{C_2}$')
 
     if use_switch_estimator:
         switches = get_recomputed(stats, type='switch', sortby='time')
