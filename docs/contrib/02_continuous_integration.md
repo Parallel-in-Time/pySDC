@@ -1,7 +1,7 @@
 # Continuous Integration in pySDC
 
-Any commit in `pySDC` are tested within by GitHub continuous integration (CI). You can see in in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions) the tests for each branches.
-Those tests can be divided in two main categories : [code linting](#code-linting) and [code testing](#code-testing).
+Any commit in `pySDC` are tested by GitHub continuous integration (CI). You can see in in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions) the tests for each branches.
+Those tests are currently divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
 Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the [documentation generation](#documentation-generation) section.
 
 ## Code linting
@@ -48,6 +48,64 @@ pytest -v pySDC/tests
 > pytest -v pySDC/tests/test_nodes.py  # only test nodes generation
 > ```
 
+## Code coverage
+
+This stage allows to checks how much of the `pySDC` code is tested by the previous stage. It is based on the [coverage](https://pypi.org/project/coverage/) library and currently applied to the following directories :
+
+- `pySDC/core`
+- `pySDC/projects`
+- `pySDC/tutorial`
+
+This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork). 
+You can look at the current coverage report for the master branch [here](https://parallel-in-time.org/pySDC/coverage/index.html) or compare the results with previous builds [here](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
+
+During developments, you can also run the coverage tests locally, using :
+
+```bash
+echo "print('Loading sitecustomize.py...');import coverage;coverage.process_startup()" > sitecustomize.py
+coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests
+```
+
+> :bell: Note that this will run all `pySDC` tests while analyzing coverage, hence requires all packages installed for the [code testing stage](#code-testing).
+
+Once the test are finished, you can collect and post-process coverage result :
+
+```bash
+coverage combine
+python -m coverage html
+```
+
+This will generate the coverage report in a `htmlcov` folder, and you can open the `index.html` file within using your favorite browser.
+
+> :warning: Coverage can be lower if some tests fails (for instance, if you did not install all required python package to run all the tests).
+
+### Coverage exceptions
+
+Some types of code lines will be ignored by the coverage analysis (_e.g_ lines starting with `raise`, ...), see the `[tool.coverage.report]` section in `pyproject.toml`.
+Part of code (functions, conditionaly, for loops, etc ...) can be ignored by coverage analysis using the `# pragma: no cover`, for instance 
+
+```python
+# ...
+# code analyzed by coverage
+# ...
+# pragma: no cover
+if condition:
+    # code ignored by coverage
+# ...
+# code analyzed by coverage
+# ...
+# pragma: no cover
+def function():
+    # all function code is ignored by coverage
+```
+
+Accepted use of the `# pragma: no cover` are:
+
+1. Functions and code used for plotting
+2. Lines in one conditional preceding any `raise` statement
+
+If you think the pragma should be used in other parts of your pull request, please indicate (and justify) this in your description.
+
 ## Documentation generation
 
 Documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/).
@@ -67,7 +125,7 @@ sphinx-build -b html docs/source docs/build/html
 Then you can open `docs/build/html/index.html` using you favorite browser and check how your own documentation looks like on the website.
 
 > :bell: **Important** : running all the tests is necessary to generate graphs and images used by the website. 
-> But you can still generate the website without it : just all images for the tutorials, projects and playgrounds will be missing.
+> But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
 > This approach can be considered for local testing of your contribution when it does not concern parts containing images (_i.e_ project or code documentation).
 
 :arrow_left: [Back to Pull Request Recommendation](./01_pull_requests.md) ---
