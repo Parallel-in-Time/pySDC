@@ -1,7 +1,7 @@
 # Continuous Integration in pySDC
 
 Any commit in `pySDC` are tested by GitHub continuous integration (CI). You can see in in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions) the tests for each branches.
-Those tests can be divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
+Those tests are currently divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
 Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the [documentation generation](#documentation-generation) section.
 
 ## Code linting
@@ -50,14 +50,14 @@ pytest -v pySDC/tests
 
 ## Code coverage
 
-This stage allows to checks how much part of the `pySDC` code is tested by the previous stage. It is based on the [coverage](https://pypi.org/project/coverage/) library and currently applied to the following directories :
+This stage allows to checks how much of the `pySDC` code is tested by the previous stage. It is based on the [coverage](https://pypi.org/project/coverage/) library and currently applied to the following directories :
 
 - `pySDC/core`
 - `pySDC/projects`
 - `pySDC/tutorial`
 
 This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork). 
-You can look at the current coverage report for the master branch [here](https://parallel-in-time.org/pySDC/coverage/index.html).
+You can look at the current coverage report for the master branch [here](https://parallel-in-time.org/pySDC/coverage/index.html) or compare the results with previous builds [here](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
 
 During developments, you can also run the coverage tests locally, using :
 
@@ -104,6 +104,8 @@ Accepted use of the `# pragma: no cover` are:
 1. Functions and code used for plotting
 2. Lines in one conditional preceding any `raise` statement
 
+If you think the pragma should be used in other parts of your pull request, please indicate (and justify) this in your description.
+
 ## Documentation generation
 
 Documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/).
@@ -123,7 +125,7 @@ sphinx-build -b html docs/source docs/build/html
 Then you can open `docs/build/html/index.html` using you favorite browser and check how your own documentation looks like on the website.
 
 > :bell: **Important** : running all the tests is necessary to generate graphs and images used by the website. 
-> But you can still generate the website without it : just all images for the tutorials, projects and playgrounds will be missing.
+> But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
 > This approach can be considered for local testing of your contribution when it does not concern parts containing images (_i.e_ project or code documentation).
 
 :arrow_left: [Back to Pull Request Recommendation](./01_pull_requests.md) ---
