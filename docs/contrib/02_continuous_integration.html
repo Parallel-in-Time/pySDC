@@ -39,8 +39,8 @@
             
   <section id="continuous-integration-in-pysdc">
 <span id="docs-contrib-02-continuous-integration-continuous-integration-in-pysdc"></span><h1>Continuous Integration in pySDC<a class="headerlink" href="#continuous-integration-in-pysdc" title="Permalink to this heading">¶</a></h1>
-<p>Any commit in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> are tested within by GitHub continuous integration (CI). You can see in in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">action panel</a> the tests for each branches.
-Those tests can be divided in two main categories : <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting"><span class="std std-ref">code linting</span></a> and <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing</span></a>.
+<p>Any commit in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> are tested by GitHub continuous integration (CI). You can see in in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">action panel</a> the tests for each branches.
+Those tests are currently divided in three main categories : <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting"><span class="std std-ref">code linting</span></a>, <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing</span></a> and <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-coverage"><span class="std std-ref">code coverage</span></a>.
 Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation"><span class="std std-ref">documentation generation</span></a> section.</p>
 <section id="code-linting">
 <span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Permalink to this heading">¶</a></h2>
@@ -83,6 +83,59 @@ When working on a single part of the code, you can run only the corresponding pa
 </div>
 </div></blockquote>
 </section>
+<section id="code-coverage">
+<span id="docs-contrib-02-continuous-integration-code-coverage"></span><h2>Code coverage<a class="headerlink" href="#code-coverage" title="Permalink to this heading">¶</a></h2>
+<p>This stage allows to checks how much of the <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> code is tested by the previous stage. It is based on the <a class="reference external" href="https://pypi.org/project/coverage/">coverage</a> library and currently applied to the following directories :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pySDC/core</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pySDC/projects</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pySDC/tutorial</span></code></p></li>
+</ul>
+<p>This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).
+You can look at the current coverage report for the master branch <a class="reference external" href="https://parallel-in-time.org/pySDC/coverage/index.html">here</a> or compare the results with previous builds <a class="reference external" href="https://app.codecov.io/gh/Parallel-in-Time/pySDC">here</a>. Codecov will also comment on any pull request, indicating the change of coverage.</p>
+<p>During developments, you can also run the coverage tests locally, using :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;print(&#39;Loading sitecustomize.py...&#39;);import coverage;coverage.process_startup()&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>sitecustomize.py
+coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>--continue-on-collection-errors<span class="w"> </span>-v<span class="w"> </span>--durations<span class="o">=</span><span class="m">0</span><span class="w"> </span>pySDC/tests
+</pre></div>
+</div>
+<blockquote>
+<div><p>🔔 Note that this will run all <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> tests while analyzing coverage, hence requires all packages installed for the <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing stage</span></a>.</p>
+</div></blockquote>
+<p>Once the test are finished, you can collect and post-process coverage result :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>coverage<span class="w"> </span>combine
+python<span class="w"> </span>-m<span class="w"> </span>coverage<span class="w"> </span>html
+</pre></div>
+</div>
+<p>This will generate the coverage report in a <code class="docutils literal notranslate"><span class="pre">htmlcov</span></code> folder, and you can open the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file within using your favorite browser.</p>
+<blockquote>
+<div><p>⚠️ Coverage can be lower if some tests fails (for instance, if you did not install all required python package to run all the tests).</p>
+</div></blockquote>
+<section id="coverage-exceptions">
+<span id="docs-contrib-02-continuous-integration-coverage-exceptions"></span><h3>Coverage exceptions<a class="headerlink" href="#coverage-exceptions" title="Permalink to this heading">¶</a></h3>
+<p>Some types of code lines will be ignored by the coverage analysis (<em>e.g</em> lines starting with <code class="docutils literal notranslate"><span class="pre">raise</span></code>, …), see the <code class="docutils literal notranslate"><span class="pre">[tool.coverage.report]</span></code> section in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.
+Part of code (functions, conditionaly, for loops, etc …) can be ignored by coverage analysis using the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">no</span> <span class="pre">cover</span></code>, for instance</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+<span class="c1"># code analyzed by coverage</span>
+<span class="c1"># ...</span>
+<span class="c1"># pragma: no cover</span>
+<span class="k">if</span> <span class="n">condition</span><span class="p">:</span>
+    <span class="c1"># code ignored by coverage</span>
+<span class="c1"># ...</span>
+<span class="c1"># code analyzed by coverage</span>
+<span class="c1"># ...</span>
+<span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">function</span><span class="p">():</span>
+    <span class="c1"># all function code is ignored by coverage</span>
+</pre></div>
+</div>
+<p>Accepted use of the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">no</span> <span class="pre">cover</span></code> are:</p>
+<ol class="arabic simple">
+<li><p>Functions and code used for plotting</p></li>
+<li><p>Lines in one conditional preceding any <code class="docutils literal notranslate"><span class="pre">raise</span></code> statement</p></li>
+</ol>
+<p>If you think the pragma should be used in other parts of your pull request, please indicate (and justify) this in your description.</p>
+</section>
+</section>
 <section id="documentation-generation">
 <span id="docs-contrib-02-continuous-integration-documentation-generation"></span><h2>Documentation generation<a class="headerlink" href="#documentation-generation" title="Permalink to this heading">¶</a></h2>
 <p>Documentation is built using <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a>.
@@ -99,7 +152,7 @@ sphinx-build<span class="w"> </span>-b<span class="w"> </span>html<span class="w
 <p>Then you can open <code class="docutils literal notranslate"><span class="pre">docs/build/html/index.html</span></code> using you favorite browser and check how your own documentation looks like on the website.</p>
 <blockquote>
 <div><p>🔔 <strong>Important</strong> : running all the tests is necessary to generate graphs and images used by the website.
-But you can still generate the website without it : just all images for the tutorials, projects and playgrounds will be missing.
+But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
 This approach can be considered for local testing of your contribution when it does not concern parts containing images (<em>i.e</em> project or code documentation).</p>
 </div></blockquote>
 <p>⬅️ <a class="reference internal" href="01_pull_requests.html"><span class="doc">Back to Pull Request Recommendation</span></a> —
@@ -121,6 +174,10 @@ This approach can be considered for local testing of your contribution when it d
 <li><a class="reference internal" href="#">Continuous Integration in pySDC</a><ul>
 <li><a class="reference internal" href="#code-linting">Code linting</a></li>
 <li><a class="reference internal" href="#code-testing">Code testing</a></li>
+<li><a class="reference internal" href="#code-coverage">Code coverage</a><ul>
+<li><a class="reference internal" href="#coverage-exceptions">Coverage exceptions</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#documentation-generation">Documentation generation</a></li>
 </ul>
 </li>
