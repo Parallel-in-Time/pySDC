@@ -16,9 +16,9 @@ authors:
     given-names: Lisa
     orcid: https://orcid.org/0000-0001-8829-0978
     affiliation: "University of Wuppertal, School of Mathematics and Natural Science, 42119 Wuppertal, Germany"
-cff-version: 1.2.0
+version: 5.1.0
+doi: 10.5281/zenodo.594191
 date-released: 2023-01-23
-doi: 10.5281/zenodo.5599144 
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"
@@ -29,4 +29,4 @@ license: BSD-2-Clause
 message: "If you use this software, please cite it using these metadata."
 repository-code: https://github.com/Parallel-in-Time/pySDC
 title: "Parallel-in-Time/pySDC"
-version: 5.1.0
+cff-version: 1.2.0
