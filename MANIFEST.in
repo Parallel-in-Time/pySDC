@@ -1,18 +1,22 @@
-# added by check_manifest.py
+# added by check-manifest
+include *.cff
+include *.in
 include *.md
-include *.txt
-include *.rst
-include Doxyfile
+include *.yml
 include LICENSE
 include data/README
-include *.cff
 include pyproject.toml
-
 recursive-include docs *.bat
+recursive-include docs *.css
+recursive-include docs *.jpg
+recursive-include docs *.json
+recursive-include docs *.md
+recursive-include docs *.png
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs *.sh
 recursive-include docs Makefile
+recursive-include etc *.yml
 recursive-include pySDC *.npy
 recursive-include pySDC *.npz
 recursive-include pySDC *.pkl

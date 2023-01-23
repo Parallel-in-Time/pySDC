@@ -9,40 +9,14 @@ from pySDC.implementations.convergence_controller_classes.estimate_extrapolation
     EstimateExtrapolationErrorNonMPI,
 )
 from pySDC.core.Hooks import hooks
+from pySDC.implementations.hooks.log_errors import LogLocalError
 
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.projects.Resilience.piline import run_piline
 
 
-class do_nothing(hooks):
+class DoNothing(hooks):
     pass
-
-
-class log_errors(hooks):
-    """
-    A hook that only logs errors, but includes a local error that is not estimated during runtime.
-    What that means is problem specific. If an analytical solution is available, the local error is exact,
-    otherwise it is estimated using a reference solution generated with scipy.
-    """
-
-    def post_step(self, step, level_number):
-
-        super(log_errors, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_loc',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]),
-        )
 
 
 def setup_mpl(font_size=8):
@@ -66,7 +40,7 @@ def setup_mpl(font_size=8):
     mpl.rcParams.update(style_options)
 
 
-def get_results_from_stats(stats, var, val, hook_class=log_errors):
+def get_results_from_stats(stats, var, val, hook_class=LogLocalError):
     """
     Extract results from the stats are used to compute the order.
 
@@ -86,16 +60,16 @@ def get_results_from_stats(stats, var, val, hook_class=log_errors):
         var: val,
     }
 
-    if hook_class == log_errors:
+    if hook_class == LogLocalError:
         e_extrapolated = np.array(get_sorted(stats, type='error_extrapolation_estimate'))[:, 1]
         e_embedded = np.array(get_sorted(stats, type='error_embedded_estimate'))[:, 1]
-        e_loc = np.array(get_sorted(stats, type='e_loc'))[:, 1]
+        e_local = np.array(get_sorted(stats, type='e_local'))[:, 1]
 
         if len(e_extrapolated[e_extrapolated != [None]]) > 0:
             results['e_extrapolated'] = e_extrapolated[e_extrapolated != [None]][-1]
 
-        if len(e_loc[e_loc != [None]]) > 0:
-            results['e'] = max([e_loc[e_loc != [None]][-1], np.finfo(float).eps])
+        if len(e_local[e_local != [None]]) > 0:
+            results['e'] = max([e_local[e_local != [None]][-1], np.finfo(float).eps])
 
         if len(e_embedded[e_embedded != [None]]) > 0:
             results['e_embedded'] = e_embedded[e_embedded != [None]][-1]
@@ -110,7 +84,7 @@ def multiple_runs(
     custom_description=None,
     prob=run_piline,
     dt_list=None,
-    hook_class=log_errors,
+    hook_class=LogLocalError,
     custom_controller_params=None,
     var='dt',
     avoid_restarts=False,
@@ -176,11 +150,11 @@ def multiple_runs(
 
         level = controller.MS[-1].levels[-1]
         e_glob = abs(level.prob.u_exact(t=level.time + level.dt) - level.u[-1])
-        e_loc = abs(level.prob.u_exact(t=level.time + level.dt, u_init=level.u[0], t_init=level.time) - level.u[-1])
+        e_local = abs(level.prob.u_exact(t=level.time + level.dt, u_init=level.u[0], t_init=level.time) - level.u[-1])
 
         res_ = get_results_from_stats(stats, var, dt_list[i], hook_class)
         res_['e_glob'] = e_glob
-        res_['e_loc'] = e_loc
+        res_['e_local'] = e_local
 
         if i == 0:
             res = res_.copy()
@@ -206,7 +180,7 @@ def plot_order(res, ax, k):
     """
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
-    key = 'e_loc'
+    key = 'e_local'
     order = get_accuracy_order(res, key=key, thresh=1e-11)
     label = f'k={k}, p={np.mean(order):.2f}'
     ax.loglog(res['dt'], res[key], color=color, ls='-', label=label)
@@ -332,7 +306,7 @@ def plot_orders(
             custom_description=custom_description,
             prob=prob,
             dt_list=dt_list,
-            hook_class=do_nothing,
+            hook_class=DoNothing,
             custom_controller_params=custom_controller_params,
         )
         plot_order(res, ax, k)
