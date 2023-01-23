@@ -1,7 +1,0 @@
-implementations.problem\_classes.Battery\_2Condensators module
-==============================================================
-
-.. automodule:: implementations.problem_classes.Battery_2Condensators
-   :members:
-   :undoc-members:
-   :show-inheritance:

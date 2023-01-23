@@ -28,7 +28,6 @@ Submodules
    implementations.problem_classes.AllenCahn_Temp_MPIFFT
    implementations.problem_classes.Auzinger_implicit
    implementations.problem_classes.Battery
-   implementations.problem_classes.Battery_2Condensators
    implementations.problem_classes.Boussinesq_2D_FD_imex
    implementations.problem_classes.BuckConverter
    implementations.problem_classes.FastWaveSlowWave_0D
