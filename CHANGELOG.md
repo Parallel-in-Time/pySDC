@@ -2,6 +2,12 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website. 
+    We revived the [codecov](https://app.codecov.io/gh/Parallel-in-Time/pySDC) connection and started the 
+    [OpenSFF Best Practices](https://bestpractices.coreinfrastructure.org/en/projects/6909) guide. 
+    The hook classes and the way they are handled has changed (without breaking the API, hooray), the battery model 
+    got quite an update and adaptivity plays a more prominent role now. Thanks to [\@brownbaerchen](https://github.com/brownbaerchen),
+    [\@tlunet](https://github.com/tlunet), [\@lisawim](https://github.com/lisawim)!
 -   October 7, 2022: Version 5 comes with many changes, both visible and
     invisible ones. Some of those break the existing API, but if you are
     using tests, you should be fine. Major changes include:
