@@ -83,9 +83,9 @@ class CollocationInexactness(ConvergenceController):
 
             # interpolate solution of old collocation problem to new one
             nodes_new = L.sweep.coll.nodes.copy()
+            print(nodes_old, '->', nodes_new)
             interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
             u_inter = interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ u_old
-            assert 0 not in nodes_new or 0 not in nodes_old, "Don't know what to do when left is node yet"
 
             # assign the interpolated values to the nodes in the level
             for i in range(0, len(u_inter)):

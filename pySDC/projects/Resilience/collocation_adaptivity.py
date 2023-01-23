@@ -107,12 +107,17 @@ def compare_collocation_inexactness(prob):
     coll_params_reduce = {
         'num_nodes': [4, 3],
     }
+    coll_params_type = {
+        # 'quad_type': ['RADAU-RIGHT', 'GAUSS'],
+        'quad_type': ['RADAU-RIGHT', 'LOBATTO'],
+    }
 
     special_params = {
         'inexact': {CollocationInexactness: coll_params_inexact},
         'refinement': {CollocationInexactness: coll_params_refinement},
         'reduce': {CollocationInexactness: coll_params_reduce},
         'standard': {},
+        'type': {CollocationInexactness: coll_params_type},
     }
 
     for i in range(len(special_params.keys())):
@@ -123,7 +128,7 @@ def compare_collocation_inexactness(prob):
             Tend=Tend,
             custom_description=custom_description,
             custom_controller_params=custom_controller_parameters,
-            hook_class=[LogData, LogSweeperParams, LogLocalErrorPostIter],
+            hook_class=[LogData, LogSweeperParams],
         )
 
         plot_residual(stats, ax, node_ax, label=key, color=CMAP[i])
@@ -155,6 +160,7 @@ def plot_residual(stats, ax, node_ax, **kwargs):
         'refinement': [3, 3, 3, 3, 3, 3, 4, 4],
         'reduce': [4, 4, 4, 4, 4, 4, 3, 3],
         'standard': [4, 4, 4, 4, 4, 4],
+        'type': [4, 4, 4, 4, 4, 4, 4],
     }
     assert np.allclose(
         nodes, expect[label]
