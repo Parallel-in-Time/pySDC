@@ -274,41 +274,6 @@ class battery(battery_n_capacitors):
 
         return me
 
-    def get_switching_info(self, u, t):
-        """
-        Provides information about a discrete event for one subinterval.
-
-        Args:
-            u (dtype_u): current values
-            t (float): current time
-
-        Returns:
-            switch_detected (bool): Indicates if a switch is found or not
-            m_guess (np.int): Index of collocation node inside one subinterval of where the discrete event was found
-            vC_switch (list): Contains function values of switching condition (for interpolation)
-        """
-
-        switch_detected = False
-        m_guess = -100
-
-        for m in range(len(u)):
-            if u[m][1] - self.params.V_ref[0] <= 0:
-                switch_detected = True
-                m_guess = m - 1
-                break
-
-        vC_switch = [u[m][1] - self.params.V_ref[0] for m in range(1, len(u))] if switch_detected else []
-
-        return switch_detected, m_guess, vC_switch
-
-    def count_switches(self):
-        """
-        Counts the number of switches. This function is called when a switch is found inside the range of tolerance
-        (in switch_estimator.py)
-        """
-
-        self.nswitches += 1
-
 
 class battery_implicit(battery):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
