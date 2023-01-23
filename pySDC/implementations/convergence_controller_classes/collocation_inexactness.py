@@ -83,7 +83,6 @@ class CollocationInexactness(ConvergenceController):
 
             # interpolate solution of old collocation problem to new one
             nodes_new = L.sweep.coll.nodes.copy()
-            print(nodes_old, '->', nodes_new)
             interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
             u_inter = interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ u_old
 
