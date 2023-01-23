@@ -106,7 +106,6 @@ def generate_description(
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'IE'
-    sweeper_params['QE'] = 'PIC'
     sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
