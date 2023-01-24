@@ -30,6 +30,14 @@ class CollocationError(Exception):
     pass
 
 
+class ConvergenceError(Exception):
+    """
+    Error class handling/indicating problems with convergence
+    """
+
+    pass
+
+
 class TransferError(Exception):
     """
     Error class handling/indicating problems with the transfer processes

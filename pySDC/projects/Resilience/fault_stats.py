@@ -18,6 +18,7 @@ from pySDC.implementations.hooks.log_errors import LogLocalError
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
+from pySDC.projects.Resilience.Lorenz import run_Lorenz
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
@@ -134,6 +135,9 @@ class AdaptivityStrategy(Strategy):
         elif problem == run_vdp:
             e_tol = 2e-5
             dt_min = 1e-3
+        elif problem == run_Lorenz:
+            e_tol = 2e-5
+            dt_min = 1e-3
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -225,6 +229,8 @@ class IterateStrategy(Strategy):
             restol = 2.3e-8
         elif problem == run_vdp:
             restol = 9e-7
+        elif problem == run_Lorenz:
+            restol = 16e-7
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -268,6 +274,9 @@ class HotRodStrategy(Strategy):
         if problem == run_vdp:
             HotRod_tol = 5e-7
             maxiter = 4
+        if problem == run_Lorenz:
+            HotRod_tol = 4e-7
+            maxiter = 6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
@@ -332,6 +341,8 @@ class FaultStats:
             return 2.3752559741400825
         elif self.prob == run_piline:
             return 20.0
+        if self.prob == run_Lorenz:
+            return 1.5
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -345,6 +356,8 @@ class FaultStats:
         custom_description = {}
         if self.prob == run_vdp:
             custom_description['step_params'] = {'maxiter': 3}
+        elif self.prob == run_Lorenz:
+            custom_description['step_params'] = {'maxiter': 5}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -745,6 +758,8 @@ class FaultStats:
             prob_name = 'vdp'
         elif self.prob == run_piline:
             prob_name = 'piline'
+        elif self.prob == run_Lorenz:
+            prob_name = 'Lorenz'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -1493,7 +1508,7 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_vdp,
+        prob=run_Lorenz,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
