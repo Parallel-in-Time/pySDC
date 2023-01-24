@@ -165,7 +165,7 @@ def check_solution(stats, controller, thresh=5e-4):
     u = get_sorted(stats, type='u')
     u_exact = controller.MS[0].levels[0].prob.u_exact(t=u[-1][0])
     error = np.linalg.norm(u[-1][1] - u_exact, np.inf)
-    error_hook = get_sorted(stats, type='e_global')[-1][1]
+    error_hook = get_sorted(stats, type='e_global_post_run')[-1][1]
 
     assert error == error_hook, f'Expected errors to match, got {error:.2e} and {error_hook:.2e}!'
     assert error < thresh, f"Error too large, got e={error:.2e}"

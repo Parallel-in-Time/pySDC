@@ -13,7 +13,7 @@ from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-from pySDC.implementations.hooks.log_errors import LogLocalError
+from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 
 # these problems are available for testing
 from pySDC.projects.Resilience.advection import run_advection
@@ -47,8 +47,20 @@ class Strategy:
 
         # prepare parameters for masks to identify faults that cannot be fixed by this strategy
         self.fixable = []
-        self.fixable += [{'key': 'node', 'op': 'gt', 'val': 0,}]
-        self.fixable += [{'key': 'error', 'op': 'uneq', 'val': np.inf,}]
+        self.fixable += [
+            {
+                'key': 'node',
+                'op': 'gt',
+                'val': 0,
+            }
+        ]
+        self.fixable += [
+            {
+                'key': 'error',
+                'op': 'uneq',
+                'val': np.inf,
+            }
+        ]
 
     def get_fixable_params(self, **kwargs):
         """
@@ -144,7 +156,13 @@ class AdaptivityStrategy(Strategy):
         Returns:
             (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
         """
-        self.fixable += [{'key': 'iteration', 'op': 'lt', 'val': maxiter,}]
+        self.fixable += [
+            {
+                'key': 'iteration',
+                'op': 'lt',
+                'val': maxiter,
+            }
+        ]
         return self.fixable
 
     def get_custom_description(self, problem, num_procs):
@@ -648,11 +666,11 @@ class FaultStats:
             run=run,
             faults=faults,
             force_params=force_params,
-            hook_class=hook_collection + [LogLocalError, LogData],
+            hook_class=hook_collection + [LogLocalErrorPostStep, LogData],
         )
 
         # plot the local error
-        e_loc = get_sorted(stats, type='e_local', recomputed=False)
+        e_loc = get_sorted(stats, type='e_local_post_step', recomputed=False)
         ax.plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=strategy.color, ls=ls)
 
         # plot the iterations
@@ -1586,7 +1604,15 @@ def main():
     for strategy in stats_analyser.strategies:
         fixable = stats_analyser.get_fixable_faults_only(strategy=strategy)
         stats_analyser.plot_things_per_things(
-            'recovered', 'bit', False, strategies=[strategy], op=stats_analyser.rec_rate, mask=fixable, args={'ylabel': 'recovery rate'}, name='fixable_recovery', ax=ax
+            'recovered',
+            'bit',
+            False,
+            strategies=[strategy],
+            op=stats_analyser.rec_rate,
+            mask=fixable,
+            args={'ylabel': 'recovery rate'},
+            name='fixable_recovery',
+            ax=ax,
         )
     fig.savefig(f'data/{stats_analyser.get_name()}-recoverable.pdf', transparent=True)
 
