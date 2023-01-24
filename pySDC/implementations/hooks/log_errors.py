@@ -2,18 +2,28 @@ import numpy as np
 from pySDC.core.Hooks import hooks
 
 
-class LogGlobalError(hooks):
+class LogError(hooks):
     """
-    Log the global error with respect to `u_exact` defined in the problem class as "e_global".
+    Base class with functions to add the local and global error to the stats, which can be inherited by hooks logging
+    these at specific places.
+
+    Errors are computed with respect to `u_exact` defined in the problem class.
     Be aware that this requires the problems to be compatible with this. We need some kind of "exact" solution for this
     to work, be it a reference solution or something analytical.
     """
 
-    def post_step(self, step, level_number):
+    def log_global_error(self, step, level_number, suffix=''):
+        """
+        Function to add the global error to the stats
 
-        super(LogGlobalError, self).post_step(step, level_number)
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): The index of the level
+            suffix (str): Suffix for naming the variable in stats
 
-        # some abbreviations
+        Returns:
+            None
+        """
         L = step.levels[level_number]
 
         L.sweep.compute_end_point()
@@ -24,14 +34,47 @@ class LogGlobalError(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type='e_global',
+            type=f'e_global{suffix}',
             value=abs(L.prob.u_exact(t=L.time + L.dt) - L.uend),
         )
+
+    def log_local_error(self, step, level_number, suffix=''):
+        """
+        Function to add the local error to the stats
+
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): The index of the level
+            suffix (str): Suffix for naming the variable in stats
+
+        Returns:
+            None
+        """
+        L = step.levels[level_number]
+
+        L.sweep.compute_end_point()
+
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type=f'e_local{suffix}',
+            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.uend),
+        )
+
+
+class LogGlobalErrorPostStep(LogError):
+    def post_step(self, step, level_number):
+        super().post_step(step, level_number)
+        self.log_global_error(step, level_number, '_post_step')
 
 
 class LogGlobalErrorPostRun(hooks):
     """
     Compute the global error once after the run is finished.
+    Because of some timing issues, we cannot inherit from the `LogError` class here.
     """
 
     def __init__(self):
@@ -84,12 +127,12 @@ class LogGlobalErrorPostRun(hooks):
                 level=L.level_index,
                 iter=step.status.iter,
                 sweep=L.status.sweep,
-                type='e_global',
+                type='e_global_post_run',
                 value=e_glob,
             )
 
 
-class LogLocalError(hooks):
+class LogLocalErrorPostStep(LogError):
     """
     Log the local error with respect to `u_exact` defined in the problem class as "e_local".
     Be aware that this requires the problems to be compatible with this. In particular, a reference solution needs to
@@ -97,20 +140,24 @@ class LogLocalError(hooks):
     """
 
     def post_step(self, step, level_number):
+        super().post_step(step, level_number)
+        self.log_local_error(step, level_number, suffix='_post_step')
 
-        super(LogLocalError, self).post_step(step, level_number)
 
-        # some abbreviations
-        L = step.levels[level_number]
+class LogLocalErrorPostIter(LogError):
+    """
+    Log the local error after each iteration
+    """
 
-        L.sweep.compute_end_point()
+    def post_iteration(self, step, level_number):
+        """
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
 
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='e_local',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.uend),
-        )
+        Returns:
+            None
+        """
+        super().post_iteration(step, level_number)
+
+        self.log_local_error(step, level_number, suffix='_post_iteration')

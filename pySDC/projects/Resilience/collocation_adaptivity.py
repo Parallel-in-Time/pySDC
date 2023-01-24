@@ -10,6 +10,7 @@ from pySDC.projects.Resilience.hook import LogData
 from pySDC.projects.Resilience.accuracy_check import get_accuracy_order
 from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
 from pySDC.core.Hooks import hooks
+from pySDC.implementations.hooks.log_errors import LogLocalErrorPostIter
 
 
 # define global parameters for running problems and plotting
@@ -60,8 +61,8 @@ def get_collocation_order(quad_type, num_nodes, node_type):
 # define a few hooks
 class LogSweeperParams(hooks):
     """
-    Log the sweeper parameters after every iteration to check if the collocation inexactness is doing what it's supposed
-    to.
+    Log the sweeper parameters after every iteration to check if the adaptive collocation convergence controller is
+    doing what it's supposed to.
     """
 
     def post_iteration(self, step, level_number):
@@ -97,40 +98,10 @@ class LogSweeperParams(hooks):
         )
 
 
-class LogLocalErrorPostIter(hooks):
-    """
-    Log the local error after each iteration
-    """
-
-    def post_iteration(self, step, level_number):
-        """
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
-
-        Returns:
-            None
-        """
-        super().post_iteration(step, level_number)
-
-        L = step.levels[level_number]
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='e_local_post_iter',
-            value=abs(L.prob.u_exact(t=L.time + L.dt) - L.uend),
-        )
-
-
 # plotting functions
-def compare_collocation_inexactness(prob):
+def compare_adaptive_collocation(prob):
     """
-    Run a problem with various modes of collocation inexactness.
+    Run a problem with various modes of adaptive collocation.
 
     Args:
         prob (function): A problem from the resilience project to run
@@ -238,7 +209,7 @@ def check_order(prob, coll_name, ax, k_ax):
         ] + [True]
         idx = np.arange(len(converged_solution))[converged_solution]
         labels = [sweeper_params[i][1][label_keys.get(coll_name, 'num_nodes')] for i in idx]
-        e_loc = np.array([me[1] for me in get_sorted(stats, type='e_local_post_iter', sortby='iter')])[
+        e_loc = np.array([me[1] for me in get_sorted(stats, type='e_local_post_iteration', sortby='iter')])[
             converged_solution
         ]
         coll_order = np.array([me[1] for me in get_sorted(stats, type='coll_order', sortby='iter')])[converged_solution]
@@ -288,7 +259,7 @@ def order_stuff(prob):
 
 def main():
     order_stuff(run_advection)
-    compare_collocation_inexactness(run_vdp)
+    compare_adaptive_collocation(run_vdp)
 
 
 if __name__ == "__main__":

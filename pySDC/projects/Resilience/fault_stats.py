@@ -12,7 +12,7 @@ from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.implementations.hooks.log_errors import LogLocalError
+from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 
 # these problems are available for testing
 from pySDC.projects.Resilience.advection import run_advection
@@ -603,11 +603,11 @@ class FaultStats:
             run=run,
             faults=faults,
             force_params=force_params,
-            hook_class=hook_collection + [LogLocalError, LogData],
+            hook_class=hook_collection + [LogLocalErrorPostStep, LogData],
         )
 
         # plot the local error
-        e_loc = get_sorted(stats, type='e_local', recomputed=False)
+        e_loc = get_sorted(stats, type='e_local_post_step', recomputed=False)
         ax.plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=strategy.color, ls=ls)
 
         # plot the iterations

@@ -132,7 +132,8 @@ class AdaptiveCollocation(ConvergenceController):
                 L.f[i] = L.prob.eval_f(L.u[i], L.time)
 
         # log the new parameters
-        msg = f'Switching to collocation {self.status.active_coll + 1} of {self.params.num_colls}:'
+        self.log(f'Switching to collocation {self.status.active_coll + 1} of {self.params.num_colls}', S, level=20)
+        msg = 'New quadrature:'
         for key in list(sweeper_params.keys()) + list(new_params_level.keys()):
             if key in self.params.vary_keys_sweeper:
                 msg += f'\n--> {key}: {update_params_sweeper[key]}'
