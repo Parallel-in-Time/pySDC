@@ -96,13 +96,20 @@ class level(FrozenClass):
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
-    def reset_level(self):
+    def reset_level(self, reset_status=True):
         """
         Routine to clean-up the level for the next time step
+
+        Args:
+            reset_status (bool): Reset the status or only the solution
+
+        Returns:
+            None
         """
 
         # reset status
-        self.status = _Status()
+        if reset_status:
+            self.status = _Status()
 
         # all data back to None
         self.uend = None

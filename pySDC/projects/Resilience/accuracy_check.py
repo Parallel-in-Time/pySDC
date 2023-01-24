@@ -9,7 +9,7 @@ from pySDC.implementations.convergence_controller_classes.estimate_extrapolation
     EstimateExtrapolationErrorNonMPI,
 )
 from pySDC.core.Hooks import hooks
-from pySDC.implementations.hooks.log_errors import LogLocalError
+from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.projects.Resilience.piline import run_piline
@@ -40,7 +40,7 @@ def setup_mpl(font_size=8):
     mpl.rcParams.update(style_options)
 
 
-def get_results_from_stats(stats, var, val, hook_class=LogLocalError):
+def get_results_from_stats(stats, var, val, hook_class=LogLocalErrorPostStep):
     """
     Extract results from the stats are used to compute the order.
 
@@ -60,10 +60,10 @@ def get_results_from_stats(stats, var, val, hook_class=LogLocalError):
         var: val,
     }
 
-    if hook_class == LogLocalError:
+    if hook_class == LogLocalErrorPostStep:
         e_extrapolated = np.array(get_sorted(stats, type='error_extrapolation_estimate'))[:, 1]
         e_embedded = np.array(get_sorted(stats, type='error_embedded_estimate'))[:, 1]
-        e_local = np.array(get_sorted(stats, type='e_local'))[:, 1]
+        e_local = np.array(get_sorted(stats, type='e_local_post_step'))[:, 1]
 
         if len(e_extrapolated[e_extrapolated != [None]]) > 0:
             results['e_extrapolated'] = e_extrapolated[e_extrapolated != [None]][-1]
@@ -84,7 +84,7 @@ def multiple_runs(
     custom_description=None,
     prob=run_piline,
     dt_list=None,
-    hook_class=LogLocalError,
+    hook_class=LogLocalErrorPostStep,
     custom_controller_params=None,
     var='dt',
     avoid_restarts=False,
