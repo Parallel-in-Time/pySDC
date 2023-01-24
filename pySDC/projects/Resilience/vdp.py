@@ -7,7 +7,7 @@ from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.core.Errors import ProblemError
+from pySDC.core.Errors import ProblemError, ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
@@ -194,7 +194,7 @@ def run_vdp(
     # call main function to get things done...
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except ProblemError:
+    except (ProblemError, ConvergenceError):
         stats = controller.return_stats()
 
     return stats, controller, Tend

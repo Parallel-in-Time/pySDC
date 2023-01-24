@@ -12,6 +12,7 @@ from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 from pySDC.implementations.hooks.log_errors import LogLocalError
 
 # these problems are available for testing
@@ -43,6 +44,21 @@ class Strategy:
 
         # setup custom descriptions
         self.custom_description = {}
+
+        # prepare parameters for masks to identify faults that cannot be fixed by this strategy
+        self.fixable = []
+        self.fixable += [{'key': 'node', 'op': 'gt', 'val': 0,}]
+        self.fixable += [{'key': 'error', 'op': 'uneq', 'val': np.inf,}]
+
+    def get_fixable_params(self, **kwargs):
+        """
+        Return a list containing dictionaries which can be passed to `FaultStats.get_mask` as keyword arguments to
+        obtain a mask of faults that can be fixed
+
+        Returns:
+            list: Dictionary of parameters
+        """
+        return self.fixable
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -117,6 +133,19 @@ class AdaptivityStrategy(Strategy):
         self.marker = '*'
         self.name = 'adaptivity'
         self.bar_plot_x_label = 'adaptivity'
+
+    def get_fixable_params(self, maxiter, **kwargs):
+        """
+        Here faults occurring in the last iteration cannot be fixed.
+
+        Args:
+            maxiter (int): Max. iterations until convergence is declared
+
+        Returns:
+            (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
+        """
+        self.fixable += [{'key': 'iteration', 'op': 'lt', 'val': maxiter,}]
+        return self.fixable
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -274,7 +303,7 @@ class HotRodStrategy(Strategy):
         if problem == run_vdp:
             HotRod_tol = 5e-7
             maxiter = 4
-        if problem == run_Lorenz:
+        elif problem == run_Lorenz:
             HotRod_tol = 4e-7
             maxiter = 6
         else:
@@ -286,7 +315,10 @@ class HotRodStrategy(Strategy):
         no_storage = num_procs > 1
 
         custom_description = {
-            'convergence_controllers': {HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage}},
+            'convergence_controllers': {
+                HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
+                BasicRestartingNonMPI: {'max_restarts': 2, 'crash_after_max_restarts': False},
+            },
             'step_params': {'maxiter': maxiter},
         }
 
@@ -1003,7 +1035,7 @@ class FaultStats:
             store = False
 
         # execute the plots for all strategies
-        for s in self.strategies:
+        for s in strategies:
             self.plot_thingA_per_thingB(s, thingA=thingA, thingB=thingB, recovered=recovered, ax=ax, mask=mask, op=op)
 
         # set the parameters
@@ -1268,6 +1300,24 @@ class FaultStats:
         else:
             return mask
 
+    def get_fixable_faults_only(self, strategy):
+        """
+        Return a mask of only faults that can be fixed with a given strategy.
+
+        Args:
+            strategy (Strategy): The resilience strategy you want to look at. In normal use it's the same for all
+
+        Returns:
+            Numpy.ndarray with boolean entries that can be used as a mask
+        """
+        fixable = strategy.get_fixable_params(maxiter=self.get_custom_description()['step_params']['maxiter'])
+        mask = self.get_mask(strategy=strategy)
+
+        for kwargs in fixable:
+            mask = self.get_mask(strategy=strategy, **kwargs, old_mask=mask)
+
+        return mask
+
     def get_index(self, mask=None):
         '''
         Get the indeces of all runs in mask
@@ -1530,6 +1580,16 @@ def main():
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
+
+    # make a plot for only the faults that can be recovered
+    fig, ax = plt.subplots(1, 1)
+    for strategy in stats_analyser.strategies:
+        fixable = stats_analyser.get_fixable_faults_only(strategy=strategy)
+        stats_analyser.plot_things_per_things(
+            'recovered', 'bit', False, strategies=[strategy], op=stats_analyser.rec_rate, mask=fixable, args={'ylabel': 'recovery rate'}, name='fixable_recovery', ax=ax
+        )
+    fig.savefig(f'data/{stats_analyser.get_name()}-recoverable.pdf', transparent=True)
+
     stats_analyser.plot_things_per_things(
         'total_iteration',
         'bit',

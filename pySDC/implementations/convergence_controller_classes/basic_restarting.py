@@ -73,6 +73,9 @@ class BasicRestarting(ConvergenceController):
         if 'max_restarts' in description.keys():
             defaults['max_restarts'] = description['max_restarts']
 
+        # allow to change parameters by adding the convergence controller manually
+        defaults = {**defaults, **description.get('convergence_controllers', {}).get(type(self), {})}
+
         return {**defaults, **params}
 
     def setup_status_variables(self, controller, **kwargs):
