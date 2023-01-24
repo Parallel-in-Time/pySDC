@@ -1,0 +1,7 @@
+implementations.convergence\_controller\_classes.adaptive\_collocation module
+=============================================================================
+
+.. automodule:: implementations.convergence_controller_classes.adaptive_collocation
+   :members:
+   :undoc-members:
+   :show-inheritance:

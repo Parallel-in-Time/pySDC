@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_accuracy_check_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.5</a>,
-            created at 2023-01-23 11:35 +0000
+            created at 2023-01-24 13:02 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -243,7 +243,7 @@
     <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">    <span class="nam">u</span> <span class="op">=</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'u'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">    <span class="nam">u_exact</span> <span class="op">=</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">MS</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">u_exact</span><span class="op">(</span><span class="nam">t</span><span class="op">=</span><span class="nam">u</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">    <span class="nam">error</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">linalg</span><span class="op">.</span><span class="nam">norm</span><span class="op">(</span><span class="nam">u</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span> <span class="op">-</span> <span class="nam">u_exact</span><span class="op">,</span> <span class="nam">np</span><span class="op">.</span><span class="nam">inf</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">    <span class="nam">error_hook</span> <span class="op">=</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'e_global'</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">    <span class="nam">error_hook</span> <span class="op">=</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">'e_global_post_run'</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">    <span class="key">assert</span> <span class="nam">error</span> <span class="op">==</span> <span class="nam">error_hook</span><span class="op">,</span> <span class="str">f'Expected errors to match, got {error:.2e} and {error_hook:.2e}!'</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">    <span class="key">assert</span> <span class="nam">error</span> <span class="op">&lt;</span> <span class="nam">thresh</span><span class="op">,</span> <span class="str">f"Error too large, got e={error:.2e}"</span>&nbsp;</span><span class="r"></span></p>
@@ -286,7 +286,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_accuracy_check_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.5</a>,
-            created at 2023-01-23 11:35 +0000
+            created at 2023-01-24 13:02 +0000
         </p>
     </div>
 </footer>

@@ -136,13 +136,20 @@
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
-<div class="viewcode-block" id="level.reset_level"><a class="viewcode-back" href="../../pySDC/core.Level.html#core.Level.level.reset_level">[docs]</a>    <span class="k">def</span> <span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="level.reset_level"><a class="viewcode-back" href="../../pySDC/core.Level.html#core.Level.level.reset_level">[docs]</a>    <span class="k">def</span> <span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_status</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to clean-up the level for the next time step</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reset_status (bool): Reset the status or only the solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># reset status</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reset_status</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">_Status</span><span class="p">()</span>
 
         <span class="c1"># all data back to None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="kc">None</span>
