@@ -66,6 +66,9 @@ class ConvergenceController(object):
     def setup(self, controller, params, description):
         """
         Setup various variables that only need to be set once in the beginning.
+        If the convergence controller is added automatically, you can give it params by adding it manually.
+        It will be instantiated only once with the manually supplied parameters overriding automatically added
+        parameters.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -75,7 +78,8 @@ class ConvergenceController(object):
         Returns:
             (dict): The updated params dictionary after setup
         """
-        return params
+        # allow to change parameters by adding the convergence controller manually
+        return {**params, **description.get('convergence_controllers', {}).get(type(self), {})}
 
     def dependencies(self, controller, description, **kwargs):
         """
