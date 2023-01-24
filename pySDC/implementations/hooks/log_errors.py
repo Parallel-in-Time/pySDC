@@ -75,6 +75,10 @@ class LogGlobalErrorPostRun(hooks):
     """
     Compute the global error once after the run is finished.
     Because of some timing issues, we cannot inherit from the `LogError` class here.
+    The issue is that the convergence controllers can change the step size after the final iteration but before the
+    `post_run` functions of the hooks are called, which results in a mismatch of `L.time + L.dt` as corresponding to
+    when the solution is computed and when the error is computed. The issue is resolved by recording the time at which
+    the solution is computed in a private attribute of this class.
     """
 
     def __init__(self):
@@ -134,7 +138,7 @@ class LogGlobalErrorPostRun(hooks):
 
 class LogLocalErrorPostStep(LogError):
     """
-    Log the local error with respect to `u_exact` defined in the problem class as "e_local".
+    Log the local error with respect to `u_exact` defined in the problem class as "e_local_post_step".
     Be aware that this requires the problems to be compatible with this. In particular, a reference solution needs to
     be made available from the initial conditions of the step, not of the run. Otherwise you compute the global error.
     """
