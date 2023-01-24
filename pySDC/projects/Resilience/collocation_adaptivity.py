@@ -8,7 +8,7 @@ from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.heat import run_heat
 from pySDC.projects.Resilience.hook import LogData
 from pySDC.projects.Resilience.accuracy_check import get_accuracy_order
-from pySDC.implementations.convergence_controller_classes.collocation_inexactness import CollocationInexactness
+from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
 from pySDC.core.Hooks import hooks
 
 
@@ -42,11 +42,11 @@ coll_params_type = {
 }
 
 special_params = {
-    'inexact': {CollocationInexactness: coll_params_inexact},
-    'refinement': {CollocationInexactness: coll_params_refinement},
-    'reduce': {CollocationInexactness: coll_params_reduce},
+    'inexact': {AdaptiveCollocation: coll_params_inexact},
+    'refinement': {AdaptiveCollocation: coll_params_refinement},
+    'reduce': {AdaptiveCollocation: coll_params_reduce},
     'standard': {},
-    'type': {CollocationInexactness: coll_params_type},
+    'type': {AdaptiveCollocation: coll_params_type},
 }
 
 

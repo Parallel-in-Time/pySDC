@@ -5,7 +5,42 @@ from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Collocation import CollBase
 
 
-class CollocationInexactness(ConvergenceController):
+class AdaptiveCollocation(ConvergenceController):
+    """
+    This convergence controller allows to change the underlying quadrature between iterations.
+
+    Supplying multiple quadrature rules will result in a change to a new quadrature whenever the previous one is
+    converged until all methods given are converged, at which point the step is ended.
+    Whenever the quadrature is changed, the solution is interpolated from the old nodes to the new nodes to ensure
+    accelerated convergence compared to starting from the initial conditions.
+
+    Use this convergence controller by supplying parameters that the sweeper accepts as a list to the `params`.
+    For instance, supplying
+    ```
+    params = {
+        'num_nodes': [2, 3],
+    }
+    ```
+    will use collocation methods like you passed to the `sweeper_params` in the `description` object, but will change
+    the number of nodes to 2 before the first iteration and to 3 as soon as the 2-node collocation problem is converged.
+    This will override whatever you set for the number of nodes in the `sweeper_params`, but you still need to set
+    something to allow instantiation of the levels before this convergence controller becomes active.
+    Make sure all lists you supply here have the same length.
+
+    Feel free to set `logger_level = 15` in the controller parameters to get comprehensive text output on what exactly
+    is happening.
+
+    This convergence controller has various applications.
+     - You could try to obtain speedup by doing some inexactness. It is currently possible to set various residual
+       tolerances, which will be passed to the levels, corresponding to the accuracy with which each collocation problem
+       is solved.
+     - You can compute multiple solutions to the same initial value problem with different order. This allows, for
+       instance, to do adaptive time stepping.
+
+    When trying to obtain speedup with this, be ware that the interpolation is not for free. In particular, it is
+    necessary to reevaluate the right hand side at all nodes afterwards.
+    """
+
     def setup(self, controller, params, description):
         """
         Record what variables we want to vary.
