@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI

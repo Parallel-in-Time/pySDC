@@ -1,5 +1,4 @@
 # Script for making some plots about resilience in the Lorenz problem
-import numpy as np
 import matplotlib.pyplot as plt
 
 from pySDC.projects.Resilience.fault_stats import (
@@ -82,7 +81,6 @@ def plot_recovery_rate(stats_analyser):  # pragma: no cover
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, args={'ylabel': 'recovery rate'}, ax=axs[0]
     )
-    not_crashed = None
     for i in range(len(stats_analyser.strategies)):
         fixable = stats_analyser.get_fixable_faults_only(strategy=stats_analyser.strategies[i])
 
