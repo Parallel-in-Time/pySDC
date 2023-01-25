@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 from mpi4py import MPI
 import sys
+import matplotlib as mpl
 
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
@@ -57,8 +58,7 @@ class Strategy:
         self.fixable += [
             {
                 'key': 'error',
-                'op': 'uneq',
-                'val': np.inf,
+                'op': 'isfinite',
             }
         ]
 
@@ -113,6 +113,29 @@ class Strategy:
         '''
 
         return {}
+
+    @property
+    def style(self):
+        """
+        Get the plotting parameters for the strategy.
+        Supply them to a plotting function using `**`
+
+        Returns:
+            (dict): The plotting parameters as a dictionary
+        """
+        return {
+            'marker': self.marker,
+            'label': self.label,
+            'color': self.color,
+            'ls': self.linestyle,
+        }
+
+    @property
+    def label(self):
+        """
+        Get a label for plotting
+        """
+        return self.name
 
 
 class BaseStrategy(Strategy):
@@ -391,7 +414,7 @@ class FaultStats:
             return 2.3752559741400825
         elif self.prob == run_piline:
             return 20.0
-        if self.prob == run_Lorenz:
+        elif self.prob == run_Lorenz:
             return 1.5
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
@@ -631,7 +654,7 @@ class FaultStats:
         [self.scrutinize_visual(self.strategies[i], run, faults, ax, k_ax, ls[i]) for i in range(len(self.strategies))]
 
         # make a legend
-        [k_ax.plot([None], [None], label=strategy.name, color=strategy.color) for strategy in self.strategies]
+        [k_ax.plot([None], [None], label=strategy.label, color=strategy.color) for strategy in self.strategies]
         k_ax.legend(frameon=True)
 
         if store:
@@ -996,7 +1019,7 @@ class FaultStats:
             ax.plot(
                 admissable_thingB,
                 me_recovered,
-                label=f'{strategy.name} (only recovered)',
+                label=f'{strategy.label} (only recovered)',
                 color=strategy.color,
                 marker=strategy.marker,
                 ls='--',
@@ -1004,7 +1027,7 @@ class FaultStats:
             )
 
         ax.plot(
-            admissable_thingB, me, label=f'{strategy.name}', color=strategy.color, marker=strategy.marker, linewidth=2
+            admissable_thingB, me, label=f'{strategy.label}', color=strategy.color, marker=strategy.marker, linewidth=2
         )
 
         ax.legend(frameon=False)
@@ -1024,6 +1047,7 @@ class FaultStats:
         name=None,
         store=True,
         ax=None,
+        fig=None,
     ):
         '''
         Plot thingA vs thingB for multiple strategies
@@ -1039,6 +1063,7 @@ class FaultStats:
             name (str): Optional name for the plot
             store (bool): Store the plot at a predefined path or not (for jupyter notebooks)
             ax (Matplotlib.axes): Somewhere to plot
+            fig (Matplotlib.figure): Figure of the ax
 
         Returns
             None
@@ -1049,7 +1074,7 @@ class FaultStats:
         # make sure we have something to plot in
         if ax is None:
             fig, ax = plt.subplots(1, 1)
-        else:
+        elif fig is None:
             store = False
 
         # execute the plots for all strategies
@@ -1095,7 +1120,7 @@ class FaultStats:
                 rec_mask = with_faults['error'] < thresh_range[thresh_idx] * fault_free['error'].mean()
                 rec_rates[strategy_idx][thresh_idx] = len(with_faults['error'][rec_mask]) / len(with_faults['error'])
 
-            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.name)
+            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.label)
         ax.legend(frameon=False)
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
@@ -1295,7 +1320,7 @@ class FaultStats:
                 vals = self.load(strategy, False)[key]
                 val = sum(vals) / len(vals)
 
-        if None in [key, val]:
+        if None in [key, val] and not op in ['isfinite']:
             mask = dat['bit'] == dat['bit']
         else:
             if op == 'uneq':
@@ -1310,6 +1335,8 @@ class FaultStats:
                 mask = dat[key] < val
             elif op == 'gt':
                 mask = dat[key] > val
+            elif op == 'isfinite':
+                mask = np.isfinite(dat[key])
             else:
                 raise NotImplementedError(f'Please implement op={op}!')
 
@@ -1595,6 +1622,7 @@ def main():
     stats_analyser.plot_things_per_things(
         'recovered', 'iteration', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
+
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
