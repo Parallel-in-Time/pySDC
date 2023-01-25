@@ -387,6 +387,8 @@ def check_step_size_limiter(size=4, comm=None):
     Returns:
         None
     """
+    from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
     custom_controller_params = {'logger_level': 30}
     expect = {}
@@ -395,11 +397,12 @@ def check_step_size_limiter(size=4, comm=None):
     for limit_step_sizes in [False, True]:
         if limit_step_sizes:
             params['dt_max'] = expect['dt_max'] * 0.9
-            params['dt_min'] = expect['dt_min'] * 1.1
+            params['dt_min'] = np.inf
+            custom_description['convergence_controllers'][StepSizeLimiter] = {'dt_min': expect['dt_min'] * 1.1}
         else:
             for k in ['dt_max', 'dt_min']:
-                if k in params.keys():
-                    params.pop(k)
+                params.pop(k, None)
+                custom_description['convergence_controllers'].pop(StepSizeLimiter, None)
 
         custom_description['convergence_controllers'][Adaptivity] = params
         stats, controller, Tend = run_vdp(
@@ -421,10 +424,10 @@ def check_step_size_limiter(size=4, comm=None):
             dt_max = max([me[1] for me in dt])
             dt_min = min([me[1] for me in dt[size:-size]])  # The first and last step might fall below the limits
             assert (
-                dt_max <= params['dt_max']
+                dt_max <= expect['dt_max']
             ), f"Exceeded maximum allowed step size! Got {dt_max:.4e}, allowed {params['dt_max']:.4e}."
             assert (
-                dt_min >= params['dt_min']
+                dt_min >= expect['dt_min']
             ), f"Exceeded minimum allowed step size! Got {dt_min:.4e}, allowed {params['dt_min']:.4e}."
 
     if comm == None:

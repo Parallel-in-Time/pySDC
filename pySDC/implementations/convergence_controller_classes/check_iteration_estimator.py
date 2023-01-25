@@ -51,7 +51,7 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
         Returns:
             dict: The updated parameters
         """
-        return {"control_order": -50, **params}
+        return {"control_order": -50, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
         """

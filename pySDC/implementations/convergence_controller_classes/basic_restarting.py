@@ -70,7 +70,7 @@ class BasicRestarting(ConvergenceController):
             "crash_after_max_restarts": True,
         }
 
-        return {**defaults, **params}
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def setup_status_variables(self, controller, **kwargs):
         """

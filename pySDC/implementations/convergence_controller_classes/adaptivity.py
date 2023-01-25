@@ -37,7 +37,7 @@ class AdaptivityBase(ConvergenceController):
             "beta": 0.9,
         }
         controller.add_hook(LogStepSize)
-        return {**defaults, **params}
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
         """

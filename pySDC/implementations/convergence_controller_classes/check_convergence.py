@@ -24,7 +24,7 @@ class CheckConvergence(ConvergenceController):
         Returns:
             (dict): The updated params dictionary
         """
-        return {"control_order": +200, **params}
+        return {"control_order": +200, **super().setup(controller, params, description, **kwargs)}
 
     @staticmethod
     def check_convergence(S):
