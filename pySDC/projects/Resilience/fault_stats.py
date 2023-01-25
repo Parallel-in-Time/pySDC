@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 from mpi4py import MPI
 import sys
+import matplotlib as mpl
 
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
@@ -12,12 +13,13 @@ from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
+from pySDC.implementations.hooks.log_errors import LogLocalError
 
 # these problems are available for testing
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
+from pySDC.projects.Resilience.Lorenz import run_Lorenz
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
@@ -85,6 +87,24 @@ class Strategy:
 
         return {}
 
+    @property
+    def style(self):
+        """
+        Get the plotting parameters for the strategy.
+        Supply them to a plotting function using `**`
+
+        Returns:
+            (dict): The plotting parameters as a dictionary
+        """
+        return {'marker': self.marker, 'label': self.label, 'color': self.color, 'ls': self.linestyle,}
+
+    @ property
+    def label(self):
+        """
+        Get a label for plotting
+        """
+        return self.name
+
 
 class BaseStrategy(Strategy):
     '''
@@ -132,6 +152,9 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-7
             dt_min = 1e-2
         elif problem == run_vdp:
+            e_tol = 2e-5
+            dt_min = 1e-3
+        elif problem == run_Lorenz:
             e_tol = 2e-5
             dt_min = 1e-3
         else:
@@ -225,6 +248,8 @@ class IterateStrategy(Strategy):
             restol = 2.3e-8
         elif problem == run_vdp:
             restol = 9e-7
+        elif problem == run_Lorenz:
+            restol = 16e-7
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -268,6 +293,9 @@ class HotRodStrategy(Strategy):
         if problem == run_vdp:
             HotRod_tol = 5e-7
             maxiter = 4
+        if problem == run_Lorenz:
+            HotRod_tol = 4e-7
+            maxiter = 6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
@@ -332,6 +360,8 @@ class FaultStats:
             return 2.3752559741400825
         elif self.prob == run_piline:
             return 20.0
+        if self.prob == run_Lorenz:
+            return 1.5
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -345,6 +375,8 @@ class FaultStats:
         custom_description = {}
         if self.prob == run_vdp:
             custom_description['step_params'] = {'maxiter': 3}
+        elif self.prob == run_Lorenz:
+            custom_description['step_params'] = {'maxiter': 5}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -568,7 +600,7 @@ class FaultStats:
         [self.scrutinize_visual(self.strategies[i], run, faults, ax, k_ax, ls[i]) for i in range(len(self.strategies))]
 
         # make a legend
-        [k_ax.plot([None], [None], label=strategy.name, color=strategy.color) for strategy in self.strategies]
+        [k_ax.plot([None], [None], label=strategy.label, color=strategy.color) for strategy in self.strategies]
         k_ax.legend(frameon=True)
 
         if store:
@@ -603,11 +635,11 @@ class FaultStats:
             run=run,
             faults=faults,
             force_params=force_params,
-            hook_class=hook_collection + [LogLocalErrorPostStep, LogData],
+            hook_class=hook_collection + [LogLocalError, LogData],
         )
 
         # plot the local error
-        e_loc = get_sorted(stats, type='e_local_post_step', recomputed=False)
+        e_loc = get_sorted(stats, type='e_local', recomputed=False)
         ax.plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=strategy.color, ls=ls)
 
         # plot the iterations
@@ -745,6 +777,8 @@ class FaultStats:
             prob_name = 'vdp'
         elif self.prob == run_piline:
             prob_name = 'piline'
+        elif self.prob == run_Lorenz:
+            prob_name = 'Lorenz'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -931,7 +965,7 @@ class FaultStats:
             ax.plot(
                 admissable_thingB,
                 me_recovered,
-                label=f'{strategy.name} (only recovered)',
+                label=f'{strategy.label} (only recovered)',
                 color=strategy.color,
                 marker=strategy.marker,
                 ls='--',
@@ -939,7 +973,7 @@ class FaultStats:
             )
 
         ax.plot(
-            admissable_thingB, me, label=f'{strategy.name}', color=strategy.color, marker=strategy.marker, linewidth=2
+            admissable_thingB, me, label=f'{strategy.label}', color=strategy.color, marker=strategy.marker, linewidth=2
         )
 
         ax.legend(frameon=False)
@@ -959,6 +993,7 @@ class FaultStats:
         name=None,
         store=True,
         ax=None,
+        fig=None,
     ):
         '''
         Plot thingA vs thingB for multiple strategies
@@ -974,6 +1009,7 @@ class FaultStats:
             name (str): Optional name for the plot
             store (bool): Store the plot at a predefined path or not (for jupyter notebooks)
             ax (Matplotlib.axes): Somewhere to plot
+            fig (Matplotlib.figure): Figure of the ax
 
         Returns
             None
@@ -984,11 +1020,11 @@ class FaultStats:
         # make sure we have something to plot in
         if ax is None:
             fig, ax = plt.subplots(1, 1)
-        else:
+        elif fig is None:
             store = False
 
         # execute the plots for all strategies
-        for s in self.strategies:
+        for s in strategies:
             self.plot_thingA_per_thingB(s, thingA=thingA, thingB=thingB, recovered=recovered, ax=ax, mask=mask, op=op)
 
         # set the parameters
@@ -1030,7 +1066,7 @@ class FaultStats:
                 rec_mask = with_faults['error'] < thresh_range[thresh_idx] * fault_free['error'].mean()
                 rec_rates[strategy_idx][thresh_idx] = len(with_faults['error'][rec_mask]) / len(with_faults['error'])
 
-            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.name)
+            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.label)
         ax.legend(frameon=False)
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
@@ -1493,7 +1529,7 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_vdp,
+        prob=run_Lorenz,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
@@ -1512,9 +1548,11 @@ def main():
     stats_analyser.plot_things_per_things(
         'recovered', 'iteration', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
+
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
+
     stats_analyser.plot_things_per_things(
         'total_iteration',
         'bit',
