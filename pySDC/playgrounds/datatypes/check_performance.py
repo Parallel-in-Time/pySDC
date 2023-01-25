@@ -100,4 +100,7 @@ plt.loglog(vecN, res[7], '--', c=p[0].get_color())
 
 plt.legend()
 plt.grid()
+plt.xlabel('Vector size')
+plt.ylabel('Computation time')
+plt.tight_layout()
 plt.show()
