@@ -1,3 +1,4 @@
+# Script for making some plots about resilience in the Lorenz problem
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -14,7 +15,7 @@ from pySDC.projects.Resilience.fault_stats import (
 cm = 1 / 2.54
 
 
-def savefig(fig, name, format='pdf'):
+def savefig(fig, name, format='pdf'):  # pragma: no cover
     """
     Save a figure to some predefined location.
     Args:
@@ -29,9 +30,13 @@ def savefig(fig, name, format='pdf'):
     print(f'saved "{path}"')
 
 
-def analyse_resilience():
-    """ """
-    # TODO docs
+def analyse_resilience():  # pragma: no cover
+    """
+    Generate some stats for resilience / load them if already available and make some plots.
+
+    Returns:
+        None
+    """
 
     stats_analyser = FaultStats(
         prob=run_Lorenz,
@@ -42,43 +47,44 @@ def analyse_resilience():
         num_procs=1,
         mode='combination',
     )
-    # stats_analyser.run_stats_generation(runs=5000, step=50)
+    stats_analyser.run_stats_generation(runs=5000, step=50)
 
     compare_strategies(stats_analyser)
     plot_recovery_rate(stats_analyser)
-    stats_analyser.scrutinize(IterateStrategy(), 41)
-    raise
 
 
-def compare_strategies(stats_analyser):
+def compare_strategies(stats_analyser):  # pragma: no cover
+    """
+    Make a plot showing local error and iteration number of time for all strategies
+
+    Args:
+        stats_analyser (FaultStats): Fault stats object, which contains some stats
+
+    Returns:
+        None
+    """
     fig, ax = plt.subplots(figsize=(16 * cm, 7 * cm))
     stats_analyser.compare_strategies(ax=ax)
     savefig(fig, 'compare_strategies', format='png')
 
 
-def plot_recovery_rate(stats_analyser):
-    # TODO: docs
-    mask = None
+def plot_recovery_rate(stats_analyser):  # pragma: no cover
+    """
+    Make a plot showing recovery rate for all faults and only for those that can be recovered.
+
+    Args:
+        stats_analyser (FaultStats): Fault stats object, which contains some stats
+
+    Returns:
+        None
+    """
     fig, axs = plt.subplots(1, 2, figsize=(16 * cm, 7 * cm), sharex=True, sharey=True)
     stats_analyser.plot_things_per_things(
-        'recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}, ax=axs[0]
+        'recovered', 'bit', False, op=stats_analyser.rec_rate, args={'ylabel': 'recovery rate'}, ax=axs[0]
     )
     not_crashed = None
     for i in range(len(stats_analyser.strategies)):
         fixable = stats_analyser.get_fixable_faults_only(strategy=stats_analyser.strategies[i])
-
-        not_fixed = stats_analyser.get_mask(
-            strategy=stats_analyser.strategies[i], key='recovered', op='eq', val=False, old_mask=fixable
-        )
-
-        if i == 2:
-            dat = stats_analyser.load(strategy=stats_analyser.strategies[i])
-            # print(dat['error'][not_fixed])
-            print(stats_analyser.strategies[i].name)
-            fixed = stats_analyser.get_mask(
-                strategy=stats_analyser.strategies[i], key='recovered', op='eq', val=False, old_mask=fixable
-            )
-            stats_analyser.print_faults(fixed)
 
         stats_analyser.plot_things_per_things(
             'recovered',
