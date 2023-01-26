@@ -6,7 +6,7 @@ Created on Mon Jan 23 18:16:35 2023
 @author: cpf5546
 """
 import numpy as np
-from time import time
+from time import process_time
 import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------------
@@ -52,35 +52,35 @@ for i, (n, nRun) in enumerate(zip(vecN, nRuns)):
     uRef[:] = 1.0
 
     for _ in range(nRun):
-        tBeg = time()
+        tBeg = process_time()
         fNew = evalF_new(uNew, 0.1)
-        tMid = time()
+        tMid = process_time()
         uRes = uNew + 0.1*fNew
-        tEnd = time()
+        tEnd = process_time()
         res[0, i] += tEnd-tBeg
         res[1, i] += tEnd-tMid
 
-        tBeg = time()
+        tBeg = process_time()
         fNew_IMEX = evalF_new_IMEX(uNew, 0.1)
-        tMid = time()
+        tMid = process_time()
         uRes = uNew + 0.1*fNew
-        tEnd = time()
+        tEnd = process_time()
         res[2, i] += tEnd-tBeg
         res[3, i] += tEnd-tMid
 
-        tBeg = time()
+        tBeg = process_time()
         fRef = evalF_ref(uRef, 0.1)
-        tMid = time()
+        tMid = process_time()
         uRes = uRef + 0.1*fRef
-        tEnd = time()
+        tEnd = process_time()
         res[4, i] += tEnd-tBeg
         res[5, i] += tEnd-tMid
 
-        tBeg = time()
+        tBeg = process_time()
         fRef_IMEX = evalF_ref_IMEX(uRef, 0.1)
-        tMid = time()
+        tMid = process_time()
         uRes = uRef + 0.1*(fRef_IMEX.impl + fRef_IMEX.expl)
-        tEnd = time()
+        tEnd = process_time()
         res[6, i] += tEnd-tBeg
         res[7, i] += tEnd-tMid
 
