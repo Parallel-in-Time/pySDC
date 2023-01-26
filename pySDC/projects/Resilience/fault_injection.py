@@ -68,15 +68,16 @@ class Fault(FrozenClass):
         Classmethod to initialize a fault based on an index to translate to a combination of fault parameters, in order
         to loop through all combinations. Probably only makes sense for ODEs.
 
-        First, we get the number of possible combinations m, and then get a value for each fault paramter as
+        First, we get the number of possible combinations m, and then get a value for each fault parameter as
         i = m % i_max (plus modifications to make sure we get a sensible value)
 
         Args:
             args (dict): Supply variables that will be exempt from randomization here.
             rnd_params (dict): Supply attributes to the randomization such as maximum values here
-            generator (int): Index for specific combinatino
+            generator (int): Index for specific combination
 
-        Returns Fault: Generated fro a specific combination of parameters
+        Returns:
+            Fault: Generated from a specific combination of parameters
         '''
 
         ranges = [
@@ -92,7 +93,7 @@ class Fault(FrozenClass):
 
         if len(np.unique(mods)) < len(mods):
             raise NotImplementedError(
-                'I can\'t deal with combinations when parameters have the same admissable number\
+                'I can\'t deal with combinations when parameters have the same admissible number\
  of values yet!'
             )
 
@@ -238,7 +239,7 @@ class FaultInjector(hooks):
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
             L.sweep.compute_residual()
         else:
-            raise NotImplementedError(f'Target {f.target} for faults not impelented!')
+            raise NotImplementedError(f'Target {f.target} for faults not implemented!')
 
         # log what happened to stats and screen
         self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
@@ -437,38 +438,45 @@ class FaultInjector(hooks):
         return self.to_float(f'{binary[:bit]}{int(binary[bit]) ^ 1}{binary[bit+1:]}')
 
 
-def test_float_conversion():
-    '''
-    Method to test the float conversion by converting to bytes and back and by flipping bits where we know what the
-    impact is. We try with 1000 random numbers, so we don't know how many times we get nan before hand.
-    '''
-    # Try the conversion between floats and bytes
-    injector = FaultInjector()
-    exp = [-1, 2, 256]
-    bit = [0, 11, 8]
-    nan_counter = 0
-    num_tests = int(1e3)
-    for i in range(num_tests):
-        # generate a random number almost between the full range of python float
-        rand = np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
-        # convert to bytes and back
-        res = injector.to_float(injector.to_binary(rand))
-        assert np.isclose(res, rand), f"Conversion between bytes and float failed for {rand}: result: {res}"
+def prepare_controller_for_faults(controller, fault_stuff, rnd_args, args):
+    """
+    Prepare the controller for a run with faults. That means the fault injection hook is added and supplied with the
+    relevant parameters.
 
-        # flip some exponent bits
-        for i in range(len(exp)):
-            res = injector.flip_bit(rand, bit[i]) / rand
-            if np.isfinite(res):
-                assert exp[i] in [
-                    res,
-                    1.0 / res,
-                ], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or \
-{1./res:.2e}'
-            else:
-                nan_counter += 1
-    if nan_counter > 0:
-        print(f'When flipping bits, we got nan {nan_counter} times out of {num_tests} tests')
+    Args:
+        controller (pySDC.controller): The controller
+        fault_stuff (dict): A dictionary with information on how to add faults
+        rnd_args (dict): Default arguments for how to add random faults in a specific problem
+        args (dict): Default arguments for where to add faults in a specific problem
+
+    Returns:
+        None
+    """
+    faultHook = get_fault_injector_hook(controller)
+    faultHook.random_generator = fault_stuff['rng']
+    faultHook.add_fault(
+        rnd_args={**rnd_args, **fault_stuff.get('rnd_params', {})},
+        args={**args, **fault_stuff.get('args', {})},
+    )
 
 
-if __name__ == "__main__":
-    test_float_conversion()
+def get_fault_injector_hook(controller):
+    """
+    Get the fault injector hook from the list of hooks in the controller.
+    If there is not one already, it is added here.
+
+    Args:
+        controller (pySDC.controller): The controller
+
+    Returns:
+        pySDC.hook.FaultInjector: The fault injecting hook
+    """
+    hook_types = [type(me) for me in controller.hooks]
+
+    if FaultInjector not in hook_types:
+        controller.add_hook(FaultInjector)
+        return get_fault_injector_hook(controller)
+    else:
+        hook_idx = [i for i in range(len(hook_types)) if hook_types[i] == FaultInjector]
+        assert len(hook_idx) == 1, f'Expected exactly one FaultInjector, got {len(hook_idx)}!'
+        return controller.hooks[hook_idx[0]]

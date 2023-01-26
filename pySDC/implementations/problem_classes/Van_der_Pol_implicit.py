@@ -46,7 +46,7 @@ class vanderpol(ptype):
 
         Args:
             t (float): current time
-            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution
+            u_init (pySDC.problem.vanderpol.dtype_u): initial conditions for getting the exact solution
             t_init (float): the starting time
 
         Returns:

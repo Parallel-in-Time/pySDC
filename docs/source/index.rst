@@ -1,6 +1,13 @@
-.. include:: ../../README.rst
 
-.. include:: ../../CHANGELOG.rst
+.. include:: README.rst
+
+Tests
+-----
+
+.. include:: ../../pySDC/tests/README.rst
+
+User Guide
+==========
 
 Tutorial
 --------
@@ -45,12 +52,6 @@ Projects
    projects/DAE.rst
 
 
-Tests
------
-
-.. include:: ../../pySDC/tests/README.rst
-
-
 API documentation
 -----------------
 
@@ -64,11 +65,8 @@ API documentation
    pySDC/helpers.rst
 
 
-Indices and tables
-------------------
+Indices and tables :
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-

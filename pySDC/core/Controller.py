@@ -3,10 +3,10 @@ import os
 import sys
 import numpy as np
 
-from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.implementations.hooks.default_hook import DefaultHooks
 
 
 # short helper class to add params as attributes
@@ -40,11 +40,16 @@ class controller(object):
             controller_params (dict): parameter set for the controller and the steps
         """
 
-        # check if we have a hook on this list. if not, use default class.
-        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
-        self.__hooks = controller_params['hook_class']()
+        # check if we have a hook on this list. If not, use default class.
+        self.__hooks = []
+        hook_classes = [DefaultHooks]
+        user_hooks = controller_params.get('hook_class', [])
+        hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
+        [self.add_hook(hook) for hook in hook_classes]
+        controller_params['hook_class'] = controller_params.get('hook_class', hook_classes)
 
-        self.hooks.pre_setup(step=None, level_number=None)
+        for hook in self.hooks:
+            hook.pre_setup(step=None, level_number=None)
 
         self.params = _Pars(controller_params)
 
@@ -54,6 +59,7 @@ class controller(object):
         if self.params.use_iteration_estimator and self.params.all_to_done:
             self.logger.warning('all_to_done and use_iteration_estimator set, will ignore all_to_done')
 
+        self.base_convergence_controllers = [CheckConvergence]
         self.setup_convergence_controllers(description)
 
     @staticmethod
@@ -100,18 +106,41 @@ class controller(object):
         else:
             pass
 
+    def add_hook(self, hook):
+        """
+        Add a hook to the controller which will be called in addition to all other hooks whenever something happens.
+        The hook is only added if a hook of the same class is not already present.
+
+        Args:
+            hook (pySDC.Hook): A hook class that is derived from the core hook class
+
+        Returns:
+            None
+        """
+        if hook not in [type(me) for me in self.hooks]:
+            self.__hooks += [hook()]
+
     def welcome_message(self):
         out = (
-            'Welcome to the one and only, really very astonishing and 87.3% bug free'
-            + '\n                                 _____ _____   _____ '
-            + '\n                                / ____|  __ \ / ____|'
-            + '\n                    _ __  _   _| (___ | |  | | |     '
-            + '\n                   | \'_ \| | | |\___ \| |  | | |     '
-            + '\n                   | |_) | |_| |____) | |__| | |____ '
-            + '\n                   | .__/ \__, |_____/|_____/ \_____|'
-            + '\n                   | |     __/ |                     '
-            + '\n                   |_|    |___/                      '
-            + '\n                                                     '
+            "Welcome to the one and only, really very astonishing and 87.3% bug free"
+            + "\n"
+            + r"                                 _____ _____   _____ "
+            + "\n"
+            + r"                                / ____|  __ \ / ____|"
+            + "\n"
+            + r"                    _ __  _   _| (___ | |  | | |     "
+            + "\n"
+            + r"                   | '_ \| | | |\___ \| |  | | |     "
+            + "\n"
+            + r"                   | |_) | |_| |____) | |__| | |____ "
+            + "\n"
+            + r"                   | .__/ \__, |_____/|_____/ \_____|"
+            + "\n"
+            + r"                   | |     __/ |                     "
+            + "\n"
+            + r"                   |_|    |___/                      "
+            + "\n"
+            + r"                                                     "
         )
         self.logger.info(out)
 
@@ -126,7 +155,7 @@ class controller(object):
         """
 
         self.welcome_message()
-        out = 'Setup overview (--> user-defined) -- BEGIN'
+        out = 'Setup overview (--> user-defined, -> dependency) -- BEGIN'
         self.logger.info(out)
         out = '----------------------------------------------------------------------------------------------------\n\n'
         out += 'Controller: %s\n' % self.__class__
@@ -190,35 +219,16 @@ class controller(object):
                         out += '-->         %s = %s\n' % (k, v)
                     else:
                         out += '            %s = %s\n' % (k, v)
+
+        out += '\n'
+        out += self.get_convergence_controllers_as_table(description)
+        out += '\n'
         self.logger.info(out)
+
         out = '----------------------------------------------------------------------------------------------------'
         self.logger.info(out)
-        out = 'Setup overview (--> user-defined) -- END\n'
+        out = 'Setup overview (--> user-defined, -> dependency) -- END\n'
         self.logger.info(out)
-
-    @staticmethod
-    def check_convergence(S):
-        """
-        Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)
-
-        Args:
-            S (pySDC.Step.step): current step
-
-        Returns:
-            bool: converged, true or false
-
-        """
-
-        # do all this on the finest level
-        L = S.levels[0]
-
-        # get residual and check against prescribed tolerance (plus check number of iterations
-        res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
-        if converged is None:
-            converged = False
-
-        return converged
 
     def run(self, u0, t0, Tend):
         """
@@ -256,7 +266,6 @@ class controller(object):
         self.convergence_controllers = []
         self.convergence_controller_order = []
         conv_classes = description.get('convergence_controllers', {})
-        conv_classes[CheckConvergence] = {}  # don't need special params for this, hence the {}
 
         # instantiate the convergence controllers
         for conv_class, params in conv_classes.items():
@@ -266,13 +275,13 @@ class controller(object):
 
     def add_convergence_controller(self, convergence_controller, description, params=None, allow_double=False):
         '''
-        Add an individual convergence controller to the list of convergence controllers and instiate it.
+        Add an individual convergence controller to the list of convergence controllers and instantiate it.
         Afterwards, the order of the convergence controllers is updated.
 
         Args:
             convergence_controller (pySDC.ConvergenceController): The convergence controller to be added
             description (dict): The description object used to instantiate the controller
-            params (dict): Parametes for the convergence controller
+            params (dict): Parameters for the convergence controller
             allow_double (bool): Allow adding the same convergence controller multiple times
 
         Returns:
@@ -291,12 +300,42 @@ class controller(object):
 
         return None
 
-    def print_convergence_controllers(self):
+    def get_convergence_controllers_as_table(self, description):
         '''
         This function is for debugging purposes to keep track of the different convergence controllers and their order.
+
+        Args:
+            description (dict): Description of the problem
+
+        Returns:
+            str: Table of convergence controllers as a string
         '''
-        print('    | order | convergence controller')
-        print('----+-------+-------------------------------------------------------------------')
+        out = 'Active convergence controllers:'
+        out += '\n    |  # | order | convergence controller'
+        out += '\n----+----+-------+---------------------------------------------------------------------------------------'
         for i in range(len(self.convergence_controllers)):
             C = self.convergence_controllers[self.convergence_controller_order[i]]
-            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}')
+
+            # figure out how the convergence controller was added
+            if type(C) in description.get('convergence_controllers', {}).keys():  # added by user
+                user_added = '--> '
+            elif type(C) in self.base_convergence_controllers:  # added by default
+                user_added = '    '
+            else:  # added as dependency
+                user_added = ' -> '
+
+            out += f'\n{user_added}|{i:3} | {C.params.control_order:5} | {type(C).__name__}'
+
+        return out
+
+    def return_stats(self):
+        """
+        Return the merged stats from all hooks
+
+        Returns:
+            dict: Merged stats from all hooks
+        """
+        stats = {}
+        for hook in self.hooks:
+            stats = {**stats, **hook.return_stats()}
+        return stats

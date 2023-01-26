@@ -69,7 +69,7 @@ class heatNd_forced(ptype):
                 if freq % 2 != 0 and problem_params['bc'] == 'periodic':
                     raise ProblemError('need even number of frequencies due to periodic BCs')
         else:
-            if problem_params['freq'] % 2 != 0 and problem_params['bc'] == 'periodic':
+            if problem_params['freq'] % 2 != 0 and problem_params['bc'] == 'periodic' and problem_params['freq'] != -1:
                 raise ProblemError('need even number of frequencies due to periodic BCs')
 
         if type(problem_params['nvars']) is tuple:
@@ -239,7 +239,7 @@ class heatNd_unforced(heatNd_forced):
 
         return f
 
-    def u_exact(self, t):
+    def u_exact(self, t, **kwargs):
         """
         Routine to compute the exact solution at time t
 
@@ -254,7 +254,10 @@ class heatNd_unforced(heatNd_forced):
 
         if self.params.ndim == 1:
             rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2
-            me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * np.exp(-t * self.params.nu * rho)
+            if self.params.freq[0] > 0:
+                me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * np.exp(-t * self.params.nu * rho)
+            elif self.params.freq[0] == -1:  # Gaussian
+                me[:] = np.exp(-0.5 * ((self.xv[0] - 0.5) / self.params.sigma) ** 2) * np.exp(-t * self.params.nu * rho)
         elif self.params.ndim == 2:
             rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2 + (
                 2.0 - 2.0 * np.cos(np.pi * self.params.freq[1] * self.dx)

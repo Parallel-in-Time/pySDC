@@ -18,6 +18,12 @@ class _Pars(FrozenClass):
 
 # short helper class to bundle all status variables
 class _Status(FrozenClass):
+    """
+    This class carries the status of the step. All variables that the core SDC / PFASST functionality depend on are
+    initialized here, while the convergence controllers are allowed to add more variables in a controlled fashion
+    later on using the `add_variable` function.
+    """
+
     def __init__(self):
         self.iter = None
         self.stage = None
@@ -27,12 +33,11 @@ class _Status(FrozenClass):
         self.pred_cnt = None
         self.done = None
         self.force_done = None
+        self.force_continue = False
         self.prev_done = None
         self.time_size = None
         self.diff_old_loc = None
         self.diff_first_loc = None
-        self.restart = False  # do I want to be restarted now?
-        self.restarts_in_a_row = 0  # how many times was I restarted?
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
@@ -132,7 +137,7 @@ class step(FrozenClass):
         # generate list of dictionaries out of the description
         descr_list = self.__dict_to_list(descr_new)
 
-        # sanity check: is there a base_transfer class? is there one even if only a single level is specified?
+        # sanity check: is there a base_transfer class? Is there one even if only a single level is specified?
         if len(descr_list) > 1 and not descr_new['space_transfer_class']:
             msg = 'need %s to instantiate step, only got %s' % ('space_transfer_class', str(descr_new.keys()))
             self.logger.error(msg)

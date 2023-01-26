@@ -8,7 +8,7 @@ class StoreUOld(ConvergenceController):
     Default control order is 90.
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         """
         Define parameters here
 
@@ -20,9 +20,9 @@ class StoreUOld(ConvergenceController):
         Returns:
             (dict): The updated params dictionary
         """
-        return {'control_order': +90, **params}
+        return {"control_order": +90, **super().setup(controller, params, description, **kwargs)}
 
-    def post_iteration_processing(self, controller, S):
+    def post_iteration_processing(self, controller, S, **kwargs):
         """
         Store the solution at the current iteration
 
@@ -33,13 +33,12 @@ class StoreUOld(ConvergenceController):
         Return:
             None
         """
-        if S.status.iter < S.params.maxiter:
-            for L in S.levels:
-                L.uold[:] = L.u[:]
+        for L in S.levels:
+            L.uold[:] = L.u[:]
 
         return None
 
-    def post_spread_processing(self, controller, S):
+    def post_spread_processing(self, controller, S, **kwargs):
         """
         Store the initial conditions in u_old in the spread phase.
 
@@ -50,5 +49,5 @@ class StoreUOld(ConvergenceController):
         Return:
             None
         """
-        self.post_iteration_processing(controller, S)
+        self.post_iteration_processing(controller, S, **kwargs)
         return None

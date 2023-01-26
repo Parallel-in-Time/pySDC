@@ -9,7 +9,7 @@ dependencies:
   - sympy>=1.0
   - numba>=0.35
   - dill>=0.2.6
-  - pytest
+  - pytest<7.2.0
   - pytest-benchmark
   - coverage[toml]
   - sphinx

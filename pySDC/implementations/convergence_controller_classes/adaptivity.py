@@ -1,9 +1,13 @@
 import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
-from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
-from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
+from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
+    StepSizeLimiter,
+)
+from pySDC.implementations.convergence_controller_classes.basic_restarting import (
+    BasicRestartingNonMPI,
+)
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.hooks.log_step_size import LogStepSize
 
 
 class AdaptivityBase(ConvergenceController):
@@ -12,7 +16,7 @@ class AdaptivityBase(ConvergenceController):
     and update rules.
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         """
         Define default parameters here.
 
@@ -29,12 +33,13 @@ class AdaptivityBase(ConvergenceController):
             (dict): The updated params dictionary
         """
         defaults = {
-            'control_order': -50,
-            'beta': 0.9,
+            "control_order": -50,
+            "beta": 0.9,
         }
-        return {**defaults, **params}
+        controller.add_hook(LogStepSize)
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         """
         Load step size limiters here, if they are desired.
 
@@ -46,15 +51,15 @@ class AdaptivityBase(ConvergenceController):
             None
         """
 
-        if 'dt_min' in self.params.__dict__.keys() or 'dt_max' in self.params.__dict__.keys():
+        if "dt_min" in self.params.__dict__.keys() or "dt_max" in self.params.__dict__.keys():
             step_limiter_params = dict()
-            step_limiter_params['dt_min'] = self.params.__dict__.get('dt_min', 0)
-            step_limiter_params['dt_max'] = self.params.__dict__.get('dt_max', np.inf)
+            step_limiter_params["dt_min"] = self.params.__dict__.get("dt_min", 0)
+            step_limiter_params["dt_max"] = self.params.__dict__.get("dt_max", np.inf)
             controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
 
         return None
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         """
         Determine a step size for the next step from an estimate of the local error of the current step.
 
@@ -65,7 +70,7 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             None
         """
-        raise NotImplementedError('Please implement a rule for updating the step size!')
+        raise NotImplementedError("Please implement a rule for updating the step size!")
 
     def compute_optimal_step_size(self, beta, dt, e_tol, e_est, order):
         """
@@ -98,9 +103,9 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             float: The error estimate
         """
-        raise NotImplementedError('Please implement a way to get the local error')
+        raise NotImplementedError("Please implement a way to get the local error")
 
-    def determine_restart(self, controller, S):
+    def determine_restart(self, controller, S, **kwargs):
         """
         Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance
 
@@ -111,11 +116,26 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             None
         """
-        if S.status.iter == S.params.maxiter:
+        if S.status.iter >= S.params.maxiter:
             e_est = self.get_local_error_estimate(controller, S)
             if e_est >= self.params.e_tol:
-                S.status.restart = True
-                self.log(f'Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}', S)
+                # see if we try to avoid restarts
+                if self.params.get('avoid_restarts'):
+                    more_iter_needed = max([L.status.iter_to_convergence for L in S.levels])
+                    rho = max([L.status.contraction_factor for L in S.levels])
+
+                    if rho > 1:
+                        S.status.restart = True
+                        self.log(f"Convergence factor = {rho:.2e} > 1 -> restarting", S)
+                    elif S.status.iter + more_iter_needed > 2 * S.params.maxiter:
+                        S.status.restart = True
+                        self.log(f"{more_iter_needed} more iterations needed for convergence -> restart", S)
+                    else:
+                        S.status.force_continue = True
+                        self.log(f"{more_iter_needed} more iterations needed for convergence -> no restart", S)
+                else:
+                    S.status.restart = True
+                    self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
 
         return None
 
@@ -127,9 +147,19 @@ class Adaptivity(AdaptivityBase):
     We have a version working in non-MPI pipelined SDC, but Adaptivity requires you to know the order of the scheme,
     which you can also know for block-Jacobi, but it works differently and it is only implemented for block
     Gauss-Seidel so far.
+
+    There is an option to reduce restarts if continued iterations could yield convergence in fewer iterations than
+    restarting based on an estimate of the contraction factor.
+    Since often only one or two more iterations suffice, this can boost efficiency of adaptivity significantly.
+    Notice that the computed step size is not effected.
+    Be aware that this does not work when Hot Rod is enabled, since that requires us to know the order of the scheme in
+    more detail. Since we reset to the second to last sweep before moving on, we cannot continue to iterate.
+    Set the reduced restart up by setting a boolean value for "avoid_restarts" in the parameters for the convergence
+    controller.
+    The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.
     """
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         """
         Load the embedded error estimator.
 
@@ -140,14 +170,26 @@ class Adaptivity(AdaptivityBase):
         Returns:
             None
         """
+        from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
+
         super(Adaptivity, self).dependencies(controller, description)
-        if type(controller) == controller_nonMPI:
-            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
-        else:
-            raise NotImplementedError('I only have an implementation of the embedded error for non MPI versions')
+
+        controller.add_convergence_controller(
+            EstimateEmbeddedError.get_implementation("nonMPI" if type(controller) == controller_nonMPI else "MPI"),
+            description=description,
+        )
+
+        # load contraction factor estimator if necessary
+        if self.params.get('avoid_restarts'):
+            from pySDC.implementations.convergence_controller_classes.estimate_contraction_factor import (
+                EstimateContractionFactor,
+            )
+
+            params = {'e_tol': self.params.e_tol}
+            controller.add_convergence_controller(EstimateContractionFactor, description=description, params=params)
         return None
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
         For adaptivity, we need to know the order of the scheme.
@@ -161,26 +203,29 @@ class Adaptivity(AdaptivityBase):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        if description['step_params'].get('restol', -1.0) >= 0:
+        if description["step_params"].get("restol", -1.0) >= 0:
             return (
                 False,
-                'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
-smaller than 0!',
+                "Adaptivity needs constant order in time and hence restol in the step parameters has to be \
+smaller than 0!",
             )
 
         if controller.params.mssdc_jac:
-            return False, 'Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
-
-        if 'e_tol' not in params.keys():
             return (
                 False,
-                'Adaptivity needs a local tolerance! Please set some up in description[\'convergence_control\
-_params\'][\'e_tol\']!',
+                "Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!",
             )
 
-        return True, ''
+        if "e_tol" not in params.keys():
+            return (
+                False,
+                "Adaptivity needs a local tolerance! Please set some up in description['convergence_control\
+_params']['e_tol']!",
+            )
 
-    def get_new_step_size(self, controller, S):
+        return True, ""
+
+    def get_new_step_size(self, controller, S, **kwargs):
         """
         Determine a step size for the next step from an embedded estimate of the local error of the current step.
 
@@ -221,12 +266,12 @@ _params\'][\'e_tol\']!',
 
 
 class AdaptivityRK(Adaptivity):
-    '''
+    """
     Adaptivity for Runge-Kutta methods. Basically, we need to change the order in the step size update
-    '''
+    """
 
-    def check_parameters(self, controller, params, description):
-        '''
+    def check_parameters(self, controller, params, description, **kwargs):
+        """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
         For adaptivity, we need to know the order of the scheme.
 
@@ -238,18 +283,18 @@ class AdaptivityRK(Adaptivity):
         Returns:
             bool: Whether the parameters are compatible
             str: The error message
-        '''
-        if 'update_order' not in params.keys():
+        """
+        if "update_order" not in params.keys():
             return (
                 False,
-                'Adaptivity needs an order for the update rule! Please set some up in \
-description[\'convergence_control_params\'][\'update_order\']!',
+                "Adaptivity needs an order for the update rule! Please set some up in \
+description['convergence_control_params']['update_order']!",
             )
 
         return super(AdaptivityRK, self).check_parameters(controller, params, description)
 
-    def get_new_step_size(self, controller, S):
-        '''
+    def get_new_step_size(self, controller, S, **kwargs):
+        """
         Determine a step size for the next step from an embedded estimate of the local error of the current step.
 
         Args:
@@ -258,7 +303,7 @@ description[\'convergence_control_params\'][\'update_order\']!',
 
         Returns:
             None
-        '''
+        """
         # check if we performed the desired amount of sweeps
         if S.status.iter == S.params.maxiter:
             L = S.levels[0]
@@ -282,9 +327,10 @@ class AdaptivityResidual(AdaptivityBase):
     rule to update the step size. Instead of giving a local tolerance that we try to hit as closely as possible, we set
     two thresholds for the residual. When we exceed the upper one, we reduce the step size by a factor of 2 and if the
     residual falls below the lower threshold, we double the step size.
+    Please setup these parameters as "e_tol" and "e_tol_low".
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         """
         Define default parameters here.
 
@@ -303,14 +349,14 @@ class AdaptivityResidual(AdaptivityBase):
             (dict): The updated params dictionary
         """
         defaults = {
-            'control_order': -45,
-            'e_tol_low': 0,
-            'e_tol': np.inf,
-            'max_restarts': 2 if 'e_tol_low' in params else None,
+            "control_order": -45,
+            "e_tol_low": 0,
+            "e_tol": np.inf,
+            "max_restarts": 99 if "e_tol_low" in params else None,
         }
         return {**defaults, **params}
 
-    def setup_status_variables(self, controller):
+    def setup_status_variables(self, controller, **kwargs):
         """
         Change maximum number of allowed restarts here.
 
@@ -330,7 +376,7 @@ class AdaptivityResidual(AdaptivityBase):
             restart_cont[0].params.max_restarts = self.params.max_restarts
         return None
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
         For adaptivity, we want a fixed order of the scheme.
@@ -344,19 +390,22 @@ class AdaptivityResidual(AdaptivityBase):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        if description['step_params'].get('restol', -1.0) >= 0:
+        if description["step_params"].get("restol", -1.0) >= 0:
             return (
                 False,
-                'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
-smaller than 0!',
+                "Adaptivity needs constant order in time and hence restol in the step parameters has to be \
+smaller than 0!",
             )
 
         if controller.params.mssdc_jac:
-            return False, 'Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
+            return (
+                False,
+                "Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!",
+            )
 
-        return True, ''
+        return True, ""
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         """
         Determine a step size for the next step.
         If we exceed the absolute tolerance of the residual in either direction, we either double or halve the step

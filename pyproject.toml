@@ -4,12 +4,15 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = 'pySDC'
-version = '5.0.0'
+version = '5.1.0'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
-readme = 'README.rst'
+readme = 'README.md'
 authors=[
     {name='Robert Speck', email='r.speck@fz-juelich.de'},
+    {name='Thibaut Lunet', email='thibaut.lunet@tuhh.de'},
+    {name='Thomas Baumann', email='t.baumann@fz-juelich.de'},
+    {name='Lisa Wimmer', email='wimmer@uni-wuppertal.de'},
     ]
 homepage = "http://www.parallel-in-time.org/pySDC/"
 repository = "https://github.com/Parallel-in-Time/pySDC/"
@@ -78,16 +81,19 @@ pyflakes = [
     '-E203', '-E741', '-E402', '-W504', '-W605', '-F401'
     ]
 #flake8-black = ["+*"]
-flake8-bugbear = ["+*", '-B023']
+flake8-bugbear = ["+*", '-B023', '-B028']
 flake8-comprehensions = ["+*", '-C408', '-C417']
 
 [tool.black]
 line-length = 120
 skip-string-normalization = true
+exclude = '''playgrounds/'''
 
 [tool.coverage.run]
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
 relative_files = true
+concurrency = ['multiprocessing']
+source = ['pySDC']
 
 [tool.coverage.report]
 skip_empty = true

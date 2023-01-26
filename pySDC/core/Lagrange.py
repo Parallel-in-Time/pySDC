@@ -43,7 +43,7 @@ def computeFejerRule(n):
     v1 = np.empty(len(v0) - 1, dtype=complex)
     np.conjugate(v0[:0:-1], out=v1)
     v1 += v0[:-1]
-    # -- Compute inverse fourier transform
+    # -- Compute inverse Fourier transform
     w = np.fft.ifft(v1)
     if max(w.imag) > 1.0e-15:
         raise ValueError(f'Max imaginary value to important for ifft: {max(w.imag)}')
@@ -80,10 +80,9 @@ class LagrangeApproximation(object):
         The interpolating points
     weights : np.1darray
         The associated barycentric weights
-
     """
 
-    def __init__(self, points, weightComputation='AUTO', scaleRef='MAX'):
+    def __init__(self, points):
         """
 
         Parameters
@@ -91,23 +90,6 @@ class LagrangeApproximation(object):
         points : list, tuple or np.1darray
             The given interpolation points, no specific scaling, but must be
             ordered in increasing order.
-        weightComputation : str, optional
-            Algorithm used to compute the barycentric weights. Can be :
-
-            - 'FAST' : uses the analytic formula (unstable for large number of points)
-            - 'STABLE' : uses logarithmic difference and scaling of the weights
-            - 'CHEBFUN' : uses the same approach as in the chebfun package
-
-            The default is 'AUTO' : it tries the 'FAST' algorithm, and if an
-            overflow is detected, it switches to the 'STABLE' algorithm.
-        scaleRef : str, optional
-            Scaling used in the 'STABLE' algorithm for weight computation.
-            Can be :
-
-            - 'ZERO' : scaling based on the weight for the value closest to :math:`t=0`.
-            - 'MAX' : scaling based on the maximum weight value.
-
-            The default is 'MAX'.
         """
         points = np.asarray(points).ravel()
 
@@ -120,50 +102,15 @@ class LagrangeApproximation(object):
             invProd **= -1
             return invProd
 
-        def logScale(diffs):
-            # Implementation using logarithmic difference and scaling
-            sign = np.sign(diffs).prod(axis=1)
-            wLog = -np.log(np.abs(diffs)).sum(axis=1)
-            if scaleRef == 'ZERO':
-                wScale = wLog[np.argmin(np.abs(points))]
-            elif scaleRef == 'MAX':
-                wScale = wLog.max()
-            else:
-                raise NotImplementedError(f'scaleRef={scaleRef}')
-            invProd = np.exp(wLog - wScale)
-            invProd *= sign
-            return invProd
-
-        def chebfun(diffs):
-            # Implementation used in chebfun
-            diffs *= 4 / (points.max() - points.min())
-            sign = np.sign(diffs).prod(axis=1)
-            vv = np.exp(np.log(np.abs(diffs)).sum(axis=1))
-            invProd = sign * vv
-            invProd **= -1
-            invProd /= np.linalg.norm(invProd, np.inf)
-            return invProd
-
-        if weightComputation == 'AUTO':
-            with np.errstate(divide='raise', over='ignore'):
-                try:
-                    invProd = analytic(diffs)
-                except FloatingPointError:
-                    invProd = logScale(diffs)
-        elif weightComputation == 'FAST':
-            invProd = analytic(diffs)
-        elif weightComputation == 'STABLE':
-            invProd = logScale(diffs)
-        elif weightComputation == 'CHEBFUN':
-            invProd = chebfun(diffs)
-        else:
-            raise NotImplementedError(f'weightComputation={weightComputation}')
-        weights = invProd
+        with np.errstate(divide='raise', over='ignore'):
+            try:
+                weights = analytic(diffs)
+            except FloatingPointError:
+                raise ValueError('Lagrange formula unstable for that much nodes')
 
         # Store attributes
         self.points = points
         self.weights = weights
-        self.weightComputation = weightComputation
 
     @property
     def n(self):
