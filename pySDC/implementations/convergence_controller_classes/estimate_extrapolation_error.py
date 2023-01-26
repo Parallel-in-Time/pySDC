@@ -57,7 +57,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
             "order_time_marching": description["step_params"]["maxiter"],
         }
 
-        new_params = {**default_params, **params}
+        new_params = {**default_params, **super().setup(controller, params, description, **kwargs)}
 
         # Do a sufficiently high order Taylor expansion
         new_params["Taylor_order"] = new_params["order_time_marching"] + 2

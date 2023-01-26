@@ -161,7 +161,12 @@ def test_fault_stats():
 
     for strategy in vdp_stats.strategies:
         dat = vdp_stats.load(strategy, True)
-        recovered = len(dat['recovered'][dat['recovered'] == True])
+        fixable_mask = vdp_stats.get_fixable_faults_only(strategy)
+        recovered_mask = vdp_stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
+
+        assert all(fixable_mask[:-1] == [False, True, False]), "Error in generating mask of fixable faults"
+
+        recovered = len(dat['recovered'][recovered_mask])
         crashed = len(dat['error'][dat['error'] == np.inf])  # on some systems the last run crashes...
         assert (
             recovered >= recovered_reference[strategy.name] - crashed

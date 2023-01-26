@@ -36,7 +36,7 @@ class HotRod(ConvergenceController):
             "control_order": -40,
             "no_storage": False,
         }
-        return {**default_params, **params}
+        return {**default_params, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
         """
