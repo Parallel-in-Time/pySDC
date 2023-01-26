@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_adaptivity_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.5</a>,
-            created at 2023-01-24 13:02 +0000
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
+            created at 2023-01-26 09:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -123,7 +123,7 @@
     <p class="pln"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t"><span class="str">    necessary to reevaluate the right hand side at all nodes afterwards.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">    <span class="key">def</span> <span class="nam">setup</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">controller</span><span class="op">,</span> <span class="nam">params</span><span class="op">,</span> <span class="nam">description</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">    <span class="key">def</span> <span class="nam">setup</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">controller</span><span class="op">,</span> <span class="nam">params</span><span class="op">,</span> <span class="nam">description</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t"><span class="str">        Record what variables we want to vary.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -160,7 +160,7 @@
     <p class="pln"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">                <span class="nam">defaults</span><span class="op">[</span><span class="str">'num_colls'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">max</span><span class="op">(</span><span class="op">[</span><span class="nam">defaults</span><span class="op">[</span><span class="str">'num_colls'</span><span class="op">]</span><span class="op">,</span> <span class="nam">len</span><span class="op">(</span><span class="nam">params</span><span class="op">[</span><span class="nam">key</span><span class="op">]</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">        <span class="key">return</span> <span class="op">{</span><span class="op">**</span><span class="nam">defaults</span><span class="op">,</span> <span class="op">**</span><span class="nam">params</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">        <span class="key">return</span> <span class="op">{</span><span class="op">**</span><span class="nam">defaults</span><span class="op">,</span> <span class="op">**</span><span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">setup</span><span class="op">(</span><span class="nam">controller</span><span class="op">,</span> <span class="nam">params</span><span class="op">,</span> <span class="nam">description</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">    <span class="key">def</span> <span class="nam">switch_sweeper</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">S</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -285,8 +285,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_adaptivity_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.0.5</a>,
-            created at 2023-01-24 13:02 +0000
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
+            created at 2023-01-26 09:52 +0000
         </p>
     </div>
 </footer>

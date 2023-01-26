@@ -103,9 +103,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Process </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="si">:</span><span class="s1">2d</span><span class="si">}</span><span class="s1"> on time </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ConvergenceController.setup"><a class="viewcode-back" href="../../pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvergenceController.setup"><a class="viewcode-back" href="../../pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup various variables that only need to be set once in the beginning.</span>
+<span class="sd">        If the convergence controller is added automatically, you can give it params by adding it manually.</span>
+<span class="sd">        It will be instantiated only once with the manually supplied parameters overriding automatically added</span>
+<span class="sd">        parameters.</span>
+
+<span class="sd">        This function scans the convergence controllers supplied to the description object for instances of itself.</span>
+<span class="sd">        This corresponds to the convergence controller being added manually by the user. If something is found, this</span>
+<span class="sd">        function will then return a composite dictionary from the `params` passed to this function as well as the</span>
+<span class="sd">        `params` passed manually, with priority to manually added parameters. If you added the convergence controller</span>
+<span class="sd">        manually, that is of course the same and nothing happens. If, on the other hand, the convergence controller was</span>
+<span class="sd">        added automatically, the `params` passed here will come from whatever added it and you can now override</span>
+<span class="sd">        parameters by adding the convergence controller manually.</span>
+<span class="sd">        This relies on children classes to return a composite dictionary from their defaults and from the result of this</span>
+<span class="sd">        function, so you should write</span>
+<span class="sd">        ```</span>
+<span class="sd">        return {**defaults, **super().setup(controller, params, description, **kwargs)}</span>
+<span class="sd">        ```</span>
+<span class="sd">        when overloading this method in a child class, with `defaults` a dictionary containing default parameters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -115,7 +132,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): The updated params dictionary after setup</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">params</span></div>
+        <span class="c1"># allow to change parameters by adding the convergence controller manually</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="p">{})}</span></div>
 
 <div class="viewcode-block" id="ConvergenceController.dependencies"><a class="viewcode-back" href="../../pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

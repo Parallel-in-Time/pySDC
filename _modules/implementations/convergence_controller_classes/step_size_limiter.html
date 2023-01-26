@@ -61,7 +61,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): The updated params dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">92</span><span class="p">,</span> <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;dt_max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">92</span><span class="p">,</span>
+            <span class="s2">&quot;dt_min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;dt_max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
 <div class="viewcode-block" id="StepSizeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

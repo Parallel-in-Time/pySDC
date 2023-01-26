@@ -81,7 +81,7 @@
 <span class="sd">    necessary to reevaluate the right hand side at all nodes afterwards.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AdaptiveCollocation.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="AdaptiveCollocation.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Record what variables we want to vary.</span>
 
@@ -118,7 +118,7 @@
 
                 <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;num_colls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;num_colls&#39;</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">])])</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
 <div class="viewcode-block" id="AdaptiveCollocation.switch_sweeper"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.switch_sweeper">[docs]</a>    <span class="k">def</span> <span class="nf">switch_sweeper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

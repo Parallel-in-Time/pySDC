@@ -417,8 +417,24 @@ arguments, but with <cite>allow_overwrite = True</cite>.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setup various variables that only need to be set once in the beginning.</p>
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup various variables that only need to be set once in the beginning.
+If the convergence controller is added automatically, you can give it params by adding it manually.
+It will be instantiated only once with the manually supplied parameters overriding automatically added
+parameters.</p>
+<p>This function scans the convergence controllers supplied to the description object for instances of itself.
+This corresponds to the convergence controller being added manually by the user. If something is found, this
+function will then return a composite dictionary from the <cite>params</cite> passed to this function as well as the
+<cite>params</cite> passed manually, with priority to manually added parameters. If you added the convergence controller
+manually, that is of course the same and nothing happens. If, on the other hand, the convergence controller was
+added automatically, the <cite>params</cite> passed here will come from whatever added it and you can now override
+parameters by adding the convergence controller manually.
+This relies on children classes to return a composite dictionary from their defaults and from the result of this
+function, so you should write
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">return</span> <span class="pre">{**defaults,</span> <span class="pre">**super().setup(controller,</span> <span class="pre">params,</span> <span class="pre">description,</span> <span class="pre">**kwargs)}</span>
+<span class="pre">`</span></code>
+when overloading this method in a child class, with <cite>defaults</cite> a dictionary containing default parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

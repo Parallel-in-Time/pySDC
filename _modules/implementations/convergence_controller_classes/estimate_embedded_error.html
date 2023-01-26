@@ -99,7 +99,11 @@
 <span class="sd">            dict: Updated parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sweeper_type</span> <span class="o">=</span> <span class="s1">&#39;RK&#39;</span> <span class="k">if</span> <span class="n">RungeKutta</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__bases__</span> <span class="k">else</span> <span class="s1">&#39;SDC&#39;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">80</span><span class="p">,</span> <span class="s2">&quot;sweeper_type&quot;</span><span class="p">:</span> <span class="n">sweeper_type</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">80</span><span class="p">,</span>
+            <span class="s2">&quot;sweeper_type&quot;</span><span class="p">:</span> <span class="n">sweeper_type</span><span class="p">,</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+        <span class="p">}</span></div>
 
 <div class="viewcode-block" id="EstimateEmbeddedError.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
