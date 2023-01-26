@@ -63,12 +63,26 @@ class ConvergenceController(object):
         self.logger.log(level, f'Process {S.status.slot:2d} on time {S.time:.6f} - {msg}')
         return None
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         """
         Setup various variables that only need to be set once in the beginning.
         If the convergence controller is added automatically, you can give it params by adding it manually.
         It will be instantiated only once with the manually supplied parameters overriding automatically added
         parameters.
+
+        This function scans the convergence controllers supplied to the description object for instances of itself.
+        This corresponds to the convergence controller being added manually by the user. If something is found, this
+        function will then return a composite dictionary from the `params` passed to this function as well as the
+        `params` passed manually, with priority to manually added parameters. If you added the convergence controller
+        manually, that is of course the same and nothing happens. If, on the other hand, the convergence controller was
+        added automatically, the `params` passed here will come from whatever added it and you can now override
+        parameters by adding the convergence controller manually.
+        This relies on children classes to return a composite dictionary from their defaults and from the result of this
+        function, so you should write
+        ```
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+        ```
+        when overloading this method in a child class, with `defaults` a dictionary containing default parameters.
 
         Args:
             controller (pySDC.Controller): The controller
