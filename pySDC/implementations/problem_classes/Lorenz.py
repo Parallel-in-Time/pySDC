@@ -141,9 +141,7 @@ class LorenzAttractor(ptype):
         me = self.dtype_u(self.init)
 
         if t > 0:
-            from scipy.integrate import solve_ivp
-
-            def rhs(t, u):
+            def eval_rhs(t, u):
                 """
                 Evaluate the right hand side, but switch the arguments for scipy.
 
@@ -156,11 +154,7 @@ class LorenzAttractor(ptype):
                 """
                 return self.eval_f(u, t)
 
-            tol = 100 * np.finfo(float).eps
-            u_init = self.u_exact(t=0) if u_init is None else u_init
-            t_init = 0 if t_init is None else t_init
-
-            me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
         else:
             me[:] = 1.0
         return me
