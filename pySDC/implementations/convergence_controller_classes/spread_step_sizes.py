@@ -28,7 +28,7 @@ class SpreadStepSizesBlockwiseBase(ConvergenceController):
             "control_order": +100,
         }
 
-        return {**defaults, **params}
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
 
 class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
