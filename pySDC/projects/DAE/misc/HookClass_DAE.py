@@ -71,6 +71,7 @@ class error_hook(hooks):
         # compute and save errors
         # Note that the component from which the error is measured is specified here
         upde = P.u_exact(step.time + step.dt)
+        # err = abs(upde[0] - L.uend[0])
         err = abs(upde[4] - L.uend[4])
 
         self.add_to_stats(
