@@ -32,11 +32,11 @@ def compute_convergence_data():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['newton_tol'] = 1e-6# tollerance for implicit solver
-    problem_params['nvars'] = 8
+    problem_params['nvars'] = 5
 
     # This comes as read-in for the step class
     step_params = dict()
-    step_params['maxiter'] = 200
+    step_params['maxiter'] =30
 
     # initialize controller parameters
     controller_params = dict()
@@ -45,21 +45,21 @@ def compute_convergence_data():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = two_transistor_amplifier
+    description['problem_class'] = one_transistor_amplifier
     description['problem_params'] = problem_params
     description['sweeper_class'] = fully_implicit_DAE
     description['step_params'] = step_params
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.5e-3  
+    Tend = 1e-3
     # set simulation parameters
     # Note: one transistor model stable for three nodes for dt <= 1e-3
     num_samples = 10
     dt_list = np.logspace(-3, -5, num=num_samples)
-    qd_list = ['MIN']
+    qd_list = ['LU']
     num_nodes_list = [3, 4, 5]
-    conv_data = dict()
+    conv_data = dict()  
 
     for qd_type in qd_list: 
         sweeper_params['QI'] = qd_type
@@ -98,7 +98,7 @@ def compute_convergence_data():
                 print("Error is", conv_data[qd_type][num_nodes]['error'][j])
 
     pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
-    beepy.beep(1)
+    # beepy.beep(1)
     print("Done")
 
 
