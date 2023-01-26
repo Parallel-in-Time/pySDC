@@ -417,6 +417,11 @@ def check_step_size_limiter(size=4, comm=None):
         # plot the step sizes
         dt = get_sorted(stats, type='dt', recomputed=False, comm=comm)
 
+        # make sure that the convergence controllers are only added once
+        convergence_controller_classes = [type(me) for me in controller.convergence_controllers]
+        for c in convergence_controller_classes:
+            assert convergence_controller_classes.count(c) == 1, f'Convergence controller {c} added multiple times'
+
         if not limit_step_sizes:
             expect['dt_max'] = max([me[1] for me in dt])
             expect['dt_min'] = min([me[1] for me in dt])

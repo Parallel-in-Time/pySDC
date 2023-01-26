@@ -7,7 +7,7 @@ We look at the familiar resilience strategies here, which are
  - *iterate*: Fixed step size and adaptive iteration count
  - *Hot Rod*: Fault detector from [here](https://doi.org/10.1007/978-3-319-43659-3_47).
 
-First, let's convince ourselves that we solving the problem to similar accuracy with all schemes by making sure the maximal local error is comparable:
+First, let's convince ourselves that we are solving the problem to similar accuracy with all schemes by making sure the maximal local error is comparable:
 
 <p>
 <img src="./Lorenz/compare_strategies.png" alt="Accuracy" style="width:100%;"/>
