@@ -141,6 +141,7 @@ class LorenzAttractor(ptype):
         me = self.dtype_u(self.init)
 
         if t > 0:
+
             def eval_rhs(t, u):
                 """
                 Evaluate the right hand side, but switch the arguments for scipy.
