@@ -16,7 +16,7 @@ class pendulum_2d(ptype_dae):
         """
         super(pendulum_2d, self).__init__(problem_params, dtype_u, dtype_f)
 
-    def eval_f(self, u, t):
+    def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
         Args:
@@ -28,8 +28,6 @@ class pendulum_2d(ptype_dae):
         g = 9.8
         # The last element of u is a Lagrange multiplier. Not sure if this needs to be time dependent, but must model the
         # weight somehow
-        du = u[5:10]
-        u = u[0:5]
         f = self.dtype_f(self.init)
         f[:] = (du[0]-u[2],
                      du[1]-u[3],
@@ -67,7 +65,7 @@ class simple_dae_1(ptype_dae):
         super(simple_dae_1, self).__init__(problem_params, dtype_u, dtype_f)
 
 
-    def eval_f(self, u, t):
+    def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
         Args:
@@ -78,8 +76,6 @@ class simple_dae_1(ptype_dae):
         """
         # Smooth index-2 DAE pg. 267 Ascher and Petzold (also the first example in KDC Minion paper)
         a = 10.0
-        du = u[3:6]
-        u = u[0:3]
         f = self.dtype_f(self.init)
         f[:] = (-du[0] + (a - 1 / (2 - t)) * u[0] + (2 - t) * a * u[2] + np.exp(t) * (3 - t) / (2 - t),
                      -du[1] + (1 - a) / (t - 2) * u[0] - u[1] + (a - 1) * u[2] + 2 * np.exp(t),
@@ -112,7 +108,7 @@ class problematic_f(ptype_dae):
         """
         super().__init__(problem_params, dtype_u, dtype_f)
 
-    def eval_f(self, u, t):
+    def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
         Args:
@@ -122,8 +118,6 @@ class problematic_f(ptype_dae):
             Current value of F(), 2 components
         """
         eta = 1
-        du = u[2:4]
-        u = u[0:2]
         f = self.dtype_f(self.init)
         f[:] = (u[0] + eta*t*u[1]-np.sin(t),
                      du[0] + eta*t*du[1] + (1+eta)*u[1]-np.cos(t))

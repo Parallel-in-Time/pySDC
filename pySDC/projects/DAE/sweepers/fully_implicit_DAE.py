@@ -74,7 +74,6 @@ class fully_implicit_DAE(sweeper):
         # get current level and problem description
         L = self.level
         # in the fully implicit case L.prob.eval_f() evaluates the function F(u, u', t)
-        # for compatibility with the Problem interface u' and u are concatenated and passed as a single array
         P = L.prob
 
         # only if the level has been touched before
@@ -112,8 +111,7 @@ class fully_implicit_DAE(sweeper):
                 # note that derivatives of algebraic variables are taken into account here too 
                 # these do not directly affect the output of eval_f but rather indirectly via QI
                 local_u_approx += L.dt * self.QI[m, m] * params_mesh
-                local_u_approx = np.concatenate((local_u_approx, params_mesh))
-                return P.eval_f(local_u_approx, L.time + L.dt * self.coll.nodes[m-1])
+                return P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m-1])
 
             # get U_k+1
             # note: not using solve_system here because this solve step is the same for any problem
@@ -193,14 +191,9 @@ class fully_implicit_DAE(sweeper):
         # compute the residual for each node
 
         res_norm = []
-        p_dim = P.init[0]
-        # needs to be twice as big to hold u and u'
-        u_impl = P.dtype_u((2*p_dim, P.init[1], P.init[2]))
         for m in range(self.coll.num_nodes):
-            u_impl[0:p_dim] = L.u[m+1]
-            u_impl[p_dim:2*p_dim] = L.f[m+1]
             # use abs function from data type here
-            res_norm.append(abs(P.eval_f(u_impl, L.time + L.dt * self.coll.nodes[m])))
+            res_norm.append(abs(P.eval_f(L.u[m+1], L.f[m+1], L.time + L.dt * self.coll.nodes[m])))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':

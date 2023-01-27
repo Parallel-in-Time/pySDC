@@ -25,7 +25,7 @@ class one_transistor_amplifier(ptype_dae):
         self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
         self.t_end = x[-1]
 
-    def eval_f(self, u, t):
+    def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
         Args:
@@ -82,7 +82,7 @@ class two_transistor_amplifier(ptype_dae):
         self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
         self.t_end = x[-1]
 
-    def eval_f(self, u, t):
+    def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
         Args:
