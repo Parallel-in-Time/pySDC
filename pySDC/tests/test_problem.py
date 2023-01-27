@@ -23,18 +23,17 @@ def test_scipy_reference(init):
     # instantiate a dummy problem
     problem = ptype(init, None, None, {})
 
-    # setup initial conditions
-    u = np.ones(init[0])
-    u[-1] += 2
-    lamdt = np.random.rand(*u.shape)
+    # setup random initial conditions
+    u0 = np.random.rand(*init[0])
+    lamdt = np.random.rand(*u0.shape)
 
     # define function to evaluate the right hand side
     def eval_rhs(t, u):
         return (u.reshape(init[0]) * -lamdt).flatten()
 
     # compute two solutions: One with scipy and one analytic exact solution
-    u_ref = problem.generate_scipy_reference_solution(eval_rhs, 1.0, u_init=u.copy(), t_init=0)
-    u_exact = u * np.exp(-lamdt)
+    u_ref = problem.generate_scipy_reference_solution(eval_rhs, 1.0, u_init=u0.copy(), t_init=0)
+    u_exact = u0 * np.exp(-lamdt)
 
     # check that the two solutions are the same to high degree
     assert (
