@@ -52,11 +52,11 @@ def compute_convergence_data():
     t0 = 0.0
     Tend = 0.1
     # set simulation parameters
-    max_iter_low = 15
-    max_iter_high = 40
+    max_iter_low = 4
+    max_iter_high = 6
     max_iter_list = [i for i in range(max_iter_low, max_iter_high)]
-    qd_list = ['LU']
-    num_nodes_list = [4]
+    qd_list = ['IE', 'LU']
+    num_nodes_list = [3]
     conv_data = dict()
 
     for qd_type in qd_list: 
@@ -97,10 +97,37 @@ def compute_convergence_data():
                 conv_data[qd_type][num_nodes]['residual'][i] = np.linalg.norm([residual[i][1] for i in range(len(residual))], np.inf)
                 conv_data[qd_type][num_nodes]['niter'][i] = round(statistics.mean(niter.values()))
                 print("Error=", conv_data[qd_type][num_nodes]['error'][i], ".  Residual=", conv_data[qd_type][num_nodes]['residual'][i])
+                assert conv_data[qd_type][num_nodes]['error'][i] < test_dict[qd_type][num_nodes][max_iter],\
+                     f"ERROR: error bound not fulfilled.\n Got {conv_data[qd_type][num_nodes]['error'][i]}\n Expecting less than {test_dict[qd_type][num_nodes][max_iter]}"
+            
 
     pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
     print("Done")
 
 
-if __name__ == "__main__":
+def main(): 
     compute_convergence_data()
+
+
+''' Dictionary of test values for use with: 
+    max_iter_low = 4
+    max_iter_high = 6
+    qd_list = ['IE', 'LU']
+    num_nodes_list = [3]
+'''
+test_dict = {
+    'IE': {
+        3: {
+            4: 2e-7, 5: 6e-8
+        }
+    }, 
+    'LU': {
+        3: {
+            4: 5e-10, 5: 4e-13
+        }
+    }
+}
+
+
+if __name__ == "__main__":
+    main()

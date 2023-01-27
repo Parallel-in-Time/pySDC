@@ -18,9 +18,9 @@ def plot_convergence():
     # Configure specific line and symbol style_lists
     # These must match the data being loaded  
     # General style_list settings e.g. font, should be changed in pySDC.helpers.plot_helper
-    num_nodes_list = [4]#[3, 4, 5]
-    color_list = ["r"]#, "blue", "g"]
-    shape_list = ["o"]#, "d", "s"]
+    num_nodes_list = [3, 4, 5]
+    color_list = ["r", "blue", "g"]
+    shape_list = ["o", "d", "s"]
     start = 0
     end = 35
     plt_helper.setup_mpl()
