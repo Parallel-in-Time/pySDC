@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.base
-@pytest.mark.parametrize("init", [[(2, 3)], [(1,)]])
+@pytest.mark.parametrize("init", [[(2, 3, 4)], [(2, 3)], [(1,)]])
 def test_scipy_reference(init):
     """
     Test the generation of reference solutions with scipy.
