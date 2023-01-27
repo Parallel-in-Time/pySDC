@@ -4,7 +4,7 @@ import pickle
 
 import pySDC.helpers.plot_helper as plt_helper
 
-
+# pragma: no cover
 def plot_convergence():
     '''
     Loads pickled error data for multiple preconditioners and collocation node counts and plots it with respect to the max. iteration count
