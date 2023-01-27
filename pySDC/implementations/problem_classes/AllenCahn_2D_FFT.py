@@ -112,29 +112,39 @@ class allencahn2d_imex(ptype):
 
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
         Routine to compute the exact solution at time t
 
         Args:
             t (float): current time
+            u_init (pySDC.implementations.problem_classes.allencahn2d_imex.dtype_u): initial conditions for getting the exact solution
+            t_init (float): the starting time
 
         Returns:
             dtype_u: exact solution
         """
 
-        assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
-        if self.params.init_type == 'circle':
-            xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
-            me[:, :] = np.tanh((self.params.radius - np.sqrt(xv**2 + yv**2)) / (np.sqrt(2) * self.params.eps))
-        elif self.params.init_type == 'checkerboard':
-            xv, yv = np.meshgrid(self.xvalues, self.xvalues)
-            me[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
-        elif self.params.init_type == 'random':
-            me[:, :] = np.random.uniform(-1, 1, self.init)
+
+        if t == 0:
+            if self.params.init_type == 'circle':
+                xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
+                me[:, :] = np.tanh((self.params.radius - np.sqrt(xv**2 + yv**2)) / (np.sqrt(2) * self.params.eps))
+            elif self.params.init_type == 'checkerboard':
+                xv, yv = np.meshgrid(self.xvalues, self.xvalues)
+                me[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
+            elif self.params.init_type == 'random':
+                me[:, :] = np.random.uniform(-1, 1, self.init)
+            else:
+                raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
         else:
-            raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
+
+            def eval_rhs(t, u):
+                f = self.eval_f(u.reshape(self.init[0]), t)
+                return (f.impl + f.expl).flatten()
+
+            me[:, :] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
 
         return me
 
