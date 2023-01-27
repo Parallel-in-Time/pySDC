@@ -142,7 +142,7 @@ class allencahn2d_imex(ptype):
 
             def eval_rhs(t, u):
                 f = self.eval_f(u.reshape(self.init[0]), t)
-                return f.impl.flatten() + f.expl.flatten()
+                return (f.impl + f.expl).flatten()
 
             me[:, :] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
 
