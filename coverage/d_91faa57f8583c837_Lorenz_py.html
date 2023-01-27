@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">45 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">45<span class="text"> run</span></button>
+            <span class="text">41 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">41<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">1<span class="text"> excluded</span></button>
         </h2>
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_NonlinearSchroedinger_MPIFFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2023-01-26 19:51 +0000
+            created at 2023-01-27 15:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -223,29 +223,24 @@
     <p class="run"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">        <span class="nam">me</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">dtype_u</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">init</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">        <span class="key">if</span> <span class="nam">t</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">            <span class="key">from</span> <span class="nam">scipy</span><span class="op">.</span><span class="nam">integrate</span> <span class="key">import</span> <span class="nam">solve_ivp</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">            <span class="key">def</span> <span class="nam">rhs</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">                <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t"><span class="str">                Evaluate the right hand side, but switch the arguments for scipy.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t"><span class="str">                Args:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t"><span class="str">                    t (float): Time</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t"><span class="str">                    u (numpy.ndarray): Solution at time t</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t"><span class="str">                Returns:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t"><span class="str">                    (numpy.ndarray): Right hand side evaluation</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t"><span class="str">                """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">            <span class="nam">tol</span> <span class="op">=</span> <span class="num">100</span> <span class="op">*</span> <span class="nam">np</span><span class="op">.</span><span class="nam">finfo</span><span class="op">(</span><span class="nam">float</span><span class="op">)</span><span class="op">.</span><span class="nam">eps</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">            <span class="nam">u_init</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">u_exact</span><span class="op">(</span><span class="nam">t</span><span class="op">=</span><span class="num">0</span><span class="op">)</span> <span class="key">if</span> <span class="nam">u_init</span> <span class="key">is</span> <span class="key">None</span> <span class="key">else</span> <span class="nam">u_init</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">            <span class="nam">t_init</span> <span class="op">=</span> <span class="num">0</span> <span class="key">if</span> <span class="nam">t_init</span> <span class="key">is</span> <span class="key">None</span> <span class="key">else</span> <span class="nam">t_init</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">solve_ivp</span><span class="op">(</span><span class="nam">rhs</span><span class="op">,</span> <span class="op">(</span><span class="nam">t_init</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span><span class="op">,</span> <span class="nam">u_init</span><span class="op">,</span> <span class="nam">rtol</span><span class="op">=</span><span class="nam">tol</span><span class="op">,</span> <span class="nam">atol</span><span class="op">=</span><span class="nam">tol</span><span class="op">)</span><span class="op">.</span><span class="nam">y</span><span class="op">[</span><span class="op">:</span><span class="op">,</span> <span class="op">-</span><span class="num">1</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="num">1.0</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">            <span class="key">def</span> <span class="nam">eval_rhs</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">                <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t"><span class="str">                Evaluate the right hand side, but switch the arguments for scipy.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t"><span class="str">                Args:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t"><span class="str">                    t (float): Time</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t"><span class="str">                    u (numpy.ndarray): Solution at time t</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t"><span class="str">                Returns:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t"><span class="str">                    (numpy.ndarray): Right hand side evaluation</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t"><span class="str">                """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">generate_scipy_reference_solution</span><span class="op">(</span><span class="nam">eval_rhs</span><span class="op">,</span> <span class="nam">t</span><span class="op">,</span> <span class="nam">u_init</span><span class="op">,</span> <span class="nam">t_init</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="num">1.0</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -255,7 +250,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_NonlinearSchroedinger_MPIFFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v7.1.0</a>,
-            created at 2023-01-26 19:51 +0000
+            created at 2023-01-27 15:52 +0000
         </p>
     </div>
 </footer>

@@ -100,6 +100,31 @@
 <dd><p>Abstract interface to RHS computation of the ODE</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Problem.ptype.generate_scipy_reference_solution">
+<span class="sig-name descname"><span class="pre">generate_scipy_reference_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.generate_scipy_reference_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.generate_scipy_reference_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a reference solution using <cite>scipy.solve_ivp</cite> with very small tolerances.
+Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher
+dimensional, you need to make sure the function <cite>eval_rhs</cite> takes a flattened one-dimensional version as an input
+and output, but reshapes to whatever the problem needs for evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eval_rhs</strong> (<em>function</em>) – Function evaluate the full right hand side. Must have signature <cite>eval_rhs(float: t, numpy.1darray: u)</cite></p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.implementations.problem_classes.Lorenz.dtype_u</em>) – initial conditions for getting the exact solution</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – the starting time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -123,6 +148,7 @@
 <li><a class="reference internal" href="#core.Problem.ptype.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.apply_mass_matrix"><code class="docutils literal notranslate"><span class="pre">apply_mass_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.generate_scipy_reference_solution"><code class="docutils literal notranslate"><span class="pre">generate_scipy_reference_solution()</span></code></a></li>
 </ul>
 </li>
 </ul>

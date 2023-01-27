@@ -96,7 +96,33 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface to apply mass matrix (only needed for FEM)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: if you want a mass matrix, implement apply_mass_matrix(u)&#39;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: if you want a mass matrix, implement apply_mass_matrix(u)&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ptype.generate_scipy_reference_solution"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype.generate_scipy_reference_solution">[docs]</a>    <span class="k">def</span> <span class="nf">generate_scipy_reference_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute a reference solution using `scipy.solve_ivp` with very small tolerances.</span>
+<span class="sd">        Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher</span>
+<span class="sd">        dimensional, you need to make sure the function `eval_rhs` takes a flattened one-dimensional version as an input</span>
+<span class="sd">        and output, but reshapes to whatever the problem needs for evaluation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eval_rhs (function): Function evaluate the full right hand side. Must have signature `eval_rhs(float: t, numpy.1darray: u)`</span>
+<span class="sd">            t (float): current time</span>
+<span class="sd">            u_init (pySDC.implementations.problem_classes.Lorenz.dtype_u): initial conditions for getting the exact solution</span>
+<span class="sd">            t_init (float): the starting time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">solve_ivp</span>
+
+        <span class="n">tol</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">u_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">u_init</span>
+        <span class="n">t_init</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">t_init</span>
+
+        <span class="n">u_shape</span> <span class="o">=</span> <span class="n">u_init</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">return</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="p">(</span><span class="n">t_init</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">u_init</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_shape</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
