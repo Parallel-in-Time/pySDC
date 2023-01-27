@@ -26,7 +26,7 @@ def test_scipy_reference(init):
     # setup initial conditions
     u = np.ones(init[0])
     u[-1] += 2
-    lamdt = -1.0
+    lamdt = np.random.rand(*u.shape)
 
     # define function to evaluate the right hand side
     def eval_rhs(t, u):
