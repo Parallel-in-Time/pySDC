@@ -25,7 +25,7 @@ class ptype_dae(ptype):
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
-        
+
         super(ptype_dae, self).__init__(
             (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
         )

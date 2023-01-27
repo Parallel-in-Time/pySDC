@@ -1,24 +1,23 @@
 from pathlib import Path
 import numpy as np
+import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
-from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
-from pySDC.projects.DAE.problems.simple_DAE import two_transistor_amplifier
 from pySDC.projects.DAE.problems.simple_DAE import problematic_f
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
-from pySDC.projects.DAE.hooks.HookClass_error import error_hook
+from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 from pySDC.helpers.stats_helper import get_sorted
+
 
 def main():
     """
-    A simple test program to run fully implicit SDC solver 
+    A simple test program to see the fully implicit SDC solver in action
     """
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-6
-    level_params['dt'] = 1e-3
+    level_params['dt'] = 1e-1
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -28,17 +27,16 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-    problem_params['nvars'] = 2 # need to work out exactly what this parameter does
+    problem_params['nvars'] = 2  # need to work out exactly what this parameter does
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 40
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['log_to_file'] = True
-    controller_params['fname'] = 'data/simple_dae_1.txt'
-    controller_params['hook_class'] = approx_solution_hook # specialized hook class for more statistics and output
+    controller_params['logger_level'] = 30
+    controller_params['hook_class'] = [approx_solution_hook, error_hook]
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -56,7 +54,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 3.0 
+    Tend = 1.0
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -64,17 +62,21 @@ def main():
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    # compute exact solution and compare
-    # uex = P.u_exact(Tend)
-    # err = abs(uex - uend)
 
-    # out = 'Error after SDC iterations: %8.6e' % err
-    # print(out)
+    # check error
+    err = get_sorted(stats, type='error_post_step', sortby='time')
+    err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
+    print(f"Error is {err}")
+    assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+
+    # store results
     sol = get_sorted(stats, type='approx_solution_hook', sortby='time')
     data = [[sol[i][0], sol[i][1][0], sol[i][1][1]] for i in range(len(sol))]
 
-    np.save("data/dae_data.npy", data)
+    pickle.dump(data, open("data/dae_conv_data.p", 'wb'))
+
     print("Done")
+
 
 if __name__ == "__main__":
     main()

@@ -4,15 +4,13 @@ from scipy import optimize
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Sweeper import sweeper
 
-# TODO: consistent initial conditions can be an issue with DAE. Might need to make sure that mesh is initialised correctly 
-# e.g. by disabling the "initialise everything to zero" option. 
 
 class fully_implicit_DAE(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
     Sweeper to solve first order differential equations in fully implicit form
-    Primarily implemented to be used with differential algebraic equations 
+    Primarily implemented to be used with differential algebraic equations
     Based on the concepts outlined in "Arbitrary order Krylov deferred correction methods for differential algebraic equations" by Huang et al.
 
     Attributes:
@@ -35,12 +33,12 @@ class fully_implicit_DAE(sweeper):
 
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
 
-    # TODO: hijacking this function to return solution from its gradient i.e. fundamental theorem of calculus. 
-    # This works well since (ab)using level.f to store the gradient. Might need to change this for release? 
+    # TODO: hijacking this function to return solution from its gradient i.e. fundamental theorem of calculus.
+    # This works well since (ab)using level.f to store the gradient. Might need to change this for release?
     def integrate(self):
         """
         Returns the solution by integrating its gradient (fundamental theorem of calculus)
-        Note that level.f stores the gradient values in the fully implicit case, rather than the evaluation of the rhs as in the ODE case 
+        Note that level.f stores the gradient values in the fully implicit case, rather than the evaluation of the rhs as in the ODE case
 
         Returns:
             list of dtype_u: containing the integral as values
@@ -61,7 +59,6 @@ class fully_implicit_DAE(sweeper):
                 me[-1] += L.dt * self.coll.Qmat[m, j] * L.f[j]
 
         return me
-
 
     def update_nodes(self):
         """
@@ -84,57 +81,59 @@ class fully_implicit_DAE(sweeper):
         u_0 = L.u[0]
 
         # get QU^k where U = u'
-        # note that for multidimensional functions the required Kronecker product is achieved since 
-        # e.g. L.f[j] is a mesh object and multiplication with a number distributes over the mesh 
+        # note that for multidimensional functions the required Kronecker product is achieved since
+        # e.g. L.f[j] is a mesh object and multiplication with a number distributes over the mesh
         integral = self.integrate()
         # build the rest of the known solution u_0 + del_t(Q - Q_del)U_k
         for m in range(1, M + 1):
             for j in range(1, M + 1):
-                integral[m-1] -= L.dt * self.QI[m, j] * L.f[j]
+                integral[m - 1] -= L.dt * self.QI[m, j] * L.f[j]
             # add initial value
-            integral[m-1] += u_0
+            integral[m - 1] += u_0
 
         # do the sweep
-        for m in range(1, M+1):
+        for m in range(1, M + 1):
             # build implicit function, consisting of the known values from above and new values from previous nodes (at k+1)
-            u_approx = P.dtype_u(integral[m-1])
+            u_approx = P.dtype_u(integral[m - 1])
             # add the known components from current sweep del_t*Q_del*U_k+1
             for j in range(1, m):
                 u_approx += L.dt * self.QI[m, j] * L.f[j]
             # params contains U = u'
             def impl_fn(params):
-                # make params into a mesh object 
+                # make params into a mesh object
                 params_mesh = P.dtype_f(P.init)
                 params_mesh[:] = params
-                # build parameters to pass to implicit function 
+                # build parameters to pass to implicit function
                 local_u_approx = u_approx
-                # note that derivatives of algebraic variables are taken into account here too 
+                # note that derivatives of algebraic variables are taken into account here too
                 # these do not directly affect the output of eval_f but rather indirectly via QI
                 local_u_approx += L.dt * self.QI[m, m] * params_mesh
-                return P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m-1])
+                return P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
 
             # get U_k+1
             # note: not using solve_system here because this solve step is the same for any problem
             options = dict()
             # options['disp'] = True
             # See link for how different methods use the default tol parameter
-            # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220 
+            # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220
             options['xtol'] = P.params.newton_tol
             options['eps'] = 1e-7
-            opt = optimize.root(impl_fn, L.f[m], 
-                method='hybr', 
-                options=options, 
+            opt = optimize.root(
+                impl_fn,
+                L.f[m],
+                method='hybr',
+                options=options,
                 # callback= lambda x, f: print("solution:", x, " residual: ", f)
-                )
-            # update gradient (recall L.f is being used to store the gradient) 
+            )
+            # update gradient (recall L.f is being used to store the gradient)
             L.f[m][:] = opt.x
 
         # Update solution approximation
-        integral = self.integrate() 
-        for m in range(M): 
-            L.u[m+1] = u_0 + integral[m] 
-        # indicate presence of new values at this level 
-        L.status.updated = True 
+        integral = self.integrate()
+        for m in range(M):
+            L.u[m + 1] = u_0 + integral[m]
+        # indicate presence of new values at this level
+        L.status.updated = True
 
         return None
 
@@ -173,13 +172,11 @@ class fully_implicit_DAE(sweeper):
 
     def compute_residual(self):
         """
-        Overrides the base implementation 
-        Uses the absolute value of the implicit function ||F(u', u, t)|| as the residual 
-        Returns: 
+        Overrides the base implementation
+        Uses the absolute value of the implicit function ||F(u', u, t)|| as the residual
+        Returns:
             None
         """
-        # TODO: could consider using the square of the implicit function. How would this change the behaviour? 
-        
 
         # get current level and problem description
         L = self.level
@@ -193,7 +190,7 @@ class fully_implicit_DAE(sweeper):
         res_norm = []
         for m in range(self.coll.num_nodes):
             # use abs function from data type here
-            res_norm.append(abs(P.eval_f(L.u[m+1], L.f[m+1], L.time + L.dt * self.coll.nodes[m])))
+            res_norm.append(abs(P.eval_f(L.u[m + 1], L.f[m + 1], L.time + L.dt * self.coll.nodes[m])))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
