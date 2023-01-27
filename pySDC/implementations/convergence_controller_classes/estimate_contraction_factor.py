@@ -22,7 +22,7 @@ class EstimateContractionFactor(ConvergenceController):
         Returns:
             dict: Updated parameters
         """
-        return {"control_order": -75, "e_tol": None, **params}
+        return {"control_order": -75, "e_tol": None, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
         """

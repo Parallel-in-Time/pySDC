@@ -3,6 +3,7 @@ from pySDC.implementations.convergence_controller_classes.spread_step_sizes impo
     SpreadStepSizesBlockwiseNonMPI,
     SpreadStepSizesBlockwiseMPI,
 )
+from pySDC.core.Errors import ConvergenceError
 
 
 class BasicRestarting(ConvergenceController):
@@ -66,12 +67,10 @@ class BasicRestarting(ConvergenceController):
         defaults = {
             "control_order": 95,
             "max_restarts": 10,
+            "crash_after_max_restarts": True,
         }
 
-        if 'max_restarts' in description.keys():
-            defaults['max_restarts'] = description['max_restarts']
-
-        return {**defaults, **params}
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def setup_status_variables(self, controller, **kwargs):
         """
@@ -214,6 +213,8 @@ class BasicRestartingNonMPI(BasicRestarting):
         if S.status.first:
             self.buffers.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
             if self.buffers.max_restart_reached and S.status.restart:
+                if self.params.crash_after_max_restarts:
+                    raise ConvergenceError(f"Restarted {S.status.restarts_in_a_row} time(s) already, surrendering now.")
                 self.log(
                     f"Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
 on...",
@@ -291,6 +292,8 @@ class BasicRestartingMPI(BasicRestarting):
             self.buffers.restart_earlier = False  # there is no earlier step
 
             if self.buffers.max_restart_reached and S.status.restart:
+                if self.params.crash_after_max_restarts:
+                    raise ConvergenceError(f"Restarted {S.status.restarts_in_a_row} time(s) already, surrendering now.")
                 self.log(
                     f"Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
 on...",
