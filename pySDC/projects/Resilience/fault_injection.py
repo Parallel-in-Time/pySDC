@@ -82,7 +82,7 @@ class Fault(FrozenClass):
 
         ranges = [
             (0, rnd_params['level_number']),
-            (0, rnd_params['node'] + 1),
+            (rnd_params.get('min_node', 0), rnd_params['node'] + 1),
             (1, rnd_params['iteration'] + 1),
             (0, rnd_params['bit']),
         ]
@@ -235,7 +235,7 @@ class FaultInjector(hooks):
             fault happens in the last iteration, it will not show up in the residual and the iteration is wrongly
             stopped.
             '''
-            L.u[f.node][f.problem_pos] = self.flip_bit(L.u[f.node][f.problem_pos][0], f.bit)
+            L.u[f.node][tuple(f.problem_pos)] = self.flip_bit(L.u[f.node][tuple(f.problem_pos)], f.bit)
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
             L.sweep.compute_residual()
         else:
