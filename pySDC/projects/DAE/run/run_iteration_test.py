@@ -10,7 +10,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats
 
 
-def compute_convergence_data():
+def setup():
     """
     Routine to run simple differential-algebraic-equation example with various max iters, preconditioners and collocation node counts
     In contrast to run_convergence_test.py, in which max iters is set large enough to not be the limiting factor, max iters is varied for a fixed time step and the improvement in the error is measured
@@ -46,36 +46,42 @@ def compute_convergence_data():
     description['problem_class'] = simple_dae_1
     description['problem_params'] = problem_params
     description['sweeper_class'] = fully_implicit_DAE
+    description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
 
-    # set time parameters
-    t0 = 0.0
-    Tend = 0.1
     # set simulation parameters
+    run_params = dict()
+    run_params['t0'] = 0.0
+    run_params['tend'] = 0.1
     max_iter_low = 4
-    max_iter_high = 6
-    max_iter_list = [i for i in range(max_iter_low, max_iter_high)]
-    qd_list = ['IE', 'LU']
-    num_nodes_list = [3]
+    max_iter_high = 10
+    run_params['max_iter_list'] = [i for i in range(max_iter_low, max_iter_high)]
+    run_params['qd_list'] = ['IE', 'LU']
+    run_params['num_nodes_list'] = [3]
+
+    return description, controller_params, run_params
+
+
+def run(description, controller_params, run_params):
+
     conv_data = dict()
 
-    for qd_type in qd_list: 
-        sweeper_params['QI'] = qd_type
+    for qd_type in run_params['qd_list']: 
+        description['sweeper_params']['QI'] = qd_type
         conv_data[qd_type] = dict()
 
-        for num_nodes in num_nodes_list:
-            sweeper_params['num_nodes'] = num_nodes 
-            description['sweeper_params'] = sweeper_params
+        for num_nodes in run_params['num_nodes_list']:
+            description['sweeper_params']['num_nodes'] = num_nodes 
             conv_data[qd_type][num_nodes] = dict()
-            conv_data[qd_type][num_nodes]['error'] = np.zeros_like(max_iter_list, dtype=float)
-            conv_data[qd_type][num_nodes]['residual'] = np.zeros_like(max_iter_list, dtype=float)
-            conv_data[qd_type][num_nodes]['niter'] = np.zeros_like(max_iter_list, dtype='int')
-            conv_data[qd_type][num_nodes]['max_iter'] = max_iter_list
+            conv_data[qd_type][num_nodes]['error'] = np.zeros_like(run_params['max_iter_list'], dtype=float)
+            conv_data[qd_type][num_nodes]['residual'] = np.zeros_like(run_params['max_iter_list'], dtype=float)
+            conv_data[qd_type][num_nodes]['niter'] = np.zeros_like(run_params['max_iter_list'], dtype='int')
+            conv_data[qd_type][num_nodes]['max_iter'] = run_params['max_iter_list']
 
-            for i, max_iter in enumerate(max_iter_list):
+            for i, max_iter in enumerate(run_params['max_iter_list']):
                 print('Working on Qdelta=%s -- num. nodes=%i -- max. iter.=%i' % (qd_type, num_nodes, max_iter))
-                step_params['maxiter'] = max_iter
-                description['step_params'] = step_params
+                description['step_params'] = dict()
+                description['step_params']['maxiter'] = max_iter
 
                 # instantiate the controller
                 controller = controller_nonMPI(
@@ -83,10 +89,10 @@ def compute_convergence_data():
                 )
                 # get initial values
                 P = controller.MS[0].levels[0].prob
-                uinit = P.u_exact(t0)
+                uinit = P.u_exact(run_params['t0'])
 
                 # call main function to get things done...
-                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+                uend, stats = controller.run(u0=uinit, t0=run_params['t0'], Tend=run_params['tend'])
 
                 # compute exact solution and compare
                 err = get_sorted(stats, type='error_post_step', sortby='time')
@@ -97,36 +103,16 @@ def compute_convergence_data():
                 conv_data[qd_type][num_nodes]['residual'][i] = np.linalg.norm([residual[i][1] for i in range(len(residual))], np.inf)
                 conv_data[qd_type][num_nodes]['niter'][i] = round(statistics.mean(niter.values()))
                 print("Error=", conv_data[qd_type][num_nodes]['error'][i], ".  Residual=", conv_data[qd_type][num_nodes]['residual'][i])
-                assert conv_data[qd_type][num_nodes]['error'][i] < test_dict[qd_type][num_nodes][max_iter],\
-                     f"ERROR: error bound not fulfilled.\n Got {conv_data[qd_type][num_nodes]['error'][i]}\n Expecting less than {test_dict[qd_type][num_nodes][max_iter]}"
-            
-
-    pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
-    print("Done")
+                
+    return conv_data
+    
 
 
 def main(): 
-    compute_convergence_data()
-
-
-''' Dictionary of test values for use with: 
-    max_iter_low = 4
-    max_iter_high = 6
-    qd_list = ['IE', 'LU']
-    num_nodes_list = [3]
-'''
-test_dict = {
-    'IE': {
-        3: {
-            4: 2e-7, 5: 6e-8
-        }
-    }, 
-    'LU': {
-        3: {
-            4: 5e-10, 5: 4e-13
-        }
-    }
-}
+    description, controller_params, run_params = setup()
+    conv_data = run(description, controller_params, run_params)
+    pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
+    print("Done")
 
 
 if __name__ == "__main__":
