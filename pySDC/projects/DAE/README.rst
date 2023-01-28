@@ -8,7 +8,6 @@ To run the scripts contained in this project a standard installation of pySDC sh
 Project overview 
 --------------------
 - hooks
-
     - | ``HookClass_approx_solution.py``  
       | Simple hook class to read out the approximate solution after each time step.
     - | ``HookClass_error.py``
