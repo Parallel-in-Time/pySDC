@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 from mpi4py import MPI
 import sys
+import matplotlib as mpl
 
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
@@ -12,12 +13,14 @@ from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 
 # these problems are available for testing
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
+from pySDC.projects.Resilience.Lorenz import run_Lorenz
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
@@ -42,6 +45,32 @@ class Strategy:
 
         # setup custom descriptions
         self.custom_description = {}
+
+        # prepare parameters for masks to identify faults that cannot be fixed by this strategy
+        self.fixable = []
+        self.fixable += [
+            {
+                'key': 'node',
+                'op': 'gt',
+                'val': 0,
+            }
+        ]
+        self.fixable += [
+            {
+                'key': 'error',
+                'op': 'isfinite',
+            }
+        ]
+
+    def get_fixable_params(self, **kwargs):
+        """
+        Return a list containing dictionaries which can be passed to `FaultStats.get_mask` as keyword arguments to
+        obtain a mask of faults that can be fixed
+
+        Returns:
+            list: Dictionary of parameters
+        """
+        return self.fixable
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -85,6 +114,29 @@ class Strategy:
 
         return {}
 
+    @property
+    def style(self):
+        """
+        Get the plotting parameters for the strategy.
+        Supply them to a plotting function using `**`
+
+        Returns:
+            (dict): The plotting parameters as a dictionary
+        """
+        return {
+            'marker': self.marker,
+            'label': self.label,
+            'color': self.color,
+            'ls': self.linestyle,
+        }
+
+    @property
+    def label(self):
+        """
+        Get a label for plotting
+        """
+        return self.name
+
 
 class BaseStrategy(Strategy):
     '''
@@ -117,6 +169,25 @@ class AdaptivityStrategy(Strategy):
         self.name = 'adaptivity'
         self.bar_plot_x_label = 'adaptivity'
 
+    def get_fixable_params(self, maxiter, **kwargs):
+        """
+        Here faults occurring in the last iteration cannot be fixed.
+
+        Args:
+            maxiter (int): Max. iterations until convergence is declared
+
+        Returns:
+            (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
+        """
+        self.fixable += [
+            {
+                'key': 'iteration',
+                'op': 'lt',
+                'val': maxiter,
+            }
+        ]
+        return self.fixable
+
     def get_custom_description(self, problem, num_procs):
         '''
         Routine to get a custom description that adds adaptivity
@@ -132,6 +203,9 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-7
             dt_min = 1e-2
         elif problem == run_vdp:
+            e_tol = 2e-5
+            dt_min = 1e-3
+        elif problem == run_Lorenz:
             e_tol = 2e-5
             dt_min = 1e-3
         else:
@@ -225,6 +299,8 @@ class IterateStrategy(Strategy):
             restol = 2.3e-8
         elif problem == run_vdp:
             restol = 9e-7
+        elif problem == run_Lorenz:
+            restol = 16e-7
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -268,6 +344,9 @@ class HotRodStrategy(Strategy):
         if problem == run_vdp:
             HotRod_tol = 5e-7
             maxiter = 4
+        elif problem == run_Lorenz:
+            HotRod_tol = 4e-7
+            maxiter = 6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
@@ -277,7 +356,10 @@ class HotRodStrategy(Strategy):
         no_storage = num_procs > 1
 
         custom_description = {
-            'convergence_controllers': {HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage}},
+            'convergence_controllers': {
+                HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
+                BasicRestartingNonMPI: {'max_restarts': 2, 'crash_after_max_restarts': False},
+            },
             'step_params': {'maxiter': maxiter},
         }
 
@@ -332,6 +414,8 @@ class FaultStats:
             return 2.3752559741400825
         elif self.prob == run_piline:
             return 20.0
+        elif self.prob == run_Lorenz:
+            return 1.5
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -345,6 +429,8 @@ class FaultStats:
         custom_description = {}
         if self.prob == run_vdp:
             custom_description['step_params'] = {'maxiter': 3}
+        elif self.prob == run_Lorenz:
+            custom_description['step_params'] = {'maxiter': 5}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -568,7 +654,7 @@ class FaultStats:
         [self.scrutinize_visual(self.strategies[i], run, faults, ax, k_ax, ls[i]) for i in range(len(self.strategies))]
 
         # make a legend
-        [k_ax.plot([None], [None], label=strategy.name, color=strategy.color) for strategy in self.strategies]
+        [k_ax.plot([None], [None], label=strategy.label, color=strategy.color) for strategy in self.strategies]
         k_ax.legend(frameon=True)
 
         if store:
@@ -745,6 +831,8 @@ class FaultStats:
             prob_name = 'vdp'
         elif self.prob == run_piline:
             prob_name = 'piline'
+        elif self.prob == run_Lorenz:
+            prob_name = 'Lorenz'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -931,7 +1019,7 @@ class FaultStats:
             ax.plot(
                 admissable_thingB,
                 me_recovered,
-                label=f'{strategy.name} (only recovered)',
+                label=f'{strategy.label} (only recovered)',
                 color=strategy.color,
                 marker=strategy.marker,
                 ls='--',
@@ -939,7 +1027,7 @@ class FaultStats:
             )
 
         ax.plot(
-            admissable_thingB, me, label=f'{strategy.name}', color=strategy.color, marker=strategy.marker, linewidth=2
+            admissable_thingB, me, label=f'{strategy.label}', color=strategy.color, marker=strategy.marker, linewidth=2
         )
 
         ax.legend(frameon=False)
@@ -959,6 +1047,7 @@ class FaultStats:
         name=None,
         store=True,
         ax=None,
+        fig=None,
     ):
         '''
         Plot thingA vs thingB for multiple strategies
@@ -974,6 +1063,7 @@ class FaultStats:
             name (str): Optional name for the plot
             store (bool): Store the plot at a predefined path or not (for jupyter notebooks)
             ax (Matplotlib.axes): Somewhere to plot
+            fig (Matplotlib.figure): Figure of the ax
 
         Returns
             None
@@ -984,11 +1074,11 @@ class FaultStats:
         # make sure we have something to plot in
         if ax is None:
             fig, ax = plt.subplots(1, 1)
-        else:
+        elif fig is None:
             store = False
 
         # execute the plots for all strategies
-        for s in self.strategies:
+        for s in strategies:
             self.plot_thingA_per_thingB(s, thingA=thingA, thingB=thingB, recovered=recovered, ax=ax, mask=mask, op=op)
 
         # set the parameters
@@ -1030,7 +1120,7 @@ class FaultStats:
                 rec_mask = with_faults['error'] < thresh_range[thresh_idx] * fault_free['error'].mean()
                 rec_rates[strategy_idx][thresh_idx] = len(with_faults['error'][rec_mask]) / len(with_faults['error'])
 
-            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.name)
+            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.label)
         ax.legend(frameon=False)
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
@@ -1230,7 +1320,7 @@ class FaultStats:
                 vals = self.load(strategy, False)[key]
                 val = sum(vals) / len(vals)
 
-        if None in [key, val]:
+        if None in [key, val] and not op in ['isfinite']:
             mask = dat['bit'] == dat['bit']
         else:
             if op == 'uneq':
@@ -1245,6 +1335,8 @@ class FaultStats:
                 mask = dat[key] < val
             elif op == 'gt':
                 mask = dat[key] > val
+            elif op == 'isfinite':
+                mask = np.isfinite(dat[key])
             else:
                 raise NotImplementedError(f'Please implement op={op}!')
 
@@ -1252,6 +1344,24 @@ class FaultStats:
             return mask & old_mask
         else:
             return mask
+
+    def get_fixable_faults_only(self, strategy):
+        """
+        Return a mask of only faults that can be fixed with a given strategy.
+
+        Args:
+            strategy (Strategy): The resilience strategy you want to look at. In normal use it's the same for all
+
+        Returns:
+            Numpy.ndarray with boolean entries that can be used as a mask
+        """
+        fixable = strategy.get_fixable_params(maxiter=self.get_custom_description()['step_params']['maxiter'])
+        mask = self.get_mask(strategy=strategy)
+
+        for kwargs in fixable:
+            mask = self.get_mask(strategy=strategy, **kwargs, old_mask=mask)
+
+        return mask
 
     def get_index(self, mask=None):
         '''
@@ -1493,7 +1603,7 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_vdp,
+        prob=run_Lorenz,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
@@ -1512,9 +1622,28 @@ def main():
     stats_analyser.plot_things_per_things(
         'recovered', 'iteration', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
+
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
+
+    # make a plot for only the faults that can be recovered
+    fig, ax = plt.subplots(1, 1)
+    for strategy in stats_analyser.strategies:
+        fixable = stats_analyser.get_fixable_faults_only(strategy=strategy)
+        stats_analyser.plot_things_per_things(
+            'recovered',
+            'bit',
+            False,
+            strategies=[strategy],
+            op=stats_analyser.rec_rate,
+            mask=fixable,
+            args={'ylabel': 'recovery rate'},
+            name='fixable_recovery',
+            ax=ax,
+        )
+    fig.savefig(f'data/{stats_analyser.get_name()}-recoverable.pdf', transparent=True)
+
     stats_analyser.plot_things_per_things(
         'total_iteration',
         'bit',

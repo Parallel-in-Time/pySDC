@@ -8,7 +8,7 @@ class petsc_vec(PETSc.Vec):
 
     def __new__(cls, init=None, val=0.0):
         if isinstance(init, petsc_vec) or isinstance(init, PETSc.Vec):
-            obj = PETSc.Vec().__new__(cls)
+            obj = PETSc.Vec.__new__(cls)
             init.copy(obj)
         elif isinstance(init, PETSc.DMDA):
             tmp = init.createGlobalVector()
@@ -16,7 +16,7 @@ class petsc_vec(PETSc.Vec):
             objarr = init.getVecArray(obj)
             objarr[:] = val
         else:
-            obj = PETSc.Vec().__new__(cls)
+            obj = PETSc.Vec.__new__(cls)
         return obj
 
     def __abs__(self):

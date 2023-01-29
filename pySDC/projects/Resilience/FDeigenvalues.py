@@ -39,33 +39,3 @@ def get_finite_difference_eigenvalues(derivative, order, type=None, steps=None, 
             eigenvalues[n] += weights[i] * np.exp(2 * np.pi * 1j * n / N * offsets[i]) * 1.0 / (dx**derivative)
 
     return eigenvalues
-
-
-def test():
-    """
-    Test a particular special case
-    """
-    order = 2
-    type = 'center'
-    dx = 0.1
-    L = 1.0
-    N = int(L // dx)
-    n = np.arange(N, dtype=complex)
-
-    # heat
-    derivative = 2
-    expect = -2.0 / (dx**2.0) * (1.0 - np.cos(2 * np.pi * n / N))
-    assert np.allclose(
-        expect, get_finite_difference_eigenvalues(derivative, order, type, dx=dx, L=L)
-    ), "Error when doing heat"
-
-    # advection
-    derivative = 1
-    expect = 1.0j / (dx) * (np.sin(2 * np.pi * n / N))
-    assert np.allclose(
-        expect, get_finite_difference_eigenvalues(derivative, order, type, dx=dx, L=L)
-    ), "Error when doing advection"
-
-
-if __name__ == '__main__':
-    test()

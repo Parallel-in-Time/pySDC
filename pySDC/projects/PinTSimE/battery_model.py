@@ -8,6 +8,7 @@ from pySDC.implementations.problem_classes.Battery import battery, battery_impli
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
@@ -142,6 +143,12 @@ def generate_description(
         adaptivity_params['e_tol'] = 1e-7
         convergence_controllers.update({Adaptivity: adaptivity_params})
 
+    if max_restarts is not None:
+        convergence_controllers[BasicRestartingNonMPI] = {
+            'max_restarts': max_restarts,
+            'crash_after_max_restarts': False,
+        }
+
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = problem  # pass problem class
@@ -150,11 +157,7 @@ def generate_description(
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    if max_restarts is not None:
-        description['max_restarts'] = max_restarts
-
-    if use_switch_estimator or use_adaptivity:
-        description['convergence_controllers'] = convergence_controllers
+    description['convergence_controllers'] = convergence_controllers
 
     return description, controller_params
 

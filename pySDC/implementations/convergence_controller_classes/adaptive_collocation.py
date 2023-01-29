@@ -41,7 +41,7 @@ class AdaptiveCollocation(ConvergenceController):
     necessary to reevaluate the right hand side at all nodes afterwards.
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         """
         Record what variables we want to vary.
 
@@ -78,7 +78,7 @@ class AdaptiveCollocation(ConvergenceController):
 
                 defaults['num_colls'] = max([defaults['num_colls'], len(params[key])])
 
-        return {**defaults, **params}
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def switch_sweeper(self, S):
         """

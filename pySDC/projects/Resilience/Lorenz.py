@@ -2,12 +2,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.core.Errors import ProblemError
+from pySDC.core.Errors import ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
@@ -113,13 +113,17 @@ def run_Lorenz(
 
     # insert faults
     if fault_stuff is not None:
-        raise NotImplementedError
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        rnd_args = {'iteration': 5}
+        args = {'time': 0.3, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # call main function to get things done...
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except ProblemError:
-        stats = controller.hooks.return_stats()
+    except ConvergenceError:
+        stats = controller.return_stats()
 
     return stats, controller, Tend
 
@@ -185,7 +189,7 @@ def main(plotting=True):
     stats, controller, _ = run_Lorenz(
         custom_description=custom_description,
         custom_controller_params=custom_controller_params,
-        Tend=10,
+        Tend=10.0,
         hook_class=[LogData, LogGlobalErrorPostRun],
     )
     check_solution(stats, controller, 5e-4)
