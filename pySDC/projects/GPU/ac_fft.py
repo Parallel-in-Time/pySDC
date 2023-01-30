@@ -1,6 +1,5 @@
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex as ac_fft_cpu
-# from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex as ac_fft_gpu
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_semiimplicit as ac_fft_gpu
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex as ac_fft_gpu
 from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
