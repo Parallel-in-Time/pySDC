@@ -27,7 +27,7 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-    problem_params['nvars'] = 2  # need to work out exactly what this parameter does
+    problem_params['nvars'] = 2  
 
     # initialize step parameters
     step_params = dict()
@@ -71,8 +71,12 @@ def main():
 
     # store results
     sol = get_sorted(stats, type='approx_solution_hook', sortby='time')
-    data = [[sol[i][0], sol[i][1][0], sol[i][1][1]] for i in range(len(sol))]
-
+    sol_dt = np.array([sol[i][0] for i in range(len(sol))])
+    sol_data = np.array([[sol[j][1][i] for j in range(len(sol))] for i in range(problem_params['nvars'])])
+    
+    data = dict()
+    data['dt'] = sol_dt
+    data['solution'] = sol_data
     pickle.dump(data, open("data/dae_conv_data.p", 'wb'))
 
     print("Done")
