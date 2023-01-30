@@ -114,7 +114,7 @@ def run(description, controller_params, run_params):
     return conv_data
 
 
-def main():
+if __name__ == "__main__":
     """
     Routine to run simple differential-algebraic-equation example with various max iters, preconditioners and collocation node counts
     In contrast to run_convergence_test.py, in which max iters is set large enough to not be the limiting factor, max iters is varied for a fixed time step and the improvement in the error is measured
@@ -125,7 +125,3 @@ def main():
     conv_data = run(description, controller_params, run_params)
     pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
     print("Done")
-
-
-if __name__ == "__main__":
-    main()

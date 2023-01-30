@@ -1,31 +1,32 @@
-import matplotlib.pyplot as plt
+import pySDC.helpers.plot_helper as plt_helper
 import numpy as np
-from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+import pickle
 
 # pragma: no cover
 def linear_plot():
     '''Loads solution data from an .npy file and plots specified parameters with respect to each other on a linear axis'''
 
-    # This comes as read-in for the problem class
-    problem_params = dict()
-    problem_params['newton_tol'] = 1e-6  # tollerance for implicit solver
-    problem_params['nvars'] = 5
+    data = pickle.load(open("data/dae_conv_data.p", "rb"))
+    plt_helper.setup_mpl()
+    fig, ax = plt_helper.newfig(textwidth=500, scale=0.89)  # Create a figure containing a single axes.
 
-    trans_amp = one_transistor_amplifier(problem_params)
+    # ax.plot(data['dt'], data['ue'], label=r'$U_e$', lw=0.6, color='r')
+    # ax.plot(data['dt'], data['solution'][:, 7], label=r'$U_8$', marker='x', markersize=2, lw=0.6, color='b')
+    # ax.plot(data['dt'], data['solution'][0], label=r'$x$', lw=0.6, marker='x', markersize=3)
+    # ax.plot(data['dt'], data['solution'][1], label=r'$y$', lw=0.6, marker='x', markersize=3)
+    ax.plot(data['dt'], data['solution'][2], label=r'$dx$', lw=0.6, marker='x', markersize=3)
+    ax.plot(data['dt'], data['solution'][3], label=r'$dy$', lw=0.6, marker='x', markersize=3)
+    # ax.plot(data['dt'], data['solution'][4], label=r'$lambda$', lw=0.6, marker='x', markersize=3)
 
-    data = np.load("/Users/heisenberg/Workspace/pySDC/pySDC/projects/DAE/misc/data/one_trans_amp.npy")
-    y_data = [trans_amp.u_exact(t)[4] for t in data[:, 0]]
-    fig, ax = plt.subplots()  # Create a figure containing a single axes.
-    # ax.plot(data[:, 1], data[:, 2])
-    ax.plot(data[:, 0], data[:, 1], label="x")
-    ax.plot(data[:, 0], y_data, label="y_interp")
-    ax.plot(data[:, 0], data[:, 5], label="y", linestyle=':')
     # title='Convergence plot two stage implicit Runge-Kutta with Gauss nodes'
-    ax.set(xlabel='t', ylabel='size')
+    # ax.set(xlabel=r'time (s)', ylabel=r'voltage (V)')
+    ax.set(xlabel=r'$x$')
     ax.grid(visible=True)
-    # fig.tight_layout()
-    plt.legend()
-    plt.show()
+    fig.tight_layout()
+    ax.legend(loc='upper left')
+
+    fname = 'data/lin_plot_1'
+    plt_helper.savefig(fname)
     # plt.savefig('../results/problematic_good.png')
 
 
