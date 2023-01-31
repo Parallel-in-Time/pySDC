@@ -1,12 +1,13 @@
 import pytest
-from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.core.Errors import ParameterError
 
 #
 # Tests that problem class enforces parameter requirements
 @pytest.mark.base
 def test_problem_class_main():
+    from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    from pySDC.core.Errors import ParameterError
+    
     # initialize problem parameters
     problem_params = dict()
 
