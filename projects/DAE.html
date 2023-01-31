@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Solving differential algebraic equations with SDC &#8212; pySDC 5.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="core package" href="../pySDC/core.html" />
+    <link rel="prev" title="Resilience in SDC" href="Resilience.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pySDC/core.html" title="core package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Resilience.html" title="Resilience in SDC"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Solving differential algebraic equations with SDC</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="solving-differential-algebraic-equations-with-sdc">
+<h1>Solving differential algebraic equations with SDC<a class="headerlink" href="#solving-differential-algebraic-equations-with-sdc" title="Permalink to this heading">¶</a></h1>
+<p>This project contains the sweepers, hooks, example problems, plotting and simulation scripts for a Master’s thesis investigating the usage of SDC methods to solve differential algebraic equations.</p>
+<p>To run the scripts contained in this project a standard installation of pySDC should suffice.</p>
+<section id="project-overview">
+<h2>Project overview<a class="headerlink" href="#project-overview" title="Permalink to this heading">¶</a></h2>
+<ul>
+<li><dl>
+<dt>hooks</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_approx_solution.py</span></code></div>
+<div class="line">Simple hook class to read out the approximate solution after each time step.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_error.py</span></code></div>
+<div class="line">Simple hook class to read out the error between approximate and exact solution after each time step. Note that for some problems the exact solution is only implemented to return initial conditions. In these cases this hook should not be used.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>plotting</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">linear_plot.py</span></code></div>
+<div class="line">Reads a previously generated data file in <cite>.npy</cite> format and generates a plot on linear axis of the specified parameters.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">loglog_plot.py</span></code></div>
+<div class="line">Reads a previously generated data file in <cite>.npy</cite> format and generates a plot on logarithmic axis of the specified parameters. Commonly used to generate convergence plots.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>problems</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">simple_DAE.py</span></code></div>
+<div class="line">A number of simple examples of differential algebraic equations are implemented here: a linear index-2 system with known analytical solution, the 2D pendulum as an index-3 system and a very simple fully implicit index-2 system that is not solvable by most numerical methods for certain values of a parameter.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">transistor_amplifier.py</span></code></div>
+<div class="line">A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>run</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">run_convergence_test.py</span></code></div>
+<div class="line">Script to generate convergence data of applying SDC to the simple linear index-2 differential algebraic system mentioned above.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_dae_playground.py</span></code></div>
+<div class="line">Testing arena for the fully implicit sweeper.</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>sweepers</dt><dd><ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_DAE.py</span></code></div>
+<div class="line">Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">semi_explicit_DAE.py</span></code></div>
+<div class="line">Sweeper that accepts a semi-explicit formulation of a system of differential algebraic equations and applies to it a modified version of spectral deferred correction</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="theoretical-details">
+<h2>Theoretical details<a class="headerlink" href="#theoretical-details" title="Permalink to this heading">¶</a></h2>
+<p>A fully implicit representation of a system of differential equations takes the form</p>
+<div class="math notranslate nohighlight">
+\[F(u'(t), u(t), t) = 0.\]</div>
+<p>A special case of such an implicit differential equation arises when the Jacobian <span class="math notranslate nohighlight">\(\partial_{u'}F\)</span> is singular. This implies that the derivative of some of the components of <span class="math notranslate nohighlight">\(u(t)\)</span> do not appear in the system of equations. The system is thus denoted a differential algebraic system of equations.</p>
+<p>Since the derivative <span class="math notranslate nohighlight">\(u'(t)\)</span> cannot be isolated the Picard formulation used in ordinary SDC cannot be used here. Instead the derivative, henceforth denoted by <span class="math notranslate nohighlight">\(U(t)\)</span>, is cast as the new unknown solution and the implicit system of equations is written as</p>
+<div class="math notranslate nohighlight">
+\[F\left(u_0+\int_0^tU(\tau)d\tau, U(t), t\right) = 0.\]</div>
+<p>Based on this equation and an initial approximate solution <span class="math notranslate nohighlight">\(tilde{U}\)</span>, the following error equation is formed</p>
+<div class="math notranslate nohighlight">
+\[F\left(u_0+\int_0^t(\tilde{U}(t)+\delta(\tau))d\tau,\;\tilde{U}(t)+\delta(t),\;\right)=0.\]</div>
+<p>This results directly in</p>
+<div class="math notranslate nohighlight">
+\[F\left(u_0+\int_0^{t_{m+1}}\tilde{U}(\tau)d\tau +\left(\int_0^{t_m} + \int_{t_m}^{t_{m+1}}\right)\delta(\tau)d\tau ,\;\tilde{U}(t_{m+1})+\delta(t_{m+1}),\;t_{m+1}\right)=0\]</div>
+<p>from which the following time marching discretisation becomes obvious</p>
+<div class="math notranslate nohighlight">
+\[F\left(u_0+[\Delta t\mathbf{Q}\tilde{U}]_{m+1} + \sum_{l=1}^{m+1}\Delta t\tilde{\delta}_l,\;\tilde{U}_{m+1}+\tilde{\delta}_{m+1},\;t_{m+1}\right) = 0.\]</div>
+<p>The spectral integration matrix <span class="math notranslate nohighlight">\(\mathbf{Q}\)</span> is used to approximate the integral of the current approximation <span class="math notranslate nohighlight">\(\tilde{U}\)</span> and a low order approximation, in this case implicit Euler, is used for the unknown error <span class="math notranslate nohighlight">\(\delta(t)\)</span>.
+Combining each step in the time marching scheme into a vector results in the following matrix formulation</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{F}\left(\mathbf{u}_0+\Delta t\mathbf{Q}\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta\tilde{\mathbf{\delta}},\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}\]</div>
+<p>with the integration matrix of the implicit Euler method</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbf{Q}_\Delta=
+\begin{pmatrix}
+\Delta t_1&amp;0&amp;\dots&amp;0&amp;0\\
+\Delta t_1&amp;\Delta t_2&amp;\dots&amp;0&amp;0\\
+.&amp;.&amp;\dots&amp;0&amp;0\\
+\Delta t_1&amp;\Delta t_2&amp;\dots&amp;\Delta t_{M-2}&amp;0\\
+\Delta t_1&amp;\Delta t_2&amp;\dots&amp;\Delta t_{M-2}&amp;\Delta t_{M-1}\\
+\end{pmatrix}\end{split}\]</div>
+<p>Finally, the iterative nature of the method is made clear by considering that the approximate solution can be updated repeatedly with a <span class="math notranslate nohighlight">\(\tilde{\mathbf{\delta}}\)</span> that is recalculated after each iteration and using the previously updated solution as the initial condition for the next iteration. In this way, reformulation of the previous equation as</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\tilde{\mathbf{U}} + \Delta t\mathbf{Q}_\Delta(\tilde{\mathbf{U}} + \tilde{\mathbf{\delta}}),\;\tilde{\mathbf{U}}+\tilde{\mathbf{\delta}},\;\mathbf{t}\right) = \mathbf{0}\]</div>
+<p>results in the following iterative scheme</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{F}\left(\mathbf{u}_0+\Delta t(\mathbf{Q}-\mathbf{Q}_\Delta)\mathbf{U}^{k}+ \Delta t\mathbf{Q}_\Delta\mathbf{U}^{k+1},\;\mathbf{U}^{k+1},\;\mathbf{t}\right) = \mathbf{0}.\]</div>
+<p>In practice each iteration is carried out line by line and the resulting implicit equation for <span class="math notranslate nohighlight">\(U_{m+1}^{k+1}\)</span> is solved using the familiar <code class="docutils literal notranslate"><span class="pre">scipy.optimize.root()</span></code> function.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Solving differential algebraic equations with SDC</a><ul>
+<li><a class="reference internal" href="#project-overview">Project overview</a></li>
+<li><a class="reference internal" href="#theoretical-details">Theoretical details</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="Resilience.html"
+                          title="previous chapter">Resilience in SDC</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../pySDC/core.html"
+                          title="next chapter">core package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/DAE.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pySDC/core.html" title="core package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Resilience.html" title="Resilience in SDC"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Solving differential algebraic equations with SDC</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>
