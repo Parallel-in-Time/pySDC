@@ -1,13 +1,14 @@
 import pytest
 import numpy as np
 
+
 @pytest.mark.base
 def test_predict_main():
-    
+
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
     from pySDC.core.Step import step
-    
+
     # initialize level parameters
     level_params = dict()
     level_params['dt'] = 5e-2
