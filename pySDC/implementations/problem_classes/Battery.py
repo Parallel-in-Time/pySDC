@@ -152,7 +152,7 @@ class battery_n_capacitors(ptype):
         m_guess = -100
         break_flag = False
 
-        for m in range(len(u)):
+        for m in range(1, len(u)):
             for k in range(1, self.params.nvars):
                 if u[m][k] - self.params.V_ref[k - 1] <= 0:
                     switch_detected = True
