@@ -116,7 +116,6 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     if space_rank == 0:
-
         # convert filtered statistics to list of computed radii, sorted by time
         computed_radii = get_sorted(stats, type='computed_radius', sortby='time')
         exact_radii = get_sorted(stats, type='exact_radius', sortby='time')
@@ -208,7 +207,6 @@ def visualize_radii():
     filelist = glob.glob('./data/*_results.json')
 
     for file in filelist:
-
         # read in file with data
         with open(file, 'r') as fp:
             results = json.load(fp)
@@ -293,7 +291,6 @@ def main(nprocs_space=None):
 
 
 if __name__ == "__main__":
-
     # Add parser to get number of processors in space (have to do this here to enable automatic testing)
     parser = ArgumentParser()
     parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)

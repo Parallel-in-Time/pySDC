@@ -72,7 +72,6 @@ def compute_and_plot_itererror():
         description['problem_params'] = problem_params
 
         for nodes_ind in np.arange(np.size(nodes_v)):
-
             sweeper_params['num_nodes'] = nodes_v[nodes_ind]
             description['sweeper_params'] = sweeper_params
 
@@ -93,7 +92,6 @@ def compute_and_plot_itererror():
             extract_stats = filter_stats(stats, type='residual_post_iteration')
 
             for k, v in extract_stats.items():
-
                 if k.iter != -1:
                     residual[cs_ind, nodes_ind, k.iter - 2] = v
 

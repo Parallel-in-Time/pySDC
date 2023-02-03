@@ -315,7 +315,6 @@ def main(cwd=''):
     # Loop over variants, exact and inexact solves
     results = {}
     for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
-
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 

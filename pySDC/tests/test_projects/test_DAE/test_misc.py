@@ -1,5 +1,6 @@
 import pytest
 
+
 #
 # Tests that problem class enforces parameter requirements
 @pytest.mark.base

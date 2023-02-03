@@ -107,7 +107,6 @@ def run_simulation(name=None, nprocs_space=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     if space_rank == 0:
-
         print()
 
         # convert filtered statistics to list of iterations count, sorted by time

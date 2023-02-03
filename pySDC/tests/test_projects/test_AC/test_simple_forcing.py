@@ -14,7 +14,6 @@ def test_main_serial():
 @pytest.mark.slow
 @pytest.mark.mpi4py
 def test_main_parallel():
-
     # try to import MPI here, will fail if things go wrong (and not later on in the subprocess part)
     import mpi4py
 

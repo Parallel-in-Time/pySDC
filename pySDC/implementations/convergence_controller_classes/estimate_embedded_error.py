@@ -185,7 +185,6 @@ class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
 
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
-
                 # get accumulated local errors from previous steps
                 if not S.status.first:
                     if not S.status.prev_done:

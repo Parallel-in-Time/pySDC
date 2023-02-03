@@ -135,7 +135,6 @@ def make_movie_from_files(path='./data', name='', output='.'):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser()
     parser.add_argument("-p", "--path", help='Path to data files', type=str, default='./data')
     parser.add_argument("-n", "--name", help='Name of the simulation', type=str)

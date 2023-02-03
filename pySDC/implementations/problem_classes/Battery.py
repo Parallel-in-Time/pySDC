@@ -277,7 +277,6 @@ class battery(battery_n_capacitors):
 
 class battery_implicit(battery):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-
         essential_keys = ['newton_maxiter', 'newton_tol', 'ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
         for key in essential_keys:
             if key not in problem_params:

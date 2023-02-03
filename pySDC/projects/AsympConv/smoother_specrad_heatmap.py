@@ -45,33 +45,27 @@ def compute_and_plot_specrad():
     np.fill_diagonal(Emat[1:, :], 1)
 
     for qd_type, conv_type in setup_list:
-
         if qd_type == 'LU':
-
             QT = coll.Qmat[1:, 1:].T
             [_, _, U] = LA.lu(QT, overwrite_a=True)
             QDmat = U.T
 
         elif qd_type == 'IE':
-
             QI = np.zeros(np.shape(coll.Qmat))
             for m in range(coll.num_nodes + 1):
                 QI[m, 1 : m + 1] = coll.delta_m[0:m]
             QDmat = QI[1:, 1:]
 
         elif qd_type == 'EE':
-
             QE = np.zeros(np.shape(coll.Qmat))
             for m in range(coll.num_nodes + 1):
                 QE[m, 0:m] = coll.delta_m[0:m]
             QDmat = QE[1:, 1:]
 
         elif qd_type == 'PIC':
-
             QDmat = np.zeros(np.shape(coll.Qmat[1:, 1:]))
 
         elif qd_type == 'EX':
-
             QT = coll.Qmat[1:, 1:].T
             [_, _, U] = LA.lu(QT, overwrite_a=True)
             QDmat = np.tril(U.T, k=-1)
@@ -84,21 +78,18 @@ def compute_and_plot_specrad():
         # print('qd_type: %s -- lim_specrad: %6.4e -- conv_type: %s' % (qd_type, lim_specrad, conv_type))
 
         if conv_type == 'to0':
-
             ilim_left = -4
             ilim_right = 2
             rlim_left = 2
             rlim_right = -4
 
         elif conv_type == 'toinf':
-
             ilim_left = 0
             ilim_right = 11
             rlim_left = 6
             rlim_right = 0
 
         elif conv_type == 'full':
-
             ilim_left = -10
             ilim_right = 11
             rlim_left = 10

@@ -87,7 +87,6 @@ class nonlinear_ODE_1(ptype):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = u - dt * np.sqrt(1 - u) - rhs
 

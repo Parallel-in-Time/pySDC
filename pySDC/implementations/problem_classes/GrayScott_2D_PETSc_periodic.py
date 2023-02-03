@@ -96,7 +96,6 @@ class GS_full(object):
 
         for j in range(ys, ye):
             for i in range(xs, xe):
-
                 # diagnoal 2-by-2 block (for u and v)
                 row.index = (i, j)
                 col.index = (i, j)

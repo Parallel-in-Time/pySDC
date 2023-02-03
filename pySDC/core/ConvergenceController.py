@@ -21,7 +21,6 @@ class Status(FrozenClass):
     """
 
     def __init__(self, status_variabes):
-
         [setattr(self, key, None) for key in status_variabes]
 
         self._freeze()
@@ -415,7 +414,6 @@ class ConvergenceController(object):
 
         # check if we have arrived at the end of the path to the variable
         if len(where) == 0:
-
             variable_exitsts = name in place.__dict__.keys()
             # check if the variable already exists and raise an error in case we are about to introduce a bug
             if not allow_overwrite and variable_exitsts:

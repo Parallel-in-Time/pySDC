@@ -112,7 +112,6 @@ class allencahn_temp_imex(ptype):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.impl[..., 0] = -self.K2 * u[..., 0]
 
             if self.params.eps > 0:
@@ -129,7 +128,6 @@ class allencahn_temp_imex(ptype):
             f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
         else:
-
             u_hat = self.fft.forward(u[..., 0])
             lap_u_hat = -self.K2 * u_hat
             f.impl[..., 0] = self.fft.backward(lap_u_hat, f.impl[..., 0])
@@ -162,13 +160,11 @@ class allencahn_temp_imex(ptype):
         """
 
         if self.params.spectral:
-
             me = self.dtype_u(self.init)
             me[..., 0] = rhs[..., 0] / (1.0 + factor * self.K2)
             me[..., 1] = rhs[..., 1] / (1.0 + factor * self.params.D * self.K2)
 
         else:
-
             me = self.dtype_u(self.init)
             rhs_hat = self.fft.forward(rhs[..., 0])
             rhs_hat /= 1.0 + factor * self.K2

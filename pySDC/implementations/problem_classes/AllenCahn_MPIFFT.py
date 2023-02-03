@@ -112,7 +112,6 @@ class allencahn_imex(ptype):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.impl = -self.K2 * u
 
             if self.params.eps > 0:
@@ -123,7 +122,6 @@ class allencahn_imex(ptype):
                 f.expl[:] = self.fft.forward(tmpf)
 
         else:
-
             u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * u_hat
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
@@ -150,11 +148,9 @@ class allencahn_imex(ptype):
         """
 
         if self.params.spectral:
-
             me = rhs / (1.0 + factor * self.K2)
 
         else:
-
             me = self.dtype_u(self.init)
             rhs_hat = self.fft.forward(rhs)
             rhs_hat /= 1.0 + factor * self.K2
@@ -233,7 +229,6 @@ class allencahn_imex_timeforcing(allencahn_imex):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.impl = -self.K2 * u
 
             tmp = newDistArray(self.fft, False)
@@ -268,7 +263,6 @@ class allencahn_imex_timeforcing(allencahn_imex):
             f.expl[:] = self.fft.forward(tmpf)
 
         else:
-
             u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * u_hat
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)

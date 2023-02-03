@@ -94,7 +94,6 @@ class CheckConvergence(ConvergenceController):
                 hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
         else:
-
             for hook in controller.hooks:
                 hook.pre_comm(step=S, level_number=0)
 

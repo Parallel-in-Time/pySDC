@@ -47,7 +47,6 @@ def setup_mpl(font_size=8, reset=False):
     mpl.rcParams.update(style_options)
 
     if find_executable('latex'):
-
         latex_support = {
             "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
             "text.usetex": True,  # use LaTeX to write all text

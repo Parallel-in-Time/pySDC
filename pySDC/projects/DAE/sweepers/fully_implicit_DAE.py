@@ -98,6 +98,7 @@ class fully_implicit_DAE(sweeper):
             # add the known components from current sweep del_t*Q_del*U_k+1
             for j in range(1, m):
                 u_approx += L.dt * self.QI[m, j] * L.f[j]
+
             # params contains U = u'
             def impl_fn(params):
                 # make params into a mesh object

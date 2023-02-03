@@ -74,7 +74,6 @@ def create_plots(cwd=''):
     ymin = 99
     ymax = 0
     for file, _, label, color, marker in list:
-
         if file is not ref:
             data = np.load(cwd + 'data/' + file)
             iter_count = data['iter_count'][nprocs - 1 :: nprocs]
@@ -109,7 +108,6 @@ def create_plots(cwd=''):
     # os.system('pdfcrop ' + fname + ' ' + fname)
 
     for file, strategy, _, _, _ in list:
-
         data = np.load(cwd + 'data/' + file)
 
         residual = data['residual'][:, minstep:maxstep]
@@ -169,5 +167,4 @@ def create_plots(cwd=''):
 
 
 if __name__ == "__main__":
-
     create_plots()

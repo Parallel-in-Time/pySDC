@@ -21,7 +21,6 @@ def get2DUpwindMatrix(N, dx, order):
 #
 #
 def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
-
     assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
     assert (
         np.size(x_b) == 2

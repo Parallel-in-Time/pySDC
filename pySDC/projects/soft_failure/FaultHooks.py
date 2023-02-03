@@ -15,7 +15,6 @@ class fault_hook(hooks):
         self.fault_iteration = None
 
     def pre_run(self, step, level_number):
-
         super(fault_hook, self).pre_run(step, level_number)
 
         L = step.levels[level_number]
@@ -25,7 +24,6 @@ class fault_hook(hooks):
         self.fault_iteration = np.random.randint(1, L.sweep.params.niters)
 
     def pre_iteration(self, step, level_number):
-
         super(fault_hook, self).pre_iteration(step, level_number)
 
         L = step.levels[level_number]
@@ -33,7 +31,6 @@ class fault_hook(hooks):
         L.sweep.fault_iteration = self.fault_iteration == step.status.iter
 
     def post_run(self, step, level_number):
-
         super(fault_hook, self).post_run(step, level_number)
 
         L = step.levels[level_number]

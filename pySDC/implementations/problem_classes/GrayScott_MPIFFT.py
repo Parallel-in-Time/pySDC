@@ -120,7 +120,6 @@ class grayscott_imex_diffusion(ptype):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.impl[..., 0] = self.Ku * u[..., 0]
             f.impl[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
@@ -133,7 +132,6 @@ class grayscott_imex_diffusion(ptype):
             f.expl[..., 1] = self.fft.forward(tmpfv)
 
         else:
-
             u_hat = self.fft.forward(u[..., 0])
             lap_u_hat = self.Ku * u_hat
             f.impl[..., 0] = self.fft.backward(lap_u_hat, f.impl[..., 0])
@@ -161,12 +159,10 @@ class grayscott_imex_diffusion(ptype):
 
         me = self.dtype_u(self.init)
         if self.params.spectral:
-
             me[..., 0] = rhs[..., 0] / (1.0 - factor * self.Ku)
             me[..., 1] = rhs[..., 1] / (1.0 - factor * self.Kv)
 
         else:
-
             rhs_hat = self.fft.forward(rhs[..., 0])
             rhs_hat /= 1.0 - factor * self.Ku
             me[..., 0] = self.fft.backward(rhs_hat, me[..., 0])
@@ -236,7 +232,6 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.impl[..., 0] = self.Ku * u[..., 0]
             f.impl[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
@@ -249,7 +244,6 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
             f.expl[..., 1] = self.fft.forward(tmpfv)
 
         else:
-
             u_hat = self.fft.forward(u[..., 0])
             lap_u_hat = self.Ku * u_hat
             f.impl[..., 0] = self.fft.backward(lap_u_hat, f.impl[..., 0])
@@ -293,7 +287,6 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.comp1[..., 0] = self.Ku * u[..., 0]
             f.comp1[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
@@ -306,7 +299,6 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             f.comp2[..., 1] = self.fft.forward(tmpfv)
 
         else:
-
             u_hat = self.fft.forward(u[..., 0])
             lap_u_hat = self.Ku * u_hat
             f.comp1[..., 0] = self.fft.backward(lap_u_hat, f.comp1[..., 0])
@@ -458,7 +450,6 @@ class grayscott_mi_linear(grayscott_imex_linear):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.comp1[..., 0] = self.Ku * u[..., 0]
             f.comp1[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
@@ -471,7 +462,6 @@ class grayscott_mi_linear(grayscott_imex_linear):
             f.comp2[..., 1] = self.fft.forward(tmpfv)
 
         else:
-
             u_hat = self.fft.forward(u[..., 0])
             lap_u_hat = self.Ku * u_hat
             f.comp1[..., 0] = self.fft.backward(lap_u_hat, f.comp1[..., 0])

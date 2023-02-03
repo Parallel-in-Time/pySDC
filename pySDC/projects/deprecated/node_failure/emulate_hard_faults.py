@@ -44,7 +44,6 @@ def hard_fault_injection(S):
 
     # if we set step and iter, inject and recover (if faults are supposed to occur)
     if ((hard_step == S.status.slot and hard_iter == S.status.iter) or doit) and strategy != 'NOFAULT':
-
         print('things went wrong here: step %i -- iteration %i -- time %e' % (S.status.slot, S.status.iter, S.time))
 
         # add incident to statistics data type

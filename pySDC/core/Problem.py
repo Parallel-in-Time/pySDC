@@ -6,7 +6,6 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
     def __init__(self, pars):
-
         for k, v in pars.items():
             setattr(self, k, v)
 
