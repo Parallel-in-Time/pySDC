@@ -19,7 +19,6 @@ from pySDC.implementations.convergence_controller_classes.adaptivity import Adap
 
 class log_data(hooks):
     def post_step(self, step, level_number):
-
         super(log_data, self).post_step(step, level_number)
 
         # some abbreviations
@@ -238,8 +237,7 @@ def run():
                 stats = controller_run(description, controller_params, use_A, use_SE, t0, Tend)
 
             check_solution(stats, dt, problem.__name__, use_A, use_SE)
-            print(problem.__name__)
-            print()
+
             plot_voltages(description, problem.__name__, sweeper.__name__, recomputed, use_SE, use_A)
 
 
