@@ -88,18 +88,15 @@ class logistics_equation(ptype):
         u = self.dtype_u(u0)
 
         if self.params.direct:
-
             d = (1 - dt * self.params.lam) ** 2 + 4 * dt * self.params.lam * rhs
             u = (-(1 - dt * self.params.lam) + np.sqrt(d)) / (2 * dt * self.params.lam)
             return u
 
         else:
-
             # start newton iteration
             n = 0
             res = 99
             while n < self.params.newton_maxiter:
-
                 # form the function g with g(u) = 0
                 g = u - dt * self.params.lam * u * (1 - u) - rhs
 

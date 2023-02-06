@@ -43,14 +43,12 @@ def compute_and_plot_specrad(Nnodes, lam):
     plt.subplots(figsize=(15, 10))
 
     for Nsweeps, color, marker in setup_list:
-
         Emat = np.zeros((Nsteps, Nsteps))
         np.fill_diagonal(Emat[1:, :], 1)
 
         Prho_list = []
         predict_list = []
         for x in xlist:
-
             mat = np.linalg.inv(np.eye(Nnodes * Nsteps) - x * lam * np.kron(np.eye(Nsteps), QDmat)).dot(
                 x * lam * np.kron(np.eye(Nsteps), (Qmat - QDmat)) + np.kron(Emat, Nmat)
             )
@@ -102,7 +100,6 @@ def compute_and_plot_specrad(Nnodes, lam):
 
 
 if __name__ == "__main__":
-
     compute_and_plot_specrad(Nnodes=3, lam=-1)
     compute_and_plot_specrad(Nnodes=3, lam=1j)
     compute_and_plot_specrad(Nnodes=7, lam=-1)

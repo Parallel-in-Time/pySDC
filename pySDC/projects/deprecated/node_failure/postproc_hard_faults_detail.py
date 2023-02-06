@@ -45,7 +45,6 @@ def create_plots(setup, cwd=''):
 
     # create heatmaps
     for file, strategy, _, _, _ in setup_list:
-
         residual = np.zeros((maxiter, maxsteps))
         residual[:] = -99
 

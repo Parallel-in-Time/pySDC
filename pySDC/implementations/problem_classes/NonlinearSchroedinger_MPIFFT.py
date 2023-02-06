@@ -116,14 +116,12 @@ class nonlinearschroedinger_imex(ptype):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-
             f.impl = -self.K2 * 1j * u
             tmp = self.fft.backward(u)
             tmpf = self.ndim * self.params.c * 2j * np.absolute(tmp) ** 2 * tmp
             f.expl[:] = self.fft.forward(tmpf)
 
         else:
-
             u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * 1j * u_hat
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
@@ -146,11 +144,9 @@ class nonlinearschroedinger_imex(ptype):
         """
 
         if self.params.spectral:
-
             me = rhs / (1.0 + factor * self.K2 * 1j)
 
         else:
-
             me = self.dtype_u(self.init)
             rhs_hat = self.fft.forward(rhs)
             rhs_hat /= 1.0 + factor * self.K2 * 1j
@@ -170,7 +166,6 @@ class nonlinearschroedinger_imex(ptype):
         """
 
         def nls_exact_1D(t, x, c):
-
             ae = 1.0 / np.sqrt(2.0) * np.exp(1j * t)
             if c != 0:
                 u = ae * ((np.cosh(t) + 1j * np.sinh(t)) / (np.cosh(t) - 1.0 / np.sqrt(2.0) * np.cos(x)) - 1.0)

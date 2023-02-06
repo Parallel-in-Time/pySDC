@@ -21,7 +21,6 @@ ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
 
 
 def main(comm=None):
-
     # initialize level parameters (part I)
     level_params = dict()
     level_params['restol'] = 1e-08
@@ -57,20 +56,17 @@ def main(comm=None):
 
     # loop over all Q-delta matrix types
     for qd_type in qd_list:
-
         # assign implicit Q-delta matrix
         sweeper_params['QI'] = qd_type
 
         # loop over all setups
         for setup, nvars, param_list in setup_list:
-
             # initialize problem parameters (part I)
             problem_params = dict()
             problem_params['nvars'] = nvars  # number of degrees of freedom for each level
 
             # loop over all parameters
             for param in param_list:
-
                 # fill description for the controller
                 description = dict()
                 description['sweeper_class'] = generic_implicit_MPI  # pass sweeper
@@ -82,7 +78,6 @@ def main(comm=None):
 
                 # decide which setup to take
                 if setup == 'heat':
-
                     problem_params['nu'] = param
                     problem_params['freq'] = 2
                     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
@@ -94,7 +89,6 @@ def main(comm=None):
                     description['level_params'] = level_params  # pass level parameters
 
                 elif setup == 'advection':
-
                     problem_params['c'] = param
                     problem_params['order'] = 2
                     problem_params['freq'] = 2
@@ -108,7 +102,6 @@ def main(comm=None):
                     description['level_params'] = level_params  # pass level parameters
 
                 elif setup == 'vanderpol':
-
                     problem_params['newton_tol'] = 1e-09
                     problem_params['newton_maxiter'] = 20
                     problem_params['mu'] = param
@@ -121,7 +114,6 @@ def main(comm=None):
                     description['level_params'] = level_params
 
                 elif setup == 'fisher':
-
                     problem_params['nu'] = 1
                     problem_params['lambda0'] = param
                     problem_params['newton_maxiter'] = 20
@@ -199,7 +191,6 @@ def plot_iterations():
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
-
         plt_helper.newfig(textwidth=238.96, scale=0.89)
 
         for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):

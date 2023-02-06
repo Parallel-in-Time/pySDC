@@ -79,7 +79,6 @@ class buck_converter(ptype):
         self.A = np.zeros((3, 3))
 
         if 0 <= ((t / Tsw) % 1) <= self.params.duty:
-
             self.A[0, 0] = -1 / (self.params.C1 * self.params.Rs)
             self.A[0, 2] = -1 / self.params.C1
 
@@ -91,7 +90,6 @@ class buck_converter(ptype):
             self.A[2, 2] = -self.params.Rp / self.params.L1
 
         else:
-
             self.A[0, 0] = -1 / (self.params.C1 * self.params.Rs)
 
             self.A[1, 1] = -1 / (self.params.C2 * self.params.Rl)

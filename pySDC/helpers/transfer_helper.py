@@ -155,17 +155,13 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
     n_f = fine_grid.size
 
     if periodic:
-
         M = np.zeros((fine_grid.size, coarse_grid.size))
 
         if equidist_nested:
-
             for i, p in zip(range(n_f), fine_grid):
-
                 if i % 2 == 0:
                     M[i, int(i / 2)] = 1.0
                 else:
-
                     nn = []
                     cpos = int(i / 2)
                     offset = int(k / 2)
@@ -193,7 +189,6 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                         M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
         else:
-
             for i, p in zip(range(n_f), fine_grid):
                 nn = next_neighbors_periodic(p, coarse_grid, k)
                 circulating_one = np.asarray([1.0] + [0.0] * (k - 1))
@@ -209,14 +204,11 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                     M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
     else:
-
         M = np.zeros((fine_grid.size, coarse_grid.size + 2 * pad))
         padded_c_grid = border_padding(coarse_grid, pad, pad)
 
         if equidist_nested:
-
             for i, p in zip(range(n_f), fine_grid):
-
                 if i % 2 != 0:
                     M[i, int((i - 1) / 2) + 1] = 1.0
                 else:
@@ -239,7 +231,6 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                         M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
         else:
-
             for i, p in zip(range(n_f), fine_grid):
                 nn = next_neighbors(p, padded_c_grid, k)
                 # construct the lagrange polynomials for the k neighbors

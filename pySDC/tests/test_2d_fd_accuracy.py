@@ -53,7 +53,6 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
     results = {}
     # loop over all nvars
     for nvars in nvars_list:
-
         # setup problem
         problem_params['nvars'] = nvars
         problem_params['order'] = order_stencil
@@ -106,7 +105,6 @@ def get_accuracy_order(results):
     order = []
     # loop over two consecutive errors/nvars pairs
     for i in range(1, len(nvars_list)):
-
         # get ids
         id = ID(nvars=nvars_list[i])
         id_prev = ID(nvars=nvars_list[i - 1])

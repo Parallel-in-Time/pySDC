@@ -61,7 +61,6 @@ def compute_convergence_data(cwd=''):
     nsteps[2, :] = nsteps[0, :]
 
     for order in [3, 4, 5]:
-
         error = np.zeros(np.shape(nsteps)[1])
 
         # setup parameters "in time"
@@ -77,7 +76,6 @@ def compute_convergence_data(cwd=''):
         description['step_params'] = step_params
 
         for ii in range(0, np.shape(nsteps)[1]):
-
             ns = nsteps[order - 3, ii]
             if (order == 3) or (order == 4):
                 problem_params['nvars'] = [(2, int(2 * ns))]

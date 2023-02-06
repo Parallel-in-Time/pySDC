@@ -113,7 +113,6 @@ class controller_MPI(controller):
 
         # while any process still active...
         while active:
-
             while not self.S.status.done:
                 name = f'REGION -- {self.S.status.stage} -- {self.S.status.slot}'
                 spu.region_begin(name)
@@ -213,12 +212,10 @@ class controller_MPI(controller):
             pass
 
         elif self.params.predict_type == 'fine_only':
-
             # do a fine sweep only
             self.S.levels[0].sweep.update_nodes()
 
         elif self.params.predict_type == 'libpfasst_style':
-
             # restrict to coarsest level
             for l in range(1, len(self.S.levels)):
                 self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
@@ -257,13 +254,11 @@ class controller_MPI(controller):
             self.S.levels[0].sweep.update_nodes()
 
         elif self.params.predict_type == 'pfasst_burnin':
-
             # restrict to coarsest level
             for l in range(1, len(self.S.levels)):
                 self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
 
             for p in range(self.S.status.slot + 1):
-
                 self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
                 if not p == 0 and not self.S.status.first:
                     self.logger.debug(
@@ -333,7 +328,6 @@ class controller_MPI(controller):
                 self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'PREDICT':
-
             # call predictor (serial)
 
             self.hooks.pre_predict(step=self.S, level_number=0)
@@ -347,7 +341,6 @@ class controller_MPI(controller):
             self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
-
             # check whether to stop iterating (parallel)
 
             self.hooks.pre_comm(step=self.S, level_number=0)
@@ -376,13 +369,11 @@ class controller_MPI(controller):
             self.S.status.done = CheckConvergence.check_convergence(self.S)
 
             if self.params.all_to_done:
-
                 self.hooks.pre_comm(step=self.S, level_number=0)
                 self.S.status.done = comm.allreduce(sendobj=self.S.status.done, op=MPI.LAND)
                 self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
             else:
-
                 self.hooks.pre_comm(step=self.S, level_number=0)
 
                 # check if an open request of the status send is pending
@@ -433,7 +424,6 @@ class controller_MPI(controller):
                         self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
 
             else:
-
                 # Need to finish alll pending isend requests. These will occur for the first active process, since
                 # in the last iteration the wait statement will not be called ("send and forget")
                 for req in self.req_send:
@@ -446,14 +436,12 @@ class controller_MPI(controller):
                 self.S.status.stage = 'DONE'
 
         elif stage == 'IT_FINE':
-
             nsweeps = self.S.levels[0].params.nsweeps
 
             self.S.levels[0].status.sweep = 0
 
             # do fine sweep
             for k in range(nsweeps):
-
                 self.S.levels[0].status.sweep += 1
 
                 self.hooks.pre_comm(step=self.S, level_number=0)
@@ -487,18 +475,15 @@ class controller_MPI(controller):
             self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_UP':
-
             # go up the hierarchy from finest to coarsest level (parallel)
 
             self.S.transfer(source=self.S.levels[0], target=self.S.levels[1])
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
             for l in range(1, len(self.S.levels) - 1):
-
                 nsweeps = self.S.levels[l].params.nsweeps
 
                 for _ in range(nsweeps):
-
                     self.hooks.pre_comm(step=self.S, level_number=l)
 
                     if self.req_send[l] is not None:
@@ -535,7 +520,6 @@ class controller_MPI(controller):
             self.S.status.stage = 'IT_COARSE'
 
         elif stage == 'IT_COARSE':
-
             # sweeps on coarsest level (serial/blocking)
 
             # receive from previous step (if not first)
@@ -590,22 +574,18 @@ class controller_MPI(controller):
                 self.S.status.stage = 'IT_CHECK'  # MSSDC
 
         elif stage == 'IT_DOWN':
-
             # prolong corrections down to finest level (parallel)
 
             # receive and sweep on middle levels (except for coarsest level)
             for l in range(len(self.S.levels) - 1, 0, -1):
-
                 # prolong values
                 self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
 
                 # on middle levels: do sweep as usual
                 if l - 1 > 0:
-
                     nsweeps = self.S.levels[l - 1].params.nsweeps
 
                     for k in range(nsweeps):
-
                         self.hooks.pre_comm(step=self.S, level_number=l - 1)
 
                         if self.req_send[l - 1] is not None:
@@ -655,5 +635,4 @@ class controller_MPI(controller):
             self.S.status.stage = 'IT_FINE'
 
         else:
-
             raise ControllerError('Weird stage, got %s' % self.S.status.stage)

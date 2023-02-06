@@ -159,7 +159,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
         nblocks = int((Tend - t0) / self.dt / num_procs)
 
         for _ in range(nblocks):
-
             self.MS = self.pfasst(self.MS)
 
             for p in slots:
@@ -240,7 +239,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         # loop over steps
         for p in slots:
-
             # store current slot number for diagnostics
             self.MS[p].status.slot = p
 
@@ -263,7 +261,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
     @staticmethod
     def update_data(MS, u, res, niter, level, stage):
-
         for S in MS:
             S.status.stage = stage
             S.status.iter = niter
@@ -309,7 +306,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
                 hook.pre_step(step=S, level_number=0)
 
         while np.linalg.norm(self.res, np.inf) > self.tol and niter < self.maxiter:
-
             niter += 1
 
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_ITERATION')
@@ -319,7 +315,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
             if self.nlevels > 1:
                 for _ in range(MS[0].levels[1].params.nsweeps):
-
                     MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=1, stage='PRE_COARSE_SWEEP')
                     for S in MS:
                         for hook in self.hooks:
@@ -336,7 +331,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
                             hook.post_sweep(step=S, level_number=1)
 
             for _ in range(MS[0].levels[0].params.nsweeps):
-
                 MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_FINE_SWEEP')
                 for S in MS:
                     for hook in self.hooks:

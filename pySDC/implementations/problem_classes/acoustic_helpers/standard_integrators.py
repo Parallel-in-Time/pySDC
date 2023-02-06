@@ -44,7 +44,6 @@ class rk_imex:
             self.nstages = 4
 
         elif self.order == 4:
-
             self.A_hat = np.array(
                 [
                     [0, 0, 0, 0, 0, 0],
@@ -107,7 +106,6 @@ class rk_imex:
             self.nstages = 6
 
         elif self.order == 5:
-
             # from Kennedy and Carpenter
             # copied from http://www.mcs.anl.gov/petsc/petsc-3.2/src/ts/impls/arkimex/arkimex.c
             self.A_hat = np.zeros((8, 8))
@@ -208,10 +206,8 @@ class rk_imex:
         self.stages = np.zeros((self.nstages, self.ndof), dtype='complex')
 
     def timestep(self, u0, dt):
-
         # Solve for stages
         for i in range(0, self.nstages):
-
             # Construct RHS
             rhs = np.copy(u0)
             for j in range(0, i):
@@ -287,7 +283,6 @@ class bdf2:
 #
 class dirk:
     def __init__(self, M, order):
-
         assert np.shape(M)[0] == np.shape(M)[1], "Matrix M must be quadratic"
         self.Ndof = np.shape(M)[0]
         self.M = sp.csc_matrix(M)
@@ -389,10 +384,8 @@ class dirk:
         self.stages = np.zeros((self.nstages, self.Ndof), dtype='complex')
 
     def timestep(self, u0, dt):
-
         uend = u0
         for i in range(0, self.nstages):
-
             b = u0
 
             # Compute right hand side for this stage's implicit step

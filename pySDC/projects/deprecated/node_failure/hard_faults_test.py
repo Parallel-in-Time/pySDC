@@ -43,9 +43,7 @@ def main(ft_setups, ft_strategies):
     controller_params['logger_level'] = 30
 
     for setup in ft_setups:
-
         if setup == 'HEAT':
-
             # initialize problem parameters
             problem_params = dict()
             problem_params['nu'] = 0.5
@@ -73,7 +71,6 @@ def main(ft_setups, ft_strategies):
             Tend = 8.0
 
         elif setup == 'ADVECTION':
-
             # initialize problem parameters
             problem_params = dict()
             problem_params['c'] = 1.0
@@ -102,7 +99,6 @@ def main(ft_setups, ft_strategies):
             Tend = 2.0
 
         else:
-
             raise NotImplementedError('setup not implemented')
 
         # do a reference run without any faults to see how things would look like (and to get maxiter/ref_niter)
@@ -127,7 +123,6 @@ def main(ft_setups, ft_strategies):
 
         # loop over all strategies
         for strategy in ft_strategies:
-
             ft_iter = range(1, ref_niter + 1)
             ft_step = range(0, num_procs)
 
@@ -138,7 +133,6 @@ def main(ft_setups, ft_strategies):
             # loop over all steps
             xcnt = -1
             for step in ft_step:
-
                 xcnt += 1
 
                 # loop over all iterations
@@ -170,7 +164,6 @@ def main(ft_setups, ft_strategies):
 
 
 if __name__ == "__main__":
-
     ft_strategies = ['SPREAD', 'SPREAD_PREDICT', 'INTERP', 'INTERP_PREDICT']
     ft_setups = ['ADVECTION', 'HEAT']
 

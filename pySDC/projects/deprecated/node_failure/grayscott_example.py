@@ -91,7 +91,6 @@ def main(ft_strategies):
     uinit = P.u_exact(t0)
 
     for strategy in ft_strategies:
-
         print('------------------------------------------ working on strategy ', strategy)
         ft.strategy = strategy
 

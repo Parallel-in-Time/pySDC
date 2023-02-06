@@ -16,9 +16,7 @@ quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_canintegratepolynomials(node_type, quad_type):
-
     for M in range(2, 13):
-
         coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
 
         # some basic consistency tests

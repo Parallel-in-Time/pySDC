@@ -150,7 +150,6 @@ class step(FrozenClass):
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
-
             L = levclass.level(
                 problem_class=descr_list[l]['problem_class'],
                 problem_params=descr_list[l]['problem_params'],
