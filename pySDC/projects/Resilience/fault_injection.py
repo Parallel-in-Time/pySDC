@@ -54,7 +54,7 @@ class Fault(FrozenClass):
 
         random = {
             'level_number': random_generator.randint(low=0, high=rnd_params['level_number']),
-            'node': random_generator.randint(low=0, high=rnd_params['node'] + 1),
+            'node': random_generator.randint(low=rnd_params.get('min_node', 0), high=rnd_params['node'] + 1),
             'iteration': random_generator.randint(low=1, high=rnd_params['iteration'] + 1),
             'problem_pos': [random_generator.randint(low=0, high=i) for i in rnd_params['problem_pos']],
             'bit': random_generator.randint(low=0, high=rnd_params['bit']),
@@ -278,13 +278,21 @@ class FaultInjector(hooks):
 {type(step.levels[level_number].u[0])}'
             )
 
+        dtype = step.levels[level_number].prob.u_exact(t=0).dtype
+        if dtype in [float, np.float64]:
+            bit = 64
+        elif dtype in [complex]:
+            bit = 128
+        else:
+            raise NotImplementedError(f'Don\'t know how many bits type {dtype} has')
+
         # define parameters for randomization
         self.rnd_params = {
             'level_number': len(step.levels),
             'node': step.levels[0].sweep.params.num_nodes,
             'iteration': step.params.maxiter,
             'problem_pos': step.levels[level_number].u[0].shape,
-            'bit': 64,  # change manually if you ever have something else
+            'bit': bit,  # change manually if you ever have something else
         }
 
         # initialize the faults have been added before we knew the random parameters

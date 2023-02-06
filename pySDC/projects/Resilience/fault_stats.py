@@ -21,6 +21,7 @@ from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.Lorenz import run_Lorenz
+from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
@@ -208,6 +209,9 @@ class AdaptivityStrategy(Strategy):
         elif problem == run_Lorenz:
             e_tol = 2e-5
             dt_min = 1e-3
+        elif problem == run_Schroedinger:
+            e_tol = 4e-6
+            dt_min = 1e-3
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -301,6 +305,8 @@ class IterateStrategy(Strategy):
             restol = 9e-7
         elif problem == run_Lorenz:
             restol = 16e-7
+        elif problem == run_Schroedinger:
+            restol = 6.5e-7
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -346,6 +352,9 @@ class HotRodStrategy(Strategy):
             maxiter = 4
         elif problem == run_Lorenz:
             HotRod_tol = 4e-7
+            maxiter = 6
+        elif problem == run_Schroedinger:
+            HotRod_tol = 3e-7
             maxiter = 6
         else:
             raise NotImplementedError(
@@ -416,6 +425,8 @@ class FaultStats:
             return 20.0
         elif self.prob == run_Lorenz:
             return 1.5
+        elif self.prob == run_Schroedinger:
+            return 1.0
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -431,6 +442,9 @@ class FaultStats:
             custom_description['step_params'] = {'maxiter': 3}
         elif self.prob == run_Lorenz:
             custom_description['step_params'] = {'maxiter': 5}
+        elif self.prob == run_Schroedinger:
+            custom_description['step_params'] = {'maxiter': 5}
+            custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -464,6 +478,10 @@ class FaultStats:
 
         max_runs = self.get_max_combinations() if self.mode == 'combination' else runs
 
+        space_comm = MPI.COMM_WORLD.Split(True)
+        for j in range(len(self.strategies)):
+            space_comm = space_comm.Split(j % MPI.COMM_WORLD.size == MPI.COMM_WORLD.rank)
+
         for i in range(step, max_runs + step, step):
             for j in range(len(self.strategies)):
                 if j % MPI.COMM_WORLD.size != MPI.COMM_WORLD.rank:
@@ -475,14 +493,18 @@ class FaultStats:
                     else:
                         runs_partial = min([5, i])
                     self.generate_stats(
-                        strategy=self.strategies[j], runs=runs_partial, faults=f, reload=self.reload or reload
+                        strategy=self.strategies[j],
+                        runs=runs_partial,
+                        faults=f,
+                        reload=self.reload or reload,
+                        space_comm=space_comm,
                     )
                 self.get_recovered(self.strategies[j])
             reload = True
 
         return None
 
-    def generate_stats(self, strategy=None, runs=1000, reload=True, faults=True):
+    def generate_stats(self, strategy=None, runs=1000, reload=True, faults=True, space_comm=None):
         '''
         Generate statistics for recovery from bit flips
         -----------------------------------------------
@@ -494,6 +516,7 @@ class FaultStats:
             runs (int): Number of runs you want to do
             reload (bool): Load previously computed statistics and continue from there or start from scratch
             faults (bool): Whether to do stats with faults or without
+            space_comm (MPI.Communicator): A communicator for space parallelisation
 
         Returns:
             None
@@ -538,7 +561,7 @@ class FaultStats:
         # perform the remaining experiments
         for i in range(already_completed['runs'], runs):
             # perform a single experiment with the correct random seed
-            stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults)
+            stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults, space_comm=space_comm)
 
             # get the data from the stats
             faults_run = get_sorted(stats, type='bitflip')
@@ -574,7 +597,7 @@ class FaultStats:
 
         return None
 
-    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None):
+    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None, space_comm=None):
         '''
         Run the problem once with the specified parameters
 
@@ -583,6 +606,7 @@ class FaultStats:
             run (int): Index for fault generation
             faults (bool): Whether or not to put faults in
             force_params (dict): Change parameters in the description of the problem
+            space_comm (MPI.Communicator): A communicator for space parallelisation
 
         Returns:
             dict: Stats object containing statistics for each step, each level and each iteration
@@ -595,7 +619,12 @@ class FaultStats:
         # build the custom description
         custom_description_prob = self.get_custom_description()
         custom_description_strategy = strategy.get_custom_description(self.prob, self.num_procs)
-        custom_description = {**custom_description_prob, **custom_description_strategy}
+        custom_description = {}
+        for key in list(custom_description_strategy.keys()) + list(custom_description_prob.keys()):
+            custom_description[key] = {
+                **custom_description_prob.get(key, {}),
+                **custom_description_strategy.get(key, {}),
+            }
         for k in force_params.keys():
             custom_description[k] = {**custom_description.get(k, {}), **force_params[k]}
 
@@ -627,6 +656,7 @@ class FaultStats:
             Tend=self.get_Tend(),
             custom_controller_params=custom_controller_params,
             custom_problem_params=custom_problem_params,
+            space_comm=space_comm,
         )
 
     def compare_strategies(self, run=0, faults=False, ax=None):
@@ -831,6 +861,8 @@ class FaultStats:
             prob_name = 'piline'
         elif self.prob == run_Lorenz:
             prob_name = 'Lorenz'
+        elif self.prob == run_Schroedinger:
+            prob_name = 'Schroedinger'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -1601,16 +1633,16 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_Lorenz,
+        prob=run_Schroedinger,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
         num_procs=1,
-        mode='combination',
+        mode='random',
     )
 
-    stats_analyser.run_stats_generation(runs=5000, step=50)
+    stats_analyser.run_stats_generation(runs=200, step=10)
     mask = None
 
     stats_analyser.compare_strategies()

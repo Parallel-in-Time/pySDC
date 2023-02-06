@@ -55,7 +55,7 @@ def run_Schroedinger(
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'LU'
+    sweeper_params['QI'] = 'IE'
     sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
@@ -91,7 +91,7 @@ def run_Schroedinger(
 
     if custom_description is not None:
         for k in custom_description.keys():
-            if type(custom_description(k)) == dict:
+            if type(custom_description[k]) == dict:
                 description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
             else:
                 description[k] = custom_description[k]
@@ -106,6 +106,17 @@ def run_Schroedinger(
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+
+    # insert faults
+    if fault_stuff is not None:
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        nvars = [me / 2 for me in problem_params['nvars']]
+        nvars[0] += 1
+
+        rnd_args = {'iteration': 5, 'problem_pos': nvars, 'min_node': 1}
+        args = {'time': 0.3, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
