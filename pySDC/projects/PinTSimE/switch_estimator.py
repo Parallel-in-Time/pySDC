@@ -36,9 +36,6 @@ class SwitchEstimator(ConvergenceController):
             'control_order': 100,
             'tol': description['level_params']['dt'],
             'coll_nodes': coll.nodes,
-            'dt_initial': description['level_params']['dt'],
-            't_switch': None,
-            'switch_detected_step': None,
         }
         return {**defaults, **params}
 
@@ -50,7 +47,7 @@ class SwitchEstimator(ConvergenceController):
             controller (pySDC.Controller): The controller
         """
 
-        self.status = Status(['switch_detected'])
+        self.status = Status(['switch_detected', 't_switch'])
 
     def reset_status_variables(self, controller, **kwargs):
         """
@@ -84,22 +81,22 @@ class SwitchEstimator(ConvergenceController):
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
-                    self.params.t_switch = self.get_switch(t_interp, vC_switch, m_guess)
+                    self.status.t_switch = self.get_switch(t_interp, vC_switch, m_guess)
 
-                    if L.time <= self.params.t_switch <= L.time + L.dt:
-                        dt_switch = self.params.t_switch - L.time
-                        if not np.isclose(self.params.t_switch - L.time, L.dt, atol=self.params.tol):
+                    if L.time <= self.status.t_switch <= L.time + L.dt:
+                        dt_switch = self.status.t_switch - L.time
+                        if not np.isclose(self.status.t_switch - L.time, L.dt, atol=self.params.tol):
                             self.log(
-                                f"Located Switch at time {self.params.t_switch:.6f} is outside the range of tol={self.params.tol:.4e}",
+                                f"Located Switch at time {self.status.t_switch:.6f} is outside the range of tol={self.params.tol:.4e}",
                                 S,
                             )
 
                         else:
                             self.log(
-                                f"Switch located at time {self.params.t_switch:.6f} inside tol={self.params.tol:.4e}", S
+                                f"Switch located at time {self.status.t_switch:.6f} inside tol={self.params.tol:.4e}", S
                             )
 
-                            L.prob.t_switch = self.params.t_switch
+                            L.prob.t_switch = self.status.t_switch
                             controller.hooks[0].add_to_stats(
                                 process=S.status.slot,
                                 time=L.time,
@@ -107,11 +104,10 @@ class SwitchEstimator(ConvergenceController):
                                 iter=0,
                                 sweep=L.status.sweep,
                                 type='switch',
-                                value=self.params.t_switch,
+                                value=self.status.t_switch,
                             )
 
                             L.prob.count_switches()
-                            self.params.switch_detected_step = True
 
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
@@ -161,11 +157,8 @@ class SwitchEstimator(ConvergenceController):
 
         L = S.levels[0]
 
-        if self.params.switch_detected_step:
-            if L.time + L.dt >= self.params.t_switch:
-                L.status.dt_new = L.status.dt_new if L.status.dt_new is not None else self.params.dt_initial
-                self.params.t_switch = None
-                self.params.switch_detected_step = None
+        if self.status.t_switch is None:
+            L.status.dt_new = L.status.dt_new if L.status.dt_new is not None else L.params.dt_initial
 
         super(SwitchEstimator, self).post_step_processing(controller, S)
 
