@@ -56,7 +56,6 @@
 
 
 <span class="k">def</span> <span class="nf">setup_diffusion</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -121,7 +120,6 @@
 
 
 <span class="k">def</span> <span class="nf">setup_advection</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -187,7 +185,6 @@
 
 
 <span class="k">def</span> <span class="nf">setup_auzinger</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -253,7 +250,6 @@
 
     <span class="k">for</span> <span class="n">ndim</span> <span class="ow">in</span> <span class="n">ndim_list</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">nsteps</span> <span class="ow">in</span> <span class="n">nsteps_list</span><span class="p">:</span>
-
             <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;diffusion&#39;</span><span class="p">:</span>
                 <span class="c1"># set time parameters</span>
                 <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -362,7 +358,7 @@
    Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.8821e-13
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.8707e-13
 
-...done, took 0.5575267780000104 seconds!
+...done, took 0.4416071400000874 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -376,7 +372,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 2.1250e-13
    Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 2.1660e-13
 
-...done, took 1.2001050149999628 seconds!
+...done, took 0.9476959539999825 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -390,7 +386,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 7.7716e-16
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 5.5511e-16
 
-...done, took 0.349984854000013 seconds!
+...done, took 0.27215556999999535 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -404,7 +400,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1841e-13
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1808e-13
 
-...done, took 0.9486674830000084 seconds!
+...done, took 0.7453412480001589 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -418,7 +414,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.2503987860000052 seconds!
+...done, took 0.20297810399983973 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -432,7 +428,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.28430655200008914 seconds!
+...done, took 0.23020545099984702 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>

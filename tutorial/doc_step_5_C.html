@@ -115,7 +115,6 @@
     <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_5_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="c1"># loop over different types of implicit sweeper types</span>
     <span class="k">for</span> <span class="n">QI</span> <span class="ow">in</span> <span class="n">QI_list</span><span class="p">:</span>
-
         <span class="c1"># define and set preconditioner for the implicit sweeper</span>
         <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QI</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>

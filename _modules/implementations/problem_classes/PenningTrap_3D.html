@@ -77,16 +77,13 @@
 <div class="viewcode-block" id="penningtrap.fast_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nogil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">fast_interactions</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-
         <span class="n">Efield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
         <span class="n">contrib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-
             <span class="n">contrib</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-
                 <span class="n">dist2</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
                     <span class="o">+</span> <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>

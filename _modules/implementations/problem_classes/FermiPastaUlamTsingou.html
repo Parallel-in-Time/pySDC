@@ -155,7 +155,6 @@
         <span class="n">energy</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">energy_modes</span><span class="p">:</span>
-
             <span class="c1"># Qk = np.sqrt(2.0 / (self.params.npart + 1)) * np.dot(u.pos, np.sin(np.pi * k * self.xvalues))</span>
             <span class="n">Qk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">))</span>
             <span class="c1"># Qkdot = np.sqrt(2.0 / (self.params.npart + 1)) * np.dot(u.vel, np.sin(np.pi * k * self.xvalues))</span>

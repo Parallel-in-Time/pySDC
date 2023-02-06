@@ -117,20 +117,17 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 
     <span class="c1"># loop over all Q-delta matrix types</span>
     <span class="k">for</span> <span class="n">qd_type</span> <span class="ow">in</span> <span class="n">qd_list</span><span class="p">:</span>
-
         <span class="c1"># assign implicit Q-delta matrix</span>
         <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qd_type</span>
 
         <span class="c1"># loop over all setups</span>
         <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
-
             <span class="c1"># initialize problem parameters (part I)</span>
             <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>  <span class="c1"># number of degrees of freedom for each level</span>
 
             <span class="c1"># loop over all parameters</span>
             <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
-
                 <span class="c1"># fill description for the controller</span>
                 <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                 <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
@@ -141,7 +138,6 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 
                 <span class="c1"># decide which setup to take</span>
                 <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
@@ -153,7 +149,6 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
@@ -167,7 +162,6 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
@@ -180,7 +174,6 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
@@ -257,7 +250,6 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 
     <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
     <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
-
         <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
@@ -355,7 +347,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
@@ -391,20 +382,17 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># loop over all Q-delta matrix types</span>
     <span class="k">for</span> <span class="n">qd_type</span> <span class="ow">in</span> <span class="n">qd_list</span><span class="p">:</span>
-
         <span class="c1"># assign implicit Q-delta matrix</span>
         <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qd_type</span>
 
         <span class="c1"># loop over all setups</span>
         <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
-
             <span class="c1"># initialize problem parameters (part I)</span>
             <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>  <span class="c1"># number of degrees of freedom for each level</span>
 
             <span class="c1"># loop over all parameters</span>
             <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
-
                 <span class="c1"># fill description for the controller</span>
                 <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                 <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit_MPI</span>  <span class="c1"># pass sweeper</span>
@@ -416,7 +404,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
                 <span class="c1"># decide which setup to take</span>
                 <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
@@ -428,7 +415,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
@@ -442,7 +428,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
@@ -455,7 +440,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
@@ -533,7 +517,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
     <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
-
         <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
@@ -1020,7 +1003,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
@@ -1056,20 +1038,17 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># loop over all Q-delta matrix types</span>
     <span class="k">for</span> <span class="n">qd_type</span> <span class="ow">in</span> <span class="n">qd_list</span><span class="p">:</span>
-
         <span class="c1"># assign implicit Q-delta matrix</span>
         <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qd_type</span>
 
         <span class="c1"># loop over all setups</span>
         <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
-
             <span class="c1"># initialize problem parameters (part I)</span>
             <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>  <span class="c1"># number of degrees of freedom for each level</span>
 
             <span class="c1"># loop over all parameters</span>
             <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
-
                 <span class="c1"># fill description for the controller</span>
                 <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                 <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit_MPI</span>  <span class="c1"># pass sweeper</span>
@@ -1081,7 +1060,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
                 <span class="c1"># decide which setup to take</span>
                 <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
@@ -1093,7 +1071,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
@@ -1107,7 +1084,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
@@ -1120,7 +1096,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
-
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
@@ -1198,7 +1173,6 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
     <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
-
         <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>

@@ -225,7 +225,6 @@
 
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sweeper_type</span> <span class="o">==</span> <span class="s2">&quot;RK&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
-
                 <span class="c1"># get accumulated local errors from previous steps</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span><span class="p">:</span>

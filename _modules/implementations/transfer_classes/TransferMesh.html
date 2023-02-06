@@ -91,14 +91,12 @@
 
         <span class="c1"># we have a 1d problem</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
-
             <span class="c1"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
             <span class="c1"># assemble restriction as transpose of interpolation</span>
             <span class="k">else</span><span class="p">:</span>
-
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">:</span>
                     <span class="n">fine_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
                     <span class="n">coarse_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -121,11 +119,9 @@
                     <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">:</span>
-
                     <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">restr_factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="o">.</span><span class="n">T</span>
 
                 <span class="k">else</span><span class="p">:</span>
-
                     <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">restr_factor</span>
                         <span class="o">*</span> <span class="n">th</span><span class="o">.</span><span class="n">interpolation_matrix_1d</span><span class="p">(</span>
@@ -139,18 +135,15 @@
 
         <span class="c1"># we have an n-d problem</span>
         <span class="k">else</span><span class="p">:</span>
-
             <span class="n">Rspace</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">Pspace</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)):</span>
-
                 <span class="c1"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">:</span>
                     <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
                     <span class="n">Pspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
                 <span class="c1"># assemble restriction as transpose of interpolation</span>
                 <span class="k">else</span><span class="p">:</span>
-
                     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">:</span>
                         <span class="n">fine_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                             <span class="p">[(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
@@ -179,7 +172,6 @@
                         <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
 
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">:</span>
-
                         <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">restr_factor</span> <span class="o">*</span> <span class="n">Pspace</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
                     <span class="k">else</span><span class="p">:</span>

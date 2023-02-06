@@ -54,7 +54,6 @@
 <span class="c1">#</span>
 <div class="viewcode-block" id="rk_imex"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex">[docs]</a><span class="k">class</span> <span class="nc">rk_imex</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-
         <span class="k">assert</span> <span class="n">order</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;Order must be between 1 and 5&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
 
@@ -91,7 +90,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span> <span class="o">=</span> <span class="mi">4</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">A_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -154,7 +152,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span> <span class="o">=</span> <span class="mi">6</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-
             <span class="c1"># from Kennedy and Carpenter</span>
             <span class="c1"># copied from http://www.mcs.anl.gov/petsc/petsc-3.2/src/ts/impls/arkimex/arkimex.c</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
@@ -254,10 +251,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndof</span><span class="p">))</span>
 
 <div class="viewcode-block" id="rk_imex.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-
         <span class="c1"># Solve for stages</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">):</span>
-
             <span class="c1"># Construct RHS</span>
             <span class="n">rhs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
@@ -397,7 +392,6 @@
 
 <div class="viewcode-block" id="SplitExplicit"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit">[docs]</a><span class="k">class</span> <span class="nc">SplitExplicit</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">pparams</span><span class="p">):</span>
-
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">boussinesq_2d_imex</span><span class="p">),</span> <span class="s2">&quot;problem is wrong type of object&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
@@ -468,14 +462,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">nsmall</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="SplitExplicit.NumSmallTimeSteps"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.NumSmallTimeSteps">[docs]</a>    <span class="k">def</span> <span class="nf">NumSmallTimeSteps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-
         <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pparams</span><span class="p">[</span><span class="s1">&#39;c_s&#39;</span><span class="p">]</span>
         <span class="n">ns</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.9</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">dz</span> <span class="o">*</span> <span class="n">dz</span><span class="p">))</span> <span class="o">/</span> <span class="n">cs</span><span class="p">)</span>
         <span class="n">ns</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">ns</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsMin</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ns</span></div>
 
 <div class="viewcode-block" id="SplitExplicit.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NumSmallTimeSteps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">problem</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt</span><span class="p">)</span>
@@ -504,7 +496,6 @@
         <span class="k">return</span> <span class="n">u0</span></div>
 
 <div class="viewcode-block" id="SplitExplicit.RK3Lin"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.RK3Lin">[docs]</a>    <span class="k">def</span> <span class="nf">RK3Lin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">FSlow</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">dTau</span><span class="p">):</span>
-
         <span class="n">u</span> <span class="o">=</span> <span class="n">u0</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">u0</span> <span class="o">+</span> <span class="n">dTau</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_fast</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="n">FSlow</span><span class="p">)</span>
@@ -529,7 +520,6 @@
 
 <div class="viewcode-block" id="dirk"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk">[docs]</a><span class="k">class</span> <span class="nc">dirk</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">boussinesq_2d_imex</span><span class="p">),</span> <span class="s2">&quot;problem is wrong type of object&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
@@ -632,10 +622,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">))</span>
 
 <div class="viewcode-block" id="dirk.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-
         <span class="n">uend</span> <span class="o">=</span> <span class="n">u0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">):</span>
-
             <span class="n">b</span> <span class="o">=</span> <span class="n">u0</span>
 
             <span class="c1"># Compute right hand side for this stage&#39;s implicit step</span>

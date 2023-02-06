@@ -84,7 +84,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span> <span class="o">=</span> <span class="mi">4</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">A_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -147,7 +146,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span> <span class="o">=</span> <span class="mi">6</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-
             <span class="c1"># from Kennedy and Carpenter</span>
             <span class="c1"># copied from http://www.mcs.anl.gov/petsc/petsc-3.2/src/ts/impls/arkimex/arkimex.c</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
@@ -248,10 +246,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndof</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="rk_imex.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-
         <span class="c1"># Solve for stages</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">):</span>
-
             <span class="c1"># Construct RHS</span>
             <span class="n">rhs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
@@ -327,7 +323,6 @@
 <span class="c1">#</span>
 <div class="viewcode-block" id="dirk"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">[docs]</a><span class="k">class</span> <span class="nc">dirk</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Matrix M must be quadratic&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
@@ -429,10 +424,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="dirk.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-
         <span class="n">uend</span> <span class="o">=</span> <span class="n">u0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">):</span>
-
             <span class="n">b</span> <span class="o">=</span> <span class="n">u0</span>
 
             <span class="c1"># Compute right hand side for this stage&#39;s implicit step</span>

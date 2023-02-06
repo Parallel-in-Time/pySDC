@@ -163,7 +163,6 @@
 
         <span class="c1"># while any process still active...</span>
         <span class="k">while</span> <span class="n">active</span><span class="p">:</span>
-
             <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">pfasst</span><span class="p">(</span><span class="n">comm_active</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">)</span>
 
@@ -540,7 +539,6 @@
             <span class="k">pass</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;fine_only&#39;</span><span class="p">:</span>
-
             <span class="c1"># do a fine sweep only</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
 
@@ -582,13 +580,11 @@
         <span class="c1">#     self.S.levels[0].sweep.update_nodes()</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;pfasst_burnin&#39;</span><span class="p">:</span>
-
             <span class="c1"># restrict to coarsest level</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
 
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">recv_full</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">:</span>
@@ -667,7 +663,6 @@
 
         <span class="c1"># if not ready, keep doing stuff</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
-
             <span class="c1"># increment iteration count here (and only here)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -689,7 +684,6 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_COARSE&#39;</span>  <span class="c1"># serial MSSDC (Gauss-like)</span>
 
         <span class="k">else</span><span class="p">:</span>
-
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span><span class="p">:</span>
                 <span class="c1"># Need to finish all pending isend requests. These will occur for the first active process, since</span>
                 <span class="c1"># in the last iteration the wait statement will not be called (&quot;send and forget&quot;)</span>
@@ -724,7 +718,6 @@
 
         <span class="c1"># do fine sweep</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsweeps</span><span class="p">):</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="c1"># send values forward</span>
@@ -756,11 +749,9 @@
 
         <span class="c1"># sweep and send on middle levels (not on finest, not on coarsest, though)</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-
             <span class="n">nsweeps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nsweeps</span>
 
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsweeps</span><span class="p">):</span>
-
                 <span class="bp">self</span><span class="o">.</span><span class="n">send_full</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">l</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">:</span>
                     <span class="k">return</span> <span class="kc">None</span>
@@ -823,17 +814,14 @@
 
         <span class="c1"># receive and sweep on middle levels (except for coarsest level)</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-
             <span class="c1"># prolong values</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
 
             <span class="c1"># on middle levels: do sweep as usual</span>
             <span class="k">if</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-
                 <span class="n">nsweeps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nsweeps</span>
 
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsweeps</span><span class="p">):</span>
-
                     <span class="bp">self</span><span class="o">.</span><span class="n">send_full</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">:</span>
                         <span class="k">return</span> <span class="kc">None</span>

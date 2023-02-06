@@ -128,18 +128,15 @@
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">direct</span><span class="p">:</span>
-
             <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lam</span> <span class="o">*</span> <span class="n">rhs</span>
             <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">u</span>
 
         <span class="k">else</span><span class="p">:</span>
-
             <span class="c1"># start newton iteration</span>
             <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
             <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
-
                 <span class="c1"># form the function g with g(u) = 0</span>
                 <span class="n">g</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lam</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span>
 

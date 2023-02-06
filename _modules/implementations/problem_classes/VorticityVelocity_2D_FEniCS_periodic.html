@@ -71,7 +71,6 @@
 
         <span class="c1"># Sub domain for Periodic boundary condition</span>
         <span class="k">class</span> <span class="nc">PeriodicBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
-
             <span class="c1"># Left boundary is &quot;target domain&quot; G</span>
             <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
                 <span class="c1"># return True if on left or bottom boundary AND NOT on one of the two corners (0, 1) and (1, 0)</span>

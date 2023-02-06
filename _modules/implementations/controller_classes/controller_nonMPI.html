@@ -107,7 +107,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">nl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nlevels</span><span class="p">):</span>
-
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">nl</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nsweeps</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">nl</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nsweeps</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">nl</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nsweeps</span><span class="p">)</span>
 
@@ -171,7 +170,6 @@
 
         <span class="c1"># main loop: as long as at least one step is still active (time &lt; Tend), do something</span>
         <span class="k">while</span> <span class="nb">any</span><span class="p">(</span><span class="n">active</span><span class="p">):</span>
-
             <span class="n">MS_active</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">active_slots</span><span class="p">]</span>
             <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
@@ -229,7 +227,6 @@
 
         <span class="c1"># loop over active slots (not directly, since we need the previous entry as well)</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">)):</span>
-
             <span class="c1"># get slot number</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">active_slots</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
@@ -380,7 +377,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
             <span class="c1"># first stage: spread values</span>
             <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                 <span class="n">hook</span><span class="o">.</span><span class="n">pre_step</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -413,7 +409,6 @@
             <span class="k">pass</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;fine_only&#39;</span><span class="p">:</span>
-
             <span class="c1"># do a fine sweep only</span>
             <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
@@ -464,17 +459,14 @@
         <span class="c1">#         S.levels[0].sweep.update_nodes()</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;pfasst_burnin&#39;</span><span class="p">:</span>
-
             <span class="c1"># loop over all steps</span>
             <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
                 <span class="c1"># restrict to coarsest level</span>
                 <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
                     <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
 
             <span class="c1"># loop over all steps</span>
             <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)):</span>
-
                 <span class="c1"># loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]</span>
                 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)):</span>
                     <span class="n">S</span> <span class="o">=</span> <span class="n">local_MS_running</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
@@ -493,7 +485,6 @@
 
             <span class="c1"># loop over all steps</span>
             <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
                 <span class="c1"># interpolate back to finest level</span>
                 <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
                     <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
@@ -531,7 +522,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
             <span class="c1"># send updated values forward</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_full</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="c1"># receive values</span>
@@ -540,7 +530,6 @@
             <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
             <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                     <span class="n">hook</span><span class="o">.</span><span class="n">post_iteration</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -602,7 +591,6 @@
             <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-
             <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -637,13 +625,10 @@
             <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-
             <span class="c1"># sweep on middle levels (not on finest, not on coarsest, though)</span>
 
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span><span class="p">[</span><span class="n">l</span><span class="p">]):</span>
-
                 <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
                     <span class="c1"># send updated values forward</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">send_full</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">l</span><span class="p">)</span>
                     <span class="c1"># receive values</span>
@@ -674,7 +659,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
             <span class="c1"># receive from previous step (if not first)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">recv_full</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -704,18 +688,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-
             <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
                 <span class="c1"># prolong values</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
 
             <span class="c1"># on middle levels: do communication and sweep as usual</span>
             <span class="k">if</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]):</span>
-
                     <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
                         <span class="c1"># send updated values forward</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">send_full</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                         <span class="c1"># receive values</span>

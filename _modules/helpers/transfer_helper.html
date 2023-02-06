@@ -195,17 +195,13 @@
     <span class="n">n_f</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">size</span>
 
     <span class="k">if</span> <span class="n">periodic</span><span class="p">:</span>
-
         <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">fine_grid</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">equidist_nested</span><span class="p">:</span>
-
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_f</span><span class="p">),</span> <span class="n">fine_grid</span><span class="p">):</span>
-
                 <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
                 <span class="k">else</span><span class="p">:</span>
-
                     <span class="n">nn</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">cpos</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
                     <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
@@ -233,7 +229,6 @@
                         <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
         <span class="k">else</span><span class="p">:</span>
-
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_f</span><span class="p">),</span> <span class="n">fine_grid</span><span class="p">):</span>
                 <span class="n">nn</span> <span class="o">=</span> <span class="n">next_neighbors_periodic</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
                 <span class="n">circulating_one</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
@@ -249,14 +244,11 @@
                     <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
     <span class="k">else</span><span class="p">:</span>
-
         <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">fine_grid</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span><span class="p">))</span>
         <span class="n">padded_c_grid</span> <span class="o">=</span> <span class="n">border_padding</span><span class="p">(</span><span class="n">coarse_grid</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">equidist_nested</span><span class="p">:</span>
-
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_f</span><span class="p">),</span> <span class="n">fine_grid</span><span class="p">):</span>
-
                 <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -279,7 +271,6 @@
                         <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">bary_pol</span><span class="p">)))</span>
 
         <span class="k">else</span><span class="p">:</span>
-
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_f</span><span class="p">),</span> <span class="n">fine_grid</span><span class="p">):</span>
                 <span class="n">nn</span> <span class="o">=</span> <span class="n">next_neighbors</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">padded_c_grid</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
                 <span class="c1"># construct the lagrange polynomials for the k neighbors</span>
