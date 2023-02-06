@@ -5,7 +5,6 @@ import pySDC.helpers.plot_helper as plt_helper
 
 
 def joint_plots(list_of_result_paths):
-
     # get result data from JUBE tables
     results = []
     for result_path in list_of_result_paths:

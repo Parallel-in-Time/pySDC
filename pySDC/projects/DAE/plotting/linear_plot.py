@@ -2,6 +2,7 @@ import pySDC.helpers.plot_helper as plt_helper
 import numpy as np
 import pickle
 
+
 # pragma: no cover
 def linear_plot():
     '''Loads solution data from an .npy file and plots specified parameters with respect to each other on a linear axis'''

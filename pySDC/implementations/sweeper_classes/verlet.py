@@ -64,7 +64,6 @@ class verlet(sweeper):
         # if we have Gauss-Lobatto nodes, we can do a magic trick from the Book
         # this takes Gauss-Lobatto IIIB and create IIIA out of this
         if self.coll.node_type == 'LEGENDRE' and self.coll.quad_type == 'LOBATTO':
-
             for m in range(self.coll.num_nodes):
                 for n in range(self.coll.num_nodes):
                     QQ[m + 1, n + 1] = self.coll.weights[n] * (
@@ -74,7 +73,6 @@ class verlet(sweeper):
 
         # if we do not have Gauss-Lobatto, just multiply Q (will not get a symplectic method, they say)
         else:
-
             QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
 
         return [QT, Qx, QQ]
@@ -101,7 +99,6 @@ class verlet(sweeper):
         # get QF(u^k)
         integral = self.integrate()
         for m in range(M):
-
             # get -QdF(u^k)_m
             for j in range(1, M + 1):
                 integral[m].pos -= L.dt * (L.dt * self.Qx[m + 1, j] * L.f[j])

@@ -70,7 +70,6 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
             return S
 
         elif stage == 'PREDICT_SWEEP':
-
             # do a (serial) sweep on coarsest level
 
             # receive new values from previous step (if not first step)
@@ -148,7 +147,6 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
             return S
 
         elif stage == 'IT_CHECK':
-
             # check whether to stop iterating
 
             self.hooks.post_iteration(step=S, level_number=0)
@@ -204,7 +202,6 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
             return S
 
         elif stage == 'IT_COARSE_RECV':
-
             # receive on coarsest level
 
             # rather complex logic here...
@@ -266,7 +263,6 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
 
             # receive and sweep on middle levels (except for coarsest level)
             for l in range(len(S.levels) - 1, 0, -1):
-
                 # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
                 if not S.status.first and not S.prev.status.done:
                     if S.prev.levels[l - 1].tag:
@@ -291,7 +287,6 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
             return S
 
         else:
-
             # fixme: use meaningful error object here
             print('Something is wrong here, you should have hit one case statement!')
             exit()

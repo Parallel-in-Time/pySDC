@@ -86,7 +86,6 @@ class auzinger(ptype):
         # start newton iteration
         n = 0
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = np.array(
                 [

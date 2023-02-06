@@ -67,7 +67,6 @@ class controller_nonMPI(controller):
 
         self.nsweeps = []
         for nl in range(self.nlevels):
-
             if all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
                 self.nsweeps.append(self.MS[0].levels[nl].params.nsweeps)
 
@@ -131,7 +130,6 @@ class controller_nonMPI(controller):
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
-
             MS_active = [self.MS[p] for p in active_slots]
             done = False
             while not done:
@@ -189,7 +187,6 @@ class controller_nonMPI(controller):
 
         # loop over active slots (not directly, since we need the previous entry as well)
         for j in range(len(active_slots)):
-
             # get slot number
             p = active_slots[j]
 
@@ -340,7 +337,6 @@ class controller_nonMPI(controller):
         """
 
         for S in local_MS_running:
-
             # first stage: spread values
             for hook in self.hooks:
                 hook.pre_step(step=S, level_number=0)
@@ -373,7 +369,6 @@ class controller_nonMPI(controller):
             pass
 
         elif self.params.predict_type == 'fine_only':
-
             # do a fine sweep only
             for S in local_MS_running:
                 S.levels[0].sweep.update_nodes()
@@ -424,17 +419,14 @@ class controller_nonMPI(controller):
         #         S.levels[0].sweep.update_nodes()
 
         elif self.params.predict_type == 'pfasst_burnin':
-
             # loop over all steps
             for S in local_MS_running:
-
                 # restrict to coarsest level
                 for l in range(1, len(S.levels)):
                     S.transfer(source=S.levels[l - 1], target=S.levels[l])
 
             # loop over all steps
             for q in range(len(local_MS_running)):
-
                 # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
                 for p in range(q, len(local_MS_running)):
                     S = local_MS_running[p]
@@ -453,7 +445,6 @@ class controller_nonMPI(controller):
 
             # loop over all steps
             for S in local_MS_running:
-
                 # interpolate back to finest level
                 for l in range(len(S.levels) - 1, 0, -1):
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
@@ -491,7 +482,6 @@ class controller_nonMPI(controller):
         """
 
         for S in local_MS_running:
-
             # send updated values forward
             self.send_full(S, level=0)
             # receive values
@@ -500,7 +490,6 @@ class controller_nonMPI(controller):
             S.levels[0].sweep.compute_residual()
 
         for S in local_MS_running:
-
             if S.status.iter > 0:
                 for hook in self.hooks:
                     hook.post_iteration(step=S, level_number=0)
@@ -562,7 +551,6 @@ class controller_nonMPI(controller):
             S.levels[0].status.sweep = 0
 
         for k in range(self.nsweeps[0]):
-
             for S in local_MS_running:
                 S.levels[0].status.sweep += 1
 
@@ -597,13 +585,10 @@ class controller_nonMPI(controller):
             S.transfer(source=S.levels[0], target=S.levels[1])
 
         for l in range(1, self.nlevels - 1):
-
             # sweep on middle levels (not on finest, not on coarsest, though)
 
             for _ in range(self.nsweeps[l]):
-
                 for S in local_MS_running:
-
                     # send updated values forward
                     self.send_full(S, level=l)
                     # receive values
@@ -634,7 +619,6 @@ class controller_nonMPI(controller):
         """
 
         for S in local_MS_running:
-
             # receive from previous step (if not first)
             self.recv_full(S, level=len(S.levels) - 1)
 
@@ -664,18 +648,14 @@ class controller_nonMPI(controller):
         """
 
         for l in range(self.nlevels - 1, 0, -1):
-
             for S in local_MS_running:
                 # prolong values
                 S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
             # on middle levels: do communication and sweep as usual
             if l - 1 > 0:
-
                 for k in range(self.nsweeps[l - 1]):
-
                     for S in local_MS_running:
-
                         # send updated values forward
                         self.send_full(S, level=l - 1)
                         # receive values

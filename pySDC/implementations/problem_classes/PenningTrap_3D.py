@@ -37,16 +37,13 @@ class penningtrap(ptype):
     @staticmethod
     @jit(nopython=True, nogil=True)
     def fast_interactions(N, pos, sig, q):
-
         Efield = np.zeros((3, N))
         contrib = np.zeros(3)
 
         for i in range(N):
-
             contrib[:] = 0
 
             for j in range(N):
-
                 dist2 = (
                     (pos[0, i] - pos[0, j]) ** 2
                     + (pos[1, i] - pos[1, j]) ** 2

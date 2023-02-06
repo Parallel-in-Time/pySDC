@@ -31,7 +31,6 @@ class fenics_vortex_2d(ptype):
 
         # Sub domain for Periodic boundary condition
         class PeriodicBoundary(df.SubDomain):
-
             # Left boundary is "target domain" G
             def inside(self, x, on_boundary):
                 # return True if on left or bottom boundary AND NOT on one of the two corners (0, 1) and (1, 0)

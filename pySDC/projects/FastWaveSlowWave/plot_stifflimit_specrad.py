@@ -54,7 +54,6 @@ def compute_specrad():
     norm = np.zeros((3, np.size(nodes_v)))
 
     for i in range(0, np.size(nodes_v)):
-
         sweeper_params['num_nodes'] = nodes_v[i]
         description['sweeper_params'] = sweeper_params  # pass sweeper parameters
 

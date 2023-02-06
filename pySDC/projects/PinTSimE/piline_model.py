@@ -17,7 +17,6 @@ from pySDC.core.Hooks import hooks
 
 class log_data(hooks):
     def post_step(self, step, level_number):
-
         super(log_data, self).post_step(step, level_number)
 
         # some abbreviations

@@ -249,7 +249,6 @@ def run_faulty_simulations(type=None, niters=None, cwd=''):
 
 
 def process_statistics(type=None, cwd=''):
-
     results = dill.load(open(cwd + "data/results_" + type + ".pkl", "rb"))
 
     # get minimal length of residual vector
@@ -377,7 +376,6 @@ def process_statistics(type=None, cwd=''):
 
 
 def main():
-
     # type = 'diffusion'
     # niters = run_clean_simulations(type=type)
     # run_faulty_simulations(type=type, niters=niters)

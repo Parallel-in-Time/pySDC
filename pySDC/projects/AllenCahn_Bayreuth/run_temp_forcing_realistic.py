@@ -101,7 +101,6 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     if space_rank == 0:
-
         print()
 
         # convert filtered statistics of iterations count, sorted by time
@@ -136,7 +135,6 @@ def main(nprocs_space=None):
 
 
 if __name__ == "__main__":
-
     # Add parser to get number of processors in space (have to do this here to enable automatic testing)
     parser = ArgumentParser()
     parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)

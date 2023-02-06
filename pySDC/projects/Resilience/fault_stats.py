@@ -466,7 +466,6 @@ class FaultStats:
 
         for i in range(step, max_runs + step, step):
             for j in range(len(self.strategies)):
-
                 if j % MPI.COMM_WORLD.size != MPI.COMM_WORLD.rank:
                     continue
 
@@ -538,7 +537,6 @@ class FaultStats:
 
         # perform the remaining experiments
         for i in range(already_completed['runs'], runs):
-
             # perform a single experiment with the correct random seed
             stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults)
 

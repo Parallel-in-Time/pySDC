@@ -131,7 +131,6 @@ class implicit_sweeper_faults(generic_implicit):
 
         # do bitflip in u
         if type == 'u':
-
             # do something to target = u here!
             # do a bitflip at random vector entry of u at random position in bit representation
             ulen = len(target)
@@ -145,7 +144,6 @@ class implicit_sweeper_faults(generic_implicit):
 
         # do bitflip in f
         elif type == 'f':
-
             # do something to target = f here!
             # do a bitflip at random vector entry of f at random position in bit representation
             flen = len(target)
@@ -158,7 +156,6 @@ class implicit_sweeper_faults(generic_implicit):
             self.fault_stats.nfaults_injected_f += 1
 
         else:
-
             tmp = None
             print('ERROR: wrong fault type specified, got %s' % type)
             exit()
@@ -250,7 +247,6 @@ class implicit_sweeper_faults(generic_implicit):
         # get QF(u^k)
         integral = self.integrate()
         for m in range(M):
-
             # get -QdF(u^k)_m
             for j in range(M + 1):
                 integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
@@ -266,7 +262,6 @@ class implicit_sweeper_faults(generic_implicit):
         # do the sweep
         m = 0
         while m < M:
-
             # see if there will be a fault
             self.fault_injected = False
             fault_at_u = False
@@ -284,7 +279,6 @@ class implicit_sweeper_faults(generic_implicit):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             if fault_at_u:
-
                 # implicit solve with prefactor stemming from the diagonal of Qd
                 L.u[m + 1] = P.solve_system(
                     rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
@@ -297,7 +291,6 @@ class implicit_sweeper_faults(generic_implicit):
                 L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
             elif fault_at_f:
-
                 # implicit solve with prefactor stemming from the diagonal of Qd
                 L.u[m + 1] = P.solve_system(
                     rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
@@ -310,7 +303,6 @@ class implicit_sweeper_faults(generic_implicit):
                 self.inject_fault(type='f', target=L.f[m + 1])
 
             else:
-
                 # implicit solve with prefactor stemming from the diagonal of Qd
                 L.u[m + 1] = P.solve_system(
                     rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]

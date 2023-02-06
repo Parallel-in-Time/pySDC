@@ -56,7 +56,6 @@ class harmonic_oscillator(ptype):
         return me
 
     def u_init(self):
-
         u0 = self.params.u0
 
         u = self.dtype_u(self.init)

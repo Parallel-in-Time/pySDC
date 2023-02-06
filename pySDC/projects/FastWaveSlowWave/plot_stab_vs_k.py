@@ -64,7 +64,6 @@ def compute_stab_vs_k(slow_resolved):
     description['step_params'] = dict()  # pass step parameters
 
     for i in range(0, np.size(mvals)):
-
         sweeper_params['num_nodes'] = mvals[i]
         description['sweeper_params'] = sweeper_params  # pass sweeper parameters
 

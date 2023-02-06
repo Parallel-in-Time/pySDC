@@ -19,7 +19,6 @@ from pySDC.implementations.convergence_controller_classes.adaptivity import Adap
 
 class log_data(hooks):
     def post_step(self, step, level_number):
-
         super(log_data, self).post_step(step, level_number)
 
         # some abbreviations

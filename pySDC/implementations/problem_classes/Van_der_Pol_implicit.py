@@ -108,7 +108,6 @@ class vanderpol(ptype):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = np.array([x1 - dt * x2 - rhs[0], x2 - dt * (mu * (1 - x1**2) * x2 - x1) - rhs[1]])
 

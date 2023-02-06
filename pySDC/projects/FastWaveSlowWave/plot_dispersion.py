@@ -93,7 +93,6 @@ def compute_and_plot_dispersion(Nsamples=15, K=3):
     amp_factor = np.zeros((3, Nsamples))
 
     for i in range(0, np.size(k_vec)):
-
         Cs = -1j * k_vec[i] * np.array([[0.0, c_speed], [c_speed, 0.0]], dtype='complex')
         Uadv = -1j * k_vec[i] * np.array([[U_speed, 0.0], [0.0, U_speed]], dtype='complex')
 

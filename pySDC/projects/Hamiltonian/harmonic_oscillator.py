@@ -73,13 +73,11 @@ def run_simulation():
     results['ks'] = ks
 
     for qd in qd_combinations:
-
         print('Working on combination (%s, %s)...' % qd)
 
         niters = np.zeros(len(ks))
 
         for i, k in enumerate(ks):
-
             problem_params['k'] = k
             description['problem_params'] = problem_params
 
@@ -140,9 +138,7 @@ def show_results(cwd=''):
     ks = results['ks']
 
     for qd in results:
-
         if qd != 'ks':
-
             plt_helper.plt.plot(ks, results[qd], label=qd)
 
     plt_helper.plt.xlabel('k')

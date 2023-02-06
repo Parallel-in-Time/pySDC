@@ -4,6 +4,7 @@ import pickle
 
 import pySDC.helpers.plot_helper as plt_helper
 
+
 # pragma: no cover
 def plot_convergence():
     '''
@@ -31,7 +32,6 @@ def plot_convergence():
         lns2 = list()
 
         for num_nodes, color, shape in zip(num_nodes_list, color_list, shape_list):
-
             # Plot convergence data
             lns1.append(
                 ax1.semilogy(
@@ -72,5 +72,4 @@ def plot_convergence():
 
 
 if __name__ == "__main__":
-
     plot_convergence()

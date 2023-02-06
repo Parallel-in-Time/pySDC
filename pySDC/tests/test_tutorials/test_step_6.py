@@ -25,7 +25,6 @@ def test_C():
     flat_installed_packages = [package.project_name for package in installed_packages]
 
     if "mpi4py" in flat_installed_packages:
-
         cwd = 'pySDC/tutorial/step_6'
         main_C(cwd)
 

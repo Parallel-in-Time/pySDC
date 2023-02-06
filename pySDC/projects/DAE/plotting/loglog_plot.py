@@ -5,6 +5,7 @@ import pickle
 
 import pySDC.helpers.plot_helper as plt_helper
 
+
 # pragma: no cover
 def plot_convergence():
     '''
@@ -64,7 +65,6 @@ def plot_convergence():
         for num_nodes, color, shape, style, order in zip(
             num_nodes_list, color_list, shape_list, style_list, order_list
         ):
-
             # Plot convergence data
             if num_nodes == 4:
                 data_start_point = 3
@@ -133,5 +133,4 @@ def plot_convergence():
 
 
 if __name__ == "__main__":
-
     plot_convergence()

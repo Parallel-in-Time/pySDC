@@ -123,7 +123,6 @@ class controller_MPI(controller):
 
         # while any process still active...
         while active:
-
             while not self.S.status.done:
                 self.pfasst(comm_active, num_procs)
 
@@ -500,7 +499,6 @@ class controller_MPI(controller):
             pass
 
         elif self.params.predict_type == 'fine_only':
-
             # do a fine sweep only
             self.S.levels[0].sweep.update_nodes()
 
@@ -542,13 +540,11 @@ class controller_MPI(controller):
         #     self.S.levels[0].sweep.update_nodes()
 
         elif self.params.predict_type == 'pfasst_burnin':
-
             # restrict to coarsest level
             for l in range(1, len(self.S.levels)):
                 self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
 
             for p in range(self.S.status.slot + 1):
-
                 if not p == 0:
                     self.recv_full(comm=comm, level=len(self.S.levels) - 1)
                     if self.S.status.force_done:
@@ -627,7 +623,6 @@ class controller_MPI(controller):
 
         # if not ready, keep doing stuff
         if not self.S.status.done:
-
             # increment iteration count here (and only here)
             self.S.status.iter += 1
 
@@ -649,7 +644,6 @@ class controller_MPI(controller):
                     self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
 
         else:
-
             if not self.params.use_iteration_estimator:
                 # Need to finish all pending isend requests. These will occur for the first active process, since
                 # in the last iteration the wait statement will not be called ("send and forget")
@@ -684,7 +678,6 @@ class controller_MPI(controller):
 
         # do fine sweep
         for k in range(nsweeps):
-
             self.S.levels[0].status.sweep += 1
 
             # send values forward
@@ -716,11 +709,9 @@ class controller_MPI(controller):
 
         # sweep and send on middle levels (not on finest, not on coarsest, though)
         for l in range(1, len(self.S.levels) - 1):
-
             nsweeps = self.S.levels[l].params.nsweeps
 
             for _ in range(nsweeps):
-
                 self.send_full(comm=comm, level=l)
                 if self.S.status.force_done:
                     return None
@@ -783,17 +774,14 @@ class controller_MPI(controller):
 
         # receive and sweep on middle levels (except for coarsest level)
         for l in range(len(self.S.levels) - 1, 0, -1):
-
             # prolong values
             self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
 
             # on middle levels: do sweep as usual
             if l - 1 > 0:
-
                 nsweeps = self.S.levels[l - 1].params.nsweeps
 
                 for k in range(nsweeps):
-
                     self.send_full(comm, level=l - 1)
                     if self.S.status.force_done:
                         return None

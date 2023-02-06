@@ -94,7 +94,6 @@ class LorenzAttractor(ptype):
         u = self.dtype_u(u0)
         res = np.inf
         for _n in range(0, self.params.newton_maxiter):
-
             # assemble G such that G(u) = 0 at the solution to the step
             G = np.array(
                 [

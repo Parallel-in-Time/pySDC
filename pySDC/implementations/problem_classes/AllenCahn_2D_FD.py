@@ -128,7 +128,6 @@ class allencahn_fullyimplicit(ptype):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u**nu)) - rhs.flatten()
 
@@ -337,7 +336,6 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
 
@@ -472,7 +470,6 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = u - factor * (1.0 / eps2 * u * (1.0 - u**nu)) - rhs.flatten()
 
@@ -566,7 +563,6 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
 
