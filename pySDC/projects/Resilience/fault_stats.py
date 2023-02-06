@@ -462,17 +462,19 @@ class FaultStats:
             }
         return custom_params
 
-    def run_stats_generation(self, runs=1000, step=None):
+    def run_stats_generation(self, runs=1000, step=None, comm=None):
         '''
         Run the generation of stats for all strategies in the `self.strategies` variable
 
         Args:
             runs (int): Number of runs you want to do
             step (int): Number of runs you want to do between saving
+            comm = kwargs.get('comm', MPI.COMM_WORLD)
 
         Returns:
             None
         '''
+        comm = MPI.COMM_WORLD if comm is None else comm
         step = runs if step is None else step
         reload = False
 
@@ -482,10 +484,10 @@ class FaultStats:
         for j in range(len(self.strategies)):
             space_comm = space_comm.Split(j % MPI.COMM_WORLD.size == MPI.COMM_WORLD.rank)
 
+        strategy_comm = comm.Split(comm.rank % len(self.strategies))
+
         for i in range(step, max_runs + step, step):
             for j in range(len(self.strategies)):
-                if j % MPI.COMM_WORLD.size != MPI.COMM_WORLD.rank:
-                    continue
 
                 for f in self.faults:
                     if f:
@@ -497,14 +499,13 @@ class FaultStats:
                         runs=runs_partial,
                         faults=f,
                         reload=self.reload or reload,
-                        space_comm=space_comm,
+                        comm=strategy_comm,
                     )
-                self.get_recovered(self.strategies[j])
             reload = True
 
         return None
 
-    def generate_stats(self, strategy=None, runs=1000, reload=True, faults=True, space_comm=None):
+    def generate_stats(self, strategy=None, runs=1000, reload=True, faults=True, comm=None):
         '''
         Generate statistics for recovery from bit flips
         -----------------------------------------------
@@ -516,11 +517,12 @@ class FaultStats:
             runs (int): Number of runs you want to do
             reload (bool): Load previously computed statistics and continue from there or start from scratch
             faults (bool): Whether to do stats with faults or without
-            space_comm (MPI.Communicator): A communicator for space parallelisation
+            comm (MPI.Communicator): Communicator for distributing runs
 
         Returns:
             None
         '''
+        comm = MPI.COMM_WORLD if comm is None else comm
 
         # initialize dictionary to store the stats in
         dat = {
@@ -537,8 +539,13 @@ class FaultStats:
 
         # reload previously recorded stats and write them to dat
         if reload:
-            already_completed = self.load(strategy, faults)
-            if already_completed['runs'] > 0 and already_completed['runs'] <= runs:
+            already_completed_ = None
+            if comm.rank == 0:
+                already_completed_ = self.load(strategy, faults)
+            already_completed = comm.bcast(already_completed_, root=0)
+            # print(already_completed, comm.rank)
+            # already_completed = comm.bcast(self.load(strategy, faults), root=0)
+            if already_completed['runs'] > 0 and already_completed['runs'] <= runs and comm.rank == 0:
                 for k in dat.keys():
                     dat[k][: min([already_completed['runs'], runs])] = already_completed.get(k, [])
         else:
@@ -558,10 +565,16 @@ class FaultStats:
                 )
                 sys.stdout.flush()
 
+        space_comm = comm.Split(comm.rank)
+
         # perform the remaining experiments
         for i in range(already_completed['runs'], runs):
+            if i % comm.size != comm.rank:
+                continue
+
             # perform a single experiment with the correct random seed
             stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults, space_comm=space_comm)
+            print('hey', comm.rank)
 
             # get the data from the stats
             faults_run = get_sorted(stats, type='bitflip')
@@ -587,13 +600,18 @@ class FaultStats:
             dat['total_iteration'][i] = total_iteration
             dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restarts')])
 
-        # store the completed stats
-        dat['runs'] = runs
-        if already_completed['runs'] < runs:
-            self.store(strategy, faults, dat)
+        dat_full = {}
+        for k in dat.keys():
+            dat_full[k] = comm.reduce(dat[k], op=MPI.SUM)
 
-        if faults:
-            self.get_recovered(strategy)
+        # store the completed stats
+        dat_full['runs'] = runs
+
+        if already_completed['runs'] < runs:
+            if comm.rank == 0:
+                self.store(strategy, faults, dat_full)
+                if self.faults:
+                    self.get_recovered(strategy)
 
         return None
 
@@ -1642,7 +1660,7 @@ def main():
         mode='random',
     )
 
-    stats_analyser.run_stats_generation(runs=200, step=10)
+    stats_analyser.run_stats_generation(runs=5000, step=50)
     mask = None
 
     stats_analyser.compare_strategies()
@@ -1672,6 +1690,7 @@ def main():
             name='fixable_recovery',
             ax=ax,
         )
+    fig.tight_layout()
     fig.savefig(f'data/{stats_analyser.get_name()}-recoverable.pdf', transparent=True)
 
     stats_analyser.plot_things_per_things(
