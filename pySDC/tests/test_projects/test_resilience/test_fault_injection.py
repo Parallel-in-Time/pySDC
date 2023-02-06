@@ -2,6 +2,17 @@ import pytest
 import os
 import sys
 import subprocess
+import numpy as np
+
+
+def get_random_float():
+    """
+    Get a random float64 number in the full range.
+
+    Returns:
+        float: Random float
+    """
+    return np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
 
 
 @pytest.mark.base
@@ -10,7 +21,6 @@ def test_float_conversion():
     Method to test the float conversion by converting to bytes and back and by flipping bits where we know what the
     impact is. We try with 1000 random numbers, so we don't know how many times we get nan beforehand.
     '''
-    import numpy as np
     from pySDC.projects.Resilience.fault_injection import FaultInjector
 
     # Try the conversion between floats and bytes
@@ -21,7 +31,7 @@ def test_float_conversion():
     num_tests = int(1e3)
     for i in range(num_tests):
         # generate a random number almost between the full range of python float
-        rand = np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
+        rand = get_random_float()
         # convert to bytes and back
         res = injector.to_float(injector.to_binary(rand))
         assert np.isclose(res, rand), f"Conversion between bytes and float failed for {rand}: result: {res}"
@@ -39,6 +49,25 @@ def test_float_conversion():
                 nan_counter += 1
     if nan_counter > 0:
         print(f'When flipping bits, we got nan {nan_counter} times out of {num_tests} tests')
+
+
+@pytest.mark.base
+def test_complex_conversion():
+    """
+    Test conversion of complex numbers to and from binary
+    """
+    from pySDC.projects.Resilience.fault_injection import FaultInjector
+
+    injector = FaultInjector()
+    num_tests = int(1e3)
+    for i in range(num_tests):
+        rand_complex = get_random_float() + get_random_float() * 1j
+
+        # convert to bytes and back
+        res = injector.to_float(injector.to_binary(rand_complex))
+        assert np.isclose(
+            res, rand_complex
+        ), f"Conversion between bytes and float failed for {rand_complex}: result: {res}"
 
 
 @pytest.mark.base
@@ -192,7 +221,6 @@ def generate_stats(load=False):
         run_vdp,
     )
     import matplotlib.pyplot as plt
-    import numpy as np
 
     np.seterr(all='warn')  # get consistent behaviour across platforms
 
@@ -214,6 +242,7 @@ if __name__ == "__main__":
     if '--test-fault-stats' in sys.argv:
         generate_stats()
     else:
+        test_complex_conversion()
         test_fault_stats()
         test_fault_injection()
         test_float_conversion()

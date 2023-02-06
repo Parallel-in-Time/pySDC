@@ -384,7 +384,8 @@ class FaultInjector(hooks):
         '''
         Converts a single float in a string containing its binary representation in memory following IEEE754
         The struct.pack function returns the input with the applied conversion code in 8 bit blocks, which are then
-        concatenated as a string
+        concatenated as a string. Complex numbers will be returned as two consecutive floats with an underscore in
+        between.
 
         Args:
             f (float, np.float64, np.float32): number to be converted to binary representation
@@ -396,6 +397,8 @@ class FaultInjector(hooks):
             conversion_code = '>d'  # big endian, double
         elif type(f) in [np.float32]:
             conversion_code = '>f'  # big endian, float
+        elif type(f) in [np.complex128]:
+            return f'{self.to_binary(f.real)}_{self.to_binary(f.imag)}'
         else:
             raise NotImplementedError(f'Don\'t know how to convert number of type {type(f)} to binary')
 
@@ -404,7 +407,7 @@ class FaultInjector(hooks):
     def to_float(self, s):
         '''
         Converts a string of a IEEE754 binary representation in a float. The string is converted to integer with base 2
-        and converted to bytes, which can be unpacked into a Python float by the struct module
+        and converted to bytes, which can be unpacked into a Python float by the struct module.
 
         Args:
             s (str): binary representation of a float number of 32 or 64 bit length following IEEE754
@@ -418,6 +421,11 @@ class FaultInjector(hooks):
         elif len(s) == 32:
             conversion_code = '>f'  # big endian, float
             byte_count = 4
+        elif len(s) == 129:  # complex floats
+            real = s[0:64]
+            imag = s[65:129]
+            return self.to_float(real) + self.to_float(imag) * 1j
+
         else:
             raise NotImplementedError(f'Don\'t know how to convert string of length {len(s)} to float')
 
