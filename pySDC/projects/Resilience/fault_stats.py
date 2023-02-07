@@ -462,7 +462,7 @@ class FaultStats:
             }
         return custom_params
 
-    def run_stats_generation(self, runs=1000, step=None, comm=None):
+    def run_stats_generation(self, runs=1000, step=None, comm=None, _reload=False, _runs_partial=0):
         '''
         Run the generation of stats for all strategies in the `self.strategies` variable
 
@@ -470,34 +470,47 @@ class FaultStats:
             runs (int): Number of runs you want to do
             step (int): Number of runs you want to do between saving
             comm (MPI.Communicator): Communicator for distributing runs
+            _reload, _runs_partial: Variables only used for recursion. Do not change!
 
         Returns:
             None
         '''
         comm = MPI.COMM_WORLD if comm is None else comm
-        step = runs if step is None else step
-        reload = False
+        step = (runs if step is None else step) if comm.size == 1 else comm.size
 
         max_runs = self.get_max_combinations() if self.mode == 'combination' else runs
 
-        space_comm = MPI.COMM_WORLD.Split(True)
-        for j in range(len(self.strategies)):
-            space_comm = space_comm.Split(j % MPI.COMM_WORLD.size == MPI.COMM_WORLD.rank)
+        if self.reload:
+            # sort the strategies to do some load balancing
+            sorting_index = None
+            if comm.rank == 0:
+                already_completed = np.array([self.load(strategy, True).get('runs', 0) for strategy in self.strategies])
+                sorting_index_ = np.argsort(already_completed)
+                sorting_index = sorting_index_[already_completed[sorting_index_] < runs]
 
-        strategy_comm = comm.Split(comm.rank % len(self.strategies))
+            # tell all ranks what strategies to use
+            sorting_index = comm.bcast(sorting_index, root=0)
+            strategies = [self.strategies[i] for i in sorting_index]
+            if len(strategies) == 0:  # check if we are already done
+                return None
 
-        for i in range(step, max_runs + step, step):
-            for j in range(0, len(self.strategies), comm.size):
+        strategy_comm = comm.Split(comm.rank % len(strategies))
 
-                for f in self.faults:
-                    if f:
-                        runs_partial = min(i, max_runs)
-                    else:
-                        runs_partial = min([5, i])
-                    self.generate_stats(
-                        strategy=self.strategies[j + comm.rank % len(self.strategies)], runs=runs_partial, faults=f, reload=self.reload or reload, comm=strategy_comm
-                    )
-            reload = True
+        for j in range(0, len(strategies), comm.size):
+
+            for f in self.faults:
+                if f:
+                    runs_partial = min(_runs_partial, max_runs)
+                else:
+                    runs_partial = min([5, _runs_partial])
+                self.generate_stats(
+                    strategy=strategies[j + comm.rank % len(strategies)],
+                    runs=runs_partial,
+                    faults=f,
+                    reload=self.reload or _reload,
+                    comm=strategy_comm,
+                )
+        self.run_stats_generation(runs=runs, step=step, comm=comm, _reload=True, _runs_partial=_runs_partial + step)
 
         return None
 
@@ -1653,7 +1666,7 @@ def main():
         mode='random',
     )
 
-    stats_analyser.run_stats_generation(runs=450, step=25)
+    stats_analyser.run_stats_generation(runs=1000)
     mask = None
 
     stats_analyser.compare_strategies()
