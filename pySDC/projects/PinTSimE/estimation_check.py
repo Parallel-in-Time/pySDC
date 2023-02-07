@@ -298,39 +298,25 @@ def differences_around_switch(
         times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
 
         diffs_true_at.append(
-            [diff_SE[m] for m in range(len(times_SE)) if np.isclose(times_SE[m], t_switch, atol=1e-15)]
+            [diff_SE[m] for m in range(len(times_SE)) if np.isclose(times_SE[m], t_switch, atol=1e-15)][0]
         )
 
-        diffs_false_before.append([diff[m - 1] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]])
-        diffs_false_after.append([diff[m] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]])
+        diffs_false_before.append(
+            [diff[m - 1] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]][0]
+        )
+        diffs_false_after.append([diff[m] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]][0])
 
-        diffs_true_at_adapt.append(
-            [
-                diff_SE_adapt[m]
-                for m in range(len(times_SE_adapt))
-                if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-13)
-            ]
-        )
-        diffs_true_before_adapt.append(
-            [
-                diff_SE_adapt[m - 1]
-                for m in range(len(times_SE_adapt))
-                if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-13)
-            ]
-        )
-        diffs_true_after_adapt.append(
-            [
-                diff_SE_adapt[m + 1]
-                for m in range(len(times_SE_adapt))
-                if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-13)
-            ]
-        )
+        for m in range(len(times_SE_adapt)):
+            if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-10):
+                diffs_true_at_adapt.append(diff_SE_adapt[m])
+                diffs_true_before_adapt.append(diff_SE_adapt[m - 1])
+                diffs_true_after_adapt.append(diff_SE_adapt[m + 1])
 
         diffs_false_before_adapt.append(
-            [diff_adapt[m - 1] for m in range(len(times_adapt)) if times_adapt[m - 1] <= t_switch <= times_adapt[m]]
+            [diff_adapt[m - 1] for m in range(len(times_adapt)) if times_adapt[m - 1] <= t_switch <= times_adapt[m]][0]
         )
         diffs_false_after_adapt.append(
-            [diff_adapt[m] for m in range(len(times_adapt)) if times_adapt[m - 1] <= t_switch <= times_adapt[m]]
+            [diff_adapt[m] for m in range(len(times_adapt)) if times_adapt[m - 1] <= t_switch <= times_adapt[m]][0]
         )
 
     setup_mpl()

@@ -122,46 +122,46 @@ def check_solution(stats, dt, use_switch_estimator):
     data = get_data_dict(stats, use_switch_estimator)
 
     if use_switch_estimator:
-        msg = f'Error when using the switch estimator for battery_2condensators for dt={dt:.1e}:'
+        msg = f'Error when using the switch estimator for battery_2capacitors for dt={dt:.1e}:'
         if dt == 1e-2:
             expected = {
-                'cL': 1.2065280755094876,
+                'cL': 1.207906161238752,
                 'vC1': 1.0094825899806945,
-                'vC2': 1.0050052828742688,
+                'vC2': 1.00000000000412,
                 'switch1': 1.6094379124373626,
-                'switch2': 3.209437912457051,
-                'restarts': 2.0,
-                'sum_niters': 1568,
+                'switch2': 3.209437912437337,
+                'restarts': 1.0,
+                'sum_niters': 1412.0,
             }
         elif dt == 4e-1:
             expected = {
-                'cL': 1.1842780233981391,
+                'cL': 1.5090409300896785,
                 'vC1': 1.0094891393319418,
-                'vC2': 1.00103823232433,
+                'vC2': 1.0018593331860708,
                 'switch1': 1.6075867934844466,
-                'switch2': 3.209437912436633,
+                'switch2': 3.2094445842818007,
                 'restarts': 2.0,
-                'sum_niters': 2000,
+                'sum_niters': 52.0,
             }
         elif dt == 4e-2:
             expected = {
-                'cL': 1.180493652021971,
+                'cL': 1.2708164018400792,
                 'vC1': 1.0094825917376264,
-                'vC2': 1.0007713468084405,
+                'vC2': 1.000030506091851,
                 'switch1': 1.6094074085553605,
-                'switch2': 3.209437912440314,
+                'switch2': 3.209437914186951,
                 'restarts': 2.0,
-                'sum_niters': 2364,
+                'sum_niters': 368.0,
             }
         elif dt == 4e-3:
             expected = {
-                'cL': 1.1537529501025199,
+                'cL': 1.1564912472685411,
                 'vC1': 1.001438946726028,
-                'vC2': 1.0004331625246141,
+                'vC2': 1.0000650435224532,
                 'switch1': 1.6093728710270467,
-                'switch2': 3.217437912434171,
+                'switch2': 3.217437912434931,
                 'restarts': 2.0,
-                'sum_niters': 8920,
+                'sum_niters': 3516.0,
             }
 
     got = {
