@@ -128,8 +128,15 @@ def plot_solution(stats):  # pragma: no cover
     import matplotlib.pyplot as plt
 
     u = get_sorted(stats, type='u')
-    fig, ax = plt.subplots()
-    ax.imshow(np.abs(u[0][1]))
+    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
+    axs[0].imshow(np.abs(u[0][1]))
+    axs[0].set_title(f't={u[0][0]:.2f}')
+    for i in range(len(u)):
+        axs[1].cla()
+        axs[1].imshow(np.abs(u[i][1]))
+        axs[1].set_title(f't={u[i][0]:.2f}')
+        plt.pause(1e-1)
+    fig.tight_layout()
     plt.show()
 
 

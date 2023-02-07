@@ -1656,6 +1656,7 @@ def main():
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
+        stats_path='data/stats-jusuf',
     )
 
     stats_analyser.run_stats_generation(runs=1000)
