@@ -558,19 +558,11 @@ class FaultStats:
         else:
             already_completed = {'runs': 0}
 
-        if already_completed['runs'] < runs:
-            if faults:
-                print(
-                    f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} with faults from \
-{already_completed["runs"]} to {runs}'
-                )
-                sys.stdout.flush()
-            else:
-                print(
-                    f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} from {already_completed["runs"]} to \
-{runs}'
-                )
-                sys.stdout.flush()
+        # prepare a message
+        involved_ranks = comm.gather(MPI.COMM_WORLD.rank, root=0)
+        msg = f'{comm.size} rank(s) ({involved_ranks}) doing {strategy.name}{" with faults" if faults else ""} from {already_completed["runs"]} to {runs}'
+        if comm.rank == 0 and already_completed['runs'] < runs:
+            print(msg, flush=True)
 
         space_comm = comm.Split(comm.rank)
 
