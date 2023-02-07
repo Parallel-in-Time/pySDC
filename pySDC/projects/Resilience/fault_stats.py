@@ -469,7 +469,7 @@ class FaultStats:
         Args:
             runs (int): Number of runs you want to do
             step (int): Number of runs you want to do between saving
-            comm = kwargs.get('comm', MPI.COMM_WORLD)
+            comm (MPI.Communicator): Communicator for distributing runs
 
         Returns:
             None
@@ -487,7 +487,7 @@ class FaultStats:
         strategy_comm = comm.Split(comm.rank % len(self.strategies))
 
         for i in range(step, max_runs + step, step):
-            for j in range(len(self.strategies)):
+            for j in range(0, len(self.strategies), comm.size):
 
                 for f in self.faults:
                     if f:
@@ -495,11 +495,7 @@ class FaultStats:
                     else:
                         runs_partial = min([5, i])
                     self.generate_stats(
-                        strategy=self.strategies[j],
-                        runs=runs_partial,
-                        faults=f,
-                        reload=self.reload or reload,
-                        comm=strategy_comm,
+                        strategy=self.strategies[j + comm.rank % len(self.strategies)], runs=runs_partial, faults=f, reload=self.reload or reload, comm=strategy_comm
                     )
             reload = True
 
@@ -543,8 +539,6 @@ class FaultStats:
             if comm.rank == 0:
                 already_completed_ = self.load(strategy, faults)
             already_completed = comm.bcast(already_completed_, root=0)
-            # print(already_completed, comm.rank)
-            # already_completed = comm.bcast(self.load(strategy, faults), root=0)
             if already_completed['runs'] > 0 and already_completed['runs'] <= runs and comm.rank == 0:
                 for k in dat.keys():
                     dat[k][: min([already_completed['runs'], runs])] = already_completed.get(k, [])
@@ -574,7 +568,6 @@ class FaultStats:
 
             # perform a single experiment with the correct random seed
             stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults, space_comm=space_comm)
-            print('hey', comm.rank)
 
             # get the data from the stats
             faults_run = get_sorted(stats, type='bitflip')
@@ -1660,7 +1653,7 @@ def main():
         mode='random',
     )
 
-    stats_analyser.run_stats_generation(runs=5000, step=50)
+    stats_analyser.run_stats_generation(runs=450, step=25)
     mask = None
 
     stats_analyser.compare_strategies()
