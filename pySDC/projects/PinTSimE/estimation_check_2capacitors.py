@@ -142,20 +142,15 @@ def run(cwd='./'):
         )
 
         restarts_dt = restarts_dict[dt_item]
-        restarts_dt_switch1.append(
-            [
-                np.sum(restarts_dt[0 : i - 1, 1])
-                for i in range(len(restarts_dt[:, 0]))
-                if np.isclose(restarts_dt[i, 0], t_switch[0], atol=1e-13)
-            ]
-        )
-        restarts_dt_switch2.append(
-            [
-                np.sum(restarts_dt[i - 2 :, 1])
-                for i in range(len(restarts_dt[:, 0]))
-                if np.isclose(restarts_dt[i, 0], t_switch[1], atol=1e-13)
-            ]
-        )
+        for i in range(len(restarts_dt[:, 0])):
+            if np.isclose(restarts_dt[i, 0], t_switch[0], atol=1e-15):
+                restarts_dt_switch1.append(np.sum(restarts_dt[0 : i - 1, 1]))
+                break
+
+        for i in range(len(restarts_dt[:, 0])):
+            if np.isclose(restarts_dt[i, 0], t_switch[1], atol=1e-15):
+                restarts_dt_switch2.append(np.sum(restarts_dt[i - 2 :, 1]))
+                break
 
         setup_mpl()
         fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
