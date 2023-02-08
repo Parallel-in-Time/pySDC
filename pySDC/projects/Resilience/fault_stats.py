@@ -288,6 +288,10 @@ class IterateStrategy(Strategy):
         self.name = 'iterate'
         self.bar_plot_x_label = 'iterate'
 
+    @property
+    def label(self):
+        return r'$k$ adaptivity'
+
     def get_custom_description(self, problem, num_procs):
         '''
         Routine to get a custom description that allows for adaptive iteration counts

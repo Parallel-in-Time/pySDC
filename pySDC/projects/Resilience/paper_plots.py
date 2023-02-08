@@ -12,6 +12,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_vdp,
 )
 from pySDC.helpers.plot_helper import setup_mpl
+from pySDC.helpers.stats_helper import get_sorted
 
 
 cm = 1 / 2.5
@@ -229,7 +230,7 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
 
     theta = np.array([30, 150, 270, 30]) * 2 * np.pi / 360
     for s in stats_analyser.strategies:
-        ax.plot(theta, res_norm[s.name] + [res_norm[s.name][0]], label=s.name, color=s.color, marker=s.marker)
+        ax.plot(theta, res_norm[s.name] + [res_norm[s.name][0]], label=s.label, color=s.color, marker=s.marker)
 
     labels = ['fail rate', 'extra iterations\nfor recovery', 'iterations for solution']
     ax.set_xticks(theta[:-1], [f'{labels[i]}\nmax={norms[i]:.2f}' for i in range(len(labels))])
@@ -239,7 +240,63 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
     savefig(fig, 'efficiency')
 
 
+def plot_adaptivity_stuff():
+    """
+    Plot the solution for a van der Pol problem as well as the local error and cost associated with the base scheme and
+    adaptivity in k and dt in order to demonstrate that adaptivity is useful.
+
+    Returns:
+        None
+    """
+    from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+
+    stats_analyser = get_stats(run_vdp, 'data/stats')
+
+    setup_mpl(font_size=8, reset=True)
+    mpl.rcParams.update({'lines.markersize': 6})
+    fig, axs = plt.subplots(3, 1, figsize=(10 * cm, 11 * cm), sharex=True, sharey=False)
+
+    def plot_error(stats, ax, iter_ax, strategy, **kwargs):
+        """
+        Plot global error and cumulative sum of iterations
+
+        Args:
+            stats (dict): Stats from pySDC run
+            ax (Matplotlib.pyplot.axes): Somewhere to plot the error
+            iter_ax (Matplotlib.pyplot.axes): Somewhere to plot the iterations
+            strategy (pySDC.projects.Resilience.fault_stats.Strategy): The resilience strategy
+
+        Returns:
+            None
+        """
+        e = get_sorted(stats, type='error_embedded_estimate', recomputed=False)
+        ax.plot([me[0] for me in e], [me[1] for me in e], markevery=15, **strategy.style, **kwargs)
+        k = get_sorted(stats, type='k')
+        iter_ax.plot([me[0] for me in k], np.cumsum([me[1] for me in k]), **strategy.style, markevery=15, **kwargs)
+        ax.set_yscale('log')
+        ax.set_ylabel(r'$e_\mathrm{loc}$')
+        iter_ax.set_ylabel(r'iterations')
+
+    force_params = {'convergence_controllers': {EstimateEmbeddedErrorNonMPI: {}}}
+    for strategy in [AdaptivityStrategy, BaseStrategy, IterateStrategy]:
+        stats, _, _ = stats_analyser.single_run(strategy=strategy(), force_params=force_params)
+        plot_error(stats, axs[1], axs[2], strategy())
+
+        if strategy == AdaptivityStrategy:
+            u = get_sorted(stats, type='u')
+            axs[0].plot([me[0] for me in u], [me[1][0] for me in u], color='black', label=r'$u$')
+            axs[0].plot([me[0] for me in u], [me[1][1] for me in u], color='black', ls='--', label=r'$u_t$')
+            axs[0].legend(frameon=False)
+
+    axs[1].set_ylim(bottom=1e-9)
+    axs[2].set_xlabel(r'$t$')
+    axs[0].set_ylabel('solution')
+    axs[2].legend(frameon=False)
+    savefig(fig, 'adaptivity')
+
+
 if __name__ == "__main__":
+    plot_adaptivity_stuff()
     plot_efficiency_polar(run_vdp)
     compare_recovery_rate_problems()
     analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
