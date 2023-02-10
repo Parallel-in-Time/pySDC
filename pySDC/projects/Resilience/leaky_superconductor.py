@@ -7,10 +7,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Resilience.hook import hook_collection, LogData
-from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
 import numpy as np
-
-from pySDC.core.Hooks import hooks
 
 import matplotlib.pyplot as plt
 from pySDC.core.Errors import ConvergenceError
@@ -121,8 +118,6 @@ def run_leaky_superconductor(
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    from pySDC.core.Errors import ConvergenceError
-
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     except ConvergenceError:
@@ -138,7 +133,6 @@ def plot_solution(stats, controller):
     dt_ax = u_ax.twinx()
 
     u = get_sorted(stats, type='u', recomputed=False)
-    x = np.linspace(0, 1, len(u[0][1]))
     u_ax.plot([me[0] for me in u], [max(me[1]) for me in u], label=r'$T$')
 
     dt = get_sorted(stats, type='dt', recomputed=False)
