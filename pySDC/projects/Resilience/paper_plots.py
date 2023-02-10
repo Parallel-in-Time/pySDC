@@ -295,7 +295,77 @@ def plot_adaptivity_stuff():
     savefig(fig, 'adaptivity')
 
 
+def plot_fault_vdp(bit=0):
+    """
+    Make a plot showing the impact of a fault on van der Pol without any resilience.
+    The faults are inserted in the last iteration in the last node in u_t such that you can best see the impact.
+
+    Args:
+        bit (int): The bit that you want to flip
+
+    Returns:
+        None
+    """
+    from pySDC.projects.Resilience.fault_stats import (
+        FaultStats,
+        BaseStrategy,
+    )
+    from pySDC.projects.Resilience.hook import LogData
+
+    stats_analyser = FaultStats(
+        prob=run_vdp,
+        strategies=[BaseStrategy()],
+        faults=[False, True],
+        reload=True,
+        recovery_thresh=1.1,
+        num_procs=1,
+        mode='combination',
+    )
+
+    fig, ax = plt.subplots(1, 1, figsize=(10 * cm, 7 * cm))
+    colors = ['blue', 'red', 'magenta']
+    ls = ['--', '--', '-', '-']
+    markers = ['*', '.', 'y']
+    do_faults = [False, True]
+    superscripts = ['*', '']
+    subscripts = ['', 't', '']
+
+    run = 779 + 12 * bit
+
+    for i in range(len(do_faults)):
+        stats, controller, Tend = stats_analyser.single_run(
+            strategy=BaseStrategy(),
+            run=run,
+            faults=do_faults[i],
+            hook_class=[LogData],
+        )
+        u = get_sorted(stats, type='u')
+        faults = get_sorted(stats, type='bitflip')
+        for j in range(len(u[0][1])):
+            ax.plot(
+                [me[0] for me in u],
+                [me[1][j] for me in u],
+                ls=ls[i],
+                color=colors[j],
+                label=rf'$u^{{{superscripts[i]}}}_{{{subscripts[j]}}}$',
+                marker=markers[0],
+                markevery=15,
+            )
+        for idx in range(len(faults)):
+            ax.axvline(faults[idx][0], color='black', label='Fault', ls=':')
+            print(
+                f'Fault at t={faults[idx][0]:.2e}, iter={faults[idx][1][1]}, node={faults[idx][1][2]}, space={faults[idx][1][3]}, bit={faults[idx][1][4]}'
+            )
+            ax.set_title(f'Fault in bit {faults[idx][1][4]}')
+
+    ax.legend(frameon=False)
+    ax.set_xlabel(r'$t$')
+    savefig(fig, f'fault_bit_{bit}')
+
+
 if __name__ == "__main__":
+    plot_fault_vdp(0)
+    plot_fault_vdp(13)
     plot_adaptivity_stuff()
     plot_efficiency_polar(run_vdp)
     compare_recovery_rate_problems()
