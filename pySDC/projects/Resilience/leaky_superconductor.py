@@ -13,7 +13,11 @@ import matplotlib.pyplot as plt
 from pySDC.core.Errors import ConvergenceError
 
 
-class plot(hooks):
+class live_plot(hooks):  # pragma no cover
+    """
+    This hook plots the solution and the non-linear part of the right hand side after every step. Keep in mind that using adaptivity will result in restarts, which is not marked in these plots. Prepare to see the temperature profile jumping back again after a restart.
+    """
+
     def pre_run(self, step, level_number):
         self.fig, self.axs = plt.subplots(1, 2, figsize=(10, 4))
 
@@ -39,7 +43,7 @@ def run_leaky_superconductor(
     imex=False,
 ):
     """
-    Run a heat problem with default parameters.
+    Run a toy problem of a superconducting magnet with a temperature leak with default parameters.
 
     Args:
         custom_description (dict): Overwrite presets
@@ -125,7 +129,7 @@ def run_leaky_superconductor(
     return stats, controller, Tend
 
 
-def plot_solution(stats, controller):
+def plot_solution(stats, controller):  # pragma no cover
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(1, 1)
