@@ -51,6 +51,7 @@ class Mesh(DataType, np.ndarray):
             global_absval = local_absval
         return float(global_absval)
 
+
 class PETScMesh(DataType, PETSc.Vec):
     # Note : priority to methods from DataType class
 
@@ -61,11 +62,15 @@ class PETScMesh(DataType, PETSc.Vec):
 
     @values.setter
     def values(self, values):
-        np.copyto(self.getArray(), values)
+        self.setArray(values)
 
-    def clone(self, values=None):
+    def clone(self, values=None, copy=True):
         # TODO : implementation
-        pass
+        if values is None:
+            return PETScMesh()
+        if not copy:
+            pass
+        return self.copy()
 
     # Additional redefinitions
     def __abs__(self):

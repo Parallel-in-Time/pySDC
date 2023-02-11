@@ -69,10 +69,8 @@ class ptype(RegisterParams):
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
 
     def apply_mass_matrix(self, u):
-        """
-        Abstract interface to apply mass matrix (only needed for FEM)
-        """
-        raise NotImplementedError('ERROR: if you want a mass matrix, implement apply_mass_matrix(u)')
+        """Default mass matrix : identity"""
+        return u
 
     def generate_scipy_reference_solution(self, eval_rhs, t, u_init=None, t_init=None):
         """

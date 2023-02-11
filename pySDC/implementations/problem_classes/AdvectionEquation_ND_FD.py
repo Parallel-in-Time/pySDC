@@ -1,15 +1,11 @@
 import numpy as np
-import scipy.sparse as sp
 from scipy.sparse.linalg import gmres, spsolve
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
-from pySDC.helpers import problem_helper
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDiff
 
 
 # noinspection PyUnusedLocal
-class advectionNd(ptype):
+class advectionNd(GenericNDimFinDiff):
     r"""
     Example implementing the unforced ND advection equation with periodic
     or Dirichlet boundary conditions in :math:`[0,1]^N`,
@@ -79,106 +75,12 @@ class advectionNd(ptype):
         bc='periodic',
         sigma=6e-2,
     ):
-        # make sure parameters have the correct types
-        if not type(nvars) in [int, tuple]:
-            raise ProblemError('nvars should be either tuple or int')
-        if not type(freq) in [int, tuple]:
-            raise ProblemError('freq should be either tuple or int')
-
-        # transforms nvars into a tuple
-        if type(nvars) is int:
-            nvars = (nvars,)
-
-        # automatically determine ndim from nvars
-        ndim = len(nvars)
-        if ndim > 3:
-            raise ProblemError(f'can work with up to three dimensions, got {ndim}')
-
-        # eventually extend freq to other dimension
-        if type(freq) is int:
-            freq = (freq,) * ndim
-        if len(freq) != ndim:
-            raise ProblemError(f'len(freq)={len(freq)}, different to ndim={ndim}')
-
-        # check values for freq and nvars
-        for f in freq:
-            if ndim == 1 and f == -1:
-                # use Gaussian initial solution in 1D
-                bc = 'periodic'
-                break
-            if f % 2 != 0 and bc == 'periodic':
-                raise ProblemError('need even number of frequencies due to periodic BCs')
-        for nvar in nvars:
-            if nvar % 2 != 0 and bc == 'periodic':
-                raise ProblemError('the setup requires nvars = 2^p per dimension')
-            if (nvar + 1) % 2 != 0 and bc == 'dirichlet-zero':
-                raise ProblemError('setup requires nvars = 2^p - 1')
-        if ndim > 1 and nvars[1:] != nvars[:-1]:
-            raise ProblemError('need a square domain, got %s' % nvars)
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(
-            init=(nvars, None, np.dtype('float64')),
-            dtype_u=mesh,
-            dtype_f=mesh,
-        )
-
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        if bc == 'periodic':
-            xvalues = np.linspace(0, 1, num=nvars[0], endpoint=False)
-        elif bc == 'dirichlet-zero':
-            xvalues = np.linspace(0, 1, num=nvars[0] + 2)[1:-1]
-        else:
-            raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
-        dx = xvalues[1] - xvalues[0]
-
-        self.A = problem_helper.get_finite_difference_matrix(
-            derivative=1,
-            order=order,
-            stencil_type=stencil_type,
-            dx=dx,
-            size=nvars[0],
-            dim=ndim,
-            bc=bc,
-        )
-        self.A *= -c
-
-        self.xvalues = xvalues
-        self.Id = sp.eye(np.prod(nvars), format='csc')
-
-        # store attribute and register them as parameters
-        self._makeAttributeAndRegister('nvars', 'c', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
-        self._makeAttributeAndRegister('freq', 'sigma', 'lintol', 'liniter', 'direct_solver', localVars=locals())
-
-    @property
-    def ndim(self):
-        """Number of dimensions of the spatial problem"""
-        return len(self.nvars)
-
-    @property
-    def dx(self):
-        """Size of the mesh (in all dimensions)"""
-        return self.xvalues[1] - self.xvalues[0]
-
-    def eval_f(self, u, t):
-        """
-        Routine to evaluate the RHS
-
-        Parameters
-        ----------
-        u : dtype_u
-            Current values.
-        t : float
-            Current time.
-
-        Returns
-        -------
-        f : dtype_f
-            The RHS values.
-        """
-        f = self.f_init
-        f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
-        return f
+            nvars, -c, 1, freq, stencil_type, order, lintol, liniter, 
+            direct_solver, bc)
+        
+        self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('sigma', localVars=locals())
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -236,9 +138,10 @@ class advectionNd(ptype):
             The exact solution.
         """
         # Initialize pointers and variables
-        ndim, freq, x, c, sigma, sol = self.ndim, self.freq, self.xvalues, self.c, self.sigma, self.u_init
+        ndim, freq, c, sigma, sol = self.ndim, self.freq, self.xvalues, self.c, self.sigma, self.u_init
 
         if ndim == 1:
+            x = self.grids
             if freq[0] >= 0:
                 sol[:] = np.sin(np.pi * freq[0] * (x - c * t))
             elif freq[0] == -1:
@@ -246,13 +149,15 @@ class advectionNd(ptype):
                 sol[:] = np.exp(-0.5 * (((x - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
 
         elif ndim == 2:
-            sol[:] = np.sin(np.pi * freq[0] * (x[None, :] - c * t)) * np.sin(np.pi * freq[1] * (x[:, None] - c * t))
+            x, y = self.grids
+            sol[:] = np.sin(np.pi * freq[0] * (x - c * t)) * np.sin(np.pi * freq[1] * (y - c * t))
 
         elif ndim == 3:
+            x, y, z = self.grids
             sol[:] = (
-                np.sin(np.pi * freq[0] * (x[None, :, None] - c * t))
-                * np.sin(np.pi * freq[1] * (x[:, None, None] - c * t))
-                * np.sin(np.pi * freq[2] * (x[None, None, :] - c * t))
+                np.sin(np.pi * freq[0] * (x - c * t))
+                * np.sin(np.pi * freq[1] * (y - c * t))
+                * np.sin(np.pi * freq[2] * (z - c * t))
             )
 
         return sol

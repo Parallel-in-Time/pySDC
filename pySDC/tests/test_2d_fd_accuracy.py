@@ -47,7 +47,6 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
     Returns:
         a dictionary containing the errors and a header (with nvars_list)
     """
-    from pySDC.implementations.datatype_classes.mesh import mesh
     from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
     results = {}
@@ -56,10 +55,10 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
         # setup problem
         problem_params['nvars'] = nvars
         problem_params['order'] = order_stencil
-        prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        prob = heatNd_unforced(**problem_params)
 
         # create x values, use only inner points
-        xvalues = np.array([i * prob.dx for i in range(prob.params.nvars[0])])
+        xvalues = np.array([i * prob.dx for i in range(prob.nvars[0])])
 
         # create a mesh instance and fill it with a sine wave
         u = prob.u_exact(t=0)
@@ -68,10 +67,10 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
         u_lap = prob.dtype_u(init=prob.init)
         u_lap[:] = (
             -2
-            * (np.pi**2 * prob.params.freq[0] * prob.params.freq[1])
-            * prob.params.nu
+            * (np.pi**2 * prob.freq[0] * prob.freq[1])
+            * prob.nu
             * np.kron(
-                np.sin(np.pi * prob.params.freq[0] * xvalues), np.sin(np.pi * prob.params.freq[1] * xvalues)
+                np.sin(np.pi * prob.freq[0] * xvalues), np.sin(np.pi * prob.freq[1] * xvalues)
             ).reshape(nvars)
         )
         # compare analytic and computed solution using the eval_f routine of the problem class
