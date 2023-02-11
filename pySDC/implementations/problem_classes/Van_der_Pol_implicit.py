@@ -57,22 +57,10 @@ class vanderpol(ptype):
 
         if t > 0.0:
 
-            def rhs(t, u):
+            def eval_rhs(t, u):
                 return self.eval_f(u, t)
 
-            tol = 100 * np.finfo(float).eps
-
-            if u_init is not None:
-                if t_init is None:
-                    raise ValueError(
-                        'Please supply `t_init` when you want to get the exact solution from a point that \
-is not 0!'
-                    )
-                me = u_init.copy()
-            else:
-                u_init = self.params.u0.copy()
-                t_init = 0.0
-            me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
         else:
             me[:] = self.params.u0[:]
         return me
@@ -120,7 +108,6 @@ is not 0!'
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             g = np.array([x1 - dt * x2 - rhs[0], x2 - dt * (mu * (1 - x1**2) * x2 - x1) - rhs[1]])
 

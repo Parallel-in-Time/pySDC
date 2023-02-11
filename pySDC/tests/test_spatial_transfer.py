@@ -30,7 +30,6 @@ def get_accuracy_orders(results):
     for iorder in iorder_list:
         # loop over two consecutive errors/nvars pairs
         for i in range(1, len(nvars_fine_list)):
-
             # get ids
             id = ID(nvars_fine=nvars_fine_list[i], iorder=iorder)
             id_prev = ID(nvars_fine=nvars_fine_list[i - 1], iorder=iorder)
@@ -77,11 +76,9 @@ def test_mesh_to_mesh_1d_dirichlet():
 
     # loop over interpolation orders and number of DOFs
     for iorder in iorder_list:
-
         space_transfer_params['iorder'] = iorder
 
         for nvars_fine in nvars_fine_list:
-
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
             Pfine = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
@@ -147,11 +144,9 @@ def test_mesh_to_mesh_1d_periodic():
 
     # loop over interpolation orders and number of DOFs
     for iorder in iorder_list:
-
         space_transfer_params['iorder'] = iorder
 
         for nvars_fine in nvars_fine_list:
-
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
             Pfine = advectionNd(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
@@ -220,7 +215,6 @@ def test_mesh_to_mesh_2d_periodic():
 
     # loop over interpolation orders and number of DOFs
     for iorder in iorder_list:
-
         space_transfer_params['iorder'] = iorder
 
         for nvars_fine in nvars_fine_list:

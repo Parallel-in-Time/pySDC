@@ -49,6 +49,7 @@ Projects
    projects/performance.rst
    projects/PinTSimE.rst
    projects/Resilience.rst
+   projects/DAE.rst
 
 
 API documentation

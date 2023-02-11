@@ -52,7 +52,6 @@ class outer_solar_system(ptype):
         # compute the acceleration due to gravitational forces
         # ... only with respect to the sun
         if self.params.sun_only:
-
             for i in range(1, self.init[0][-1]):
                 dx = u.pos[:, i] - u.pos[:, 0]
                 r = np.sqrt(np.dot(dx, dx))
@@ -61,7 +60,6 @@ class outer_solar_system(ptype):
 
         # ... or with all planets involved
         else:
-
             for i in range(self.init[0][-1]):
                 for j in range(i):
                     dx = u.pos[:, i] - u.pos[:, j]

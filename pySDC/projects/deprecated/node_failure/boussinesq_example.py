@@ -92,7 +92,6 @@ def main(ft_strategies):
     print("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
     for strategy in ft_strategies:
-
         print('------------------------------------------ working on strategy ', strategy)
         ft.strategy = strategy
 

@@ -87,7 +87,6 @@ def create_animation(cwd=''):
         return plot
 
     def animate(index):
-
         csum_blocks = np.zeros(len(iter_count_blocks) + 1)
         csum_blocks[1:] = np.cumsum(iter_count_blocks)
         block = np.searchsorted(csum_blocks[1:], index)

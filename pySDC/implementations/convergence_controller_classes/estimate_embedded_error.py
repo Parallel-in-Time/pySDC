@@ -59,7 +59,11 @@ class EstimateEmbeddedError(ConvergenceController):
             dict: Updated parameters
         """
         sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__bases__ else 'SDC'
-        return {"control_order": -80, "sweeper_type": sweeper_type, **params}
+        return {
+            "control_order": -80,
+            "sweeper_type": sweeper_type,
+            **super().setup(controller, params, description, **kwargs),
+        }
 
     def dependencies(self, controller, description, **kwargs):
         """
@@ -181,7 +185,6 @@ class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
 
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
-
                 # get accumulated local errors from previous steps
                 if not S.status.first:
                     if not S.status.prev_done:

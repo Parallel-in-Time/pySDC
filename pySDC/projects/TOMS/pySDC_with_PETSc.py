@@ -118,7 +118,6 @@ def main():
 
     # limit output to space-rank 0 (as before when setting the logger level)
     if space_rank == 0:
-
         out = 'This is time-rank %i...' % time_rank
         print(out)
 

@@ -30,7 +30,6 @@ def run_advection(
     custom_controller_params=None,
     custom_problem_params=None,
 ):
-
     # initialize level parameters
     level_params = dict()
     level_params['dt'] = 0.05

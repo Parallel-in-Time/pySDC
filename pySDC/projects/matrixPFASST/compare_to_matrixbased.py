@@ -263,7 +263,6 @@ def compare_controllers(type=None, par=0.0, f=None):
 
 
 def main():
-
     par_list = [1e-02, 1.0, 1e02]
 
     Path("data").mkdir(parents=True, exist_ok=True)

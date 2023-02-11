@@ -30,7 +30,6 @@ def main(num_proc_list=None, fname=None, multi_level=True):
     f = open('data/' + fname, 'w')
     # loop over different numbers of processes
     for num_proc in num_proc_list:
-
         out = 'Working with %2i processes...' % num_proc
         f.write(out + '\n')
         print(out)

@@ -14,7 +14,6 @@ from pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes imp
 #
 class rk_imex:
     def __init__(self, problem, order):
-
         assert order in [1, 2, 3, 4, 5], "Order must be between 1 and 5"
         self.order = order
 
@@ -51,7 +50,6 @@ class rk_imex:
             self.nstages = 4
 
         elif self.order == 4:
-
             self.A_hat = np.array(
                 [
                     [0, 0, 0, 0, 0, 0],
@@ -114,7 +112,6 @@ class rk_imex:
             self.nstages = 6
 
         elif self.order == 5:
-
             # from Kennedy and Carpenter
             # copied from http://www.mcs.anl.gov/petsc/petsc-3.2/src/ts/impls/arkimex/arkimex.c
             self.A_hat = np.zeros((8, 8))
@@ -214,10 +211,8 @@ class rk_imex:
         self.stages = np.zeros((self.nstages, self.ndof))
 
     def timestep(self, u0, dt):
-
         # Solve for stages
         for i in range(0, self.nstages):
-
             # Construct RHS
             rhs = np.copy(u0)
             for j in range(0, i):
@@ -357,7 +352,6 @@ class bdf2:
 
 class SplitExplicit:
     def __init__(self, problem, method, pparams):
-
         assert isinstance(problem, boussinesq_2d_imex), "problem is wrong type of object"
         self.Ndof = np.shape(problem.M)[0]
         self.method = method
@@ -428,14 +422,12 @@ class SplitExplicit:
         self.logger.nsmall = 0
 
     def NumSmallTimeSteps(self, dx, dz, dt):
-
         cs = self.pparams['c_s']
         ns = dt / (0.9 / np.sqrt(1 / (dx * dx) + 1 / (dz * dz)) / cs)
         ns = max(np.int(np.ceil(ns)), self.nsMin)
         return ns
 
     def timestep(self, u0, dt):
-
         self.U[:, 0] = u0
 
         self.ns = self.NumSmallTimeSteps(self.problem.h[0], self.problem.h[1], dt)
@@ -464,7 +456,6 @@ class SplitExplicit:
         return u0
 
     def RK3Lin(self, u0, FSlow, ns, dTau):
-
         u = u0
         for _ in range(0, ns):
             u = u0 + dTau / 3.0 * (self.f_fast(u) + FSlow)
@@ -489,7 +480,6 @@ class SplitExplicit:
 
 class dirk:
     def __init__(self, problem, order):
-
         assert isinstance(problem, boussinesq_2d_imex), "problem is wrong type of object"
         self.Ndof = np.shape(problem.M)[0]
         self.order = order
@@ -592,10 +582,8 @@ class dirk:
         self.stages = np.zeros((self.nstages, self.Ndof))
 
     def timestep(self, u0, dt):
-
         uend = u0
         for i in range(0, self.nstages):
-
             b = u0
 
             # Compute right hand side for this stage's implicit step

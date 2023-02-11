@@ -86,7 +86,6 @@ def compute_and_plot_solutions():
 
     # Perform time steps with standard integrators
     for i in range(0, nsteps):
-
         # trapezoidal rule step
         ynew_tp = trap.timestep(y0_tp, dt)
 

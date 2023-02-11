@@ -23,7 +23,6 @@ def check_error(subclass):
 
 @pytest.mark.base
 def test_datatypes_mesh():
-
     init = [10, (10, 10), (10, 10, 10)]
     for i in init:
         yield check_datatypes_mesh, i
@@ -75,7 +74,6 @@ def check_datatypes_mesh(init):
 
 @pytest.mark.base
 def test_datatypes_particles():
-
     init = [1, 10]
     for i in init:
         yield check_datatypes_particles, i

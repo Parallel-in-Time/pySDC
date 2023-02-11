@@ -16,7 +16,6 @@ class err_reduction_hook(hooks):
 
         L = step.levels[level_number]
         if step.status.iter == 2 and np.isclose(L.time + L.dt, 0.1):
-
             P = L.prob
 
             err = []
@@ -48,7 +47,6 @@ class err_reduction_hook(hooks):
         L = step.levels[level_number]
 
         if step.status.iter == 2 and np.isclose(L.time + L.dt, 0.1):
-
             P = L.prob
 
             err = []

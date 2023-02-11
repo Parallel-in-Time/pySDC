@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/DAE/README.rst

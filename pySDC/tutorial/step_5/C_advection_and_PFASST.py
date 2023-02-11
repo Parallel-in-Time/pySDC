@@ -75,7 +75,6 @@ def main():
     f = open('data/step_5_C_out.txt', 'w')
     # loop over different types of implicit sweeper types
     for QI in QI_list:
-
         # define and set preconditioner for the implicit sweeper
         sweeper_params['QI'] = QI
         description['sweeper_params'] = sweeper_params  # pass sweeper parameters

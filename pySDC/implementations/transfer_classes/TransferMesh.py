@@ -51,14 +51,12 @@ class mesh_to_mesh(space_transfer):
 
         # we have a 1d problem
         if type(self.fine_prob.params.nvars) is int:
-
             # if number of variables is the same on both levels, Rspace and Pspace are identity
             if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
                 self.Rspace = sp.eye(self.coarse_prob.params.nvars)
                 self.Pspace = sp.eye(self.fine_prob.params.nvars)
             # assemble restriction as transpose of interpolation
             else:
-
                 if not self.params.periodic:
                     fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
                     coarse_grid = np.array(
@@ -81,11 +79,9 @@ class mesh_to_mesh(space_transfer):
                     restr_factor = 1.0
 
                 if self.params.iorder == self.params.rorder:
-
                     self.Rspace = restr_factor * self.Pspace.T
 
                 else:
-
                     self.Rspace = (
                         restr_factor
                         * th.interpolation_matrix_1d(
@@ -99,18 +95,15 @@ class mesh_to_mesh(space_transfer):
 
         # we have an n-d problem
         else:
-
             Rspace = []
             Pspace = []
             for i in range(len(self.fine_prob.params.nvars)):
-
                 # if number of variables is the same on both levels, Rspace and Pspace are identity
                 if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
                     Rspace.append(sp.eye(self.coarse_prob.params.nvars[i]))
                     Pspace.append(sp.eye(self.fine_prob.params.nvars[i]))
                 # assemble restriction as transpose of interpolation
                 else:
-
                     if not self.params.periodic:
                         fine_grid = np.array(
                             [(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.params.nvars[i])]
@@ -139,7 +132,6 @@ class mesh_to_mesh(space_transfer):
                         restr_factor = 1.0
 
                     if self.params.iorder == self.params.rorder:
-
                         Rspace.append(restr_factor * Pspace[-1].T)
 
                     else:

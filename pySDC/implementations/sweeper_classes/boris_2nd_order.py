@@ -264,7 +264,6 @@ class boris_2nd_order(sweeper):
         return C_coll, Q_coll, Q_vv, M_vv, F
 
     def get_scalar_problems_manysweep_mats(self, nsweeps, lambdas=None):
-
         """
         For a scalar problem, K sweeps of SDC can be written in matrix form.
 
@@ -291,7 +290,6 @@ class boris_2nd_order(sweeper):
         return Mat_sweep, np.max(np.abs(Keig))
 
     def get_scalar_problems_picardsweep_mats(self, nsweeps, lambdas=None):
-
         """
         For a scalar problem, K sweeps of SDC can be written in matrix form.
 

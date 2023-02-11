@@ -73,7 +73,6 @@ def compute_RDC_errors():
     results['maxiter_list'] = maxiter_list
 
     for maxiter in maxiter_list:
-
         # ugly, but much faster than re-initializing the controller over and over again
         controller_rdc.MS[0].params.maxiter = maxiter
 

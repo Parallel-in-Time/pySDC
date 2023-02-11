@@ -8,7 +8,6 @@ quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 @pytest.mark.base
 class TestImexSweeper(unittest.TestCase):
-
     #
     # Some auxiliary functions which are not tests themselves
     #
@@ -57,7 +56,6 @@ class TestImexSweeper(unittest.TestCase):
     # Check that a level object can be instantiated
     #
     def test_caninstantiate(self):
-
         from pySDC.core import Step as stepclass
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
@@ -72,7 +70,6 @@ class TestImexSweeper(unittest.TestCase):
     # Check that a level object can be registered in a step object (needed as prerequiste to execute update_nodes
     #
     def test_canregisterlevel(self):
-
         from pySDC.core import Step as stepclass
 
         for node_type, quad_type in zip(node_types, quad_types):

@@ -38,7 +38,6 @@ def create_plots(setup, cwd=''):
         vmax = max(vmax, data.max())
 
     for file, strategy in fields:
-
         infile = np.load(cwd + 'data/' + file)
 
         data = infile['iter_count'].T

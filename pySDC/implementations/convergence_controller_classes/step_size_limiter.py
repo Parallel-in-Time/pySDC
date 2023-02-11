@@ -21,7 +21,12 @@ class StepSizeLimiter(ConvergenceController):
         Returns:
             (dict): The updated params dictionary
         """
-        return {"control_order": +92, "dt_min": 0, "dt_max": np.inf, **params}
+        defaults = {
+            "control_order": +92,
+            "dt_min": 0,
+            "dt_max": np.inf,
+        }
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def get_new_step_size(self, controller, S, **kwargs):
         """

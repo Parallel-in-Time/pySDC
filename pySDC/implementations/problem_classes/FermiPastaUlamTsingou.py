@@ -115,7 +115,6 @@ class fermi_pasta_ulam_tsingou(ptype):
         energy = {}
 
         for k in self.params.energy_modes:
-
             # Qk = np.sqrt(2.0 / (self.params.npart + 1)) * np.dot(u.pos, np.sin(np.pi * k * self.xvalues))
             Qk = np.sqrt(2.0 * self.dx) * np.dot(u.pos, np.sin(np.pi * k * self.xvalues))
             # Qkdot = np.sqrt(2.0 / (self.params.npart + 1)) * np.dot(u.vel, np.sin(np.pi * k * self.xvalues))

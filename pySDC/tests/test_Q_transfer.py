@@ -21,7 +21,6 @@ def test_Q_transfer(node_type, quad_type):
     """
 
     for M in range(3, 9):
-
         Mfine = M
         Mcoarse = int((Mfine + 1) / 2.0)
 
@@ -36,7 +35,6 @@ def test_Q_transfer(node_type, quad_type):
         coarse_grid = coll_coarse.nodes
 
         for order in range(2, coll_coarse.num_nodes + 1):
-
             Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=order, pad=0, equidist_nested=False)
             Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=order, pad=0)
 
@@ -70,7 +68,6 @@ def test_Q_transfer_minimal(node_type, quad_type):
     coll_coarse = CollBase(Mcoarse, 0, 1, node_type=node_type, quad_type=quad_type)
 
     for M in range(3, 9):
-
         Mfine = M
 
         coll_fine = CollBase(Mfine, 0, 1, node_type=node_type, quad_type=quad_type)

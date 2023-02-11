@@ -47,9 +47,7 @@ def main(ft_setups, ft_strategies):
     ft_iter = 7
 
     for setup in ft_setups:
-
         if setup == 'HEAT':
-
             # initialize problem parameters
             problem_params = dict()
             problem_params['nu'] = 0.5
@@ -77,7 +75,6 @@ def main(ft_setups, ft_strategies):
             Tend = 8.0
 
         elif setup == 'ADVECTION':
-
             # initialize problem parameters
             problem_params = dict()
             problem_params['c'] = 1.0
@@ -106,12 +103,10 @@ def main(ft_setups, ft_strategies):
             Tend = 2.0
 
         else:
-
             raise NotImplementedError('setup not implemented')
 
         # loop over all stategies and check how things evolve
         for strategy in ft_strategies:
-
             print('Working on setup %s with strategy %s..' % (setup, strategy))
 
             ft.strategy = strategy
@@ -154,7 +149,6 @@ def main(ft_setups, ft_strategies):
 
 
 if __name__ == "__main__":
-
     ft_strategies = ['NOFAULT', 'SPREAD', 'SPREAD_PREDICT', 'INTERP', 'INTERP_PREDICT']
     # ft_setups = ['ADVECTION', 'HEAT']
 

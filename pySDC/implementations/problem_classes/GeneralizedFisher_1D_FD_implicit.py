@@ -93,7 +93,6 @@ class generalized_fisher(ptype):
         n = 0
         res = 99
         while n < self.params.newton_maxiter:
-
             # form the function g with g(u) = 0
             uext = np.concatenate(([ul], u, [ur]))
             g = u - factor * (self.A.dot(uext)[1:-1] + lambda0**2 * u * (1 - u**nu)) - rhs

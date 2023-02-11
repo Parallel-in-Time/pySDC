@@ -95,7 +95,6 @@ def run_diffusion(QI, max_proc_exp=13):
     file.close()
 
     for i in range(0, max_proc_exp):
-
         num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
         description['level_params'] = level_params  # pass level parameters
@@ -199,7 +198,6 @@ def run_advection(QI, max_proc_exp=7):
     file.close()
 
     for i in range(0, max_proc_exp):
-
         num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
         description['level_params'] = level_params  # pass level parameters
@@ -247,7 +245,6 @@ def plot_results(cwd=''):
     setups = [('diffusion', 'LU', 'LU2'), ('advection', 'LU', 'LU2')]
 
     for type, QI1, QI2 in setups:
-
         fname = cwd + 'data/results_conv_' + type + '_Linf_QI' + QI1 + '.txt'
         file = open(fname, 'r')
         reader = csv.DictReader(file, delimiter=',')

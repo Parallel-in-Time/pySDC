@@ -16,7 +16,6 @@ from pySDC.tutorial.step_8.HookClass_error_output import error_output
 
 
 def setup_diffusion(dt=None, ndim=None, ml=False):
-
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-10
@@ -81,7 +80,6 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
 
 
 def setup_advection(dt=None, ndim=None, ml=False):
-
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-10
@@ -147,7 +145,6 @@ def setup_advection(dt=None, ndim=None, ml=False):
 
 
 def setup_auzinger(dt=None, ml=False):
-
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-10
@@ -213,7 +210,6 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
 
     for ndim in ndim_list:
         for nsteps in nsteps_list:
-
             if type == 'diffusion':
                 # set time parameters
                 t0 = 0.0

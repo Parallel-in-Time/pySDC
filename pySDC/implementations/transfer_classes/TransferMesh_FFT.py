@@ -7,7 +7,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 class mesh_to_mesh_fft(space_transfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Custom base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between 1d meshes with FFT for periodic boundaries
 
