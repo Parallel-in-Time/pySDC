@@ -118,7 +118,7 @@ class TestImexSweeper(unittest.TestCase):
             # Perform node-to-node SDC sweep
             level.sweep.update_nodes()
 
-            lambdas = [problem.params.lambda_f[0], problem.params.lambda_s[0]]
+            lambdas = [problem.lambda_f[0], problem.lambda_s[0]]
             LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats(lambdas=lambdas)
 
             unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(u0full))
@@ -147,7 +147,7 @@ class TestImexSweeper(unittest.TestCase):
             # Compute end value from matrix formulation
             if level.sweep.params.do_coll_update:
                 uend_mat = self.pparams['u0'] + step.dt * level.sweep.coll.weights.dot(
-                    ustages * (problem.params.lambda_s[0] + problem.params.lambda_f[0])
+                    ustages * (problem.lambda_s[0] + problem.lambda_f[0])
                 )
             else:
                 uend_mat = ustages[-1]
@@ -169,7 +169,7 @@ class TestImexSweeper(unittest.TestCase):
             QE, QI, Q = level.sweep.get_sweeper_mats()
 
             # Build collocation matrix
-            Mcoll = np.eye(nnodes) - step.dt * Q * (problem.params.lambda_s[0] + problem.params.lambda_f[0])
+            Mcoll = np.eye(nnodes) - step.dt * Q * (problem.lambda_s[0] + problem.lambda_f[0])
 
             # Solve collocation problem directly
             ucoll = np.linalg.inv(Mcoll).dot(u0full)
@@ -177,13 +177,13 @@ class TestImexSweeper(unittest.TestCase):
             # Put stages of collocation solution into level
             for l in range(0, nnodes):
                 level.u[l + 1][:] = ucoll[l]
-                level.f[l + 1].impl[:] = problem.params.lambda_f[0] * ucoll[l]
-                level.f[l + 1].expl[:] = problem.params.lambda_s[0] * ucoll[l]
+                level.f[l + 1].impl[:] = problem.lambda_f[0] * ucoll[l]
+                level.f[l + 1].expl[:] = problem.lambda_s[0] * ucoll[l]
 
             # Perform node-to-node SDC sweep
             level.sweep.update_nodes()
 
-            lambdas = [problem.params.lambda_f[0], problem.params.lambda_s[0]]
+            lambdas = [problem.lambda_f[0], problem.lambda_s[0]]
             LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats(lambdas=lambdas)
 
             # Make sure both matrix and node-to-node sweep leave collocation unaltered
@@ -214,7 +214,7 @@ class TestImexSweeper(unittest.TestCase):
                 level.sweep.update_nodes()
             usweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
 
-            lambdas = [problem.params.lambda_f[0], problem.params.lambda_s[0]]
+            lambdas = [problem.lambda_f[0], problem.lambda_s[0]]
             LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats(lambdas=lambdas)
 
             unew = u0full
@@ -250,13 +250,13 @@ class TestImexSweeper(unittest.TestCase):
             level.sweep.compute_end_point()
             uend_sweep = level.uend
 
-            lambdas = [problem.params.lambda_f[0], problem.params.lambda_s[0]]
+            lambdas = [problem.lambda_f[0], problem.lambda_s[0]]
 
             # Build single matrix representing K sweeps
             Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat(nsweeps=K, lambdas=lambdas)
             # Now build update function
             if level.sweep.params.do_coll_update:
-                update = 1.0 + (problem.params.lambda_s[0] + problem.params.lambda_f[0]) * level.sweep.coll.weights.dot(
+                update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0]) * level.sweep.coll.weights.dot(
                     Mat_sweep.dot(np.ones(nnodes))
                 )
                 # Multiply u0 by value of update function to get end value directly

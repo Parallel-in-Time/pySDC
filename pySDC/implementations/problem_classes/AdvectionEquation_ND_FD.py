@@ -138,7 +138,7 @@ class advectionNd(GenericNDimFinDiff):
             The exact solution.
         """
         # Initialize pointers and variables
-        ndim, freq, c, sigma, sol = self.ndim, self.freq, self.xvalues, self.c, self.sigma, self.u_init
+        ndim, freq, c, sigma, sol = self.ndim, self.freq, self.c, self.sigma, self.u_init
 
         if ndim == 1:
             x = self.grids

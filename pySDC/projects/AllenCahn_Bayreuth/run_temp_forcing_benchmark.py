@@ -64,7 +64,6 @@ def run_simulation(name=None, nprocs_space=None):
     problem_params['D'] = 1.0
     problem_params['dw'] = [300.0]
     problem_params['comm'] = space_comm
-    problem_params['name'] = name
     problem_params['init_type'] = 'circle_rand'
     problem_params['spectral'] = True
 

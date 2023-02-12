@@ -40,7 +40,7 @@ def run_advection(
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
 
-    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'backward', 'order': 5, 'bc': 'periodic'}
+    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'order': 5, 'bc': 'periodic'}
 
     if custom_problem_params is not None:
         problem_params = {**problem_params, **custom_problem_params}

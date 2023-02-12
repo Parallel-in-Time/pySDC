@@ -21,7 +21,7 @@ def test_scipy_reference(init):
     from pySDC.core.Problem import ptype
 
     # instantiate a dummy problem
-    problem = ptype(init, None, None, {})
+    problem = ptype(init, None, None)
 
     # setup random initial conditions
     u0 = np.random.rand(*init[0])
@@ -38,8 +38,8 @@ def test_scipy_reference(init):
     # check that the two solutions are the same to high degree
     assert (
         u_ref.shape == u_exact.shape
-    ), f"The shape of the scipy reference solution does not match the shape of the actual solution"
-    assert np.allclose(u_ref, u_exact, atol=1e-12), f"The scipy solution deviates significantly from the exact solution"
+    ), "The shape of the scipy reference solution does not match the shape of the actual solution"
+    assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
 
 
 if __name__ == '__main__':

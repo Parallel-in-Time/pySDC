@@ -1,7 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pylab as plt
 import numpy as np
-from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI

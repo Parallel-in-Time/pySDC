@@ -30,10 +30,10 @@ class monitor(hooks):
         L = step.levels[0]
 
         # get space-communicator and data
-        self.comm = L.prob.params.comm
+        self.comm = L.prob.comm
 
         # get real space values
-        if L.prob.params.spectral:
+        if L.prob.spectral:
             tmp = L.prob.fft.backward(L.u[0])
         else:
             tmp = L.u[0][:]
@@ -49,15 +49,15 @@ class monitor(hooks):
         if self.ndim == 3:
             vol = c_global * L.prob.dx**3
             radius = (vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
-            self.init_vol = np.pi * 4.0 / 3.0 * L.prob.params.radius**3
+            self.init_vol = np.pi * 4.0 / 3.0 * L.prob.radius**3
         elif self.ndim == 2:
             vol = c_global * L.prob.dx**2
             radius = np.sqrt(vol / np.pi)
-            self.init_vol = np.pi * L.prob.params.radius**2
+            self.init_vol = np.pi * L.prob.radius**2
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
-        self.init_radius = L.prob.params.radius
+        self.init_radius = L.prob.radius
         self.corr_rad = self.init_radius / radius
         self.corr_vol = self.init_vol / vol
         radius *= self.corr_rad
@@ -116,14 +116,14 @@ class monitor(hooks):
         L = step.levels[0]
 
         # get real space values
-        if L.prob.params.spectral:
+        if L.prob.spectral:
             tmp = L.prob.fft.backward(L.uend)
         else:
             tmp = L.uend[:]
 
         # compute numerical radius and volume
         # c_local = np.count_nonzero(tmp >= 0.5)
-        # c_local = float(tmp[tmp > 2 * L.prob.params.eps].sum())
+        # c_local = float(tmp[tmp > 2 * L.prob.eps].sum())
         c_local = float(tmp[:].sum())
         if self.comm is not None:
             c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)

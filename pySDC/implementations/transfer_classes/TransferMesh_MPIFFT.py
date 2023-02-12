@@ -24,9 +24,9 @@ class fft_to_fft(space_transfer):
         # invoke super initialization
         super(fft_to_fft, self).__init__(fine_prob, coarse_prob, params)
 
-        assert self.fine_prob.params.spectral == self.coarse_prob.params.spectral
+        assert self.fine_prob.spectral == self.coarse_prob.spectral
 
-        self.spectral = self.fine_prob.params.spectral
+        self.spectral = self.fine_prob.spectral
 
         Nf = list(self.fine_prob.fft.global_shape())
         Nc = list(self.coarse_prob.fft.global_shape())
@@ -34,7 +34,7 @@ class fft_to_fft(space_transfer):
         axes = tuple(range(len(Nf)))
 
         self.fft_pad = PFFT(
-            self.coarse_prob.params.comm,
+            self.coarse_prob.comm,
             Nc,
             padding=self.ratio,
             axes=axes,
