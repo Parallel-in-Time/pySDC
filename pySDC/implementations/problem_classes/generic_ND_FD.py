@@ -13,8 +13,8 @@ from pySDC.core.Problem import ptype
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
+
 class GenericNDimFinDiff(ptype):
-    
     def __init__(
         self,
         nvars=512,
@@ -26,7 +26,7 @@ class GenericNDimFinDiff(ptype):
         lintol=1e-12,
         liniter=10000,
         direct_solver=True,
-        bc='periodic'
+        bc='periodic',
     ):
         # make sure parameters have the correct types
         if not type(nvars) in [int, tuple]:
@@ -98,7 +98,7 @@ class GenericNDimFinDiff(ptype):
         # store attribute and register them as parameters
         self._makeAttributeAndRegister('nvars', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('freq', 'lintol', 'liniter', 'direct_solver', localVars=locals())
-        
+
     @property
     def ndim(self):
         """Number of dimensions of the spatial problem"""
@@ -108,7 +108,7 @@ class GenericNDimFinDiff(ptype):
     def dx(self):
         """Size of the mesh (in all dimensions)"""
         return self.xvalues[1] - self.xvalues[0]
-    
+
     @property
     def grids(self):
         """ND grids associated to the problem"""
@@ -119,7 +119,7 @@ class GenericNDimFinDiff(ptype):
             return x[None, :], x[:, None]
         if self.ndim == 3:
             return x[None, :, None], x[:, None, None], x[None, None, :]
-        
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS

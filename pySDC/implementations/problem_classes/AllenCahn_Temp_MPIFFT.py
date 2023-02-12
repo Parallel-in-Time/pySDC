@@ -22,8 +22,7 @@ class allencahn_temp_imex(ptype):
         dy: mesh width in y direction
     """
 
-    def __init__(self, nvars, eps, radius, spectral, TM, D,
-                 dw=0.0, L=1.0, init_type='circle', comm=None):
+    def __init__(self, nvars, eps, radius, spectral, TM, D, dw=0.0, L=1.0, init_type='circle', comm=None):
         """
         Initialization routine
 
@@ -48,14 +47,21 @@ class allencahn_temp_imex(ptype):
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super().__init__(
-            init=(tmp_u.shape, comm, tmp_u.dtype),
-            dtype_u=mesh,
-            dtype_f=imex_mesh
-        )
+        super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype), dtype_u=mesh, dtype_f=imex_mesh)
         self._makeAttributeAndRegister(
-            'nvars', 'eps', 'radius', 'spectral', 'TM', 'D', 'dw', 'L', 'init_type', 'comm',
-            localVars=locals(), readOnly=True)
+            'nvars',
+            'eps',
+            'radius',
+            'spectral',
+            'TM',
+            'D',
+            'dw',
+            'L',
+            'init_type',
+            'comm',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         L = np.array([self.L] * ndim, dtype=float)
 
@@ -106,9 +112,9 @@ class allencahn_temp_imex(ptype):
                 tmp_T = newDistArray(self.fft, False)
                 tmp_u = self.fft.backward(u[..., 0], tmp_u)
                 tmp_T = self.fft.backward(u[..., 1], tmp_T)
-                tmpf = -2.0 / self.eps**2 * tmp_u * (1.0 - tmp_u) * (
-                    1.0 - 2.0 * tmp_u
-                ) - 6.0 * self.dw * (tmp_T - self.TM) / self.TM * tmp_u * (1.0 - tmp_u)
+                tmpf = -2.0 / self.eps**2 * tmp_u * (1.0 - tmp_u) * (1.0 - 2.0 * tmp_u) - 6.0 * self.dw * (
+                    tmp_T - self.TM
+                ) / self.TM * tmp_u * (1.0 - tmp_u)
                 f.expl[..., 0] = self.fft.forward(tmpf)
 
             f.impl[..., 1] = -self.D * self.K2 * u[..., 1]
@@ -121,9 +127,7 @@ class allencahn_temp_imex(ptype):
 
             if self.eps > 0:
                 f.expl[..., 0] = -2.0 / self.eps**2 * u[..., 0] * (1.0 - u[..., 0]) * (1.0 - 2.0 * u[..., 0])
-                f.expl[..., 0] -= (
-                    6.0 * self.dw * (u[..., 1] - self.TM) / self.TM * u[..., 0] * (1.0 - u[..., 0])
-                )
+                f.expl[..., 0] -= 6.0 * self.dw * (u[..., 1] - self.TM) / self.TM * u[..., 0] * (1.0 - u[..., 0])
 
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = -self.D * self.K2 * u_hat

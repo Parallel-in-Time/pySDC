@@ -15,7 +15,7 @@ class testequation0d(ptype):
     Attributes:
         A: digonal matrix containing the parameters
     """
-    
+
     # TODO : add default values
     def __init__(self, lambdas, u0):
         """
@@ -26,18 +26,12 @@ class testequation0d(ptype):
             dtype_u: mesh data type for solution
             dtype_f: mesh data type for RHS
         """
-        assert not any(isinstance(i, list) for i in lambdas), (
-            'ERROR: expect flat list here, got %s' % lambdas
-        )
+        assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
         nvars = len(lambdas)
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(
-            init=(nvars, None, np.dtype('complex128')),
-            dtype_u=mesh,
-            dtype_f=mesh
-        )
+        super().__init__(init=(nvars, None, np.dtype('complex128')), dtype_u=mesh, dtype_f=mesh)
 
         self.A = self.__get_A(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)

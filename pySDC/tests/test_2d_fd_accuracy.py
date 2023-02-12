@@ -69,9 +69,7 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
             -2
             * (np.pi**2 * prob.freq[0] * prob.freq[1])
             * prob.nu
-            * np.kron(
-                np.sin(np.pi * prob.freq[0] * xvalues), np.sin(np.pi * prob.freq[1] * xvalues)
-            ).reshape(nvars)
+            * np.kron(np.sin(np.pi * prob.freq[0] * xvalues), np.sin(np.pi * prob.freq[1] * xvalues)).reshape(nvars)
         )
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)

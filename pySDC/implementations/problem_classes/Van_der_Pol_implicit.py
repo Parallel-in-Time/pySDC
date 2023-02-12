@@ -10,9 +10,9 @@ class vanderpol(ptype):
     """
     Example implementing the van der pol oscillator
     """
+
     # TODO : choose default values
-    def __init__(self, u0, mu, newton_maxiter, newton_tol, 
-                 stop_at_nan=True, crash_at_maxiter=True):
+    def __init__(self, u0, mu, newton_maxiter, newton_tol, stop_at_nan=True, crash_at_maxiter=True):
         """
         Initialization routine
 
@@ -25,8 +25,8 @@ class vanderpol(ptype):
         super().__init__((nvars, None, np.dtype('float64')), mesh, mesh)
         self._makeAttributeAndRegister('nvars', 'u0', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
-            'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter',
-            localVars=locals())
+            'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter', localVars=locals()
+        )
 
     def u_exact(self, t, u_init=None, t_init=None):
         """

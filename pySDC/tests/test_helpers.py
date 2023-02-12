@@ -144,7 +144,9 @@ def fd_stencil_single(derivative, order, stencil_type):
             else:
                 raise NotImplementedError("Order " + str(order) + " not implemented.")
         else:
-            raise NotImplementedError(f"No reference values for stencil_type \"{stencil_type}\" implemented for 1st derivative")
+            raise NotImplementedError(
+                f"No reference values for stencil_type \"{stencil_type}\" implemented for 1st derivative"
+            )
     elif derivative == 2:
         if stencil_type == 'center':
             coeff = 1.0
@@ -161,7 +163,9 @@ def fd_stencil_single(derivative, order, stencil_type):
                 stencil = [-1 / 560, 8 / 315, -1 / 5, 8 / 5, -205 / 72, 8 / 5, -1 / 5, 8 / 315, -1 / 560]
                 zero_pos = 5
         else:
-            raise NotImplementedError(f"No reference values for stencil_type \"{stencil_type}\" implemented for 2nd derivative")
+            raise NotImplementedError(
+                f"No reference values for stencil_type \"{stencil_type}\" implemented for 2nd derivative"
+            )
     else:
         raise NotImplementedError(f"No reference values for derivative {derivative} implemented")
 

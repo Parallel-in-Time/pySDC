@@ -75,10 +75,8 @@ class advectionNd(GenericNDimFinDiff):
         bc='periodic',
         sigma=6e-2,
     ):
-        super().__init__(
-            nvars, -c, 1, freq, stencil_type, order, lintol, liniter, 
-            direct_solver, bc)
-        
+        super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, direct_solver, bc)
+
         self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
 
@@ -115,7 +113,14 @@ class advectionNd(GenericNDimFinDiff):
         if direct_solver:
             sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
         else:
-            sol[:] = gmres(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
+            sol[:] = gmres(
+                Id - factor * A,
+                rhs.flatten(),
+                x0=u0.flatten(),
+                tol=lintol,
+                maxiter=liniter,
+                atol=0,
+            )[
                 0
             ].reshape(nvars)
 

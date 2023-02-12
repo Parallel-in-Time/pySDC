@@ -6,7 +6,6 @@ from pySDC.implementations.datatype_classes.mesh import imex_mesh
 
 
 class heatNd_unforced(GenericNDimFinDiff):
-    
     def __init__(
         self,
         nvars=512,
@@ -20,12 +19,10 @@ class heatNd_unforced(GenericNDimFinDiff):
         bc='periodic',
         sigma=6e-2,
     ):
-        super().__init__(
-            nvars, nu, 2, freq, stencil_type, order, lintol, liniter, 
-            direct_solver, bc)
+        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, direct_solver, bc)
         self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
-    
+
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple linear solver for (I-factor*A)u = rhs
@@ -79,11 +76,7 @@ class heatNd_unforced(GenericNDimFinDiff):
                 2.0 - 2.0 * np.cos(np.pi * freq[1] * dx)
             ) / dx**2
             x, y = self.grids
-            sol[:] = (
-                np.sin(np.pi * freq[0] * x)
-                * np.sin(np.pi * freq[1] * y)
-                * np.exp(-t * nu * rho)
-            )
+            sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.exp(-t * nu * rho)
         elif ndim == 3:
             rho = (
                 (2.0 - 2.0 * np.cos(np.pi * freq[0] * dx)) / dx**2
@@ -94,12 +87,13 @@ class heatNd_unforced(GenericNDimFinDiff):
             sol[:] = (
                 np.sin(np.pi * freq[0] * x)
                 * np.sin(np.pi * freq[1] * y)
-                * np.sin(np.pi * freq[2] *z)
+                * np.sin(np.pi * freq[2] * z)
                 * np.exp(-t * nu * rho)
             )
 
         return sol
-    
+
+
 class heatNd_forced(GenericNDimFinDiff):
     """
     Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,
@@ -120,11 +114,9 @@ class heatNd_forced(GenericNDimFinDiff):
         lintol=1e-12,
         liniter=10000,
         direct_solver=True,
-        bc='periodic'
+        bc='periodic',
     ):
-        super().__init__(
-            nvars, nu, 2, freq, stencil_type, order, lintol, liniter, 
-            direct_solver, bc)
+        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, direct_solver, bc)
         self.dtype_f = imex_mesh
         self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
 
@@ -142,7 +134,7 @@ class heatNd_forced(GenericNDimFinDiff):
 
         f = self.f_init
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.nvars)
-        
+
         ndim, freq, nu = self.ndim, self.freq, self.nu
         if ndim == 1:
             x = self.grids
@@ -183,20 +175,12 @@ class heatNd_forced(GenericNDimFinDiff):
             sol[:] = np.sin(np.pi * freq[0] * x) * np.cos(t)
         elif ndim == 2:
             x, y = self.grids
-            sol[:] = (
-                np.sin(np.pi * freq[0] * x)
-                * np.sin(np.pi * freq[1] * y)
-                * np.cos(t)
-            )
+            sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.cos(t)
         elif ndim == 3:
             x, y, z = self.grids
-            sol[:] = (
-                np.sin(np.pi * freq[0] * x)
-                * np.sin(np.pi * freq[1] * y)
-                * np.sin(np.pi * freq[2] * z)
-                * np.cos(t)
-            )
+            sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.sin(np.pi * freq[2] * z) * np.cos(t)
         return sol
+
 
 # Manually inherit solve_system from heatNd_unforced
 heatNd_forced.solve_system = heatNd_unforced.solve_system

@@ -23,8 +23,7 @@ class allencahn_imex(ptype):
         dy: mesh width in y direction
     """
 
-    def __init__(self, nvars, eps, radius, spectral, 
-                 dw=0.0, L=1.0, init_type='circle', comm=None):
+    def __init__(self, nvars, eps, radius, spectral, dw=0.0, L=1.0, init_type='circle', comm=None):
         """
         Initialization routine
 
@@ -45,14 +44,10 @@ class allencahn_imex(ptype):
         tmp_u = newDistArray(self.fft, spectral)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super().__init__(
-            init=(tmp_u.shape, comm, tmp_u.dtype),
-            dtype_u=mesh,
-            dtype_f=imex_mesh
-        )
+        super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype), dtype_u=mesh, dtype_f=imex_mesh)
         self._makeAttributeAndRegister(
-            'nvars', 'eps', 'radius', 'spectral', 'dw', 'L', 'init_type', 'comm',
-            localVars=locals(), readOnly=True)
+            'nvars', 'eps', 'radius', 'spectral', 'dw', 'L', 'init_type', 'comm', localVars=locals(), readOnly=True
+        )
 
         L = np.array([self.L] * ndim, dtype=float)
 
@@ -100,9 +95,7 @@ class allencahn_imex(ptype):
 
             if self.eps > 0:
                 tmp = self.fft.backward(u)
-                tmpf = -2.0 / self.eps**2 * tmp * (1.0 - tmp) * (
-                    1.0 - 2.0 * tmp
-                ) - 6.0 * self.dw * tmp * (1.0 - tmp)
+                tmpf = -2.0 / self.eps**2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp) - 6.0 * self.dw * tmp * (1.0 - tmp)
                 f.expl[:] = self.fft.forward(tmpf)
 
         else:
@@ -111,9 +104,7 @@ class allencahn_imex(ptype):
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
             if self.eps > 0:
-                f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.dw * u * (
-                    1.0 - u
-                )
+                f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.dw * u * (1.0 - u)
 
         return f
 

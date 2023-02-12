@@ -59,9 +59,7 @@ class mesh_to_mesh(space_transfer):
             else:
                 if not self.params.periodic:
                     fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.nvars)])
-                    coarse_grid = np.array(
-                        [(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)]
-                    )
+                    coarse_grid = np.array([(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)])
                 else:
                     fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.nvars)])
                     coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)])
@@ -105,17 +103,13 @@ class mesh_to_mesh(space_transfer):
                 # assemble restriction as transpose of interpolation
                 else:
                     if not self.params.periodic:
-                        fine_grid = np.array(
-                            [(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])]
-                        )
+                        fine_grid = np.array([(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])])
                         coarse_grid = np.array(
                             [(j + 1) * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])]
                         )
                     else:
                         fine_grid = np.array([j * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])])
-                        coarse_grid = np.array(
-                            [j * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])]
-                        )
+                        coarse_grid = np.array([j * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])])
 
                     Pspace.append(
                         th.interpolation_matrix_1d(
