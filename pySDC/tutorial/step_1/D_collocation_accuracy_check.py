@@ -10,7 +10,6 @@ import os.path
 import scipy.sparse as sp
 
 from pySDC.core.Collocation import CollBase
-from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 # setup id for gathering the results (will sort by dt)
@@ -30,7 +29,7 @@ def main():
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # instantiate problem
-    prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = heatNd_unforced(**problem_params)
 
     # instantiate collocation class, relative to the time interval [0,1]
     coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
@@ -82,7 +81,7 @@ def run_accuracy_check(prob, coll, dt_list):
         Q = coll.Qmat[1:, 1:]
 
         # build system matrix M of collocation problem
-        M = sp.eye(prob.params.nvars[0] * coll.num_nodes) - dt * sp.kron(Q, prob.A)
+        M = sp.eye(prob.nvars[0] * coll.num_nodes) - dt * sp.kron(Q, prob.A)
 
         # get initial value at t0 = 0
         u0 = prob.u_exact(t=0)
@@ -95,7 +94,7 @@ def run_accuracy_check(prob, coll, dt_list):
         u_coll = sp.linalg.spsolve(M, u0_coll)
 
         # compute error
-        err = np.linalg.norm(u_coll[-prob.params.nvars[0] :] - uend, np.inf)
+        err = np.linalg.norm(u_coll[-prob.nvars[0] :] - uend, np.inf)
         # get id for this dt and store error in results
         id = ID(dt=dt)
         results[id] = err

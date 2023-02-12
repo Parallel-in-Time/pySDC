@@ -13,10 +13,6 @@ def set_parameter():
     problem_params['eps'] = 0.04
     problem_params['radius'] = 0.25
     problem_params['nvars'] = (512, 512)
-    problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1e-08
-    problem_params['lin_tol'] = 1e-10
-    problem_params['lin_maxiter'] = 99
 
     # initialize level parameters
     level_params = dict()

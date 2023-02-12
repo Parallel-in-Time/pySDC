@@ -133,18 +133,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         rfft_object: planned real FFT for forward transformation
         irfft_object: planned IFFT for backward transformation
     """
-
-    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
-        """
-        super(allencahn2d_imex_stab, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
-
+    def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
+        super().__init__(nvars, nu, eps, radius, L, init_type)
         self.lap -= 2.0 / self.eps**2
 
     def eval_f(self, u, t):

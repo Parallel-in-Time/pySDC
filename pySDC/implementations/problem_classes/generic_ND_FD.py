@@ -73,12 +73,13 @@ class GenericNDimFinDiff(ptype):
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         if bc == 'periodic':
-            xvalues = np.linspace(0, 1, num=nvars[0], endpoint=False)
+            dx = 1.0 / nvars[0]
+            xvalues = np.array([i * dx for i in range(nvars[0])])
         elif bc == 'dirichlet-zero':
-            xvalues = np.linspace(0, 1, num=nvars[0] + 2)[1:-1]
+            dx = 1.0 / (nvars[0] + 1)
+            xvalues = np.array([(i + 1) * dx for i in range(nvars[0])])
         else:
-            raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
-        dx = xvalues[1] - xvalues[0]
+            raise ProblemError(f'Boundary conditions {bc} not implemented.')
 
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=derivative,

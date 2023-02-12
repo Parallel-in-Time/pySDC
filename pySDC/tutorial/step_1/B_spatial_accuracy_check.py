@@ -68,10 +68,10 @@ def run_accuracy_check(nvars_list, problem_params):
     for nvars in nvars_list:
         # setup problem
         problem_params['nvars'] = nvars
-        prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        prob = heatNd_unforced(**problem_params)
 
         # create x values, use only inner points
-        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars[0])])
+        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.nvars[0])])
 
         # create a mesh instance and fill it with a sine wave
         u = prob.u_exact(t=0)
@@ -79,7 +79,7 @@ def run_accuracy_check(nvars_list, problem_params):
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
         u_lap[:] = (
-            -((np.pi * prob.params.freq[0]) ** 2) * prob.params.nu * np.sin(np.pi * prob.params.freq[0] * xvalues)
+            -((np.pi * prob.freq[0]) ** 2) * prob.nu * np.sin(np.pi * prob.freq[0] * xvalues)
         )
 
         # compare analytic and computed solution using the eval_f routine of the problem class

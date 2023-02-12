@@ -57,11 +57,11 @@ def main():
     f = open('data/step_4_B_out.txt', 'w')
     for l in range(len(S.levels)):
         L = S.levels[l]
-        out = 'Level %2i: nvars = %4i -- nnodes = %2i' % (l, L.prob.params.nvars[0], L.sweep.coll.num_nodes)
+        out = 'Level %2i: nvars = %4i -- nnodes = %2i' % (l, L.prob.nvars[0], L.sweep.coll.num_nodes)
         f.write(out + '\n')
         print(out)
-        assert L.prob.params.nvars[0] == problem_params['nvars'][min(l, len(problem_params['nvars']) - 1)], (
-            "ERROR: number of DOFs is not correct on this level, got %s" % L.prob.params.nvars
+        assert L.prob.nvars[0] == problem_params['nvars'][min(l, len(problem_params['nvars']) - 1)], (
+            "ERROR: number of DOFs is not correct on this level, got %s" % L.prob.nvars
         )
         assert L.sweep.coll.num_nodes == sweeper_params['num_nodes'][min(l, len(sweeper_params['num_nodes']) - 1)], (
             "ERROR: number of nodes is not correct on this level, got %s" % L.sweep.coll.num_nodes
