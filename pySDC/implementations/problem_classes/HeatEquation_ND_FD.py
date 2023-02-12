@@ -94,7 +94,7 @@ class heatNd_unforced(GenericNDimFinDiff):
         return sol
 
 
-class heatNd_forced(GenericNDimFinDiff):
+class heatNd_forced(heatNd_unforced):
     """
     Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,
     discretized using central finite differences
@@ -103,22 +103,7 @@ class heatNd_forced(GenericNDimFinDiff):
         A: FD discretization of the ND laplace operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
-
-    def __init__(
-        self,
-        nvars=512,
-        nu=0.1,
-        freq=2,
-        stencil_type='center',
-        order=2,
-        lintol=1e-12,
-        liniter=10000,
-        direct_solver=True,
-        bc='periodic',
-    ):
-        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, direct_solver, bc)
-        self.dtype_f = imex_mesh
-        self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
+    dtype_f = imex_mesh
 
     def eval_f(self, u, t):
         """

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -9,20 +9,18 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 class vanderpol(ptype):
     """
     Example implementing the van der pol oscillator
+    
+    TODO : doku
     """
-
-    # TODO : choose default values
+    dtype_u = mesh
+    dtype_f = mesh
+    
     def __init__(self, u0, mu, newton_maxiter, newton_tol, stop_at_nan=True, crash_at_maxiter=True):
         """
         Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
         """
         nvars = 2
-        super().__init__((nvars, None, np.dtype('float64')), mesh, mesh)
+        super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'u0', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
             'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter', localVars=locals()

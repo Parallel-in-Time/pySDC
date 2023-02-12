@@ -15,43 +15,34 @@ class acoustic_1d_imex(ptype):
     """
     Example implementing the one-dimensional IMEX acoustic-advection
 
+    TODO : doku
+
     Attributes:
         mesh (numpy.ndarray): 1d mesh
         dx (float): mesh size
         Dx: matrix for the advection operator
         Id: sparse identity matrix
         A: matrix for the wave operator
-
     """
+    dtype_u = mesh
+    dtype_f = imex_mesh
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    def __init__(self, nvars, cs, cadv, order_adv, waveno):
         """
         Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data
-            dtype_f: mesh data with two components
         """
+        # invoke super init, passing number of dofs
+        super().__init__((nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'nvars', 'cs', 'cadv', 'order_adv', 'waveno', 
+            localVars=locals(), readOnly=True)
 
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'cs', 'cadv', 'order_adv', 'waveno']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(acoustic_1d_imex, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
-        )
-
-        self.mesh = np.linspace(0.0, 1.0, self.params.nvars[1], endpoint=False)
+        self.mesh = np.linspace(0.0, 1.0, self.nvars[1], endpoint=False)
         self.dx = self.mesh[1] - self.mesh[0]
 
-        self.Dx = -self.params.cadv * getWave1DAdvectionMatrix(self.params.nvars[1], self.dx, self.params.order_adv)
-        self.Id, A = getWave1DMatrix(self.params.nvars[1], self.dx, ['periodic', 'periodic'], ['periodic', 'periodic'])
-        self.A = -self.params.cs * A
+        self.Dx = -self.cadv * getWave1DAdvectionMatrix(self.nvars[1], self.dx, self.order_adv)
+        self.Id, A = getWave1DMatrix(self.nvars[1], self.dx, ['periodic', 'periodic'], ['periodic', 'periodic'])
+        self.A = -self.cs * A
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -151,9 +142,9 @@ class acoustic_1d_imex(ptype):
 
         me = self.dtype_u(self.init)
         me[0, :] = 0.5 * u_initial(
-            self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno
-        ) - 0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
+            self.mesh - (self.cadv + self.cs) * t, self.waveno
+        ) - 0.5 * u_initial(self.mesh - (self.cadv - self.cs) * t, self.waveno)
         me[1, :] = 0.5 * u_initial(
-            self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno
-        ) + 0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
+            self.mesh - (self.cadv + self.cs) * t, self.waveno
+        ) + 0.5 * u_initial(self.mesh - (self.cadv - self.cs) * t, self.waveno)
         return me

@@ -15,6 +15,8 @@ class testequation0d(ptype):
     Attributes:
         A: digonal matrix containing the parameters
     """
+    dtype_u = mesh
+    dtype_f = mesh
 
     # TODO : add default values
     def __init__(self, lambdas, u0):
@@ -31,7 +33,7 @@ class testequation0d(ptype):
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(init=(nvars, None, np.dtype('complex128')), dtype_u=mesh, dtype_f=mesh)
+        super().__init__(init=(nvars, None, np.dtype('complex128')))
 
         self.A = self.__get_A(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)

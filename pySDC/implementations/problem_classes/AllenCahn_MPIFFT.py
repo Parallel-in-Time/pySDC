@@ -22,6 +22,8 @@ class allencahn_imex(ptype):
         dx: mesh width in x direction
         dy: mesh width in y direction
     """
+    dtype_u = mesh
+    dtype_f = imex_mesh
 
     def __init__(self, nvars, eps, radius, spectral, dw=0.0, L=1.0, init_type='circle', comm=None):
         """
@@ -44,7 +46,7 @@ class allencahn_imex(ptype):
         tmp_u = newDistArray(self.fft, spectral)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype), dtype_u=mesh, dtype_f=imex_mesh)
+        super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype))
         self._makeAttributeAndRegister(
             'nvars', 'eps', 'radius', 'spectral', 'dw', 'L', 'init_type', 'comm', localVars=locals(), readOnly=True
         )

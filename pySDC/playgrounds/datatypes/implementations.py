@@ -80,9 +80,9 @@ class PETScMesh(DataType, PETSc.Vec):
 class Particles(Mesh):
     # TODO : understand what p and q are in the original implementation
 
-    def __init__(self, nParticles):
+    def __new__(cls, nParticles):
         # Note : maybe shape=(2, nParticles, 3) can also be considered ...
-        super().__init__(shape=(2, 3, nParticles), dtype=float)
+        return super().__new__(cls, shape=(2, 3, nParticles), dtype=float)
 
     @property
     def nParticles(self):

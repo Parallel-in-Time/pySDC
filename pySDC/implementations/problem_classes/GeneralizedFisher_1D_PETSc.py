@@ -1,7 +1,6 @@
 import numpy as np
 from petsc4py import PETSc
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
@@ -11,23 +10,23 @@ class Fisher_full(object):
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
 
-    def __init__(self, da, params, factor, dx):
+    def __init__(self, da, prob, factor, dx):
         """
         Initialization routine
 
         Args:
             da: DMDA object
-            params: problem parameters
+            prob: problem instance
             factor: temporal factor (dt*Qd)
             dx: grid spacing in x direction
         """
         assert da.getDim() == 1
         self.da = da
-        self.params = params
         self.factor = factor
         self.dx = dx
+        self.prob = prob
         self.localX = da.createLocalVec()
-        (self.xs, self.xe) = self.da.getRanges()[0]
+        self.xs, self.xe = self.da.getRanges()[0]
         self.mx = self.da.getSizes()[0]
         self.row = PETSc.Mat.Stencil()
         self.col = PETSc.Mat.Stencil()
@@ -58,7 +57,7 @@ class Fisher_full(object):
                 u_e = x[i + 1]  # east
                 u_w = x[i - 1]  # west
                 u_xx = (u_e - 2 * u + u_w) / self.dx**2
-                f[i] = x[i] - self.factor * (u_xx + self.params.lambda0**2 * x[i] * (1 - x[i] ** self.params.nu))
+                f[i] = x[i] - self.factor * (u_xx + self.prob.lambda0**2 * x[i] * (1 - x[i] ** self.prob.nu))
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -85,7 +84,7 @@ class Fisher_full(object):
             else:
                 diag = 1.0 - self.factor * (
                     -2.0 / self.dx**2
-                    + self.params.lambda0**2 * (1.0 - (self.params.nu + 1) * x[i] ** self.params.nu)
+                    + self.prob.lambda0**2 * (1.0 - (self.prob.nu + 1) * x[i] ** self.prob.nu)
                 )
                 for index, value in [
                     (i - 1, -self.factor / self.dx**2),
@@ -106,19 +105,19 @@ class Fisher_reaction(object):
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
 
-    def __init__(self, da, params, factor):
+    def __init__(self, da, prob, factor):
         """
         Initialization routine
 
         Args:
             da: DMDA object
-            params: problem parameters
+            prob: problem instance
             factor: temporal factor (dt*Qd)
             dx: grid spacing in x direction
         """
         assert da.getDim() == 1
         self.da = da
-        self.params = params
+        self.prob = prob
         self.factor = factor
         self.localX = da.createLocalVec()
 
@@ -145,7 +144,7 @@ class Fisher_reaction(object):
             if i == 0 or i == mx - 1:
                 f[i] = x[i]
             else:
-                f[i] = x[i] - self.factor * self.params.lambda0**2 * x[i] * (1 - x[i] ** self.params.nu)
+                f[i] = x[i] - self.factor * self.prob.lambda0**2 * x[i] * (1 - x[i] ** self.prob.nu)
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -172,8 +171,8 @@ class Fisher_reaction(object):
             if i == 0 or i == mx - 1:
                 P.setValueStencil(row, row, 1.0)
             else:
-                diag = 1.0 - self.factor * self.params.lambda0**2 * (
-                    1.0 - (self.params.nu + 1) * x[i] ** self.params.nu
+                diag = 1.0 - self.factor * self.prob.lambda0**2 * (
+                    1.0 - (self.prob.nu + 1) * x[i] ** self.prob.nu
                 )
                 P.setValueStencil(row, row, diag)
         P.assemble()
@@ -186,45 +185,31 @@ class petsc_fisher_multiimplicit(ptype):
     """
     Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc
     """
-
-    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_comp2):
+    dtype_u = petsc_vec
+    dtype_f = petsc_vec_comp2
+    
+    def __init__(
+            self,
+            nvars, lambda0, nu, interval, 
+            comm=PETSc.COMM_WORLD, lsol_tol=1e-10, nlsol_tol=1e-10,
+            lsol_maxiter=None, nlsol_maxiter=None):
         """
         Initialization routine
-
-        Args:
-            problem_params: custom parameters for the example
-            dtype_u: PETSc data type (will be passed to parent class)
-            dtype_f: PETSc data type with 2 components (will be passed to parent class)
+        
+        TODO : doku
         """
-
-        # define optional parameters
-        if 'comm' not in problem_params:
-            problem_params['comm'] = PETSc.COMM_WORLD
-        if 'lsol_tol' not in problem_params:
-            problem_params['lsol_tol'] = 1e-10
-        if 'nlsol_tol' not in problem_params:
-            problem_params['nlsol_tol'] = 1e-10
-        if 'lsol_maxiter' not in problem_params:
-            problem_params['lsol_maxiter'] = None
-        if 'nlsol_maxiter' not in problem_params:
-            problem_params['nlsol_maxiter'] = None
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'lambda0', 'nu', 'interval']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
         # create DMDA object which will be used for all grid operations
-        da = PETSc.DMDA().create([problem_params['nvars']], dof=1, stencil_width=1, comm=problem_params['comm'])
+        da = PETSc.DMDA().create([nvars], dof=1, stencil_width=1, comm=comm)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_fisher_multiimplicit, self).__init__(
-            init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
-        )
+        super().__init__(init=da)
+        self._makeAttributeAndRegister(
+            'nvars', 'lambda0', 'nu', 'interval', 'comm', 
+            'lsol_tol', 'nlsol_tol', 'lsol_maxiter', 'nlsol_maxiter',
+            localVars=locals(), readOnly=True)
 
         # compute dx and get local ranges
-        self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars - 1)
+        self.dx = (self.interval[1] - self.interval[0]) / (self.nvars - 1)
         (self.xs, self.xe) = self.init.getRanges()[0]
 
         # compute discretization matrix A and identity
@@ -233,20 +218,20 @@ class petsc_fisher_multiimplicit(ptype):
 
         # setup linear solver
         self.ksp = PETSc.KSP()
-        self.ksp.create(comm=self.params.comm)
+        self.ksp.create(comm=self.comm)
         self.ksp.setType('cg')
         pc = self.ksp.getPC()
         pc.setType('ilu')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
-        self.ksp.setTolerances(rtol=self.params.lsol_tol, atol=self.params.lsol_tol, max_it=self.params.lsol_maxiter)
+        self.ksp.setTolerances(rtol=self.lsol_tol, atol=self.lsol_tol, max_it=self.lsol_maxiter)
         self.ksp_itercount = 0
         self.ksp_ncalls = 0
 
         # setup nonlinear solver
         self.snes = PETSc.SNES()
-        self.snes.create(comm=self.params.comm)
-        if self.params.nlsol_maxiter <= 1:
+        self.snes.create(comm=self.comm)
+        if self.nlsol_maxiter <= 1:
             self.snes.setType('ksponly')
         self.snes.getKSP().setType('cg')
         pc = self.snes.getKSP().getPC()
@@ -254,10 +239,10 @@ class petsc_fisher_multiimplicit(ptype):
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
         self.snes.setTolerances(
-            rtol=self.params.nlsol_tol,
-            atol=self.params.nlsol_tol,
-            stol=self.params.nlsol_tol,
-            max_it=self.params.nlsol_maxiter,
+            rtol=self.nlsol_tol,
+            atol=self.nlsol_tol,
+            stol=self.nlsol_tol,
+            max_it=self.nlsol_maxiter,
         )
         self.snes_itercount = 0
         self.snes_ncalls = 0
@@ -362,7 +347,7 @@ class petsc_fisher_multiimplicit(ptype):
         fa2 = self.init.getVecArray(f.comp2)
         xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
-            fa2[i] = self.params.lambda0**2 * xa[i] * (1 - xa[i] ** self.params.nu)
+            fa2[i] = self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
         fa2[0] = 0
         fa2[-1] = 0
 
@@ -407,7 +392,7 @@ class petsc_fisher_multiimplicit(ptype):
         """
 
         me = self.dtype_u(u0)
-        target = Fisher_reaction(self.init, self.params, factor)
+        target = Fisher_reaction(self.init, self, factor)
 
         # assign residual function and Jacobian
         F = self.init.createGlobalVec()
@@ -433,16 +418,16 @@ class petsc_fisher_multiimplicit(ptype):
             dtype_u: exact solution
         """
 
-        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1**2 - self.params.lambda0**2)
+        lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
+        sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
         me = self.dtype_u(self.init)
         xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             xa[i] = (
                 1
-                + (2 ** (self.params.nu / 2.0) - 1)
-                * np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + (i + 1) * self.dx + 2 * lam1 * t))
-            ) ** (-2.0 / self.params.nu)
+                + (2 ** (self.nu / 2.0) - 1)
+                * np.exp(-self.nu / 2.0 * sig1 * (self.interval[0] + (i + 1) * self.dx + 2 * lam1 * t))
+            ) ** (-2.0 / self.nu)
 
         return me
 
@@ -451,21 +436,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
     """
     Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
-
-    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec):
-        """
-        Initialization routine
-
-        Args:
-            problem_params: custom parameters for the example
-            dtype_u: PETSc data type (will be passed to parent class)
-            dtype_f: PETSc data type (will be passed to parent class)
-        """
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_fisher_fullyimplicit, self).__init__(
-            problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f
-        )
+    dtype_f = petsc_vec
 
     def eval_f(self, u, t):
         """
@@ -485,7 +456,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         fa2 = self.init.getVecArray(f)
         xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
-            fa2[i] += self.params.lambda0**2 * xa[i] * (1 - xa[i] ** self.params.nu)
+            fa2[i] += self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
         fa2[0] = 0
         fa2[-1] = 0
 
@@ -506,7 +477,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         """
 
         me = self.dtype_u(u0)
-        target = Fisher_full(self.init, self.params, factor, self.dx)
+        target = Fisher_full(self.init, self, factor, self.dx)
 
         # assign residual function and Jacobian
 
@@ -525,19 +496,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
     """
     Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
-
-    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_imex):
-        """
-        Initialization routine
-
-        Args:
-            problem_params: custom parameters for the example
-            dtype_u: PETSc data type (will be passed to parent class)
-            dtype_f: PETSc data type with implicit and explicit parts (will be passed to parent class)
-        """
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_fisher_semiimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
+    dtype_f = petsc_vec_imex
 
     def eval_f(self, u, t):
         """
@@ -560,7 +519,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         fa2 = self.init.getVecArray(f.expl)
         xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
-            fa2[i] = self.params.lambda0**2 * xa[i] * (1 - xa[i] ** self.params.nu)
+            fa2[i] = self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
         fa2[0] = 0
         fa2[-1] = 0
 

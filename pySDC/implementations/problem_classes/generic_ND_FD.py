@@ -15,6 +15,10 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class GenericNDimFinDiff(ptype):
+    
+    dtype_u = mesh
+    dtype_f = mesh
+    
     def __init__(
         self,
         nvars=512,
@@ -65,12 +69,8 @@ class GenericNDimFinDiff(ptype):
         if ndim > 1 and nvars[1:] != nvars[:-1]:
             raise ProblemError('need a square domain, got %s' % nvars)
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(
-            init=(nvars, None, np.dtype('float64')),
-            dtype_u=mesh,
-            dtype_f=mesh,
-        )
+        # invoke super init, passing number of dofs
+        super().__init__(init=(nvars, None, np.dtype('float64')))
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         if bc == 'periodic':

@@ -21,7 +21,7 @@ def test_scipy_reference(init):
     from pySDC.core.Problem import ptype
 
     # instantiate a dummy problem
-    problem = ptype(init, None, None)
+    problem = ptype(init)
 
     # setup random initial conditions
     u0 = np.random.rand(*init[0])

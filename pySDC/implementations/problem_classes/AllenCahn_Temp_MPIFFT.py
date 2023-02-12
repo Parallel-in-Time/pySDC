@@ -21,7 +21,9 @@ class allencahn_temp_imex(ptype):
         dx: mesh width in x direction
         dy: mesh width in y direction
     """
-
+    dtype_u = mesh
+    dtype_f = imex_mesh
+    
     def __init__(self, nvars, eps, radius, spectral, TM, D, dw=0.0, L=1.0, init_type='circle', comm=None):
         """
         Initialization routine
@@ -47,7 +49,7 @@ class allencahn_temp_imex(ptype):
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super().__init__(init=(sizes, comm, tmp_u.dtype), dtype_u=mesh, dtype_f=imex_mesh)
+        super().__init__(init=(sizes, comm, tmp_u.dtype))
         self._makeAttributeAndRegister(
             'nvars',
             'eps',
