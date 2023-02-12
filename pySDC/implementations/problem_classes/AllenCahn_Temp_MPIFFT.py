@@ -47,7 +47,7 @@ class allencahn_temp_imex(ptype):
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super().__init__(init=(tmp_u.shape, comm, tmp_u.dtype), dtype_u=mesh, dtype_f=imex_mesh)
+        super().__init__(init=(sizes, comm, tmp_u.dtype), dtype_u=mesh, dtype_f=imex_mesh)
         self._makeAttributeAndRegister(
             'nvars',
             'eps',
