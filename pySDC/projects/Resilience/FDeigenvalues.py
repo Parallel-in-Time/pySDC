@@ -31,7 +31,9 @@ def get_finite_difference_eigenvalues(derivative, order, stencil_type=None, step
     eigenvalues = np.zeros(N, dtype=complex)
 
     # get the stencil
-    weights, offsets = get_finite_difference_stencil(derivative=derivative, order=order, stencil_type=stencil_type, steps=steps)
+    weights, offsets = get_finite_difference_stencil(
+        derivative=derivative, order=order, stencil_type=stencil_type, steps=steps
+    )
 
     # get the impact of the stencil in Fourier space
     for n in range(N):

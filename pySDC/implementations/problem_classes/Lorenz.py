@@ -13,16 +13,16 @@ class LorenzAttractor(ptype):
 
     Since the problem is non-linear, we need to use a Newton solver.
 
-    Problem and initial conditions do not originate from, 
+    Problem and initial conditions do not originate from,
     but were taken from doi.org/10.2140/camcos.2015.10.1
-    
+
     TODO : add equations with parameters
     """
+
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, sigma=10., rho=28., beta=8/3, 
-                 newton_tol=1e-9, newton_maxiter=99):
+    def __init__(self, sigma=10.0, rho=28.0, beta=8 / 3, newton_tol=1e-9, newton_maxiter=99):
         """
         Initialization routine
 
@@ -32,11 +32,10 @@ class LorenzAttractor(ptype):
         nvars = 3
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister('nvars', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
-            'nvars', localVars=locals(), readOnly=True)
-        self._makeAttributeAndRegister(
-            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter',
-            localVars=locals(), readOnly=True)
+            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=True
+        )
 
     def eval_f(self, u, t):
         """

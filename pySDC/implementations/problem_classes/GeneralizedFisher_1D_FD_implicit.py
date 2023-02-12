@@ -17,12 +17,11 @@ class generalized_fisher(ptype):
         A: second-order FD discretization of the 1D laplace operator
         dx: distance between two spatial nodes
     """
+
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(
-            self, nvars, nu, lambda0, newton_maxiter, newton_tol, interval,
-            stop_at_nan=True):
+    def __init__(self, nvars, nu, lambda0, newton_maxiter, newton_tol, interval, stop_at_nan=True):
         """Initialization routine"""
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
@@ -32,8 +31,16 @@ class generalized_fisher(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'nu', 'lambda0', 'newton_maxiter', 'newton_tol', 'interval',
-            'stop_at_nan', localVars=locals(), readOnly=True)
+            'nvars',
+            'nu',
+            'lambda0',
+            'newton_maxiter',
+            'newton_tol',
+            'interval',
+            'stop_at_nan',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = (self.interval[1] - self.interval[0]) / (self.nvars + 1)
@@ -70,12 +77,8 @@ class generalized_fisher(ptype):
         # set up boundary values to embed inner points
         lam1 = lambda0 / 2.0 * ((nu / 2.0 + 1) ** 0.5 + (nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1**2 - lambda0**2)
-        ul = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (self.interval[0] + 2 * lam1 * t))) ** (
-            -2.0 / nu
-        )
-        ur = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (self.interval[1] + 2 * lam1 * t))) ** (
-            -2.0 / nu
-        )
+        ul = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (self.interval[0] + 2 * lam1 * t))) ** (-2.0 / nu)
+        ur = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (self.interval[1] + 2 * lam1 * t))) ** (-2.0 / nu)
 
         # start newton iteration
         n = 0
@@ -126,16 +129,12 @@ class generalized_fisher(ptype):
         # set up boundary values to embed inner points
         lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
-        ul = (
-            1
-            + (2 ** (self.nu / 2.0) - 1)
-            * np.exp(-self.nu / 2.0 * sig1 * (self.interval[0] + 2 * lam1 * t))
-        ) ** (-2 / self.nu)
-        ur = (
-            1
-            + (2 ** (self.nu / 2.0) - 1)
-            * np.exp(-self.nu / 2.0 * sig1 * (self.interval[1] + 2 * lam1 * t))
-        ) ** (-2 / self.nu)
+        ul = (1 + (2 ** (self.nu / 2.0) - 1) * np.exp(-self.nu / 2.0 * sig1 * (self.interval[0] + 2 * lam1 * t))) ** (
+            -2 / self.nu
+        )
+        ur = (1 + (2 ** (self.nu / 2.0) - 1) * np.exp(-self.nu / 2.0 * sig1 * (self.interval[1] + 2 * lam1 * t))) ** (
+            -2 / self.nu
+        )
 
         uext = np.concatenate(([ul], u, [ur]))
 
@@ -159,7 +158,7 @@ class generalized_fisher(ptype):
 
         lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
-        me[:] = (
-            1 + (2 ** (self.nu / 2.0) - 1) * np.exp(-self.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))
-        ) ** (-2.0 / self.nu)
+        me[:] = (1 + (2 ** (self.nu / 2.0) - 1) * np.exp(-self.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (
+            -2.0 / self.nu
+        )
         return me

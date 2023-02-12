@@ -11,11 +11,11 @@ class battery_n_capacitors(ptype):
     Attributes:
         nswitches: number of switches
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(
-            self, ncapacitors, Vs, Rs, C, R, L, alpha, V_ref):
+    def __init__(self, ncapacitors, Vs, Rs, C, R, L, alpha, V_ref):
         """Initialization routine"""
         n = ncapacitors
         nvars = n + 1
@@ -23,8 +23,8 @@ class battery_n_capacitors(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref',
-            localVars=locals(), readOnly=True)
+            'nvars', 'ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref', localVars=locals(), readOnly=True
+        )
 
         self.A = np.zeros((n + 1, n + 1))
         self.switch_A, self.switch_f = self.get_problem_dict()
@@ -150,9 +150,7 @@ class battery_n_capacitors(ptype):
             if break_flag:
                 break
 
-        vC_switch = (
-            [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
-        )
+        vC_switch = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
 
         return switch_detected, m_guess, vC_switch
 
@@ -185,6 +183,7 @@ class battery(battery_n_capacitors):
     """
     Example implementing the battery drain model with one capacitor, inherits from battery_n_capacitors.
     """
+
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):
@@ -260,16 +259,11 @@ class battery(battery_n_capacitors):
 
 
 class battery_implicit(battery):
-    
     dtype_f = mesh
-    
-    def __init__(
-        self, ncapacitors, Vs, Rs, C, R, L, alpha, V_ref,
-        newton_maxiter, newton_tol
-    ):
+
+    def __init__(self, ncapacitors, Vs, Rs, C, R, L, alpha, V_ref, newton_maxiter, newton_tol):
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
-        self._makeAttributeAndRegister(
-            'newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
         self.newton_itercount = 0
         self.lin_itercount = 0

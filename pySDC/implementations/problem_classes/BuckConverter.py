@@ -7,25 +7,25 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 class buck_converter(ptype):
     """
     Example implementing the buck converter model as in the description in the PinTSimE project
-    
+
     TODO : doku
-    
+
     Attributes:
         A: system matrix, representing the 3 ODEs
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(
-            self, duty, fsw, Vs, Rs, C1, Rp, L1, C2, Rl):
+    def __init__(self, duty, fsw, Vs, Rs, C1, Rp, L1, C2, Rl):
         """Initialization routine"""
 
         # invoke super init, passing number of dofs
         nvars = 3
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'duty', 'fsw', 'Vs', 'Rs', 'C1', 'Rp', 'L1', 'C2', 'Rl',
-            localVars=locals(), readOnly=True)
+            'nvars', 'duty', 'fsw', 'Vs', 'Rs', 'C1', 'Rp', 'L1', 'C2', 'Rl', localVars=locals(), readOnly=True
+        )
 
         self.A = np.zeros((nvars, nvars))
 

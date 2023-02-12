@@ -13,19 +13,19 @@ class piline(ptype):
     Attributes:
         A: system matrix, representing the 3 ODEs
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(
-            self, Vs, Rs, C1, Rpi, Lpi, C2, Rl):
+    def __init__(self, Vs, Rs, C1, Rpi, Lpi, C2, Rl):
         """Initialization routine"""
 
         nvars = 3
         # invoke super init, passing number of dofs
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'Vs', 'Rs', 'C1', 'Rpi', 'Lpi', 'C2', 'Rl',
-            localVars=locals(), readOnly=True)
+            'nvars', 'Vs', 'Rs', 'C1', 'Rpi', 'Lpi', 'C2', 'Rl', localVars=locals(), readOnly=True
+        )
 
         # compute dx and get discretization matrix A
         self.A = np.zeros((3, 3))
