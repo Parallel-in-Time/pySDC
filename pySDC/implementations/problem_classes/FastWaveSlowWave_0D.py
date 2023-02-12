@@ -12,6 +12,7 @@ class swfw_scalar(ptype):
 
     Attributes:
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 

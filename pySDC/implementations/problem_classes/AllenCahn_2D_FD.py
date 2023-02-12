@@ -16,17 +16,17 @@ class allencahn_fullyimplicit(ptype):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
 
-    TODO : doku 
+    TODO : doku
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
         dx: distance between two spatial nodes (same for both directions)
     """
+
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars, nu, eps, newton_maxiter, newton_tol, lin_tol, 
-                 lin_maxiter, radius, order=2):
+    def __init__(self, nvars, nu, eps, newton_maxiter, newton_tol, lin_tol, lin_maxiter, radius, order=2):
         """
         Initialization routine
         """
@@ -41,9 +41,18 @@ class allencahn_fullyimplicit(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'nu', 'eps', 'newton_maxiter', 'newton_tol', 'lin_tol',
-            'lin_maxiter', 'radius', 'order', localVars=locals(), 
-            readOnly=True)
+            'nvars',
+            'nu',
+            'eps',
+            'newton_maxiter',
+            'newton_tol',
+            'lin_tol',
+            'lin_maxiter',
+            'radius',
+            'order',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.nvars[0]
@@ -192,6 +201,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
+
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):
@@ -258,6 +268,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
+
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):
@@ -340,7 +351,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
-    dtype_f=comp2_mesh
+
+    dtype_f = comp2_mesh
 
     def eval_f(self, u, t):
         """
@@ -461,6 +473,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
+
     dtype_f = comp2_mesh
 
     def eval_f(self, u, t):

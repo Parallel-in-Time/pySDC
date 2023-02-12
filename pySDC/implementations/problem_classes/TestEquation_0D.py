@@ -15,6 +15,7 @@ class testequation0d(ptype):
     Attributes:
         A: digonal matrix containing the parameters
     """
+
     dtype_u = mesh
     dtype_f = mesh
 

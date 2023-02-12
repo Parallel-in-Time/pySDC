@@ -24,6 +24,7 @@ class acoustic_1d_imex(ptype):
         Id: sparse identity matrix
         A: matrix for the wave operator
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
@@ -33,9 +34,7 @@ class acoustic_1d_imex(ptype):
         """
         # invoke super init, passing number of dofs
         super().__init__((nvars, None, np.dtype('float64')))
-        self._makeAttributeAndRegister(
-            'nvars', 'cs', 'cadv', 'order_adv', 'waveno', 
-            localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('nvars', 'cs', 'cadv', 'order_adv', 'waveno', localVars=locals(), readOnly=True)
 
         self.mesh = np.linspace(0.0, 1.0, self.nvars[1], endpoint=False)
         self.dx = self.mesh[1] - self.mesh[0]
@@ -141,10 +140,10 @@ class acoustic_1d_imex(ptype):
             return np.sin(k * 2.0 * np.pi * x) + np.sin(2.0 * np.pi * x)
 
         me = self.dtype_u(self.init)
-        me[0, :] = 0.5 * u_initial(
-            self.mesh - (self.cadv + self.cs) * t, self.waveno
-        ) - 0.5 * u_initial(self.mesh - (self.cadv - self.cs) * t, self.waveno)
-        me[1, :] = 0.5 * u_initial(
-            self.mesh - (self.cadv + self.cs) * t, self.waveno
-        ) + 0.5 * u_initial(self.mesh - (self.cadv - self.cs) * t, self.waveno)
+        me[0, :] = 0.5 * u_initial(self.mesh - (self.cadv + self.cs) * t, self.waveno) - 0.5 * u_initial(
+            self.mesh - (self.cadv - self.cs) * t, self.waveno
+        )
+        me[1, :] = 0.5 * u_initial(self.mesh - (self.cadv + self.cs) * t, self.waveno) + 0.5 * u_initial(
+            self.mesh - (self.cadv - self.cs) * t, self.waveno
+        )
         return me

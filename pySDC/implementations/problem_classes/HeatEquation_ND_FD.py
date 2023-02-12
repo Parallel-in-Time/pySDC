@@ -103,6 +103,7 @@ class heatNd_forced(heatNd_unforced):
         A: FD discretization of the ND laplace operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
+
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):

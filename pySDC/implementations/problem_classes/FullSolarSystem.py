@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.Errors import ParameterError
+
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
 
@@ -10,31 +10,14 @@ class full_solar_system(outer_solar_system):
     Example implementing the full solar system problem
     """
 
-    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
-        """
-        Initialization routine
+    dtype_u = particles
+    dtype_f = acceleration
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed to parent class)
-            dtype_f: acceleration data type (will be passed to parent class)
-        """
+    def __init__(self, sun_only=False):
+        """Initialization routine"""
 
-        if 'sun_only' not in problem_params:
-            problem_params['sun_only'] = False
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = []
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # invoke parant's class (!) super init, passing nparts, dtype_u and dtype_f
-        super(outer_solar_system, self).__init__(((3, 10), None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
-
-        # gravitational constant
-        self.G = 2.95912208286e-4
+        super().__init__(sun_only)
+        self.init = ((3, 10), None, np.dtype('float64'))
 
     def u_exact(self, t):
         """

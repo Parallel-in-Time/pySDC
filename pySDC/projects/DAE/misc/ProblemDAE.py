@@ -8,6 +8,7 @@ class ptype_dae(ptype):
     """
     Interface class for DAE problems. Ensures that all parameters are passed that are needed by DAE sweepers
     """
+
     dtype_u = mesh
     dtype_f = mesh
 

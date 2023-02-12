@@ -248,12 +248,23 @@ class petsc_grayscott_multiimplicit(ptype):
     """
     Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
+
     dtype_u = petsc_vec
     dtype_f = petsc_vec_comp2
 
     def __init__(
-            self, nvars, Du, Dv, A, B, comm=PETSc.COMM_WORLD, 
-            lsol_tol=1e-10, nlsol_tol=1e-10, lsol_maxiter=None, nlsol_maxiter=None):
+        self,
+        nvars,
+        Du,
+        Dv,
+        A,
+        B,
+        comm=PETSc.COMM_WORLD,
+        lsol_tol=1e-10,
+        nlsol_tol=1e-10,
+        lsol_maxiter=None,
+        nlsol_maxiter=None,
+    ):
         """
         Initialization routine
 
@@ -274,9 +285,19 @@ class petsc_grayscott_multiimplicit(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=da)
         self._makeAttributeAndRegister(
-            'nvars', 'Du', 'Dv', 'A', 'B', 'comm', 'lsol_tol', 'lsol_maxiter',
-            'nlsol_tol', 'nlsol_maxiter',
-            localVars=locals(), readOnly=True)
+            'nvars',
+            'Du',
+            'Dv',
+            'A',
+            'B',
+            'comm',
+            'lsol_tol',
+            'lsol_maxiter',
+            'nlsol_tol',
+            'nlsol_maxiter',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx, dy and get local ranges
         self.dx = 100.0 / (self.nvars[0])
@@ -512,6 +533,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
     """
     Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
+
     dtype_f = petsc_vec
 
     def eval_f(self, u, t):
@@ -573,6 +595,7 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
     """
     Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
+
     dtype_f = petsc_vec_imex
 
     def eval_f(self, u, t):

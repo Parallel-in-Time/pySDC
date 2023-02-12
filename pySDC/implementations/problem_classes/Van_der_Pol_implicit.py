@@ -9,12 +9,13 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 class vanderpol(ptype):
     """
     Example implementing the van der pol oscillator
-    
+
     TODO : doku
     """
+
     dtype_u = mesh
     dtype_f = mesh
-    
+
     def __init__(self, u0, mu, newton_maxiter, newton_tol, stop_at_nan=True, crash_at_maxiter=True):
         """
         Initialization routine

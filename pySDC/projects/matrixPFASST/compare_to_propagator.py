@@ -92,7 +92,7 @@ def advection_setup(par=0.0):
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 2
-    problem_params['type'] = 'center'
+    problem_params['stencil_type'] = 'center'
     problem_params['bc'] = 'periodic'  # boundary conditions
 
     # initialize step parameters

@@ -11,6 +11,7 @@ import logging
 
 from pySDC.core.Common import RegisterParams
 
+
 class ptype(RegisterParams):
     """
     Prototype class for problems, just defines the attributes essential to get started.
@@ -29,6 +30,7 @@ class ptype(RegisterParams):
     logger: logging.Logger
         custom logger for problem-related logging.
     """
+
     logger = logging.getLogger('problem')
     dtype_u = None
     dtype_f = None

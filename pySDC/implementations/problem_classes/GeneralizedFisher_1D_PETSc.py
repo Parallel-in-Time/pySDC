@@ -83,8 +83,7 @@ class Fisher_full(object):
                 P.setValueStencil(self.row, self.row, 1.0)
             else:
                 diag = 1.0 - self.factor * (
-                    -2.0 / self.dx**2
-                    + self.prob.lambda0**2 * (1.0 - (self.prob.nu + 1) * x[i] ** self.prob.nu)
+                    -2.0 / self.dx**2 + self.prob.lambda0**2 * (1.0 - (self.prob.nu + 1) * x[i] ** self.prob.nu)
                 )
                 for index, value in [
                     (i - 1, -self.factor / self.dx**2),
@@ -171,9 +170,7 @@ class Fisher_reaction(object):
             if i == 0 or i == mx - 1:
                 P.setValueStencil(row, row, 1.0)
             else:
-                diag = 1.0 - self.factor * self.prob.lambda0**2 * (
-                    1.0 - (self.prob.nu + 1) * x[i] ** self.prob.nu
-                )
+                diag = 1.0 - self.factor * self.prob.lambda0**2 * (1.0 - (self.prob.nu + 1) * x[i] ** self.prob.nu)
                 P.setValueStencil(row, row, diag)
         P.assemble()
         if J != P:
@@ -185,17 +182,25 @@ class petsc_fisher_multiimplicit(ptype):
     """
     Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc
     """
+
     dtype_u = petsc_vec
     dtype_f = petsc_vec_comp2
-    
+
     def __init__(
-            self,
-            nvars, lambda0, nu, interval, 
-            comm=PETSc.COMM_WORLD, lsol_tol=1e-10, nlsol_tol=1e-10,
-            lsol_maxiter=None, nlsol_maxiter=None):
+        self,
+        nvars,
+        lambda0,
+        nu,
+        interval,
+        comm=PETSc.COMM_WORLD,
+        lsol_tol=1e-10,
+        nlsol_tol=1e-10,
+        lsol_maxiter=None,
+        nlsol_maxiter=None,
+    ):
         """
         Initialization routine
-        
+
         TODO : doku
         """
         # create DMDA object which will be used for all grid operations
@@ -204,9 +209,18 @@ class petsc_fisher_multiimplicit(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=da)
         self._makeAttributeAndRegister(
-            'nvars', 'lambda0', 'nu', 'interval', 'comm', 
-            'lsol_tol', 'nlsol_tol', 'lsol_maxiter', 'nlsol_maxiter',
-            localVars=locals(), readOnly=True)
+            'nvars',
+            'lambda0',
+            'nu',
+            'interval',
+            'comm',
+            'lsol_tol',
+            'nlsol_tol',
+            'lsol_maxiter',
+            'nlsol_maxiter',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx and get local ranges
         self.dx = (self.interval[1] - self.interval[0]) / (self.nvars - 1)
@@ -436,6 +450,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
     """
     Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
+
     dtype_f = petsc_vec
 
     def eval_f(self, u, t):
@@ -496,6 +511,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
     """
     Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
+
     dtype_f = petsc_vec_imex
 
     def eval_f(self, u, t):

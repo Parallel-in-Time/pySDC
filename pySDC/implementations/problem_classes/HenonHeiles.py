@@ -1,6 +1,5 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
@@ -11,25 +10,13 @@ class henon_heiles(ptype):
     Example implementing the harmonic oscillator
     """
 
-    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
-        """
-        Initialization routine
+    dtype_u = particles
+    dtype_f = acceleration
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = []
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # invoke super init, passing nparts, dtype_u and dtype_f
-        super(henon_heiles, self).__init__((2, None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
+    def __init__(self):
+        """Initialization routine"""
+        # invoke super init, passing nparts
+        super().__init__((2, None, np.dtype('float64')))
 
     def eval_f(self, u, t):
         """

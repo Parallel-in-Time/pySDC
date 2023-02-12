@@ -21,9 +21,10 @@ class allencahn_temp_imex(ptype):
         dx: mesh width in x direction
         dy: mesh width in y direction
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
-    
+
     def __init__(self, nvars, eps, radius, spectral, TM, D, dw=0.0, L=1.0, init_type='circle', comm=None):
         """
         Initialization routine

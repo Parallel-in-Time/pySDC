@@ -22,6 +22,7 @@ class allencahn_imex(ptype):
         dx: mesh width in x direction
         dy: mesh width in y direction
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
