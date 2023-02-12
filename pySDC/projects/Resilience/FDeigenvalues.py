@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.helpers.problem_helper import get_finite_difference_stencil
 
 
-def get_finite_difference_eigenvalues(derivative, order, type=None, steps=None, dx=None, L=1.0):
+def get_finite_difference_eigenvalues(derivative, order, stencil_type=None, steps=None, dx=None, L=1.0):
     """
     Compute the eigenvalues of the finite difference (FD) discretization using Fourier transform.
 
@@ -18,7 +18,7 @@ def get_finite_difference_eigenvalues(derivative, order, type=None, steps=None, 
     Args:
         derivative (int): The order of the derivative
         order (int): The order of accuracy of the derivative
-        type (str): The type of stencil, i.e. 'forward', 'backward', or 'center'
+        stencil_type (str): The type of stencil, i.e. 'forward', 'backward', or 'center'
         steps (list): If you want an exotic stencil like upwind, you can give the offsets here
         dx (float): The mesh spacing
         L (float): The length of the interval in space
@@ -31,7 +31,7 @@ def get_finite_difference_eigenvalues(derivative, order, type=None, steps=None, 
     eigenvalues = np.zeros(N, dtype=complex)
 
     # get the stencil
-    weights, offsets = get_finite_difference_stencil(derivative=derivative, order=order, type=type, steps=steps)
+    weights, offsets = get_finite_difference_stencil(derivative=derivative, order=order, stencil_type=stencil_type, steps=steps)
 
     # get the impact of the stencil in Fourier space
     for n in range(N):

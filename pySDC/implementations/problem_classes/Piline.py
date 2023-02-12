@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -14,43 +13,29 @@ class piline(ptype):
     Attributes:
         A: system matrix, representing the 3 ODEs
     """
+    dtype_u = mesh
+    dtype_f = imex_mesh
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
+    def __init__(
+            self, Vs, Rs, C1, Rpi, Lpi, C2, Rl):
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type for solution
-            dtype_f: mesh data type for RHS
-        """
-
-        problem_params['nvars'] = 3
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['Vs', 'Rs', 'C1', 'Rpi', 'Lpi', 'C2', 'Rl']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(piline, self).__init__(
-            init=(problem_params['nvars'], None, np.dtype('float64')),
-            dtype_u=dtype_u,
-            dtype_f=dtype_f,
-            params=problem_params,
-        )
+        nvars = 3
+        # invoke super init, passing number of dofs
+        super().__init__(init=(nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'nvars', 'Vs', 'Rs', 'C1', 'Rpi', 'Lpi', 'C2', 'Rl',
+            localVars=locals(), readOnly=True)
 
         # compute dx and get discretization matrix A
         self.A = np.zeros((3, 3))
-        self.A[0, 0] = -1 / (self.params.Rs * self.params.C1)
-        self.A[0, 2] = -1 / self.params.C1
-        self.A[1, 1] = -1 / (self.params.Rl * self.params.C2)
-        self.A[1, 2] = 1 / self.params.C2
-        self.A[2, 0] = 1 / self.params.Lpi
-        self.A[2, 1] = -1 / self.params.Lpi
-        self.A[2, 2] = -self.params.Rpi / self.params.Lpi
+        self.A[0, 0] = -1 / (self.Rs * self.C1)
+        self.A[0, 2] = -1 / self.C1
+        self.A[1, 1] = -1 / (self.Rl * self.C2)
+        self.A[1, 2] = 1 / self.C2
+        self.A[2, 0] = 1 / self.Lpi
+        self.A[2, 1] = -1 / self.Lpi
+        self.A[2, 2] = -self.Rpi / self.Lpi
 
     def eval_f(self, u, t):
         """
@@ -66,7 +51,7 @@ class piline(ptype):
 
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
-        f.expl[0] = self.params.Vs / (self.params.Rs * self.params.C1)
+        f.expl[0] = self.Vs / (self.Rs * self.C1)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -84,7 +69,7 @@ class piline(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
+        me[:] = np.linalg.solve(np.eye(self.nvars) - factor * self.A, rhs)
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):

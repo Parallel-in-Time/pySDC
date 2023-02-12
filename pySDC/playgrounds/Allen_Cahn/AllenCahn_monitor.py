@@ -33,9 +33,9 @@ class monitor(hooks):
 
         rows1 = np.where(L.u[0][int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] > -0.99)
         rows2 = np.where(L.u[0][int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] < 0.99)
-        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps
+        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
 
-        self.init_radius = L.prob.params.radius
+        self.init_radius = L.prob.radius
 
         self.add_to_stats(
             process=step.status.slot,
@@ -84,7 +84,7 @@ class monitor(hooks):
         exact_radius = np.sqrt(max(self.init_radius**2 - 2.0 * (L.time + L.dt), 0))
         rows1 = np.where(L.uend[int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] > -0.99)
         rows2 = np.where(L.uend[int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] < 0.99)
-        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps
+        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
 
         self.add_to_stats(
             process=step.status.slot,

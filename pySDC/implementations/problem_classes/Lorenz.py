@@ -13,37 +13,30 @@ class LorenzAttractor(ptype):
 
     Since the problem is non-linear, we need to use a Newton solver.
 
-    Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1
+    Problem and initial conditions do not originate from, 
+    but were taken from doi.org/10.2140/camcos.2015.10.1
+    
+    TODO : add equations with parameters
     """
+    dtype_u = mesh
+    dtype_f = mesh
 
-    def __init__(self, problem_params):
+    def __init__(self, sigma=10., rho=28., beta=8/3, 
+                 newton_tol=1e-9, newton_maxiter=99):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
         """
-
-        # take care of essential parameters in defaults such that they always exist
-        defaults = {
-            'sigma': 10.0,
-            'rho': 28.0,
-            'beta': 8.0 / 3.0,
-            'nvars': 3,
-            'newton_tol': 1e-9,
-            'newton_maxiter': 99,
-        }
-
-        for key in defaults.keys():
-            problem_params[key] = problem_params.get(key, defaults[key])
-
+        nvars = 3
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(
-            init=(problem_params['nvars'], None, np.dtype('float64')),
-            dtype_u=mesh,
-            dtype_f=mesh,
-            params=problem_params,
-        )
+        super().__init__(init=(nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'nvars', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter',
+            localVars=locals(), readOnly=True)
 
     def eval_f(self, u, t):
         """
@@ -57,9 +50,9 @@ class LorenzAttractor(ptype):
             dtype_f: the RHS
         """
         # abbreviations
-        sigma = self.params.sigma
-        rho = self.params.rho
-        beta = self.params.beta
+        sigma = self.sigma
+        rho = self.rho
+        beta = self.beta
 
         f = self.dtype_f(self.init)
 
@@ -86,14 +79,14 @@ class LorenzAttractor(ptype):
         """
 
         # abbreviations
-        sigma = self.params.sigma
-        rho = self.params.rho
-        beta = self.params.beta
+        sigma = self.sigma
+        rho = self.rho
+        beta = self.beta
 
         # start Newton iterations
         u = self.dtype_u(u0)
         res = np.inf
-        for _n in range(0, self.params.newton_maxiter):
+        for _n in range(0, self.newton_maxiter):
             # assemble G such that G(u) = 0 at the solution to the step
             G = np.array(
                 [
@@ -105,7 +98,7 @@ class LorenzAttractor(ptype):
 
             # compute the residual and determine if we are done
             res = np.linalg.norm(G, np.inf)
-            if res <= self.params.newton_tol or np.isnan(res):
+            if res <= self.newton_tol or np.isnan(res):
                 break
 
             # assemble Jacobian J of G

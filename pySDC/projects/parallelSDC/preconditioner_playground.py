@@ -59,7 +59,8 @@ def main():
         for setup, nvars, param_list in setup_list:
             # initialize problem parameters (part I)
             problem_params = dict()
-            problem_params['nvars'] = nvars  # number of degrees of freedom for each level
+            if setup != 'vanderpol':
+                problem_params['nvars'] = nvars  # number of degrees of freedom for each level
 
             # loop over all parameters
             for param in param_list:
@@ -87,7 +88,7 @@ def main():
                     problem_params['c'] = param
                     problem_params['order'] = 2
                     problem_params['freq'] = 2
-                    problem_params['type'] = 'center'  # boundary conditions
+                    problem_params['stencil_type'] = 'center'  # boundary conditions
                     problem_params['bc'] = 'periodic'  # boundary conditions
 
                     level_params['dt'] = 0.1

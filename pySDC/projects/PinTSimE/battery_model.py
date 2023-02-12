@@ -3,7 +3,6 @@ import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import sort_stats, filter_stats, get_sorted
-from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -110,8 +109,9 @@ def generate_description(
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_maxiter'] = 200
-    problem_params['newton_tol'] = 1e-08
+    if problem == battery_implicit:
+        problem_params['newton_maxiter'] = 200
+        problem_params['newton_tol'] = 1e-08
     problem_params['ncapacitors'] = ncapacitors  # number of condensators
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
