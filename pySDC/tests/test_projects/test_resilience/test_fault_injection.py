@@ -144,7 +144,8 @@ def test_fault_injection():
 
 
 @pytest.mark.mpi4py
-def test_fault_stats():
+@pytest.mark.parametrize("numprocs", [1, 4, 7])
+def test_fault_stats(numprocs):
     """
     Test generation of fault statistics and their recovery rates
     """
@@ -163,14 +164,14 @@ def test_fault_stats():
     my_env['PYTHONPATH'] = '../../..:.'
     my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
 
-    cmd = f"mpirun -np {4} python {__file__} --test-fault-stats".split()
+    cmd = f"mpirun -np {numprocs} python {__file__} --test-fault-stats".split()
 
     p = subprocess.Popen(cmd, env=my_env, cwd=".")
 
     p.wait()
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
         p.returncode,
-        4,
+        numprocs,
     )
 
     vdp_stats = generate_stats(True)
@@ -243,6 +244,6 @@ if __name__ == "__main__":
         generate_stats()
     else:
         test_complex_conversion()
-        test_fault_stats()
+        test_fault_stats(8)
         test_fault_injection()
         test_float_conversion()

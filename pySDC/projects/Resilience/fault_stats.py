@@ -481,10 +481,11 @@ class FaultStats:
         '''
         comm = MPI.COMM_WORLD if comm is None else comm
         step = (runs if step is None else step) if comm.size == 1 else comm.size
+        reload = self.reload or _reload
 
         max_runs = self.get_max_combinations() if self.mode == 'combination' else runs
 
-        if self.reload:
+        if reload:
             # sort the strategies to do some load balancing
             sorting_index = None
             if comm.rank == 0:
@@ -497,11 +498,12 @@ class FaultStats:
             strategies = [self.strategies[i] for i in sorting_index]
             if len(strategies) == 0:  # check if we are already done
                 return None
+        else:
+            strategies = self.strategies
 
         strategy_comm = comm.Split(comm.rank % len(strategies))
 
         for j in range(0, len(strategies), comm.size):
-
             for f in self.faults:
                 if f:
                     runs_partial = min(_runs_partial, max_runs)
@@ -511,7 +513,7 @@ class FaultStats:
                     strategy=strategies[j + comm.rank % len(strategies)],
                     runs=runs_partial,
                     faults=f,
-                    reload=self.reload or _reload,
+                    reload=reload,
                     comm=strategy_comm,
                 )
         self.run_stats_generation(runs=runs, step=step, comm=comm, _reload=True, _runs_partial=_runs_partial + step)

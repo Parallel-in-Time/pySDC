@@ -97,6 +97,7 @@ def compare_strategies(stats_analyser, **kwargs):  # pragma: no cover
     Returns:
         None
     """
+    my_setup_mpl()
     fig, ax = plt.subplots(figsize=(16 * cm, 7 * cm))
     stats_analyser.compare_strategies(ax=ax)
     savefig(fig, 'compare_strategies', **kwargs)
@@ -165,6 +166,7 @@ def compare_recovery_rate_problems():  # pragma no cover
     schroedinger_stats = get_stats(run_Schroedinger, 'data/stats-jusuf/')
     titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger']
 
+    my_setup_mpl()
     fig, axs = plt.subplots(1, 3, figsize=(16 * cm, 5.5 * cm), sharex=False, sharey=True)
 
     plot_recovery_rate_recoverable_only(vdp_stats, fig, axs[0], ylabel='recovery rate')
@@ -200,12 +202,10 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
         None
     """
 
-    my_setup_mpl()
-
     stats_analyser = get_stats(problem, path)
+    mask = stats_analyser.get_mask()  # get empty mask, potentially put in some other mask later
 
-    mask = stats_analyser.get_mask()
-
+    my_setup_mpl()
     fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8 * cm, 8 * cm))
 
     res = {}
@@ -327,6 +327,7 @@ def plot_fault_vdp(bit=0):  # pragma no cover
         mode='combination',
     )
 
+    my_setup_mpl()
     fig, ax = plt.subplots(1, 1, figsize=(10 * cm, 7 * cm))
     colors = ['blue', 'red', 'magenta']
     ls = ['--', '--', '-', '-']
