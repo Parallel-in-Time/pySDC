@@ -41,6 +41,8 @@ def run_leaky_superconductor(
     custom_controller_params=None,
     custom_problem_params=None,
     imex=False,
+    u0=None,
+    t0=None,
 ):
     """
     Run a toy problem of a superconducting magnet with a temperature leak with default parameters.
@@ -53,6 +55,9 @@ def run_leaky_superconductor(
         fault_stuff (dict): A dictionary with information on how to add faults
         custom_controller_params (dict): Overwrite presets
         custom_problem_params (dict): Overwrite presets
+        imex (bool): Solve the problem IMEX or fully implicit
+        u0 (dtype_u): Initial value
+        t0 (float): Starting time
 
     Returns:
         dict: The stats object
@@ -108,7 +113,7 @@ def run_leaky_superconductor(
             description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
-    t0 = 0.0
+    t0 = 0.0 if t0 is None else t0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
@@ -119,7 +124,7 @@ def run_leaky_superconductor(
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
+    uinit = P.u_exact(t0) if u0 is None else u0
 
     # call main function to get things done...
     try:
@@ -169,6 +174,7 @@ def compare_imex_full(plotting=False):
     custom_description['problem_params'] = {
         'lintol': 1e-4,
         'liniter': 15,
+        'direct_solver': True,
     }
     custom_controller_params = {'logger_level': 30}
     for imex in [True, False]:
@@ -181,7 +187,7 @@ def compare_imex_full(plotting=False):
         )
 
         res[imex] = get_sorted(stats, type='u')[-1][1]
-        if plotting:
+        if plotting:  # pragma no cover
             plot_solution(stats, controller)
 
     diff = abs(res[True] - res[False])

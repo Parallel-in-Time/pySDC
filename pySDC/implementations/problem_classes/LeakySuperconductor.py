@@ -49,6 +49,10 @@ class LeakySuperconductor(ptype):
             'lintol': 1e-8,
         }
 
+        # optional parameters for solving the linear problems within the Newton solver iteratively
+        defaults['liniter_within_newton'] = problem_params.get('liniter_within_newton', defaults['liniter'])
+        defaults['lintol_within_newton'] = problem_params.get('lintol_within_newton', defaults['lintol'])
+
         for key in problem_params.keys():
             if key not in defaults.keys():
                 raise ParameterError(
@@ -137,7 +141,7 @@ class LeakySuperconductor(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple linear solver for (I-factor*A)u = rhs
+        Simple Newton solver for (I-factor*f)(u) = rhs
 
         Args:
             rhs (dtype_f): right-hand side for the linear system
@@ -190,7 +194,17 @@ class LeakySuperconductor(ptype):
             J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
 
             # solve the linear system
-            delta = np.linalg.solve(J, G)
+            if self.params.direct_solver:
+                delta = np.linalg.solve(J, G)
+            else:
+                delta = cg(
+                    J,
+                    G,
+                    x0=G * 0,
+                    tol=self.params.lintol_within_newton,
+                    maxiter=self.params.liniter_within_newton,
+                    atol=0,
+                )[0].reshape(self.params.nvars)
 
             # update solution
             u = u - delta
@@ -223,7 +237,7 @@ class LeakySuperconductor(ptype):
                 Returns:
                     (numpy.1darray): RHS
                 """
-                return self.eval_f(u, t)
+                return self.eval_f(u.reshape(self.init[0]), t).flatten()
 
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
         return me
@@ -253,7 +267,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple linear solver for (I-factor*A)u = rhs
+        Simple linear solver for (I-factor*f_expl)(u) = rhs
 
         Args:
             rhs (dtype_f): right-hand side for the linear system
@@ -278,4 +292,38 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
                 maxiter=self.params.liniter,
                 atol=0,
             )[0].reshape(self.params.nvars)
+        return me
+
+    def u_exact(self, t, u_init=None, t_init=None):
+        """
+        Routine to compute the exact solution at time t
+
+        Args:
+            t (float): current time
+
+        Returns:
+            dtype_u: exact solution
+        """
+        me = self.dtype_u(self.init, val=0.0)
+
+        if t == 0:
+            me[:] = super().u_exact(t, u_init, t_init)
+
+        if t > 0:
+
+            def eval_rhs(t, u):
+                """
+                Function to pass to `scipy.solve_ivp` to evaluate the full RHS
+
+                Args:
+                    t (float): Current time
+                    u (numpy.1darray): Current solution
+
+                Returns:
+                    (numpy.1darray): RHS
+                """
+                f = self.eval_f(u.reshape(self.init[0]), t)
+                return (f.impl + f.expl).flatten()
+
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
         return me
