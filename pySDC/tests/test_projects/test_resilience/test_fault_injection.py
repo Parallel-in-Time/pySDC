@@ -144,7 +144,7 @@ def test_fault_injection():
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize("numprocs", [4])
+@pytest.mark.parametrize("numprocs", [4, 7])
 def test_fault_stats(numprocs):
     """
     Test generation of fault statistics and their recovery rates
@@ -244,6 +244,6 @@ if __name__ == "__main__":
         generate_stats()
     else:
         test_complex_conversion()
-        test_fault_stats(8)
+        test_fault_stats(7)
         test_fault_injection()
         test_float_conversion()

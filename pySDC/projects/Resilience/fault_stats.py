@@ -481,6 +481,7 @@ class FaultStats:
         '''
         comm = MPI.COMM_WORLD if comm is None else comm
         step = (runs if step is None else step) if comm.size == 1 else comm.size
+        _runs_partial = step if _runs_partial == 0 else _runs_partial
         reload = self.reload or _reload
 
         max_runs = self.get_max_combinations() if self.mode == 'combination' else runs
@@ -615,7 +616,10 @@ class FaultStats:
             if comm.rank == 0:
                 self.store(strategy, faults, dat_full)
                 if self.faults:
-                    self.get_recovered(strategy)
+                    try:
+                        self.get_recovered(strategy)
+                    except KeyError:
+                        print('Warning: Can\'t compute recovery rate right now')
 
         return None
 
