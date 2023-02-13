@@ -18,10 +18,10 @@ class live_plot(hooks):  # pragma no cover
     This hook plots the solution and the non-linear part of the right hand side after every step. Keep in mind that using adaptivity will result in restarts, which is not marked in these plots. Prepare to see the temperature profile jumping back again after a restart.
     """
 
-    def pre_run(self, step, level_number):
+    def pre_run(self, step, level_number):  # pragma no cover
         self.fig, self.axs = plt.subplots(1, 2, figsize=(10, 4))
 
-    def post_step(self, step, level_number):
+    def post_step(self, step, level_number):  # pragma no cover
         for ax in self.axs:
             ax.cla()
         L = step.levels[level_number]
@@ -172,8 +172,8 @@ def compare_imex_full(plotting=False):
     dt_max = {True: 2e1, False: np.inf}
     custom_description = {}
     custom_description['problem_params'] = {
-        'lintol': 1e-4,
-        'liniter': 15,
+        'newton_tol': 1e-4,
+        'newton_iter': 15,
         'direct_solver': True,
     }
     custom_controller_params = {'logger_level': 30}

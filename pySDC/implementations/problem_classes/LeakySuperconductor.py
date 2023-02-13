@@ -47,11 +47,9 @@ class LeakySuperconductor(ptype):
             'direct_solver': True,
             'liniter': 99,
             'lintol': 1e-8,
+            'newton_tol': 1e-8,
+            'newton_iter': 99,
         }
-
-        # optional parameters for solving the linear problems within the Newton solver iteratively
-        defaults['liniter_within_newton'] = problem_params.get('liniter_within_newton', defaults['liniter'])
-        defaults['lintol_within_newton'] = problem_params.get('lintol_within_newton', defaults['lintol'])
 
         for key in problem_params.keys():
             if key not in defaults.keys():
@@ -182,12 +180,12 @@ class LeakySuperconductor(ptype):
 
         u = self.dtype_u(u0)
         res = np.inf
-        for _n in range(0, self.params.liniter):
+        for _n in range(0, self.params.newton_iter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
 
             res = np.linalg.norm(G, np.inf)
-            if res <= self.params.lintol or np.isnan(res):
+            if res <= self.params.newton_tol or np.isnan(res):
                 break
 
             # assemble Jacobian J of G
@@ -197,14 +195,9 @@ class LeakySuperconductor(ptype):
             if self.params.direct_solver:
                 delta = np.linalg.solve(J, G)
             else:
-                delta = cg(
-                    J,
-                    G,
-                    x0=G * 0,
-                    tol=self.params.lintol_within_newton,
-                    maxiter=self.params.liniter_within_newton,
-                    atol=0,
-                )[0].reshape(self.params.nvars)
+                delta = cg(J, G, x0=G * 0, tol=self.params.lintol, maxiter=self.params.liniter, atol=0,)[
+                    0
+                ].reshape(self.params.nvars)
 
             # update solution
             u = u - delta

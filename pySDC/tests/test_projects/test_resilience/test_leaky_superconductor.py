@@ -3,7 +3,8 @@ import pytest
 
 @pytest.mark.base
 @pytest.mark.parametrize("imex", [True, False])
-def test_scipy_reference_solution(imex, plotting=False):
+@pytest.mark.parametrize("direct_solver", [True, False])
+def test_scipy_reference_solution(imex, direct_solver, plotting=False):
     """
     Test if the IMEX and fully implicit SDC schemes can match the solutions obtained by a scipy reference solution.
     Since the scipy solutions require many steps to accurately solve the problem explicitly, we divide the temporal
@@ -31,9 +32,11 @@ def test_scipy_reference_solution(imex, plotting=False):
     dt_max = {True: 2e1, False: np.inf}
     custom_description = {}
     custom_description['problem_params'] = {
+        'newton_tol': 1e-4,
+        'newton_iter': 15,
         'lintol': 1e-4,
-        'liniter': 15,
-        'direct_solver': True,
+        'liniter': 5,
+        'direct_solver': direct_solver,
     }
     custom_controller_params = {'logger_level': 30}
     custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-6, 'dt_max': dt_max[imex]}}
@@ -70,6 +73,9 @@ def test_scipy_reference_solution(imex, plotting=False):
 
 @pytest.mark.base
 def test_imex_vs_fully_implicit_leaky_superconductor():
+    """
+    Test if the IMEX and fully implicit schemes get the same solution. This is a test that the global accuracy is ok.
+    """
     from pySDC.projects.Resilience.leaky_superconductor import compare_imex_full
 
     compare_imex_full()
