@@ -142,7 +142,7 @@ class LeakySuperconductor(ptype):
         Simple Newton solver for (I-factor*f)(u) = rhs
 
         Args:
-            rhs (dtype_f): right-hand side for the linear system
+            rhs (dtype_f): right-hand side
             factor (float): abbrev. for the local stepsize (or any other factor required)
             u0 (dtype_u): initial guess for the iterative solver
             t (float): current time (e.g. for time-dependent BCs)
