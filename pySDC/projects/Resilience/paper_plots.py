@@ -48,6 +48,11 @@ def get_stats(problem, path='data/stats'):
     )
 
 
+def my_setup_mpl(**kwargs):
+    setup_mpl(reset=True, font_size=8)
+    mpl.rcParams.update({'lines.markersize': 8})
+
+
 def savefig(fig, name, format='pdf', base_path='data/paper'):  # pragma: no cover
     """
     Save a figure to some predefined location.
@@ -107,6 +112,7 @@ def plot_recovery_rate(stats_analyser, **kwargs):  # pragma: no cover
     Returns:
         None
     """
+    my_setup_mpl()
     fig, axs = plt.subplots(1, 2, figsize=(16 * cm, 7 * cm), sharex=True, sharey=True)
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, args={'ylabel': 'recovery rate'}, ax=axs[0]
@@ -194,8 +200,7 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
         None
     """
 
-    setup_mpl(reset=True, font_size=8)
-    mpl.rcParams.update({'lines.markersize': 8})
+    my_setup_mpl()
 
     stats_analyser = get_stats(problem, path)
 
@@ -241,7 +246,7 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
     savefig(fig, 'efficiency')
 
 
-def plot_adaptivity_stuff():
+def plot_adaptivity_stuff():  # pragma no cover
     """
     Plot the solution for a van der Pol problem as well as the local error and cost associated with the base scheme and
     adaptivity in k and dt in order to demonstrate that adaptivity is useful.
@@ -253,8 +258,7 @@ def plot_adaptivity_stuff():
 
     stats_analyser = get_stats(run_vdp, 'data/stats')
 
-    setup_mpl(font_size=8, reset=True)
-    mpl.rcParams.update({'lines.markersize': 6})
+    my_setup_mpl()
     fig, axs = plt.subplots(3, 1, figsize=(10 * cm, 11 * cm), sharex=True, sharey=False)
 
     def plot_error(stats, ax, iter_ax, strategy, **kwargs):
@@ -279,7 +283,7 @@ def plot_adaptivity_stuff():
         iter_ax.set_ylabel(r'iterations')
 
     force_params = {'convergence_controllers': {EstimateEmbeddedErrorNonMPI: {}}}
-    for strategy in [AdaptivityStrategy, BaseStrategy, IterateStrategy]:
+    for strategy in [BaseStrategy, AdaptivityStrategy, IterateStrategy]:
         stats, _, _ = stats_analyser.single_run(strategy=strategy(), force_params=force_params)
         plot_error(stats, axs[1], axs[2], strategy())
 
@@ -296,7 +300,7 @@ def plot_adaptivity_stuff():
     savefig(fig, 'adaptivity')
 
 
-def plot_fault_vdp(bit=0):
+def plot_fault_vdp(bit=0):  # pragma no cover
     """
     Make a plot showing the impact of a fault on van der Pol without any resilience.
     The faults are inserted in the last iteration in the last node in u_t such that you can best see the impact.
@@ -364,14 +368,13 @@ def plot_fault_vdp(bit=0):
     savefig(fig, f'fault_bit_{bit}')
 
 
-def plot_vdp_solution():
+def plot_vdp_solution():  # pragma no cover
     """
     Plot the solution of van der Pol problem over time to illustrate the varying time scales.
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
-    setup_mpl(font_size=8, reset=True)
-    mpl.rcParams.update({'lines.markersize': 8})
+    my_setup_mpl()
     fig, ax = plt.subplots(figsize=(9 * cm, 8 * cm))
 
     custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': 1e-7}}}
@@ -387,6 +390,7 @@ def plot_vdp_solution():
 
 
 if __name__ == "__main__":
+    plot_recovery_rate(get_stats(run_vdp))
     plot_vdp_solution()
     plot_fault_vdp(0)
     plot_fault_vdp(13)
