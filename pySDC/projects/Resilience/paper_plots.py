@@ -1,3 +1,4 @@
+# script to make pretty plots for papers or talks
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -363,7 +364,30 @@ def plot_fault_vdp(bit=0):
     savefig(fig, f'fault_bit_{bit}')
 
 
+def plot_vdp_solution():
+    """
+    Plot the solution of van der Pol problem over time to illustrate the varying time scales.
+    """
+    from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+    setup_mpl(font_size=8, reset=True)
+    mpl.rcParams.update({'lines.markersize': 8})
+    fig, ax = plt.subplots(figsize=(9 * cm, 8 * cm))
+
+    custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': 1e-7}}}
+    problem_params = {}
+
+    stats, _, _ = run_vdp(custom_description=custom_description, custom_problem_params=problem_params, Tend=28.6)
+
+    u = get_sorted(stats, type='u')
+    ax.plot([me[0] for me in u], [me[1][0] for me in u], color='black')
+    ax.set_ylabel(r'$u$')
+    ax.set_xlabel(r'$t$')
+    savefig(fig, 'vdp_sol')
+
+
 if __name__ == "__main__":
+    plot_vdp_solution()
     plot_fault_vdp(0)
     plot_fault_vdp(13)
     plot_adaptivity_stuff()
