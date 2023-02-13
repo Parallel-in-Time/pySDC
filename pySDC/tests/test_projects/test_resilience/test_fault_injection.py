@@ -144,7 +144,7 @@ def test_fault_injection():
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize("numprocs", [4, 7])
+@pytest.mark.parametrize("numprocs", [3, 4])
 def test_fault_stats(numprocs):
     """
     Test generation of fault statistics and their recovery rates
