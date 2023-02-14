@@ -202,14 +202,40 @@ def compare_imex_full(plotting=False):
     ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
 
 
-def try_faults(bit=1):
+def try_faults(bit=1, iteration=1, node=1, problem_pos=None, level_number=0, adaptivity=True, e_tol=1e-6):
+    problem_pos = [30] if problem_pos is None else 30
     fault_stuff = {
-        'rng': rng,
-        'args': strategy.get_fault_args(self.prob, self.num_procs),
-        'rnd_params': strategy.get_fault_args(self.prob, self.num_procs),
+        'rng': np.random.RandomState(0),
+        'args': {
+            'bit': bit,
+            'iteration': iteration,
+            'level_number': level_number,
+            'problem_pos': problem_pos,
+            'node': node,
+            'time': 1e1,
+        },
     }
+    controller_params = {'logger_level': 15}
+
+    custom_description = {}
+    if adaptivity:
+        from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+        custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': e_tol, 'dt_max': 2e0}}
+    else:
+        custom_description['level_params'] = {'e_tol': e_tol, 'dt': 1.0}
+        custom_description['step_params'] = {'maxiter': 99}
+
+    stats, controller, _ = run_leaky_superconductor(
+        fault_stuff=fault_stuff,
+        custom_controller_params=controller_params,
+        custom_description=custom_description,
+        Tend=300,
+    )
+    plot_solution(stats, controller)
 
 
 if __name__ == '__main__':
-    compare_imex_full(plotting=True)
+    try_faults(bit=2, node=3, adaptivity=False)
+    # compare_imex_full(plotting=True)
     plt.show()

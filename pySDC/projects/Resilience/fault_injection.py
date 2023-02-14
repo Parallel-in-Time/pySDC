@@ -320,7 +320,6 @@ class FaultInjector(hooks):
         Returns:
             None
         '''
-
         super(FaultInjector, self).pre_step(step, level_number)
 
         self.timestep_idx += 1
