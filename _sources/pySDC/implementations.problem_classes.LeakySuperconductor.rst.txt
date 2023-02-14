@@ -1,0 +1,7 @@
+implementations.problem\_classes.LeakySuperconductor module
+===========================================================
+
+.. automodule:: implementations.problem_classes.LeakySuperconductor
+   :members:
+   :undoc-members:
+   :show-inheritance:

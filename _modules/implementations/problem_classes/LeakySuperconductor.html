@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.problem_classes.LeakySuperconductor &#8212; pySDC 5.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.LeakySuperconductor</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.LeakySuperconductor</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">cg</span><span class="p">,</span> <span class="n">spsolve</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">ProblemError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers</span> <span class="kn">import</span> <span class="n">problem_helper</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+
+
+<span class="c1"># noinspection PyUnusedLocal</span>
+<div class="viewcode-block" id="LeakySuperconductor"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor">[docs]</a><span class="k">class</span> <span class="nc">LeakySuperconductor</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a toy problem to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
+<span class="sd">    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment</span>
+<span class="sd">    sufficiently, there will be a runaway effect heating up the entire magnet.</span>
+<span class="sd">    This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.</span>
+
+<span class="sd">    The model we use is a 1d heat equation with Neumann-zero boundary conditions, meaning this magnet is totally</span>
+<span class="sd">    insulated from its environment except for the leak.</span>
+<span class="sd">    We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the</span>
+<span class="sd">    leak itself.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            problem_params (dict): custom parameters for the example</span>
+<span class="sd">            dtype_u: mesh data type (will be passed parent class)</span>
+<span class="sd">            dtype_f: mesh data type (will be passed parent class)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># these parameters will be used later, so assert their existence</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Cv&#39;</span><span class="p">:</span> <span class="mf">1000.0</span><span class="p">,</span>
+            <span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="mf">1000.0</span><span class="p">,</span>
+            <span class="s1">&#39;u_thresh&#39;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
+            <span class="s1">&#39;u_max&#39;</span><span class="p">:</span> <span class="mf">2e-2</span><span class="p">,</span>
+            <span class="s1">&#39;Q_max&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">&#39;leak_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">),</span>
+            <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s1">&#39;stencil_type&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bc&#39;</span><span class="p">:</span> <span class="s1">&#39;neumann-zero&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;nvars&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">,</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>
+            <span class="s1">&#39;newton_iter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">defaults</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know what to do with parameter </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> in this problem!. Available parameters: </span><span class="si">{</span><span class="n">defaults</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">problem_params</span><span class="p">}</span>
+
+        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
+            <span class="n">dtype_u</span><span class="o">=</span><span class="n">dtype_u</span><span class="p">,</span>
+            <span class="n">dtype_f</span><span class="o">=</span><span class="n">dtype_f</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># compute dx (equal in both dimensions) and get discretization matrix A</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span>
+            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;neumann-zero&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Boundary conditions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">bc</span><span class="si">}</span><span class="s1"> not implemented.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+            <span class="n">derivative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">stencil_type</span><span class="p">,</span>
+            <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">bc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">bc</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">K</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">=</span> <span class="n">xvalues</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leak</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">leak_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">leak_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="LeakySuperconductor.eval_f_non_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f_non_linear">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f_non_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the non-linear part of f</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: the non-linear part of the RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">u_thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_thresh</span>
+        <span class="n">u_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_max</span>
+        <span class="n">Q_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Q_max</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">u_thresh</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">u_max</span> <span class="o">-</span> <span class="n">u_thresh</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_max</span>
+        <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&lt;</span> <span class="n">u_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_max</span>
+        <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&gt;=</span> <span class="n">u_max</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_max</span>
+
+        <span class="c1"># boundary conditions</span>
+        <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="LeakySuperconductor.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the full right hand side.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Current solution</span>
+<span class="sd">            t (float): Current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: The right hand side</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Cv</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="LeakySuperconductor.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple Newton solver for (I-factor*f)(u) = rhs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side</span>
+<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Evaluate the non-linear part of the Jacobian only</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                u (dtype_u): Current solution</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                dtype_u: The derivative of the non-linear part of the solution w.r.t. to the solution.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">u_thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_thresh</span>
+            <span class="n">u_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_max</span>
+            <span class="n">Q_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Q_max</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Q_max</span> <span class="o">/</span> <span class="p">(</span><span class="n">u_max</span> <span class="o">-</span> <span class="n">u_thresh</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&lt;</span> <span class="n">u_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&gt;</span> <span class="n">u_max</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># boundary conditions</span>
+            <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">me</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">for</span> <span class="n">_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_iter</span><span class="p">):</span>
+            <span class="c1"># assemble G such that G(u) = 0 at the solution of the step</span>
+            <span class="n">G</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_tol</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble Jacobian J of G</span>
+            <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="n">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
+
+            <span class="c1"># solve the linear system</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+
+            <span class="c1"># update solution</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">delta</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+
+<div class="viewcode-block" id="LeakySuperconductor.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time t</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                Function to pass to `scipy.solve_ivp` to evaluate the full RHS</span>
+
+<span class="sd">                Args:</span>
+<span class="sd">                    t (float): Current time</span>
+<span class="sd">                    u (numpy.1darray): Current solution</span>
+
+<span class="sd">                Returns:</span>
+<span class="sd">                    (numpy.1darray): RHS</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div></div>
+
+
+<div class="viewcode-block" id="LeakySuperconductorIMEX"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX">[docs]</a><span class="k">class</span> <span class="nc">LeakySuperconductorIMEX</span><span class="p">(</span><span class="n">LeakySuperconductor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LeakySuperconductorIMEX.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Cv</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Cv</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="LeakySuperconductorIMEX.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for (I-factor*f_expl)(u) = rhs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
+<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="LeakySuperconductorIMEX.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time t</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                Function to pass to `scipy.solve_ivp` to evaluate the full RHS</span>
+
+<span class="sd">                Args:</span>
+<span class="sd">                    t (float): Current time</span>
+<span class="sd">                    u (numpy.1darray): Current solution</span>
+
+<span class="sd">                Returns:</span>
+<span class="sd">                    (numpy.1darray): RHS</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.LeakySuperconductor</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>
