@@ -96,6 +96,12 @@ def get_finite_difference_matrix(
 
     if bc == 'dirichlet-zero':
         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
+    elif bc == 'neumann-zero':
+        A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
+        A_1d[0, 0] = -(dx ** (derivative - 1))
+        A_1d[0, 1] = +(dx ** (derivative - 1))
+        A_1d[-1, -1] = -(dx ** (derivative - 1))
+        A_1d[-1, -2] = +(dx ** (derivative - 1))
     elif bc == 'periodic':
         A_1d = 0 * sp.eye(size, format='csc')
         for i in steps:
@@ -105,7 +111,7 @@ def get_finite_difference_matrix(
             if steps[i] < 0:
                 A_1d += coeff[i] * sp.eye(size, k=size + steps[i])
     else:
-        raise NotImplementedError(f'Boundary conditons {bc} not implemented.')
+        raise NotImplementedError(f'Boundary conditions {bc} not implemented.')
 
     if dim == 1:
         A = A_1d
