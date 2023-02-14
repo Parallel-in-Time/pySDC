@@ -76,8 +76,7 @@ def run_leaky_superconductor(
     sweeper_params['QI'] = 'IE'
     sweeper_params['QE'] = 'PIC'
 
-    problem_params = {
-    }
+    problem_params = {}
 
     if custom_problem_params is not None:
         problem_params = {**problem_params, **custom_problem_params}
@@ -193,7 +192,9 @@ def compare_imex_full(plotting=False):
         diff < 5e-3
     ), f"Difference between IMEX and fully-implicit too large! Got {diff:.2e}, allowed is only {5e-3:.2e}!"
     prob = controller.MS[0].levels[0].prob
-    assert max(res[True]) > prob.params.u_max, f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
+    assert (
+        max(res[True]) > prob.params.u_max
+    ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
 
 
 if __name__ == '__main__':
