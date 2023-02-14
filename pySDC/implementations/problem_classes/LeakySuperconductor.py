@@ -44,9 +44,6 @@ class LeakySuperconductor(ptype):
             'stencil_type': 'center',
             'bc': 'neumann-zero',
             'nvars': 2**7,
-            'direct_solver': True,
-            'liniter': 99,
-            'lintol': 1e-8,
             'newton_tol': 1e-8,
             'newton_iter': 99,
         }
@@ -192,12 +189,7 @@ class LeakySuperconductor(ptype):
             J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
 
             # solve the linear system
-            if self.params.direct_solver:
-                delta = np.linalg.solve(J, G)
-            else:
-                delta = cg(J, G, x0=G * 0, tol=self.params.lintol, maxiter=self.params.liniter, atol=0,)[
-                    0
-                ].reshape(self.params.nvars)
+            delta = np.linalg.solve(J, G)
 
             # update solution
             u = u - delta
@@ -273,18 +265,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         """
 
         me = self.dtype_u(self.init)
-
-        if self.params.direct_solver:
-            me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
-        else:
-            me[:] = cg(
-                self.Id - factor * self.A,
-                rhs.flatten(),
-                x0=u0.flatten(),
-                tol=self.params.lintol,
-                maxiter=self.params.liniter,
-                atol=0,
-            )[0].reshape(self.params.nvars)
+        me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
