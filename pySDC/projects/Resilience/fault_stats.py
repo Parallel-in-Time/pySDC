@@ -22,6 +22,7 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
+from pySDC.projects.Resilience.leaky_superconductor import run_leaky_superconductor
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
@@ -212,6 +213,9 @@ class AdaptivityStrategy(Strategy):
         elif problem == run_Schroedinger:
             e_tol = 4e-6
             dt_min = 1e-3
+        elif problem == run_leaky_superconductor:
+            e_tol = 1e-6
+            dt_min = 1e-3
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
@@ -303,6 +307,9 @@ class IterateStrategy(Strategy):
         Returns:
             The custom description you can supply to the problem when running it
         '''
+        restol = -1
+        e_tol = -1
+
         if problem == run_piline:
             restol = 2.3e-8
         elif problem == run_vdp:
@@ -311,6 +318,8 @@ class IterateStrategy(Strategy):
             restol = 16e-7
         elif problem == run_Schroedinger:
             restol = 6.5e-7
+        elif problem == run_leaky_superconductor:
+            e_tol = 1e-6
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -319,7 +328,7 @@ strategy'
 
         custom_description = {
             'step_params': {'maxiter': 99},
-            'level_params': {'restol': restol},
+            'level_params': {'restol': restol, 'e_tol': e_tol},
         }
 
         return {**custom_description, **self.custom_description}
@@ -431,6 +440,8 @@ class FaultStats:
             return 1.5
         elif self.prob == run_Schroedinger:
             return 1.0
+        elif self.prob == run_leaky_superconductor:
+            return 10.0
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -449,6 +460,8 @@ class FaultStats:
         elif self.prob == run_Schroedinger:
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
+        elif self.prob == run_leaky_superconductor:
+            custom_description['level_params'] = {'dt': 1.0, 'restol': -1}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -793,6 +806,7 @@ class FaultStats:
         stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params)
 
         t, u = get_sorted(stats, type='u')[-1]
+        print(max(u))
         k = [me[1] for me in get_sorted(stats, type='k')]
         print(k)
 
@@ -889,6 +903,8 @@ class FaultStats:
             prob_name = 'Lorenz'
         elif self.prob == run_Schroedinger:
             prob_name = 'Schroedinger'
+        elif self.prob == run_leaky_superconductor:
+            prob_name = 'Quench'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -1659,17 +1675,18 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_Schroedinger,
-        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        prob=run_leaky_superconductor,
+        strategies=[IterateStrategy()],
+        # strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
-        stats_path='data/stats-jusuf',
+        stats_path='data/stats',
     )
 
-    stats_analyser.run_stats_generation(runs=1000)
+    stats_analyser.run_stats_generation(runs=280)
     mask = None
 
     stats_analyser.compare_strategies()

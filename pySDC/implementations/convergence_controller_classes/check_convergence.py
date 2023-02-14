@@ -24,7 +24,36 @@ class CheckConvergence(ConvergenceController):
         Returns:
             (dict): The updated params dictionary
         """
-        return {"control_order": +200, **super().setup(controller, params, description, **kwargs)}
+        defaults = {'control_order': +200, 'use_e_tol': 'e_tol' in description['level_params'].keys()}
+
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load the embedded error estimator if needed.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        """
+        super().dependencies(controller, description)
+
+        if self.params.use_e_tol:
+
+            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
+                EstimateEmbeddedError,
+            )
+            from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+            controller.add_convergence_controller(
+                EstimateEmbeddedError.get_implementation("nonMPI" if type(controller) == controller_nonMPI else "MPI"),
+                description=description,
+            )
+
+        return None
 
     @staticmethod
     def check_convergence(S):
@@ -42,10 +71,16 @@ class CheckConvergence(ConvergenceController):
         L = S.levels[0]
         L.sweep.compute_residual()
 
-        # get residual and check against prescribed tolerance (plus check number of iterations
-        res = L.status.residual
+        # get residual and check against prescribed tolerance (plus check number of iterations)
+        iter_converged = S.status.iter >= S.params.maxiter
+        res_converged = L.status.residual <= L.params.restol
+        e_tol_converged = (
+            L.status.error_embedded_estimate < L.params.e_tol
+            if (L.params.get('e_tol') and L.status.get('error_embedded_estimate'))
+            else False
+        )
         converged = (
-            S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
+            iter_converged or res_converged or e_tol_converged or S.status.force_done
         ) and not S.status.force_continue
         if converged is None:
             converged = False

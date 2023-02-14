@@ -43,6 +43,7 @@ def run_leaky_superconductor(
     imex=False,
     u0=None,
     t0=None,
+    **kwargs,
 ):
     """
     Run a toy problem of a superconducting magnet with a temperature leak with default parameters.
@@ -118,7 +119,11 @@ def run_leaky_superconductor(
 
     # insert faults
     if fault_stuff is not None:
-        raise NotImplementedError("The parameters have not been adapted to this equation yet!")
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        rnd_args = {'iteration': 2, 'min_node': 1}
+        args = {'time': 1.0, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -195,6 +200,14 @@ def compare_imex_full(plotting=False):
     assert (
         max(res[True]) > prob.params.u_max
     ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
+
+
+def try_faults(bit=1):
+    fault_stuff = {
+        'rng': rng,
+        'args': strategy.get_fault_args(self.prob, self.num_procs),
+        'rnd_params': strategy.get_fault_args(self.prob, self.num_procs),
+    }
 
 
 if __name__ == '__main__':

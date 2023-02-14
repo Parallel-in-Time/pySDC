@@ -207,7 +207,7 @@ class LeakySuperconductor(ptype):
             dtype_u: exact solution
         """
 
-        me = self.dtype_u(self.init, val=0)
+        me = self.dtype_u(self.init, val=0.0)
 
         if t > 0:
 
