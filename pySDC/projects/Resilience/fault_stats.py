@@ -836,7 +836,6 @@ class FaultStats:
         print(max(u))
         k = [me[1] for me in get_sorted(stats, type='k')]
         print(k)
-        raise
 
         print(f'\nOverview for {strategy.name} strategy')
 
@@ -1711,8 +1710,13 @@ def main():
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
-        stats_path='data/stats',
+        stats_path='data/stats-jusuf/',
     )
+
+    mask = stats_analyser.get_mask(strategy=AdaptivityStrategy(), key='recovered', val=False)
+    stats_analyser.print_faults(mask)
+    stats_analyser.scrutinize(strategy=AdaptivityStrategy(), run=498, faults=True)
+    return None
 
     stats_analyser.run_stats_generation(runs=5)
     mask = None
