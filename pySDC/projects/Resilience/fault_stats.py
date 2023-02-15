@@ -9,7 +9,7 @@ import matplotlib as mpl
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
+from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData, LogNewtonIter
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -201,6 +201,8 @@ class AdaptivityStrategy(Strategy):
         Returns:
             The custom descriptions you can supply to the problem when running it
         '''
+        custom_description = {}
+
         if problem == run_piline:
             e_tol = 1e-7
             dt_min = 1e-2
@@ -216,14 +218,14 @@ class AdaptivityStrategy(Strategy):
         elif problem == run_leaky_superconductor:
             e_tol = 1e-6
             dt_min = 1e-3
+            custom_description['level_params'] = {'dt': 1e-2}
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
  strategy'
             )
 
-        custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min}}}
-
+        custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min}}
         return {**custom_description, **self.custom_description}
 
 
@@ -320,6 +322,7 @@ class IterateStrategy(Strategy):
             restol = 6.5e-7
         elif problem == run_leaky_superconductor:
             e_tol = 1e-6
+            restol = 1e-9
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -368,6 +371,9 @@ class HotRodStrategy(Strategy):
             maxiter = 6
         elif problem == run_Schroedinger:
             HotRod_tol = 3e-7
+            maxiter = 6
+        elif problem == run_leaky_superconductor:
+            HotRod_tol = 5e-4
             maxiter = 6
         else:
             raise NotImplementedError(
@@ -441,7 +447,7 @@ class FaultStats:
         elif self.prob == run_Schroedinger:
             return 1.0
         elif self.prob == run_leaky_superconductor:
-            return 10.0
+            return 450
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -461,7 +467,8 @@ class FaultStats:
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
         elif self.prob == run_leaky_superconductor:
-            custom_description['level_params'] = {'dt': 1.0, 'restol': -1}
+            custom_description['level_params'] = {'dt': 10, 'restol': -1}
+            custom_description['step_params'] = {'maxiter': 5}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -562,6 +569,7 @@ class FaultStats:
             'bit': np.zeros(runs),
             'error': np.zeros(runs),
             'total_iteration': np.zeros(runs),
+            'total_newton_iteration': np.zeros(runs),
             'restarts': np.zeros(runs),
             'target': np.zeros(runs),
         }
@@ -602,8 +610,9 @@ class FaultStats:
             if t < Tend:
                 error = np.inf
             else:
-                error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+                error = self.get_error(u, t, controller)
             total_iteration = sum([k[1] for k in get_sorted(stats, type='k')])
+            total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='newton_iter')])
 
             # record the new data point
             if faults:
@@ -616,6 +625,7 @@ class FaultStats:
                 dat['target'][i] = faults_run[0][1][5]
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
+            dat['total_newton_iteration'][i] = total_newton_iteration
             dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restarts')])
 
         dat_full = {}
@@ -636,6 +646,23 @@ class FaultStats:
 
         return None
 
+    def get_error(self, u, t, controller):
+        """
+        Compute the error.
+
+        Args:
+            u (dtype_u): The solution at the end of the run
+            t (float): Time at which `u` was recorded
+            controller (pySDC.controller.controller): The controller
+
+        Returns:
+            float: Error
+        """
+        if self.prob == run_leaky_superconductor:
+            return abs(max(u) - 0.03837)
+        else:
+            return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+
     def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None, space_comm=None):
         '''
         Run the problem once with the specified parameters
@@ -652,7 +679,7 @@ class FaultStats:
             pySDC.Controller: The controller of the run
             float: The time the problem should have run to
         '''
-        hook_class = hook_collection + [LogData] if hook_class is None else hook_class
+        hook_class = hook_collection + [LogNewtonIter] + ([LogData] if hook_class is None else hook_class)
         force_params = {} if force_params is None else force_params
 
         # build the custom description
@@ -809,6 +836,7 @@ class FaultStats:
         print(max(u))
         k = [me[1] for me in get_sorted(stats, type='k')]
         print(k)
+        raise
 
         print(f'\nOverview for {strategy.name} strategy')
 
@@ -819,7 +847,7 @@ class FaultStats:
             error = np.inf
             print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
         else:
-            error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+            error = self.get_error(u, t, controller)
         recovery_thresh = e_star * self.recovery_thresh
 
         print(
@@ -1676,8 +1704,8 @@ class FaultStats:
 def main():
     stats_analyser = FaultStats(
         prob=run_leaky_superconductor,
-        strategies=[IterateStrategy()],
-        # strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        # strategies=[IterateStrategy(), AdaptivityStrategy()],
+        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
@@ -1686,10 +1714,10 @@ def main():
         stats_path='data/stats',
     )
 
-    stats_analyser.run_stats_generation(runs=280)
+    stats_analyser.run_stats_generation(runs=5)
     mask = None
 
-    stats_analyser.compare_strategies()
+    # stats_analyser.compare_strategies()
     stats_analyser.plot_things_per_things(
         'recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )

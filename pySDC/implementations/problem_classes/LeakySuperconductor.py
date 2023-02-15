@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import cg, spsolve
+from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -92,6 +92,8 @@ class LeakySuperconductor(ptype):
 
         self.leak = np.logical_and(self.xv > self.params.leak_range[0], self.xv < self.params.leak_range[1])
 
+        self.total_newton_iter = 0  # store here how many iterations you needed for the Newton solver to converge in the last solve in case you want to log this
+
     def eval_f_non_linear(self, u, t):
         """
         Get the non-linear part of f
@@ -182,7 +184,7 @@ class LeakySuperconductor(ptype):
             G = u - factor * self.eval_f(u, t) - rhs
 
             res = np.linalg.norm(G, np.inf)
-            if res <= self.params.newton_tol or np.isnan(res):
+            if (res <= self.params.newton_tol or np.isnan(res)) and _n > 0:
                 break
 
             # assemble Jacobian J of G
@@ -193,6 +195,8 @@ class LeakySuperconductor(ptype):
 
             # update solution
             u = u - delta
+
+        self.total_newton_iter += _n
 
         return u
 
