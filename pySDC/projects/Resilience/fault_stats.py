@@ -616,7 +616,7 @@ class FaultStats:
             if t < Tend:
                 error = np.inf
             else:
-                error = self.get_error(u, t, controller)
+                error = self.get_error(u, t, controller, strategy)
             total_iteration = sum([k[1] for k in get_sorted(stats, type='k')])
             total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='newton_iter')])
 
@@ -652,7 +652,7 @@ class FaultStats:
 
         return None
 
-    def get_error(self, u, t, controller):
+    def get_error(self, u, t, controller, strategy):
         """
         Compute the error.
 
@@ -660,12 +660,19 @@ class FaultStats:
             u (dtype_u): The solution at the end of the run
             t (float): Time at which `u` was recorded
             controller (pySDC.controller.controller): The controller
+            strategy (Strategy): The resilience strategy
 
         Returns:
             float: Error
         """
         if self.prob == run_leaky_superconductor:
-            return abs(max(u))
+            ref = {
+                AdaptivityStrategy: 0.036832240840408426,
+                IterateStrategy: 0.0368214748207781,
+                HotRodStrategy: 0.03682153860683977,
+                BaseStrategy: 0.03682153860683977,
+            }
+            return abs(max(u) - ref[type(strategy)])
         else:
             return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
 
@@ -852,7 +859,7 @@ class FaultStats:
             error = np.inf
             print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
         else:
-            error = self.get_error(u, t, controller)
+            error = self.get_error(u, t, controller, strategy)
         recovery_thresh = e_star * self.recovery_thresh
 
         print(
