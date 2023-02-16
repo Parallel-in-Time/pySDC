@@ -154,7 +154,7 @@ class nonlinearschroedinger_imex(ptype):
 
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, **kwargs):
         """
         Routine to compute the exact solution at time t, see (1.3) https://arxiv.org/pdf/nlin/0702010.pdf for details
 
