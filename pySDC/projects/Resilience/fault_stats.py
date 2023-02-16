@@ -203,6 +203,9 @@ class AdaptivityStrategy(Strategy):
         '''
         custom_description = {}
 
+        dt_max = np.inf
+        dt_min = 1e-5
+
         if problem == run_piline:
             e_tol = 1e-7
             dt_min = 1e-2
@@ -216,16 +219,18 @@ class AdaptivityStrategy(Strategy):
             e_tol = 4e-6
             dt_min = 1e-3
         elif problem == run_leaky_superconductor:
-            e_tol = 1e-6
+            e_tol = 1e-7
             dt_min = 1e-3
-            custom_description['level_params'] = {'dt': 1e-2}
+            dt_max = 1e2
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
  strategy'
             )
 
-        custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min}}
+        custom_description['convergence_controllers'] = {
+            Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min, 'dt_max': dt_max}
+        }
         return {**custom_description, **self.custom_description}
 
 
@@ -321,8 +326,8 @@ class IterateStrategy(Strategy):
         elif problem == run_Schroedinger:
             restol = 6.5e-7
         elif problem == run_leaky_superconductor:
-            e_tol = 1e-6
-            restol = 1e-9
+            # e_tol = 1e-6
+            restol = 1e-11
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -373,7 +378,7 @@ class HotRodStrategy(Strategy):
             HotRod_tol = 3e-7
             maxiter = 6
         elif problem == run_leaky_superconductor:
-            HotRod_tol = 5e-4
+            HotRod_tol = 3e-5
             maxiter = 6
         else:
             raise NotImplementedError(
@@ -467,8 +472,9 @@ class FaultStats:
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
         elif self.prob == run_leaky_superconductor:
-            custom_description['level_params'] = {'dt': 10, 'restol': -1}
+            custom_description['level_params'] = {'restol': -1, 'dt': 10.0}
             custom_description['step_params'] = {'maxiter': 5}
+            custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-10}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -659,7 +665,7 @@ class FaultStats:
             float: Error
         """
         if self.prob == run_leaky_superconductor:
-            return abs(max(u) - 0.03837)
+            return abs(max(u) - 0.036825)
         else:
             return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
 
@@ -854,6 +860,13 @@ class FaultStats:
 {error < recovery_thresh}'
         )
         print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
+
+        _newton_iter = get_sorted(stats, type='newton_iter')
+        if len(_newton_iter) > 0:
+            newton_iter = [me[1] for me in _newton_iter]
+            print(
+                f'Newton: k: sum: {np.sum(newton_iter)}, min: {np.min(newton_iter)}, max: {np.max(newton_iter)}, mean: {np.mean(newton_iter):.2f},'
+            )
 
         # checkout the step size
         dt = [me[1] for me in get_sorted(stats, type='dt')]
@@ -1703,22 +1716,16 @@ class FaultStats:
 def main():
     stats_analyser = FaultStats(
         prob=run_leaky_superconductor,
-        # strategies=[IterateStrategy(), AdaptivityStrategy()],
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
-        reload=True,
+        reload=False,
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
-        stats_path='data/stats-jusuf/',
+        stats_path='data/stats/',
     )
 
-    mask = stats_analyser.get_mask(strategy=AdaptivityStrategy(), key='recovered', val=False)
-    stats_analyser.print_faults(mask)
-    stats_analyser.scrutinize(strategy=AdaptivityStrategy(), run=498, faults=True)
-    return None
-
-    stats_analyser.run_stats_generation(runs=5)
+    stats_analyser.run_stats_generation(runs=1000)
     mask = None
 
     # stats_analyser.compare_strategies()
