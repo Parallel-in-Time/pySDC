@@ -411,6 +411,7 @@ class FaultStats:
         faults=None,
         reload=True,
         recovery_thresh=1 + 1e-3,
+        recovery_thresh_abs=1e9,
         num_procs=1,
         mode='combination',
         stats_path='data/stats',
@@ -432,6 +433,7 @@ class FaultStats:
         self.faults = [False, True] if faults is None else faults
         self.reload = reload
         self.recovery_thresh = recovery_thresh
+        self.recovery_thresh_abs = recovery_thresh_abs
         self.num_procs = num_procs
         self.mode = mode
         self.stats_path = stats_path
@@ -860,7 +862,7 @@ class FaultStats:
             print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
         else:
             error = self.get_error(u, t, controller, strategy)
-        recovery_thresh = e_star * self.recovery_thresh
+        recovery_thresh = self.get_thresh(strategy)
 
         print(
             f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
@@ -1006,6 +1008,17 @@ class FaultStats:
             return {'runs': 0}
         return dat
 
+    def get_thresh(self, strategy=None):
+        """
+        Get recovery threshold based on relative and absolute tolerances
+
+        Args:
+            strategy (Strategy): The resilience strategy
+        """
+        fault_free = self.load(strategy, False)
+        assert fault_free['error'].std() / fault_free['error'].mean() < 1e-5
+        return self.recovery_thresh_abs + self.recovery_thresh * fault_free["error"].mean()
+
     def get_recovered(self, strategy=None):
         '''
         Determine the recovery rate for a specific strategy and store it to disk.
@@ -1019,12 +1032,9 @@ class FaultStats:
         '''
         if strategy is None:
             [self.get_recovered(strat) for strat in self.strategies]
-        fault_free = self.load(strategy, False)
+
         with_faults = self.load(strategy, True)
-
-        assert fault_free['error'].std() / fault_free['error'].mean() < 1e-5
-
-        with_faults['recovered'] = with_faults['error'] < self.recovery_thresh * fault_free['error'].mean()
+        with_faults['recovered'] = with_faults['error'] < self.get_thresh(strategy)
         self.store(strategy, True, with_faults)
 
         return None
@@ -1725,14 +1735,16 @@ def main():
         prob=run_leaky_superconductor,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
-        reload=False,
+        reload=True,
         recovery_thresh=1.1,
+        recovery_thresh_abs=5e-5,
         num_procs=1,
         mode='random',
-        stats_path='data/stats',
+        stats_path='data/stats-jusuf',
     )
 
     stats_analyser.run_stats_generation(runs=1000)
+    stats_analyser.get_recovered()
     mask = None
 
     # stats_analyser.compare_strategies()
@@ -1767,7 +1779,7 @@ def main():
 
     fig, ax = plt.subplots(1, 1, figsize=(13, 4))
     stats_analyser.plot_recovery_thresholds(ax=ax, thresh_range=np.logspace(-1, 1, 1000))
-    ax.axvline(stats_analyser.recovery_thresh, color='grey', ls=':', label='recovery threshold')
+    ax.axvline(stats_analyser.get_thresh(BaseStrategy()), color='grey', ls=':', label='recovery threshold')
     ax.set_xscale('log')
     ax.legend(frameon=False)
     fig.tight_layout()

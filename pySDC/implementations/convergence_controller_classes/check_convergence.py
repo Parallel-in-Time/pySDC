@@ -42,7 +42,6 @@ class CheckConvergence(ConvergenceController):
         super().dependencies(controller, description)
 
         if self.params.use_e_tol:
-
             from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
                 EstimateEmbeddedError,
             )
