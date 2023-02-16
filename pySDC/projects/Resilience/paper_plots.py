@@ -36,12 +36,17 @@ def get_stats(problem, path='data/stats'):
     else:
         mode = 'random'
 
+    recovery_thresh_abs = {
+        run_leaky_superconductor: 5e-5,
+    }
+
     return FaultStats(
         prob=problem,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
+        recovery_thresh_abs=recovery_thresh_abs.get(problem, 0),
         num_procs=1,
         mode=mode,
         stats_path=path,
