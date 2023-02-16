@@ -665,7 +665,7 @@ class FaultStats:
             float: Error
         """
         if self.prob == run_leaky_superconductor:
-            return abs(max(u) - 0.036825)
+            return abs(max(u))
         else:
             return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
 
@@ -1722,7 +1722,7 @@ def main():
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
-        stats_path='data/stats/',
+        stats_path='data/stats',
     )
 
     stats_analyser.run_stats_generation(runs=1000)
@@ -1757,6 +1757,14 @@ def main():
         )
     fig.tight_layout()
     fig.savefig(f'data/{stats_analyser.get_name()}-recoverable.pdf', transparent=True)
+
+    fig, ax = plt.subplots(1, 1, figsize=(13, 4))
+    stats_analyser.plot_recovery_thresholds(ax=ax, thresh_range=np.logspace(-1, 1, 1000))
+    ax.axvline(stats_analyser.recovery_thresh, color='grey', ls=':', label='recovery threshold')
+    ax.set_xscale('log')
+    ax.legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(f'data/{stats_analyser.get_name()}-threshold.pdf', transparent=True)
 
     stats_analyser.plot_things_per_things(
         'total_iteration',

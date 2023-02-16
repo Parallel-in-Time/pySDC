@@ -155,7 +155,7 @@ def run_leaky_superconductor(
         from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
         rnd_args = {'iteration': 5, 'min_node': 1}
-        args = {'time': 29.0, 'target': 0}
+        args = {'time': 21.0, 'target': 0}
         prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # get initial values on finest level
