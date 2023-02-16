@@ -71,7 +71,7 @@ class LeakySuperconductor(ptype):
             self.dx = 1.0 / (self.params.nvars + 1)
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
         elif self.params.bc == 'neumann-zero':
-            self.dx = 1.0 / (self.params.nvars - 1)
+            self.dx = 1.0 / (self.params.nvars + 1)
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
         else:
             raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
@@ -158,7 +158,7 @@ class LeakySuperconductor(ptype):
                 u (dtype_u): Current solution
 
             Returns:
-                dtype_u: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
             """
             u_thresh = self.params.u_thresh
             u_max = self.params.u_max
@@ -175,7 +175,7 @@ class LeakySuperconductor(ptype):
             me[-1] = 0.0
 
             me = self.dtype_u(self.init)
-            return me
+            return sp.diags(me, format='csc')
 
         u = self.dtype_u(u0)
         res = np.inf
@@ -184,14 +184,16 @@ class LeakySuperconductor(ptype):
             G = u - factor * self.eval_f(u, t) - rhs
 
             res = np.linalg.norm(G, np.inf)
-            if (res <= self.params.newton_tol or np.isnan(res)) and _n > 0:
+            if res <= self.params.newton_tol and _n > 0:
                 break
 
             # assemble Jacobian J of G
-            J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
+            J = self.Id - factor * (self.A + get_non_linear_Jacobian(u)) / self.params.Cv
 
             # solve the linear system
-            delta = np.linalg.solve(J, G)
+            delta = spsolve(J, G)
+            if not np.isfinite(delta).all():
+                break
 
             # update solution
             u = u - delta
@@ -269,7 +271,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
+        me[:] = spsolve(self.Id - factor * self.A / self.params.Cv, rhs.flatten()).reshape(self.params.nvars)
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
