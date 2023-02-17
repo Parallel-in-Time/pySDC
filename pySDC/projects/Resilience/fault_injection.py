@@ -127,6 +127,39 @@ class FaultInjector(hooks):
         self.rnd_params = {}
         self.random_generator = np.random.RandomState(2187)  # number of the cell in which Princess Leia is held
 
+    @classmethod
+    def generate_fault_stuff_single_fault(cls, bit=0, iteration=1, problem_pos=None, level_number=0, node=1, time=None):
+        """
+        Generate a fault stuff object which will insert a single fault at the supplied parameters. Because there will
+        be some parameter set for everything, there is no randomization anymore.
+
+        Args:
+            bit (int): Which bit to flip
+            iteration (int): After which iteration to flip
+            problem_pos: Where in the problem to flip a bit, type depends on the problem
+            level_number (int): In which level you want to flip
+            node (int): In which node to flip
+            time (float): The bitflip will occur in the time step after this time is reached
+
+        Returns:
+            dict: Can be supplied to the run functions in the resilience project to generate the single fault
+        """
+        assert problem_pos is not None, "Please supply a spatial position for the fault as `problem_pos`!"
+        assert time is not None, "Please supply a time for the fault as `time`!"
+        fault_stuff = {
+            'rng': np.random.RandomState(0),
+            'args': {
+                'bit': bit,
+                'iteration': iteration,
+                'level_number': level_number,
+                'problem_pos': problem_pos,
+                'node': node,
+                'time': time,
+            },
+        }
+        fault_stuff['rnd_args'] = fault_stuff['args']
+        return fault_stuff
+
     def add_fault(self, args, rnd_args):
         if type(self.random_generator) == int:
             self.add_fault_from_combination(args, rnd_args)

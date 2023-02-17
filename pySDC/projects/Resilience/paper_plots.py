@@ -17,6 +17,7 @@ from pySDC.helpers.stats_helper import get_sorted
 
 
 cm = 1 / 2.5
+TEXTWIDTH = 11.9446244611 * cm
 
 
 def get_stats(problem, path='data/stats'):
@@ -55,7 +56,7 @@ def get_stats(problem, path='data/stats'):
 
 def my_setup_mpl(**kwargs):
     setup_mpl(reset=True, font_size=8)
-    mpl.rcParams.update({'lines.markersize': 8})
+    mpl.rcParams.update({'lines.markersize': 6})
 
 
 def savefig(fig, name, format='pdf', base_path='data/paper'):  # pragma: no cover
@@ -103,7 +104,7 @@ def compare_strategies(stats_analyser, **kwargs):  # pragma: no cover
         None
     """
     my_setup_mpl()
-    fig, ax = plt.subplots(figsize=(16 * cm, 7 * cm))
+    fig, ax = plt.subplots(figsize=(TEXTWIDTH, 5 * cm))
     stats_analyser.compare_strategies(ax=ax)
     savefig(fig, 'compare_strategies', **kwargs)
 
@@ -119,7 +120,7 @@ def plot_recovery_rate(stats_analyser, **kwargs):  # pragma: no cover
         None
     """
     my_setup_mpl()
-    fig, axs = plt.subplots(1, 2, figsize=(16 * cm, 7 * cm), sharex=True, sharey=True)
+    fig, axs = plt.subplots(1, 2, figsize=(TEXTWIDTH, 5 * cm), sharex=True, sharey=True)
     stats_analyser.plot_things_per_things(
         'recovered', 'bit', False, op=stats_analyser.rec_rate, args={'ylabel': 'recovery rate'}, ax=axs[0]
     )
@@ -172,7 +173,7 @@ def compare_recovery_rate_problems():  # pragma no cover
     titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger']
 
     my_setup_mpl()
-    fig, axs = plt.subplots(1, 3, figsize=(16 * cm, 5.5 * cm), sharex=False, sharey=True)
+    fig, axs = plt.subplots(1, 3, figsize=(TEXTWIDTH, 4 * cm), sharex=False, sharey=True)
 
     plot_recovery_rate_recoverable_only(vdp_stats, fig, axs[0], ylabel='recovery rate')
     plot_recovery_rate_recoverable_only(lorenz_stats, fig, axs[1], ylabel='', xlabel='')
@@ -211,13 +212,14 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
     mask = stats_analyser.get_mask()  # get empty mask, potentially put in some other mask later
 
     my_setup_mpl()
-    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8 * cm, 8 * cm))
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(7 * cm, 7 * cm))
 
     res = {}
     for strategy in stats_analyser.strategies:
         dat = stats_analyser.load(strategy=strategy, faults=True)
         dat_no_faults = stats_analyser.load(strategy=strategy, faults=False)
 
+        mask = stats_analyser.get_fixable_faults_only(strategy=strategy)
         fail_rate = 1.0 - stats_analyser.rec_rate(dat, dat_no_faults, 'recovered', mask)
         iterations_no_faults = np.mean(dat_no_faults['total_iteration'])
 
@@ -264,7 +266,7 @@ def plot_adaptivity_stuff():  # pragma no cover
     stats_analyser = get_stats(run_vdp, 'data/stats')
 
     my_setup_mpl()
-    fig, axs = plt.subplots(3, 1, figsize=(10 * cm, 11 * cm), sharex=True, sharey=False)
+    fig, axs = plt.subplots(3, 1, figsize=(TEXTWIDTH, TEXTWIDTH), sharex=True, sharey=False)
 
     def plot_error(stats, ax, iter_ax, strategy, **kwargs):
         """
@@ -333,9 +335,9 @@ def plot_fault_vdp(bit=0):  # pragma no cover
     )
 
     my_setup_mpl()
-    fig, ax = plt.subplots(1, 1, figsize=(10 * cm, 7 * cm))
+    fig, ax = plt.subplots(1, 1, figsize=(TEXTWIDTH * 3.0 / 4.0, 5 * cm))
     colors = ['blue', 'red', 'magenta']
-    ls = ['--', '--', '-', '-']
+    ls = ['--', '-']
     markers = ['*', '.', 'y']
     do_faults = [False, True]
     superscripts = ['*', '']
