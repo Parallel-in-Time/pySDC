@@ -20,6 +20,34 @@ class synchronous_machine_pi_line(ptype_dae):
         # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
         # self.t_end = x[-1]
 
+        self.L_d = 1.8099
+        self.L_q = 1.76
+        self.L_F = 1.8247
+        self.L_D = 1.8312
+        self.L_Q1 = 2.3352
+        self.L_Q2 = 1.735
+        self.L_md = 1.6599
+        self.L_mq = 1.61
+        self.R_s = 0.003
+        self.R_F = 0.0006
+        self.R_D = 0.0284
+        self.R_Q1 = 0.0062
+        self.R_Q2 = 0.0237
+        self.omega_b = 376.9911184307752
+        self.H_ = 3.525
+        self.K_D = 0.5
+        # pi line
+        self.C_pi = 0.000002
+        self.R_pi = 0.02
+        self.L_pi = 0.00003
+        # load
+        self.R_L = 0.75
+        self.v_F = 0.000939
+        self.v_D = 0
+        self.v_Q1 = 0
+        self.v_Q2 = 0
+        self.T_m = 0.854
+
     def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
@@ -29,40 +57,9 @@ class synchronous_machine_pi_line(ptype_dae):
         Returns:
             Current value of F(), 21 components
         """
-        # constants
-        # generator
-        v_F = 0.000939
-        v_D = 0
-        v_Q1 = 0
-        v_Q2 = 0
-        L_d = 1.8099
-        L_q = 1.76
-        L_F = 1.8247
-        L_D = 1.8312
-        L_Q1 = 2.3352
-        L_Q2 = 1.735
-        L_md = 1.6599
-        L_mq = 1.61
-        R_s = 0.003
-        R_F = 0.0006
-        R_D = 0.0284
-        R_Q1 = 0.0062
-        R_Q2 = 0.0237
-        omega_b = 376.9911184307752
-        omega_e = 1
-        H_ = 3.525
-        K_D = 0.0
-        # pi line
-        C_pi = 0.000002
-        R_pi = 0.02
-        L_pi = 0.00003
-        # load
-        R_L = 0.75
 
-        if t < 0.05: 
-            T_m = 0.854
-        else:
-            T_m = 0.354
+        if t >= 0.05: 
+            self.T_m = 0.354
 
         f = self.dtype_f(self.init)
 
@@ -91,30 +88,30 @@ class synchronous_machine_pi_line(ptype_dae):
 
         f[:] = (
             # differential generator
-            dpsi_d + omega_b * (v_d - R_s * i_d + omega_m * psi_q),
-            dpsi_q + omega_b * (v_q - R_s * i_q - omega_m * psi_d),
-            dpsi_F + omega_b * (v_F - R_F * i_F),
-            dpsi_D + omega_b * (v_D - R_D * i_D),
-            dpsi_Q1 + omega_b * (v_Q1 - R_Q1 * i_Q1),
-            dpsi_Q2 + omega_b * (v_Q2 - R_Q2 * i_Q2),
-            domega_m + omega_b / (2 * H_) * (T_m + (psi_d * i_q - psi_q * i_d) - K_D * omega_b * (omega_m - omega_e)),
+            dpsi_d + self.omega_b * (v_d - self.R_s * i_d + omega_m * psi_q),
+            dpsi_q + self.omega_b * (v_q - self.R_s * i_q - omega_m * psi_d),
+            dpsi_F + self.omega_b * (self.v_F - self.R_F * i_F),
+            dpsi_D + self.omega_b * (self.v_D - self.R_D * i_D),
+            dpsi_Q1 + self.omega_b * (self.v_Q1 - self.R_Q1 * i_Q1),
+            dpsi_Q2 + self.omega_b * (self.v_Q2 - self.R_Q2 * i_Q2),
+            domega_m + 1 / (2 * self.H_) * (self.T_m + (psi_d * i_q - psi_q * i_d) - self.K_D * self.omega_b * (omega_m - self.omega_e)),
             # differential pi line
-            dv_d + omega_m * v_q + 2/C_pi * (i_d - iz_d),
-            dv_q - omega_m * v_q + 2/C_pi * (i_q - iz_q),
-            dvl_d + omega_m * vl_q + 2/C_pi * (iz_d - il_d),
-            dvl_q - omega_m * vl_q + 2/C_pi * (iz_q - il_q),
-            diz_d - R_pi/L_pi * iz_d + omega_m * iz_q + (v_d - vl_d) / L_pi,
-            diz_q - R_pi/L_pi * iz_q - omega_m * iz_d + (v_q - vl_q) / L_pi,
+            dv_d + omega_m * v_q + 2/self.C_pi * (i_d - iz_d),
+            dv_q - omega_m * v_q + 2/self.C_pi * (i_q - iz_q),
+            dvl_d + omega_m * vl_q + 2/self.C_pi * (iz_d - il_d),
+            dvl_q - omega_m * vl_q + 2/self.C_pi * (iz_q - il_q),
+            diz_d - self.R_pi/self.L_pi * iz_d + omega_m * iz_q + (v_d - vl_d) / self.L_pi,
+            diz_q - self.R_pi/self.L_pi * iz_q - omega_m * iz_d + (v_q - vl_q) / self.L_pi,
             # algebraic generator
-            -psi_d + L_d * i_d + L_md * i_F + L_md * i_D,
-            -psi_q + L_q * i_q + L_mq * i_Q1 + L_mq * i_Q2,
-            -psi_F + L_md * i_d + L_F * i_F + L_md * i_D,
-            -psi_D + L_md * i_d + L_md * i_F + L_D * i_D,
-            -psi_Q1 + L_mq * i_q + L_Q1 * i_Q1 + L_mq * i_Q2,
-            -psi_Q2 + L_mq * i_q + L_mq * i_Q1 + L_Q2 * i_Q2,
+            -psi_d + self.L_d * i_d + self.L_md * i_F + self.L_md * i_D,
+            -psi_q + self.L_q * i_q + self.L_mq * i_Q1 + self.L_mq * i_Q2,
+            -psi_F + self.L_md * i_d + self.L_F * i_F + self.L_md * i_D,
+            -psi_D + self.L_md * i_d + self.L_md * i_F + self.L_D * i_D,
+            -psi_Q1 + self.L_mq * i_q + self.L_Q1 * i_Q1 + self.L_mq * i_Q2,
+            -psi_Q2 + self.L_mq * i_q + self.L_mq * i_Q1 + self.L_Q2 * i_Q2,
             # algebraic pi line
-            -il_d + vl_d/R_L,
-            -il_q + vl_q/R_L,
+            -il_d + vl_d/self.R_L,
+            -il_q + vl_q/self.R_L,
         )
         return f
 
@@ -228,10 +225,9 @@ class synchronous_machine_infinite_bus(ptype_dae):
         # Rotor (field) operating voltages
         # These are modelled as constants. Intuition: permanent magnet as rotor 
         self.v_D = 0
+        self.v_F = 8.736809687330562e-4
         self.v_Q1 = 0
         self.v_Q2 = 0
-        self.v_F = 8.736809687330562e-4
-        # Mechanical torque 
         self.T_m = 0.854
 
     def eval_f(self, u, du, t):
@@ -243,11 +239,9 @@ class synchronous_machine_infinite_bus(ptype_dae):
         Returns:
             Current value of F(), 21 components
         """
-        # Constants generator
        
-        # Simulate torque disturbance 
         if t >= 0.05: 
-            T_m = 0.354
+            self.T_m = 0.354
 
         f = self.dtype_f(self.init)
 
@@ -288,7 +282,7 @@ class synchronous_machine_infinite_bus(ptype_dae):
             -dpsi_Q1 + self.omega_b * (self.v_Q1 - self.R_Q1 * i_Q1),
             -dpsi_Q2 + self.omega_b * (self.v_Q2 - self.R_Q2 * i_Q2),
             -ddelta_r + self.omega_b * (omega_m-1),
-            -domega_m + 1 / (2 * self.H_) * (T_m - (psi_q * i_d - psi_d * i_q) - self.K_D * self.omega_b * (omega_m-1)),
+            -domega_m + 1 / (2 * self.H_) * (self.T_m - (psi_q * i_d - psi_d * i_q) - self.K_D * self.omega_b * (omega_m-1)),
             # algebraic generator
             -psi_d + self.L_d * i_d + self.L_md * i_F + self.L_md * i_D,
             -psi_q + self.L_q * i_q + self.L_mq * i_Q1 + self.L_mq * i_Q2,
@@ -329,14 +323,10 @@ class synchronous_machine_infinite_bus(ptype_dae):
         i_Q1 = 0.0
         i_Q2 = 0.0
 
-        v_q = 0.776
-
         delta_r = 39.1 * np.pi/180
         omega_0 = 2*np.pi*60
         omega_b = 2*np.pi*60
         omega_m = omega_0/omega_b
-
-        self.v_F = self.R_F * (v_q + self.R_s * i_q + self.L_d * i_d)/self.L_md
 
         me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
                 i_d, i_q, i_F, i_D, i_Q1, i_Q2,
