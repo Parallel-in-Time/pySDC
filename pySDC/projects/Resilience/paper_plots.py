@@ -11,13 +11,16 @@ from pySDC.projects.Resilience.fault_stats import (
     run_Lorenz,
     run_Schroedinger,
     run_vdp,
+    run_leaky_superconductor,
 )
-from pySDC.helpers.plot_helper import setup_mpl
+from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 from pySDC.helpers.stats_helper import get_sorted
 
 
 cm = 1 / 2.5
 TEXTWIDTH = 11.9446244611 * cm
+# JOURNAL = 'Springer_Numerical_Algorithms'
+JOURNAL = 'JSC_beamer'
 
 
 def get_stats(problem, path='data/stats'):
@@ -170,20 +173,27 @@ def compare_recovery_rate_problems():  # pragma no cover
     vdp_stats = get_stats(run_vdp)
     lorenz_stats = get_stats(run_Lorenz)
     schroedinger_stats = get_stats(run_Schroedinger, 'data/stats-jusuf/')
-    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger']
+    stats = [
+        get_stats(run_vdp),
+        get_stats(run_Lorenz),
+        get_stats(run_Schroedinger, 'data/stats-jusuf'),
+        get_stats(run_leaky_superconductor, 'data/stats-jusuf'),
+    ]
+    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger', 'Quench']
 
     my_setup_mpl()
-    fig, axs = plt.subplots(1, 3, figsize=(TEXTWIDTH, 4 * cm), sharex=False, sharey=True)
+    fig, axs = plt.subplots(2, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.7), sharey=True)
+    [
+        plot_recovery_rate_recoverable_only(stats[i], fig, axs.flatten()[i], ylabel='', xlabel='', title=titles[i])
+        for i in range(len(stats))
+    ]
 
-    plot_recovery_rate_recoverable_only(vdp_stats, fig, axs[0], ylabel='recovery rate')
-    plot_recovery_rate_recoverable_only(lorenz_stats, fig, axs[1], ylabel='', xlabel='')
-    plot_recovery_rate_recoverable_only(schroedinger_stats, fig, axs[2], ylabel='', xlabel='')
-
-    for i in range(len(axs)):
-        axs[i].set_title(titles[i])
-
-    for ax in axs[1:]:
+    for ax in axs.flatten():
         ax.get_legend().remove()
+
+    axs[1, 1].legend(frameon=False)
+    axs[1, 0].set_xlabel('bit')
+    axs[1, 0].set_ylabel('recovery rate')
 
     savefig(fig, 'compare_equations')
 
@@ -266,7 +276,8 @@ def plot_adaptivity_stuff():  # pragma no cover
     stats_analyser = get_stats(run_vdp, 'data/stats')
 
     my_setup_mpl()
-    fig, axs = plt.subplots(3, 1, figsize=(TEXTWIDTH, TEXTWIDTH), sharex=True, sharey=False)
+    scale = 0.5 if JOURNAL == 'JSC_beamer' else 1.0
+    fig, axs = plt.subplots(3, 1, figsize=figsize_by_journal(JOURNAL, scale, 1), sharex=True, sharey=False)
 
     def plot_error(stats, ax, iter_ax, strategy, **kwargs):
         """
@@ -286,7 +297,7 @@ def plot_adaptivity_stuff():  # pragma no cover
         k = get_sorted(stats, type='k')
         iter_ax.plot([me[0] for me in k], np.cumsum([me[1] for me in k]), **strategy.style, markevery=15, **kwargs)
         ax.set_yscale('log')
-        ax.set_ylabel(r'$e_\mathrm{loc}$')
+        ax.set_ylabel('local error')
         iter_ax.set_ylabel(r'iterations')
 
     force_params = {'convergence_controllers': {EstimateEmbeddedErrorNonMPI: {}}}
@@ -303,7 +314,7 @@ def plot_adaptivity_stuff():  # pragma no cover
     axs[1].set_ylim(bottom=1e-9)
     axs[2].set_xlabel(r'$t$')
     axs[0].set_ylabel('solution')
-    axs[2].legend(frameon=False)
+    axs[2].legend(frameon=JOURNAL == 'JSC_beamer')
     savefig(fig, 'adaptivity')
 
 
@@ -398,11 +409,11 @@ def plot_vdp_solution():  # pragma no cover
 
 
 if __name__ == "__main__":
-    plot_recovery_rate(get_stats(run_vdp))
-    plot_vdp_solution()
-    plot_fault_vdp(0)
-    plot_fault_vdp(13)
-    plot_adaptivity_stuff()
-    plot_efficiency_polar(run_vdp)
+    # plot_recovery_rate(get_stats(run_vdp))
+    # plot_vdp_solution()
+    # plot_fault_vdp(0)
+    # plot_fault_vdp(13)
+    # plot_adaptivity_stuff()
+    # plot_efficiency_polar(run_vdp)
     compare_recovery_rate_problems()
-    analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
+    # analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
