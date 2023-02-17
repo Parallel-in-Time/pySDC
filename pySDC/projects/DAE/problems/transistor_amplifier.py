@@ -33,7 +33,7 @@ class one_transistor_amplifier(ptype_dae):
             u (dtype_u): the current values. This parameter has been "hijacked" to contain [u', u] in this case to enable evaluation of the implicit representation
             t (float): current time
         Returns:
-            Current value of F(), 8 components
+            Current value of F(), 5 components
         """
         u_b = 6.0
         u_e = 0.4 * np.sin(200 * np.pi * t)
