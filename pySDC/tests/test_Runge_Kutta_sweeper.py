@@ -9,6 +9,7 @@ from pySDC.implementations.sweeper_classes.Runge_Kutta import (
     CrankNicholson,
     Cash_Karp,
     Heun_Euler,
+    DIRK34,
 )
 from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
@@ -131,7 +132,7 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
     )
 
     # check if we think the method should be A-stable
-    Astable_methods = [RK1, CrankNicholson, MidpointMethod]  # only the implicit versions are A-stable
+    Astable_methods = [RK1, CrankNicholson, MidpointMethod, DIRK34]  # only the implicit versions are A-stable
     assert (
         implicit and sweeper in Astable_methods
     ) == Astable, f"Unexpected region of stability for {sweeper.__name__} sweeper!"
@@ -161,6 +162,8 @@ def test_all_stability():
         for i in range(len(sweepers[j])):
             plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=re, im=im, crosshair=crosshair[i])
         axs[j].set_title(titles[j])
+
+    plot_stability_single(DIRK34, re=re, im=im)
 
     fig.tight_layout()
 
@@ -216,7 +219,7 @@ def test_advection():
 
 
 @pytest.mark.base
-@pytest.mark.parametrize("sweeper", [Cash_Karp, Heun_Euler])
+@pytest.mark.parametrize("sweeper", [Cash_Karp, Heun_Euler, DIRK34])
 def test_embedded_estimate_order(sweeper):
     """
     Test the order of embedded Runge-Kutta schemes. They are not run with adaptivity here,
@@ -244,12 +247,18 @@ def test_embedded_estimate_order(sweeper):
 
     custom_controller_params = {'logger_level': 40}
 
+    expected_order = {
+        Cash_Karp: [5],
+        Heun_Euler: [2],
+        DIRK34: [4],
+    }
+
     Tend = 7e-2
     dt_list = Tend * 2.0 ** (-np.arange(8))
     prob = run_vdp
     plot_all_errors(
         ax,
-        [5] if sweeper == Cash_Karp else [2],
+        expected_order.get(sweeper, None),
         True,
         Tend_fixed=Tend,
         custom_description=description,
