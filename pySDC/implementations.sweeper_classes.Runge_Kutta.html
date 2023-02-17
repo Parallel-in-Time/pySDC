@@ -76,6 +76,14 @@
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK34">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DIRK34</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK34"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Embedded A-stable diagonally implicit RK pair of order 3 and 4.</p>
+<p>Taken from [here](<a class="reference external" href="https://doi.org/10.1007/BF01934920">https://doi.org/10.1007/BF01934920</a>).</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heun_Euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
@@ -160,6 +168,7 @@ method, which does not require us to solve a system of equations to compute the 
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34"><code class="docutils literal notranslate"><span class="pre">DIRK34</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod"><code class="docutils literal notranslate"><span class="pre">MidpointMethod</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK1"><code class="docutils literal notranslate"><span class="pre">RK1</span></code></a></li>
