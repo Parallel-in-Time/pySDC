@@ -333,3 +333,24 @@ class Cash_Karp(RungeKutta):
         matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
         super(Cash_Karp, self).__init__(params)
+
+
+class DIRK34(RungeKutta):
+    """
+    Embedded A-stable diagonally implicit RK pair of order 3 and 4.
+
+    Taken from [here](https://doi.org/10.1007/BF01934920).
+    """
+
+    def __init__(self, params):
+        nodes = np.array([5.0 / 6.0, 10.0 / 39.0, 0, 1.0 / 6.0])
+        weights = np.array(
+            [[32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0], [61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0]]
+        )
+        matrix = np.zeros((4, 4))
+        matrix[0, 0] = 5.0 / 6.0
+        matrix[1, :2] = [-15.0 / 26.0, 5.0 / 6.0]
+        matrix[2, :3] = [215.0 / 54.0, -130.0 / 27.0, 5.0 / 6.0]
+        matrix[3, :] = [4007.0 / 6075.0, -31031.0 / 24300.0, -133.0 / 2700.0, 5.0 / 6.0]
+        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
+        super().__init__(params)
