@@ -20,7 +20,7 @@ from pySDC.helpers.stats_helper import get_sorted
 cm = 1 / 2.5
 TEXTWIDTH = 11.9446244611 * cm
 JOURNAL = 'Springer_Numerical_Algorithms'
-# JOURNAL = 'JSC_beamer'
+BASE_PATH = 'data/paper'
 
 
 def get_stats(problem, path='data/stats'):
@@ -44,9 +44,13 @@ def get_stats(problem, path='data/stats'):
         run_leaky_superconductor: 5e-5,
     }
 
+    strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
+    if JOURNAL not in ['JSC_beamer']:
+        strategies += [HotRodStrategy()]
+
     return FaultStats(
         prob=problem,
-        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        strategies=strategies,
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
@@ -62,7 +66,7 @@ def my_setup_mpl(**kwargs):
     mpl.rcParams.update({'lines.markersize': 6})
 
 
-def savefig(fig, name, format='pdf', base_path='data/paper'):  # pragma: no cover
+def savefig(fig, name, format='pdf'):  # pragma: no cover
     """
     Save a figure to some predefined location.
 
@@ -73,7 +77,7 @@ def savefig(fig, name, format='pdf', base_path='data/paper'):  # pragma: no cove
         None
     """
     fig.tight_layout()
-    path = f'{base_path}/{name}.{format}'
+    path = f'{BASE_PATH}/{name}.{format}'
     fig.savefig(path, bbox_inches='tight', transparent=True, dpi=200)
     print(f'saved "{path}"')
 
@@ -387,6 +391,9 @@ def plot_fault_vdp(bit=0):  # pragma no cover
 def plot_vdp_solution():  # pragma no cover
     """
     Plot the solution of van der Pol problem over time to illustrate the varying time scales.
+
+    Returns:
+        None
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
@@ -405,12 +412,51 @@ def plot_vdp_solution():  # pragma no cover
     savefig(fig, 'vdp_sol')
 
 
-if __name__ == "__main__":
-    plot_recovery_rate(get_stats(run_vdp))
+def make_plots_for_SIAM_CSE23():  # pragma no cover
+    """
+    Make plots for the SIAM talk
+    """
+    global JOURNAL, BASE_PATH
+    JOURNAL = 'JSC_beamer'
+    BASE_PATH = 'data/paper/SIAMCSE23'
+
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 3.0 / 4.0))
+    plot_recovery_rate_recoverable_only(get_stats(run_vdp), fig, ax)
+    savefig(fig, 'recovery_rate')
+
+    plot_adaptivity_stuff()
+    compare_recovery_rate_problems()
     plot_vdp_solution()
+
+
+def make_plots_for_paper():  # pragma no cover
+    """
+    Make plots that are supposed to go in the paper.
+    """
+    global JOURNAL, BASE_PATH
+    JOURNAL = 'Springer_Numerical_Algorithms'
+    BASE_PATH = 'data/paper'
+
+    plot_recovery_rate(get_stats(run_vdp))
     plot_fault_vdp(0)
     plot_fault_vdp(13)
     plot_adaptivity_stuff()
     plot_efficiency_polar(run_vdp)
     compare_recovery_rate_problems()
-    analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
+
+
+def make_plots_for_notes():  # pragma no cover
+    """
+    Make plots for the notes for the website / GitHub
+    """
+    global JOURNAL, BASE_PATH
+    JOURNAL = 'Springer_Numerical_Algorithms'
+    BASE_PATH = 'notes/Lorenz'
+
+    analyse_resilience(run_Lorenz, format='png')
+
+
+if __name__ == "__main__":
+    make_plots_for_notes()
+    make_plots_for_SIAM_CSE23()
+    make_plots_for_paper()

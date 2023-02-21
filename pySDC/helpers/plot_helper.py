@@ -27,7 +27,8 @@ def figsize(textwidth, scale, ratio):
 
 def figsize_by_journal(journal, scale, ratio):  # pragma no cover
     """
-    Get figsize for specific journal.
+    Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead
+    of the parameters supplied.
 
     Args:
         journal (str): Name of journal
@@ -37,14 +38,26 @@ def figsize_by_journal(journal, scale, ratio):  # pragma no cover
     Returns:
         list: Width and height of the figure to be passed to matplotlib
     """
-    # store textwidth in points here, get this from LaTeX using \the\textwidth
+    # store text width in points here, get this from LaTeX using \the\textwidth
     textwidths = {
         'JSC_beamer': 426.79135,
         'Springer_Numerical_Algorithms': 338.58778,
     }
+    # store text height in points here, get this from LaTeX using \the\textheight
+    textheights = {
+        'JSC_beamer': 214.43411,
+    }
     assert (
         journal in textwidths.keys()
     ), f"Textwidth only available for {list(textwidths.keys())}. Please implement one for \"{journal}\"! Get the textwidth using \"\\the\\textwidth\" in your tex file."
+
+    # see if the figure fits on the page or if we need to apply the scaling to the height instead
+    if scale * ratio * textwidths[journal] > textheights.get(journal, 1e9):
+        if textheights[journal] / scale / ratio > textwidths[journal]:
+            raise ValueError(
+                f"We cannot fit figure with scale {scale:.2f} and ratio {ratio:.2f} on the page for journal {journal}!"
+            )
+        return figsize(textheights[journal] / (scale * ratio), 1, ratio)
 
     return figsize(textwidths[journal], scale, ratio)
 
