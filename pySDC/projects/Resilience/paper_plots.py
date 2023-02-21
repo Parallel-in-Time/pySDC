@@ -19,8 +19,8 @@ from pySDC.helpers.stats_helper import get_sorted
 
 cm = 1 / 2.5
 TEXTWIDTH = 11.9446244611 * cm
-# JOURNAL = 'Springer_Numerical_Algorithms'
-JOURNAL = 'JSC_beamer'
+JOURNAL = 'Springer_Numerical_Algorithms'
+# JOURNAL = 'JSC_beamer'
 
 
 def get_stats(problem, path='data/stats'):
@@ -170,9 +170,6 @@ def compare_recovery_rate_problems():  # pragma no cover
     Returns:
         None
     """
-    vdp_stats = get_stats(run_vdp)
-    lorenz_stats = get_stats(run_Lorenz)
-    schroedinger_stats = get_stats(run_Schroedinger, 'data/stats-jusuf/')
     stats = [
         get_stats(run_vdp),
         get_stats(run_Lorenz),
@@ -409,11 +406,11 @@ def plot_vdp_solution():  # pragma no cover
 
 
 if __name__ == "__main__":
-    # plot_recovery_rate(get_stats(run_vdp))
-    # plot_vdp_solution()
-    # plot_fault_vdp(0)
-    # plot_fault_vdp(13)
-    # plot_adaptivity_stuff()
-    # plot_efficiency_polar(run_vdp)
+    plot_recovery_rate(get_stats(run_vdp))
+    plot_vdp_solution()
+    plot_fault_vdp(0)
+    plot_fault_vdp(13)
+    plot_adaptivity_stuff()
+    plot_efficiency_polar(run_vdp)
     compare_recovery_rate_problems()
-    # analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
+    analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
