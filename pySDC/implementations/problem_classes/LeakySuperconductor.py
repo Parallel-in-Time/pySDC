@@ -92,7 +92,7 @@ class LeakySuperconductor(ptype):
 
         self.leak = np.logical_and(self.xv > self.params.leak_range[0], self.xv < self.params.leak_range[1])
 
-        self.total_newton_iter = 0  # store here how many iterations you needed for the Newton solver to converge in the last solve in case you want to log this
+        self.total_newton_iter = 0  # store here how many iterations you needed for the Newton solver over the entire run to extract the desired information in the hooks
 
     def eval_f_non_linear(self, u, t):
         """
