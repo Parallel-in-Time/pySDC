@@ -9,7 +9,7 @@ import matplotlib as mpl
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
+from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData, LogNewtonIter
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -22,6 +22,7 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
+from pySDC.projects.Resilience.leaky_superconductor import run_leaky_superconductor
 
 plot_helper.setup_mpl(reset=True)
 cmap = TABLEAU_COLORS
@@ -200,6 +201,11 @@ class AdaptivityStrategy(Strategy):
         Returns:
             The custom descriptions you can supply to the problem when running it
         '''
+        custom_description = {}
+
+        dt_max = np.inf
+        dt_min = 1e-5
+
         if problem == run_piline:
             e_tol = 1e-7
             dt_min = 1e-2
@@ -212,14 +218,19 @@ class AdaptivityStrategy(Strategy):
         elif problem == run_Schroedinger:
             e_tol = 4e-6
             dt_min = 1e-3
+        elif problem == run_leaky_superconductor:
+            e_tol = 1e-7
+            dt_min = 1e-3
+            dt_max = 1e2
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
  strategy'
             )
 
-        custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min}}}
-
+        custom_description['convergence_controllers'] = {
+            Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min, 'dt_max': dt_max}
+        }
         return {**custom_description, **self.custom_description}
 
 
@@ -303,6 +314,9 @@ class IterateStrategy(Strategy):
         Returns:
             The custom description you can supply to the problem when running it
         '''
+        restol = -1
+        e_tol = -1
+
         if problem == run_piline:
             restol = 2.3e-8
         elif problem == run_vdp:
@@ -311,6 +325,9 @@ class IterateStrategy(Strategy):
             restol = 16e-7
         elif problem == run_Schroedinger:
             restol = 6.5e-7
+        elif problem == run_leaky_superconductor:
+            # e_tol = 1e-6
+            restol = 1e-11
         else:
             raise NotImplementedError(
                 'I don\'t have a residual tolerance for your problem. Please add one to the \
@@ -319,7 +336,7 @@ strategy'
 
         custom_description = {
             'step_params': {'maxiter': 99},
-            'level_params': {'restol': restol},
+            'level_params': {'restol': restol, 'e_tol': e_tol},
         }
 
         return {**custom_description, **self.custom_description}
@@ -360,6 +377,9 @@ class HotRodStrategy(Strategy):
         elif problem == run_Schroedinger:
             HotRod_tol = 3e-7
             maxiter = 6
+        elif problem == run_leaky_superconductor:
+            HotRod_tol = 3e-5
+            maxiter = 6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
@@ -391,6 +411,7 @@ class FaultStats:
         faults=None,
         reload=True,
         recovery_thresh=1 + 1e-3,
+        recovery_thresh_abs=1e9,
         num_procs=1,
         mode='combination',
         stats_path='data/stats',
@@ -412,6 +433,7 @@ class FaultStats:
         self.faults = [False, True] if faults is None else faults
         self.reload = reload
         self.recovery_thresh = recovery_thresh
+        self.recovery_thresh_abs = recovery_thresh_abs
         self.num_procs = num_procs
         self.mode = mode
         self.stats_path = stats_path
@@ -431,6 +453,8 @@ class FaultStats:
             return 1.5
         elif self.prob == run_Schroedinger:
             return 1.0
+        elif self.prob == run_leaky_superconductor:
+            return 450
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
@@ -449,6 +473,10 @@ class FaultStats:
         elif self.prob == run_Schroedinger:
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
+        elif self.prob == run_leaky_superconductor:
+            custom_description['level_params'] = {'restol': -1, 'dt': 10.0}
+            custom_description['step_params'] = {'maxiter': 5}
+            custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-10}
         return custom_description
 
     def get_custom_problem_params(self):
@@ -549,6 +577,7 @@ class FaultStats:
             'bit': np.zeros(runs),
             'error': np.zeros(runs),
             'total_iteration': np.zeros(runs),
+            'total_newton_iteration': np.zeros(runs),
             'restarts': np.zeros(runs),
             'target': np.zeros(runs),
         }
@@ -589,8 +618,9 @@ class FaultStats:
             if t < Tend:
                 error = np.inf
             else:
-                error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+                error = self.get_error(u, t, controller, strategy)
             total_iteration = sum([k[1] for k in get_sorted(stats, type='k')])
+            total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='newton_iter')])
 
             # record the new data point
             if faults:
@@ -603,6 +633,7 @@ class FaultStats:
                 dat['target'][i] = faults_run[0][1][5]
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
+            dat['total_newton_iteration'][i] = total_newton_iteration
             dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restarts')])
 
         dat_full = {}
@@ -623,6 +654,30 @@ class FaultStats:
 
         return None
 
+    def get_error(self, u, t, controller, strategy):
+        """
+        Compute the error.
+
+        Args:
+            u (dtype_u): The solution at the end of the run
+            t (float): Time at which `u` was recorded
+            controller (pySDC.controller.controller): The controller
+            strategy (Strategy): The resilience strategy
+
+        Returns:
+            float: Error
+        """
+        if self.prob == run_leaky_superconductor:
+            ref = {
+                AdaptivityStrategy: 0.036832240840408426,
+                IterateStrategy: 0.0368214748207781,
+                HotRodStrategy: 0.03682153860683977,
+                BaseStrategy: 0.03682153860683977,
+            }
+            return abs(max(u) - ref[type(strategy)])
+        else:
+            return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+
     def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None, space_comm=None):
         '''
         Run the problem once with the specified parameters
@@ -639,7 +694,7 @@ class FaultStats:
             pySDC.Controller: The controller of the run
             float: The time the problem should have run to
         '''
-        hook_class = hook_collection + [LogData] if hook_class is None else hook_class
+        hook_class = hook_collection + [LogNewtonIter] + ([LogData] if hook_class is None else hook_class)
         force_params = {} if force_params is None else force_params
 
         # build the custom description
@@ -793,6 +848,7 @@ class FaultStats:
         stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params)
 
         t, u = get_sorted(stats, type='u')[-1]
+        print(max(u))
         k = [me[1] for me in get_sorted(stats, type='k')]
         print(k)
 
@@ -805,14 +861,21 @@ class FaultStats:
             error = np.inf
             print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
         else:
-            error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
-        recovery_thresh = e_star * self.recovery_thresh
+            error = self.get_error(u, t, controller, strategy)
+        recovery_thresh = self.get_thresh(strategy)
 
         print(
             f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
 {error < recovery_thresh}'
         )
         print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
+
+        _newton_iter = get_sorted(stats, type='newton_iter')
+        if len(_newton_iter) > 0:
+            newton_iter = [me[1] for me in _newton_iter]
+            print(
+                f'Newton: k: sum: {np.sum(newton_iter)}, min: {np.min(newton_iter)}, max: {np.max(newton_iter)}, mean: {np.mean(newton_iter):.2f},'
+            )
 
         # checkout the step size
         dt = [me[1] for me in get_sorted(stats, type='dt')]
@@ -889,6 +952,8 @@ class FaultStats:
             prob_name = 'Lorenz'
         elif self.prob == run_Schroedinger:
             prob_name = 'Schroedinger'
+        elif self.prob == run_leaky_superconductor:
+            prob_name = 'Quench'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
 
@@ -943,6 +1008,17 @@ class FaultStats:
             return {'runs': 0}
         return dat
 
+    def get_thresh(self, strategy=None):
+        """
+        Get recovery threshold based on relative and absolute tolerances
+
+        Args:
+            strategy (Strategy): The resilience strategy
+        """
+        fault_free = self.load(strategy, False)
+        assert fault_free['error'].std() / fault_free['error'].mean() < 1e-5
+        return self.recovery_thresh_abs + self.recovery_thresh * fault_free["error"].mean()
+
     def get_recovered(self, strategy=None):
         '''
         Determine the recovery rate for a specific strategy and store it to disk.
@@ -956,12 +1032,9 @@ class FaultStats:
         '''
         if strategy is None:
             [self.get_recovered(strat) for strat in self.strategies]
-        fault_free = self.load(strategy, False)
+
         with_faults = self.load(strategy, True)
-
-        assert fault_free['error'].std() / fault_free['error'].mean() < 1e-5
-
-        with_faults['recovered'] = with_faults['error'] < self.recovery_thresh * fault_free['error'].mean()
+        with_faults['recovered'] = with_faults['error'] < self.get_thresh(strategy)
         self.store(strategy, True, with_faults)
 
         return None
@@ -1659,20 +1732,22 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_Schroedinger,
+        prob=run_leaky_superconductor,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
+        recovery_thresh_abs=5e-5,
         num_procs=1,
         mode='random',
         stats_path='data/stats-jusuf',
     )
 
     stats_analyser.run_stats_generation(runs=1000)
+    stats_analyser.get_recovered()
     mask = None
 
-    stats_analyser.compare_strategies()
+    # stats_analyser.compare_strategies()
     stats_analyser.plot_things_per_things(
         'recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask, args={'ylabel': 'recovery rate'}
     )
@@ -1701,6 +1776,14 @@ def main():
         )
     fig.tight_layout()
     fig.savefig(f'data/{stats_analyser.get_name()}-recoverable.pdf', transparent=True)
+
+    fig, ax = plt.subplots(1, 1, figsize=(13, 4))
+    stats_analyser.plot_recovery_thresholds(ax=ax, thresh_range=np.logspace(-1, 1, 1000))
+    ax.axvline(stats_analyser.get_thresh(BaseStrategy()), color='grey', ls=':', label='recovery threshold')
+    ax.set_xscale('log')
+    ax.legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(f'data/{stats_analyser.get_name()}-threshold.pdf', transparent=True)
 
     stats_analyser.plot_things_per_things(
         'total_iteration',

@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import cg, spsolve
+from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -72,7 +72,7 @@ class LeakySuperconductor(ptype):
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
         elif self.params.bc == 'neumann-zero':
             self.dx = 1.0 / (self.params.nvars - 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
+            xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
         else:
             raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
 
@@ -85,12 +85,14 @@ class LeakySuperconductor(ptype):
             dim=1,
             bc=self.params.bc,
         )
-        self.A *= self.params.K
+        self.A *= self.params.K / self.params.Cv
 
         self.xv = xvalues
         self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
 
         self.leak = np.logical_and(self.xv > self.params.leak_range[0], self.xv < self.params.leak_range[1])
+
+        self.total_newton_iter = 0  # store here how many iterations you needed for the Newton solver over the entire run to extract the desired information in the hooks
 
     def eval_f_non_linear(self, u, t):
         """
@@ -117,6 +119,8 @@ class LeakySuperconductor(ptype):
         me[0] = 0.0
         me[-1] = 0.0
 
+        me[:] /= self.params.Cv
+
         return me
 
     def eval_f(self, u, t):
@@ -131,7 +135,7 @@ class LeakySuperconductor(ptype):
             dtype_f: The right hand side
         """
         f = self.dtype_f(self.init)
-        f[:] = (self.A.dot(u.flatten()).reshape(self.params.nvars) + self.eval_f_non_linear(u, t)) / self.params.Cv
+        f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars) + self.eval_f_non_linear(u, t)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -156,7 +160,7 @@ class LeakySuperconductor(ptype):
                 u (dtype_u): Current solution
 
             Returns:
-                dtype_u: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
             """
             u_thresh = self.params.u_thresh
             u_max = self.params.u_max
@@ -172,27 +176,33 @@ class LeakySuperconductor(ptype):
             me[0] = 0.0
             me[-1] = 0.0
 
-            me = self.dtype_u(self.init)
-            return me
+            me[:] /= self.params.Cv
+
+            return sp.diags(me, format='csc')
 
         u = self.dtype_u(u0)
         res = np.inf
-        for _n in range(0, self.params.newton_iter):
+        for n in range(0, self.params.newton_iter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
 
             res = np.linalg.norm(G, np.inf)
-            if res <= self.params.newton_tol or np.isnan(res):
+            if res <= self.params.newton_tol and n > 0:  # we want to make at least one Newton iteration
                 break
 
             # assemble Jacobian J of G
             J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
 
             # solve the linear system
-            delta = np.linalg.solve(J, G)
+            delta = spsolve(J, G)
+
+            if not np.isfinite(delta).all():
+                break
 
             # update solution
             u = u - delta
+
+        self.total_newton_iter += n
 
         return u
 
@@ -207,7 +217,7 @@ class LeakySuperconductor(ptype):
             dtype_u: exact solution
         """
 
-        me = self.dtype_u(self.init, val=0)
+        me = self.dtype_u(self.init, val=0.0)
 
         if t > 0:
 
@@ -245,8 +255,8 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         """
 
         f = self.dtype_f(self.init)
-        f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars) / self.params.Cv
-        f.expl[:] = self.eval_f_non_linear(u, t) / self.params.Cv
+        f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        f.expl[:] = self.eval_f_non_linear(u, t)
 
         return f
 

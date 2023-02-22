@@ -1,5 +1,4 @@
-# script to run a simple heat problem
-
+# script to run a quench problem
 from pySDC.implementations.problem_classes.LeakySuperconductor import LeakySuperconductor, LeakySuperconductorIMEX
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -18,18 +17,52 @@ class live_plot(hooks):  # pragma no cover
     This hook plots the solution and the non-linear part of the right hand side after every step. Keep in mind that using adaptivity will result in restarts, which is not marked in these plots. Prepare to see the temperature profile jumping back again after a restart.
     """
 
-    def pre_run(self, step, level_number):  # pragma no cover
-        self.fig, self.axs = plt.subplots(1, 2, figsize=(10, 4))
+    def _plot_state(self, step, level_number):  # pragma no cover
+        """
+        Plot the solution at all collocation nodes and the non-linear part of the right hand side
 
-    def post_step(self, step, level_number):  # pragma no cover
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): Number of current level
+
+        Returns:
+            None
+        """
+        L = step.levels[level_number]
         for ax in self.axs:
             ax.cla()
-        L = step.levels[level_number]
-        self.axs[0].plot(L.prob.xv, L.u[-1])
+        [self.axs[0].plot(L.prob.xv, L.u[i], legend=f"node {i}") for i in range(len(L.u))]
         self.axs[0].axhline(L.prob.params.u_thresh, color='black')
         self.axs[1].plot(L.prob.xv, L.prob.eval_f_non_linear(L.u[-1], L.time))
         self.axs[0].set_ylim(0, 0.025)
+        self.fig.suptitle(f"t={L.time:.2e}, k={step.status.iter}")
         plt.pause(1e-9)
+
+    def pre_run(self, step, level_number):  # pragma no cover
+        """
+        Setup a figure to plot into
+
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): Number of current level
+
+        Returns:
+            None
+        """
+        self.fig, self.axs = plt.subplots(1, 2, figsize=(10, 4))
+
+    def post_step(self, step, level_number):  # pragma no cover
+        """
+        Call the plotting function after the step
+
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): Number of current level
+
+        Returns:
+            None
+        """
+        self._plot_state(step, level_number)
 
 
 def run_leaky_superconductor(
@@ -43,6 +76,7 @@ def run_leaky_superconductor(
     imex=False,
     u0=None,
     t0=None,
+    **kwargs,
 ):
     """
     Run a toy problem of a superconducting magnet with a temperature leak with default parameters.
@@ -67,7 +101,7 @@ def run_leaky_superconductor(
 
     # initialize level parameters
     level_params = dict()
-    level_params['dt'] = 1e-2
+    level_params['dt'] = 10.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -118,7 +152,11 @@ def run_leaky_superconductor(
 
     # insert faults
     if fault_stuff is not None:
-        raise NotImplementedError("The parameters have not been adapted to this equation yet!")
+        from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+
+        rnd_args = {'iteration': 5, 'min_node': 1}
+        args = {'time': 21.0, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -167,15 +205,15 @@ def compare_imex_full(plotting=False):
 
     res = {}
 
-    dt_max = {True: 2e1, False: np.inf}
     custom_description = {}
     custom_description['problem_params'] = {
-        'newton_tol': 1e-4,
-        'newton_iter': 15,
+        'newton_tol': 1e-10,
+        'newton_iter': 20,
+        'nvars': 2**9,
     }
     custom_controller_params = {'logger_level': 30}
-    for imex in [True, False]:
-        custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-6, 'dt_max': dt_max[imex]}}
+    for imex in [False, True]:
+        custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-6, 'dt_max': 1e2}}
         stats, controller, _ = run_leaky_superconductor(
             custom_description=custom_description,
             custom_controller_params=custom_controller_params,
@@ -188,9 +226,10 @@ def compare_imex_full(plotting=False):
             plot_solution(stats, controller)
 
     diff = abs(res[True] - res[False])
+    thresh = 3e-3
     assert (
-        diff < 5e-3
-    ), f"Difference between IMEX and fully-implicit too large! Got {diff:.2e}, allowed is only {5e-3:.2e}!"
+        diff < thresh
+    ), f"Difference between IMEX and fully-implicit too large! Got {diff:.2e}, allowed is only {thresh:.2e}!"
     prob = controller.MS[0].levels[0].prob
     assert (
         max(res[True]) > prob.params.u_max

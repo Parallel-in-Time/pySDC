@@ -11,13 +11,16 @@ from pySDC.projects.Resilience.fault_stats import (
     run_Lorenz,
     run_Schroedinger,
     run_vdp,
+    run_leaky_superconductor,
 )
-from pySDC.helpers.plot_helper import setup_mpl
+from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 from pySDC.helpers.stats_helper import get_sorted
 
 
 cm = 1 / 2.5
 TEXTWIDTH = 11.9446244611 * cm
+JOURNAL = 'Springer_Numerical_Algorithms'
+BASE_PATH = 'data/paper'
 
 
 def get_stats(problem, path='data/stats'):
@@ -37,12 +40,21 @@ def get_stats(problem, path='data/stats'):
     else:
         mode = 'random'
 
+    recovery_thresh_abs = {
+        run_leaky_superconductor: 5e-5,
+    }
+
+    strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
+    if JOURNAL not in ['JSC_beamer']:
+        strategies += [HotRodStrategy()]
+
     return FaultStats(
         prob=problem,
-        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        strategies=strategies,
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
+        recovery_thresh_abs=recovery_thresh_abs.get(problem, 0),
         num_procs=1,
         mode=mode,
         stats_path=path,
@@ -54,7 +66,7 @@ def my_setup_mpl(**kwargs):
     mpl.rcParams.update({'lines.markersize': 6})
 
 
-def savefig(fig, name, format='pdf', base_path='data/paper'):  # pragma: no cover
+def savefig(fig, name, format='pdf'):  # pragma: no cover
     """
     Save a figure to some predefined location.
 
@@ -65,7 +77,7 @@ def savefig(fig, name, format='pdf', base_path='data/paper'):  # pragma: no cove
         None
     """
     fig.tight_layout()
-    path = f'{base_path}/{name}.{format}'
+    path = f'{BASE_PATH}/{name}.{format}'
     fig.savefig(path, bbox_inches='tight', transparent=True, dpi=200)
     print(f'saved "{path}"')
 
@@ -162,23 +174,27 @@ def compare_recovery_rate_problems():  # pragma no cover
     Returns:
         None
     """
-    vdp_stats = get_stats(run_vdp)
-    lorenz_stats = get_stats(run_Lorenz)
-    schroedinger_stats = get_stats(run_Schroedinger, 'data/stats-jusuf/')
-    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger']
+    stats = [
+        get_stats(run_vdp),
+        get_stats(run_Lorenz),
+        get_stats(run_Schroedinger, 'data/stats-jusuf'),
+        get_stats(run_leaky_superconductor, 'data/stats-jusuf'),
+    ]
+    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger', 'Quench']
 
     my_setup_mpl()
-    fig, axs = plt.subplots(1, 3, figsize=(TEXTWIDTH, 4 * cm), sharex=False, sharey=True)
+    fig, axs = plt.subplots(2, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.7), sharey=True)
+    [
+        plot_recovery_rate_recoverable_only(stats[i], fig, axs.flatten()[i], ylabel='', xlabel='', title=titles[i])
+        for i in range(len(stats))
+    ]
 
-    plot_recovery_rate_recoverable_only(vdp_stats, fig, axs[0], ylabel='recovery rate')
-    plot_recovery_rate_recoverable_only(lorenz_stats, fig, axs[1], ylabel='', xlabel='')
-    plot_recovery_rate_recoverable_only(schroedinger_stats, fig, axs[2], ylabel='', xlabel='')
-
-    for i in range(len(axs)):
-        axs[i].set_title(titles[i])
-
-    for ax in axs[1:]:
+    for ax in axs.flatten():
         ax.get_legend().remove()
+
+    axs[1, 1].legend(frameon=False)
+    axs[1, 0].set_xlabel('bit')
+    axs[1, 0].set_ylabel('recovery rate')
 
     savefig(fig, 'compare_equations')
 
@@ -261,7 +277,8 @@ def plot_adaptivity_stuff():  # pragma no cover
     stats_analyser = get_stats(run_vdp, 'data/stats')
 
     my_setup_mpl()
-    fig, axs = plt.subplots(3, 1, figsize=(TEXTWIDTH, TEXTWIDTH), sharex=True, sharey=False)
+    scale = 0.5 if JOURNAL == 'JSC_beamer' else 1.0
+    fig, axs = plt.subplots(3, 1, figsize=figsize_by_journal(JOURNAL, scale, 1), sharex=True, sharey=False)
 
     def plot_error(stats, ax, iter_ax, strategy, **kwargs):
         """
@@ -281,7 +298,7 @@ def plot_adaptivity_stuff():  # pragma no cover
         k = get_sorted(stats, type='k')
         iter_ax.plot([me[0] for me in k], np.cumsum([me[1] for me in k]), **strategy.style, markevery=15, **kwargs)
         ax.set_yscale('log')
-        ax.set_ylabel(r'$e_\mathrm{loc}$')
+        ax.set_ylabel('local error')
         iter_ax.set_ylabel(r'iterations')
 
     force_params = {'convergence_controllers': {EstimateEmbeddedErrorNonMPI: {}}}
@@ -298,7 +315,7 @@ def plot_adaptivity_stuff():  # pragma no cover
     axs[1].set_ylim(bottom=1e-9)
     axs[2].set_xlabel(r'$t$')
     axs[0].set_ylabel('solution')
-    axs[2].legend(frameon=False)
+    axs[2].legend(frameon=JOURNAL == 'JSC_beamer')
     savefig(fig, 'adaptivity')
 
 
@@ -374,11 +391,14 @@ def plot_fault_vdp(bit=0):  # pragma no cover
 def plot_vdp_solution():  # pragma no cover
     """
     Plot the solution of van der Pol problem over time to illustrate the varying time scales.
+
+    Returns:
+        None
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
     my_setup_mpl()
-    fig, ax = plt.subplots(figsize=(9 * cm, 8 * cm))
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 0.9))
 
     custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': 1e-7}}}
     problem_params = {}
@@ -392,12 +412,51 @@ def plot_vdp_solution():  # pragma no cover
     savefig(fig, 'vdp_sol')
 
 
-if __name__ == "__main__":
-    plot_recovery_rate(get_stats(run_vdp))
+def make_plots_for_SIAM_CSE23():  # pragma no cover
+    """
+    Make plots for the SIAM talk
+    """
+    global JOURNAL, BASE_PATH
+    JOURNAL = 'JSC_beamer'
+    BASE_PATH = 'data/paper/SIAMCSE23'
+
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 3.0 / 4.0))
+    plot_recovery_rate_recoverable_only(get_stats(run_vdp), fig, ax)
+    savefig(fig, 'recovery_rate')
+
+    plot_adaptivity_stuff()
+    compare_recovery_rate_problems()
     plot_vdp_solution()
+
+
+def make_plots_for_paper():  # pragma no cover
+    """
+    Make plots that are supposed to go in the paper.
+    """
+    global JOURNAL, BASE_PATH
+    JOURNAL = 'Springer_Numerical_Algorithms'
+    BASE_PATH = 'data/paper'
+
+    plot_recovery_rate(get_stats(run_vdp))
     plot_fault_vdp(0)
     plot_fault_vdp(13)
     plot_adaptivity_stuff()
     plot_efficiency_polar(run_vdp)
     compare_recovery_rate_problems()
-    analyse_resilience(run_Lorenz, format='png', base_path='notes/Lorenz')
+
+
+def make_plots_for_notes():  # pragma no cover
+    """
+    Make plots for the notes for the website / GitHub
+    """
+    global JOURNAL, BASE_PATH
+    JOURNAL = 'Springer_Numerical_Algorithms'
+    BASE_PATH = 'notes/Lorenz'
+
+    analyse_resilience(run_Lorenz, format='png')
+
+
+if __name__ == "__main__":
+    make_plots_for_notes()
+    make_plots_for_SIAM_CSE23()
+    make_plots_for_paper()
