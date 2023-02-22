@@ -71,8 +71,8 @@ class LeakySuperconductor(ptype):
             self.dx = 1.0 / (self.params.nvars + 1)
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
         elif self.params.bc == 'neumann-zero':
-            self.dx = 1.0 / (self.params.nvars + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
+            self.dx = 1.0 / (self.params.nvars - 1)
+            xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
         else:
             raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
 
@@ -85,7 +85,7 @@ class LeakySuperconductor(ptype):
             dim=1,
             bc=self.params.bc,
         )
-        self.A *= self.params.K
+        self.A *= self.params.K / self.params.Cv
 
         self.xv = xvalues
         self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
@@ -119,6 +119,8 @@ class LeakySuperconductor(ptype):
         me[0] = 0.0
         me[-1] = 0.0
 
+        me[:] /= self.params.Cv
+
         return me
 
     def eval_f(self, u, t):
@@ -133,7 +135,7 @@ class LeakySuperconductor(ptype):
             dtype_f: The right hand side
         """
         f = self.dtype_f(self.init)
-        f[:] = (self.A.dot(u.flatten()).reshape(self.params.nvars) + self.eval_f_non_linear(u, t)) / self.params.Cv
+        f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars) + self.eval_f_non_linear(u, t)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -174,31 +176,33 @@ class LeakySuperconductor(ptype):
             me[0] = 0.0
             me[-1] = 0.0
 
-            me = self.dtype_u(self.init)
+            me[:] /= self.params.Cv
+
             return sp.diags(me, format='csc')
 
         u = self.dtype_u(u0)
         res = np.inf
-        for _n in range(0, self.params.newton_iter):
+        for n in range(0, self.params.newton_iter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
 
             res = np.linalg.norm(G, np.inf)
-            if res <= self.params.newton_tol and _n > 0:
+            if res <= self.params.newton_tol and n > 0:  # we want to make at least one Newton iteration
                 break
 
             # assemble Jacobian J of G
-            J = self.Id - factor * (self.A + get_non_linear_Jacobian(u)) / self.params.Cv
+            J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
 
             # solve the linear system
             delta = spsolve(J, G)
+
             if not np.isfinite(delta).all():
                 break
 
             # update solution
             u = u - delta
 
-        self.total_newton_iter += _n
+        self.total_newton_iter += n
 
         return u
 
@@ -251,8 +255,8 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         """
 
         f = self.dtype_f(self.init)
-        f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars) / self.params.Cv
-        f.expl[:] = self.eval_f_non_linear(u, t) / self.params.Cv
+        f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        f.expl[:] = self.eval_f_non_linear(u, t)
 
         return f
 
@@ -271,7 +275,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = spsolve(self.Id - factor * self.A / self.params.Cv, rhs.flatten()).reshape(self.params.nvars)
+        me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):

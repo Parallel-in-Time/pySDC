@@ -398,7 +398,7 @@ def plot_vdp_solution():  # pragma no cover
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
     my_setup_mpl()
-    fig, ax = plt.subplots(figsize=(9 * cm, 8 * cm))
+    fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 0.9))
 
     custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': 1e-7}}}
     problem_params = {}
