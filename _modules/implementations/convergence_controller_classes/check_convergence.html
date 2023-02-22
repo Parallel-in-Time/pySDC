@@ -64,7 +64,35 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): The updated params dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">200</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="o">+</span><span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;use_e_tol&#39;</span><span class="p">:</span> <span class="s1">&#39;e_tol&#39;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+<div class="viewcode-block" id="CheckConvergence.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the embedded error estimator if needed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_e_tol</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">EstimateEmbeddedError</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+
+            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+                <span class="n">EstimateEmbeddedError</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="s2">&quot;nonMPI&quot;</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">controller</span><span class="p">)</span> <span class="o">==</span> <span class="n">controller_nonMPI</span> <span class="k">else</span> <span class="s2">&quot;MPI&quot;</span><span class="p">),</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="CheckConvergence.check_convergence"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
@@ -82,10 +110,16 @@
         <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span>
 
-        <span class="c1"># get residual and check against prescribed tolerance (plus check number of iterations</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
+        <span class="c1"># get residual and check against prescribed tolerance (plus check number of iterations)</span>
+        <span class="n">iter_converged</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span>
+        <span class="n">res_converged</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&lt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span>
+        <span class="n">e_tol_converged</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">&lt;</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;e_tol&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error_embedded_estimate&#39;</span><span class="p">))</span>
+            <span class="k">else</span> <span class="kc">False</span>
+        <span class="p">)</span>
         <span class="n">converged</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">or</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
+            <span class="n">iter_converged</span> <span class="ow">or</span> <span class="n">res_converged</span> <span class="ow">or</span> <span class="n">e_tol_converged</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
         <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_continue</span>
         <span class="k">if</span> <span class="n">converged</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>

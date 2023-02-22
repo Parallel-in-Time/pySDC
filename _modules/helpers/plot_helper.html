@@ -46,12 +46,60 @@
 
 
 <div class="viewcode-block" id="figsize"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize">[docs]</a><span class="k">def</span> <span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get figsize.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        textwidth (str): Textwdith in your LaTeX file in points</span>
+<span class="sd">        scale (float): The width of the figure relative to the textwidth</span>
+<span class="sd">        ratio (float): The height of the figure relative to its width</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Width and height of the figure to be passed to matplotlib</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fig_width_pt</span> <span class="o">=</span> <span class="n">textwidth</span>  <span class="c1"># Get this from LaTeX using \the\textwidth</span>
     <span class="n">inches_per_pt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">72.27</span>  <span class="c1"># Convert pt to inch</span>
     <span class="n">fig_width</span> <span class="o">=</span> <span class="n">fig_width_pt</span> <span class="o">*</span> <span class="n">inches_per_pt</span> <span class="o">*</span> <span class="n">scale</span>  <span class="c1"># width in inches</span>
     <span class="n">fig_height</span> <span class="o">=</span> <span class="n">fig_width</span> <span class="o">*</span> <span class="n">ratio</span>  <span class="c1"># height in inches</span>
     <span class="n">fig_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">fig_width</span><span class="p">,</span> <span class="n">fig_height</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">fig_size</span></div>
+
+
+<div class="viewcode-block" id="figsize_by_journal"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize_by_journal">[docs]</a><span class="k">def</span> <span class="nf">figsize_by_journal</span><span class="p">(</span><span class="n">journal</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>  <span class="c1"># pragma no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead</span>
+<span class="sd">    of the parameters supplied.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        journal (str): Name of journal</span>
+<span class="sd">        scale (float): The width of the figure relative to the textwidth</span>
+<span class="sd">        ratio (float): The height of the figure relative to its width</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Width and height of the figure to be passed to matplotlib</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># store text width in points here, get this from LaTeX using \the\textwidth</span>
+    <span class="n">textwidths</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;JSC_beamer&#39;</span><span class="p">:</span> <span class="mf">426.79135</span><span class="p">,</span>
+        <span class="s1">&#39;Springer_Numerical_Algorithms&#39;</span><span class="p">:</span> <span class="mf">338.58778</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="c1"># store text height in points here, get this from LaTeX using \the\textheight</span>
+    <span class="n">textheights</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;JSC_beamer&#39;</span><span class="p">:</span> <span class="mf">214.43411</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">journal</span> <span class="ow">in</span> <span class="n">textwidths</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Textwidth only available for </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">textwidths</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">. Please implement one for </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">! Get the textwidth using </span><span class="se">\&quot;\\</span><span class="s2">the</span><span class="se">\\</span><span class="s2">textwidth</span><span class="se">\&quot;</span><span class="s2"> in your tex file.&quot;</span>
+
+    <span class="c1"># see if the figure fits on the page or if we need to apply the scaling to the height instead</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">ratio</span> <span class="o">*</span> <span class="n">textwidths</span><span class="p">[</span><span class="n">journal</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">textheights</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">journal</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">textheights</span><span class="p">[</span><span class="n">journal</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span> <span class="o">/</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="n">textwidths</span><span class="p">[</span><span class="n">journal</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;We cannot fit figure with scale </span><span class="si">{</span><span class="n">scale</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> and ratio </span><span class="si">{</span><span class="n">ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> on the page for journal </span><span class="si">{</span><span class="n">journal</span><span class="si">}</span><span class="s2">!&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">figsize</span><span class="p">(</span><span class="n">textheights</span><span class="p">[</span><span class="n">journal</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">scale</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">figsize</span><span class="p">(</span><span class="n">textwidths</span><span class="p">[</span><span class="n">journal</span><span class="p">],</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="setup_mpl"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.setup_mpl">[docs]</a><span class="k">def</span> <span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

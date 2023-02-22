@@ -51,7 +51,45 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.plot_helper.figsize">
 <span class="sig-name descname"><span class="pre">figsize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textwidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#figsize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.figsize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get figsize.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>textwidth</strong> (<em>str</em>) – Textwdith in your LaTeX file in points</p></li>
+<li><p><strong>scale</strong> (<em>float</em>) – The width of the figure relative to the textwidth</p></li>
+<li><p><strong>ratio</strong> (<em>float</em>) – The height of the figure relative to its width</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Width and height of the figure to be passed to matplotlib</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.plot_helper.figsize_by_journal">
+<span class="sig-name descname"><span class="pre">figsize_by_journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">journal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#figsize_by_journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.figsize_by_journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead
+of the parameters supplied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>journal</strong> (<em>str</em>) – Name of journal</p></li>
+<li><p><strong>scale</strong> (<em>float</em>) – The width of the figure relative to the textwidth</p></li>
+<li><p><strong>ratio</strong> (<em>float</em>) – The height of the figure relative to its width</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Width and height of the figure to be passed to matplotlib</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.plot_helper.newfig">
@@ -82,6 +120,7 @@
     <ul>
 <li><a class="reference internal" href="#">helpers.plot_helper module</a><ul>
 <li><a class="reference internal" href="#helpers.plot_helper.figsize"><code class="docutils literal notranslate"><span class="pre">figsize()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.plot_helper.figsize_by_journal"><code class="docutils literal notranslate"><span class="pre">figsize_by_journal()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.plot_helper.newfig"><code class="docutils literal notranslate"><span class="pre">newfig()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.plot_helper.savefig"><code class="docutils literal notranslate"><span class="pre">savefig()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.plot_helper.setup_mpl"><code class="docutils literal notranslate"><span class="pre">setup_mpl()</span></code></a></li>

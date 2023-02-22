@@ -115,6 +115,23 @@ Test the residual and max. number of iterations as well as allowing overrides to
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_convergence.html#CheckConvergence.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the embedded error estimator if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/check_convergence.html#CheckConvergence.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define default parameters here</p>
@@ -154,6 +171,7 @@ Test the residual and max. number of iterations as well as allowing overrides to
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence"><code class="docutils literal notranslate"><span class="pre">check_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">check_iteration_status()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence"><code class="docutils literal notranslate"><span class="pre">communicate_convergence()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
