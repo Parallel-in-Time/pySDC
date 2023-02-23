@@ -254,7 +254,9 @@ def compare_imex_full(plotting=False):
         max(res[True]) > prob.params.u_max
     ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
 
-    assert rhs[True] == rhs[False], f"Expected IMEX and fully implicit schemes to take the same number of right hand side evaluations per step, but got {rhs[True]} and {rhs[False]}!"
+    assert (
+        rhs[True] == rhs[False]
+    ), f"Expected IMEX and fully implicit schemes to take the same number of right hand side evaluations per step, but got {rhs[True]} and {rhs[False]}!"
 
 
 if __name__ == '__main__':

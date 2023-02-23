@@ -198,7 +198,11 @@ class LeakySuperconductor(ptype):
         for n in range(0, self.params.newton_iter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
-            self.work_counters['rhs'].niter -= 1  # Work regarding construction of the Jacobian etc. should count into the Newton iterations only
+            self.work_counters[
+                'rhs'
+            ].niter -= (
+                1  # Work regarding construction of the Jacobian etc. should count into the Newton iterations only
+            )
 
             res = np.linalg.norm(G, np.inf)
             if res <= self.params.newton_tol and n > 0:  # we want to make at least one Newton iteration
