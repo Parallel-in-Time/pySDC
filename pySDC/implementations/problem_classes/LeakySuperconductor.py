@@ -96,6 +96,7 @@ class LeakySuperconductor(ptype):
         self.leak = np.logical_and(self.xv > self.params.leak_range[0], self.xv < self.params.leak_range[1])
 
         self.work_counters['newton'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
         if not self.params.direct_solver:
             self.work_counters['linear'] = WorkCounter()
 
@@ -141,6 +142,7 @@ class LeakySuperconductor(ptype):
         """
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars) + self.eval_f_non_linear(u, t)
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -196,6 +198,7 @@ class LeakySuperconductor(ptype):
         for n in range(0, self.params.newton_iter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
+            self.work_counters['rhs'].niter -= 1  # Work regarding construction of the Jacobian etc. should count into the Newton iterations only
 
             res = np.linalg.norm(G, np.inf)
             if res <= self.params.newton_tol and n > 0:  # we want to make at least one Newton iteration
@@ -281,6 +284,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
         f.expl[:] = self.eval_f_non_linear(u, t)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):

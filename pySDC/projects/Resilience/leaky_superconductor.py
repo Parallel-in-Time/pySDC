@@ -209,6 +209,7 @@ def compare_imex_full(plotting=False):
     newton_iter_max = 20
 
     res = {}
+    rhs = {}
 
     custom_description = {}
     custom_description['problem_params'] = {
@@ -232,6 +233,7 @@ def compare_imex_full(plotting=False):
 
         res[imex] = get_sorted(stats, type='u')[-1][1]
         newton_iter = [me[1] for me in get_sorted(stats, type='work_newton')]
+        rhs[imex] = np.mean([me[1] for me in get_sorted(stats, type='work_rhs')]) // 1
 
         if imex:
             assert all([me == 0 for me in newton_iter]), "IMEX is not supposed to do Newton iterations!"
@@ -251,6 +253,8 @@ def compare_imex_full(plotting=False):
     assert (
         max(res[True]) > prob.params.u_max
     ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
+
+    assert rhs[True] == rhs[False], f"Expected IMEX and fully implicit schemes to take the same number of right hand side evaluations per step, but got {rhs[True]} and {rhs[False]}!"
 
 
 if __name__ == '__main__':
