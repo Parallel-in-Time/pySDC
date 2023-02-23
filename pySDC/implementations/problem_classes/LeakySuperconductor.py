@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import spsolve, cg, gmres, inv
+from scipy.sparse.linalg import spsolve, gmres, inv
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype, WorkCounter

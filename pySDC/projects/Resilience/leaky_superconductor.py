@@ -218,7 +218,7 @@ def compare_imex_full(plotting=False):
     }
     custom_description['step_params'] = {'maxiter': maxiter}
     custom_description['sweeper_params'] = {'num_nodes': num_nodes}
-     
+
     custom_controller_params = {'logger_level': 30}
     for imex in [False, True]:
         custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-6, 'dt_max': 1e2}}
@@ -236,7 +236,9 @@ def compare_imex_full(plotting=False):
         if imex:
             assert all([me == 0 for me in newton_iter]), "IMEX is not supposed to do Newton iterations!"
         else:
-            assert max(newton_iter)/num_nodes/maxiter <= newton_iter_max, "Took more Newton iterations than allowed!"
+            assert (
+                max(newton_iter) / num_nodes / maxiter <= newton_iter_max
+            ), "Took more Newton iterations than allowed!"
         if plotting:  # pragma no cover
             plot_solution(stats, controller)
 
