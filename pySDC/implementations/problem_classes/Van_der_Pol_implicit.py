@@ -39,7 +39,6 @@ class vanderpol(ptype):
         super(vanderpol, self).__init__(
             (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
         )
-        self.total_newton_iter = 0  # access this from the hooks to make stats
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
@@ -129,7 +128,6 @@ class vanderpol(ptype):
             x1 = u[0]
             x2 = u[1]
             n += 1
-        self.total_newton_iter += n
 
         if np.isnan(res) and self.params.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)

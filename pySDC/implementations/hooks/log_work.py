@@ -1,5 +1,6 @@
 from pySDC.core.Hooks import hooks
 
+
 class LogWork(hooks):
     """
     Log the increment of all work counters in the problem between steps
@@ -18,7 +19,8 @@ class LogWork(hooks):
         """
         if level_number == 0:
             self.__work_last_step = [
-                    {key: step.levels[i].prob.work_counters[key].niter for key in step.levels[i].prob.work_counters.keys()} for i in range(len(step.levels))
+                {key: step.levels[i].prob.work_counters[key].niter for key in step.levels[i].prob.work_counters.keys()}
+                for i in range(len(step.levels))
             ]
 
     def post_step(self, step, level_number):

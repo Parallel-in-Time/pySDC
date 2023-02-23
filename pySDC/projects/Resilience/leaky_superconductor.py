@@ -202,15 +202,23 @@ def compare_imex_full(plotting=False):
         plotting (bool): Plot the solution or not
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+    from pySDC.implementations.hooks.log_work import LogWork
+
+    maxiter = 5
+    num_nodes = 3
+    newton_iter_max = 20
 
     res = {}
 
     custom_description = {}
     custom_description['problem_params'] = {
         'newton_tol': 1e-10,
-        'newton_iter': 20,
+        'newton_iter': newton_iter_max,
         'nvars': 2**9,
     }
+    custom_description['step_params'] = {'maxiter': maxiter}
+    custom_description['sweeper_params'] = {'num_nodes': num_nodes}
+     
     custom_controller_params = {'logger_level': 30}
     for imex in [False, True]:
         custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-6, 'dt_max': 1e2}}
@@ -219,9 +227,16 @@ def compare_imex_full(plotting=False):
             custom_controller_params=custom_controller_params,
             imex=imex,
             Tend=5e2,
+            hook_class=LogWork,
         )
 
         res[imex] = get_sorted(stats, type='u')[-1][1]
+        newton_iter = [me[1] for me in get_sorted(stats, type='work_newton')]
+
+        if imex:
+            assert all([me == 0 for me in newton_iter]), f"IMEX is not supposed to do Newton iterations!"
+        else:
+            assert max(newton_iter)/num_nodes/maxiter <= newton_iter_max, "Took more Newton iterations than allowed!"
         if plotting:  # pragma no cover
             plot_solution(stats, controller)
 
@@ -236,100 +251,6 @@ def compare_imex_full(plotting=False):
     ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
 
 
-def compare_dirk():
-    from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityRK
-    from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
-    from pySDC.projects.Resilience.hook import hook_collection, LogNewtonIter, LogData, LogSpaceIter
-    from pySDC.helpers.plot_helper import figsize_by_journal, setup_mpl
-    from pySDC.implementations.hooks.log_work import LogWork
-
-    setup_mpl(reset=True)
-    fig, axs = plt.subplots(2, 2, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.82), sharex=True)
-
-    problem_params = {}
-    problem_params['direct_solver'] = False
-
-    description = {}
-    description['step_params'] = {'maxiter': 4}
-    description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-5, 'dt_max': 50.0}}
-
-    description_RK = {}
-    description_RK['convergence_controllers'] = {AdaptivityRK: {'e_tol': 1e-5, 'dt_max': 5e1, 'update_order': 4}}
-    description_RK['sweeper_class'] = DIRK34
-    description_RK['step_params'] = {'maxiter': 1}
-
-    description_res = {}
-    description_res['step_params'] = {'maxiter': 99}
-    description_res['level_params'] = {'restol': 1e-10}
-
-    controller_params = {}
-    controller_params['hook_class'] = hook_collection + [LogNewtonIter, LogData, LogSpaceIter, LogWork]
-    controller_params['logger_level'] = 30
-    Tend = 500
-
-    stats_fixed, _, _ = run_leaky_superconductor(
-        custom_description=description_res,
-        imex=False,
-        Tend=Tend,
-        custom_controller_params=controller_params,
-        custom_problem_params=problem_params,
-    )
-    stats, _, _ = run_leaky_superconductor(
-        custom_description=description,
-        imex=False,
-        Tend=Tend,
-        custom_controller_params=controller_params,
-        custom_problem_params=problem_params,
-    )
-    stats_RK, _, _ = run_leaky_superconductor(
-        custom_description=description_RK,
-        imex=False,
-        Tend=Tend,
-        custom_controller_params=controller_params,
-        custom_problem_params=problem_params,
-    )
-
-    labels = {
-        0: 'SDC+adaptivity',
-        1: 'DIRK4(3)',
-        2: 'SDC',
-    }
-    ls = {
-        0: '-',
-        1: '--',
-        2: ':',
-    }
-    S = [stats, stats_RK, stats_fixed]
-    for i in range(len(S)):
-        newton_iter = get_sorted(S[i], type='work_newton')
-        axs[0, 0].plot(
-            [me[0] for me in newton_iter], np.cumsum([me[1] for me in newton_iter]), label=labels[i], ls=ls[i]
-        )
-
-        space_iter = get_sorted(S[i], type='work_linear')
-        axs[1, 1].plot([me[0] for me in space_iter], np.cumsum([me[1] for me in space_iter]), ls=ls[i])
-
-        dt = get_sorted(S[i], type='dt')
-        axs[0, 1].plot([me[0] for me in dt], [me[1] for me in dt], ls=ls[i])
-
-        # u = get_sorted(S[i], type='u', recomputed=False)
-        # axs[1,1].plot([me[0] for me in u], [max(me[1]) for me in u], ls=ls[i])
-
-        k = get_sorted(S[i], type='sweeps', recomputed=None)
-        axs[1, 0].plot([me[0] for me in k], np.cumsum([me[1] for me in k]), ls=ls[i])
-    axs[0, 0].set_yscale('log')
-    axs[1, 1].set_yscale('log')
-    axs[0, 0].legend(frameon=False)
-    axs[0, 0].set_ylabel('cumulative Newton iterations')
-    axs[1, 0].set_ylabel('cumulative SDC iterations')
-    axs[1, 0].set_xlabel('$t$')
-    axs[0, 1].set_ylabel(r'$\Delta t$')
-    axs[1, 1].set_ylabel('cumulative GMRES iterations')
-    fig.tight_layout()
-    fig.savefig('data/quench_newton.pdf')
-
-
 if __name__ == '__main__':
-    compare_dirk()
-    # compare_imex_full(plotting=True)
+    compare_imex_full(plotting=True)
     plt.show()
