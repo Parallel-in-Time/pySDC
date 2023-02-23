@@ -234,7 +234,7 @@ def compare_imex_full(plotting=False):
         newton_iter = [me[1] for me in get_sorted(stats, type='work_newton')]
 
         if imex:
-            assert all([me == 0 for me in newton_iter]), f"IMEX is not supposed to do Newton iterations!"
+            assert all([me == 0 for me in newton_iter]), "IMEX is not supposed to do Newton iterations!"
         else:
             assert max(newton_iter)/num_nodes/maxiter <= newton_iter_max, "Took more Newton iterations than allowed!"
         if plotting:  # pragma no cover
