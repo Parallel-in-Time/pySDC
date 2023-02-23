@@ -12,6 +12,18 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
+class WorkCounter(object):
+    """
+    Class for counting iterations
+    """
+
+    def __init__(self):
+        self.niter = 0
+
+    def __call__(self, *args, **kwargs):
+        self.niter += 1
+
+
 class ptype(object):
     """
     Prototype class for problems, just defines the attributes essential to get started
@@ -36,6 +48,7 @@ class ptype(object):
         """
 
         self.params = _Pars(params)
+        self.work_counters = {}
 
         # set up logger
         self.logger = logging.getLogger('problem')
