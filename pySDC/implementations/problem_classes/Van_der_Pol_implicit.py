@@ -2,7 +2,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -39,6 +39,7 @@ class vanderpol(ptype):
         super(vanderpol, self).__init__(
             (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
         )
+        self.work_counters['newton'] = WorkCounter()
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
@@ -128,6 +129,7 @@ class vanderpol(ptype):
             x1 = u[0]
             x2 = u[1]
             n += 1
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.params.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)

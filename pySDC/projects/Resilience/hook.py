@@ -8,30 +8,6 @@ from pySDC.implementations.hooks.log_step_size import LogStepSize
 hook_collection = [LogSolution, LogEmbeddedErrorEstimate, LogExtrapolationErrorEstimate, LogStepSize]
 
 
-class LogNewtonIter(hooks):
-    """
-    Log the number of Newton iterations required for each step
-    """
-
-    def pre_step(self, step, level_number):
-        if level_number == 0:
-            self.__newton_iter_last_step = [
-                step.levels[i].prob.__dict__.get('total_newton_iter', 0) for i in range(len(step.levels))
-            ]
-
-    def post_step(self, step, level_number):
-        L = step.levels[level_number]
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='newton_iter',
-            value=L.prob.__dict__.get('total_newton_iter', 0) - self.__newton_iter_last_step[level_number],
-        )
-
-
 class LogData(hooks):
     """
     Record data required for analysis of problems in the resilience project

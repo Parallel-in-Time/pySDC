@@ -9,12 +9,13 @@ import matplotlib as mpl
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
 
-from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData, LogNewtonIter
+from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
+from pySDC.implementations.hooks.log_work import LogWork
 
 # these problems are available for testing
 from pySDC.projects.Resilience.advection import run_advection
@@ -620,7 +621,7 @@ class FaultStats:
             else:
                 error = self.get_error(u, t, controller, strategy)
             total_iteration = sum([k[1] for k in get_sorted(stats, type='k')])
-            total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='newton_iter')])
+            total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='work_newton')])
 
             # record the new data point
             if faults:
@@ -694,7 +695,7 @@ class FaultStats:
             pySDC.Controller: The controller of the run
             float: The time the problem should have run to
         '''
-        hook_class = hook_collection + [LogNewtonIter] + ([LogData] if hook_class is None else hook_class)
+        hook_class = hook_collection + [LogWork] + ([LogData] if hook_class is None else hook_class)
         force_params = {} if force_params is None else force_params
 
         # build the custom description
@@ -870,7 +871,7 @@ class FaultStats:
         )
         print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
 
-        _newton_iter = get_sorted(stats, type='newton_iter')
+        _newton_iter = get_sorted(stats, type='work_newton')
         if len(_newton_iter) > 0:
             newton_iter = [me[1] for me in _newton_iter]
             print(

@@ -202,15 +202,24 @@ def compare_imex_full(plotting=False):
         plotting (bool): Plot the solution or not
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+    from pySDC.implementations.hooks.log_work import LogWork
+
+    maxiter = 5
+    num_nodes = 3
+    newton_iter_max = 20
 
     res = {}
+    rhs = {}
 
     custom_description = {}
     custom_description['problem_params'] = {
         'newton_tol': 1e-10,
-        'newton_iter': 20,
+        'newton_iter': newton_iter_max,
         'nvars': 2**9,
     }
+    custom_description['step_params'] = {'maxiter': maxiter}
+    custom_description['sweeper_params'] = {'num_nodes': num_nodes}
+
     custom_controller_params = {'logger_level': 30}
     for imex in [False, True]:
         custom_description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-6, 'dt_max': 1e2}}
@@ -219,9 +228,19 @@ def compare_imex_full(plotting=False):
             custom_controller_params=custom_controller_params,
             imex=imex,
             Tend=5e2,
+            hook_class=LogWork,
         )
 
         res[imex] = get_sorted(stats, type='u')[-1][1]
+        newton_iter = [me[1] for me in get_sorted(stats, type='work_newton')]
+        rhs[imex] = np.mean([me[1] for me in get_sorted(stats, type='work_rhs')]) // 1
+
+        if imex:
+            assert all([me == 0 for me in newton_iter]), "IMEX is not supposed to do Newton iterations!"
+        else:
+            assert (
+                max(newton_iter) / num_nodes / maxiter <= newton_iter_max
+            ), "Took more Newton iterations than allowed!"
         if plotting:  # pragma no cover
             plot_solution(stats, controller)
 
@@ -234,6 +253,10 @@ def compare_imex_full(plotting=False):
     assert (
         max(res[True]) > prob.params.u_max
     ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
+
+    assert (
+        rhs[True] == rhs[False]
+    ), f"Expected IMEX and fully implicit schemes to take the same number of right hand side evaluations per step, but got {rhs[True]} and {rhs[False]}!"
 
 
 if __name__ == '__main__':

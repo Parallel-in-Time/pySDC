@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import spsolve
+from scipy.sparse.linalg import spsolve, gmres, inv
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -46,6 +46,9 @@ class LeakySuperconductor(ptype):
             'nvars': 2**7,
             'newton_tol': 1e-8,
             'newton_iter': 99,
+            'lintol': 1e-8,
+            'liniter': 99,
+            'direct_solver': True,
         }
 
         for key in problem_params.keys():
@@ -92,7 +95,10 @@ class LeakySuperconductor(ptype):
 
         self.leak = np.logical_and(self.xv > self.params.leak_range[0], self.xv < self.params.leak_range[1])
 
-        self.total_newton_iter = 0  # store here how many iterations you needed for the Newton solver over the entire run to extract the desired information in the hooks
+        self.work_counters['newton'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
+        if not self.params.direct_solver:
+            self.work_counters['linear'] = WorkCounter()
 
     def eval_f_non_linear(self, u, t):
         """
@@ -136,6 +142,7 @@ class LeakySuperconductor(ptype):
         """
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars) + self.eval_f_non_linear(u, t)
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -182,9 +189,20 @@ class LeakySuperconductor(ptype):
 
         u = self.dtype_u(u0)
         res = np.inf
+        delta = np.zeros_like(u)
+
+        # construct a preconditioner for the space solver
+        if not self.params.direct_solver:
+            M = inv(self.Id - factor * self.A)
+
         for n in range(0, self.params.newton_iter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
+            self.work_counters[
+                'rhs'
+            ].niter -= (
+                1  # Work regarding construction of the Jacobian etc. should count into the Newton iterations only
+            )
 
             res = np.linalg.norm(G, np.inf)
             if res <= self.params.newton_tol and n > 0:  # we want to make at least one Newton iteration
@@ -194,7 +212,19 @@ class LeakySuperconductor(ptype):
             J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
 
             # solve the linear system
-            delta = spsolve(J, G)
+            if self.params.direct_solver:
+                delta = spsolve(J, G)
+            else:
+                delta, info = gmres(
+                    J,
+                    G,
+                    x0=delta,
+                    M=M,
+                    tol=self.params.lintol,
+                    maxiter=self.params.liniter,
+                    atol=0,
+                    callback=self.work_counters['linear'],
+                )
 
             if not np.isfinite(delta).all():
                 break
@@ -202,7 +232,7 @@ class LeakySuperconductor(ptype):
             # update solution
             u = u - delta
 
-        self.total_newton_iter += n
+            self.work_counters['newton']()
 
         return u
 
@@ -258,6 +288,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
         f.expl[:] = self.eval_f_non_linear(u, t)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
