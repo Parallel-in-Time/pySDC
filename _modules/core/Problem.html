@@ -52,6 +52,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
 
+<div class="viewcode-block" id="WorkCounter"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.WorkCounter">[docs]</a><span class="k">class</span> <span class="nc">WorkCounter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for counting iterations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
 <div class="viewcode-block" id="ptype"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype">[docs]</a><span class="k">class</span> <span class="nc">ptype</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prototype class for problems, just defines the attributes essential to get started</span>
@@ -76,6 +88,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># set up logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;problem&#39;</span><span class="p">)</span>

@@ -40,10 +40,10 @@
   <h1>Source code for implementations.problem_classes.LeakySuperconductor</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">spsolve</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">spsolve</span><span class="p">,</span> <span class="n">gmres</span><span class="p">,</span> <span class="n">inv</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">ProblemError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">WorkCounter</span>
 <span class="kn">from</span> <span class="nn">pySDC.helpers</span> <span class="kn">import</span> <span class="n">problem_helper</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
@@ -86,6 +86,9 @@
             <span class="s1">&#39;nvars&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">,</span>
             <span class="s1">&#39;newton_tol&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>
             <span class="s1">&#39;newton_iter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+            <span class="s1">&#39;lintol&#39;</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">,</span>
+            <span class="s1">&#39;liniter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+            <span class="s1">&#39;direct_solver&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -132,7 +135,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">leak</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">leak_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">leak_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_newton_iter</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># store here how many iterations you needed for the Newton solver over the entire run to extract the desired information in the hooks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">direct_solver</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
 <div class="viewcode-block" id="LeakySuperconductor.eval_f_non_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f_non_linear">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f_non_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -176,6 +182,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="LeakySuperconductor.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -222,9 +229,20 @@
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="c1"># construct a preconditioner for the space solver</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">direct_solver</span><span class="p">:</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_iter</span><span class="p">):</span>
             <span class="c1"># assemble G such that G(u) = 0 at the solution of the step</span>
             <span class="n">G</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span>
+                <span class="s1">&#39;rhs&#39;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">niter</span> <span class="o">-=</span> <span class="p">(</span>
+                <span class="mi">1</span>  <span class="c1"># Work regarding construction of the Jacobian etc. should count into the Newton iterations only</span>
+            <span class="p">)</span>
 
             <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_tol</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># we want to make at least one Newton iteration</span>
@@ -234,7 +252,19 @@
             <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="n">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
 
             <span class="c1"># solve the linear system</span>
-            <span class="n">delta</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">direct_solver</span><span class="p">:</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">delta</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">gmres</span><span class="p">(</span>
+                    <span class="n">J</span><span class="p">,</span>
+                    <span class="n">G</span><span class="p">,</span>
+                    <span class="n">x0</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span>
+                    <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span>
+                    <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">lintol</span><span class="p">,</span>
+                    <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">liniter</span><span class="p">,</span>
+                    <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">],</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
                 <span class="k">break</span>
@@ -242,7 +272,7 @@
             <span class="c1"># update solution</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">delta</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_newton_iter</span> <span class="o">+=</span> <span class="n">n</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
 
         <span class="k">return</span> <span class="n">u</span></div>
 
@@ -298,6 +328,7 @@
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="LeakySuperconductorIMEX.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
