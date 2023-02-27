@@ -20,6 +20,11 @@
    :alt: zenodo
 
 
+.. image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green
+   :target: https://fair-software.eu
+   :alt: fair-software.eu
+
+
 Welcome to pySDC!
 =================
 
