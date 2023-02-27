@@ -2,6 +2,7 @@
 [![badge-ossf](https://bestpractices.coreinfrastructure.org/projects/6909/badge)](https://bestpractices.coreinfrastructure.org/projects/6909)
 [![badge-cc](https://codecov.io/gh/Parallel-in-Time/pySDC/branch/master/graph/badge.svg?token=hpP18dmtgS)](https://codecov.io/gh/Parallel-in-Time/pySDC)
 [![zenodo](https://zenodo.org/badge/26165004.svg)](https://zenodo.org/badge/latestdoi/26165004)
+[![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
 # Welcome to pySDC!
 
