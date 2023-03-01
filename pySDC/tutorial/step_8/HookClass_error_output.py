@@ -26,7 +26,7 @@ class error_output(hooks):
         # solution of the collocation problem
         description = step.params.description
         description['level_params']['restol'] = 1e-14
-        description['problem_params']['direct_solver'] = True
+        description['problem_params']['solver_type'] = 'direct'
 
         controller_params = step.params.controller_params
         del controller_params['hook_class']  # get rid of the hook, otherwise this will be an endless recursion..

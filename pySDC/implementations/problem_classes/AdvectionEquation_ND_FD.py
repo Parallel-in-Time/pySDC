@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.sparse.linalg import gmres, spsolve
 
 from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDiff
 
@@ -34,8 +33,8 @@ class advectionNd(GenericNDimFinDiff):
         Tolerance for spatial solver (GMRES).
     liniter : int, optional
         Max. iterations number for GMRES.
-    direct_solver : bool, optional
-        Whether to solve directly or use GMRES.
+    solver_type : str, optional
+        Solve the linear system directly or using GMRES or CG
     bc : str, optional
         Boundary conditions, either "periodic" or "dirichlet".
     sigma : float, optional
@@ -71,60 +70,14 @@ class advectionNd(GenericNDimFinDiff):
         order=2,
         lintol=1e-12,
         liniter=10000,
-        direct_solver=True,
+        solver_type='direct',
         bc='periodic',
         sigma=6e-2,
     ):
-        super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, direct_solver, bc)
+        super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, solver_type, bc)
 
         self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
-
-    def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs.
-
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side for the linear system.
-        factor : float
-            Abbrev. for the local stepsize (or any other factor required).
-        u0 : dtype_u
-            Initial guess for the iterative solver.
-        t : float
-            Current time (e.g. for time-dependent BCs).
-
-        Returns
-        -------
-        sol : dtype_u
-            The solution of the linear solver.
-        """
-        direct_solver, Id, A, nvars, lintol, liniter, sol = (
-            self.direct_solver,
-            self.Id,
-            self.A,
-            self.nvars,
-            self.lintol,
-            self.liniter,
-            self.u_init,
-        )
-
-        if direct_solver:
-            sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
-        else:
-            sol[:] = gmres(
-                Id - factor * A,
-                rhs.flatten(),
-                x0=u0.flatten(),
-                tol=lintol,
-                maxiter=liniter,
-                atol=0,
-            )[
-                0
-            ].reshape(nvars)
-
-        return sol
 
     def u_exact(self, t, **kwargs):
         """
