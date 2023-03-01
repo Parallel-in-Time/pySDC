@@ -10,7 +10,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import gmres, spsolve, cg
 
 from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -100,6 +100,9 @@ class GenericNDimFinDiff(ptype):
         self._makeAttributeAndRegister('nvars', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('freq', 'lintol', 'liniter', 'solver_type', localVars=locals())
 
+        if self.solver_type != 'direct':
+            self.work_counters[self.solver_type] = WorkCounter()
+
     @property
     def ndim(self):
         """Number of dimensions of the spatial problem"""
@@ -174,13 +177,25 @@ class GenericNDimFinDiff(ptype):
         if solver_type == 'direct':
             sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
         elif solver_type == 'gmres':
-            sol[:] = gmres(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
-                0
-            ].reshape(nvars)
+            sol[:] = gmres(
+                Id - factor * A,
+                rhs.flatten(),
+                x0=u0.flatten(),
+                tol=lintol,
+                maxiter=liniter,
+                atol=0,
+                callback=self.work_counters[solver_type],
+            )[0].reshape(nvars)
         elif solver_type == 'cg':
-            sol[:] = cg(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
-                0
-            ].reshape(nvars)
+            sol[:] = cg(
+                Id - factor * A,
+                rhs.flatten(),
+                x0=u0.flatten(),
+                tol=lintol,
+                maxiter=liniter,
+                atol=0,
+                callback=self.work_counters[solver_type],
+            )[0].reshape(nvars)
         else:
             raise ValueError(f'solver type "{solver_type}" not known in generic advection-diffusion implementation!')
 

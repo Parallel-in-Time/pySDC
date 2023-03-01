@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.sparse.linalg import cg, spsolve
 
 from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDiff
 from pySDC.implementations.datatype_classes.mesh import imex_mesh
