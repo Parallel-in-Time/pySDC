@@ -21,6 +21,7 @@ class WorkCounter(object):
         self.niter = 0
 
     def __call__(self, *args, **kwargs):
+        # *args and **kwargs are necessary for gmres
         self.niter += 1
 
 
