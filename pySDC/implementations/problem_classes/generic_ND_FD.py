@@ -7,6 +7,7 @@ Created on Sat Feb 11 22:39:30 2023
 """
 import numpy as np
 import scipy.sparse as sp
+from scipy.sparse.linalg import gmres, spsolve, cg
 
 from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
@@ -28,7 +29,7 @@ class GenericNDimFinDiff(ptype):
         order=2,
         lintol=1e-12,
         liniter=10000,
-        direct_solver=True,
+        solver_type='direct',
         bc='periodic',
     ):
         # make sure parameters have the correct types
@@ -96,7 +97,7 @@ class GenericNDimFinDiff(ptype):
 
         # store attribute and register them as parameters
         self._makeAttributeAndRegister('nvars', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
-        self._makeAttributeAndRegister('freq', 'lintol', 'liniter', 'direct_solver', localVars=locals())
+        self._makeAttributeAndRegister('freq', 'lintol', 'liniter', 'solver_type', localVars=locals())
 
     @property
     def ndim(self):
@@ -138,3 +139,48 @@ class GenericNDimFinDiff(ptype):
         f = self.f_init
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-factor*A)u = rhs.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
+
+        Returns
+        -------
+        sol : dtype_u
+            The solution of the linear solver.
+        """
+        solver_type, Id, A, nvars, lintol, liniter, sol = (
+            self.solver_type,
+            self.Id,
+            self.A,
+            self.nvars,
+            self.lintol,
+            self.liniter,
+            self.u_init,
+        )
+
+        if solver_type == 'direct':
+            sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
+        elif solver_type == 'gmres':
+            sol[:] = gmres(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
+                0
+            ].reshape(nvars)
+        elif solver_type == 'cg':
+            sol[:] = cg(Id - factor * A, rhs.flatten(), x0=u0.flatten(), tol=lintol, maxiter=liniter, atol=0,)[
+                0
+            ].reshape(nvars)
+        else:
+            raise ValueError(f'solver type "{solver_type}" not known in generic advection-diffusion implementation!')
+
+        return sol
