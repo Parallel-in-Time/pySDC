@@ -16,8 +16,8 @@ def main():
         nvars=1023,  # number of degrees of freedom
         nu=0.1,  # diffusion coefficient
         freq=4,  # frequency for the test value
-        bc='dirichlet-zero'  # boundary conditions
-        )
+        bc='dirichlet-zero',  # boundary conditions
+    )
 
     # instantiate collocation class, relative to the time interval [0,1]
     coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')

@@ -133,6 +133,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         rfft_object: planned real FFT for forward transformation
         irfft_object: planned IFFT for backward transformation
     """
+
     def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
         super().__init__(nvars, nu, eps, radius, L, init_type)
         self.lap -= 2.0 / self.eps**2

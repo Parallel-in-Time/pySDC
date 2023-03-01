@@ -17,6 +17,7 @@ class allencahn2d_imex(ptype):
         rfft_object: planned real FFT for forward transformation
         irfft_object: planned IFFT for backward transformation
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
@@ -41,8 +42,8 @@ class allencahn2d_imex(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'nu', 'eps', 'radius', 'L', 'init_type',
-            localVars=locals(), readOnly=True)
+            'nvars', 'nu', 'eps', 'radius', 'L', 'init_type', localVars=locals(), readOnly=True
+        )
 
         self.dx = self.L / self.nvars[0]  # could be useful for hooks, too.
         self.xvalues = np.array([i * self.dx - self.L / 2.0 for i in range(self.nvars[0])])
@@ -149,6 +150,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         rfft_object: planned real FFT for forward transformation
         irfft_object: planned IFFT for backward transformation
     """
+
     def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
         super().__init__(nvars, nu, eps, radius, L, init_type)
         self.lap -= 2.0 / self.eps**2
@@ -170,9 +172,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
         if self.eps > 0:
-            f.expl[:] = (
-                1.0 / self.eps**2 * v * (1.0 - v**self.nu) + 2.0 / self.eps**2 * v
-            ).reshape(self.nvars)
+            f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu) + 2.0 / self.eps**2 * v).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):

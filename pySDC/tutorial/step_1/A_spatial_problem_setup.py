@@ -13,8 +13,8 @@ def main():
         nvars=1023,  # number of degrees of freedom
         nu=0.1,  # diffusion coefficient
         freq=4,  # frequency for the test value
-        bc='dirichlet-zero'  # boundary conditions
-        )
+        bc='dirichlet-zero',  # boundary conditions
+    )
 
     # run accuracy test, get error back
     err = run_accuracy_check(prob)

@@ -21,10 +21,11 @@ class nonlinearschroedinger_imex(ptype):
         X: grid coordinates in real space
         K2: Laplace operator in spectral space
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, spectral, L=2*np.pi, c=1.0, comm=MPI.COMM_WORLD):
+    def __init__(self, nvars, spectral, L=2 * np.pi, c=1.0, comm=MPI.COMM_WORLD):
         """
         Initialization routine
 
@@ -45,22 +46,16 @@ class nonlinearschroedinger_imex(ptype):
         # Creating FFT structure
         self.ndim = len(nvars)
         axes = tuple(range(self.ndim))
-        self.fft = PFFT(
-            comm, list(nvars), axes=axes, dtype=np.complex128, collapse=True
-        )
+        self.fft = PFFT(comm, list(nvars), axes=axes, dtype=np.complex128, collapse=True)
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, spectral)
-        
+
         L = np.array([L] * self.ndim, dtype=float)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(nonlinearschroedinger_imex, self).__init__(
-            init=(tmp_u.shape, comm, tmp_u.dtype)
-        )
-        self._makeAttributeAndRegister(
-            'nvars', 'spectral', 'L', 'c', 'comm', 
-            localVars=locals(), readOnly=True)
+        super(nonlinearschroedinger_imex, self).__init__(init=(tmp_u.shape, comm, tmp_u.dtype))
+        self._makeAttributeAndRegister('nvars', 'spectral', 'L', 'c', 'comm', localVars=locals(), readOnly=True)
 
         # get local mesh
         X = np.ogrid[self.fft.local_slice(False)]

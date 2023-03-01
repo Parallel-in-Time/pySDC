@@ -9,6 +9,7 @@ class auzinger(ptype):
     """
     Example implementing the Auzinger initial value problem
     """
+
     dtype_u = mesh
     dtype_f = mesh
 
@@ -23,8 +24,7 @@ class auzinger(ptype):
         """
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
         super().__init__((2, None, np.dtype('float64')))
-        self._makeAttributeAndRegister(
-            'newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
     def u_exact(self, t):
         """

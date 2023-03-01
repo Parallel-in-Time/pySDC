@@ -19,11 +19,11 @@ class fenics_heat(ptype):
         g: forcing term
         bc: boundary conditions
     """
+
     dtype_u = fenics_mesh
     dtype_f = rhs_fenics_mesh
 
-    def __init__(
-            self, c_nvars, t0, family, order, refinements, nu):
+    def __init__(self, c_nvars, t0, family, order, refinements, nu):
         """
         Initialization routine
 
@@ -59,8 +59,8 @@ class fenics_heat(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat, self).__init__(self.V)
         self._makeAttributeAndRegister(
-            'c_nvars', 't0', 'family', 'order', 'refinements', 'nu', 
-            localVars=locals(), readOnly=True)
+            'c_nvars', 't0', 'family', 'order', 'refinements', 'nu', localVars=locals(), readOnly=True
+        )
 
         # Stiffness term (Laplace)
         u = df.TrialFunction(self.V)

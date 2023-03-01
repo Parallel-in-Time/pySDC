@@ -21,25 +21,28 @@ class LeakySuperconductor(ptype):
     We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
     leak itself.
     """
+
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self,
-                 Cv=1000.0,
-                 K=1000.0,
-                 u_thresh=1e-2,
-                 u_max=2e-2,
-                 Q_max=1.0,
-                 leak_range=(0.45, 0.55),
-                 order=2,
-                 stencil_type='center',
-                 bc='neumann-zero',
-                 nvars=2**7,
-                 newton_tol=1e-8,
-                 newton_iter=99,
-                 lintol=1e-8,
-                 liniter=99,
-                 direct_solver=True):
+    def __init__(
+        self,
+        Cv=1000.0,
+        K=1000.0,
+        u_thresh=1e-2,
+        u_max=2e-2,
+        Q_max=1.0,
+        leak_range=(0.45, 0.55),
+        order=2,
+        stencil_type='center',
+        bc='neumann-zero',
+        nvars=2**7,
+        newton_tol=1e-8,
+        newton_iter=99,
+        lintol=1e-8,
+        liniter=99,
+        direct_solver=True,
+    ):
         """
         Initialization routine
 
@@ -51,10 +54,24 @@ class LeakySuperconductor(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'Cv', 'K', 'u_thresh', 'u_max', 'Q_max', 'leak_range', 'order', 
-            'stencil_type', 'bc', 'nvars', 'newton_tol', 'newton_iter', 
-            'lintol', 'liniter', 'direct_solver',
-            localVars=locals(), readOnly=True)
+            'Cv',
+            'K',
+            'u_thresh',
+            'u_max',
+            'Q_max',
+            'leak_range',
+            'order',
+            'stencil_type',
+            'bc',
+            'nvars',
+            'newton_tol',
+            'newton_iter',
+            'lintol',
+            'liniter',
+            'direct_solver',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         if self.bc == 'periodic':
@@ -259,7 +276,6 @@ class LeakySuperconductor(ptype):
 
 
 class LeakySuperconductorIMEX(LeakySuperconductor):
-    
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):

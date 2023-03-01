@@ -19,12 +19,11 @@ class heat2d_petsc_forced(ptype):
         dy: distance between two spatial nodes in y direction
         ksp: PETSc linear solver object
     """
+
     dtype_u = petsc_vec
     dtype_f = petsc_vec_imex
 
-    def __init__(self,
-                 cnvars, nu, freq, refine, 
-                 comm=PETSc.COMM_WORLD, sol_tol=1e-10, sol_maxiter=None):
+    def __init__(self, cnvars, nu, freq, refine, comm=PETSc.COMM_WORLD, sol_tol=1e-10, sol_maxiter=None):
         """
         Initialization routine
 
@@ -38,17 +37,24 @@ class heat2d_petsc_forced(ptype):
             raise ProblemError('this is a 2d example, got %s' % cnvars)
 
         # create DMDA object which will be used for all grid operations
-        da = PETSc.DMDA().create(
-            [cnvars[0], cnvars[1]], stencil_width=1, comm=comm
-        )
+        da = PETSc.DMDA().create([cnvars[0], cnvars[1]], stencil_width=1, comm=comm)
         for _ in range(refine):
             da = da.refine()
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=da)
         self._makeAttributeAndRegister(
-            'cnvars', 'nu', 'freq', 'comm', 'refine', 'comm', 'sol_tol', 'sol_maxiter',
-            localVars=locals(), readOnly=True)
+            'cnvars',
+            'nu',
+            'freq',
+            'comm',
+            'refine',
+            'comm',
+            'sol_tol',
+            'sol_maxiter',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx, dy and get local ranges
         self.dx = 1.0 / (self.init.getSizes()[0] - 1)
@@ -207,10 +213,6 @@ class heat2d_petsc_forced(ptype):
         xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j] = (
-                    np.sin(np.pi * self.freq * i * self.dx)
-                    * np.sin(np.pi * self.freq * j * self.dy)
-                    * np.cos(t)
-                )
+                xa[i, j] = np.sin(np.pi * self.freq * i * self.dx) * np.sin(np.pi * self.freq * j * self.dy) * np.cos(t)
 
         return me
