@@ -50,10 +50,10 @@ def run_heat(
         'freq': 2,
         'nvars': 2**9,
         'nu': 1.0,
-        'type': 'center',
+        'stencil_type': 'center',
         'order': 6,
         'bc': 'periodic',
-        'direct_solver': True,
+        'solver_type': 'direct',
         'lintol': None,
         'liniter': None,
     }
