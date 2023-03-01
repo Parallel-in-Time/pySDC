@@ -15,42 +15,13 @@ class heatNd_unforced(GenericNDimFinDiff):
         order=2,
         lintol=1e-12,
         liniter=10000,
-        direct_solver=True,
+        solver_type='direct',
         bc='periodic',
         sigma=6e-2,
     ):
-        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, direct_solver, bc)
+        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc)
         self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
-
-    def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
-
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
-
-        Returns:
-            dtype_u: solution as mesh
-        """
-
-        sol = self.u_init
-
-        if self.direct_solver:
-            sol[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.nvars)
-        else:
-            sol[:] = cg(
-                self.Id - factor * self.A,
-                rhs.flatten(),
-                x0=u0.flatten(),
-                tol=self.lintol,
-                maxiter=self.liniter,
-                atol=0,
-            )[0].reshape(self.nvars)
-        return sol
 
     def u_exact(self, t, **kwargs):
         """
