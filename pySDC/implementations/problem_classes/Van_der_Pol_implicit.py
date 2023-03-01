@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -26,6 +26,7 @@ class vanderpol(ptype):
         self._makeAttributeAndRegister(
             'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter', localVars=locals()
         )
+        self.work_counters['newton'] = WorkCounter()
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
@@ -115,6 +116,7 @@ class vanderpol(ptype):
             x1 = u[0]
             x2 = u[1]
             n += 1
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)

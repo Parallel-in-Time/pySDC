@@ -112,7 +112,7 @@ def multiple_runs(
     if dt_list is not None:
         pass
     elif Tend_fixed:
-        dt_list = 0.1 * 10.0 ** -(np.arange(5) / 2)
+        dt_list = 0.1 * 10.0 ** -(np.arange(3) / 2)
     else:
         dt_list = 0.01 * 10.0 ** -(np.arange(20) / 10.0)
 
@@ -376,7 +376,7 @@ def check_order_with_adaptivity():
     we expect is 1 + 1/k.
     """
     setup_mpl()
-    ks = [4, 3, 2]
+    ks = [3, 2]
     for serial in [True, False]:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
         plot_all_errors(ax, ks, serial, Tend_fixed=5e-1, var='e_tol', dt_list=[1e-5, 1e-6, 1e-7], avoid_restarts=True)

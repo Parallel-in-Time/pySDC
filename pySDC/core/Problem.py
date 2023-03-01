@@ -12,6 +12,18 @@ import logging
 from pySDC.core.Common import RegisterParams
 
 
+class WorkCounter(object):
+    """
+    Class for counting iterations
+    """
+
+    def __init__(self):
+        self.niter = 0
+
+    def __call__(self, *args, **kwargs):
+        self.niter += 1
+
+
 class ptype(RegisterParams):
     """
     Prototype class for problems, just defines the attributes essential to get started.
@@ -37,6 +49,7 @@ class ptype(RegisterParams):
 
     def __init__(self, init):
         # pass initialization parameter to instantiate data types
+        self.work_counters = {}
         self.init = init
 
     @property

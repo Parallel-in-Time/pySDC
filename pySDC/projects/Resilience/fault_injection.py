@@ -54,7 +54,7 @@ class Fault(FrozenClass):
 
         random = {
             'level_number': random_generator.randint(low=0, high=rnd_params['level_number']),
-            'node': random_generator.randint(low=0, high=rnd_params['node'] + 1),
+            'node': random_generator.randint(low=rnd_params.get('min_node', 0), high=rnd_params['node'] + 1),
             'iteration': random_generator.randint(low=1, high=rnd_params['iteration'] + 1),
             'problem_pos': [random_generator.randint(low=0, high=i) for i in rnd_params['problem_pos']],
             'bit': random_generator.randint(low=0, high=rnd_params['bit']),
@@ -82,7 +82,7 @@ class Fault(FrozenClass):
 
         ranges = [
             (0, rnd_params['level_number']),
-            (0, rnd_params['node'] + 1),
+            (rnd_params.get('min_node', 0), rnd_params['node'] + 1),
             (1, rnd_params['iteration'] + 1),
             (0, rnd_params['bit']),
         ]
@@ -126,6 +126,39 @@ class FaultInjector(hooks):
         self.fault_init = []  # add faults to this list when the random parameters have not been set up yet
         self.rnd_params = {}
         self.random_generator = np.random.RandomState(2187)  # number of the cell in which Princess Leia is held
+
+    @classmethod
+    def generate_fault_stuff_single_fault(cls, bit=0, iteration=1, problem_pos=None, level_number=0, node=1, time=None):
+        """
+        Generate a fault stuff object which will insert a single fault at the supplied parameters. Because there will
+        be some parameter set for everything, there is no randomization anymore.
+
+        Args:
+            bit (int): Which bit to flip
+            iteration (int): After which iteration to flip
+            problem_pos: Where in the problem to flip a bit, type depends on the problem
+            level_number (int): In which level you want to flip
+            node (int): In which node to flip
+            time (float): The bitflip will occur in the time step after this time is reached
+
+        Returns:
+            dict: Can be supplied to the run functions in the resilience project to generate the single fault
+        """
+        assert problem_pos is not None, "Please supply a spatial position for the fault as `problem_pos`!"
+        assert time is not None, "Please supply a time for the fault as `time`!"
+        fault_stuff = {
+            'rng': np.random.RandomState(0),
+            'args': {
+                'bit': bit,
+                'iteration': iteration,
+                'level_number': level_number,
+                'problem_pos': problem_pos,
+                'node': node,
+                'time': time,
+            },
+        }
+        fault_stuff['rnd_args'] = fault_stuff['args']
+        return fault_stuff
 
     def add_fault(self, args, rnd_args):
         if type(self.random_generator) == int:
@@ -235,7 +268,7 @@ class FaultInjector(hooks):
             fault happens in the last iteration, it will not show up in the residual and the iteration is wrongly
             stopped.
             '''
-            L.u[f.node][f.problem_pos] = self.flip_bit(L.u[f.node][f.problem_pos][0], f.bit)
+            L.u[f.node][tuple(f.problem_pos)] = self.flip_bit(L.u[f.node][tuple(f.problem_pos)], f.bit)
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
             L.sweep.compute_residual()
         else:
@@ -278,13 +311,21 @@ class FaultInjector(hooks):
 {type(step.levels[level_number].u[0])}'
             )
 
+        dtype = step.levels[level_number].prob.u_exact(t=0).dtype
+        if dtype in [float, np.float64]:
+            bit = 64
+        elif dtype in [complex]:
+            bit = 128
+        else:
+            raise NotImplementedError(f'Don\'t know how many bits type {dtype} has')
+
         # define parameters for randomization
         self.rnd_params = {
             'level_number': len(step.levels),
             'node': step.levels[0].sweep.params.num_nodes,
             'iteration': step.params.maxiter,
             'problem_pos': step.levels[level_number].u[0].shape,
-            'bit': 64,  # change manually if you ever have something else
+            'bit': bit,  # change manually if you ever have something else
         }
 
         # initialize the faults have been added before we knew the random parameters
@@ -312,7 +353,6 @@ class FaultInjector(hooks):
         Returns:
             None
         '''
-
         super(FaultInjector, self).pre_step(step, level_number)
 
         self.timestep_idx += 1
@@ -384,7 +424,7 @@ class FaultInjector(hooks):
         '''
         Converts a single float in a string containing its binary representation in memory following IEEE754
         The struct.pack function returns the input with the applied conversion code in 8 bit blocks, which are then
-        concatenated as a string
+        concatenated as a string. Complex numbers will be returned as two consecutive strings.
 
         Args:
             f (float, np.float64, np.float32): number to be converted to binary representation
@@ -396,6 +436,8 @@ class FaultInjector(hooks):
             conversion_code = '>d'  # big endian, double
         elif type(f) in [np.float32]:
             conversion_code = '>f'  # big endian, float
+        elif type(f) in [np.complex128]:
+            return f'{self.to_binary(f.real)}{self.to_binary(f.imag)}'
         else:
             raise NotImplementedError(f'Don\'t know how to convert number of type {type(f)} to binary')
 
@@ -404,7 +446,7 @@ class FaultInjector(hooks):
     def to_float(self, s):
         '''
         Converts a string of a IEEE754 binary representation in a float. The string is converted to integer with base 2
-        and converted to bytes, which can be unpacked into a Python float by the struct module
+        and converted to bytes, which can be unpacked into a Python float by the struct module.
 
         Args:
             s (str): binary representation of a float number of 32 or 64 bit length following IEEE754
@@ -418,6 +460,11 @@ class FaultInjector(hooks):
         elif len(s) == 32:
             conversion_code = '>f'  # big endian, float
             byte_count = 4
+        elif len(s) == 128:  # complex floats
+            real = s[0:64]
+            imag = s[64:128]
+            return self.to_float(real) + self.to_float(imag) * 1j
+
         else:
             raise NotImplementedError(f'Don\'t know how to convert string of length {len(s)} to float')
 

@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -36,6 +36,7 @@ class LorenzAttractor(ptype):
         self._makeAttributeAndRegister(
             'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=True
         )
+        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
@@ -114,6 +115,7 @@ class LorenzAttractor(ptype):
 
             # update solution
             u = u - delta
+            self.work_counters['newton']()
 
         return u
 
