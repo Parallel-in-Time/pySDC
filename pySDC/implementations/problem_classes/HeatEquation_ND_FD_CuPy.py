@@ -94,7 +94,7 @@ class heatNd_forced(ptype):
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,
-            type=self.stencil_type,
+            stencil_type=self.stencil_type,
             dx=self.dx,
             size=self.nvars[0],
             dim=self.ndim,

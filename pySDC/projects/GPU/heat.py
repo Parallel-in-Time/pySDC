@@ -12,7 +12,6 @@ def set_parameter():
     problem_params['nu'] = 1
     problem_params['freq'] = (4, 4, 4)
     problem_params['order'] = 2
-    problem_params['ndim'] = 3
     problem_params['lintol'] = 1e-10
     problem_params['liniter'] = 99
     problem_params['direct_solver'] = False
