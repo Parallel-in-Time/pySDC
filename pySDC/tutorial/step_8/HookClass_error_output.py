@@ -1,5 +1,6 @@
 from pySDC.core.Hooks import hooks
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.problem_classes.Auzinger_implicit import auzinger
 
 
 class error_output(hooks):
@@ -26,7 +27,8 @@ class error_output(hooks):
         # solution of the collocation problem
         description = step.params.description
         description['level_params']['restol'] = 1e-14
-        description['problem_params']['solver_type'] = 'direct'
+        if type(L.prob) != auzinger:
+            description['problem_params']['solver_type'] = 'direct'
 
         controller_params = step.params.controller_params
         del controller_params['hook_class']  # get rid of the hook, otherwise this will be an endless recursion..

@@ -31,7 +31,7 @@ def main():
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 4
     problem_params['bc'] = 'periodic'
-    problem_params['stencil_type'] = 'backward'
+    problem_params['stencil_type'] = 'center'
 
     # initialize step parameters
     step_params = dict()
