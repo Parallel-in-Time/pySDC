@@ -19,6 +19,8 @@ class heatNd_unforced(GenericNDimFinDiff):
         sigma=6e-2,
     ):
         super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc)
+        if solver_type == 'GMRES':
+            self.logger.warn('GMRES is not usually used for heat equation')
         self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
 
@@ -136,7 +138,3 @@ class heatNd_forced(heatNd_unforced):
             x, y, z = self.grids
             sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.sin(np.pi * freq[2] * z) * np.cos(t)
         return sol
-
-
-# Manually inherit solve_system from heatNd_unforced
-heatNd_forced.solve_system = heatNd_unforced.solve_system

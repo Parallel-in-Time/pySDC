@@ -26,7 +26,7 @@ def run():
     problem_params['c'] = 0.1  # diffusion coefficient
     problem_params['freq'] = tuple(2 for _ in range(ndim))  # frequencies
     problem_params['nvars'] = tuple(N for _ in range(ndim))  # number of dofs
-    problem_params['solver_type'] = 'gmres'  # do GMRES instead of LU
+    problem_params['solver_type'] = 'GMRES'  # do GMRES instead of LU
     problem_params['liniter'] = 10  # number of GMRES iterations
     problem_params['bc'] = 'periodic'  # boundary conditions
 

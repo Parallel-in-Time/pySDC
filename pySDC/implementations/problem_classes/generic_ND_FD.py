@@ -176,7 +176,7 @@ class GenericNDimFinDiff(ptype):
 
         if solver_type == 'direct':
             sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
-        elif solver_type == 'gmres':
+        elif solver_type == 'GMRES':
             sol[:] = gmres(
                 Id - factor * A,
                 rhs.flatten(),
@@ -186,7 +186,7 @@ class GenericNDimFinDiff(ptype):
                 atol=0,
                 callback=self.work_counters[solver_type],
             )[0].reshape(nvars)
-        elif solver_type == 'cg':
+        elif solver_type == 'CG':
             sol[:] = cg(
                 Id - factor * A,
                 rhs.flatten(),
