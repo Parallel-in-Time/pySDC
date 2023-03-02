@@ -14,7 +14,7 @@ def set_parameter():
     problem_params['order'] = 2
     problem_params['lintol'] = 1e-10
     problem_params['liniter'] = 99
-    problem_params['direct_solver'] = False
+    problem_params['solver_type'] = 'CG'
     problem_params['nvars'] = (32, 32, 32)
     problem_params['bc'] = 'periodic'
 

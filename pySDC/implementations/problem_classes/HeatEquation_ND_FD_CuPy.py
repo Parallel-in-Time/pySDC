@@ -24,7 +24,7 @@ class heatNd_forced(ptype):
     dtype_f = imex_cupy_mesh
 
     def __init__(
-        self, nvars, nu, freq, bc, order=2, stencil_type='center', lintol=1e-12, liniter=10000, direct_solver=True
+        self, nvars, nu, freq, bc, order=2, stencil_type='center', lintol=1e-12, liniter=10000, solver_type='direct'
     ):
         """Initialization routine"""
 
@@ -76,7 +76,7 @@ class heatNd_forced(ptype):
             'stencil_type',
             'lintol',
             'liniter',
-            'direct_solver',
+            'solver_type',
             localVars=locals(),
             readOnly=True,
         )
@@ -161,9 +161,9 @@ class heatNd_forced(ptype):
 
         me = self.dtype_u(self.init)
 
-        if self.direct_solver:
+        if self.solver_type == 'direct':
             me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.nvars)
-        else:
+        elif self.solver_type == 'CG':
             me[:] = cg(
                 self.Id - factor * self.A,
                 rhs.flatten(),
@@ -172,6 +172,8 @@ class heatNd_forced(ptype):
                 maxiter=self.liniter,
                 atol=0,
             )[0].reshape(self.nvars)
+        else:
+            raise NotImplementedError(f'Solver {self.solver_type} not implemented in GPU heat equation!')
         return me
 
     def u_exact(self, t):
