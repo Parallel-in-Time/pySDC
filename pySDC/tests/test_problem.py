@@ -5,18 +5,12 @@ from pySDC.core.Problem import ptype
 from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
 
 PROBLEMS = {
-    logistics_equation: 
-        {'probParams' : 
-             dict(u0=2.0, newton_maxiter=100, newton_tol=1e-6, direct=True,
-                  lam=0.5, stop_at_nan=True),
-          'testParams': {
-              'tBeg': 0,
-              'tEnd': 1.0,
-              'nSteps': 1000,
-              'tol': 1e-3
-              }
-        }
+    logistics_equation: {
+        'probParams': dict(u0=2.0, newton_maxiter=100, newton_tol=1e-6, direct=True, lam=0.5, stop_at_nan=True),
+        'testParams': {'tBeg': 0, 'tEnd': 1.0, 'nSteps': 1000, 'tol': 1e-3},
     }
+}
+
 
 @pytest.mark.base
 @pytest.mark.parametrize("init", [[(2, 3, 4)], [(2, 3)], [(1,)]])
@@ -55,10 +49,10 @@ def test_scipy_reference(init):
     ), "The shape of the scipy reference solution does not match the shape of the actual solution"
     assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
 
+
 @pytest.mark.base
 @pytest.mark.parametrize('probType', PROBLEMS.keys())
 def testProblem(probType):
-    
     params = PROBLEMS[probType]['probParams']
     prob = probType(**params)
 
@@ -66,13 +60,13 @@ def testProblem(probType):
     tBeg = testParams['tBeg']
     tEnd = testParams['tEnd']
     nSteps = testParams['nSteps']
-    dt = (tEnd-tBeg)/nSteps
+    dt = (tEnd - tBeg) / nSteps
     uNum = prob.u_exact(tBeg)
     for n in range(nSteps):
-        uNum = uNum + dt*prob.eval_f(uNum, tBeg + n*dt)
-    
+        uNum = uNum + dt * prob.eval_f(uNum, tBeg + n * dt)
+
     assert np.linalg.norm(prob.u_exact(tEnd) - uNum, ord=np.inf) < testParams['tol']
-    
+
 
 if __name__ == '__main__':
     test_scipy_reference([(2, 3)])

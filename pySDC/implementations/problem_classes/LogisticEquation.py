@@ -9,15 +9,15 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 class logistics_equation(ptype):
     r"""
     Problem implementing a specific form of the Logistic Differential Equation
-    
+
     .. math::
         \frac{du}{dt} = \lambda u(t)(1-u(t))
-         
+
     with :math:`\lambda` a given real coefficient. Its analytical solution is :
-        
+
     .. math::
         u(t) = u(0) \frac{e^{\lambda t}}{1-u(0)+u(0)e^{\lambda t}}
-        
+
     """
     dtype_u = mesh
     dtype_f = mesh
@@ -27,8 +27,16 @@ class logistics_equation(ptype):
 
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'u0', 'lam', 'newton_maxiter', 'newton_tol', 'direct', 'nvars',
-            'stop_at_nan', localVars=locals(), readOnly=True)
+            'u0',
+            'lam',
+            'newton_maxiter',
+            'newton_tol',
+            'direct',
+            'nvars',
+            'stop_at_nan',
+            localVars=locals(),
+            readOnly=True,
+        )
 
     def u_exact(self, t):
         """
@@ -41,11 +49,7 @@ class logistics_equation(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = (
-            self.u0
-            * np.exp(self.lam * t)
-            / (1 - self.u0 + self.u0 * np.exp(self.lam * t))
-        )
+        me[:] = self.u0 * np.exp(self.lam * t) / (1 - self.u0 + self.u0 * np.exp(self.lam * t))
         return me
 
     def eval_f(self, u, t):
