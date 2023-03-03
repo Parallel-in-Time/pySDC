@@ -6,6 +6,7 @@ try:
     # Hack in case dolfin is used => must be imported before mpi4py
     try:
         import dolfin as df
+
         del df
     except ImportError:
         pass
