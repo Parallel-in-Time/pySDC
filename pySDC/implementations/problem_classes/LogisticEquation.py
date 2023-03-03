@@ -1,42 +1,34 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
 class logistics_equation(ptype):
+    r"""
+    Problem implementing a specific form of the Logistic Differential Equation
+    
+    .. math::
+        \frac{du}{dt} = \lambda u(t)(1-u(t))
+         
+    with :math:`\lambda` a given real coefficient. Its analytical solution is :
+        
+    .. math::
+        u(t) = u(0) \frac{e^{\lambda t}}{1-u(0)+u(0)e^{\lambda t}}
+        
     """
-    Example implementing the logistic equation, taken from
-    <https://www-users.cse.umn.edu/~olver/ln\_/odq.pdf> (Example 2.2)
-    """
+    dtype_u = mesh
+    dtype_f = mesh
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine
+    def __init__(self, u0, newton_maxiter, newton_tol, direct, lam=1, stop_at_nan=True):
+        nvars = 1
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['u0', 'lam', 'newton_maxiter', 'newton_tol', 'direct']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-        problem_params['nvars'] = 1
-
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
-        # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(logistics_equation, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
-        )
+        super().__init__((nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'u0', 'lam', 'newton_maxiter', 'newton_tol', 'direct', 'nvars',
+            'stop_at_nan', localVars=locals(), readOnly=True)
 
     def u_exact(self, t):
         """
@@ -50,9 +42,9 @@ class logistics_equation(ptype):
 
         me = self.dtype_u(self.init)
         me[:] = (
-            self.params.u0
-            * np.exp(self.params.lam * t)
-            / (1 - self.params.u0 + self.params.u0 * np.exp(self.params.lam * t))
+            self.u0
+            * np.exp(self.lam * t)
+            / (1 - self.u0 + self.u0 * np.exp(self.lam * t))
         )
         return me
 
@@ -68,7 +60,7 @@ class logistics_equation(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.params.lam * u * (1 - u)
+        f[:] = self.lam * u * (1 - u)
         return f
 
     def solve_system(self, rhs, dt, u0, t):
@@ -87,38 +79,38 @@ class logistics_equation(ptype):
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
 
-        if self.params.direct:
-            d = (1 - dt * self.params.lam) ** 2 + 4 * dt * self.params.lam * rhs
-            u = (-(1 - dt * self.params.lam) + np.sqrt(d)) / (2 * dt * self.params.lam)
+        if self.direct:
+            d = (1 - dt * self.lam) ** 2 + 4 * dt * self.lam * rhs
+            u = (-(1 - dt * self.lam) + np.sqrt(d)) / (2 * dt * self.lam)
             return u
 
         else:
             # start newton iteration
             n = 0
             res = 99
-            while n < self.params.newton_maxiter:
+            while n < self.newton_maxiter:
                 # form the function g with g(u) = 0
-                g = u - dt * self.params.lam * u * (1 - u) - rhs
+                g = u - dt * self.lam * u * (1 - u) - rhs
 
                 # if g is close to 0, then we are done
                 res = np.linalg.norm(g, np.inf)
-                if res < self.params.newton_tol or np.isnan(res):
+                if res < self.newton_tol or np.isnan(res):
                     break
 
                 # assemble dg/du
-                dg = 1 - dt * self.params.lam * (1 - 2 * u)
+                dg = 1 - dt * self.lam * (1 - 2 * u)
                 # newton update: u1 = u0 - g/dg
                 u -= 1.0 / dg * g
 
                 # increase iteration count
                 n += 1
 
-            if np.isnan(res) and self.params.stop_at_nan:
+            if np.isnan(res) and self.stop_at_nan:
                 raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
             elif np.isnan(res):
                 self.logger.warning('Newton got nan after %i iterations...' % n)
 
-            if n == self.params.newton_maxiter:
+            if n == self.newton_maxiter:
                 raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
             return u
