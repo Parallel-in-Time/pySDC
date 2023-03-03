@@ -3,6 +3,12 @@ import numpy as np
 from pySDC.core.Errors import DataError
 
 try:
+    # Hack in case dolfin is used => must be imported before mpi4py
+    try:
+        import dolfin as df
+        del df
+    except ImportError:
+        pass
     from mpi4py import MPI
 except ImportError:
     MPI = None
