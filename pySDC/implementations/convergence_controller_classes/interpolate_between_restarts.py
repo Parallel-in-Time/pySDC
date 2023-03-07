@@ -64,7 +64,6 @@ class InterpolateBetweenRestarts(ConvergenceController):
         """
 
         if S.status.restart and any([L.status.dt_new for L in S.levels]):
-
             for L in S.levels:
                 nodes_old = L.sweep.coll.nodes.copy()
                 nodes_new = L.sweep.coll.nodes.copy() * L.status.dt_new / L.params.dt
