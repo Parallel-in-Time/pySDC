@@ -6,7 +6,6 @@ from pySDC.implementations.convergence_controller_classes.step_size_limiter impo
 from pySDC.implementations.convergence_controller_classes.basic_restarting import (
     BasicRestartingNonMPI,
 )
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.hooks.log_step_size import LogStepSize
 
 
@@ -175,7 +174,7 @@ class Adaptivity(AdaptivityBase):
         super(Adaptivity, self).dependencies(controller, description)
 
         controller.add_convergence_controller(
-            EstimateEmbeddedError.get_implementation("nonMPI" if type(controller) == controller_nonMPI else "MPI"),
+            EstimateEmbeddedError.get_implementation("nonMPI" if not self.params.useMPI else "MPI"),
             description=description,
         )
 

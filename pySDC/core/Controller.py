@@ -32,13 +32,14 @@ class controller(object):
     Base abstract controller class
     """
 
-    def __init__(self, controller_params, description):
+    def __init__(self, controller_params, description, useMPI=None):
         """
         Initialization routine for the base controller
 
         Args:
             controller_params (dict): parameter set for the controller and the steps
         """
+        self.useMPI = useMPI
 
         # check if we have a hook on this list. If not, use default class.
         self.__hooks = []
@@ -288,7 +289,7 @@ class controller(object):
             None
         '''
         # check if we passed any sort of special params
-        params = {} if params is None else params
+        params = {**({} if params is None else params), 'useMPI': self.useMPI}
 
         # check if we already have the convergence controller or if we want to have it multiple times
         if convergence_controller not in [type(me) for me in self.convergence_controllers] or allow_double:
