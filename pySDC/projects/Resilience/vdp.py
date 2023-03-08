@@ -461,13 +461,13 @@ def interpolation_stuff():  # pragma: no cover
     labels = ['interpolate', 'regular', 'keep iterating']
 
     for i in range(3):
-        convergence_ontrollers = {
+        convergence_controllers = {
             Adaptivity: {'e_tol': 1e-7, 'dt_max': 9.0e-1},
         }
         if i == 0:
-            convergence_ontrollers[InterpolateBetweenRestarts] = {}
+            convergence_controllers[InterpolateBetweenRestarts] = {}
         if i == 2:
-            convergence_ontrollers[Adaptivity]['avoid_restarts'] = True
+            convergence_controllers[Adaptivity]['avoid_restarts'] = True
 
         problem_params = {
             'mu': 5,
@@ -478,7 +478,7 @@ def interpolation_stuff():  # pragma: no cover
         }
 
         custom_description = {
-            'convergence_controllers': convergence_ontrollers,
+            'convergence_controllers': convergence_controllers,
             'problem_params': problem_params,
             'sweeper_params': sweeper_params,
         }

@@ -20,9 +20,6 @@ class InterpolateBetweenRestarts(ConvergenceController):
             controller (pySDC.Controller.controller): The controller
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
-
-        Returns:
-            None
         """
         defaults = {
             'control_order': 50,
@@ -35,9 +32,6 @@ class InterpolateBetweenRestarts(ConvergenceController):
 
         Args:
             controller (pySDC.Controller.controller): The controller
-
-        Returns:
-            None
         """
         self.status = Status(['u_inter', 'f_inter', 'perform_interpolation'])
 
@@ -45,30 +39,27 @@ class InterpolateBetweenRestarts(ConvergenceController):
         self.status.f_inter = []
         self.status.perform_interpolation = False
 
-    def post_spread_processing(self, controller, S, **kwargs):
+    def post_spread_processing(self, controller, step, **kwargs):
         """
         Spread the interpolated values to the collocation nodes. This overrides whatever the sweeper uses for prediction.
 
         Args:
             controller (pySDC.Controller.controller): The controller
-            S (pySDC.Step.step): The current step
-
-        Returns:
-            None
+            step (pySDC.Step.step): The current step
         """
         if self.status.perform_interpolation:
-            for i in range(len(S.levels)):
-                L = S.levels[i]
-                for m in range(len(L.u)):
-                    L.u[m][:] = self.status.u_inter[i][m][:]
-                    L.f[m][:] = self.status.f_inter[i][m][:]
+            for i in range(len(step.levels)):
+                level = step.levels[i]
+                for m in range(len(level.u)):
+                    level.u[m][:] = self.status.u_inter[i][m][:]
+                    level.f[m][:] = self.status.f_inter[i][m][:]
 
             # reset the status variables
             self.status.perform_interpolation = False
             self.status.u_inter = []
             self.status.f_inter = []
 
-    def post_iteration_processing(self, controller, S, **kwargs):
+    def post_iteration_processing(self, controller, step, **kwargs):
         """
         Interpolate the solution and right hand sides and store them in the sweeper, where they will be distributed
         accordingly in the prediction step.
@@ -81,22 +72,21 @@ class InterpolateBetweenRestarts(ConvergenceController):
 
         Args:
             controller (pySDC.Controller): The controller
-            S (pySDC.Step.step): The current step
-
-        Returns:
-            None
+            step (pySDC.Step.step): The current step
         """
-        if S.status.restart and all([L.status.dt_new for L in S.levels]):
-            for L in S.levels:
-                nodes_old = L.sweep.coll.nodes.copy()
-                nodes_new = L.sweep.coll.nodes.copy() * L.status.dt_new / L.params.dt
+        if step.status.restart and all([level.status.dt_new for level in step.levels]):
+            for level in step.levels:
+                nodes_old = level.sweep.coll.nodes.copy()
+                nodes_new = level.sweep.coll.nodes.copy() * level.status.dt_new / level.params.dt
 
                 interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
-                self.status.u_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ L.u[:])[:]]
-                self.status.f_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ L.f[:])[:]]
+                self.status.u_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ level.u[:])[:]]
+                self.status.f_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ level.f[:])[:]]
 
                 self.status.perform_interpolation = True
 
-                self.log(f'Interpolating before restart from dt={L.params.dt:.2e} to dt={L.status.dt_new:.2e}', S)
+                self.log(
+                    f'Interpolating before restart from dt={level.params.dt:.2e} to dt={level.status.dt_new:.2e}', step
+                )
         else:
             self.status.perform_interpolation = False
