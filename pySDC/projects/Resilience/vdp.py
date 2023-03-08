@@ -443,7 +443,7 @@ def check_step_size_limiter(size=4, comm=None):
             print(f'Passed step size limiter test with {size} ranks in MPI implementation')
 
 
-def interpolation_stuff():  # pragma no cover
+def interpolation_stuff():  # pragma: no cover
     """
     Plot interpolation vdp with interpolation after a restart and compare it to other modes of adaptivity.
     """

@@ -12,12 +12,12 @@ import matplotlib.pyplot as plt
 from pySDC.core.Errors import ConvergenceError
 
 
-class live_plot(hooks):  # pragma no cover
+class live_plot(hooks):  # pragma: no cover
     """
     This hook plots the solution and the non-linear part of the right hand side after every step. Keep in mind that using adaptivity will result in restarts, which is not marked in these plots. Prepare to see the temperature profile jumping back again after a restart.
     """
 
-    def _plot_state(self, step, level_number):  # pragma no cover
+    def _plot_state(self, step, level_number):  # pragma: no cover
         """
         Plot the solution at all collocation nodes and the non-linear part of the right hand side
 
@@ -38,7 +38,7 @@ class live_plot(hooks):  # pragma no cover
         self.fig.suptitle(f"t={L.time:.2e}, k={step.status.iter}")
         plt.pause(1e-9)
 
-    def pre_run(self, step, level_number):  # pragma no cover
+    def pre_run(self, step, level_number):  # pragma: no cover
         """
         Setup a figure to plot into
 
@@ -51,7 +51,7 @@ class live_plot(hooks):  # pragma no cover
         """
         self.fig, self.axs = plt.subplots(1, 2, figsize=(10, 4))
 
-    def post_step(self, step, level_number):  # pragma no cover
+    def post_step(self, step, level_number):  # pragma: no cover
         """
         Call the plotting function after the step
 
@@ -170,7 +170,7 @@ def run_leaky_superconductor(
     return stats, controller, Tend
 
 
-def plot_solution(stats, controller):  # pragma no cover
+def plot_solution(stats, controller):  # pragma: no cover
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(1, 1)
@@ -241,7 +241,7 @@ def compare_imex_full(plotting=False):
             assert (
                 max(newton_iter) / num_nodes / maxiter <= newton_iter_max
             ), "Took more Newton iterations than allowed!"
-        if plotting:  # pragma no cover
+        if plotting:  # pragma: no cover
             plot_solution(stats, controller)
 
     diff = abs(res[True] - res[False])
