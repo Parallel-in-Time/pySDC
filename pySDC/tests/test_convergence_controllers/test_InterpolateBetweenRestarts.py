@@ -81,19 +81,60 @@ class LogInterpolation(hooks):
             )
 
 
-@pytest.mark.base
-def test_InterpolateBetweenRestarts(plotting=False):
-    """
-    Check that the solution is interpolated to the new nodes correctly and ends up the next step the way we want it to.
-    We also check that the residual at the end of the step after the restart is smaller than before.
-    """
+class CheckInterpolationOrder(hooks):
+    def __init__(self):
+        self.mess_with_solution = True
+        self.messed_with_solution = False
+        self.p = None
+        self.uStart = None
+
+    def post_iteration(self, step, level_number):
+        """
+        Replace the solution by a random polynomial
+        """
+        level = step.levels[level_number]
+        nodes = np.append(0, level.sweep.coll.nodes) * level.dt
+        nNodes = len(nodes)
+
+        if self.mess_with_solution:
+            self.p = np.poly1d(np.random.rand(nNodes))
+            self.uStart = self.p(nodes.copy())
+            for i in range(nNodes):
+                level.u[i][:] = self.uStart[i]
+
+            step.status.force_done = True
+            step.status.restart = True
+            self.mess_with_solution = False
+            self.messed_with_solution = True
+            level.status.dt_new = np.random.rand(1)[0] * level.params.dt
+
+    def pre_iteration(self, step, level_number):
+        """
+        Check that the polynomial has been interpolated exactly
+        """
+        level = step.levels[level_number]
+        nodes = np.append(0, level.sweep.coll.nodes) * level.dt
+
+        if self.messed_with_solution:
+            u_inter = [me[0] for me in level.u]
+            u_analytic = self.p(nodes)
+            self.messed_with_solution = False
+            assert np.allclose(
+                u_inter, u_analytic
+            ), f"Interpolation of polynomial was not exact, got {u_inter} and {u_analytic}"
+
+            # stop the simulation by setting the time parameters
+            level.status.time = 1e1
+            level.params.dt = 1e1
+            step.status.force_done = True
+
+
+def run_vdp(hook, adaptivity=True):
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
     from pySDC.implementations.convergence_controller_classes.interpolate_between_restarts import (
         InterpolateBetweenRestarts,
     )
-
     import numpy as np
-    from pySDC.helpers.stats_helper import get_sorted, filter_stats
     from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -122,14 +163,15 @@ def test_InterpolateBetweenRestarts(plotting=False):
 
     # convergence controllers
     convergence_controllers = {
-        Adaptivity: {'e_tol': 1e-7},
         InterpolateBetweenRestarts: {},
     }
+    if adaptivity:
+        convergence_controllers[Adaptivity] = {'e_tol': 1e-7}
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = LogInterpolation
+    controller_params['hook_class'] = hook
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
@@ -153,6 +195,18 @@ def test_InterpolateBetweenRestarts(plotting=False):
     uinit = P.u_exact(t0)
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=1e-2)
+    return stats
+
+
+@pytest.mark.base
+def test_InterpolateBetweenRestarts(plotting=False):
+    """
+    Check that the solution is interpolated to the new nodes correctly and ends up the next step the way we want it to.
+    We also check that the residual at the end of the step after the restart is smaller than before.
+    """
+    from pySDC.helpers.stats_helper import get_sorted, filter_stats
+
+    stats = run_vdp(LogInterpolation)
 
     u = {
         'before': get_sorted(stats, type='u_before_interpolation'),
@@ -211,5 +265,16 @@ def test_InterpolateBetweenRestarts(plotting=False):
         plt.show()
 
 
+@pytest.mark.base
+def test_interpolation_order():
+    """
+    Replace the solution with a polynomial and check that it is interpolated exactly
+    """
+    from pySDC.helpers.stats_helper import get_sorted, filter_stats
+
+    run_vdp(CheckInterpolationOrder, False)
+
+
 if __name__ == "__main__":
+    test_interpolation_order()
     test_InterpolateBetweenRestarts(plotting=True)
