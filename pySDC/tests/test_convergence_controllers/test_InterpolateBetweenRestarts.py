@@ -185,25 +185,30 @@ def test_InterpolateBetweenRestarts(plotting=False):
                 abs(u['double_check'][i][1][j] - u['after'][i][1][j]) < 1e-12
             ), f"The interpolated solution from the convergence controller is not right! Expected {u['double_check'][i][1][j]}, got {u['after'][i][1][j]}"
 
-    import matplotlib.pyplot as plt
+    if plotting:
+        import matplotlib.pyplot as plt
 
-    fig, axs = plt.subplots(2, 1, sharex=True)
+        fig, axs = plt.subplots(2, 1, sharex=True)
 
-    colors = {
-        'before': 'teal',
-        'after': 'violet',
-        'double_check': 'black',
-    }
+        colors = {
+            'before': 'teal',
+            'after': 'violet',
+            'double_check': 'black',
+        }
 
-    ls = {'before': '-', 'after': '--', 'double_check': '-.'}
-    for i in [0, 1]:
-        for key in nodes.keys():
-            axs[0].plot(np.append([0], nodes[key][i][1]), [me[1] for me in u[key][i][1]], color=colors[key], ls=ls[key])
-            axs[1].plot(np.append([0], nodes[key][i][1]), [me[0] for me in u[key][i][1]], color=colors[key], ls=ls[key])
-    axs[1].set_xlabel('$t$')
-    axs[0].set_ylabel('$u_t$')
-    axs[1].set_ylabel('$u$')
-    plt.show()
+        ls = {'before': '-', 'after': '--', 'double_check': '-.'}
+        for i in [0, 1]:
+            for key in nodes.keys():
+                axs[0].plot(
+                    np.append([0], nodes[key][i][1]), [me[1] for me in u[key][i][1]], color=colors[key], ls=ls[key]
+                )
+                axs[1].plot(
+                    np.append([0], nodes[key][i][1]), [me[0] for me in u[key][i][1]], color=colors[key], ls=ls[key]
+                )
+        axs[1].set_xlabel('$t$')
+        axs[0].set_ylabel('$u_t$')
+        axs[1].set_ylabel('$u$')
+        plt.show()
 
 
 if __name__ == "__main__":
