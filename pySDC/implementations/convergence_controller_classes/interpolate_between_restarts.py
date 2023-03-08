@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Lagrange import LagrangeApproximation
 from pySDC.core.Collocation import CollBase
 
@@ -26,7 +26,6 @@ class InterpolateBetweenRestarts(ConvergenceController):
         """
         defaults = {
             'control_order': 50,
-            'initial_guess': description['sweeper_params'].get('initial_guess', 'spread'),
         }
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
@@ -40,9 +39,34 @@ class InterpolateBetweenRestarts(ConvergenceController):
         Returns:
             None
         """
-        for S in controller.MS if not self.params.useMPI else [controller.S]:
-            self.add_variable(S, 'u_inter', where=['levels', '_level__sweep'])
-            self.add_variable(S, 'f_inter', where=['levels', '_level__sweep'])
+        self.status = Status(['u_inter', 'f_inter', 'perform_interpolation'])
+
+        self.status.u_inter = []
+        self.status.f_inter = []
+        self.status.perform_interpolation = False
+
+    def post_spread_processing(self, controller, S, **kwargs):
+        """
+        Spread the interpolated values to the collocation nodes. This overrides whatever the sweeper uses for prediction.
+
+        Args:
+            controller (pySDC.Controller.controller): The controller
+            S (pySDC.Step.step): The current step
+
+        Returns:
+            None
+        """
+        if self.status.perform_interpolation:
+            for i in range(len(S.levels)):
+                L = S.levels[i]
+                for m in range(len(L.u)):
+                    L.u[m][:] = self.status.u_inter[i][m][:]
+                    L.f[m][:] = self.status.f_inter[i][m][:]
+
+            # reset the status variables
+            self.status.perform_interpolation = False
+            self.status.u_inter = []
+            self.status.f_inter = []
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -62,20 +86,17 @@ class InterpolateBetweenRestarts(ConvergenceController):
         Returns:
             None
         """
-
-        if S.status.restart and any([L.status.dt_new for L in S.levels]):
+        if S.status.restart and all([L.status.dt_new for L in S.levels]):
             for L in S.levels:
                 nodes_old = L.sweep.coll.nodes.copy()
                 nodes_new = L.sweep.coll.nodes.copy() * L.status.dt_new / L.params.dt
 
                 interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
-                L.sweep.u_inter = (interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ L.u[:])[:]
-                L.sweep.f_inter = (interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ L.f[:])[:]
+                self.status.u_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ L.u[:])[:]]
+                self.status.f_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ L.f[:])[:]]
 
-                L.sweep.params.initial_guess = 'interpolate'
+                self.status.perform_interpolation = True
 
                 self.log(f'Interpolating before restart from dt={L.params.dt:.2e} to dt={L.status.dt_new:.2e}', S)
-
-        else:  # if there is no restart planned, please predict as usual
-            for L in S.levels:
-                L.sweep.params.initial_guess = self.params.initial_guess
+        else:
+            self.status.perform_interpolation = False

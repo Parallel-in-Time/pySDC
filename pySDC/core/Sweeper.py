@@ -321,17 +321,6 @@ class sweeper(object):
             elif self.params.initial_guess == 'random':
                 L.u[m] = P.dtype_u(init=P.init, val=self.rng.rand(1)[0])
                 L.f[m] = P.dtype_f(init=P.init, val=self.rng.rand(1)[0])
-            elif self.params.initial_guess == 'interpolate':
-                """
-                This relies on the convergence controller "InterpolateBetweenRestarts", which will take care that the
-                solution and right hand sides are interpolated and stored in the respective variables in the sweeper.
-                Here, the interpolated values are only distributed.
-                """
-                L.u[m] = P.dtype_u(P.init)
-                L.u[m][:] = self.u_inter[m][:]
-
-                L.f[m] = P.dtype_f(P.init)
-                L.f[m][:] = self.f_inter[m][:]
             else:
                 raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 

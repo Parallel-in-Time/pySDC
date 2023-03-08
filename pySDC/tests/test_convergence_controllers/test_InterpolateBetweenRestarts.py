@@ -27,7 +27,7 @@ class LogInterpolation(hooks):
                 iter=step.status.iter,
                 sweep=L.status.sweep,
                 type='u_inter',
-                value=L.u,
+                value=L.u.copy(),
             )
             self.add_to_stats(
                 process=step.status.slot,
@@ -54,7 +54,7 @@ class LogInterpolation(hooks):
                 iter=step.status.iter,
                 sweep=L.status.sweep,
                 type='u_before_interpolation',
-                value=L.u,
+                value=L.u.copy(),
             )
             self.add_to_stats(
                 process=step.status.slot,
@@ -64,25 +64,6 @@ class LogInterpolation(hooks):
                 sweep=L.status.sweep,
                 type='nodes',
                 value=L.sweep.coll.nodes * L.params.dt,
-            )
-
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=L.level_index,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='u_inter_planned',
-                value=L.sweep.u_inter,
-            )
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=L.level_index,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='nodes_inter_planned',
-                value=L.sweep.coll.nodes * L.status.dt_new,
             )
 
             # double check
@@ -104,6 +85,7 @@ class LogInterpolation(hooks):
 def test_InterpolateBetweenRestarts(plotting=False):
     """
     Check that the solution is interpolated to the new nodes correctly and ends up the next step the way we want it to.
+    We also check that the residual at the end of the step after the restart is smaller than before.
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
     from pySDC.implementations.convergence_controller_classes.interpolate_between_restarts import (
@@ -125,6 +107,7 @@ def test_InterpolateBetweenRestarts(plotting=False):
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
+    sweeper_params['initial_guess'] = 'spread'
 
     problem_params = {
         'mu': 5.0,
@@ -173,31 +156,33 @@ def test_InterpolateBetweenRestarts(plotting=False):
 
     u = {
         'before': get_sorted(stats, type='u_before_interpolation'),
-        'planned': get_sorted(stats, type='u_inter_planned'),
         'after': get_sorted(stats, type='u_inter'),
         'double_check': get_sorted(stats, type='u_inter_double_check'),
     }
 
     nodes = {
         'before': get_sorted(stats, type='nodes'),
-        'planned': get_sorted(stats, type='nodes_inter_planned'),
         'after': get_sorted(stats, type='nodes_inter'),
+        'double_check': get_sorted(stats, type='nodes_inter'),
     }
+
+    residual = get_sorted(stats, type='residual_post_step')
+    for t in np.unique([me[0] for me in residual]):
+        _res = np.array([me[1] for me in residual if me[0] == t])
+        if len(_res) > 1:
+            contraction = _res[1:] / _res[:-1]
+            assert all(
+                contraction < 6e-3
+            ), f"Residual was not decreased as much as expected! Got {max(contraction):.2e}. Without interpolation we expect about 0.15, but with interpolation we want about 6e-3!"
 
     for i in range(len(u['before'])):
         # check the nodes
-        assert np.allclose(
-            nodes['planned'][i][1], nodes['after'][i][1], atol=1e-12
-        ), "Ended up with unexpected collocation nodes somehow!"
         assert nodes['after'][i][1][-1] < nodes['before'][i][1][-1], "Step size was not reduced!"
 
         # check the solution
-        for j in range(len(u['planned'][i][1])):
-            assert np.allclose(
-                u['planned'][i][1][j], u['after'][i][1][j]
-            ), f"The interpolated solution did not end up in the next step! Expected {u['planned'][i][1][j]}, got {u['after'][i][1][j]}"
-            assert np.allclose(
-                u['double_check'][i][1][j], u['after'][i][1][j]
+        for j in range(len(u['before'][i][1])):
+            assert (
+                abs(u['double_check'][i][1][j] - u['after'][i][1][j]) < 1e-12
             ), f"The interpolated solution from the convergence controller is not right! Expected {u['double_check'][i][1][j]}, got {u['after'][i][1][j]}"
 
     import matplotlib.pyplot as plt
@@ -205,17 +190,13 @@ def test_InterpolateBetweenRestarts(plotting=False):
     fig, axs = plt.subplots(2, 1, sharex=True)
 
     colors = {
-        'before': 'blue',
-        'planned': 'green',
+        'before': 'teal',
         'after': 'violet',
+        'double_check': 'black',
     }
 
-    ls = {
-        'before': '-',
-        'planned': '-',
-        'after': '--',
-    }
-    for i in [0]:
+    ls = {'before': '-', 'after': '--', 'double_check': '-.'}
+    for i in [0, 1]:
         for key in nodes.keys():
             axs[0].plot(np.append([0], nodes[key][i][1]), [me[1] for me in u[key][i][1]], color=colors[key], ls=ls[key])
             axs[1].plot(np.append([0], nodes[key][i][1]), [me[0] for me in u[key][i][1]], color=colors[key], ls=ls[key])
