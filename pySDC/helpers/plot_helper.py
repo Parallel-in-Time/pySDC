@@ -25,7 +25,7 @@ def figsize(textwidth, scale, ratio):
     return fig_size
 
 
-def figsize_by_journal(journal, scale, ratio):  # pragma no cover
+def figsize_by_journal(journal, scale, ratio):  # pragma: no cover
     """
     Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead
     of the parameters supplied.

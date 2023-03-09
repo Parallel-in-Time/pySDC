@@ -1,7 +1,6 @@
 import numpy as np
 
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
@@ -49,7 +48,7 @@ class HotRod(ConvergenceController):
         Returns:
             None
         """
-        if type(controller) == controller_nonMPI:
+        if not self.params.useMPI:
             from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
                 EstimateEmbeddedErrorNonMPI,
             )

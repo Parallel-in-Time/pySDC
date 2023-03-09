@@ -138,7 +138,7 @@ def plot_recovery_rate(stats_analyser, **kwargs):  # pragma: no cover
     savefig(fig, 'recovery_rate_compared', **kwargs)
 
 
-def plot_recovery_rate_recoverable_only(stats_analyser, fig, ax, **kwargs):  # pragma no cover
+def plot_recovery_rate_recoverable_only(stats_analyser, fig, ax, **kwargs):  # pragma: no cover
     """
     Plot the recovery rate considering only faults that can be recovered theoretically.
 
@@ -166,7 +166,7 @@ def plot_recovery_rate_recoverable_only(stats_analyser, fig, ax, **kwargs):  # p
         )
 
 
-def compare_recovery_rate_problems():  # pragma no cover
+def compare_recovery_rate_problems():  # pragma: no cover
     """
     Compare the recovery rate for vdP, Lorenz and Schroedinger problems.
     Only faults that can be recovered are shown.
@@ -199,7 +199,7 @@ def compare_recovery_rate_problems():  # pragma no cover
     savefig(fig, 'compare_equations')
 
 
-def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
+def plot_efficiency_polar(problem, path='data/stats'):  # pragma: no cover
     """
     Plot the recovery rate and the computational cost in a polar plot.
 
@@ -264,7 +264,7 @@ def plot_efficiency_polar(problem, path='data/stats'):  # pragma no cover
     savefig(fig, 'efficiency')
 
 
-def plot_adaptivity_stuff():  # pragma no cover
+def plot_adaptivity_stuff():  # pragma: no cover
     """
     Plot the solution for a van der Pol problem as well as the local error and cost associated with the base scheme and
     adaptivity in k and dt in order to demonstrate that adaptivity is useful.
@@ -319,7 +319,7 @@ def plot_adaptivity_stuff():  # pragma no cover
     savefig(fig, 'adaptivity')
 
 
-def plot_fault_vdp(bit=0):  # pragma no cover
+def plot_fault_vdp(bit=0):  # pragma: no cover
     """
     Make a plot showing the impact of a fault on van der Pol without any resilience.
     The faults are inserted in the last iteration in the last node in u_t such that you can best see the impact.
@@ -388,7 +388,7 @@ def plot_fault_vdp(bit=0):  # pragma no cover
     savefig(fig, f'fault_bit_{bit}')
 
 
-def plot_vdp_solution():  # pragma no cover
+def plot_vdp_solution():  # pragma: no cover
     """
     Plot the solution of van der Pol problem over time to illustrate the varying time scales.
 
@@ -412,7 +412,7 @@ def plot_vdp_solution():  # pragma no cover
     savefig(fig, 'vdp_sol')
 
 
-def make_plots_for_SIAM_CSE23():  # pragma no cover
+def make_plots_for_SIAM_CSE23():  # pragma: no cover
     """
     Make plots for the SIAM talk
     """
@@ -429,7 +429,7 @@ def make_plots_for_SIAM_CSE23():  # pragma no cover
     plot_vdp_solution()
 
 
-def make_plots_for_paper():  # pragma no cover
+def make_plots_for_paper():  # pragma: no cover
     """
     Make plots that are supposed to go in the paper.
     """
@@ -445,7 +445,7 @@ def make_plots_for_paper():  # pragma no cover
     compare_recovery_rate_problems()
 
 
-def make_plots_for_notes():  # pragma no cover
+def make_plots_for_notes():  # pragma: no cover
     """
     Make plots for the notes for the website / GitHub
     """

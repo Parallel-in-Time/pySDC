@@ -30,7 +30,7 @@ class controller_nonMPI(controller):
             raise ControllerError('predict flag is ignored, use predict_type instead')
 
         # call parent's initialization routine
-        super(controller_nonMPI, self).__init__(controller_params, description)
+        super().__init__(controller_params, description, useMPI=False)
 
         self.MS = [stepclass.step(description)]
 

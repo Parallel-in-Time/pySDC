@@ -195,6 +195,7 @@ def run_vdp(
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     except (ProblemError, ConvergenceError):
+        print('Warning: Premature termination!')
         stats = controller.return_stats()
 
     return stats, controller, Tend
@@ -440,6 +441,78 @@ def check_step_size_limiter(size=4, comm=None):
     else:
         if comm.rank == 0:
             print(f'Passed step size limiter test with {size} ranks in MPI implementation')
+
+
+def interpolation_stuff():  # pragma: no cover
+    """
+    Plot interpolation vdp with interpolation after a restart and compare it to other modes of adaptivity.
+    """
+    from pySDC.implementations.convergence_controller_classes.interpolate_between_restarts import (
+        InterpolateBetweenRestarts,
+    )
+    from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
+    from pySDC.implementations.hooks.log_work import LogWork
+    from pySDC.helpers.plot_helper import figsize_by_journal
+
+    fig, axs = plt.subplots(4, 1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1.0, 1.0), sharex=True)
+    restart_ax = axs[2].twinx()
+
+    colors = ['black', 'red', 'blue']
+    labels = ['interpolate', 'regular', 'keep iterating']
+
+    for i in range(3):
+        convergence_controllers = {
+            Adaptivity: {'e_tol': 1e-7, 'dt_max': 9.0e-1},
+        }
+        if i == 0:
+            convergence_controllers[InterpolateBetweenRestarts] = {}
+        if i == 2:
+            convergence_controllers[Adaptivity]['avoid_restarts'] = True
+
+        problem_params = {
+            'mu': 5,
+        }
+
+        sweeper_params = {
+            'QI': 'LU',
+        }
+
+        custom_description = {
+            'convergence_controllers': convergence_controllers,
+            'problem_params': problem_params,
+            'sweeper_params': sweeper_params,
+        }
+
+        custom_controller_params = {'logger_level': 30}
+        stats, controller, _ = run_vdp(
+            custom_description=custom_description,
+            custom_controller_params=custom_controller_params,
+            hook_class=[LogLocalErrorPostStep, LogData, LogWork] + hook_collection,
+        )
+
+        k = get_sorted(stats, type='work_newton')
+        restarts = get_sorted(stats, type='restart')
+        u = get_sorted(stats, type='u', recomputed=False)
+        e_loc = get_sorted(stats, type='e_local_post_step', recomputed=False)
+        dt = get_sorted(stats, type='dt', recomputed=False)
+
+        axs[0].plot([me[0] for me in u], [me[1][1] for me in u], color=colors[i], label=labels[i])
+        axs[1].plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=colors[i])
+        axs[2].plot([me[0] for me in k], np.cumsum([me[1] for me in k]), color=colors[i])
+        restart_ax.plot([me[0] for me in restarts], np.cumsum([me[1] for me in restarts]), color=colors[i], ls='--')
+        axs[3].plot([me[0] for me in dt], [me[1] for me in dt], color=colors[i])
+
+    for ax in [axs[1], axs[3]]:
+        ax.set_yscale('log')
+    axs[0].set_ylabel(r'$u$')
+    axs[1].set_ylabel(r'$e_\mathrm{local}$')
+    axs[2].set_ylabel(r'Newton iterations')
+    restart_ax.set_ylabel(r'restarts (dashed)')
+    axs[3].set_ylabel(r'$\Delta t$')
+    axs[3].set_xlabel(r'$t$')
+    axs[0].legend(frameon=False)
+    fig.tight_layout()
+    plt.show()
 
 
 if __name__ == "__main__":
