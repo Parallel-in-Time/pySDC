@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/helpers/plot_helper.py: 78%</title>
+    <title>Coverage for pySDC/helpers/plot_helper.py: 94%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/helpers/plot_helper.py</b>:
-            <span class="pc_cov">78%</span>
+            <span class="pc_cov">94%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,10 +54,10 @@
             </div>
         </aside>
         <h2>
-            <span class="text">40 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">31<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">9<span class="text"> missing</span></button>
-            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">3<span class="text"> excluded</span></button>
+            <span class="text">32 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">30<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
+            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">11<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
             <a id="prevFileLink" class="nav" href="d_8d0d803e4e125e5c_Sweeper_py.html">&#xab; prev</a> &nbsp; &nbsp;
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_41564483689e14fd_problem_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.1">coverage.py v7.2.1</a>,
-            created at 2023-02-27 15:53 +0000
+            created at 2023-03-09 14:46 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -107,7 +107,7 @@
     <p class="run"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">    <span class="key">return</span> <span class="nam">fig_size</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="key">def</span> <span class="nam">figsize_by_journal</span><span class="op">(</span><span class="nam">journal</span><span class="op">,</span> <span class="nam">scale</span><span class="op">,</span> <span class="nam">ratio</span><span class="op">)</span><span class="op">:</span>  <span class="com"># pragma no cover</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="key">def</span> <span class="nam">figsize_by_journal</span><span class="op">(</span><span class="nam">journal</span><span class="op">,</span> <span class="nam">scale</span><span class="op">,</span> <span class="nam">ratio</span><span class="op">)</span><span class="op">:</span>  <span class="com"># pragma: no cover</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t"><span class="str">    of the parameters supplied.</span>&nbsp;</span><span class="r"></span></p>
@@ -121,27 +121,27 @@
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t"><span class="str">        list: Width and height of the figure to be passed to matplotlib</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">    <span class="com"># store text width in points here, get this from LaTeX using \the\textwidth</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">    <span class="nam">textwidths</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">    <span class="nam">textwidths</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">        <span class="str">'JSC_beamer'</span><span class="op">:</span> <span class="num">426.79135</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">        <span class="str">'Springer_Numerical_Algorithms'</span><span class="op">:</span> <span class="num">338.58778</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">    <span class="com"># store text height in points here, get this from LaTeX using \the\textheight</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">    <span class="nam">textheights</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">    <span class="nam">textheights</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">        <span class="str">'JSC_beamer'</span><span class="op">:</span> <span class="num">214.43411</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="key">assert</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="key">assert</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">        <span class="nam">journal</span> <span class="key">in</span> <span class="nam">textwidths</span><span class="op">.</span><span class="nam">keys</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">    <span class="op">)</span><span class="op">,</span> <span class="str">f"Textwidth only available for {list(textwidths.keys())}. Please implement one for \"{journal}\"! Get the textwidth using \"\\the\\textwidth\" in your tex file."</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">    <span class="com"># see if the figure fits on the page or if we need to apply the scaling to the height instead</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">    <span class="key">if</span> <span class="nam">scale</span> <span class="op">*</span> <span class="nam">ratio</span> <span class="op">*</span> <span class="nam">textwidths</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span> <span class="op">></span> <span class="nam">textheights</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">journal</span><span class="op">,</span> <span class="num">1e9</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="key">if</span> <span class="nam">textheights</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span> <span class="op">/</span> <span class="nam">scale</span> <span class="op">/</span> <span class="nam">ratio</span> <span class="op">></span> <span class="nam">textwidths</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">    <span class="key">if</span> <span class="nam">scale</span> <span class="op">*</span> <span class="nam">ratio</span> <span class="op">*</span> <span class="nam">textwidths</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span> <span class="op">></span> <span class="nam">textheights</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">journal</span><span class="op">,</span> <span class="num">1e9</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="key">if</span> <span class="nam">textheights</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span> <span class="op">/</span> <span class="nam">scale</span> <span class="op">/</span> <span class="nam">ratio</span> <span class="op">></span> <span class="nam">textwidths</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">                <span class="str">f"We cannot fit figure with scale {scale:.2f} and ratio {ratio:.2f} on the page for journal {journal}!"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="key">return</span> <span class="nam">figsize</span><span class="op">(</span><span class="nam">textheights</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span> <span class="op">/</span> <span class="op">(</span><span class="nam">scale</span> <span class="op">*</span> <span class="nam">ratio</span><span class="op">)</span><span class="op">,</span> <span class="num">1</span><span class="op">,</span> <span class="nam">ratio</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">        <span class="key">return</span> <span class="nam">figsize</span><span class="op">(</span><span class="nam">textheights</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span> <span class="op">/</span> <span class="op">(</span><span class="nam">scale</span> <span class="op">*</span> <span class="nam">ratio</span><span class="op">)</span><span class="op">,</span> <span class="num">1</span><span class="op">,</span> <span class="nam">ratio</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="key">return</span> <span class="nam">figsize</span><span class="op">(</span><span class="nam">textwidths</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span><span class="op">,</span> <span class="nam">scale</span><span class="op">,</span> <span class="nam">ratio</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="key">return</span> <span class="nam">figsize</span><span class="op">(</span><span class="nam">textwidths</span><span class="op">[</span><span class="nam">journal</span><span class="op">]</span><span class="op">,</span> <span class="nam">scale</span><span class="op">,</span> <span class="nam">ratio</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t"><span class="key">def</span> <span class="nam">setup_mpl</span><span class="op">(</span><span class="nam">font_size</span><span class="op">=</span><span class="num">8</span><span class="op">,</span> <span class="nam">reset</span><span class="op">=</span><span class="key">False</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -216,7 +216,7 @@
             <a id="nextFileLink" class="nav" href="d_41564483689e14fd_problem_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.1">coverage.py v7.2.1</a>,
-            created at 2023-02-27 15:53 +0000
+            created at 2023-03-09 14:46 +0000
         </p>
     </div>
 </footer>

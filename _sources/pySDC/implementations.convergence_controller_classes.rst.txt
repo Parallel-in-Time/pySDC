@@ -16,6 +16,7 @@ Submodules
    implementations.convergence_controller_classes.estimate_embedded_error
    implementations.convergence_controller_classes.estimate_extrapolation_error
    implementations.convergence_controller_classes.hotrod
+   implementations.convergence_controller_classes.interpolate_between_restarts
    implementations.convergence_controller_classes.spread_step_sizes
    implementations.convergence_controller_classes.step_size_limiter
    implementations.convergence_controller_classes.store_uold

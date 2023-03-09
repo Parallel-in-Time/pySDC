@@ -72,13 +72,14 @@
 <span class="sd">    Base abstract controller class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine for the base controller</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller_params (dict): parameter set for the controller and the steps</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span> <span class="o">=</span> <span class="n">useMPI</span>
 
         <span class="c1"># check if we have a hook on this list. If not, use default class.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span> <span class="o">=</span> <span class="p">[]</span>
@@ -328,7 +329,7 @@
 <span class="sd">            None</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># check if we passed any sort of special params</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">params</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">params</span><span class="p">),</span> <span class="s1">&#39;useMPI&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span><span class="p">}</span>
 
         <span class="c1"># check if we already have the convergence controller or if we want to have it multiple times</span>
         <span class="k">if</span> <span class="n">convergence_controller</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">]</span> <span class="ow">or</span> <span class="n">allow_double</span><span class="p">:</span>

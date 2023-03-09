@@ -46,6 +46,7 @@
 <div class="viewcode-block" id="Pars"><a class="viewcode-back" href="../../pySDC/core.ConvergenceController.html#core.ConvergenceController.Pars">[docs]</a><span class="k">class</span> <span class="nc">Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_order</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># integer that determines the order in which the convergence controllers are called</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># depends on the controller</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>

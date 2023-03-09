@@ -65,7 +65,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># call parent&#39;s initialization routine</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">controller_MPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># create single step per processor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
