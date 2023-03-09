@@ -97,7 +97,7 @@ class CheckInterpolationOrder(hooks):
         nNodes = len(nodes)
 
         if self.mess_with_solution:
-            self.p = np.poly1d(np.random.rand(nNodes))
+            self.p = np.polynomial.Polynomial(np.random.rand(nNodes))
             self.uStart = self.p(nodes.copy())
             for i in range(nNodes):
                 level.u[i][:] = self.uStart[i]
