@@ -6,6 +6,26 @@ class LogEmbeddedErrorEstimate(hooks):
     Store the embedded error estimate at the end of each step as "error_embedded_estimate".
     """
 
+    def log_error(self, step, level_number, appendix=''):
+        L = step.levels[level_number]
+
+        for flavour in ['', '_collocation']:
+            if L.status.get(f'error_embedded_estimate{flavour}'):
+                if flavour == '_collocation':
+                    iter, value = L.status.error_embedded_estimate_collocation
+                else:
+                    iter = step.status.iter
+                    value = L.status.error_embedded_estimate
+                self.add_to_stats(
+                    process=step.status.slot,
+                    time=L.time + L.dt,
+                    level=L.level_index,
+                    iter=iter,
+                    sweep=L.status.sweep,
+                    type=f'error_embedded_estimate{flavour}{appendix}',
+                    value=value,
+                )
+
     def post_step(self, step, level_number, appendix=''):
         """
         Record embedded error estimate
@@ -18,18 +38,7 @@ class LogEmbeddedErrorEstimate(hooks):
             None
         """
         super().post_step(step, level_number)
-
-        L = step.levels[level_number]
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type=f'error_embedded_estimate{appendix}',
-            value=L.status.get('error_embedded_estimate'),
-        )
+        self.log_error(step, level_number, appendix)
 
 
 class LogEmbeddedErrorEstimatePostIter(LogEmbeddedErrorEstimate):
@@ -51,23 +60,8 @@ class LogEmbeddedErrorEstimatePostIter(LogEmbeddedErrorEstimate):
         Returns:
             None
         """
-        # check if the estimate is available at all
         super().post_iteration(step, level_number)
-
-        L = step.levels[level_number]
-
-        if not L.status.get('error_embedded_estimate'):
-            return None
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=step.status.iter - 1,
-            sweep=L.status.sweep,
-            type='error_embedded_estimate_post_iteration',
-            value=L.status.get('error_embedded_estimate'),
-        )
+        self.log_error(step, level_number, '_post_iteration')
 
     def post_step(self, step, level_number):
         super().post_step(step, level_number, appendix='_post_iteration')
