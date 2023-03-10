@@ -158,6 +158,96 @@ This is called in the <cite>restart_block</cite> function.
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimateEmbeddedErrorCollocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorCollocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<p>Estimates an embedded error based on changing the underlying quadrature rule. The error estimate is stored as
+<cite>error_embedded_estimate_collocation</cite> in the status of the level. Note that we only compute the estimate on the
+finest level. The error is stored as a tuple with the first index denoting to which iteration it belongs. This
+is useful since the error estimate is not available immediately after, but only when the next collocation problem
+is converged to make sure the two solutions are of different accuracy.</p>
+<p>Changing the collocation method between iterations happens using the <cite>AdaptiveCollocation</cite> convergence controller.
+Please refer to that for documentation on how to use this. Just pass the parameters for that convergence controller
+as <cite>adaptive_coll_params</cite> to the parameters for this one and they will be passed on when the <cite>AdaptiveCollocation</cite>
+convergence controller is automatically added while loading dependencies.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorCollocation.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the <cite>AdaptiveCollocation</cite> convergence controller to switch between collocation problems between iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorCollocation.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the embedded error as the difference between the interpolated and the current solution on the finest
+level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller.controller</em>) – The controller</p></li>
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorCollocation.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.reset_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset status variables.
+This is called in the <cite>restart_block</cite> function.
+:param controller: The controller
+:type controller: pySDC.Controller</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorCollocation.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a default value for control order to the parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup_status_variables">
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorCollocation.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the embedded error variable to the levels and add a status variable for previous steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimateEmbeddedErrorMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError" title="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EstimateEmbeddedError</span></code></a></p>
@@ -239,6 +329,14 @@ In serial this is the local error, but in block Gauss-Seidel MSSDC this is a sem
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedErrorCollocation</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedErrorMPI</span></code></a><ul>

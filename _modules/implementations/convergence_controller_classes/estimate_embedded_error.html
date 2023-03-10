@@ -40,7 +40,7 @@
   <h1>Source code for implementations.convergence_controller_classes.estimate_embedded_error</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span><span class="p">,</span> <span class="n">Status</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.store_uold</span> <span class="kn">import</span> <span class="n">StoreUOld</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
 
@@ -243,6 +243,100 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorCollocation</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimates an embedded error based on changing the underlying quadrature rule. The error estimate is stored as</span>
+<span class="sd">    `error_embedded_estimate_collocation` in the status of the level. Note that we only compute the estimate on the</span>
+<span class="sd">    finest level. The error is stored as a tuple with the first index denoting to which iteration it belongs. This</span>
+<span class="sd">    is useful since the error estimate is not available immediately after, but only when the next collocation problem</span>
+<span class="sd">    is converged to make sure the two solutions are of different accuracy.</span>
+
+<span class="sd">    Changing the collocation method between iterations happens using the `AdaptiveCollocation` convergence controller.</span>
+<span class="sd">    Please refer to that for documentation on how to use this. Just pass the parameters for that convergence controller</span>
+<span class="sd">    as `adaptive_coll_params` to the parameters for this one and they will be passed on when the `AdaptiveCollocation`</span>
+<span class="sd">    convergence controller is automatically added while loading dependencies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a default value for control order to the parameters</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Updated parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">210</span><span class="p">,</span>
+            <span class="s2">&quot;adaptive_coll_params&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">defaults</span></div>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the `AdaptiveCollocation` convergence controller to switch between collocation problems between iterations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.adaptive_collocation</span> <span class="kn">import</span> <span class="n">AdaptiveCollocation</span>
+
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+            <span class="n">AdaptiveCollocation</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">adaptive_coll_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the embedded error as the difference between the interpolated and the current solution on the finest</span>
+<span class="sd">        level.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller.controller): The controller</span>
+<span class="sd">            step (pySDC.Step.step): The current step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+            <span class="n">lvl</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span> <span class="o">+=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">uend</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="p">[</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate_collocation</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="p">)</span></div>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add the embedded error variable to the levels and add a status variable for previous steps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;iter&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># the solutions of converged collocation problems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># the iteration in which the solution converged</span>
+
+        <span class="k">if</span> <span class="s1">&#39;comm&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;active_slots&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;active_slots&#39;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">steps</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
+        <span class="n">where</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;levels&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;error_embedded_estimate_collocation&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.reset_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.reset_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
