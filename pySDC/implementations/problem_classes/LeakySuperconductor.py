@@ -145,6 +145,34 @@ class LeakySuperconductor(ptype):
         self.work_counters['rhs']()
         return f
 
+    def get_non_linear_Jacobian(self, u):
+        """
+        Evaluate the non-linear part of the Jacobian only
+
+        Args:
+            u (dtype_u): Current solution
+
+        Returns:
+            scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+        """
+        u_thresh = self.params.u_thresh
+        u_max = self.params.u_max
+        Q_max = self.params.Q_max
+        me = self.dtype_u(self.init)
+
+        me[:] = Q_max / (u_max - u_thresh)
+        me[u < u_thresh] = 0
+        me[u > u_max] = 0
+        me[self.leak] = 0
+
+        # boundary conditions
+        me[0] = 0.0
+        me[-1] = 0.0
+
+        me[:] /= self.params.Cv
+
+        return sp.diags(me, format='csc')
+
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple Newton solver for (I-factor*f)(u) = rhs
@@ -158,34 +186,6 @@ class LeakySuperconductor(ptype):
         Returns:
             dtype_u: solution as mesh
         """
-
-        def get_non_linear_Jacobian(u):
-            """
-            Evaluate the non-linear part of the Jacobian only
-
-            Args:
-                u (dtype_u): Current solution
-
-            Returns:
-                scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
-            """
-            u_thresh = self.params.u_thresh
-            u_max = self.params.u_max
-            Q_max = self.params.Q_max
-            me = self.dtype_u(self.init)
-
-            me[:] = Q_max / (u_max - u_thresh)
-            me[u < u_thresh] = 0
-            me[u > u_max] = 0
-            me[self.leak] = 0
-
-            # boundary conditions
-            me[0] = 0.0
-            me[-1] = 0.0
-
-            me[:] /= self.params.Cv
-
-            return sp.diags(me, format='csc')
 
         u = self.dtype_u(u0)
         res = np.inf
@@ -209,7 +209,7 @@ class LeakySuperconductor(ptype):
                 break
 
             # assemble Jacobian J of G
-            J = self.Id - factor * (self.A + get_non_linear_Jacobian(u))
+            J = self.Id - factor * (self.A + self.get_non_linear_Jacobian(u))
 
             # solve the linear system
             if self.params.direct_solver:
@@ -251,6 +251,19 @@ class LeakySuperconductor(ptype):
 
         if t > 0:
 
+            def jac(t, u):
+                """
+                Get the Jacobian for the implicit BDF method to use in `scipy.odeint`
+
+                Args:
+                    t (float): The current time
+                    u (dtype_u): Current solution
+
+                Returns:
+                    scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                """
+                return self.A + self.get_non_linear_Jacobian(u)
+
             def eval_rhs(t, u):
                 """
                 Function to pass to `scipy.solve_ivp` to evaluate the full RHS
@@ -264,7 +277,7 @@ class LeakySuperconductor(ptype):
                 """
                 return self.eval_f(u.reshape(self.init[0]), t).flatten()
 
-            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init, method='BDF', jac=jac)
         return me
 
 
@@ -326,6 +339,19 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
 
         if t > 0:
 
+            def jac(t, u):
+                """
+                Get the Jacobian for the implicit BDF method to use in `scipy.odeint`
+
+                Args:
+                    t (float): The current time
+                    u (dtype_u): Current solution
+
+                Returns:
+                    scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                """
+                return self.A
+
             def eval_rhs(t, u):
                 """
                 Function to pass to `scipy.solve_ivp` to evaluate the full RHS
@@ -340,5 +366,5 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
                 f = self.eval_f(u.reshape(self.init[0]), t)
                 return (f.impl + f.expl).flatten()
 
-            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init, method='BDF', jac=jac)
         return me
