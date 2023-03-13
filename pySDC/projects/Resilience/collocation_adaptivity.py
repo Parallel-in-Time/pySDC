@@ -274,11 +274,55 @@ def order_stuff(prob):
     fig.tight_layout()
 
 
-def main():
+def adaptivity_collocation(plotting=False):
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityCollocation
+
+    e_tol = 1e-7
+
+    adaptive_coll_params = {
+        'num_nodes': [2, 3],
+    }
+
+    convergence_controllers = {}
+    convergence_controllers[AdaptivityCollocation] = {'adaptive_coll_params': adaptive_coll_params, 'e_tol': e_tol}
+
+    step_params = {}
+    step_params['maxiter'] = 99
+
+    level_params = {}
+    level_params['restol'] = 1e-8
+
+    description = {}
+    description['convergence_controllers'] = convergence_controllers
+    description['step_params'] = step_params
+    description['level_params'] = level_params
+
+    controller_params = {'logger_level': 30}
+
+    stats, controller, _ = run_vdp(custom_description=description, custom_controller_params=controller_params)
+
+    e_em = get_sorted(stats, type='error_embedded_estimate_collocation', recomputed=False)
+    assert (
+        max([me[1] for me in e_em]) <= e_tol
+    ), "Exceeded threshold for local tolerance when using collocation based adaptivity"
+    assert (
+        min([me[1] for me in e_em][1:-1]) >= e_tol / 10
+    ), "Over resolved problem when using collocation based adaptivity"
+
+    if plotting:
+        from pySDC.projects.Resilience.vdp import plot_step_sizes
+
+        fig, ax = plt.subplots()
+
+        plot_step_sizes(stats, ax, 'error_embedded_estimate_collocation')
+
+
+def main(plotting=False):
+    adaptivity_collocation(plotting)
     order_stuff(run_advection)
     compare_adaptive_collocation(run_vdp)
 
 
 if __name__ == "__main__":
-    main()
+    main(True)
     plt.show()

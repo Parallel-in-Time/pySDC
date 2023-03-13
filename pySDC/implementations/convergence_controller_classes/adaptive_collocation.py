@@ -105,7 +105,7 @@ class AdaptiveCollocation(ConvergenceController):
             P = L.prob
 
             # store solution of current level which will be interpolated to new level
-            u_old = L.u.copy()
+            u_old = [me.flatten() for me in L.u]
             nodes_old = L.sweep.coll.nodes.copy()
 
             # change sweeper
@@ -119,12 +119,13 @@ class AdaptiveCollocation(ConvergenceController):
             # interpolate solution of old collocation problem to new one
             nodes_new = L.sweep.coll.nodes.copy()
             interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
+
             u_inter = interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ u_old
 
             # assign the interpolated values to the nodes in the level
             for i in range(0, len(u_inter)):
                 me = P.dtype_u(P.init)
-                me[:] = u_inter[i]
+                me[:] = np.reshape(u_inter[i], P.init[0])
                 L.u[i] = me
 
             # reevaluate rhs
@@ -195,3 +196,29 @@ class AdaptiveCollocation(ConvergenceController):
             None
         """
         self.switch_sweeper(S)
+
+    def check_parameters(self, controller, params, description, **kwargs):
+        """
+        Check if we allow the scheme to solve the collocation problems to convergence.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: The error message
+        """
+        if description["level_params"].get("restol", -1.0) <= 1e-16:
+            return (
+                False,
+                "Switching the collocation problems requires solving them to some tolerance that can be reached. Please set attainable `restol` in the level params",
+            )
+        if description["step_params"].get("maxiter", -1.0) < 99:
+            return (
+                False,
+                "Switching the collocation problems requires solving them exactly, which may require many iterations please set `maxiter` to at least 99 in the step params",
+            )
+
+        return True, ""
