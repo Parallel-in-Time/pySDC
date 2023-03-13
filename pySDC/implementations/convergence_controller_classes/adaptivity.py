@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
     StepSizeLimiter,
 )
@@ -202,7 +202,7 @@ class Adaptivity(AdaptivityBase):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        if description["step_params"].get("restol", -1.0) >= 0:
+        if description["level_params"].get("restol", -1.0) >= 0:
             return (
                 False,
                 "Adaptivity needs constant order in time and hence restol in the step parameters has to be \
@@ -218,8 +218,7 @@ smaller than 0!",
         if "e_tol" not in params.keys():
             return (
                 False,
-                "Adaptivity needs a local tolerance! Please set some up in description['convergence_control\
-_params']['e_tol']!",
+                "Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!",
             )
 
         return True, ""
@@ -389,7 +388,7 @@ class AdaptivityResidual(AdaptivityBase):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        if description["step_params"].get("restol", -1.0) >= 0:
+        if description["level_params"].get("restol", -1.0) >= 0:
             return (
                 False,
                 "Adaptivity needs constant order in time and hence restol in the step parameters has to be \
@@ -446,3 +445,146 @@ smaller than 0!",
             float: Embedded error estimate
         """
         return S.levels[0].status.residual
+
+
+class AdaptivityCollocation(AdaptivityBase):
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Add a default value for control order to the parameters.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters
+        """
+        defaults = {
+            "adaptive_coll_params": {},
+            "num_colls": 0,
+            **super().setup(controller, params, description, **kwargs),
+            "control_order": 220,
+        }
+
+        for key in defaults['adaptive_coll_params'].keys():
+            if type(defaults['adaptive_coll_params'][key]) == list:
+                defaults['num_colls'] = max([defaults['num_colls'], len(defaults['adaptive_coll_params'][key])])
+
+        return defaults
+
+    def setup_status_variables(self, controller, **kwargs):
+        self.status = Status(['error', 'order'])
+        self.status.error = []
+        self.status.order = []
+
+    def reset_status_variables(self, controller, **kwargs):
+        self.setup_status_variables(controller, **kwargs)
+
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load the `EstimateEmbeddedErrorCollocation` convergence controller to estimate the local error by switching
+        between collocation problems between iterations.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+        """
+        from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
+            EstimateEmbeddedErrorCollocation,
+        )
+
+        super().dependencies(controller, description)
+
+        params = {'adaptive_coll_params': self.params.adaptive_coll_params}
+        controller.add_convergence_controller(
+            EstimateEmbeddedErrorCollocation,
+            params=params,
+            description=description,
+        )
+
+    def get_local_error_estimate(self, controller, S, **kwargs):
+        """
+        Get the collocation based embedded error estimate.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            float: Embedded error estimate
+        """
+        if len(self.status.error) > 1:
+            return self.status.error[-1][1]
+        else:
+            return 0.0
+
+    def post_iteration_processing(self, controller, step, **kwargs):
+        """
+        Get the error estimate and its order if available.
+
+        Args:
+            controller (pySDC.Controller.controller): The controller
+            step (pySDC.Step.step): The current step
+        """
+        if step.status.done:
+            lvl = step.levels[0]
+            self.status.error += [lvl.status.error_embedded_estimate_collocation]
+            self.status.order += [lvl.sweep.coll.order]
+
+    def get_new_step_size(self, controller, S, **kwargs):
+        if len(self.status.order) == self.params.num_colls:
+            lvl = S.levels[0]
+
+            # compute next step size
+            order = self.status.order[-2] + 1  # local order of second to most accurate solution
+            e_est = self.get_local_error_estimate(controller, S)
+            lvl.status.dt_new = self.compute_optimal_step_size(
+                self.params.beta, lvl.params.dt, self.params.e_tol, e_est, order
+            )
+            self.log(f'Adjusting step size from {lvl.params.dt:.2e} to {lvl.status.dt_new:.2e}', S)
+
+    def check_parameters(self, controller, params, description, **kwargs):
+        """
+        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+        For adaptivity, we need to know the order of the scheme.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: The error message
+        """
+        if controller.params.mssdc_jac:
+            return (
+                False,
+                "Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!",
+            )
+
+        if "e_tol" not in params.keys():
+            return (
+                False,
+                "Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!",
+            )
+
+        return True, ""
+
+    def determine_restart(self, controller, S, **kwargs):
+        """
+        Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        if len(self.status.order) == self.params.num_colls:
+            e_est = self.get_local_error_estimate(controller, S)
+            if e_est >= self.params.e_tol:
+                S.status.restart = True
+                self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)

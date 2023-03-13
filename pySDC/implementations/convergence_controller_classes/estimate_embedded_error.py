@@ -270,7 +270,7 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
             if len(self.status.u) > 1:
                 lvl.status.error_embedded_estimate_collocation = (
                     self.status.iter[-2],
-                    abs(self.status.u[-1] - self.status.u[-2]),
+                    max([np.finfo(float).eps, abs(self.status.u[-1] - self.status.u[-2])]),
                 )
 
     def setup_status_variables(self, controller, **kwargs):

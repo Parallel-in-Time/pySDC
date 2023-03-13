@@ -195,3 +195,29 @@ class AdaptiveCollocation(ConvergenceController):
             None
         """
         self.switch_sweeper(S)
+
+    def check_parameters(self, controller, params, description, **kwargs):
+        """
+        Check if we allow the scheme to solve the collocation problems to convergence.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: The error message
+        """
+        if description["level_params"].get("restol", -1.0) <= 1e-16:
+            return (
+                False,
+                "Switching the collocation problems requires solving them to some tolerance that can be reached. Please set attainable `restol` in the level params",
+            )
+        if description["step_params"].get("maxiter", -1.0) < 99:
+            return (
+                False,
+                "Switching the collocation problems requires solving them exactly, which may require many iterations please set `maxiter` to at least 99 in the step params",
+            )
+
+        return True, ""

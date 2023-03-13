@@ -11,7 +11,7 @@ from pySDC.core.Errors import ProblemError, ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 
 
-def plot_step_sizes(stats, ax):
+def plot_step_sizes(stats, ax, e_em_key='error_embedded_estimate'):
     """
     Plot solution and step sizes to visualize the dynamics in the van der Pol equation.
 
@@ -28,7 +28,7 @@ def plot_step_sizes(stats, ax):
     p = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     t = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
 
-    e_em = np.array(get_sorted(stats, type='error_embedded_estimate', recomputed=False, sortby='time'))[:, 1]
+    e_em = np.array(get_sorted(stats, type=e_em_key, recomputed=False, sortby='time'))[:, 1]
     dt = np.array(get_sorted(stats, type='dt', recomputed=False, sortby='time'))
     restart = np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))
 
