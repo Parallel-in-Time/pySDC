@@ -194,7 +194,7 @@ def plot_solution(stats, controller):  # pragma: no cover
     dt_ax.set_ylabel(r'$\Delta t$')
 
 
-def compare_imex_full(plotting=False):
+def compare_imex_full(plotting=False, leak_type='linear'):
     """
     Compare the results of IMEX and fully implicit runs. For IMEX we need to limit the step size in order to achieve convergence, but for fully implicit, adaptivity can handle itself better.
 
@@ -218,6 +218,7 @@ def compare_imex_full(plotting=False):
         'newton_tol': 1e-10,
         'newton_iter': newton_iter_max,
         'nvars': 2**9,
+        'leak_type': leak_type,
     }
     custom_description['step_params'] = {'maxiter': maxiter}
     custom_description['sweeper_params'] = {'num_nodes': num_nodes}
@@ -229,7 +230,7 @@ def compare_imex_full(plotting=False):
             custom_description=custom_description,
             custom_controller_params=custom_controller_params,
             imex=imex,
-            Tend=5e2,
+            Tend=4.3e2,
             hook_class=[LogWork, LogGlobalErrorPostRun],
         )
 

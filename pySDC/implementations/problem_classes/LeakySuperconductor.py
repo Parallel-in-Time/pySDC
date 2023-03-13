@@ -40,6 +40,7 @@ class LeakySuperconductor(ptype):
             'u_max': 2e-2,
             'Q_max': 1.0,
             'leak_range': (0.45, 0.55),
+            'leak_type': 'linear',
             'order': 2,
             'stencil_type': 'center',
             'bc': 'neumann-zero',
@@ -116,7 +117,13 @@ class LeakySuperconductor(ptype):
         Q_max = self.params.Q_max
         me = self.dtype_u(self.init)
 
-        me[:] = (u - u_thresh) / (u_max - u_thresh) * Q_max
+        if self.params.leak_type == 'linear':
+            me[:] = (u - u_thresh) / (u_max - u_thresh) * Q_max
+        elif self.params.leak_type == 'exponential':
+            me[:] = Q_max * (np.exp(u) - np.exp(u_thresh)) / (np.exp(u_max) - np.exp(u_thresh))
+        else:
+            raise NotImplementedError(f'Leak type {self.params.leak_type} not implemented!')
+
         me[u < u_thresh] = 0
         me[self.leak] = Q_max
         me[u >= u_max] = Q_max
@@ -160,7 +167,13 @@ class LeakySuperconductor(ptype):
         Q_max = self.params.Q_max
         me = self.dtype_u(self.init)
 
-        me[:] = Q_max / (u_max - u_thresh)
+        if self.params.leak_type == 'linear':
+            me[:] = Q_max / (u_max - u_thresh)
+        elif self.params.leak_type == 'exponential':
+            me[:] = Q_max * np.exp(u) / (np.exp(u_max) - np.exp(u_thresh))
+        else:
+            raise NotImplementedError(f'Leak type {self.params.leak_type} not implemented!')
+
         me[u < u_thresh] = 0
         me[u > u_max] = 0
         me[self.leak] = 0
