@@ -145,7 +145,7 @@
             <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
 
             <span class="c1"># store solution of current level which will be interpolated to new level</span>
-            <span class="n">u_old</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">u_old</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">]</span>
             <span class="n">nodes_old</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
             <span class="c1"># change sweeper</span>
@@ -159,12 +159,13 @@
             <span class="c1"># interpolate solution of old collocation problem to new one</span>
             <span class="n">nodes_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">interpolator</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nodes_old</span><span class="p">))</span>
+
             <span class="n">u_inter</span> <span class="o">=</span> <span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nodes_new</span><span class="p">))</span> <span class="o">@</span> <span class="n">u_old</span>
 
             <span class="c1"># assign the interpolated values to the nodes in the level</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">u_inter</span><span class="p">)):</span>
                 <span class="n">me</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-                <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_inter</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_inter</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span>
 
             <span class="c1"># reevaluate rhs</span>
@@ -234,7 +235,33 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">switch_sweeper</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">switch_sweeper</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AdaptiveCollocation.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if we allow the scheme to solve the collocation problems to convergence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Whether the parameters are compatible</span>
+<span class="sd">            str: The error message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;level_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;restol&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-16</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;Switching the collocation problems requires solving them to some tolerance that can be reached. Please set attainable `restol` in the level params&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;maxiter&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">99</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;Switching the collocation problems requires solving them exactly, which may require many iterations please set `maxiter` to at least 99 in the step params&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

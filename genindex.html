@@ -127,6 +127,8 @@
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase">AdaptivityBase (class in implementations.convergence_controller_classes.adaptivity)</a>
 </li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation">AdaptivityCollocation (class in implementations.convergence_controller_classes.adaptivity)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual">AdaptivityResidual (class in implementations.convergence_controller_classes.adaptivity)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityRK">AdaptivityRK (class in implementations.convergence_controller_classes.adaptivity)</a>
@@ -281,9 +283,13 @@
         <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.check_iteration_status">(ConvergenceController method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters">check_parameters() (Adaptivity method)</a>
+      <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.check_parameters">check_parameters() (AdaptiveCollocation method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.Adaptivity.check_parameters">(Adaptivity method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.check_parameters">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters">(AdaptivityResidual method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.check_parameters">(AdaptivityRK method)</a>
@@ -361,14 +367,14 @@
       </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size">compute_optimal_step_size() (AdaptivityBase method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">compute_residual() (imex_1st_order_mass method)</a>
 
       <ul>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.compute_residual">(sweeper method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Lagrange.html#core.Lagrange.computeFejerRule">computeFejerRule() (in module core.Lagrange)</a>
 </li>
       <li><a href="pySDC/core.Step.html#core.Step.step.connect_levels">connect_levels() (step method)</a>
@@ -516,6 +522,8 @@
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.dependencies">(AdaptivityBase method)</a>
 </li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.dependencies">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.dependencies">(BasicRestarting method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">(CheckConvergence method)</a>
@@ -536,6 +544,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.determine_restart">determine_restart() (AdaptivityBase method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.determine_restart">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.determine_restart">(BasicRestarting method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">(BasicRestartingMPI method)</a>
@@ -982,6 +992,8 @@
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_local_error_estimate">(AdaptivityBase method)</a>
 </li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_local_error_estimate">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_local_error_estimate">(AdaptivityResidual method)</a>
 </li>
       </ul></li>
@@ -989,6 +1001,8 @@
 
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.get_new_step_size">(AdaptivityBase method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_new_step_size">(AdaptivityCollocation method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.get_new_step_size">(AdaptivityResidual method)</a>
 </li>
@@ -1013,14 +1027,14 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">get_scalar_problems_picardsweep_mats() (boris_2nd_order method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">get_scalar_problems_sweeper_mats() (boris_2nd_order method)</a>
 
       <ul>
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats">(imex_1st_order method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.stats_helper.html#helpers.stats_helper.get_sorted">get_sorted() (in module helpers.stats_helper)</a>
 </li>
       <li><a href="pySDC/helpers.problem_helper.html#helpers.problem_helper.get_steps">get_steps() (in module helpers.problem_helper)</a>
@@ -2442,6 +2456,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_iteration_processing">post_iteration_processing() (AdaptiveCollocation method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.post_iteration_processing">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.post_iteration_processing">(ConvergenceController method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_contraction_factor.html#implementations.convergence_controller_classes.estimate_contraction_factor.EstimateContractionFactor.post_iteration_processing">(EstimateContractionFactor method)</a>
@@ -2646,6 +2662,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.reset_status_variables">reset_status_variables() (AdaptiveCollocation method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.reset_status_variables">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.reset_status_variables">(BasicRestarting method)</a>
 </li>
         <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.reset_status_variables">(ConvergenceController method)</a>
@@ -2770,6 +2788,8 @@
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.setup">(AdaptivityBase method)</a>
 </li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.setup">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup">(AdaptivityResidual method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup">(BasicRestarting method)</a>
@@ -2812,6 +2832,8 @@
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup_status_variables">setup_status_variables() (AdaptiveCollocation method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.setup_status_variables">(AdaptivityCollocation method)</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup_status_variables">(AdaptivityResidual method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup_status_variables">(BasicRestarting method)</a>

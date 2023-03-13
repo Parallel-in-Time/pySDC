@@ -87,6 +87,28 @@ instance, to do adaptive time stepping.</p></li>
 <p>When trying to obtain speedup with this, be ware that the interpolation is not for free. In particular, it is
 necessary to reevaluate the right hand side at all nodes afterwards.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptive_collocation.html#AdaptiveCollocation.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if we allow the scheme to solve the collocation problems to convergence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the parameters are compatible
+str: The error message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_iteration_processing">
 <span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptive_collocation.html#AdaptiveCollocation.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Switch to the next collocation method if the current one is converged.</p>
@@ -200,6 +222,7 @@ necessary to reevaluate the right hand side at all nodes afterwards.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.convergence_controller_classes.adaptive_collocation module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation"><code class="docutils literal notranslate"><span class="pre">AdaptiveCollocation</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_spread_processing"><code class="docutils literal notranslate"><span class="pre">post_spread_processing()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
