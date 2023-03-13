@@ -448,6 +448,13 @@ smaller than 0!",
 
 
 class AdaptivityCollocation(AdaptivityBase):
+    """
+    Control the step size via a collocation based estimate of the local error.
+    The error estimate works by subtracting two solutions to collocation problems with different order. You can
+    interpolate between collocation methods as much as you want but the adaptive step size selection will always be
+    based on the last switch of quadrature.
+    """
+
     def setup(self, controller, params, description, **kwargs):
         """
         Add a default value for control order to the parameters.
@@ -537,8 +544,11 @@ class AdaptivityCollocation(AdaptivityBase):
             lvl = S.levels[0]
 
             # compute next step size
-            order = self.status.order[-2] + 1  # local order of second to most accurate solution
+            order = (
+                min(self.status.order[-2::]) + 1
+            )  # local order of less accurate of the last two collocation problems
             e_est = self.get_local_error_estimate(controller, S)
+
             lvl.status.dt_new = self.compute_optimal_step_size(
                 self.params.beta, lvl.params.dt, self.params.e_tol, e_est, order
             )

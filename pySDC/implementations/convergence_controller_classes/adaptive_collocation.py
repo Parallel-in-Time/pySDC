@@ -105,7 +105,7 @@ class AdaptiveCollocation(ConvergenceController):
             P = L.prob
 
             # store solution of current level which will be interpolated to new level
-            u_old = L.u.copy()
+            u_old = [me.flatten() for me in L.u]
             nodes_old = L.sweep.coll.nodes.copy()
 
             # change sweeper
@@ -119,12 +119,13 @@ class AdaptiveCollocation(ConvergenceController):
             # interpolate solution of old collocation problem to new one
             nodes_new = L.sweep.coll.nodes.copy()
             interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
+
             u_inter = interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ u_old
 
             # assign the interpolated values to the nodes in the level
             for i in range(0, len(u_inter)):
                 me = P.dtype_u(P.init)
-                me[:] = u_inter[i]
+                me[:] = np.reshape(u_inter[i], P.init[0])
                 L.u[i] = me
 
             # reevaluate rhs
