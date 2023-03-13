@@ -102,6 +102,23 @@ leak itself.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.get_non_linear_Jacobian">
+<span class="sig-name descname"><span class="pre">get_non_linear_Jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/LeakySuperconductor.html#LeakySuperconductor.get_non_linear_Jacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.get_non_linear_Jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the non-linear part of the Jacobian only</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – Current solution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The derivative of the non-linear part of the solution w.r.t. to the solution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.sparse.csc</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/LeakySuperconductor.html#LeakySuperconductor.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.solve_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple Newton solver for (I-factor*f)(u) = rhs</p>
@@ -223,6 +240,7 @@ leak itself.</p>
 <li><a class="reference internal" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor"><code class="docutils literal notranslate"><span class="pre">LeakySuperconductor</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f_non_linear"><code class="docutils literal notranslate"><span class="pre">eval_f_non_linear()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.get_non_linear_Jacobian"><code class="docutils literal notranslate"><span class="pre">get_non_linear_Jacobian()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>

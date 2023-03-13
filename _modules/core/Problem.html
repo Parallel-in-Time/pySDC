@@ -110,12 +110,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: if you want a mass matrix, implement apply_mass_matrix(u)&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ptype.generate_scipy_reference_solution"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype.generate_scipy_reference_solution">[docs]</a>    <span class="k">def</span> <span class="nf">generate_scipy_reference_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ptype.generate_scipy_reference_solution"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype.generate_scipy_reference_solution">[docs]</a>    <span class="k">def</span> <span class="nf">generate_scipy_reference_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute a reference solution using `scipy.solve_ivp` with very small tolerances.</span>
 <span class="sd">        Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher</span>
 <span class="sd">        dimensional, you need to make sure the function `eval_rhs` takes a flattened one-dimensional version as an input</span>
 <span class="sd">        and output, but reshapes to whatever the problem needs for evaluation.</span>
+
+<span class="sd">        The keyword arguments will be passed to `scipy.solve_ivp`. You should consider passing `method=&#39;BDF&#39;` for stiff</span>
+<span class="sd">        problems and to accelerate that you can pass a function that evaluates the Jacobian with arguments `jac(t, u)`</span>
+<span class="sd">        as `jac=jac`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            eval_rhs (function): Function evaluate the full right hand side. Must have signature `eval_rhs(float: t, numpy.1darray: u)`</span>
@@ -134,7 +138,9 @@
         <span class="n">t_init</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">t_init</span>
 
         <span class="n">u_shape</span> <span class="o">=</span> <span class="n">u_init</span><span class="o">.</span><span class="n">shape</span>
-        <span class="k">return</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="p">(</span><span class="n">t_init</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">u_init</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_shape</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">solve_ivp</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="p">(</span><span class="n">t_init</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">u_init</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_shape</span><span class="p">)</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

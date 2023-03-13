@@ -109,11 +109,14 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Problem.ptype.generate_scipy_reference_solution">
-<span class="sig-name descname"><span class="pre">generate_scipy_reference_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.generate_scipy_reference_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.generate_scipy_reference_solution" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_scipy_reference_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.generate_scipy_reference_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.generate_scipy_reference_solution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute a reference solution using <cite>scipy.solve_ivp</cite> with very small tolerances.
 Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher
 dimensional, you need to make sure the function <cite>eval_rhs</cite> takes a flattened one-dimensional version as an input
 and output, but reshapes to whatever the problem needs for evaluation.</p>
+<p>The keyword arguments will be passed to <cite>scipy.solve_ivp</cite>. You should consider passing <cite>method=’BDF’</cite> for stiff
+problems and to accelerate that you can pass a function that evaluates the Jacobian with arguments <cite>jac(t, u)</cite>
+as <cite>jac=jac</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
