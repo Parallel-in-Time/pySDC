@@ -194,7 +194,7 @@ def plot_solution(stats, controller):  # pragma: no cover
     dt_ax.set_ylabel(r'$\Delta t$')
 
 
-def compare_imex_full(plotting=False):
+def compare_imex_full(plotting=False, leak_type='linear'):
     """
     Compare the results of IMEX and fully implicit runs. For IMEX we need to limit the step size in order to achieve convergence, but for fully implicit, adaptivity can handle itself better.
 
@@ -203,6 +203,7 @@ def compare_imex_full(plotting=False):
     """
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
     from pySDC.implementations.hooks.log_work import LogWork
+    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
 
     maxiter = 5
     num_nodes = 3
@@ -210,12 +211,14 @@ def compare_imex_full(plotting=False):
 
     res = {}
     rhs = {}
+    error = {}
 
     custom_description = {}
     custom_description['problem_params'] = {
         'newton_tol': 1e-10,
         'newton_iter': newton_iter_max,
         'nvars': 2**9,
+        'leak_type': leak_type,
     }
     custom_description['step_params'] = {'maxiter': maxiter}
     custom_description['sweeper_params'] = {'num_nodes': num_nodes}
@@ -227,13 +230,14 @@ def compare_imex_full(plotting=False):
             custom_description=custom_description,
             custom_controller_params=custom_controller_params,
             imex=imex,
-            Tend=5e2,
-            hook_class=LogWork,
+            Tend=4.3e2,
+            hook_class=[LogWork, LogGlobalErrorPostRun],
         )
 
         res[imex] = get_sorted(stats, type='u')[-1][1]
         newton_iter = [me[1] for me in get_sorted(stats, type='work_newton')]
         rhs[imex] = np.mean([me[1] for me in get_sorted(stats, type='work_rhs')]) // 1
+        error[imex] = get_sorted(stats, type='e_global_post_run')[-1][1]
 
         if imex:
             assert all([me == 0 for me in newton_iter]), "IMEX is not supposed to do Newton iterations!"
@@ -257,6 +261,11 @@ def compare_imex_full(plotting=False):
     assert (
         rhs[True] == rhs[False]
     ), f"Expected IMEX and fully implicit schemes to take the same number of right hand side evaluations per step, but got {rhs[True]} and {rhs[False]}!"
+
+    assert (
+        error[True] > error[False]
+    ), f"Expected IMEX to be less accurate at the same precision settings than unsplit version, got for IMEX: e={error[True]:.2e} and fully implicit: e={error[False]:.2e}"
+    assert error[True] < 1.1e-4, f'Expected error of IMEX version to be less than 1.1e-4, but got e={error[True]:.2e}!'
 
 
 if __name__ == '__main__':

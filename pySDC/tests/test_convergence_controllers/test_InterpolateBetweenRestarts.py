@@ -155,6 +155,7 @@ def run_vdp(hook, adaptivity=True):
         'newton_tol': 1e-9,
         'newton_maxiter': 99,
         'u0': np.array([2.0, 0.0]),
+        'crash_at_maxiter': False,
     }
 
     # initialize step parameters
