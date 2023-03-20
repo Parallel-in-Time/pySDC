@@ -33,6 +33,7 @@ class LeakySuperconductor(ptype):
         u_max=2e-2,
         Q_max=1.0,
         leak_range=(0.45, 0.55),
+        leak_type='linear',
         order=2,
         stencil_type='center',
         bc='neumann-zero',
@@ -60,6 +61,7 @@ class LeakySuperconductor(ptype):
             'u_max',
             'Q_max',
             'leak_range',
+            'leak_type',
             'order',
             'stencil_type',
             'bc',
@@ -123,12 +125,12 @@ class LeakySuperconductor(ptype):
         Q_max = self.Q_max
         me = self.dtype_u(self.init)
 
-        if self.params.leak_type == 'linear':
+        if self.leak_type == 'linear':
             me[:] = (u - u_thresh) / (u_max - u_thresh) * Q_max
-        elif self.params.leak_type == 'exponential':
+        elif self.leak_type == 'exponential':
             me[:] = Q_max * (np.exp(u) - np.exp(u_thresh)) / (np.exp(u_max) - np.exp(u_thresh))
         else:
-            raise NotImplementedError(f'Leak type {self.params.leak_type} not implemented!')
+            raise NotImplementedError(f'Leak type {self.leak_type} not implemented!')
 
         me[u < u_thresh] = 0
         me[self.leak] = Q_max
@@ -168,17 +170,17 @@ class LeakySuperconductor(ptype):
         Returns:
             scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
         """
-        u_thresh = self.params.u_thresh
-        u_max = self.params.u_max
-        Q_max = self.params.Q_max
+        u_thresh = self.u_thresh
+        u_max = self.u_max
+        Q_max = self.Q_max
         me = self.dtype_u(self.init)
 
-        if self.params.leak_type == 'linear':
+        if self.leak_type == 'linear':
             me[:] = Q_max / (u_max - u_thresh)
-        elif self.params.leak_type == 'exponential':
+        elif self.leak_type == 'exponential':
             me[:] = Q_max * np.exp(u) / (np.exp(u_max) - np.exp(u_thresh))
         else:
-            raise NotImplementedError(f'Leak type {self.params.leak_type} not implemented!')
+            raise NotImplementedError(f'Leak type {self.leak_type} not implemented!')
 
         me[u < u_thresh] = 0
         me[u > u_max] = 0
@@ -188,7 +190,7 @@ class LeakySuperconductor(ptype):
         me[0] = 0.0
         me[-1] = 0.0
 
-        me[:] /= self.params.Cv
+        me[:] /= self.Cv
 
         return sp.diags(me, format='csc')
 
@@ -205,35 +207,6 @@ class LeakySuperconductor(ptype):
         Returns:
             dtype_u: solution as mesh
         """
-
-        def get_non_linear_Jacobian(u):
-            """
-            Evaluate the non-linear part of the Jacobian only
-
-            Args:
-                u (dtype_u): Current solution
-
-            Returns:
-                scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
-            """
-            u_thresh = self.u_thresh
-            u_max = self.u_max
-            Q_max = self.Q_max
-            me = self.dtype_u(self.init)
-
-            me[:] = Q_max / (u_max - u_thresh)
-            me[u < u_thresh] = 0
-            me[u > u_max] = 0
-            me[self.leak] = 0
-
-            # boundary conditions
-            me[0] = 0.0
-            me[-1] = 0.0
-
-            me[:] /= self.Cv
-
-            return sp.diags(me, format='csc')
-
         u = self.dtype_u(u0)
         res = np.inf
         delta = np.zeros_like(u)
