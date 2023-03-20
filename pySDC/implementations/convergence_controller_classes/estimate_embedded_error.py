@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.ConvergenceController import ConvergenceController, Pars
+from pySDC.core.ConvergenceController import ConvergenceController, Pars, Status
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 
@@ -203,3 +203,97 @@ class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
                     self.send(comm, dest=S.status.slot + 1, data=temp, blocking=True)
 
         return None
+
+
+class EstimateEmbeddedErrorCollocation(ConvergenceController):
+    """
+    Estimates an embedded error based on changing the underlying quadrature rule. The error estimate is stored as
+    `error_embedded_estimate_collocation` in the status of the level. Note that we only compute the estimate on the
+    finest level. The error is stored as a tuple with the first index denoting to which iteration it belongs. This
+    is useful since the error estimate is not available immediately after, but only when the next collocation problem
+    is converged to make sure the two solutions are of different accuracy.
+
+    Changing the collocation method between iterations happens using the `AdaptiveCollocation` convergence controller.
+    Please refer to that for documentation on how to use this. Just pass the parameters for that convergence controller
+    as `adaptive_coll_params` to the parameters for this one and they will be passed on when the `AdaptiveCollocation`
+    convergence controller is automatically added while loading dependencies.
+    """
+
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Add a default value for control order to the parameters
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters
+        """
+        defaults = {
+            "control_order": 210,
+            "adaptive_coll_params": {},
+            **super().setup(controller, params, description, **kwargs),
+        }
+        return defaults
+
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load the `AdaptiveCollocation` convergence controller to switch between collocation problems between iterations.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+        """
+        from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
+
+        controller.add_convergence_controller(
+            AdaptiveCollocation, params=self.params.adaptive_coll_params, description=description
+        )
+
+    def post_iteration_processing(self, controller, step, **kwargs):
+        """
+        Compute the embedded error as the difference between the interpolated and the current solution on the finest
+        level.
+
+        Args:
+            controller (pySDC.Controller.controller): The controller
+            step (pySDC.Step.step): The current step
+        """
+        if step.status.done:
+            lvl = step.levels[0]
+            lvl.sweep.compute_end_point()
+            self.status.u += [lvl.uend]
+            self.status.iter += [step.status.iter]
+
+            if len(self.status.u) > 1:
+                lvl.status.error_embedded_estimate_collocation = (
+                    self.status.iter[-2],
+                    max([np.finfo(float).eps, abs(self.status.u[-1] - self.status.u[-2])]),
+                )
+
+    def setup_status_variables(self, controller, **kwargs):
+        """
+        Add the embedded error variable to the levels and add a status variable for previous steps.
+
+        Args:
+            controller (pySDC.Controller): The controller
+        """
+        self.status = Status(['u', 'iter'])
+        self.status.u = []  # the solutions of converged collocation problems
+        self.status.iter = []  # the iteration in which the solution converged
+
+        if 'comm' in kwargs.keys():
+            steps = [controller.S]
+        else:
+            if 'active_slots' in kwargs.keys():
+                steps = [controller.MS[i] for i in kwargs['active_slots']]
+            else:
+                steps = controller.MS
+        where = ["levels", "status"]
+        for S in steps:
+            self.add_variable(S, name='error_embedded_estimate_collocation', where=where, init=None)
+
+    def reset_status_variables(self, controller, **kwargs):
+        self.setup_status_variables(controller, **kwargs)

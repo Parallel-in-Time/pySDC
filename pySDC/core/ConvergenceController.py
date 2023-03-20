@@ -6,6 +6,7 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 class Pars(FrozenClass):
     def __init__(self, params):
         self.control_order = 0  # integer that determines the order in which the convergence controllers are called
+        self.useMPI = None  # depends on the controller
 
         for k, v in params.items():
             setattr(self, k, v)

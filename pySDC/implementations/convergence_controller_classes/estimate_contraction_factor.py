@@ -1,7 +1,6 @@
 import numpy as np
 
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 
 
@@ -36,7 +35,7 @@ class EstimateContractionFactor(ConvergenceController):
             None
         """
         controller.add_convergence_controller(
-            EstimateEmbeddedError.get_implementation("nonMPI" if type(controller) == controller_nonMPI else "MPI"),
+            EstimateEmbeddedError.get_implementation("nonMPI" if not self.params.useMPI else "MPI"),
             description=description,
         )
 

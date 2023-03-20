@@ -9,8 +9,12 @@ from pySDC.projects.Resilience.heat import run_heat
 from pySDC.projects.Resilience.hook import LogData
 from pySDC.projects.Resilience.accuracy_check import get_accuracy_order
 from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
+    EstimateEmbeddedErrorCollocation,
+)
 from pySDC.core.Hooks import hooks
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostIter
+from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimatePostIter
 
 
 # define global parameters for running problems and plotting
@@ -43,11 +47,11 @@ coll_params_type = {
 }
 
 special_params = {
-    'inexact': {AdaptiveCollocation: coll_params_inexact},
-    'refinement': {AdaptiveCollocation: coll_params_refinement},
-    'reduce': {AdaptiveCollocation: coll_params_reduce},
+    'inexact': {EstimateEmbeddedErrorCollocation: {'adaptive_coll_params': coll_params_inexact}},
+    'refinement': {EstimateEmbeddedErrorCollocation: {'adaptive_coll_params': coll_params_refinement}},
+    'reduce': {EstimateEmbeddedErrorCollocation: {'adaptive_coll_params': coll_params_reduce}},
     'standard': {},
-    'type': {AdaptiveCollocation: coll_params_type},
+    'type': {EstimateEmbeddedErrorCollocation: {'adaptive_coll_params': coll_params_type}},
 }
 
 
@@ -200,7 +204,7 @@ def check_order(prob, coll_name, ax, k_ax):
             Tend=dt_range[i],
             custom_description=custom_description,
             custom_controller_params=custom_controller_parameters,
-            hook_class=[LogData, LogSweeperParams, LogLocalErrorPostIter],
+            hook_class=[LogData, LogSweeperParams, LogLocalErrorPostIter, LogEmbeddedErrorEstimatePostIter],
         )
 
         sweeper_params = get_sorted(stats, type='sweeper_params', sortby='iter')
@@ -212,23 +216,35 @@ def check_order(prob, coll_name, ax, k_ax):
         e_loc = np.array([me[1] for me in get_sorted(stats, type='e_local_post_iteration', sortby='iter')])[
             converged_solution
         ]
+
+        e_em_raw = [
+            me[1] for me in get_sorted(stats, type='error_embedded_estimate_collocation_post_iteration', sortby='iter')
+        ]
+        e_em = np.array((e_em_raw + [None] if coll_name == 'refinement' else [None] + e_em_raw))
         coll_order = np.array([me[1] for me in get_sorted(stats, type='coll_order', sortby='iter')])[converged_solution]
 
-        res += [(dt_range[i], e_loc, idx[1:] - idx[:-1], labels, coll_order)]
-        # res += [(dt_range[i], np.array([me[1] for me in e_loc])[converged_solution], (idx[1:]-idx[:-1])/(idx[:-1]+1)*100, labels)]
+        res += [(dt_range[i], e_loc, idx[1:] - idx[:-1], labels, coll_order, e_em)]
 
     # assemble sth we can compute the order from
     result = {'dt': [me[0] for me in res]}
+    embedded_errors = {'dt': [me[0] for me in res]}
     num_sols = len(res[0][1])
     for i in range(num_sols):
         result[i] = [me[1][i] for me in res]
+        embedded_errors[i] = [me[5][i] for me in res]
+
         label = res[0][3][i]
         expected_order = res[0][4][i] + 1
 
-        order = get_accuracy_order(result, key=i, thresh=1e-9)
-        assert np.isclose(
-            np.mean(order), expected_order, atol=0.3
-        ), f"Expected order: {expected_order}, got {order:.2f}!"
+        ax.scatter(result['dt'], embedded_errors[i], color=CMAP[i])
+
+        for me in [result, embedded_errors]:
+            if None in me[i]:
+                continue
+            order = get_accuracy_order(me, key=i, thresh=1e-9)
+            assert np.isclose(
+                np.mean(order), expected_order, atol=0.3
+            ), f"Expected order: {expected_order}, got {order:.2f}!"
         ax.loglog(result['dt'], result[i], label=f'{label} nodes: order: {np.mean(order):.1f}', color=CMAP[i])
 
         if i > 0:
@@ -236,7 +252,7 @@ def check_order(prob, coll_name, ax, k_ax):
             k_ax.plot(result['dt'], extra_iter, ls='--', color=CMAP[i])
     ax.legend(frameon=False)
     ax.set_xlabel(r'$\Delta t$')
-    ax.set_ylabel(r'$e_\mathrm{local}$')
+    ax.set_ylabel(r'$e_\mathrm{local}$ (lines), $e_\mathrm{embedded}$ (dots)')
     k_ax.set_ylabel(r'extra iterations')
 
 
@@ -247,6 +263,7 @@ def order_stuff(prob):
     for i in range(len(modes)):
         k_axs += [axs.flatten()[i].twinx()]
         check_order(prob, modes[i], axs.flatten()[i], k_axs[-1])
+        axs.flatten()[i].set_title(modes[i])
 
     for i in range(2):
         k_axs[i].set_ylabel('')
@@ -257,11 +274,55 @@ def order_stuff(prob):
     fig.tight_layout()
 
 
-def main():
+def adaptivity_collocation(plotting=False):
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityCollocation
+
+    e_tol = 1e-7
+
+    adaptive_coll_params = {
+        'num_nodes': [2, 3],
+    }
+
+    convergence_controllers = {}
+    convergence_controllers[AdaptivityCollocation] = {'adaptive_coll_params': adaptive_coll_params, 'e_tol': e_tol}
+
+    step_params = {}
+    step_params['maxiter'] = 99
+
+    level_params = {}
+    level_params['restol'] = 1e-8
+
+    description = {}
+    description['convergence_controllers'] = convergence_controllers
+    description['step_params'] = step_params
+    description['level_params'] = level_params
+
+    controller_params = {'logger_level': 30}
+
+    stats, controller, _ = run_vdp(custom_description=description, custom_controller_params=controller_params)
+
+    e_em = get_sorted(stats, type='error_embedded_estimate_collocation', recomputed=False)
+    assert (
+        max([me[1] for me in e_em]) <= e_tol
+    ), "Exceeded threshold for local tolerance when using collocation based adaptivity"
+    assert (
+        min([me[1] for me in e_em][1:-1]) >= e_tol / 10
+    ), "Over resolved problem when using collocation based adaptivity"
+
+    if plotting:
+        from pySDC.projects.Resilience.vdp import plot_step_sizes
+
+        fig, ax = plt.subplots()
+
+        plot_step_sizes(stats, ax, 'error_embedded_estimate_collocation')
+
+
+def main(plotting=False):
+    adaptivity_collocation(plotting)
     order_stuff(run_advection)
     compare_adaptive_collocation(run_vdp)
 
 
 if __name__ == "__main__":
-    main()
+    main(True)
     plt.show()

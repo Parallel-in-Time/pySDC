@@ -92,12 +92,16 @@ class ptype(RegisterParams):
         """Default mass matrix : identity"""
         return u
 
-    def generate_scipy_reference_solution(self, eval_rhs, t, u_init=None, t_init=None):
+    def generate_scipy_reference_solution(self, eval_rhs, t, u_init=None, t_init=None, **kwargs):
         """
         Compute a reference solution using `scipy.solve_ivp` with very small tolerances.
         Keep in mind that scipy needs the solution to be a one dimensional array. If you are solving something higher
         dimensional, you need to make sure the function `eval_rhs` takes a flattened one-dimensional version as an input
         and output, but reshapes to whatever the problem needs for evaluation.
+
+        The keyword arguments will be passed to `scipy.solve_ivp`. You should consider passing `method='BDF'` for stiff
+        problems and to accelerate that you can pass a function that evaluates the Jacobian with arguments `jac(t, u)`
+        as `jac=jac`.
 
         Args:
             eval_rhs (function): Function evaluate the full right hand side. Must have signature `eval_rhs(float: t, numpy.1darray: u)`
@@ -116,4 +120,6 @@ class ptype(RegisterParams):
         t_init = 0 if t_init is None else t_init
 
         u_shape = u_init.shape
-        return solve_ivp(eval_rhs, (t_init, t), u_init.flatten(), rtol=tol, atol=tol).y[:, -1].reshape(u_shape)
+        return (
+            solve_ivp(eval_rhs, (t_init, t), u_init.flatten(), rtol=tol, atol=tol, **kwargs).y[:, -1].reshape(u_shape)
+        )

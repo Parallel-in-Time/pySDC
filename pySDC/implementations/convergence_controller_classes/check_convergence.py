@@ -45,10 +45,9 @@ class CheckConvergence(ConvergenceController):
             from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
                 EstimateEmbeddedError,
             )
-            from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
             controller.add_convergence_controller(
-                EstimateEmbeddedError.get_implementation("nonMPI" if type(controller) == controller_nonMPI else "MPI"),
+                EstimateEmbeddedError.get_implementation("nonMPI" if not self.params.useMPI else "MPI"),
                 description=description,
             )
 

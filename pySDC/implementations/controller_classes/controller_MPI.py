@@ -25,7 +25,7 @@ class controller_MPI(controller):
         """
 
         # call parent's initialization routine
-        super(controller_MPI, self).__init__(controller_params, description)
+        super().__init__(controller_params, description, useMPI=True)
 
         # create single step per processor
         self.S = step(description)
