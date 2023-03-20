@@ -206,7 +206,6 @@ class LeakySuperconductor(ptype):
             dtype_u: solution as mesh
         """
 
-<<<<<<< HEAD
         def get_non_linear_Jacobian(u):
             """
             Evaluate the non-linear part of the Jacobian only
@@ -235,8 +234,6 @@ class LeakySuperconductor(ptype):
 
             return sp.diags(me, format='csc')
 
-=======
->>>>>>> upstream/master
         u = self.dtype_u(u0)
         res = np.inf
         delta = np.zeros_like(u)

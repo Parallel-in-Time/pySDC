@@ -5,6 +5,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
+
 # pragma: no cover
 def set_parameter():
     # initialize problem parameters
@@ -56,6 +57,7 @@ def set_parameter():
     description['step_params'] = step_params  # pass step parameters
 
     return controller_params, description, t0, Tend
+
 
 # pragma: no cover
 def main():
