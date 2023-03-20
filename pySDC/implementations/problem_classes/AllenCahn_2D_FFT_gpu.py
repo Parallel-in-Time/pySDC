@@ -6,7 +6,7 @@ from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
 
-# noinspection PyUnusedLocal
+# pragma: no cover
 class allencahn2d_imex(ptype):
     """
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping

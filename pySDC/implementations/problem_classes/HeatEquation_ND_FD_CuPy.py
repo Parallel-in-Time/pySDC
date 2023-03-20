@@ -9,7 +9,7 @@ from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
 
-# noinspection PyUnusedLocal
+# pragma: no cover
 class heatNd_forced(ptype):
     """
     Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,

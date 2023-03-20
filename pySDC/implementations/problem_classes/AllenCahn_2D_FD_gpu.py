@@ -10,7 +10,7 @@ from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cup
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
-# noinspection PyUnusedLocal
+# pragma: no cover
 class allencahn_fullyimplicit(ptype):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC

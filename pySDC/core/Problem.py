@@ -14,7 +14,15 @@ from pySDC.core.Common import RegisterParams
 
 class WorkCounter(object):
     """
-    Class for counting iterations
+    Utility class for counting iterations.
+
+    Contains one attribute `niter` initialized to zero during
+    instantiation, which can be incremented by calling object as
+    a function, e.g
+
+    >>> count = WorkCounter()  # => niter = 0
+    >>> count()                # => niter = 1
+    >>> count()                # => niter = 2
     """
 
     def __init__(self):
@@ -49,9 +57,8 @@ class ptype(RegisterParams):
     dtype_f = None
 
     def __init__(self, init):
-        # pass initialization parameter to instantiate data types
-        self.work_counters = {}
-        self.init = init
+        self.work_counters = {}  # Dictionnary to store WorkCounter objects
+        self.init = init  # Initialization parameter to instantiate data types
 
     @property
     def u_init(self):
