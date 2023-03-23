@@ -24,11 +24,11 @@ class grayscott_imex_diffusion(ptype):
         Ku: Laplace operator in spectral space (u component)
         Kv: Laplace operator in spectral space (v component)
     """
+
     dtype_u = mesh
     dtype_f = imex_mesh
 
     def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
-
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
@@ -53,8 +53,9 @@ class grayscott_imex_diffusion(ptype):
 
         # invoke super init, passing the communicator and the local dimensions as init
         super().__init__(init=(sizes, comm, tmp_u.dtype))
-        self._makeAttributeAndRegister('nvars', 'Du', 'Dv', 'A', 'B', 'spectral', 'L', 'comm',
-                                       localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'nvars', 'Du', 'Dv', 'A', 'B', 'spectral', 'L', 'comm', localVars=locals(), readOnly=True
+        )
 
         L = np.array([self.L] * self.ndim, dtype=float)
 
@@ -187,7 +188,6 @@ class grayscott_imex_diffusion(ptype):
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
-
     def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         self.Ku -= self.A
@@ -233,7 +233,6 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
-
     dtype_f = comp2_mesh
 
     def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
@@ -389,7 +388,6 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 
 class grayscott_mi_linear(grayscott_imex_linear):
-
     dtype_f = comp2_mesh
 
     def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):

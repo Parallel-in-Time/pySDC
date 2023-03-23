@@ -22,7 +22,6 @@ class allencahn_front_fullyimplicit(ptype):
     dtype_f = mesh
 
     def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, stop_at_nan=True):
-
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars + 1) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p - 1')
@@ -30,8 +29,16 @@ class allencahn_front_fullyimplicit(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
-            'nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'stop_at_nan',
-            localVars=locals(), readOnly=True)
+            'nvars',
+            'dw',
+            'eps',
+            'newton_maxiter',
+            'newton_tol',
+            'interval',
+            'stop_at_nan',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = (self.interval[1] - self.interval[0]) / (self.nvars + 1)
@@ -355,15 +362,24 @@ class allencahn_periodic_fullyimplicit(ptype):
     dtype_f = mesh
 
     def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
-
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__((nvars, None, np.dtype('float64')))
-        self._makeAttributeAndRegister('nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'radius',
-                                       'stop_at_nan', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'nvars',
+            'dw',
+            'eps',
+            'newton_maxiter',
+            'newton_tol',
+            'interval',
+            'radius',
+            'stop_at_nan',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = (self.interval[1] - self.interval[0]) / self.nvars
@@ -465,11 +481,7 @@ class allencahn_periodic_fullyimplicit(ptype):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        f[:] = (
-            self.A.dot(u)
-            - 2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
-            - 6.0 * self.dw * u * (1.0 - u)
-        )
+        f[:] = self.A.dot(u) - 2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * self.dw * u * (1.0 - u)
         return f
 
     def u_exact(self, t):
@@ -620,11 +632,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
                 u
                 - rhs
                 - factor
-                * (
-                    -2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u)
-                    - 6.0 * dw * u * (1.0 - u)
-                    + 0.0 / self.eps**2 * u
-                )
+                * (-2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * dw * u * (1.0 - u) + 0.0 / self.eps**2 * u)
             )
 
             # if g is close to 0, then we are done

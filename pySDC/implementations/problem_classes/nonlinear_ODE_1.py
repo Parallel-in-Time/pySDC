@@ -18,8 +18,9 @@ class nonlinear_ODE_1(ptype):
     def __init__(self, u0, newton_maxiter, newton_tol, stop_at_nan=True):
         nvars = 1
         super().__init__((nvars, None, np.dtype('float64')))
-        self._makeAttributeAndRegister('u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan',
-                                       localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
+        )
 
     def u_exact(self, t):
         """
