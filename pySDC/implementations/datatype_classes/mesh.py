@@ -3,13 +3,9 @@ import numpy as np
 from pySDC.core.Errors import DataError
 
 try:
-    # Hack in case dolfin is used => must be imported before mpi4py
-    try:
-        import dolfin as df
-
-        del df
-    except ImportError:
-        pass
+    # TODO : mpi4py cannot be imported before dolfin when using fenics mesh
+    # see https://github.com/Parallel-in-Time/pySDC/pull/285#discussion_r1145850590
+    # This should be dealt with at some point
     from mpi4py import MPI
 except ImportError:
     MPI = None
