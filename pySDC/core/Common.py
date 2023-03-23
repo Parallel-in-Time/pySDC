@@ -27,7 +27,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
     Attributes
     ----------
     params : dict (property)
-        Dictionnary containing names and values of registered parameters.
+        Dictionary containing names and values of registered parameters.
     _parNames : set of str
         Names of all the registered parameters.
     _parNamesReadOnly : set of str
@@ -43,7 +43,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         *names : list of str
             The name of the parameters to be registered (should be class attributes).
         localVars : dict
-            Dictionnary containing key=names and values=paramValues for each
+            Dictionary containing key=names and values=paramValues for each
             parNames given in names. Can be provided, for instance, using
             `locals()` built-in dictionary. MUST BE provided as soon as
             names contains anything.
@@ -51,7 +51,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
             Wether or not store the parameters as read-only attributes
         """
         if len(names) > 1 and localVars is None:
-            raise ValueError("a dictionnary must be provided in localVars with parameters values")
+            raise ValueError("a dictionary must be provided in localVars with parameters values")
         # Set parameters as attributes
         for name in names:
             # pragma: no cover
@@ -67,7 +67,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
 
     @property
     def params(self):
-        """Dictionnary containing names and values of registered parameters"""
+        """Dictionary containing names and values of registered parameters"""
         return {name: getattr(self, name) for name in self._parNamesReadOnly.union(self._parNames)}
 
     def __setattr__(self, name, value):
