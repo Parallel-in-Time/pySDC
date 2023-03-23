@@ -3,7 +3,7 @@ import scipy.sparse as sp
 from mpi4py import MPI
 from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
@@ -24,40 +24,20 @@ class grayscott_imex_diffusion(ptype):
         Ku: Laplace operator in spectral space (u component)
         Kv: Laplace operator in spectral space (v component)
     """
+    dtype_u = mesh
+    dtype_f = imex_mesh
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
+    def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: fft data type (will be passed to parent class)
-            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
-        """
-
-        if 'L' not in problem_params:
-            problem_params['L'] = 2.0
-        # if 'init_type' not in problem_params:
-        #     problem_params['init_type'] = 'circle'
-        if 'comm' not in problem_params:
-            problem_params['comm'] = MPI.COMM_WORLD
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'Du', 'Dv', 'A', 'B', 'spectral']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
+        if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
         # Creating FFT structure
-        self.ndim = len(problem_params['nvars'])
+        self.ndim = len(nvars)
         axes = tuple(range(self.ndim))
         self.fft = PFFT(
-            problem_params['comm'],
-            list(problem_params['nvars']),
+            comm,
+            list(nvars),
             axes=axes,
             dtype=np.float64,
             collapse=True,
@@ -65,18 +45,18 @@ class grayscott_imex_diffusion(ptype):
         )
 
         # get test data to figure out type and dimensions
-        tmp_u = newDistArray(self.fft, problem_params['spectral'])
+        tmp_u = newDistArray(self.fft, spectral)
 
         # add two components to contain field and temperature
         self.ncomp = 2
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(grayscott_imex_diffusion, self).__init__(
-            init=(sizes, problem_params['comm'], tmp_u.dtype), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
-        )
+        super().__init__(init=(sizes, comm, tmp_u.dtype))
+        self._makeAttributeAndRegister('nvars', 'Du', 'Dv', 'A', 'B', 'spectral', 'L', 'comm',
+                                       localVars=locals(), readOnly=True)
 
-        L = np.array([self.params.L] * self.ndim, dtype=float)
+        L = np.array([self.L] * self.ndim, dtype=float)
 
         # get local mesh
         X = np.ogrid[self.fft.local_slice(False)]
@@ -98,12 +78,12 @@ class grayscott_imex_diffusion(ptype):
         K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
         K = np.array(K).astype(float)
         self.K2 = np.sum(K * K, 0, dtype=float)
-        self.Ku = -self.K2 * self.params.Du
-        self.Kv = -self.K2 * self.params.Dv
+        self.Ku = -self.K2 * self.Du
+        self.Kv = -self.K2 * self.Dv
 
         # Need this for diagnostics
-        self.dx = self.params.L / problem_params['nvars'][0]
-        self.dy = self.params.L / problem_params['nvars'][1]
+        self.dx = self.L / nvars[0]
+        self.dy = self.L / nvars[1]
 
     def eval_f(self, u, t):
         """
@@ -119,15 +99,15 @@ class grayscott_imex_diffusion(ptype):
 
         f = self.dtype_f(self.init)
 
-        if self.params.spectral:
+        if self.spectral:
             f.impl[..., 0] = self.Ku * u[..., 0]
             f.impl[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv**2 + self.params.A * (1 - tmpu)
-            tmpfv = tmpu * tmpv**2 - self.params.B * tmpv
+            tmpfu = -tmpu * tmpv**2 + self.A * (1 - tmpu)
+            tmpfv = tmpu * tmpv**2 - self.B * tmpv
             f.expl[..., 0] = self.fft.forward(tmpfu)
             f.expl[..., 1] = self.fft.forward(tmpfv)
 
@@ -138,8 +118,8 @@ class grayscott_imex_diffusion(ptype):
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = self.Kv * u_hat
             f.impl[..., 1] = self.fft.backward(lap_u_hat, f.impl[..., 1])
-            f.expl[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.params.A * (1 - u[..., 0])
-            f.expl[..., 1] = u[..., 0] * u[..., 1] ** 2 - self.params.B * u[..., 1]
+            f.expl[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.A * (1 - u[..., 0])
+            f.expl[..., 1] = u[..., 0] * u[..., 1] ** 2 - self.B * u[..., 1]
 
         return f
 
@@ -158,7 +138,7 @@ class grayscott_imex_diffusion(ptype):
         """
 
         me = self.dtype_u(self.init)
-        if self.params.spectral:
+        if self.spectral:
             me[..., 0] = rhs[..., 0] / (1.0 - factor * self.Ku)
             me[..., 1] = rhs[..., 1] / (1.0 - factor * self.Kv)
 
@@ -188,7 +168,7 @@ class grayscott_imex_diffusion(ptype):
         me = self.dtype_u(self.init, val=0.0)
 
         # This assumes that the box is [-L/2, L/2]^2
-        if self.params.spectral:
+        if self.spectral:
             tmp = 1.0 - np.exp(-80.0 * ((self.X[0] + 0.05) ** 2 + (self.X[1] + 0.02) ** 2))
             me[..., 0] = self.fft.forward(tmp)
             tmp = np.exp(-80.0 * ((self.X[0] - 0.05) ** 2 + (self.X[1] - 0.02) ** 2))
@@ -207,15 +187,11 @@ class grayscott_imex_diffusion(ptype):
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Init routine for the IMEX problem class with linear splitting
-        """
 
-        super(grayscott_imex_linear, self).__init__(problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
-
-        self.Ku -= self.params.A
-        self.Kv -= self.params.B
+    def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
+        super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
+        self.Ku -= self.A
+        self.Kv -= self.B
 
     def eval_f(self, u, t):
         """
@@ -231,14 +207,14 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
         f = self.dtype_f(self.init)
 
-        if self.params.spectral:
+        if self.spectral:
             f.impl[..., 0] = self.Ku * u[..., 0]
             f.impl[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv**2 + self.params.A
+            tmpfu = -tmpu * tmpv**2 + self.A
             tmpfv = tmpu * tmpv**2
             f.expl[..., 0] = self.fft.forward(tmpfu)
             f.expl[..., 1] = self.fft.forward(tmpfv)
@@ -250,27 +226,20 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = self.Kv * u_hat
             f.impl[..., 1] = self.fft.backward(lap_u_hat, f.impl[..., 1])
-            f.expl[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.params.A
+            f.expl[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.A
             f.expl[..., 1] = u[..., 0] * u[..., 1] ** 2
 
         return f
 
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
-        """
-        Init routine for the multi-implicit problem class with diffusion splitting
-        """
 
-        if 'newton_maxiter' not in problem_params:
-            raise ParameterError('need newton_maxiter as parameter for the problem class')
-        if 'newton_tol' not in problem_params:
-            raise ParameterError('need newton_tol as parameter for the problem class')
+    dtype_f = comp2_mesh
 
-        super(grayscott_mi_diffusion, self).__init__(problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
-
+    def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
+        super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         # This may not run in parallel yet..
-        assert self.params.comm.Get_size() == 1
+        assert self.comm.Get_size() == 1
 
     def eval_f(self, u, t):
         """
@@ -286,15 +255,15 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
         f = self.dtype_f(self.init)
 
-        if self.params.spectral:
+        if self.spectral:
             f.comp1[..., 0] = self.Ku * u[..., 0]
             f.comp1[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv**2 + self.params.A * (1 - tmpu)
-            tmpfv = tmpu * tmpv**2 - self.params.B * tmpv
+            tmpfu = -tmpu * tmpv**2 + self.A * (1 - tmpu)
+            tmpfv = tmpu * tmpv**2 - self.B * tmpv
             f.comp2[..., 0] = self.fft.forward(tmpfu)
             f.comp2[..., 1] = self.fft.forward(tmpfv)
 
@@ -305,8 +274,8 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = self.Kv * u_hat
             f.comp1[..., 1] = self.fft.backward(lap_u_hat, f.comp1[..., 1])
-            f.comp2[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.params.A * (1 - u[..., 0])
-            f.comp2[..., 1] = u[..., 0] * u[..., 1] ** 2 - self.params.B * u[..., 1]
+            f.comp2[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.A * (1 - u[..., 0])
+            f.comp2[..., 1] = u[..., 0] * u[..., 1] ** 2 - self.B * u[..., 1]
 
         return f
 
@@ -342,7 +311,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         """
         u = self.dtype_u(u0)
 
-        if self.params.spectral:
+        if self.spectral:
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
@@ -361,22 +330,22 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # print(n, res)
             # form the function g with g(u) = 0
-            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv**2 + self.params.A * (1 - tmpu))
-            tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2 - self.params.B * tmpv)
+            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv**2 + self.A * (1 - tmpu))
+            tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2 - self.B * tmpv)
 
             # if g is close to 0, then we are done
             res = max(np.linalg.norm(tmpgu, np.inf), np.linalg.norm(tmpgv, np.inf))
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg
-            dg00 = 1 - factor * (-(tmpv**2) - self.params.A)
+            dg00 = 1 - factor * (-(tmpv**2) - self.A)
             dg01 = -factor * (-2 * tmpu * tmpv)
             dg10 = -factor * (tmpv**2)
-            dg11 = 1 - factor * (2 * tmpu * tmpv - self.params.B)
+            dg11 = 1 - factor * (2 * tmpu * tmpv - self.B)
 
             # interleave and unravel to put into sparse matrix
             dg00I = np.ravel(np.kron(dg00, np.array([1, 0])))
@@ -393,24 +362,24 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             # invert dg matrix
             b = sp.linalg.spsolve(dg, g)
             # update real space vectors
-            tmpu[:] -= b[::2].reshape(self.params.nvars)
-            tmpv[:] -= b[1::2].reshape(self.params.nvars)
+            tmpu[:] -= b[::2].reshape(self.nvars)
+            tmpv[:] -= b[1::2].reshape(self.nvars)
 
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         # self.newton_ncalls += 1
         # self.newton_itercount += n
         me = self.dtype_u(self.init)
-        if self.params.spectral:
+        if self.spectral:
             me[..., 0] = self.fft.forward(tmpu)
             me[..., 1] = self.fft.forward(tmpv)
         else:
@@ -420,20 +389,13 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 
 class grayscott_mi_linear(grayscott_imex_linear):
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
-        """
-        Init routine for the multi-implicit problem class with linear splitting
-        """
 
-        if 'newton_maxiter' not in problem_params:
-            raise ParameterError('need newton_maxiter as parameter for the problem class')
-        if 'newton_tol' not in problem_params:
-            raise ParameterError('need newton_tol as parameter for the problem class')
+    dtype_f = comp2_mesh
 
-        super(grayscott_mi_linear, self).__init__(problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
-
+    def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
+        super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         # This may not run in parallel yet..
-        assert self.params.comm.Get_size() == 1
+        assert self.comm.Get_size() == 1
 
     def eval_f(self, u, t):
         """
@@ -449,14 +411,14 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
         f = self.dtype_f(self.init)
 
-        if self.params.spectral:
+        if self.spectral:
             f.comp1[..., 0] = self.Ku * u[..., 0]
             f.comp1[..., 1] = self.Kv * u[..., 1]
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv**2 + self.params.A
+            tmpfu = -tmpu * tmpv**2 + self.A
             tmpfv = tmpu * tmpv**2
             f.comp2[..., 0] = self.fft.forward(tmpfu)
             f.comp2[..., 1] = self.fft.forward(tmpfv)
@@ -468,7 +430,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = self.Kv * u_hat
             f.comp1[..., 1] = self.fft.backward(lap_u_hat, f.comp1[..., 1])
-            f.comp2[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.params.A
+            f.comp2[..., 0] = -u[..., 0] * u[..., 1] ** 2 + self.A
             f.comp2[..., 1] = u[..., 0] * u[..., 1] ** 2
 
         return f
@@ -505,7 +467,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
         """
         u = self.dtype_u(u0)
 
-        if self.params.spectral:
+        if self.spectral:
             tmpu = newDistArray(self.fft, False)
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
@@ -524,15 +486,15 @@ class grayscott_mi_linear(grayscott_imex_linear):
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # print(n, res)
             # form the function g with g(u) = 0
-            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv**2 + self.params.A)
+            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv**2 + self.A)
             tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2)
 
             # if g is close to 0, then we are done
             res = max(np.linalg.norm(tmpgu, np.inf), np.linalg.norm(tmpgv, np.inf))
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg
@@ -556,24 +518,24 @@ class grayscott_mi_linear(grayscott_imex_linear):
             # invert dg matrix
             b = sp.linalg.spsolve(dg, g)
             # update real-space vectors
-            tmpu[:] -= b[::2].reshape(self.params.nvars)
-            tmpv[:] -= b[1::2].reshape(self.params.nvars)
+            tmpu[:] -= b[::2].reshape(self.nvars)
+            tmpv[:] -= b[1::2].reshape(self.nvars)
 
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         # self.newton_ncalls += 1
         # self.newton_itercount += n
         me = self.dtype_u(self.init)
-        if self.params.spectral:
+        if self.spectral:
             me[..., 0] = self.fft.forward(tmpu)
             me[..., 1] = self.fft.forward(tmpv)
         else:

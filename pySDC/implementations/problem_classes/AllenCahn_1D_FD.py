@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
@@ -18,45 +18,31 @@ class allencahn_front_fullyimplicit(ptype):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine
+    dtype_u = mesh
+    dtype_f = mesh
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
+    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, stop_at_nan=True):
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars'] + 1) % 2 != 0:
+        if (nvars + 1) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p - 1')
 
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_front_fullyimplicit, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
-        )
+        super().__init__((nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'stop_at_nan',
+            localVars=locals(), readOnly=True)
 
         # compute dx and get discretization matrix A
-        self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
-        self.xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
+        self.dx = (self.interval[1] - self.interval[0]) / (self.nvars + 1)
+        self.xvalues = np.array([(i + 1 - (self.nvars + 1) / 2) * self.dx for i in range(self.nvars)])
 
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=2,
             type='center',
             dx=self.dx,
-            size=self.params.nvars + 2,
+            size=self.nvars + 2,
             dim=1,
             bc='dirichlet-zero',
         )
@@ -82,20 +68,20 @@ class allencahn_front_fullyimplicit(ptype):
         """
 
         u = self.dtype_u(u0)
-        eps2 = self.params.eps**2
-        dw = self.params.dw
+        eps2 = self.eps**2
+        dw = self.dw
 
-        Id = sp.eye(self.params.nvars)
+        Id = sp.eye(self.nvars)
 
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
+        self.uext[0] = 0.5 * (1 + np.tanh((self.interval[0] - v * t) / (np.sqrt(2) * self.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.interval[1] - v * t) / (np.sqrt(2) * self.eps)))
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
             self.uext[1:-1] = u[:]
@@ -113,7 +99,7 @@ class allencahn_front_fullyimplicit(ptype):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg
@@ -127,16 +113,16 @@ class allencahn_front_fullyimplicit(ptype):
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
-            # u -= gmres(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
@@ -159,17 +145,17 @@ class allencahn_front_fullyimplicit(ptype):
             dtype_f: the RHS
         """
         # set up boundary values to embed inner points
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
+        self.uext[0] = 0.5 * (1 + np.tanh((self.interval[0] - v * t) / (np.sqrt(2) * self.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.interval[1] - v * t) / (np.sqrt(2) * self.eps)))
 
         self.uext[1:-1] = u[:]
 
         f = self.dtype_f(self.init)
         f[:] = (
             self.A.dot(self.uext)[1:-1]
-            - 2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
-            - 6.0 * self.params.dw * u * (1.0 - u)
+            - 2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
+            - 6.0 * self.dw * u * (1.0 - u)
         )
         return f
 
@@ -184,9 +170,9 @@ class allencahn_front_fullyimplicit(ptype):
             dtype_u: exact solution
         """
 
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
-        me[:] = 0.5 * (1 + np.tanh((self.xvalues - v * t) / (np.sqrt(2) * self.params.eps)))
+        me[:] = 0.5 * (1 + np.tanh((self.xvalues - v * t) / (np.sqrt(2) * self.eps)))
         return me
 
 
@@ -200,32 +186,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type with implicit and explicit components (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars'] + 1) % 2 != 0:
-            raise ProblemError('setup requires nvars = 2^p - 1')
-
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_front_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
+    dtype_f = imex_mesh
 
     def eval_f(self, u, t):
         """
@@ -239,15 +200,15 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
             dtype_f: the RHS
         """
         # set up boundary values to embed inner points
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
+        self.uext[0] = 0.5 * (1 + np.tanh((self.interval[0] - v * t) / (np.sqrt(2) * self.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.interval[1] - v * t) / (np.sqrt(2) * self.eps)))
 
         self.uext[1:-1] = u[:]
 
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(self.uext)[1:-1]
-        f.expl[:] = -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * self.params.dw * u * (1.0 - u)
+        f.expl[:] = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * self.dw * u * (1.0 - u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -268,7 +229,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         self.uext[0] = 0.0
         self.uext[-1] = 0.0
         self.uext[1:-1] = rhs[:]
-        me[:] = spsolve(sp.eye(self.params.nvars + 2, format='csc') - factor * self.A, self.uext)[1:-1]
+        me[:] = spsolve(sp.eye(self.nvars + 2, format='csc') - factor * self.A, self.uext)[1:-1]
         return me
 
 
@@ -294,20 +255,20 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         """
 
         u = self.dtype_u(u0)
-        dw = self.params.dw
-        a2 = np.tanh(self.dx / (np.sqrt(2) * self.params.eps)) ** 2
+        dw = self.dw
+        a2 = np.tanh(self.dx / (np.sqrt(2) * self.eps)) ** 2
 
-        Id = sp.eye(self.params.nvars)
+        Id = sp.eye(self.nvars)
 
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
+        self.uext[0] = 0.5 * (1 + np.tanh((self.interval[0] - v * t) / (np.sqrt(2) * self.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.interval[1] - v * t) / (np.sqrt(2) * self.eps)))
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
             self.uext[1:-1] = u[:]
@@ -317,7 +278,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg
@@ -335,16 +296,16 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
             # For some reason, doing cg or gmres does not work so well here...
-            # u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            # u -= cg(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
@@ -367,16 +328,16 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             dtype_f: the RHS
         """
         # set up boundary values to embed inner points
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
+        self.uext[0] = 0.5 * (1 + np.tanh((self.interval[0] - v * t) / (np.sqrt(2) * self.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.interval[1] - v * t) / (np.sqrt(2) * self.eps)))
 
         self.uext[1:-1] = u[:]
 
-        a2 = np.tanh(self.dx / (np.sqrt(2) * self.params.eps)) ** 2
+        a2 = np.tanh(self.dx / (np.sqrt(2) * self.eps)) ** 2
         gprim = 1.0 / self.dx**2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1) * (2.0 * u - 1.0)
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * self.params.dw * u * (1.0 - u)
+        f[:] = self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * self.dw * u * (1.0 - u)
         return f
 
 
@@ -390,45 +351,30 @@ class allencahn_periodic_fullyimplicit(ptype):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine
+    dtype_u = mesh
+    dtype_f = mesh
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'radius']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
+    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars']) % 2 != 0:
+        if (nvars) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p')
 
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_periodic_fullyimplicit, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
-        )
+        super().__init__((nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister('nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'radius',
+                                       'stop_at_nan', localVars=locals(), readOnly=True)
 
         # compute dx and get discretization matrix A
-        self.dx = (self.params.interval[1] - self.params.interval[0]) / self.params.nvars
-        self.xvalues = np.array([self.params.interval[0] + i * self.dx for i in range(self.params.nvars)])
+        self.dx = (self.interval[1] - self.interval[0]) / self.nvars
+        self.xvalues = np.array([self.interval[0] + i * self.dx for i in range(self.nvars)])
 
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=2,
             type='center',
             dx=self.dx,
-            size=self.params.nvars,
+            size=self.nvars,
             dim=1,
             bc='periodic',
         )
@@ -453,15 +399,15 @@ class allencahn_periodic_fullyimplicit(ptype):
         """
 
         u = self.dtype_u(u0)
-        eps2 = self.params.eps**2
-        dw = self.params.dw
+        eps2 = self.eps**2
+        dw = self.dw
 
-        Id = sp.eye(self.params.nvars)
+        Id = sp.eye(self.nvars)
 
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
             g = (
@@ -473,7 +419,7 @@ class allencahn_periodic_fullyimplicit(ptype):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg
@@ -487,16 +433,16 @@ class allencahn_periodic_fullyimplicit(ptype):
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
-            # u -= gmres(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
@@ -521,8 +467,8 @@ class allencahn_periodic_fullyimplicit(ptype):
         f = self.dtype_f(self.init)
         f[:] = (
             self.A.dot(u)
-            - 2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
-            - 6.0 * self.params.dw * u * (1.0 - u)
+            - 2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
+            - 6.0 * self.dw * u * (1.0 - u)
         )
         return f
 
@@ -537,9 +483,9 @@ class allencahn_periodic_fullyimplicit(ptype):
             dtype_u: exact solution
         """
 
-        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
+        v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
-        me[:] = 0.5 * (1 + np.tanh((self.params.radius - abs(self.xvalues) - v * t) / (np.sqrt(2) * self.params.eps)))
+        me[:] = 0.5 * (1 + np.tanh((self.radius - abs(self.xvalues) - v * t) / (np.sqrt(2) * self.eps)))
         return me
 
 
@@ -549,34 +495,11 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     with driving force, 0-1 formulation (Bayreuth example)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
+    dtype_f = imex_mesh
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'radius']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars']) % 2 != 0:
-            raise ProblemError('setup requires nvars = 2^p')
-
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_periodic_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
-
-        self.A -= sp.eye(self.init) * 0.0 / self.params.eps**2
+    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
+        super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
+        self.A -= sp.eye(self.init) * 0.0 / self.eps**2
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -593,7 +516,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         """
 
         me = self.dtype_u(u0)
-        me[:] = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs)
+        me[:] = spsolve(sp.eye(self.nvars, format='csc') - factor * self.A, rhs)
         return me
 
     def eval_f(self, u, t):
@@ -610,9 +533,9 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u)
         f.expl[:] = (
-            -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
-            - 6.0 * self.params.dw * u * (1.0 - u)
-            + 0.0 / self.params.eps**2 * u
+            -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+            - 6.0 * self.dw * u * (1.0 - u)
+            + 0.0 / self.eps**2 * u
         )
         return f
 
@@ -623,34 +546,11 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     with driving force, 0-1 formulation (Bayreuth example)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
-        """
-        Initialization routine
+    dtype_f = comp2_mesh
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval', 'radius']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars']) % 2 != 0:
-            raise ProblemError('setup requires nvars = 2^p')
-
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_periodic_multiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
-
-        self.A -= sp.eye(self.init[0]) * 0.0 / self.params.eps**2
+    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
+        super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
+        self.A -= sp.eye(self.init) * 0.0 / self.eps**2
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
@@ -667,7 +567,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         """
 
         me = self.dtype_u(u0)
-        me[:] = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs)
+        me[:] = spsolve(sp.eye(self.nvars, format='csc') - factor * self.A, rhs)
         return me
 
     def eval_f(self, u, t):
@@ -684,9 +584,9 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         f = self.dtype_f(self.init)
         f.comp1[:] = self.A.dot(u)
         f.comp2[:] = (
-            -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
-            - 6.0 * self.params.dw * u * (1.0 - u)
-            + 0.0 / self.params.eps**2 * u
+            -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+            - 6.0 * self.dw * u * (1.0 - u)
+            + 0.0 / self.eps**2 * u
         )
         return f
 
@@ -705,15 +605,15 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         """
 
         u = self.dtype_u(u0)
-        eps2 = self.params.eps**2
-        dw = self.params.dw
+        eps2 = self.eps**2
+        dw = self.dw
 
-        Id = sp.eye(self.params.nvars)
+        Id = sp.eye(self.nvars)
 
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
             g = (
@@ -723,35 +623,35 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
                 * (
                     -2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u)
                     - 6.0 * dw * u * (1.0 - u)
-                    + 0.0 / self.params.eps**2 * u
+                    + 0.0 / self.eps**2 * u
                 )
             )
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg
             dg = Id - factor * (
                 -2.0 / eps2 * sp.diags((1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0)
                 - 6.0 * dw * sp.diags((1.0 - u) - u, offsets=0)
-                + 0.0 / self.params.eps**2 * Id
+                + 0.0 / self.eps**2 * Id
             )
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
-            # u -= gmres(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
