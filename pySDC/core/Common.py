@@ -56,8 +56,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
         for name in names:
             try:
                 super().__setattr__(name, localVars[name])
-            # pragma: no cover
-            except KeyError:
+            except KeyError:  # pragma: no cover
                 raise ValueError(f'value for {name} not given in localVars')
         # Register as class parameter
         if readOnly:

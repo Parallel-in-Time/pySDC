@@ -1,10 +1,8 @@
 import pySDC.helpers.plot_helper as plt_helper
-import numpy as np
 import pickle
 
 
-# pragma: no cover
-def linear_plot():
+def linear_plot():  # pragma: no cover
     '''Loads solution data from an .npy file and plots specified parameters with respect to each other on a linear axis'''
 
     data = pickle.load(open("data/dae_conv_data.p", "rb"))

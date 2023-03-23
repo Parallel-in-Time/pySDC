@@ -70,7 +70,7 @@ class ProblemError(Exception):
     pass
 
 
-class ReadOnlyError(Exception):
+class ReadOnlyError(Exception):  # pragma: no cover
     """
     Exception thrown when setting a read-only class attribute
     """

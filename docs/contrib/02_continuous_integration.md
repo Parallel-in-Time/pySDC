@@ -56,7 +56,7 @@ This stage allows to checks how much of the `pySDC` code is tested by the previo
 - `pySDC/projects`
 - `pySDC/tutorial`
 
-This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork). 
+This analysis is done in parallel to the test each time a pull is done on any branch (main repository or fork).
 You can look at the current coverage report for the master branch [here](https://parallel-in-time.org/pySDC/coverage/index.html) or compare the results with previous builds [here](https://app.codecov.io/gh/Parallel-in-Time/pySDC). Codecov will also comment on any pull request, indicating the change of coverage.
 
 During developments, you can also run the coverage tests locally, using :
@@ -82,20 +82,18 @@ This will generate the coverage report in a `htmlcov` folder, and you can open t
 ### Coverage exceptions
 
 Some types of code lines will be ignored by the coverage analysis (_e.g_ lines starting with `raise`, ...), see the `[tool.coverage.report]` section in `pyproject.toml`.
-Part of code (functions, conditionaly, for loops, etc ...) can be ignored by coverage analysis using the `# pragma: no cover`, for instance 
+Part of code (functions, conditionaly, for loops, etc ...) can be ignored by coverage analysis using the `# pragma: no cover`, for instance
 
 ```python
 # ...
 # code analyzed by coverage
 # ...
-# pragma: no cover
-if condition:
+if condition:  # pragma: no cover
     # code ignored by coverage
 # ...
 # code analyzed by coverage
 # ...
-# pragma: no cover
-def function():
+def function():  # pragma: no cover
     # all function code is ignored by coverage
 ```
 
@@ -109,7 +107,7 @@ If you think the pragma should be used in other parts of your pull request, plea
 ## Documentation generation
 
 Documentation is built using [sphinx](https://www.sphinx-doc.org/en/master/).
-To check its generation, you can wait for all the CI tasks to download the `docs` artifacts, unzip it and open the `index.html` file there with you favorite browser. 
+To check its generation, you can wait for all the CI tasks to download the `docs` artifacts, unzip it and open the `index.html` file there with you favorite browser.
 
 However, when you are working on documentation (of the project, of the code, etc ...), you can already build and check the website locally :
 
@@ -124,7 +122,7 @@ sphinx-build -b html docs/source docs/build/html
 
 Then you can open `docs/build/html/index.html` using you favorite browser and check how your own documentation looks like on the website.
 
-> :bell: **Important** : running all the tests is necessary to generate graphs and images used by the website. 
+> :bell: **Important** : running all the tests is necessary to generate graphs and images used by the website.
 > But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
 > This approach can be considered for local testing of your contribution when it does not concern parts containing images (_i.e_ project or code documentation).
 

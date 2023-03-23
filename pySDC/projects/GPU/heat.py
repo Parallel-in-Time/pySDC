@@ -6,8 +6,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
-# pragma: no cover
-def set_parameter():
+def set_parameter():  # pragma: no cover
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 1
@@ -59,8 +58,7 @@ def set_parameter():
     return controller_params, description, t0, Tend
 
 
-# pragma: no cover
-def main():
+def main():  # pragma: no cover
     controller_params, description, t0, Tend = set_parameter()
 
     # fill description dictionary with CPU problem

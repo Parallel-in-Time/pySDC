@@ -9,8 +9,7 @@ from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
 
-# pragma: no cover
-class heatNd_forced(ptype):
+class heatNd_forced(ptype):  # pragma: no cover
     """
     Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,
     discretized using central finite differences
