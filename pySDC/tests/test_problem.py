@@ -42,9 +42,14 @@ def test_scipy_reference(init):
     assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
 
 
-@pytest.mark.base
 class TestBasics:
-    # TODO: basic tests with fenics should be done before the following import
+    # To avoid clash between dolfin and mpi4py, need to import dolfin first
+    try:
+        import dolfin as df
+    except ImportError:
+        pass
+    finally:
+        del df
 
     from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
 
