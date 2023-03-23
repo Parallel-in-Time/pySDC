@@ -42,6 +42,7 @@ def test_scipy_reference(init):
     assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
 
 
+@pytest.mark.base
 class TestBasics:
     # TODO: basic tests with fenics should be done before the following import
 
