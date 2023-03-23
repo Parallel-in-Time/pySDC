@@ -42,23 +42,17 @@ def test_scipy_reference(init):
     assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
 
 
+@pytest.mark.base
 class TestBasics:
-    # To avoid clash between dolfin and mpi4py, need to import dolfin first
-    try:
-        import dolfin as df
-    except ImportError:
-        pass
-    finally:
-        del df
+    PROBLEMS = {}
 
-    from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
+    def __init__(self):
+        from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
 
-    PROBLEMS = {
-        logistics_equation: {
+        self.PROBLEMS[logistics_equation] = {
             'probParams': dict(u0=2.0, newton_maxiter=100, newton_tol=1e-6, direct=True, lam=0.5, stop_at_nan=True),
             'testParams': {'tBeg': 0, 'tEnd': 1.0, 'nSteps': 1000, 'tol': 1e-3},
         }
-    }
 
     @pytest.mark.base
     @pytest.mark.parametrize('probType', PROBLEMS.keys())
