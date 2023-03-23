@@ -57,7 +57,7 @@ class ptype(RegisterParams):
     dtype_f = None
 
     def __init__(self, init):
-        self.work_counters = {}  # Dictionnary to store WorkCounter objects
+        self.work_counters = {}  # Dictionary to store WorkCounter objects
         self.init = init  # Initialization parameter to instantiate data types
 
     @property

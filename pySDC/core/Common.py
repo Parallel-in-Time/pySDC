@@ -54,6 +54,7 @@ class RegisterParams(metaclass=_MetaRegisterParams):
             raise ValueError("a dictionnary must be provided in localVars with parameters values")
         # Set parameters as attributes
         for name in names:
+            # pragma: no cover
             try:
                 super().__setattr__(name, localVars[name])
             except KeyError:
