@@ -3,13 +3,13 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - numpy>=1.15.4,<1.23
+  - numpy>=1.15.4
   - scipy>=0.17.1
   - matplotlib>=3.0
   - sympy>=1.0
   - numba>=0.35
   - dill>=0.2.6
-  - pytest<7.2.0
+  - pytest
   - pytest-benchmark
   - coverage[toml]
   - sphinx
