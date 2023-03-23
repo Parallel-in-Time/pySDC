@@ -88,7 +88,7 @@ class ptype(RegisterParams):
         """
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
 
-    def apply_mass_matrix(self, u):
+    def apply_mass_matrix(self, u):  # pragma: no cover
         """Default mass matrix : identity"""
         return u
 

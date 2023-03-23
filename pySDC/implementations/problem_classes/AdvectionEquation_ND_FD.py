@@ -76,7 +76,7 @@ class advectionNd(GenericNDimFinDiff):
     ):
         super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, solver_type, bc)
 
-        if solver_type == 'CG':
+        if solver_type == 'CG':  # pragma: no cover
             self.logger.warn('CG is not usually used for advection equation')
         self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
