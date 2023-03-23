@@ -16,8 +16,7 @@ class swfw_scalar(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    # TODO : choose default values
-    def __init__(self, lambda_s, lambda_f, u0):
+    def __init__(self, lambda_s=-1, lambda_f=-1000, u0=1):
         """
         Initialization routine
         """
