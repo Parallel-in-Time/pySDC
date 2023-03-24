@@ -16,9 +16,9 @@ authors:
     given-names: Lisa
     orcid: https://orcid.org/0000-0001-8829-0978
     affiliation: "University of Wuppertal, School of Mathematics and Natural Science, 42119 Wuppertal, Germany"
-version: 5.1.0
+version: 5.2.0
 doi: 10.5281/zenodo.594191
-date-released: 2023-01-23
+date-released: 2023-03-24
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"

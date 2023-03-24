@@ -2,6 +2,10 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their 
+    parameters explicitly with the constructor, and not with a dictionary (backward compatible, thanks @tlunet). The resilience project
+    now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the 
+    TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare `pySDC` for Version 6.
 -   January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website. 
     We revived the [codecov](https://app.codecov.io/gh/Parallel-in-Time/pySDC) connection and started the 
     [OpenSFF Best Practices](https://bestpractices.coreinfrastructure.org/en/projects/6909) guide. 
