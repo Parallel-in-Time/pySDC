@@ -40,8 +40,8 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
         problem_params['nvars'] = [tuple(64 for _ in range(ndim)), tuple(32 for _ in range(ndim))]  # number of dofs
     else:
         problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
-    problem_params['direct_solver'] = False  # do GMRES instead of LU
-    problem_params['liniter'] = 10  # number of GMRES iterations
+    problem_params['solver_type'] = 'CG'  # do CG instead of LU
+    problem_params['liniter'] = 10  # number of CG iterations
 
     # initialize step parameters
     step_params = dict()
@@ -105,7 +105,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
         problem_params['nvars'] = [tuple(64 for _ in range(ndim)), tuple(32 for _ in range(ndim))]  # number of dofs
     else:
         problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
-    problem_params['direct_solver'] = False  # do GMRES instead of LU
+    problem_params['solver_type'] = 'GMRES'  # do GMRES instead of LU
     problem_params['liniter'] = 10  # number of GMRES iterations
 
     # initialize step parameters

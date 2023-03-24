@@ -123,7 +123,7 @@ def main():
 
     results = dict()
     results['interval'] = problem_params['interval']
-    results['xvalues'] = np.array([(i + 1 - (P.params.nvars + 1) / 2) * P.dx for i in range(P.params.nvars)])
+    results['xvalues'] = np.array([(i + 1 - (P.nvars + 1) / 2) * P.dx for i in range(P.nvars)])
     results['uinit'] = uinit
     results['uend'] = uend
     results['uex'] = uex

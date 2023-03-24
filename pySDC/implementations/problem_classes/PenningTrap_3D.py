@@ -1,7 +1,7 @@
 import numpy as np
 from numba import jit
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
@@ -12,27 +12,14 @@ class penningtrap(ptype):
     Example implementing particles in a penning trap
     """
 
-    def __init__(self, problem_params, dtype_u=particles, dtype_f=fields):
-        """
-        Initialization routine
+    dtype_u = particles
+    dtype_f = fields
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: fields data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['omega_B', 'omega_E', 'u0', 'nparts', 'sig']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
+    def __init__(self, omega_B, omega_E, u0, nparts, sig):
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(penningtrap, self).__init__(
-            ((3, problem_params['nparts']), None, np.dtype('float64')), dtype_u, dtype_f, problem_params
-        )
+        super().__init__(((3, nparts), None, np.dtype('float64')))
+        self._makeAttributeAndRegister('nparts', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('omega_B', 'omega_E', 'u0', 'sig', localVars=locals())
 
     @staticmethod
     @jit(nopython=True, nogil=True)
@@ -67,9 +54,9 @@ class penningtrap(ptype):
 
         """
 
-        N = self.params.nparts
+        N = self.nparts
 
-        Efield = self.fast_interactions(N, part.pos, self.params.sig, part.q)
+        Efield = self.fast_interactions(N, part.pos, self.sig, part.q)
 
         return Efield
 
@@ -84,7 +71,7 @@ class penningtrap(ptype):
             dtype_f: Fields for the particles (internal and external)
         """
 
-        N = self.params.nparts
+        N = self.nparts
 
         Emat = np.diag([1, 1, -2])
         f = self.dtype_f(self.init)
@@ -92,11 +79,12 @@ class penningtrap(ptype):
         f.elec[:] = self.get_interactions(part)
 
         for n in range(N):
-            f.elec[:, n] += self.params.omega_E**2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
-            f.magn[:, n] = self.params.omega_B * np.array([0, 0, 1])
+            f.elec[:, n] += self.omega_E**2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
+            f.magn[:, n] = self.omega_B * np.array([0, 0, 1])
 
         return f
 
+    # TODO : Warning, this should be moved to u_exact(t=0) !
     def u_init(self):
         """
         Routine to compute the starting values for the particles
@@ -105,8 +93,8 @@ class penningtrap(ptype):
             dtype_u: particle set filled with initial data
         """
 
-        u0 = self.params.u0
-        N = self.params.nparts
+        u0 = self.u0
+        N = self.nparts
 
         u = self.dtype_u(self.init)
 
@@ -167,10 +155,10 @@ class penningtrap(ptype):
         """
 
         # some abbreviations
-        wE = self.params.omega_E
-        wB = self.params.omega_B
-        N = self.params.nparts
-        u0 = self.params.u0
+        wE = self.omega_E
+        wB = self.omega_B
+        N = self.nparts
+        u0 = self.u0
 
         if N != 1:
             raise ProblemError('u_exact is only valid for a single particle')
@@ -219,7 +207,7 @@ class penningtrap(ptype):
         if not isinstance(part, particles):
             raise ProblemError('something is wrong during build_f, got %s' % type(part))
 
-        N = self.params.nparts
+        N = self.nparts
 
         rhs = acceleration(self.init)
         for n in range(N):
@@ -242,7 +230,7 @@ class penningtrap(ptype):
             the velocities at the (m+1)th node
         """
 
-        N = self.params.nparts
+        N = self.nparts
         vel = particles.velocity(self.init)
 
         Emean = 0.5 * (old_fields.elec + new_fields.elec)

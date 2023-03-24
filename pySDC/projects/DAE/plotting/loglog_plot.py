@@ -6,8 +6,7 @@ import pickle
 import pySDC.helpers.plot_helper as plt_helper
 
 
-# pragma: no cover
-def plot_convergence():
+def plot_convergence():  # pragma: no cover
     '''
     Loads pickled error data for multiple preconditioners and collocation node count and plots it with respect to the time step size on a log-log axis.
     A new plot is generated for each preconditioner. Different collocation node counts are plotted on the same axes

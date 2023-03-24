@@ -32,7 +32,7 @@ class live_plot(hooks):  # pragma: no cover
         for ax in self.axs:
             ax.cla()
         [self.axs[0].plot(L.prob.xv, L.u[i], legend=f"node {i}") for i in range(len(L.u))]
-        self.axs[0].axhline(L.prob.params.u_thresh, color='black')
+        self.axs[0].axhline(L.prob.u_thresh, color='black')
         self.axs[1].plot(L.prob.xv, L.prob.eval_f_non_linear(L.u[-1], L.time))
         self.axs[0].set_ylim(0, 0.025)
         self.fig.suptitle(f"t={L.time:.2e}, k={step.status.iter}")
@@ -255,8 +255,8 @@ def compare_imex_full(plotting=False, leak_type='linear'):
     ), f"Difference between IMEX and fully-implicit too large! Got {diff:.2e}, allowed is only {thresh:.2e}!"
     prob = controller.MS[0].levels[0].prob
     assert (
-        max(res[True]) > prob.params.u_max
-    ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.params.u_max:.2e}!"
+        max(res[True]) > prob.u_max
+    ), f"Expected runaway to happen, but maximum temperature is {max(res[True]):.2e} < u_max={prob.u_max:.2e}!"
 
     assert (
         rhs[True] == rhs[False]

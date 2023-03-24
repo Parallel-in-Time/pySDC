@@ -20,7 +20,10 @@ class heat2d_petsc_forced(ptype):
         ksp: PETSc linear solver object
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_imex):
+    dtype_u = petsc_vec
+    dtype_f = petsc_vec_imex
+
+    def __init__(self, cnvars, nu, freq, refine, comm=PETSc.COMM_WORLD, sol_tol=1e-10, sol_maxiter=None):
         """
         Initialization routine
 
@@ -29,35 +32,29 @@ class heat2d_petsc_forced(ptype):
             dtype_u: PETSc data type (will be passed parent class)
             dtype_f: PETSc data type with implicit and explicit parts (will be passed parent class)
         """
-
-        # these parameters will be used later, so assert their existence
-
-        if 'comm' not in problem_params:
-            problem_params['comm'] = PETSc.COMM_WORLD
-        if 'sol_tol' not in problem_params:
-            problem_params['sol_tol'] = 1e-10
-        if 'sol_maxiter' not in problem_params:
-            problem_params['sol_maxiter'] = None
-
-        essential_keys = ['cnvars', 'nu', 'freq', 'comm', 'refine']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
         # make sure parameters have the correct form
-        if len(problem_params['cnvars']) != 2:
-            raise ProblemError('this is a 2d example, got %s' % problem_params['cnvars'])
+        if len(cnvars) != 2:
+            raise ProblemError('this is a 2d example, got %s' % cnvars)
 
         # create DMDA object which will be used for all grid operations
-        da = PETSc.DMDA().create(
-            [problem_params['cnvars'][0], problem_params['cnvars'][1]], stencil_width=1, comm=problem_params['comm']
-        )
-        for _ in range(problem_params['refine']):
+        da = PETSc.DMDA().create([cnvars[0], cnvars[1]], stencil_width=1, comm=comm)
+        for _ in range(refine):
             da = da.refine()
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat2d_petsc_forced, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super().__init__(init=da)
+        self._makeAttributeAndRegister(
+            'cnvars',
+            'nu',
+            'freq',
+            'comm',
+            'refine',
+            'comm',
+            'sol_tol',
+            'sol_maxiter',
+            localVars=locals(),
+            readOnly=True,
+        )
 
         # compute dx, dy and get local ranges
         self.dx = 1.0 / (self.init.getSizes()[0] - 1)
@@ -70,14 +67,14 @@ class heat2d_petsc_forced(ptype):
 
         # setup solver
         self.ksp = PETSc.KSP()
-        self.ksp.create(comm=self.params.comm)
+        self.ksp.create(comm=self.comm)
         self.ksp.setType('gmres')
         pc = self.ksp.getPC()
         pc.setType('none')
         # pc.setType('hypre')
         # self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
-        self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
+        self.ksp.setTolerances(rtol=self.sol_tol, atol=self.sol_tol, max_it=self.sol_maxiter)
 
         self.ksp_ncalls = 0
         self.ksp_itercount = 0
@@ -109,13 +106,13 @@ class heat2d_petsc_forced(ptype):
                 if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
                     A.setValueStencil(row, row, 1.0)
                 else:
-                    diag = self.params.nu * (-2.0 / self.dx**2 - 2.0 / self.dy**2)
+                    diag = self.nu * (-2.0 / self.dx**2 - 2.0 / self.dy**2)
                     for index, value in [
-                        ((i, j - 1), self.params.nu / self.dy**2),
-                        ((i - 1, j), self.params.nu / self.dx**2),
+                        ((i, j - 1), self.nu / self.dy**2),
+                        ((i - 1, j), self.nu / self.dx**2),
                         ((i, j), diag),
-                        ((i + 1, j), self.params.nu / self.dx**2),
-                        ((i, j + 1), self.params.nu / self.dy**2),
+                        ((i + 1, j), self.nu / self.dx**2),
+                        ((i, j + 1), self.nu / self.dy**2),
                     ]:
                         col.index = index
                         col.field = 0
@@ -173,9 +170,9 @@ class heat2d_petsc_forced(ptype):
         fa = self.init.getVecArray(f.expl)
         xv, yv = np.meshgrid(range(self.xs, self.xe), range(self.ys, self.ye), indexing='ij')
         fa[self.xs : self.xe, self.ys : self.ye] = (
-            -np.sin(np.pi * self.params.freq * xv * self.dx)
-            * np.sin(np.pi * self.params.freq * yv * self.dy)
-            * (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
+            -np.sin(np.pi * self.freq * xv * self.dx)
+            * np.sin(np.pi * self.freq * yv * self.dy)
+            * (np.sin(t) - self.nu * 2.0 * (np.pi * self.freq) ** 2 * np.cos(t))
         )
 
         return f
@@ -216,10 +213,6 @@ class heat2d_petsc_forced(ptype):
         xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j] = (
-                    np.sin(np.pi * self.params.freq * i * self.dx)
-                    * np.sin(np.pi * self.params.freq * j * self.dy)
-                    * np.cos(t)
-                )
+                xa[i, j] = np.sin(np.pi * self.freq * i * self.dx) * np.sin(np.pi * self.freq * j * self.dy) * np.cos(t)
 
         return me

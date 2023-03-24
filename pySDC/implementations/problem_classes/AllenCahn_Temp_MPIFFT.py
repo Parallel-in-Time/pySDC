@@ -1,7 +1,7 @@
 import numpy as np
 from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -22,7 +22,10 @@ class allencahn_temp_imex(ptype):
         dy: mesh width in y direction
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    dtype_u = mesh
+    dtype_f = imex_mesh
+
+    def __init__(self, nvars, eps, radius, spectral, TM, D, dw=0.0, L=1.0, init_type='circle', comm=None):
         """
         Initialization routine
 
@@ -31,46 +34,39 @@ class allencahn_temp_imex(ptype):
             dtype_u: fft data type (will be passed to parent class)
             dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
-
-        if 'L' not in problem_params:
-            problem_params['L'] = 1.0
-        if 'init_type' not in problem_params:
-            problem_params['init_type'] = 'circle'
-        if 'comm' not in problem_params:
-            problem_params['comm'] = None
-        if 'dw' not in problem_params:
-            problem_params['dw'] = 1.0
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw', 'spectral', 'TM', 'D']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
+        if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
         # creating FFT structure
-        ndim = len(problem_params['nvars'])
+        ndim = len(nvars)
         axes = tuple(range(ndim))
-        self.fft = PFFT(
-            problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64, collapse=True
-        )
+        self.fft = PFFT(comm, list(nvars), axes=axes, dtype=np.float64, collapse=True)
 
         # get test data to figure out type and dimensions
-        tmp_u = newDistArray(self.fft, problem_params['spectral'])
+        tmp_u = newDistArray(self.fft, spectral)
 
         # add two components to contain field and temperature
         self.ncomp = 2
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_temp_imex, self).__init__(
-            init=(sizes, problem_params['comm'], tmp_u.dtype), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        super().__init__(init=(sizes, comm, tmp_u.dtype))
+        self._makeAttributeAndRegister(
+            'nvars',
+            'eps',
+            'radius',
+            'spectral',
+            'TM',
+            'D',
+            'dw',
+            'L',
+            'init_type',
+            'comm',
+            localVars=locals(),
+            readOnly=True,
         )
 
-        L = np.array([self.params.L] * ndim, dtype=float)
+        L = np.array([self.L] * ndim, dtype=float)
 
         # get local mesh
         X = np.ogrid[self.fft.local_slice(False)]
@@ -94,8 +90,8 @@ class allencahn_temp_imex(ptype):
         self.K2 = np.sum(K * K, 0, dtype=float)
 
         # Need this for diagnostics
-        self.dx = self.params.L / problem_params['nvars'][0]
-        self.dy = self.params.L / problem_params['nvars'][1]
+        self.dx = self.L / nvars[0]
+        self.dy = self.L / nvars[1]
 
     def eval_f(self, u, t):
         """
@@ -111,20 +107,20 @@ class allencahn_temp_imex(ptype):
 
         f = self.dtype_f(self.init)
 
-        if self.params.spectral:
+        if self.spectral:
             f.impl[..., 0] = -self.K2 * u[..., 0]
 
-            if self.params.eps > 0:
+            if self.eps > 0:
                 tmp_u = newDistArray(self.fft, False)
                 tmp_T = newDistArray(self.fft, False)
                 tmp_u = self.fft.backward(u[..., 0], tmp_u)
                 tmp_T = self.fft.backward(u[..., 1], tmp_T)
-                tmpf = -2.0 / self.params.eps**2 * tmp_u * (1.0 - tmp_u) * (
-                    1.0 - 2.0 * tmp_u
-                ) - 6.0 * self.params.dw * (tmp_T - self.params.TM) / self.params.TM * tmp_u * (1.0 - tmp_u)
+                tmpf = -2.0 / self.eps**2 * tmp_u * (1.0 - tmp_u) * (1.0 - 2.0 * tmp_u) - 6.0 * self.dw * (
+                    tmp_T - self.TM
+                ) / self.TM * tmp_u * (1.0 - tmp_u)
                 f.expl[..., 0] = self.fft.forward(tmpf)
 
-            f.impl[..., 1] = -self.params.D * self.K2 * u[..., 1]
+            f.impl[..., 1] = -self.D * self.K2 * u[..., 1]
             f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
         else:
@@ -132,14 +128,12 @@ class allencahn_temp_imex(ptype):
             lap_u_hat = -self.K2 * u_hat
             f.impl[..., 0] = self.fft.backward(lap_u_hat, f.impl[..., 0])
 
-            if self.params.eps > 0:
-                f.expl[..., 0] = -2.0 / self.params.eps**2 * u[..., 0] * (1.0 - u[..., 0]) * (1.0 - 2.0 * u[..., 0])
-                f.expl[..., 0] -= (
-                    6.0 * self.params.dw * (u[..., 1] - self.params.TM) / self.params.TM * u[..., 0] * (1.0 - u[..., 0])
-                )
+            if self.eps > 0:
+                f.expl[..., 0] = -2.0 / self.eps**2 * u[..., 0] * (1.0 - u[..., 0]) * (1.0 - 2.0 * u[..., 0])
+                f.expl[..., 0] -= 6.0 * self.dw * (u[..., 1] - self.TM) / self.TM * u[..., 0] * (1.0 - u[..., 0])
 
             u_hat = self.fft.forward(u[..., 1])
-            lap_u_hat = -self.params.D * self.K2 * u_hat
+            lap_u_hat = -self.D * self.K2 * u_hat
             f.impl[..., 1] = self.fft.backward(lap_u_hat, f.impl[..., 1])
             f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
@@ -159,10 +153,10 @@ class allencahn_temp_imex(ptype):
             dtype_u: solution as mesh
         """
 
-        if self.params.spectral:
+        if self.spectral:
             me = self.dtype_u(self.init)
             me[..., 0] = rhs[..., 0] / (1.0 + factor * self.K2)
-            me[..., 1] = rhs[..., 1] / (1.0 + factor * self.params.D * self.K2)
+            me[..., 1] = rhs[..., 1] / (1.0 + factor * self.D * self.K2)
 
         else:
             me = self.dtype_u(self.init)
@@ -170,7 +164,7 @@ class allencahn_temp_imex(ptype):
             rhs_hat /= 1.0 + factor * self.K2
             me[..., 0] = self.fft.backward(rhs_hat)
             rhs_hat = self.fft.forward(rhs[..., 1])
-            rhs_hat /= 1.0 + factor * self.params.D * self.K2
+            rhs_hat /= 1.0 + factor * self.D * self.K2
             me[..., 1] = self.fft.backward(rhs_hat)
 
         return me
@@ -187,23 +181,23 @@ class allencahn_temp_imex(ptype):
         """
 
         def circle():
-            tmp_me = newDistArray(self.fft, self.params.spectral)
+            tmp_me = newDistArray(self.fft, self.spectral)
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
-            if self.params.spectral:
-                tmp = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+            if self.spectral:
+                tmp = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
                 tmp_me[:] = self.fft.forward(tmp)
             else:
-                tmp_me[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+                tmp_me[:] = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
             return tmp_me
 
         def circle_rand():
-            tmp_me = newDistArray(self.fft, self.params.spectral)
+            tmp_me = newDistArray(self.fft, self.spectral)
             ndim = len(tmp_me.shape)
-            L = int(self.params.L)
+            L = int(self.L)
             # get random radii for circles/spheres
             np.random.seed(1)
-            lbound = 3.0 * self.params.eps
-            ubound = 0.5 - self.params.eps
+            lbound = 3.0 * self.eps
+            ubound = 0.5 - self.eps
             rand_radii = (ubound - lbound) * np.random.random_sample(size=tuple([L] * ndim)) + lbound
             # distribute circles/spheres
             tmp = newDistArray(self.fft, False)
@@ -213,19 +207,19 @@ class allencahn_temp_imex(ptype):
                         # build radius
                         r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
-                        tmp += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
+                        tmp += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.eps)) + 1
             # normalize to [0,1]
             tmp *= 0.5
             assert np.all(tmp <= 1.0)
-            if self.params.spectral:
+            if self.spectral:
                 tmp_me[:] = self.fft.forward(tmp)
             else:
                 tmp_me[:] = tmp[:]
             return tmp_me
 
         def sine():
-            tmp_me = newDistArray(self.fft, self.params.spectral)
-            if self.params.spectral:
+            tmp_me = newDistArray(self.fft, self.spectral)
+            if self.spectral:
                 tmp = 0.5 * (2.0 + 0.0 * np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
                 tmp_me[:] = self.fft.forward(tmp)
             else:
@@ -234,14 +228,14 @@ class allencahn_temp_imex(ptype):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
-        if self.params.init_type == 'circle':
+        if self.init_type == 'circle':
             me[..., 0] = circle()
             me[..., 1] = sine()
-        elif self.params.init_type == 'circle_rand':
+        elif self.init_type == 'circle_rand':
             me[..., 0] = circle_rand()
             me[..., 1] = sine()
         else:
-            raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
+            raise NotImplementedError('type of initial value not implemented, got %s' % self.init_type)
 
         return me
 
@@ -266,29 +260,29 @@ class allencahn_temp_imex(ptype):
 #
 #         f = self.dtype_f(self.init)
 #
-#         if self.params.spectral:
+#         if self.spectral:
 #
 #             f.impl = -self.K2 * u
 #
 #             tmp = newDistArray(self.fft, False)
 #             tmp[:] = self.fft.backward(u, tmp)
 #
-#             if self.params.eps > 0:
-#                 tmpf = -2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp)
+#             if self.eps > 0:
+#                 tmpf = -2.0 / self.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp)
 #             else:
 #                 tmpf = self.dtype_f(self.init, val=0.0)
 #
 #             # build sum over RHS without driving force
 #             Rt_local = float(np.sum(self.fft.backward(f.impl) + tmpf))
-#             if self.params.comm is not None:
-#                 Rt_global = self.params.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+#             if self.comm is not None:
+#                 Rt_global = self.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
 #             else:
 #                 Rt_global = Rt_local
 #
 #             # build sum over driving force term
 #             Ht_local = float(np.sum(6.0 * tmp * (1.0 - tmp)))
-#             if self.params.comm is not None:
-#                 Ht_global = self.params.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+#             if self.comm is not None:
+#                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
 #             else:
 #                 Ht_global = Rt_local
 #
@@ -307,20 +301,20 @@ class allencahn_temp_imex(ptype):
 #             lap_u_hat = -self.K2 * u_hat
 #             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 #
-#             if self.params.eps > 0:
-#                 f.expl = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+#             if self.eps > 0:
+#                 f.expl = -2.0 / self.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u)
 #
 #             # build sum over RHS without driving force
 #             Rt_local = float(np.sum(f.impl + f.expl))
-#             if self.params.comm is not None:
-#                 Rt_global = self.params.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+#             if self.comm is not None:
+#                 Rt_global = self.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
 #             else:
 #                 Rt_global = Rt_local
 #
 #             # build sum over driving force term
 #             Ht_local = float(np.sum(6.0 * u * (1.0 - u)))
-#             if self.params.comm is not None:
-#                 Ht_global = self.params.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+#             if self.comm is not None:
+#                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
 #             else:
 #                 Ht_global = Rt_local
 #

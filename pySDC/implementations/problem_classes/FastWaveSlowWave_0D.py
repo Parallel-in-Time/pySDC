@@ -13,27 +13,16 @@ class swfw_scalar(ptype):
     Attributes:
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    dtype_u = mesh
+    dtype_f = imex_mesh
+
+    def __init__(self, lambda_s=-1, lambda_f=-1000, u0=1):
         """
         Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['lambda_s', 'lambda_f', 'u0']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        init = ([problem_params['lambda_s'].size, problem_params['lambda_f'].size], None, np.dtype('complex128'))
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(swfw_scalar, self).__init__(init, dtype_u, dtype_f, problem_params)
+        init = ([lambda_s.size, lambda_f.size], None, np.dtype('complex128'))
+        super().__init__(init)
+        self._makeAttributeAndRegister('lambda_s', 'lambda_f', 'u0', localVars=locals(), readOnly=True)
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -50,9 +39,9 @@ class swfw_scalar(ptype):
         """
 
         me = self.dtype_u(self.init)
-        for i in range(self.params.lambda_s.size):
-            for j in range(self.params.lambda_f.size):
-                me[i, j] = rhs[i, j] / (1.0 - factor * self.params.lambda_f[j])
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                me[i, j] = rhs[i, j] / (1.0 - factor * self.lambda_f[j])
 
         return me
 
@@ -69,9 +58,9 @@ class swfw_scalar(ptype):
         """
 
         fexpl = self.dtype_u(self.init)
-        for i in range(self.params.lambda_s.size):
-            for j in range(self.params.lambda_f.size):
-                fexpl[i, j] = self.params.lambda_s[i] * u[i, j]
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                fexpl[i, j] = self.lambda_s[i] * u[i, j]
         return fexpl
 
     def __eval_fimpl(self, u, t):
@@ -87,9 +76,9 @@ class swfw_scalar(ptype):
         """
 
         fimpl = self.dtype_u(self.init)
-        for i in range(self.params.lambda_s.size):
-            for j in range(self.params.lambda_f.size):
-                fimpl[i, j] = self.params.lambda_f[j] * u[i, j]
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                fimpl[i, j] = self.lambda_f[j] * u[i, j]
 
         return fimpl
 
@@ -122,7 +111,7 @@ class swfw_scalar(ptype):
         """
 
         me = self.dtype_u(self.init)
-        for i in range(self.params.lambda_s.size):
-            for j in range(self.params.lambda_f.size):
-                me[i, j] = self.params.u0 * np.exp((self.params.lambda_f[j] + self.params.lambda_s[i]) * t)
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                me[i, j] = self.u0 * np.exp((self.lambda_f[j] + self.lambda_s[i]) * t)
         return me

@@ -6,7 +6,6 @@ import numpy as np
 @pytest.mark.base
 def test_pendulum_u_exact_main():
     from pySDC.projects.DAE.problems.simple_DAE import pendulum_2d
-    from pySDC.implementations.datatype_classes.mesh import mesh
 
     # initialize problem parameters
     problem_params = dict()
@@ -14,7 +13,7 @@ def test_pendulum_u_exact_main():
     problem_params['nvars'] = 5
 
     # instantiate problem
-    prob = pendulum_2d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = pendulum_2d(**problem_params)
 
     # ignore using warning while checking error
     warnings.filterwarnings('ignore')
@@ -36,7 +35,6 @@ def test_pendulum_u_exact_main():
 @pytest.mark.base
 def test_one_transistor_amplifier_u_exact_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
-    from pySDC.implementations.datatype_classes.mesh import mesh
 
     # initialize problem parameters
     problem_params = dict()
@@ -44,7 +42,7 @@ def test_one_transistor_amplifier_u_exact_main():
     problem_params['nvars'] = 5
 
     # instantiate problem
-    prob = one_transistor_amplifier(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = one_transistor_amplifier(**problem_params)
 
     # ignore using warning while checking error
     warnings.filterwarnings('ignore')
@@ -66,7 +64,6 @@ def test_one_transistor_amplifier_u_exact_main():
 @pytest.mark.base
 def test_two_transistor_amplifier_u_exact_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import two_transistor_amplifier
-    from pySDC.implementations.datatype_classes.mesh import mesh
 
     # initialize problem parameters
     problem_params = dict()
@@ -74,7 +71,7 @@ def test_two_transistor_amplifier_u_exact_main():
     problem_params['nvars'] = 8
 
     # instantiate problem
-    prob = two_transistor_amplifier(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = two_transistor_amplifier(**problem_params)
 
     # ignore using warning while checking error
     warnings.filterwarnings('ignore')

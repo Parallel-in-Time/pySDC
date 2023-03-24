@@ -29,12 +29,12 @@ class mesh_to_mesh_fft2d(space_transfer):
         super(mesh_to_mesh_fft2d, self).__init__(fine_prob, coarse_prob, params)
 
         # TODO: cleanup and move to real-valued FFT
-        assert len(self.fine_prob.params.nvars) == 2
-        assert len(self.coarse_prob.params.nvars) == 2
-        assert self.fine_prob.params.nvars[0] == self.fine_prob.params.nvars[1]
-        assert self.coarse_prob.params.nvars[0] == self.coarse_prob.params.nvars[1]
+        assert len(self.fine_prob.nvars) == 2
+        assert len(self.coarse_prob.nvars) == 2
+        assert self.fine_prob.nvars[0] == self.fine_prob.nvars[1]
+        assert self.coarse_prob.nvars[0] == self.coarse_prob.nvars[1]
 
-        self.ratio = int(self.fine_prob.params.nvars[0] / self.coarse_prob.params.nvars[0])
+        self.ratio = int(self.fine_prob.nvars[0] / self.coarse_prob.nvars[0])
 
     def restrict(self, F):
         """

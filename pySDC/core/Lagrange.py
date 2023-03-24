@@ -74,6 +74,12 @@ class LagrangeApproximation(object):
     are the barycentric weights.
     The theory and implementation is inspired from `this paper <http://dx.doi.org/10.1137/S0036144502417715>`_.
 
+    Parameters
+    ----------
+    points : list, tuple or np.1darray
+        The given interpolation points, no specific scaling, but must be
+        ordered in increasing order.
+
     Attributes
     ----------
     points : np.1darray
@@ -83,14 +89,6 @@ class LagrangeApproximation(object):
     """
 
     def __init__(self, points):
-        """
-
-        Parameters
-        ----------
-        points : list, tuple or np.1darray
-            The given interpolation points, no specific scaling, but must be
-            ordered in increasing order.
-        """
         points = np.asarray(points).ravel()
 
         diffs = points[:, None] - points[None, :]

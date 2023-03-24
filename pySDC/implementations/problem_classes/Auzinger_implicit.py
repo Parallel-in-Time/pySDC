@@ -1,6 +1,5 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -11,7 +10,10 @@ class auzinger(ptype):
     Example implementing the Auzinger initial value problem
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    dtype_u = mesh
+    dtype_f = mesh
+
+    def __init__(self, newton_maxiter, newton_tol):
         """
         Initialization routine
 
@@ -20,16 +22,9 @@ class auzinger(ptype):
             dtype_u: mesh data type (will be passed to parent class)
             dtype_f: mesh data type (will be passed to parent class)
         """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['newton_maxiter', 'newton_tol']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(auzinger, self).__init__((2, None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
+        super().__init__((2, None, np.dtype('float64')))
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
     def u_exact(self, t):
         """
@@ -85,7 +80,7 @@ class auzinger(ptype):
 
         # start newton iteration
         n = 0
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # form the function g with g(u) = 0
             g = np.array(
                 [
@@ -97,7 +92,7 @@ class auzinger(ptype):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.newton_tol:
+            if res < self.newton_tol:
                 break
 
             # assemble dg and invert the matrix (yeah, I know)

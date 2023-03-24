@@ -11,35 +11,15 @@ class harmonic_oscillator(ptype):
     Example implementing the harmonic oscillator
     """
 
-    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
-        """
-        Initialization routine
+    dtype_u = particles
+    dtype_f = acceleration
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed to parent class)
-            dtype_f: acceleration data type (will be passed to parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        problem_params["phase"] = 1.0
-        problem_params["amp"] = 0.0
-        essential_keys = ["k", "mu", "u0", "phase", "amp"]
-
-        for key in essential_keys:
-            if key == "mu" and key not in problem_params:
-                problem_params["mu"] = 0.0
-            if key == "u0" and key not in problem_params:
-                problem_params["u0"] = np.array([1, 0])
-            elif key not in problem_params:
-                msg = "need %s to instantiate problem, only got %s" % (
-                    key,
-                    str(problem_params.keys()),
-                )
-                raise ParameterError(msg)
-
+    def __init__(self, k, mu=0.0, u0=(1, 0), phase=1.0, amp=0.0):
+        """Initialization routine"""
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(harmonic_oscillator, self).__init__((1, None, np.dtype("float64")), dtype_u, dtype_f, problem_params)
+        u0 = np.asarray(u0)
+        super().__init__((1, None, np.dtype("float64")))
+        self._makeAttributeAndRegister('k', 'mu', 'u0', 'phase', 'amp', localVars=locals(), readOnly=True)
 
     def eval_f(self, u, t):
         """
@@ -52,11 +32,11 @@ class harmonic_oscillator(ptype):
             dtype_f: RHS
         """
         me = self.dtype_f(self.init)
-        me[:] = -self.params.k * u.pos - self.params.mu * u.vel
+        me[:] = -self.k * u.pos - self.mu * u.vel
         return me
 
     def u_init(self):
-        u0 = self.params.u0
+        u0 = self.u0
 
         u = self.dtype_u(self.init)
 
@@ -75,12 +55,12 @@ class harmonic_oscillator(ptype):
             dtype_u: exact position and velocity
         """
         me = self.dtype_u(self.init)
-        delta = self.params.mu / (2)
-        omega = np.sqrt(self.params.k)
+        delta = self.mu / (2)
+        omega = np.sqrt(self.k)
 
-        U_0 = self.params.u0
+        U_0 = self.u0
         alpha = np.sqrt(np.abs(delta**2 - omega**2))
-        print(self.params.mu)
+        print(self.mu)
         if delta > omega:
             """
             Overdamped case
@@ -132,5 +112,5 @@ class harmonic_oscillator(ptype):
             float: hamiltonian
         """
 
-        ham = 0.5 * self.params.k * u.pos[0] ** 2 + 0.5 * u.vel[0] ** 2
+        ham = 0.5 * self.k * u.pos[0] ** 2 + 0.5 * u.vel[0] ** 2
         return ham

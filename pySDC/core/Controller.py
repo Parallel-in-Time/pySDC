@@ -185,12 +185,11 @@ class controller(object):
                     else:
                         out += '            %s = %s\n' % (k, v)
             out += '-->         Problem: %s\n' % L.prob.__class__
-            for k, v in vars(L.prob.params).items():
-                if not k.startswith('_'):
-                    if k in description['problem_params']:
-                        out += '-->             %s = %s\n' % (k, v)
-                    else:
-                        out += '                %s = %s\n' % (k, v)
+            for k, v in L.prob.params.items():
+                if k in description['problem_params']:
+                    out += '-->             %s = %s\n' % (k, v)
+                else:
+                    out += '                %s = %s\n' % (k, v)
             out += '-->             Data type u: %s\n' % L.prob.dtype_u
             out += '-->             Data type f: %s\n' % L.prob.dtype_f
             out += '-->             Sweeper: %s\n' % L.sweep.__class__

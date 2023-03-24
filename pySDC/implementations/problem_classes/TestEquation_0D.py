@@ -16,7 +16,11 @@ class testequation0d(ptype):
         A: digonal matrix containing the parameters
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    dtype_u = mesh
+    dtype_f = mesh
+
+    # TODO : add default values
+    def __init__(self, lambdas, u0):
         """
         Initialization routine
 
@@ -25,29 +29,15 @@ class testequation0d(ptype):
             dtype_u: mesh data type for solution
             dtype_f: mesh data type for RHS
         """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['lambdas', 'u0']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        assert not any(isinstance(i, list) for i in problem_params['lambdas']), (
-            'ERROR: expect flat list here, got %s' % problem_params['lambdas']
-        )
-        problem_params['nvars'] = len(problem_params['lambdas'])
-        assert problem_params['nvars'] > 0, 'ERROR: expect at least one lambda parameter here'
+        assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
+        nvars = len(lambdas)
+        assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(testequation0d, self).__init__(
-            init=(problem_params['nvars'], None, np.dtype('complex128')),
-            dtype_u=dtype_u,
-            dtype_f=dtype_f,
-            params=problem_params,
-        )
+        super().__init__(init=(nvars, None, np.dtype('complex128')))
 
-        self.A = self.__get_A(self.params.lambdas)
+        self.A = self.__get_A(lambdas)
+        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
 
     @staticmethod
     def __get_A(lambdas):
@@ -95,7 +85,7 @@ class testequation0d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.params.nvars, format='csc') - factor * self.A)
+        L = splu(sp.eye(self.nvars, format='csc') - factor * self.A)
         me[:] = L.solve(rhs)
         return me
 
@@ -111,5 +101,5 @@ class testequation0d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = self.params.u0 * np.exp(t * np.array(self.params.lambdas))
+        me[:] = self.u0 * np.exp(t * np.array(self.lambdas))
         return me

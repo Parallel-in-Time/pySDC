@@ -1,12 +1,10 @@
 import os
-import numpy as np
 import pickle
 
 import pySDC.helpers.plot_helper as plt_helper
 
 
-# pragma: no cover
-def plot_convergence():
+def plot_convergence():  # pragma: no cover
     '''
     Loads pickled error data for multiple preconditioners and collocation node counts and plots it with respect to the max. iteration count
     The y axis is logarithmically scaled. The x axis is linearly scaled.

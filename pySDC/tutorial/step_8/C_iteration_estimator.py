@@ -31,7 +31,6 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['ndim'] = ndim  # will be iterated over
     problem_params['order'] = 8  # order of accuracy for FD discretization in space
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['bc'] = 'periodic'  # boundary conditions
@@ -40,8 +39,8 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
         problem_params['nvars'] = [tuple(64 for _ in range(ndim)), tuple(32 for _ in range(ndim))]  # number of dofs
     else:
         problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
-    problem_params['direct_solver'] = False  # do GMRES instead of LU
-    problem_params['liniter'] = 10  # number of GMRES iterations
+    problem_params['solver_type'] = 'CG'  # do CG instead of LU
+    problem_params['liniter'] = 10  # number of CG iterations
 
     # initialize step parameters
     step_params = dict()
@@ -95,9 +94,8 @@ def setup_advection(dt=None, ndim=None, ml=False):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['ndim'] = ndim  # will be iterated over
     problem_params['order'] = 6  # order of accuracy for FD discretization in space
-    problem_params['type'] = 'center'  # order of accuracy for FD discretization in space
+    problem_params['stencil_type'] = 'center'  # order of accuracy for FD discretization in space
     problem_params['bc'] = 'periodic'  # boundary conditions
     problem_params['c'] = 0.1  # diffusion coefficient
     problem_params['freq'] = tuple(2 for _ in range(ndim))  # frequencies
@@ -105,7 +103,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
         problem_params['nvars'] = [tuple(64 for _ in range(ndim)), tuple(32 for _ in range(ndim))]  # number of dofs
     else:
         problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
-    problem_params['direct_solver'] = False  # do GMRES instead of LU
+    problem_params['solver_type'] = 'GMRES'  # do GMRES instead of LU
     problem_params['liniter'] = 10  # number of GMRES iterations
 
     # initialize step parameters

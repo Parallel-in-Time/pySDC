@@ -117,7 +117,7 @@ class fully_implicit_DAE(sweeper):
             # options['disp'] = True
             # See link for how different methods use the default tol parameter
             # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220
-            options['xtol'] = P.params.newton_tol
+            options['xtol'] = P.newton_tol
             options['eps'] = 1e-7
             opt = optimize.root(
                 impl_fn,

@@ -21,7 +21,7 @@ class LogLambdas(hooks):
     def pre_run(self, step, level_number):
         super().pre_run(step, level_number)
         L = step.levels[level_number]
-        self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='lambdas', value=L.prob.params.lambdas)
+        self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='lambdas', value=L.prob.lambdas)
 
 
 hooks = [LogLambdas, LogSolutionAfterIteration, LogStepSize]

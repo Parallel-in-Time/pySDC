@@ -1,6 +1,5 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
@@ -11,31 +10,17 @@ class outer_solar_system(ptype):
     Example implementing the outer solar system problem
     """
 
-    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
-        """
-        Initialization routine
+    dtype_u = particles
+    dtype_f = acceleration
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
-        """
+    G = 2.95912208286e-4
 
-        if 'sun_only' not in problem_params:
-            problem_params['sun_only'] = False
+    def __init__(self, sun_only=False):
+        """Initialization routine"""
 
-        # these parameters will be used later, so assert their existence
-        essential_keys = []
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # invoke super init, passing nparts, dtype_u and dtype_f
-        super(outer_solar_system, self).__init__(((3, 6), None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
-
-        # gravitational constant
-        self.G = 2.95912208286e-4
+        # invoke super init, passing nparts
+        super().__init__(((3, 6), None, np.dtype('float64')))
+        self._makeAttributeAndRegister('sun_only', localVars=locals())
 
     def eval_f(self, u, t):
         """
@@ -51,7 +36,7 @@ class outer_solar_system(ptype):
 
         # compute the acceleration due to gravitational forces
         # ... only with respect to the sun
-        if self.params.sun_only:
+        if self.sun_only:
             for i in range(1, self.init[0][-1]):
                 dx = u.pos[:, i] - u.pos[:, 0]
                 r = np.sqrt(np.dot(dx, dx))

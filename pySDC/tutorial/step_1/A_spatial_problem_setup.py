@@ -1,7 +1,6 @@
 import numpy as np
 from pathlib import Path
 
-from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 
@@ -9,16 +8,13 @@ def main():
     """
     A simple test program to set up a spatial problem and play with it
     """
-
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
-    problem_params['nvars'] = 1023  # number of degrees of freedom
-    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
-
     # instantiate problem
-    prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = heatNd_unforced(
+        nvars=1023,  # number of degrees of freedom
+        nu=0.1,  # diffusion coefficient
+        freq=4,  # frequency for the test value
+        bc='dirichlet-zero',  # boundary conditions
+    )
 
     # run accuracy test, get error back
     err = run_accuracy_check(prob)
@@ -45,15 +41,15 @@ def run_accuracy_check(prob):
     """
 
     # create x values, use only inner points
-    xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars[0])])
+    xvalues = np.array([(i + 1) * prob.dx for i in range(prob.nvars[0])])
 
     # create a mesh instance and fill it with a sine wave
     u = prob.dtype_u(init=prob.init)
-    u[:] = np.sin(np.pi * prob.params.freq[0] * xvalues)
+    u[:] = np.sin(np.pi * prob.freq[0] * xvalues)
 
     # create a mesh instance and fill it with the Laplacian of the sine wave
     u_lap = prob.dtype_u(init=prob.init)
-    u_lap[:] = -((np.pi * prob.params.freq[0]) ** 2) * prob.params.nu * np.sin(np.pi * prob.params.freq[0] * xvalues)
+    u_lap[:] = -((np.pi * prob.freq[0]) ** 2) * prob.nu * np.sin(np.pi * prob.freq[0] * xvalues)
 
     # compare analytic and computed solution using the eval_f routine of the problem class
     err = abs(prob.eval_f(u, 0) - u_lap)

@@ -1,7 +1,6 @@
 import numpy as np
-from scipy.integrate import solve_ivp
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -10,34 +9,22 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 class vanderpol(ptype):
     """
     Example implementing the van der pol oscillator
+
+    TODO : doku
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    dtype_u = mesh
+    dtype_f = mesh
+
+    def __init__(self, u0, mu, newton_maxiter, newton_tol, stop_at_nan=True, crash_at_maxiter=True):
         """
         Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
         """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['u0', 'mu', 'newton_maxiter', 'newton_tol']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-        problem_params['nvars'] = 2
-
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-        if 'crash_at_maxiter' not in problem_params:
-            problem_params['crash_at_maxiter'] = True
-
-        # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(vanderpol, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        nvars = 2
+        super().__init__((nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister('nvars', 'u0', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter', localVars=locals()
         )
         self.work_counters['newton'] = WorkCounter()
 
@@ -63,7 +50,7 @@ class vanderpol(ptype):
 
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
         else:
-            me[:] = self.params.u0[:]
+            me[:] = self.u0
         return me
 
     def eval_f(self, u, t):
@@ -79,9 +66,9 @@ class vanderpol(ptype):
 
         x1 = u[0]
         x2 = u[1]
-        f = self.dtype_f(self.init)
+        f = self.f_init
         f[0] = x2
-        f[1] = self.params.mu * (1 - x1**2) * x2 - x1
+        f[1] = self.mu * (1 - x1**2) * x2 - x1
         return f
 
     def solve_system(self, rhs, dt, u0, t):
@@ -98,7 +85,7 @@ class vanderpol(ptype):
             dtype_u: solution u
         """
 
-        mu = self.params.mu
+        mu = self.mu
 
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
@@ -108,13 +95,13 @@ class vanderpol(ptype):
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # form the function g with g(u) = 0
             g = np.array([x1 - dt * x2 - rhs[0], x2 - dt * (mu * (1 - x1**2) * x2 - x1) - rhs[1]])
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
-            if res < self.params.newton_tol or np.isnan(res):
+            if res < self.newton_tol or np.isnan(res):
                 break
 
             # prefactor for dg/du
@@ -131,12 +118,12 @@ class vanderpol(ptype):
             n += 1
             self.work_counters['newton']()
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter and self.params.crash_at_maxiter:
+        if n == self.newton_maxiter and self.crash_at_maxiter:
             raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u

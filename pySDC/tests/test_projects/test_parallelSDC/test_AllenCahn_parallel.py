@@ -5,7 +5,12 @@ import pytest
 def test_main():
     from pySDC.projects.parallelSDC.AllenCahn_parallel import main
 
-    # try to import MPI here, will fail if things go wrong (and not later on in the subprocess part)
-    import mpi4py
+    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
+    try:
+        import mpi4py
+
+        del mpi4py
+    except ImportError:
+        raise ImportError('petsc tests need mpi4py')
 
     main()

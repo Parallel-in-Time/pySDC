@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -12,30 +12,14 @@ class nonlinear_ODE_1(ptype):
     https://www.osti.gov/servlets/purl/6111421 (Problem E-4)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine
+    dtype_u = mesh
+    dtype_f = mesh
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['u0', 'newton_maxiter', 'newton_tol']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-        problem_params['nvars'] = 1
-
-        if 'stop_at_nan' not in problem_params:
-            problem_params['stop_at_nan'] = True
-
-        # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(nonlinear_ODE_1, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+    def __init__(self, u0, newton_maxiter, newton_tol, stop_at_nan=True):
+        nvars = 1
+        super().__init__((nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
 
     def u_exact(self, t):
@@ -86,13 +70,13 @@ class nonlinear_ODE_1(ptype):
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.newton_maxiter:
+        while n < self.newton_maxiter:
             # form the function g with g(u) = 0
             g = u - dt * np.sqrt(1 - u) - rhs
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
-            if res < self.params.newton_tol or np.isnan(res):
+            if res < self.newton_tol or np.isnan(res):
                 break
 
             # assemble dg/du
@@ -103,12 +87,12 @@ class nonlinear_ODE_1(ptype):
             # increase iteration count
             n += 1
 
-        if np.isnan(res) and self.params.stop_at_nan:
+        if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.newton_maxiter:
             raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u

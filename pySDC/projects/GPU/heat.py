@@ -6,16 +6,15 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
-def set_parameter():
+def set_parameter():  # pragma: no cover
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 1
     problem_params['freq'] = (4, 4, 4)
     problem_params['order'] = 2
-    problem_params['ndim'] = 3
     problem_params['lintol'] = 1e-10
     problem_params['liniter'] = 99
-    problem_params['direct_solver'] = False
+    problem_params['solver_type'] = 'CG'
     problem_params['nvars'] = (32, 32, 32)
     problem_params['bc'] = 'periodic'
 
@@ -59,7 +58,7 @@ def set_parameter():
     return controller_params, description, t0, Tend
 
 
-def main():
+def main():  # pragma: no cover
     controller_params, description, t0, Tend = set_parameter()
 
     # fill description dictionary with CPU problem

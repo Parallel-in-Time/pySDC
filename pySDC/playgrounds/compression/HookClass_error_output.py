@@ -46,7 +46,7 @@ class error_output(hooks):
 
         description = step.params.description
         description['level_params']['restol'] = 1e-14
-        description['problem_params']['direct_solver'] = True
+        description['problem_params']['solver_type'] = 'direct'
         description['convergence_controllers'] = {}
 
         controller_params = step.params.controller_params

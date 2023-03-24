@@ -2,7 +2,7 @@ import numpy as np
 from mpi4py import MPI
 from mpi4py_fft import PFFT
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -22,7 +22,10 @@ class nonlinearschroedinger_imex(ptype):
         K2: Laplace operator in spectral space
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    dtype_u = mesh
+    dtype_f = imex_mesh
+
+    def __init__(self, nvars, spectral, L=2 * np.pi, c=1.0, comm=MPI.COMM_WORLD):
         """
         Initialization routine
 
@@ -31,51 +34,28 @@ class nonlinearschroedinger_imex(ptype):
             dtype_u: fft data type (will be passed to parent class)
             dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
+        if not L == 2.0 * np.pi:
+            raise ProblemError(f'Setup not implemented, L has to be 2pi, got {L}')
 
-        if 'L' not in problem_params:
-            problem_params['L'] = 2.0 * np.pi
-        # if 'init_type' not in problem_params:
-        #     problem_params['init_type'] = 'circle'
-        if 'comm' not in problem_params:
-            problem_params['comm'] = MPI.COMM_WORLD
-        if 'c' not in problem_params:
-            problem_params['c'] = 1.0
+        if not (c == 0.0 or c == 1.0):
+            raise ProblemError(f'Setup not implemented, c has to be 0 or 1, got {c}')
 
-        if not problem_params['L'] == 2.0 * np.pi:
-            raise ProblemError(f'Setup not implemented, L has to be 2pi, got {problem_params["L"]}')
-
-        if not (problem_params['c'] == 0.0 or problem_params['c'] == 1.0):
-            raise ProblemError(f'Setup not implemented, c has to be 0 or 1, got {problem_params["c"]}')
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'c', 'L', 'spectral']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
+        if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
         # Creating FFT structure
-        self.ndim = len(problem_params['nvars'])
+        self.ndim = len(nvars)
         axes = tuple(range(self.ndim))
-        self.fft = PFFT(
-            problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.complex128, collapse=True
-        )
+        self.fft = PFFT(comm, list(nvars), axes=axes, dtype=np.complex128, collapse=True)
 
         # get test data to figure out type and dimensions
-        tmp_u = newDistArray(self.fft, problem_params['spectral'])
+        tmp_u = newDistArray(self.fft, spectral)
+
+        L = np.array([L] * self.ndim, dtype=float)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(nonlinearschroedinger_imex, self).__init__(
-            init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
-            dtype_u=dtype_u,
-            dtype_f=dtype_f,
-            params=problem_params,
-        )
-
-        self.L = np.array([self.params.L] * self.ndim, dtype=float)
+        super(nonlinearschroedinger_imex, self).__init__(init=(tmp_u.shape, comm, tmp_u.dtype))
+        self._makeAttributeAndRegister('nvars', 'spectral', 'L', 'c', 'comm', localVars=locals(), readOnly=True)
 
         # get local mesh
         X = np.ogrid[self.fft.local_slice(False)]
@@ -98,8 +78,8 @@ class nonlinearschroedinger_imex(ptype):
         self.K2 = np.sum(K * K, 0, dtype=float)
 
         # Need this for diagnostics
-        self.dx = self.params.L / problem_params['nvars'][0]
-        self.dy = self.params.L / problem_params['nvars'][1]
+        self.dx = self.L / nvars[0]
+        self.dy = self.L / nvars[1]
 
     def eval_f(self, u, t):
         """
@@ -115,17 +95,17 @@ class nonlinearschroedinger_imex(ptype):
 
         f = self.dtype_f(self.init)
 
-        if self.params.spectral:
+        if self.spectral:
             f.impl = -self.K2 * 1j * u
             tmp = self.fft.backward(u)
-            tmpf = self.ndim * self.params.c * 2j * np.absolute(tmp) ** 2 * tmp
+            tmpf = self.ndim * self.c * 2j * np.absolute(tmp) ** 2 * tmp
             f.expl[:] = self.fft.forward(tmpf)
 
         else:
             u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * 1j * u_hat
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
-            f.expl = self.ndim * self.params.c * 2j * np.absolute(u) ** 2 * u
+            f.expl = self.ndim * self.c * 2j * np.absolute(u) ** 2 * u
 
         return f
 
@@ -143,7 +123,7 @@ class nonlinearschroedinger_imex(ptype):
             dtype_u: solution as mesh
         """
 
-        if self.params.spectral:
+        if self.spectral:
             me = rhs / (1.0 + factor * self.K2 * 1j)
 
         else:
@@ -176,10 +156,10 @@ class nonlinearschroedinger_imex(ptype):
 
         me = self.dtype_u(self.init, val=0.0)
 
-        if self.params.spectral:
-            tmp = nls_exact_1D(self.ndim * t, sum(self.X), self.params.c)
+        if self.spectral:
+            tmp = nls_exact_1D(self.ndim * t, sum(self.X), self.c)
             me[:] = self.fft.forward(tmp)
         else:
-            me[:] = nls_exact_1D(self.ndim * t, sum(self.X), self.params.c)
+            me[:] = nls_exact_1D(self.ndim * t, sum(self.X), self.c)
 
         return me

@@ -3,7 +3,6 @@ import logging
 import dolfin as df
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
@@ -22,7 +21,10 @@ class fenics_heat_weak_fullyimplicit(ptype):
         bc: boundary conditions
     """
 
-    def __init__(self, problem_params, dtype_u=fenics_mesh, dtype_f=fenics_mesh):
+    dtype_u = fenics_mesh
+    dtype_f = fenics_mesh
+
+    def __init__(self, c_nvars, t0, family, order, refinements, nu):
         """
         Initialization routine
 
@@ -38,10 +40,6 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
         # these parameters will be used later, so assert their existence
         essential_keys = ['c_nvars', 't0', 'family', 'order', 'refinements', 'nu']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
 
         # set logger level for FFC and dolfin
         logging.getLogger('ULF').setLevel(logging.WARNING)
@@ -53,30 +51,33 @@ class fenics_heat_weak_fullyimplicit(ptype):
         df.parameters["form_compiler"]["cpp_optimize"] = True
 
         # set mesh and refinement (for multilevel)
-        mesh = df.UnitIntervalMesh(problem_params['c_nvars'])
-        for _ in range(problem_params['refinements']):
+        mesh = df.UnitIntervalMesh(c_nvars)
+        for _ in range(refinements):
             mesh = df.refine(mesh)
 
         # define function space for future reference
-        self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
+        self.V = df.FunctionSpace(mesh, family, order)
         tmp = df.Function(self.V)
         print('DoFs on this level:', len(tmp.vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_heat_weak_fullyimplicit, self).__init__(self.V, dtype_u, dtype_f, problem_params)
+        super(fenics_heat_weak_fullyimplicit, self).__init__(self.V)
+        self._makeAttributeAndRegister(
+            'c_nvars', 't0', 'family', 'order', 'refinements', 'nu', localVars=locals(), readOnly=True
+        )
 
         self.g = df.Expression(
             '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
             a=np.pi,
-            b=self.params.nu,
-            t=self.params.t0,
-            degree=self.params.order,
+            b=self.nu,
+            t=self.t0,
+            degree=self.order,
         )
 
         # rhs in weak form
         self.w = df.Function(self.V)
         v = df.TestFunction(self.V)
-        self.a_K = -self.params.nu * df.inner(df.nabla_grad(self.w), df.nabla_grad(v)) * df.dx + self.g * v * df.dx
+        self.a_K = -self.nu * df.inner(df.nabla_grad(self.w), df.nabla_grad(v)) * df.dx + self.g * v * df.dx
 
         # mass matrix
         u = df.TrialFunction(self.V)
@@ -183,7 +184,7 @@ class fenics_heat_weak_fullyimplicit(ptype):
             dtype_u: exact solution
         """
 
-        u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
+        u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
         me = self.dtype_u(self.V)
         me.values = df.interpolate(u0, self.V)
 
@@ -203,7 +204,10 @@ class fenics_heat_weak_imex(ptype):
         bc: boundary conditions
     """
 
-    def __init__(self, problem_params, dtype_u=fenics_mesh, dtype_f=rhs_fenics_mesh):
+    dtype_u = fenics_mesh
+    dtype_f = rhs_fenics_mesh
+
+    def __init__(self, c_nvars, t0, family, order, refinements, nu):
         """
         Initialization routine
 
@@ -217,13 +221,6 @@ class fenics_heat_weak_imex(ptype):
         def Boundary(x, on_boundary):
             return on_boundary
 
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['c_nvars', 't0', 'family', 'order', 'refinements', 'nu']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
         # set logger level for FFC and dolfin
         logging.getLogger('ULF').setLevel(logging.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
@@ -234,30 +231,33 @@ class fenics_heat_weak_imex(ptype):
         df.parameters["form_compiler"]["cpp_optimize"] = True
 
         # set mesh and refinement (for multilevel)
-        mesh = df.UnitIntervalMesh(problem_params['c_nvars'])
-        for _ in range(problem_params['refinements']):
+        mesh = df.UnitIntervalMesh(c_nvars)
+        for _ in range(refinements):
             mesh = df.refine(mesh)
 
         # define function space for future reference
-        self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
+        self.V = df.FunctionSpace(mesh, family, order)
         tmp = df.Function(self.V)
         print('DoFs on this level:', len(tmp.vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_heat_weak_imex, self).__init__(self.V, dtype_u, dtype_f, problem_params)
+        super(fenics_heat_weak_imex, self).__init__(self.V)
+        self._makeAttributeAndRegister(
+            'c_nvars', 't0', 'family', 'order', 'refinements', 'nu', localVars=locals(), readOnly=True
+        )
 
         self.g = df.Expression(
             '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
             a=np.pi,
-            b=self.params.nu,
-            t=self.params.t0,
-            degree=self.params.order,
+            b=self.nu,
+            t=self.t0,
+            degree=self.order,
         )
 
         # rhs in weak form
         self.u = df.TrialFunction(self.V)
         self.v = df.TestFunction(self.V)
-        self.a_K = -self.params.nu * df.inner(df.grad(self.u), df.grad(self.v)) * df.dx
+        self.a_K = -self.nu * df.inner(df.grad(self.u), df.grad(self.v)) * df.dx
 
         # mass matrix
         a_M = self.u * self.v * df.dx
@@ -336,7 +336,7 @@ class fenics_heat_weak_imex(ptype):
         """
 
         tmp = self.dtype_u(self.V)
-        tmp.values.vector()[:] = df.assemble(-self.params.nu * df.inner(df.grad(u.values), df.grad(self.v)) * df.dx)
+        tmp.values.vector()[:] = df.assemble(-self.nu * df.inner(df.grad(u.values), df.grad(self.v)) * df.dx)
         fimpl = self.__invert_mass_matrix(tmp)
 
         return fimpl
@@ -369,7 +369,7 @@ class fenics_heat_weak_imex(ptype):
             dtype_u: exact solution
         """
 
-        u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
+        u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
         me = self.dtype_u(df.interpolate(u0, self.V))
 
         return me

@@ -3,7 +3,6 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class pendulum_2d(ptype_dae):
@@ -12,11 +11,11 @@ class pendulum_2d(ptype_dae):
     The pendulum is used in most introductory literature on DAEs, for example on page 8 of "The numerical solution of differential-algebraic systems by Runge-Kutta methods" by Hairer et al.
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, nvars, newton_tol):
         """
         Initialization routine for the problem class
         """
-        super(pendulum_2d, self).__init__(problem_params, dtype_u, dtype_f)
+        super().__init__(nvars, newton_tol)
         # load reference solution
         data = np.load(r'pySDC/projects/DAE/misc/data/pendulum.npy')
         t = data[:, 0]
@@ -65,12 +64,6 @@ class simple_dae_1(ptype_dae):
     See, for example, page 267 of "computer methods for ODEs and DAEs" by Ascher and Petzold
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine for the problem class
-        """
-        super(simple_dae_1, self).__init__(problem_params, dtype_u, dtype_f)
-
     def eval_f(self, u, du, t):
         """
         Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
@@ -110,12 +103,12 @@ class problematic_f(ptype_dae):
     See, for example, page 264 of "computer methods for ODEs and DAEs" by Ascher and Petzold
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh, eta=1):
+    def __init__(self, nvars, newton_tol, eta=1):
         """
         Initialization routine for the problem class
         """
-        self.eta = eta
-        super().__init__(problem_params, dtype_u, dtype_f)
+        super().__init__(nvars, newton_tol)
+        self._makeAttributeAndRegister('eta', localVars=locals())
 
     def eval_f(self, u, du, t):
         """

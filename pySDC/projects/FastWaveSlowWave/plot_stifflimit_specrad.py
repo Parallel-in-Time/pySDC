@@ -74,11 +74,8 @@ def compute_specrad():
         assert nnodes == nodes_v[i], 'Something went wrong during instantiation, nnodes is not correct, got %s' % nnodes
 
         for j in range(0, 2):
-            LHS = np.eye(nnodes) - dt * (P.params.lambda_f[j] * QI + P.params.lambda_s[0] * QE)
-            RHS = dt * (
-                (P.params.lambda_f[j] + P.params.lambda_s[0]) * Q
-                - (P.params.lambda_f[j] * QI + P.params.lambda_s[0] * QE)
-            )
+            LHS = np.eye(nnodes) - dt * (P.lambda_f[j] * QI + P.lambda_s[0] * QE)
+            RHS = dt * ((P.lambda_f[j] + P.lambda_s[0]) * Q - (P.lambda_f[j] * QI + P.lambda_s[0] * QE))
             evals, evecs = np.linalg.eig(np.linalg.inv(LHS).dot(RHS))
             specrad[j + 1, i] = np.linalg.norm(evals, np.inf)
             norm[j + 1, i] = np.linalg.norm(np.linalg.inv(LHS).dot(RHS), np.inf)

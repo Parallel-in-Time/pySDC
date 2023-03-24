@@ -11,7 +11,7 @@ def test_FD_eigenvalues(equation):
     from pySDC.projects.Resilience.FDeigenvalues import get_finite_difference_eigenvalues
 
     order = 2
-    type = 'center'
+    stencil_type = 'center'
     dx = 0.1
     L = 1.0
     N = int(L // dx)
@@ -25,7 +25,7 @@ def test_FD_eigenvalues(equation):
         expect = 1.0j / (dx) * (np.sin(2 * np.pi * n / N))
 
     assert np.allclose(
-        expect, get_finite_difference_eigenvalues(derivative, order, type, dx=dx, L=L)
+        expect, get_finite_difference_eigenvalues(derivative, order, stencil_type, dx=dx, L=L)
     ), f"Error when doing {equation}"
 
 

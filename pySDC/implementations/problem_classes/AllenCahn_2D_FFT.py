@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -18,7 +18,10 @@ class allencahn2d_imex(ptype):
         irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    dtype_u = mesh
+    dtype_f = imex_mesh
+
+    def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
         """
         Initialization routine
 
@@ -28,45 +31,31 @@ class allencahn2d_imex(ptype):
             dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
-        if 'L' not in problem_params:
-            problem_params['L'] = 1.0
-        if 'init_type' not in problem_params:
-            problem_params['init_type'] = 'circle'
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'nu', 'eps', 'L', 'radius']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if len(problem_params['nvars']) != 2:
-            raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
-        if problem_params['nvars'][0] != problem_params['nvars'][1]:
-            raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
-        if problem_params['nvars'][0] % 2 != 0:
+        if len(nvars) != 2:
+            raise ProblemError('this is a 2d example, got %s' % nvars)
+        if nvars[0] != nvars[1]:
+            raise ProblemError('need a square domain, got %s' % nvars)
+        if nvars[0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn2d_imex, self).__init__(
-            init=(problem_params['nvars'], None, np.dtype('float64')),
-            dtype_u=dtype_u,
-            dtype_f=dtype_f,
-            params=problem_params,
+        super().__init__(init=(nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
+            'nvars', 'nu', 'eps', 'radius', 'L', 'init_type', localVars=locals(), readOnly=True
         )
 
-        self.dx = self.params.L / self.params.nvars[0]  # could be useful for hooks, too.
-        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
+        self.dx = self.L / self.nvars[0]  # could be useful for hooks, too.
+        self.xvalues = np.array([i * self.dx - self.L / 2.0 for i in range(self.nvars[0])])
 
         kx = np.zeros(self.init[0][0])
         ky = np.zeros(self.init[0][1] // 2 + 1)
 
-        kx[: int(self.init[0][0] / 2) + 1] = 2 * np.pi / self.params.L * np.arange(0, int(self.init[0][0] / 2) + 1)
+        kx[: int(self.init[0][0] / 2) + 1] = 2 * np.pi / self.L * np.arange(0, int(self.init[0][0] / 2) + 1)
         kx[int(self.init[0][0] / 2) + 1 :] = (
-            2 * np.pi / self.params.L * np.arange(int(self.init[0][0] / 2) + 1 - self.init[0][0], 0)
+            2 * np.pi / self.L * np.arange(int(self.init[0][0] / 2) + 1 - self.init[0][0], 0)
         )
-        ky[:] = 2 * np.pi / self.params.L * np.arange(0, self.init[0][1] // 2 + 1)
+        ky[:] = 2 * np.pi / self.L * np.arange(0, self.init[0][1] // 2 + 1)
 
         xv, yv = np.meshgrid(kx, ky, indexing='ij')
         self.lap = -(xv**2) - yv**2
@@ -87,8 +76,8 @@ class allencahn2d_imex(ptype):
         v = u.flatten()
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
-        if self.params.eps > 0:
-            f.expl[:] = (1.0 / self.params.eps**2 * v * (1.0 - v**self.params.nu)).reshape(self.params.nvars)
+        if self.eps > 0:
+            f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -128,16 +117,16 @@ class allencahn2d_imex(ptype):
         me = self.dtype_u(self.init, val=0.0)
 
         if t == 0:
-            if self.params.init_type == 'circle':
+            if self.init_type == 'circle':
                 xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
-                me[:, :] = np.tanh((self.params.radius - np.sqrt(xv**2 + yv**2)) / (np.sqrt(2) * self.params.eps))
-            elif self.params.init_type == 'checkerboard':
+                me[:, :] = np.tanh((self.radius - np.sqrt(xv**2 + yv**2)) / (np.sqrt(2) * self.eps))
+            elif self.init_type == 'checkerboard':
                 xv, yv = np.meshgrid(self.xvalues, self.xvalues)
                 me[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
-            elif self.params.init_type == 'random':
+            elif self.init_type == 'random':
                 me[:, :] = np.random.uniform(-1, 1, self.init)
             else:
-                raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
+                raise NotImplementedError('type of initial value not implemented, got %s' % self.init_type)
         else:
 
             def eval_rhs(t, u):
@@ -162,18 +151,9 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
-        """
-        super(allencahn2d_imex_stab, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
-
-        self.lap -= 2.0 / self.params.eps**2
+    def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
+        super().__init__(nvars, nu, eps, radius, L, init_type)
+        self.lap -= 2.0 / self.eps**2
 
     def eval_f(self, u, t):
         """
@@ -191,10 +171,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         v = u.flatten()
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
-        if self.params.eps > 0:
-            f.expl[:] = (
-                1.0 / self.params.eps**2 * v * (1.0 - v**self.params.nu) + 2.0 / self.params.eps**2 * v
-            ).reshape(self.params.nvars)
+        if self.eps > 0:
+            f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu) + 2.0 / self.eps**2 * v).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):

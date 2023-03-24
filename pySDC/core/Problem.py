@@ -1,74 +1,96 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Description
+-----------
+
+Module containing the base Problem class for pySDC
+"""
+
 import logging
 
-from pySDC.helpers.pysdc_helper import FrozenClass
-
-
-# short helper class to add params as attributes
-class _Pars(FrozenClass):
-    def __init__(self, pars):
-        for k, v in pars.items():
-            setattr(self, k, v)
-
-        self._freeze()
+from pySDC.core.Common import RegisterParams
 
 
 class WorkCounter(object):
     """
-    Class for counting iterations
+    Utility class for counting iterations.
+
+    Contains one attribute `niter` initialized to zero during
+    instantiation, which can be incremented by calling object as
+    a function, e.g
+
+    >>> count = WorkCounter()  # => niter = 0
+    >>> count()                # => niter = 1
+    >>> count()                # => niter = 2
     """
 
     def __init__(self):
         self.niter = 0
 
     def __call__(self, *args, **kwargs):
+        # *args and **kwargs are necessary for gmres
         self.niter += 1
 
 
-class ptype(object):
+class ptype(RegisterParams):
     """
-    Prototype class for problems, just defines the attributes essential to get started
+    Prototype class for problems, just defines the attributes essential to get started.
 
-    Attributes:
-        logger: custom logger for problem-related logging
-        params (__Pars): parameter object containing the custom parameters passed by the user
-        init: number of degrees-of-freedom (whatever this may represent)
-        dtype_u: variable data type
-        dtype_f: RHS data type
+    Parameters
+    ----------
+    init : list of args
+        Argument(s) used to initialize data types.
+    dtype_u : type
+        Variable data type. Should generate a data variable using dtype_u(init).
+    dtype_f : type
+        RHS data type. Should generate a data variable using dtype_f(init).
+
+    Attributes
+    ----------
+    logger: logging.Logger
+        custom logger for problem-related logging.
     """
 
-    def __init__(self, init, dtype_u, dtype_f, params):
-        """
-        Initialization routine
+    logger = logging.getLogger('problem')
+    dtype_u = None
+    dtype_f = None
 
-        Args:
-            init: number of degrees-of-freedom (whatever this may represent)
-            dtype_u: variable data type
-            dtype_f: RHS data type
-            params (dict): set or parameters
-        """
+    def __init__(self, init):
+        self.work_counters = {}  # Dictionary to store WorkCounter objects
+        self.init = init  # Initialization parameter to instantiate data types
 
-        self.params = _Pars(params)
-        self.work_counters = {}
+    @property
+    def u_init(self):
+        """Generate a data variable for u"""
+        return self.dtype_u(self.init)
 
-        # set up logger
-        self.logger = logging.getLogger('problem')
-
-        # pass initialization parameter and data types
-        self.init = init
-        self.dtype_u = dtype_u
-        self.dtype_f = dtype_f
+    @property
+    def f_init(self):
+        """Generate a data variable for RHS"""
+        return self.dtype_f(self.init)
 
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        f : dtype_f
+            The RHS values.
         """
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
 
-    def apply_mass_matrix(self, u):
-        """
-        Abstract interface to apply mass matrix (only needed for FEM)
-        """
-        raise NotImplementedError('ERROR: if you want a mass matrix, implement apply_mass_matrix(u)')
+    def apply_mass_matrix(self, u):  # pragma: no cover
+        """Default mass matrix : identity"""
+        return u
 
     def generate_scipy_reference_solution(self, eval_rhs, t, u_init=None, t_init=None, **kwargs):
         """

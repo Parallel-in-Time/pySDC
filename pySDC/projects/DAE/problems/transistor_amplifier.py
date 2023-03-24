@@ -3,7 +3,6 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # Helper function
@@ -17,8 +16,8 @@ class one_transistor_amplifier(ptype_dae):
     The problem is an index-1 DAE
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        super(one_transistor_amplifier, self).__init__(problem_params, dtype_u, dtype_f)
+    def __init__(self, nvars, newton_tol):
+        super().__init__(nvars, newton_tol)
         # load reference solution
         data = np.load(r'pySDC/projects/DAE/misc/data/one_trans_amp.npy')
         x = data[:, 0]
@@ -76,8 +75,8 @@ class two_transistor_amplifier(ptype_dae):
     The problem is an index-1 DAE
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        super(two_transistor_amplifier, self).__init__(problem_params, dtype_u, dtype_f)
+    def __init__(self, nvars, newton_tol):
+        super().__init__(nvars, newton_tol)
         # load reference solution
         data = np.load(r'pySDC/projects/DAE/misc/data/two_trans_amp.npy')
         x = data[:, 0]

@@ -1,5 +1,6 @@
 # Test some functionality of the core problem module
 import pytest
+import numpy as np
 
 
 @pytest.mark.base
@@ -17,11 +18,10 @@ def test_scipy_reference(init):
     Returns:
         None
     """
-    import numpy as np
     from pySDC.core.Problem import ptype
 
     # instantiate a dummy problem
-    problem = ptype(init, None, None, {})
+    problem = ptype(init)
 
     # setup random initial conditions
     u0 = np.random.rand(*init[0])
@@ -38,9 +38,44 @@ def test_scipy_reference(init):
     # check that the two solutions are the same to high degree
     assert (
         u_ref.shape == u_exact.shape
-    ), f"The shape of the scipy reference solution does not match the shape of the actual solution"
-    assert np.allclose(u_ref, u_exact, atol=1e-12), f"The scipy solution deviates significantly from the exact solution"
+    ), "The shape of the scipy reference solution does not match the shape of the actual solution"
+    assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
+
+
+@pytest.mark.base
+class TestBasics:
+    PROBLEMS = {}
+
+    def __init__(self):
+        from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
+
+        self.PROBLEMS[logistics_equation] = {
+            'probParams': dict(u0=2.0, newton_maxiter=100, newton_tol=1e-6, direct=True, lam=0.5, stop_at_nan=True),
+            'testParams': {'tBeg': 0, 'tEnd': 1.0, 'nSteps': 1000, 'tol': 1e-3},
+        }
+
+    @pytest.mark.base
+    @pytest.mark.parametrize('probType', PROBLEMS.keys())
+    def test_uExact_accuracy(self, probType):
+        params = self.PROBLEMS[probType]['probParams']
+        prob = probType(**params)
+
+        testParams = self.PROBLEMS[probType]['testParams']
+        tBeg = testParams['tBeg']
+        tEnd = testParams['tEnd']
+        nSteps = testParams['nSteps']
+        dt = (tEnd - tBeg) / nSteps
+        uNum = prob.u_exact(tBeg)
+        for n in range(nSteps):
+            uNum = uNum + dt * prob.eval_f(uNum, tBeg + n * dt)
+
+        assert np.linalg.norm(prob.u_exact(tEnd) - uNum, ord=np.inf) < testParams['tol']
 
 
 if __name__ == '__main__':
     test_scipy_reference([(2, 3)])
+
+    from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
+
+    prob = TestBasics()
+    prob.test_uExact_accuracy(logistics_equation)

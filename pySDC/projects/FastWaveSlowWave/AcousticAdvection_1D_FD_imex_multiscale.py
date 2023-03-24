@@ -28,9 +28,9 @@ class acoustic_1d_imex_multiscale(acoustic_1d_imex):
         ms = 1.0
 
         me = self.dtype_u(self.init)
-        me[0, :] = np.exp(-np.square(self.mesh - x_0 - self.params.cs * t) / (sigma_0 * sigma_0)) + ms * np.exp(
-            -np.square(self.mesh - x_1 - self.params.cs * t) / (sigma_0 * sigma_0)
-        ) * np.cos(k * (self.mesh - self.params.cs * t) / sigma_0)
+        me[0, :] = np.exp(-np.square(self.mesh - x_0 - self.cs * t) / (sigma_0 * sigma_0)) + ms * np.exp(
+            -np.square(self.mesh - x_1 - self.cs * t) / (sigma_0 * sigma_0)
+        ) * np.cos(k * (self.mesh - self.cs * t) / sigma_0)
         me[1, :] = me[0, :]
 
         return me
