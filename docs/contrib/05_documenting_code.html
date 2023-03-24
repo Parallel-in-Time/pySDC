@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Documenting Code &#8212; pySDC 5.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documenting Code</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="documenting-code">
+<span id="docs-contrib-05-documenting-code-documenting-code"></span><h1>Documenting Code<a class="headerlink" href="#documenting-code" title="Permalink to this heading">¶</a></h1>
+<p>When developing a new class or function, or improving current classes in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>, adding Python docstring to document the code is important, in particular :</p>
+<ul class="simple">
+<li><p>to help developer understanding how classes and functions work when reading the code</p></li>
+<li><p>to help user understanding how classes and functions work when reading the <a class="reference external" href="https://parallel-in-time.org/pySDC/#api-documentation">documentation</a></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">pySDC</span></code> follows the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">NumPy Style Python Docstring</a>, below is simplified example
+for a class and a function :</p>
+<blockquote>
+<div><p>🔔 Don’t document the <code class="docutils literal notranslate"><span class="pre">init</span></code> function, but rather the class itself. Also describe parameters (given to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code>) and attributes (stored into the class) separately.</p>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LagrangeApproximation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class approximating any function on a given set of points using barycentric</span>
+<span class="sd">    Lagrange interpolation.</span>
+
+<span class="sd">    Let note :math:`(t_j)_{0\leq j&lt;n}` the set of points, then any scalar</span>
+<span class="sd">    function :math:`f` can be approximated by the barycentric formula :</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        p(x) =</span>
+<span class="sd">        \frac{\displaystyle \sum_{j=0}^{n-1}\frac{w_j}{x-x_j}f_j}</span>
+<span class="sd">        {\displaystyle \sum_{j=0}^{n-1}\frac{w_j}{x-x_j}},</span>
+
+<span class="sd">    where :math:`f_j=f(t_j)` and</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}</span>
+
+<span class="sd">    are the barycentric weights.</span>
+<span class="sd">    The theory and implementation is inspired from `this paper &lt;http://dx.doi.org/10.1137/S0036144502417715&gt;`_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : list, tuple or np.1darray</span>
+<span class="sd">        The given interpolation points, no specific scaling, but must be</span>
+<span class="sd">        ordered in increasing order.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : np.1darray</span>
+<span class="sd">        The interpolating points</span>
+<span class="sd">    weights : np.1darray</span>
+<span class="sd">        The associated barycentric weights</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+        <span class="k">pass</span>  <span class="c1"># Implementation ...</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of points&quot;&quot;&quot;</span>
+        <span class="k">pass</span>  <span class="c1"># Implementation ...</span>
+
+    <span class="k">def</span> <span class="nf">getInterpolationMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the interpolation matrix for a given set of discrete &quot;time&quot;</span>
+<span class="sd">        points.</span>
+
+<span class="sd">        For instance, if we note :math:`\vec{f}` the vector containing the</span>
+<span class="sd">        :math:`f_j=f(t_j)` values, and :math:`(\tau_m)_{0\leq m&lt;M}`</span>
+<span class="sd">        the &quot;time&quot; points where to interpolate.</span>
+<span class="sd">        Then :math:`I[\vec{f}]`, the vector containing the interpolated</span>
+<span class="sd">        :math:`f(\tau_m)` values, can be obtained using :</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            I[\vec{f}] = P_{Inter} \vec{f},</span>
+
+<span class="sd">        where :math:`P_{Inter}` is the interpolation matrix returned by this</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        times : list-like or np.1darray</span>
+<span class="sd">            The discrete &quot;time&quot; points where to interpolate the function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PInter : np.2darray(M, n)</span>
+<span class="sd">            The interpolation matrix, with :math:`M` rows (size of the **times**</span>
+<span class="sd">            parameter) and :math:`n` columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>  <span class="c1"># Implementation ...</span>
+</pre></div>
+</div>
+<p>A more detailed example is given <a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html">here …</a></p>
+<p>⬅️ <a class="reference internal" href="04_custom_implementations.html"><span class="doc">Back to custom implementations</span></a> —
+⬆️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Contributing Summary</span></a> —
+➡️ <a class="reference external" href="https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background">Next to a cute picture of cat</a></p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/docs/contrib/05_documenting_code.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Documenting Code</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

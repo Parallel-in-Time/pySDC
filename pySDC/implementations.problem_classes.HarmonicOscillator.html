@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.HarmonicOscillator module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.HarmonicOscillator module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.GrayScott_MPIFFT.html" title="implementations.problem_classes.GrayScott_MPIFFT module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HarmonicOscillator module</a></li> 
@@ -51,9 +51,21 @@
 <span id="implementations-problem-classes-harmonicoscillator-module"></span><h1>implementations.problem_classes.HarmonicOscillator module<a class="headerlink" href="#module-implementations.problem_classes.HarmonicOscillator" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harmonic_oscillator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.particles.particles'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.particles.acceleration'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harmonic_oscillator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing the harmonic oscillator</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">acceleration</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">particles</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_f" title="Permalink to this definition">¶</a></dt>
@@ -111,7 +123,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_init">
 <span class="sig-name descname"><span class="pre">u_init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator.u_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generate a data variable for u</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -129,6 +142,8 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.HarmonicOscillator module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator"><code class="docutils literal notranslate"><span class="pre">harmonic_oscillator</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_hamiltonian"><code class="docutils literal notranslate"><span class="pre">eval_hamiltonian()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -186,7 +201,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.GrayScott_MPIFFT.html" title="implementations.problem_classes.GrayScott_MPIFFT module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HarmonicOscillator module</a></li> 

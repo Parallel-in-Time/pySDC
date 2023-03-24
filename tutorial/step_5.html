@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Step-5: PFASST &#8212; pySDC 5.1.0 documentation</title>
+    <title>Step-5: PFASST &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="step_4.html" title="Step-4: Multilevel SDC"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-5: PFASST</a></li> 
       </ul>
     </div>  
@@ -463,7 +463,7 @@ More choices have been implemented in <code class="docutils literal notranslate"
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;backward&#39;</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;stencil_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -734,7 +734,7 @@ Mean number of iterations went up from 5.00 to 13.12 for QI = IE!
         <li class="right" >
           <a href="step_4.html" title="Step-4: Multilevel SDC"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-5: PFASST</a></li> 
       </ul>
     </div>

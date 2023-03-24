@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.AllenCahn_1D_FD module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.AllenCahn_1D_FD module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.AdvectionEquation_ND_FD.html" title="implementations.problem_classes.AdvectionEquation_ND_FD module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_1D_FD module</a></li> 
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-allencahn-1d-fd-module"></span><h1>implementations.problem_classes.AllenCahn_1D_FD module<a class="headerlink" href="#module-implementations.problem_classes.AllenCahn_1D_FD" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_finel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_finel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a></p>
 <p>Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
 with driving force, 0-1 formulation (Bayreuth example), Finel’s trick/parametrization</p>
@@ -101,7 +101,7 @@ with driving force, 0-1 formulation (Bayreuth example), Finel’s trick/parametr
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
 with driving force, 0-1 formulation (Bayreuth example)</p>
@@ -115,6 +115,18 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx" title="Permalink to this definition">¶</a></dt>
 <dd><p>distance between two spatial nodes</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -180,7 +192,7 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a></p>
 <p>Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
 with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping</p>
@@ -194,6 +206,12 @@ with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepp
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx" title="Permalink to this definition">¶</a></dt>
 <dd><p>distance between two spatial nodes</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -242,7 +260,7 @@ with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepp
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
 with driving force, 0-1 formulation (Bayreuth example)</p>
@@ -256,6 +274,18 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx" title="Permalink to this definition">¶</a></dt>
 <dd><p>distance between two spatial nodes</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -321,10 +351,16 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.comp2_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a></p>
 <p>Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
 with driving force, 0-1 formulation (Bayreuth example)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">comp2_mesh</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f" title="Permalink to this definition">¶</a></dt>
@@ -393,10 +429,16 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a></p>
 <p>Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
 with driving force, 0-1 formulation (Bayreuth example)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f" title="Permalink to this definition">¶</a></dt>
@@ -462,6 +504,8 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -470,6 +514,7 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_front_semiimplicit</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 </ul>
@@ -477,18 +522,22 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_multiimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1"><code class="docutils literal notranslate"><span class="pre">solve_system_1()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2"><code class="docutils literal notranslate"><span class="pre">solve_system_2()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_semiimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 </ul>
@@ -544,7 +593,7 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
         <li class="right" >
           <a href="implementations.problem_classes.AdvectionEquation_ND_FD.html" title="implementations.problem_classes.AdvectionEquation_ND_FD module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_1D_FD module</a></li> 

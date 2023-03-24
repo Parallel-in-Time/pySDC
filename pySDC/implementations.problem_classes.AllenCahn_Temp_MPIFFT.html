@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.AllenCahn_Temp_MPIFFT module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.AllenCahn_Temp_MPIFFT module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.AllenCahn_MPIFFT.html" title="implementations.problem_classes.AllenCahn_MPIFFT module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_Temp_MPIFFT module</a></li> 
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-allencahn-temp-mpifft-module"></span><h1>implementations.problem_classes.AllenCahn_Temp_MPIFFT module<a class="headerlink" href="#module-implementations.problem_classes.AllenCahn_Temp_MPIFFT" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_temp_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_Temp_MPIFFT.html#allencahn_temp_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_temp_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_Temp_MPIFFT.html#allencahn_temp_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping</p>
 <p>mpi4py-fft: <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a></p>
@@ -83,6 +83,18 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dy">
 <span class="sig-name descname"><span class="pre">dy</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dy" title="Permalink to this definition">¶</a></dt>
 <dd><p>mesh width in y direction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -165,6 +177,8 @@
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.K2"><code class="docutils literal notranslate"><span class="pre">K2</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dy"><code class="docutils literal notranslate"><span class="pre">dy</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -221,7 +235,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.AllenCahn_MPIFFT.html" title="implementations.problem_classes.AllenCahn_MPIFFT module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AllenCahn_Temp_MPIFFT module</a></li> 

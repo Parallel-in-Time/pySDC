@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_716c1644203275a5_TransferMesh_NoCoarse_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.2">coverage.py v7.2.2</a>,
-            created at 2023-03-23 13:51 +0000
+            created at 2023-03-24 11:31 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -106,9 +106,9 @@
     <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="com"># invoke super initialization</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">        <span class="nam">super</span><span class="op">(</span><span class="nam">fft_to_fft</span><span class="op">,</span> <span class="nam">self</span><span class="op">)</span><span class="op">.</span><span class="nam">__init__</span><span class="op">(</span><span class="nam">fine_prob</span><span class="op">,</span> <span class="nam">coarse_prob</span><span class="op">,</span> <span class="nam">params</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">        <span class="key">assert</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">spectral</span> <span class="op">==</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">spectral</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">        <span class="key">assert</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">spectral</span> <span class="op">==</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">spectral</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">spectral</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">spectral</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">        <span class="nam">Nf</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">        <span class="nam">Nc</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">fft</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -116,7 +116,7 @@
     <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">        <span class="nam">axes</span> <span class="op">=</span> <span class="nam">tuple</span><span class="op">(</span><span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">Nf</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">fft_pad</span> <span class="op">=</span> <span class="nam">PFFT</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">comm</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">comm</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">            <span class="nam">Nc</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">            <span class="nam">padding</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">ratio</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">            <span class="nam">axes</span><span class="op">=</span><span class="nam">axes</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -218,7 +218,7 @@
             <a id="nextFileLink" class="nav" href="d_716c1644203275a5_TransferMesh_NoCoarse_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.2">coverage.py v7.2.2</a>,
-            created at 2023-03-23 13:51 +0000
+            created at 2023-03-24 11:31 +0000
         </p>
     </div>
 </footer>

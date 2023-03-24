@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.HeatEquation_2D_PETSc_forced module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.HeatEquation_2D_PETSc_forced module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html" title="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_2D_PETSc_forced module</a></li> 
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-heatequation-2d-petsc-forced-module"></span><h1>implementations.problem_classes.HeatEquation_2D_PETSc_forced module<a class="headerlink" href="#module-implementations.problem_classes.HeatEquation_2D_PETSc_forced" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">heat2d_petsc_forced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.petsc_vec.petsc_vec'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.petsc_vec.petsc_vec_imex'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_2D_PETSc_forced.html#heat2d_petsc_forced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">heat2d_petsc_forced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_2D_PETSc_forced.html#heat2d_petsc_forced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing the forced 2D heat equation with Dirichlet BCs in [0,1]^2,
 discretized using central finite differences and realized with PETSc</p>
@@ -83,6 +83,18 @@ discretized using central finite differences and realized with PETSc</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp">
 <span class="sig-name descname"><span class="pre">ksp</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp" title="Permalink to this definition">¶</a></dt>
 <dd><p>PETSc linear solver object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">petsc_vec_imex</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">petsc_vec</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -165,6 +177,8 @@ discretized using central finite differences and realized with PETSc</p>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dy"><code class="docutils literal notranslate"><span class="pre">dy</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp"><code class="docutils literal notranslate"><span class="pre">ksp</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -221,7 +235,7 @@ discretized using central finite differences and realized with PETSc</p>
         <li class="right" >
           <a href="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html" title="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.HeatEquation_2D_PETSc_forced module</a></li> 

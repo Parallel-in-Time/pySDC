@@ -13,7 +13,7 @@ Additionally, a *few* rules are set to enforce code readability, consistency and
 Others are specific conventions chosen for the pySDC library, that may follow Python standards (or not ...), detailed in the :doc:`naming conventions <./docs/contrib/03_naming_conventions>` page.
 
 Finally, while ``pySDC`` provides many base functionalities that implement classical flavors of SDC, it also allows problem-specific applications through Object-Oriented Programming (OOP) and the implementation of custom inherited classes.
-This follows a specific OOP framework, you can look at the page on :doc:`custom implementations <./docs/contrib/04_custom_implementations>` for more details.
+This follows a specific OOP framework, you can look at the page on :doc:`custom implementations <./docs/contrib/04_custom_implementations>` for more details. Additional guideline are also given on how to :doc:`document the code <./docs/contrib/05_documenting_code>` in ``pySDC``.
 
 
 #. `GitHub Forks and Pull Requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models>`_
@@ -21,5 +21,6 @@ This follows a specific OOP framework, you can look at the page on :doc:`custom 
 #. :doc:`Continuous Integration <./docs/contrib/02_continuous_integration>`
 #. :doc:`Naming Conventions <./docs/contrib/03_naming_conventions>`
 #. :doc:`Custom Implementations <./docs/contrib/04_custom_implementations>`
+#. :doc:`Documenting Code <./docs/contrib/05_documenting_code>`
 
 |:arrow_left:| :doc:`Back to main page <./index>`

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.AdvectionEquation_ND_FD module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.AdvectionEquation_ND_FD module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -14,6 +14,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -35,7 +36,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html" title="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AdvectionEquation_ND_FD module</a></li> 
@@ -51,74 +52,80 @@
 <span id="implementations-problem-classes-advectionequation-nd-fd-module"></span><h1>implementations.problem_classes.AdvectionEquation_ND_FD module<a class="headerlink" href="#module-implementations.problem_classes.AdvectionEquation_ND_FD" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">advectionNd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the unforced ND advection equation with periodic BCs in [0,1]^N,
-discretized using central finite differences</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">advectionNd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericNDimFinDiff</span></code></p>
+<p>Example implementing the unforced ND advection equation with periodic
+or Dirichlet boundary conditions in <span class="math notranslate nohighlight">\([0,1]^N\)</span>,
+and initial solution of the form</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x},0) = \prod_{i=1}^N \sin(f\pi x_i),\]</div>
+<p>with <span class="math notranslate nohighlight">\(x_i\)</span> the coordinate in <span class="math notranslate nohighlight">\(i^{th}\)</span> dimension.
+Discretization uses central finite differences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution (same in all dimensions). Using a tuple allows to
+consider several dimensions, e.g nvars=(16,16) for a 2D problem.</p></li>
+<li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed (same in all dimensions).</p></li>
+<li><p><strong>freq</strong> (<em>int</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – Spatial frequency <span class="math notranslate nohighlight">\(f\)</span> of the initial conditions, can be tuple.</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of the finite difference stencil.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the finite difference discretization.</p></li>
+<li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for spatial solver (GMRES).</p></li>
+<li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Max. iterations number for GMRES.</p></li>
+<li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Solve the linear system directly or using GMRES or CG</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Boundary conditions, either “periodic” or “dirichlet”.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>If freq=-1 and ndim=1, uses a Gaussian initial solution of the form</p>
+<div class="math notranslate nohighlight">
+\[u(x,0) = e^{
+    \frac{\displaystyle 1}{\displaystyle 2}
+    \left(
+        \frac{\displaystyle x-1/2}{\displaystyle \sigma}
+    \right)^2
+    }\]</div>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.A">
 <span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.A" title="Permalink to this definition">¶</a></dt>
-<dd><p>FD discretization of the ND grad operator</p>
+<dd><p>FD discretization matrix of the ND grad operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.dx">
-<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.dx" title="Permalink to this definition">¶</a></dt>
-<dd><p>distance between two spatial nodes (here: being the same in all dimensions)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.Id">
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.Id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identity matrix of the same dimension as A</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple linear solver for (I-factor*A)u = rhs</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dtype_u</p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Args can be set as values or as tuples, which will increase the dimension.
+Do, however, take care that all spatial parameters have the same dimension.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time t</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional arguments (that won’t be used).</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact solution</p>
+<dd class="field-even"><p><strong>sol</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -143,9 +150,7 @@ discretized using central finite differences</p>
 <li><a class="reference internal" href="#">implementations.problem_classes.AdvectionEquation_ND_FD module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd"><code class="docutils literal notranslate"><span class="pre">advectionNd</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.Id"><code class="docutils literal notranslate"><span class="pre">Id</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>
@@ -200,7 +205,7 @@ discretized using central finite differences</p>
         <li class="right" >
           <a href="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html" title="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.AdvectionEquation_ND_FD module</a></li> 

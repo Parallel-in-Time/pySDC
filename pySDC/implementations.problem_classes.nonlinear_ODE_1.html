@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.nonlinear_ODE_1 module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.nonlinear_ODE_1 module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="implementations.sweeper_classes package" href="implementations.sweeper_classes.html" />
-    <link rel="prev" title="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module" href="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html" /> 
+    <link rel="prev" title="implementations.problem_classes.generic_ND_FD module" href="implementations.problem_classes.generic_ND_FD.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -33,9 +33,9 @@
           <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html" title="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module"
+          <a href="implementations.problem_classes.generic_ND_FD.html" title="implementations.problem_classes.generic_ND_FD module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.nonlinear_ODE_1 module</a></li> 
@@ -51,10 +51,22 @@
 <span id="implementations-problem-classes-nonlinear-ode-1-module"></span><h1>implementations.problem_classes.nonlinear_ODE_1 module<a class="headerlink" href="#module-implementations.problem_classes.nonlinear_ODE_1" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nonlinear_ODE_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nonlinear_ODE_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing some simple nonlinear ODE with a singularity in the derivative, taken from
 <a class="reference external" href="https://www.osti.gov/servlets/purl/6111421">https://www.osti.gov/servlets/purl/6111421</a> (Problem E-4)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.eval_f" title="Permalink to this definition">¶</a></dt>
@@ -130,6 +142,8 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.nonlinear_ODE_1 module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1"><code class="docutils literal notranslate"><span class="pre">nonlinear_ODE_1</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -142,8 +156,8 @@
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html"
-                          title="previous chapter">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module</a></p>
+    <p class="topless"><a href="implementations.problem_classes.generic_ND_FD.html"
+                          title="previous chapter">implementations.problem_classes.generic_ND_FD module</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -184,9 +198,9 @@
           <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html" title="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module"
+          <a href="implementations.problem_classes.generic_ND_FD.html" title="implementations.problem_classes.generic_ND_FD module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.nonlinear_ODE_1 module</a></li> 

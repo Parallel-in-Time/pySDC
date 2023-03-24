@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Custom implementation guidelines &#8212; pySDC 5.1.0 documentation</title>
+    <title>Custom implementation guidelines &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Custom implementation guidelines</a></li> 
       </ul>
     </div>  
@@ -39,10 +39,63 @@
             
   <section id="custom-implementation-guidelines">
 <span id="docs-contrib-04-custom-implementations-custom-implementation-guidelines"></span><h1>Custom implementation guidelines<a class="headerlink" href="#custom-implementation-guidelines" title="Permalink to this heading">¶</a></h1>
-<p>… in construction …</p>
+<p><code class="docutils literal notranslate"><span class="pre">pySDC</span></code> solves (non-)linear ODE of the form</p>
+<p>$$
+frac{du}{dt} = f(u, t), quad u(0)=u_0, quad t in [0, T].
+$$</p>
+<p>where $u$ a vector or scalar, representing one or more variables.</p>
+<p>The type of variable, the definition of the right-hand side $f(u,t)$ and initial solution value $u_0$ are defined in a given <code class="docutils literal notranslate"><span class="pre">Problem</span></code> class.</p>
+<p>… to be continued …</p>
+<section id="implementing-a-custom-problem-class">
+<span id="docs-contrib-04-custom-implementations-implementing-a-custom-problem-class"></span><h2>Implementing a custom problem class<a class="headerlink" href="#implementing-a-custom-problem-class" title="Permalink to this heading">¶</a></h2>
+<p>Any problem class inherit from the same base class, that is (currently) the <code class="docutils literal notranslate"><span class="pre">ptype</span></code> class from the module <code class="docutils literal notranslate"><span class="pre">pySDC.code.Problem</span></code>.
+Each custom problem should inherit from this base class, like for the following example template :</p>
+<ul class="simple">
+<li><p>right-hand side $f(u,t)=lambda u +  ct$ with</p>
+<ul>
+<li><p>$lambda$ one or more complex values (in vector form)</p></li>
+<li><p>$c$ one scalar value</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ProblemError</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+
+<span class="k">class</span> <span class="nc">MyCustomProblem</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+    <span class="c1"># 1) Provide datatype class as class attribute</span>
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>  <span class="c1"># -&gt; used for u values</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>  <span class="c1"># -&gt; used for f(u,t) values</span>
+
+    <span class="c1"># 2) Define constructor</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+
+        <span class="c1"># Store lambda values into a numpy array (with copy) + check</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lam</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda values must be given as 1D vector, got shape </span><span class="si">{</span><span class="n">lam</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Call base constructor</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">lam</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lam</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+        <span class="c1"># Register parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;lam&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># 3) Define RHS function</span>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>  <span class="c1"># Generate new datatype to store result</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lam</span><span class="o">*</span><span class="n">u</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">*</span><span class="n">t</span>  <span class="c1"># Compute RHS value</span>
+        <span class="k">return</span> <span class="n">f</span>
+</pre></div>
+</div>
+<p>🔔 The <code class="docutils literal notranslate"><span class="pre">_makeAttributeAndRegister</span></code> automatically add <code class="docutils literal notranslate"><span class="pre">lam</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code>, and register them in a list of parameters that are printed in the outputs of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>.
+If you set <code class="docutils literal notranslate"><span class="pre">readOnly=True</span></code>, then those parameters cannot be changed after initializing the problem (if not specifies, use <code class="docutils literal notranslate"><span class="pre">readOnly=False</span></code>).</p>
 <p>⬅️ <a class="reference internal" href="03_naming_conventions.html"><span class="doc">Back to Naming Conventions</span></a> —
 ⬆️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Contributing Summary</span></a> —
-➡️ <a class="reference external" href="https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background">Next to a cute picture of cat</a></p>
+➡️ <a class="reference internal" href="05_documenting_code.html"><span class="doc">Next to Documenting Code</span></a></p>
+</section>
 </section>
 
 
@@ -52,6 +105,16 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Custom implementation guidelines</a><ul>
+<li><a class="reference internal" href="#implementing-a-custom-problem-class">Implementing a custom problem class</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -82,7 +145,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Custom implementation guidelines</a></li> 
       </ul>
     </div>

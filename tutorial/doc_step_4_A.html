@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>&lt;no title&gt; &#8212; pySDC 5.1.0 documentation</title>
+    <title>&lt;no title&gt; &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -27,7 +27,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>  
@@ -43,7 +43,6 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 <span class="kn">from</span> <span class="nn">pySDC.tutorial.step_1.B_spatial_accuracy_check</span> <span class="kn">import</span> <span class="n">get_accuracy_order</span>
@@ -79,24 +78,24 @@
 
         <span class="c1"># instantiate fine problem</span>
         <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_fine</span>  <span class="c1"># number of degrees of freedom</span>
-        <span class="n">Pfine</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">Pfine</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
         <span class="c1"># instantiate coarse problem using half of the DOFs</span>
         <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">nvars_fine</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">Pcoarse</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">Pcoarse</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
         <span class="c1"># instantiate spatial interpolation</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span><span class="p">(</span><span class="n">fine_prob</span><span class="o">=</span><span class="n">Pfine</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="o">=</span><span class="n">Pcoarse</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">space_transfer_params</span><span class="p">)</span>
 
         <span class="c1"># set exact fine solution to compare with</span>
-        <span class="n">xvalues_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+        <span class="n">xvalues_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
         <span class="n">uexact_fine</span> <span class="o">=</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">uexact_fine</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues_fine</span><span class="p">)</span>
+        <span class="n">uexact_fine</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues_fine</span><span class="p">)</span>
 
         <span class="c1"># set exact coarse solution as source</span>
-        <span class="n">xvalues_coarse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+        <span class="n">xvalues_coarse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
         <span class="n">uexact_coarse</span> <span class="o">=</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">uexact_coarse</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues_coarse</span><span class="p">)</span>
+        <span class="n">uexact_coarse</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues_coarse</span><span class="p">)</span>
 
         <span class="c1"># do the interpolation/prolongation</span>
         <span class="n">uinter</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">prolong</span><span class="p">(</span><span class="n">uexact_coarse</span><span class="p">)</span>
@@ -174,7 +173,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>

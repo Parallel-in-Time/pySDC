@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.FullSolarSystem.html" title="implementations.problem_classes.FullSolarSystem module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module</a></li> 
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-generalizedfisher-1d-fd-implicit-module"></span><h1>implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module<a class="headerlink" href="#module-implementations.problem_classes.GeneralizedFisher_1D_FD_implicit" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generalized_fisher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_FD_implicit.html#generalized_fisher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generalized_fisher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_FD_implicit.html#generalized_fisher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing the generalized Fisher’s equation in 1D with finite differences</p>
 <dl class="py attribute">
@@ -64,6 +64,18 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dx" title="Permalink to this definition">¶</a></dt>
 <dd><p>distance between two spatial nodes</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -143,6 +155,8 @@
 <li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher"><code class="docutils literal notranslate"><span class="pre">generalized_fisher</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -199,7 +213,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.FullSolarSystem.html" title="implementations.problem_classes.FullSolarSystem module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module</a></li> 

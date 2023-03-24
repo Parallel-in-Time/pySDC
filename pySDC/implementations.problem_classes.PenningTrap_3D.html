@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.PenningTrap_3D module &#8212; pySDC 5.1.0 documentation</title>
+    <title>implementations.problem_classes.PenningTrap_3D module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.OuterSolarSystem.html" title="implementations.problem_classes.OuterSolarSystem module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.PenningTrap_3D module</a></li> 
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-penningtrap-3d-module"></span><h1>implementations.problem_classes.PenningTrap_3D module<a class="headerlink" href="#module-implementations.problem_classes.PenningTrap_3D" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">penningtrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.particles.particles'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.particles.fields'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">penningtrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">omega_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing particles in a penning trap</p>
 <dl class="py method">
@@ -93,6 +93,18 @@
 <dd class="field-odd"><p><a class="reference internal" href="implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.acceleration" title="implementations.datatype_classes.particles.acceleration">acceleration</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">fields</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">particles</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -186,6 +198,8 @@
 <li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap"><code class="docutils literal notranslate"><span class="pre">penningtrap</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver"><code class="docutils literal notranslate"><span class="pre">boris_solver()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.build_f"><code class="docutils literal notranslate"><span class="pre">build_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions"><code class="docutils literal notranslate"><span class="pre">fast_interactions()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions"><code class="docutils literal notranslate"><span class="pre">get_interactions()</span></code></a></li>
@@ -244,7 +258,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.OuterSolarSystem.html" title="implementations.problem_classes.OuterSolarSystem module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.PenningTrap_3D module</a></li> 

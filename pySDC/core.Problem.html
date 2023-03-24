@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>core.Problem module &#8212; pySDC 5.1.0 documentation</title>
+    <title>core.Problem module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="core.Nodes.html" title="core.Nodes module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.Problem module</a></li> 
       </ul>
@@ -48,63 +48,90 @@
             
   <section id="module-core.Problem">
 <span id="core-problem-module"></span><h1>core.Problem module<a class="headerlink" href="#module-core.Problem" title="Permalink to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p>Module containing the base Problem class for pySDC</p>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Problem.WorkCounter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WorkCounter</span></span><a class="reference internal" href="../_modules/core/Problem.html#WorkCounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.WorkCounter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for counting iterations</p>
+<p>Utility class for counting iterations.</p>
+<p>Contains one attribute <cite>niter</cite> initialized to zero during
+instantiation, which can be incremented by calling object as
+a function, e.g</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">count</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>  <span class="c1"># =&gt; niter = 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">count</span><span class="p">()</span>                <span class="c1"># =&gt; niter = 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">count</span><span class="p">()</span>                <span class="c1"># =&gt; niter = 2</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Problem.ptype">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ptype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Prototype class for problems, just defines the attributes essential to get started</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ptype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RegisterParams</span></code></p>
+<p>Prototype class for problems, just defines the attributes essential to get started.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>init</strong> (<em>list</em><em> of </em><em>args</em>) – Argument(s) used to initialize data types.</p></li>
+<li><p><strong>dtype_u</strong> (<em>type</em>) – Variable data type. Should generate a data variable using dtype_u(init).</p></li>
+<li><p><strong>dtype_f</strong> (<em>type</em>) – RHS data type. Should generate a data variable using dtype_f(init).</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Problem.ptype.logger">
 <span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#core.Problem.ptype.logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>custom logger for problem-related logging</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.Problem.ptype.params">
-<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Problem.ptype.params" title="Permalink to this definition">¶</a></dt>
-<dd><p>parameter object containing the custom parameters passed by the user</p>
+<dd><p>custom logger for problem-related logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>__Pars</p>
+<dd class="field-odd"><p>logging.Logger</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.Problem.ptype.init">
-<span class="sig-name descname"><span class="pre">init</span></span><a class="headerlink" href="#core.Problem.ptype.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>number of degrees-of-freedom (whatever this may represent)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.Problem.ptype.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#core.Problem.ptype.dtype_u" title="Permalink to this definition">¶</a></dt>
-<dd><p>variable data type</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.Problem.ptype.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#core.Problem.ptype.dtype_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>RHS data type</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Problem.ptype.apply_mass_matrix">
 <span class="sig-name descname"><span class="pre">apply_mass_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.apply_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.apply_mass_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Abstract interface to apply mass matrix (only needed for FEM)</p>
+<dd><p>Default mass matrix : identity</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Problem.ptype.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#core.Problem.ptype.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Problem.ptype.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#core.Problem.ptype.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Problem.ptype.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype.eval_f" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract interface to RHS computation of the ODE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.Problem.ptype.f_init">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f_init</span></span><a class="headerlink" href="#core.Problem.ptype.f_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a data variable for RHS</p>
 </dd></dl>
 
 <dl class="py method">
@@ -135,6 +162,17 @@ as <cite>jac=jac</cite>.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Logger</span> <span class="pre">problem</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.Problem.ptype.u_init">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_init</span></span><a class="headerlink" href="#core.Problem.ptype.u_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a data variable for u</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -150,16 +188,18 @@ as <cite>jac=jac</cite>.</p>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">core.Problem module</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#core.Problem.WorkCounter"><code class="docutils literal notranslate"><span class="pre">WorkCounter</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype"><code class="docutils literal notranslate"><span class="pre">ptype</span></code></a><ul>
 <li><a class="reference internal" href="#core.Problem.ptype.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
-<li><a class="reference internal" href="#core.Problem.ptype.params"><code class="docutils literal notranslate"><span class="pre">params</span></code></a></li>
-<li><a class="reference internal" href="#core.Problem.ptype.init"><code class="docutils literal notranslate"><span class="pre">init</span></code></a></li>
-<li><a class="reference internal" href="#core.Problem.ptype.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
-<li><a class="reference internal" href="#core.Problem.ptype.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.apply_mass_matrix"><code class="docutils literal notranslate"><span class="pre">apply_mass_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.f_init"><code class="docutils literal notranslate"><span class="pre">f_init</span></code></a></li>
 <li><a class="reference internal" href="#core.Problem.ptype.generate_scipy_reference_solution"><code class="docutils literal notranslate"><span class="pre">generate_scipy_reference_solution()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.u_init"><code class="docutils literal notranslate"><span class="pre">u_init</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -213,7 +253,7 @@ as <cite>jac=jac</cite>.</p>
         <li class="right" >
           <a href="core.Nodes.html" title="core.Nodes module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.Problem module</a></li> 
       </ul>

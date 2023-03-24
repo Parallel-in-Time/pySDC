@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>helpers.problem_helper module &#8212; pySDC 5.1.0 documentation</title>
+    <title>helpers.problem_helper module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="helpers.plot_helper.html" title="helpers.plot_helper module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="helpers.html" accesskey="U">helpers package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers.problem_helper module</a></li> 
       </ul>
@@ -50,21 +50,21 @@
 <span id="helpers-problem-helper-module"></span><h1>helpers.problem_helper module<a class="headerlink" href="#module-helpers.problem_helper" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_matrix">
-<span class="sig-name descname"><span class="pre">get_finite_difference_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cupy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_matrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_finite_difference_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cupy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build FD matrix from stencils, with boundary conditions</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_stencil">
-<span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_stencil" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_stencil" title="Permalink to this definition">¶</a></dt>
 <dd><p>Derive general finite difference stencils from Taylor expansions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – Type of the stencil</p></li>
-<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>type</cite></p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em>) – Type of the stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>stencil_type</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -79,15 +79,15 @@ numpy.ndarray: The offsets for the stencil</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.problem_helper.get_steps">
-<span class="sig-name descname"><span class="pre">get_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_steps" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_steps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the offsets for the FD stencil.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – Type of the stencil</p></li>
-<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>type</cite></p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em>) – Type of the stencil</p></li>
+<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>stencil_type</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -167,7 +167,7 @@ numpy.ndarray: The offsets for the stencil</p>
         <li class="right" >
           <a href="helpers.plot_helper.html" title="helpers.plot_helper module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="helpers.html" >helpers package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers.problem_helper module</a></li> 
       </ul>

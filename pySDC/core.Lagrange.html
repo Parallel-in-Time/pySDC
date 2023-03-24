@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>core.Lagrange module &#8212; pySDC 5.1.0 documentation</title>
+    <title>core.Lagrange module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="core.Hooks.html" title="core.Hooks module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="core.html" accesskey="U">core package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.Lagrange module</a></li> 
       </ul>
@@ -66,6 +66,12 @@ function <span class="math notranslate nohighlight">\(f\)</span> can be approxim
 \[w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}\]</div>
 <p>are the barycentric weights.
 The theory and implementation is inspired from <a class="reference external" href="http://dx.doi.org/10.1137/S0036144502417715">this paper</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>list</em><em>, </em><em>tuple</em><em> or </em><em>np.1darray</em>) – The given interpolation points, no specific scaling, but must be
+ordered in increasing order.</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.points">
 <span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.points" title="Permalink to this definition">¶</a></dt>
@@ -258,7 +264,7 @@ Inspired from quadpy (<a class="reference external" href="https://github.com/nsc
         <li class="right" >
           <a href="core.Hooks.html" title="core.Hooks module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="core.html" >core package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.Lagrange module</a></li> 
       </ul>

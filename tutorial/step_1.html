@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Step-1: A first spatial problem &#8212; pySDC 5.1.0 documentation</title>
+    <title>Step-1: A first spatial problem &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../index.html" title="Welcome to pySDC!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-1: A first spatial problem</a></li> 
       </ul>
     </div>  
@@ -79,7 +79,6 @@ instantiate things within subroutines</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 
 
@@ -87,16 +86,13 @@ instantiate things within subroutines</p></li>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple test program to set up a spatial problem and play with it</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># initialize problem parameters</span>
-    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
-
     <span class="c1"># instantiate problem</span>
-    <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="mi">1023</span><span class="p">,</span>  <span class="c1"># number of degrees of freedom</span>
+        <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># diffusion coefficient</span>
+        <span class="n">freq</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># frequency for the test value</span>
+        <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
+    <span class="p">)</span>
 
     <span class="c1"># run accuracy test, get error back</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
@@ -123,15 +119,15 @@ instantiate things within subroutines</p></li>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># create x values, use only inner points</span>
-    <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+    <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
 
     <span class="c1"># create a mesh instance and fill it with a sine wave</span>
     <span class="n">u</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-    <span class="n">u</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
 
     <span class="c1"># create a mesh instance and fill it with the Laplacian of the sine wave</span>
     <span class="n">u_lap</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-    <span class="n">u_lap</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
+    <span class="n">u_lap</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
 
     <span class="c1"># compare analytic and computed solution using the eval_f routine of the problem class</span>
     <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">u_lap</span><span class="p">)</span>
@@ -232,19 +228,17 @@ the data! Also, use headers to store meta-information.</p></li>
     <span class="k">for</span> <span class="n">nvars</span> <span class="ow">in</span> <span class="n">nvars_list</span><span class="p">:</span>
         <span class="c1"># setup problem</span>
         <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>
-        <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
         <span class="c1"># create x values, use only inner points</span>
-        <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+        <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
 
         <span class="c1"># create a mesh instance and fill it with a sine wave</span>
         <span class="n">u</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># create a mesh instance and fill it with the Laplacian of the sine wave</span>
         <span class="n">u_lap</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">u_lap</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="o">-</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">u_lap</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
 
         <span class="c1"># compare analytic and computed solution using the eval_f routine of the problem class</span>
         <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">u_lap</span><span class="p">)</span>
@@ -399,7 +393,6 @@ space is fine? …</p></li>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Collocation</span> <span class="kn">import</span> <span class="n">CollBase</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 
 
@@ -408,15 +401,13 @@ space is fine? …</p></li>
 <span class="sd">    A simple test program to create and solve a collocation problem directly</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># initialize problem parameters</span>
-    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
-
     <span class="c1"># instantiate problem</span>
-    <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="mi">1023</span><span class="p">,</span>  <span class="c1"># number of degrees of freedom</span>
+        <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># diffusion coefficient</span>
+        <span class="n">freq</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># frequency for the test value</span>
+        <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">,</span>  <span class="c1"># boundary conditions</span>
+    <span class="p">)</span>
 
     <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
     <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
@@ -454,7 +445,7 @@ space is fine? …</p></li>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
 
     <span class="c1"># build system matrix M of collocation problem</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
 
     <span class="c1"># get initial value at t0 = 0</span>
     <span class="n">u0</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -467,7 +458,7 @@ space is fine? …</p></li>
     <span class="n">u_coll</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">u0_coll</span><span class="p">)</span>
 
     <span class="c1"># compute error</span>
-    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_coll</span><span class="p">[</span><span class="o">-</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">uend</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_coll</span><span class="p">[</span><span class="o">-</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">uend</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">err</span>
 
@@ -507,7 +498,6 @@ compute 0 very, very thoroughly…</p></li>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Collocation</span> <span class="kn">import</span> <span class="n">CollBase</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 
 <span class="c1"># setup id for gathering the results (will sort by dt)</span>
@@ -527,7 +517,7 @@ compute 0 very, very thoroughly…</p></li>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># instantiate problem</span>
-    <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">heatNd_unforced</span><span class="p">(</span><span class="o">**</span><span class="n">problem_params</span><span class="p">)</span>
 
     <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
     <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">)</span>
@@ -579,7 +569,7 @@ compute 0 very, very thoroughly…</p></li>
         <span class="n">Q</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
 
         <span class="c1"># build system matrix M of collocation problem</span>
-        <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
 
         <span class="c1"># get initial value at t0 = 0</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -592,7 +582,7 @@ compute 0 very, very thoroughly…</p></li>
         <span class="n">u_coll</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">u0_coll</span><span class="p">)</span>
 
         <span class="c1"># compute error</span>
-        <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_coll</span><span class="p">[</span><span class="o">-</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">uend</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_coll</span><span class="p">[</span><span class="o">-</span><span class="n">prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">uend</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
         <span class="c1"># get id for this dt and store error in results</span>
         <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">err</span>
@@ -774,7 +764,7 @@ compute 0 very, very thoroughly…</p></li>
         <li class="right" >
           <a href="../index.html" title="Welcome to pySDC!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-1: A first spatial problem</a></li> 
       </ul>
     </div>
