@@ -113,17 +113,15 @@ class fully_implicit_DAE(sweeper):
 
             # get U_k+1
             # note: not using solve_system here because this solve step is the same for any problem
-            options = dict()
-            # options['disp'] = True
             # See link for how different methods use the default tol parameter
             # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220
-            options['xtol'] = P.newton_tol
-            options['eps'] = 1e-7
+            # options['xtol'] = P.params.newton_tol
+            # options['eps'] = 1e-16
             opt = optimize.root(
                 impl_fn,
                 L.f[m],
                 method='hybr',
-                options=options,
+                tol=P.params.newton_tol,
                 # callback= lambda x, f: print("solution:", x, " residual: ", f)
             )
             # update gradient (recall L.f is being used to store the gradient)

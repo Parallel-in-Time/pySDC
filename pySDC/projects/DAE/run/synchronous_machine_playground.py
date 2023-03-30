@@ -5,7 +5,7 @@ import statistics
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
-from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_pi_line
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
@@ -20,13 +20,13 @@ def main():
     #TODO: Run generator steady state for 10000 seconds. Try out different time step sizes. 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-8
+    level_params['restol'] = 1e-7
     level_params['dt'] = 1e-2
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-    sweeper_params['num_nodes'] = 5
+    sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
 
     # initialize problem parameters
@@ -41,7 +41,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = approx_solution_hook
+    controller_params['hook_class'] = [error_hook, approx_solution_hook]
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -59,7 +59,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1e1
+    Tend = 10.0
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -69,9 +69,9 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # check error
-    # err = get_sorted(stats, type='error_post_step', sortby='time')
-    # err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
-    # print(f"Error is {err}")
+    err = get_sorted(stats, type='error_post_step', sortby='time')
+    err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
+    print(f"Error is {err}")
     # assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
     # store results
