@@ -17,11 +17,12 @@ class synchronous_machine_pi_line(ptype_dae):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         super(synchronous_machine_pi_line, self).__init__(problem_params, dtype_u, dtype_f)
         # load reference solution
+        # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/synch_gen.npy')
         # x = data[:, 0]
         # y = data[:, 1:]
         # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
-        # self.t_end = x[-1]
+        self.t_end = 0.0
 
         self.L_d = 1.8099
         self.L_q = 1.76
@@ -60,7 +61,8 @@ class synchronous_machine_pi_line(ptype_dae):
         Returns:
             Current value of F(), 21 components
         """
-
+        
+        # simulate torque change at t = 0.05
         if t >= 0.05: 
             self.T_m = 0.354
 
@@ -129,41 +131,41 @@ class synchronous_machine_pi_line(ptype_dae):
             Mesh containing fixed initial value, 5 components
         """
         me = self.dtype_u(self.init)
-
-        # if t < self.t_end:
-        #     me[:] = self.u_ref(t)
-        # else:
-        #     warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
-
-        # consistent of order 1e-1 for derivative of zero
-        psi_d = 0.3971299 
-        psi_q = 0.9219154
-        psi_F = 0.8374232
-        psi_D = 0.5795112
-        psi_Q1 = 0.8433430
-        psi_Q2 = 0.8433430
-        i_d = -1.215876
-        i_q = 0.5238156
-        i_F = 1.565
-        i_D = 0
-        i_Q1 = 0 
-        i_Q2 = 0
-        v_d = -0.9362397
-        v_q = 0.4033005
-        omega_m = 1.0
-        # pi line
-        iz_d = -1.215875
-        iz_q = 0.5238151
-        il_d = -1.215875
-        il_q = 0.5238147
-        vl_d = -0.9119063
-        vl_q = 0.3928611
-
-        me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
+        
+        if t == 0:
+            psi_d = 0.3971299 
+            psi_q = 0.9219154
+            psi_F = 0.8374232
+            psi_D = 0.5795112
+            psi_Q1 = 0.8433430
+            psi_Q2 = 0.8433430
+            i_d = -1.215876
+            i_q = 0.5238156
+            i_F = 1.565
+            i_D = 0
+            i_Q1 = 0 
+            i_Q2 = 0
+            v_d = -0.9362397
+            v_q = 0.4033005
+            omega_m = 1.0
+            # pi line
+            iz_d = -1.215875
+            iz_q = 0.5238151
+            il_d = -1.215875
+            il_q = 0.5238147
+            vl_d = -0.9119063
+            vl_q = 0.3928611
+            me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
                 i_d, i_q, i_F, i_D, i_Q1, i_Q2,
                 omega_m, 
                 v_d, v_q, 
                 iz_d, iz_q, il_d, il_q, vl_d, vl_q)
+        elif t < self.t_end:
+            me[:] = self.u_ref(t)
+        else:
+            warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
+            me[:] = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        
         return me
 
 
@@ -176,13 +178,12 @@ class synchronous_machine_infinite_bus(ptype_dae):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         super(synchronous_machine_infinite_bus, self).__init__(problem_params, dtype_u, dtype_f)
         # load reference solution
-        # no difference in output for reference 5 and 6 up to \Delta_t = 1e-4
-        data = np.load(r'pySDC/projects/DAE/misc/data/synch_gen.npy')
-        # data = np.load(r'data/synch_gen.npy')
-        x = data[:, 0]
-        y = data[:, 1:]
-        self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
-        self.t_end = x[-1]
+        # data file must be generated and stored under misc/data and self.t_end = t[-1]
+        # data = np.load(r'pySDC/projects/DAE/misc/data/synch_gen.npy')
+        # x = data[:, 0]
+        # y = data[:, 1:]
+        # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
+        self.t_end = 0.0
 
         self.L_d = 1.8099
         self.L_q = 1.76
@@ -216,9 +217,10 @@ class synchronous_machine_infinite_bus(ptype_dae):
             u (dtype_u): the current values. This parameter has been "hijacked" to contain [u', u] in this case to enable evaluation of the implicit representation
             t (float): current time
         Returns:
-            Current value of F(), 21 components
+            Current value of F(), 14 components
         """
 
+        # simulate torque change at t = 0.05
         if t >= 0.05: 
             self.T_m = 0.354
 
@@ -282,31 +284,31 @@ class synchronous_machine_infinite_bus(ptype_dae):
             Mesh containing fixed initial value, 5 components
         """
         me = self.dtype_u(self.init)
-        # Alternate initial conditions if reference solution should not be used 
-        # if t == 0: 
-        #     psi_d = 0.7770802016688648
-        #     psi_q = -0.6337183129426077
-        #     psi_F = 1.152966888216155
-        #     psi_D = 0.9129958488040036
-        #     psi_Q1 = -0.5797082294536264
-        #     psi_Q2 = -0.579708229453273
-        #     i_d = -0.9061043142342473
-        #     i_q = -0.36006722326230495
-        #     i_F = 1.45613494788927
-        #     i_D = 0.0
-        #     i_Q1 = 0.0
-        #     i_Q2 = 0.0
 
-        #     delta_r = 39.1 * np.pi/180
-        #     omega_0 = 2*np.pi*60
-        #     omega_b = 2*np.pi*60
-        #     omega_m = omega_0/omega_b = omega_r since pf = 2 i.e. two pole machine 
+        if t == 0: 
+            psi_d = 0.7770802016688648
+            psi_q = -0.6337183129426077
+            psi_F = 1.152966888216155
+            psi_D = 0.9129958488040036
+            psi_Q1 = -0.5797082294536264
+            psi_Q2 = -0.579708229453273
+            i_d = -0.9061043142342473
+            i_q = -0.36006722326230495
+            i_F = 1.45613494788927
+            i_D = 0.0
+            i_Q1 = 0.0
+            i_Q2 = 0.0
 
-        #     me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
-        #         i_d, i_q, i_F, i_D, i_Q1, i_Q2,
-        #         delta_r,
-        #         omega_m)
-        if t < self.t_end:
+            delta_r = 39.1 * np.pi/180
+            omega_0 = 2*np.pi*60
+            omega_b = 2*np.pi*60
+            omega_m = omega_0/omega_b #= omega_r since pf = 2 i.e. two pole machine 
+
+            me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
+                i_d, i_q, i_F, i_D, i_Q1, i_Q2,
+                delta_r,
+                omega_m)
+        elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
             warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")

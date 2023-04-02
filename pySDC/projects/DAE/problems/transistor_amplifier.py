@@ -19,12 +19,13 @@ class one_transistor_amplifier(ptype_dae):
     def __init__(self, nvars, newton_tol):
         super().__init__(nvars, newton_tol)
         # load reference solution
-        data = np.load(r'pySDC/projects/DAE/misc/data/one_trans_amp.npy')
-        x = data[:, 0]
-        # The last column contains the input signal
-        y = data[:, 1:-1]
-        self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
-        self.t_end = x[-1]
+        # data file must be generated and stored under misc/data and self.t_end = t[-1]
+        # data = np.load(r'pySDC/projects/DAE/misc/data/one_trans_amp.npy')
+        # x = data[:, 0]
+        # # The last column contains the input signal
+        # y = data[:, 1:-1]
+        # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
+        self.t_end = 0.0
 
     def eval_f(self, u, du, t):
         """
@@ -61,7 +62,9 @@ class one_transistor_amplifier(ptype_dae):
         """
         me = self.dtype_u(self.init)
 
-        if t < self.t_end:
+        if t == 0: 
+            me[:] = (0,3,3,6,0)
+        elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
             warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
@@ -78,12 +81,13 @@ class two_transistor_amplifier(ptype_dae):
     def __init__(self, nvars, newton_tol):
         super().__init__(nvars, newton_tol)
         # load reference solution
-        data = np.load(r'pySDC/projects/DAE/misc/data/two_trans_amp.npy')
-        x = data[:, 0]
+        # data file must be generated and stored under misc/data and self.t_end = t[-1]
+        # data = np.load(r'pySDC/projects/DAE/misc/data/two_trans_amp.npy')
+        # x = data[:, 0]
         # The last column contains the input signal
-        y = data[:, 1:-1]
-        self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
-        self.t_end = x[-1]
+        # y = data[:, 1:-1]
+        # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
+        self.t_end = 0.0
 
     def eval_f(self, u, du, t):
         """
@@ -125,7 +129,9 @@ class two_transistor_amplifier(ptype_dae):
         """
         me = self.dtype_u(self.init)
 
-        if t < self.t_end:
+        if t == 0: 
+            me[:] = (0, 3, 3, 6, 3, 3, 6, 0)
+        elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
             warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
