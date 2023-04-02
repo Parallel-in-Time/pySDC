@@ -102,15 +102,15 @@ def run(description, controller_params, run_params):
                 residual = get_sorted(stats, type='residual_post_step', sortby='time')
                 niter = filter_stats(stats, type='niter')
 
-                conv_data[qd_type][num_nodes]['error'][i] = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
+                conv_data[qd_type][num_nodes]['error'][i] = np.linalg.norm([err[j][1] for j in range(len(err))], np.inf)
                 conv_data[qd_type][num_nodes]['residual'][i] = np.linalg.norm(
-                    [residual[i][1] for i in range(len(residual))], np.inf
+                    [residual[j][1] for j in range(len(residual))], np.inf
                 )
                 conv_data[qd_type][num_nodes]['niter'][i] = round(statistics.mean(niter.values()))
                 print(
                     "Error=",
                     conv_data[qd_type][num_nodes]['error'][i],
-                    ".  Residual=",
+                    "  Residual=",
                     conv_data[qd_type][num_nodes]['residual'][i],
                 )
 
@@ -126,5 +126,5 @@ if __name__ == "__main__":
 
     description, controller_params, run_params = setup()
     conv_data = run(description, controller_params, run_params)
-    pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
+    pickle.dump(conv_data, open("data/dae_iter_data.p", 'wb'))
     print("Done")
