@@ -1,5 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
 mpl.use('TkAgg')
 from distutils.spawn import find_executable
 
@@ -124,5 +125,5 @@ def savefig(filename, save_pdf=False, save_pgf=False, save_png=True):
     if save_pdf:
         plt.savefig('{}.pdf'.format(filename), bbox_inches='tight')
     if save_png:
-        plt.savefig('{}.png'.format(filename), dpi=2*mpl.rcParams["figure.dpi"])
+        plt.savefig('{}.png'.format(filename), dpi=2 * mpl.rcParams["figure.dpi"])
     plt.close()
