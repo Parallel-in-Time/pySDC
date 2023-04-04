@@ -158,7 +158,6 @@ def test_pendulum_main():
 
 @pytest.mark.base
 def test_one_transistor_amplifier_main():
-
     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
@@ -296,7 +295,6 @@ def test_two_transistor_amplifier_main():
 
 @pytest.mark.base
 def test_synchgen_infinite_bus_main():
-
     from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
