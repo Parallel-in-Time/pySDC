@@ -7,36 +7,40 @@ To run the scripts contained in this project a standard installation of pySDC sh
 
 Project overview 
 --------------------
-- hooks
-    - | ``HookClass_approx_solution.py``  
-      | Simple hook class to read out the approximate solution after each time step.
-    - | ``HookClass_error.py``
-      | Simple hook class to read out the error between approximate and exact solution after each time step. Note that for some problems the exact solution is only implemented to return initial conditions. In these cases this hook should not be used.
+- misc
+    - | ``HookClass_DAE.py``  
+      | Simple hook classes to read out the approximate solution and error after each time step.
 
 - plotting
     - | ``linear_plot.py``
       | Reads a previously generated data file in `.npy` format and generates a plot on linear axis of the specified parameters.
     - | ``loglog_plot.py``
       | Reads a previously generated data file in `.npy` format and generates a plot on logarithmic axis of the specified parameters. Commonly used to generate convergence plots.
+    - | ``semilogy_plot.py``
+      | Reads a previously generated data file in `.npy` format and generates a plot on logarithmic y-axis and linear x-axis. 
 
 - problems
     - | ``simple_DAE.py`` 
       | A number of simple examples of differential algebraic equations are implemented here: a linear index-2 system with known analytical solution, the 2D pendulum as an index-3 system and a very simple fully implicit index-2 system that is not solvable by most numerical methods for certain values of a parameter.
+    - | ``synchronous_machine.py`` 
+      | Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system. 
     - | ``transistor_amplifier.py``
       | A two transistor amplifier model that results in an index-1 differential algebraic system. A nice example of a system resulting from a common real world situation.
 
 - run
     - | ``run_convergence_test.py`` 
       | Script to generate convergence data of applying SDC to the simple linear index-2 differential algebraic system mentioned above. 
+    - | ``run_iteration_test.py`` 
+      | Script to generate data describing behaviour of error and residual of applying SDC to the simple linear index-2 differential algebraic system mentioned above. 
     - | ``fully_implicit_dae_playground.py``
       | Testing arena for the fully implicit sweeper. 
+    - | ``synchronous_machine_playground.py``
+      | Testing arena for the synchronous machine model. 
 
 - sweepers
     - | ``fully_implicit_DAE.py`` 
       | Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction
-    - | ``semi_explicit_DAE.py``
-      | Sweeper that accepts a semi-explicit formulation of a system of differential algebraic equations and applies to it a modified version of spectral deferred correction
-
+ 
 Theoretical details 
 ----------------------
 A fully implicit representation of a system of differential equations takes the form 

@@ -3,7 +3,7 @@ import statistics
 import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
+from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 from pySDC.helpers.stats_helper import get_sorted
@@ -16,7 +16,7 @@ def setup():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-16
+    level_params['restol'] = 1e-10
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
@@ -24,8 +24,8 @@ def setup():
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['newton_tol'] = 1e-6  # tollerance for implicit solver
-    problem_params['nvars'] = 5
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
+    problem_params['nvars'] = 3
 
     # This comes as read-in for the step class
     step_params = dict()
@@ -38,7 +38,7 @@ def setup():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = one_transistor_amplifier
+    description['problem_class'] = simple_dae_1
     description['problem_params'] = problem_params
     description['sweeper_class'] = fully_implicit_DAE
     description['sweeper_params'] = sweeper_params
@@ -49,8 +49,8 @@ def setup():
     num_samples = 2
     run_params = dict()
     run_params['t0'] = 0.0
-    run_params['tend'] = 1e-3
-    run_params['dt_list'] = np.logspace(-3, -5, num=num_samples)
+    run_params['tend'] = 0.1
+    run_params['dt_list'] = np.logspace(-2, -3, num=num_samples)
     run_params['qd_list'] = ['IE', 'LU']
     run_params['num_nodes_list'] = [3]
 

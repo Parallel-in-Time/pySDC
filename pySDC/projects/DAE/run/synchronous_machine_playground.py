@@ -5,7 +5,6 @@ import statistics
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
-from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_pi_line
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
@@ -17,11 +16,10 @@ def main():
     """
     A testing ground for the synchronous machine model 
     """
-    #TODO: Run generator steady state for 10000 seconds. Try out different time step sizes. 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-7
-    level_params['dt'] = 1e-2
+    level_params['dt'] = 1e-1
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -59,7 +57,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 10.0
+    Tend = 1.0
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -68,11 +66,19 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # check error
-    err = get_sorted(stats, type='error_post_step', sortby='time')
-    err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
-    print(f"Error is {err}")
-    # assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+    # check error (only available if reference solution was provided)
+    # err = get_sorted(stats, type='error_post_step', sortby='time')
+    # err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
+    # print(f"Error is {err}")
+
+    print("HERE",uend)
+
+    uend_ref = [ 8.30823565e-01, -4.02584174e-01,  1.16966755e+00,  9.47592808e-01,
+ -3.68076863e-01, -3.87492326e-01, -7.77837831e-01, -1.67347611e-01,
+  1.34810867e+00,  5.46223705e-04,  1.29690691e-02, -8.00823474e-02,
+  3.10281509e-01,  9.94039645e-01]
+    err = np.linalg.norm(uend-uend_ref, np.inf)
+    assert np.isclose(err,0, atol=1e-4), "Error too large."
 
     # store results
     sol = get_sorted(stats, type='approx_solution', sortby='time')
