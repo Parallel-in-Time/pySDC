@@ -72,8 +72,8 @@ def plot_convergence():  # pragma: no cover
         ):
             # Plot convergence data
             ax.loglog(
-                data[qd_type][num_nodes]['dt'][data_start_point:],
-                data[qd_type][num_nodes]['error'][data_start_point:],
+                data[qd_type][num_nodes]['dt'][:],
+                data[qd_type][num_nodes]['error'][:],
                 label="node count = {}".format(num_nodes),
                 color=color,
                 marker=shape,
@@ -110,8 +110,8 @@ def plot_convergence():  # pragma: no cover
             # Update the current y limits of the data
             # Ensures that final plot fits the data but cuts off the excess reference lines
             ylim = (
-                min(np.append(data[qd_type][num_nodes]['error'][data_start_point:], ylim[0])),
-                max(np.append(data[qd_type][num_nodes]['error'][data_start_point:], ylim[1])),
+                min(np.append(data[qd_type][num_nodes]['error'][:], ylim[0])),
+                max(np.append(data[qd_type][num_nodes]['error'][:], ylim[1])),
             )
 
         ax.set(ylim=((1e-2 * ylim[0], 5e1 * ylim[1])))

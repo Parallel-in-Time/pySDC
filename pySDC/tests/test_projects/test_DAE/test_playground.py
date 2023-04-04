@@ -2,13 +2,12 @@ import pytest
 import warnings
 
 
-
 @pytest.mark.base
 def test_problematic_main():
     from pySDC.projects.DAE.run.fully_implicit_dae_playground import main
 
     main()
-    
+
 
 @pytest.mark.base
 def test_synch_gen_playground_main():
@@ -17,4 +16,3 @@ def test_synch_gen_playground_main():
     warnings.filterwarnings('ignore')
     main()
     warnings.resetwarnings()
-

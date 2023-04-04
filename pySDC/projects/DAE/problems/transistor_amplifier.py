@@ -62,8 +62,8 @@ class one_transistor_amplifier(ptype_dae):
         """
         me = self.dtype_u(self.init)
 
-        if t == 0: 
-            me[:] = (0,3,3,6,0)
+        if t == 0:
+            me[:] = (0, 3, 3, 6, 0)
         elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
@@ -129,7 +129,7 @@ class two_transistor_amplifier(ptype_dae):
         """
         me = self.dtype_u(self.init)
 
-        if t == 0: 
+        if t == 0:
             me[:] = (0, 3, 3, 6, 3, 3, 6, 0)
         elif t < self.t_end:
             me[:] = self.u_ref(t)

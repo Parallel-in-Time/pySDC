@@ -9,7 +9,7 @@ def test_pendulum_u_exact_main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1e-3 # tollerance for implicit solver
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
     problem_params['nvars'] = 5
 
     # instantiate problem
@@ -146,10 +146,10 @@ def test_pendulum_main():
     warnings.resetwarnings()
 
     # call main function to get things done...
-    # ignore warning from non-existent reference solution 
+    # ignore warning from non-existent reference solution
     warnings.filterwarnings('ignore')
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    uend_ref = [0.98613917, -0.16592027,  0.29956023,  1.77825875,  4.82500525]
+    uend_ref = [0.98613917, -0.16592027, 0.29956023, 1.77825875, 4.82500525]
 
     # check error
     err = np.linalg.norm(uend - uend_ref, np.inf)
@@ -214,10 +214,10 @@ def test_one_transistor_amplifier_main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     warnings.resetwarnings()
 
-    uend_ref = [-0.02182035 , 3.06674603,  2.89634691,  2.45212382, -2.69727238]
+    uend_ref = [-0.02182035, 3.06674603, 2.89634691, 2.45212382, -2.69727238]
 
     # check error
-    err = np.linalg.norm(uend-uend_ref, np.inf)
+    err = np.linalg.norm(uend - uend_ref, np.inf)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
@@ -278,10 +278,19 @@ def test_two_transistor_amplifier_main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     warnings.resetwarnings()
 
-    uend_ref = [-5.52721527e-03,  3.00630407e+00,  2.84974338e+00,  4.07588343e+00, 2.12960582e+00,  2.19430889e+00,  5.89240699e+00,  9.99531182e-02]
-    
+    uend_ref = [
+        -5.52721527e-03,
+        3.00630407e00,
+        2.84974338e00,
+        4.07588343e00,
+        2.12960582e00,
+        2.19430889e00,
+        5.89240699e00,
+        9.99531182e-02,
+    ]
+
     # check error
-    err = np.linalg.norm(uend-uend_ref, np.inf)
+    err = np.linalg.norm(uend - uend_ref, np.inf)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
 
 
@@ -319,7 +328,7 @@ def test_synchgen_infinite_bus_main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = synchronous_machine_infinite_bus 
+    description['problem_class'] = synchronous_machine_infinite_bus
     description['problem_params'] = problem_params
     description['sweeper_class'] = fully_implicit_DAE
     description['sweeper_params'] = sweeper_params
@@ -343,11 +352,23 @@ def test_synchgen_infinite_bus_main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     warnings.resetwarnings()
 
-    uend_ref = [ 8.30823565e-01, -4.02584174e-01,  1.16966755e+00,  9.47592808e-01,
- -3.68076863e-01, -3.87492326e-01, -7.77837831e-01, -1.67347611e-01,
-  1.34810867e+00,  5.46223705e-04,  1.29690691e-02, -8.00823474e-02,
-  3.10281509e-01,  9.94039645e-01]
-    
+    uend_ref = [
+        8.30823565e-01,
+        -4.02584174e-01,
+        1.16966755e00,
+        9.47592808e-01,
+        -3.68076863e-01,
+        -3.87492326e-01,
+        -7.77837831e-01,
+        -1.67347611e-01,
+        1.34810867e00,
+        5.46223705e-04,
+        1.29690691e-02,
+        -8.00823474e-02,
+        3.10281509e-01,
+        9.94039645e-01,
+    ]
+
     # check error
-    err = np.linalg.norm(uend-uend_ref, np.inf)
+    err = np.linalg.norm(uend - uend_ref, np.inf)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."

@@ -38,12 +38,12 @@ class synchronous_machine_infinite_bus(ptype_dae):
         self.omega_b = 376.9911184307752
         self.H_ = 3.525
         self.K_D = 0.0
-        # Line impedance 
-        self.Z_line = -0.2688022164909709-0.15007173591230372j
-        # Infinite bus voltage 
+        # Line impedance
+        self.Z_line = -0.2688022164909709 - 0.15007173591230372j
+        # Infinite bus voltage
         self.E_B = 0.7
         # Rotor (field) operating voltages
-        # These are modelled as constants. Intuition: permanent magnet as rotor 
+        # These are modelled as constants. Intuition: permanent magnet as rotor
         self.v_F = 8.736809687330562e-4
         self.T_m = 0.854
 
@@ -58,40 +58,40 @@ class synchronous_machine_infinite_bus(ptype_dae):
         """
 
         # simulate torque change at t = 0.05
-        if t >= 0.05: 
+        if t >= 0.05:
             self.T_m = 0.354
 
         f = self.dtype_f(self.init)
 
-        # u = [psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
+        # u = [psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2,
         #       i_d, i_q, i_F, i_D, i_Q1, i_Q2
-        #       omega_m, 
-        #       v_d, v_q, 
+        #       omega_m,
+        #       v_d, v_q,
         #       iz_d, iz_q, il_d, il_q, vl_d, vl_q]
 
-        # extract variables for readability 
-        # algebraic components 
-        psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2 = u[0], u[1], u[2], u[3], u[4], u[5] 
-        i_d, i_q, i_F, i_D, i_Q1, i_Q2 = u[6], u[7], u[8], u[9], u[10], u[11] 
+        # extract variables for readability
+        # algebraic components
+        psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2 = u[0], u[1], u[2], u[3], u[4], u[5]
+        i_d, i_q, i_F, i_D, i_Q1, i_Q2 = u[6], u[7], u[8], u[9], u[10], u[11]
         delta_r = u[12]
         omega_m = u[13]
 
-        # differential components 
+        # differential components
         # these result directly from the voltage equations, introduced e.g. pg. 145 Krause
-        dpsi_d, dpsi_q, dpsi_F, dpsi_D, dpsi_Q1, dpsi_Q2 = du[0], du[1], du[2], du[3], du[4], du[5] 
+        dpsi_d, dpsi_q, dpsi_F, dpsi_D, dpsi_Q1, dpsi_Q2 = du[0], du[1], du[2], du[3], du[4], du[5]
         ddelta_r = du[12]
         domega_m = du[13]
         # Network current
-        I_Re = i_d*np.sin(delta_r) + i_q * np.cos(delta_r)
-        I_Im = - i_d*np.cos(delta_r) + i_q * np.sin(delta_r)
-        # Machine terminal voltages in network coordinates 
-        # Need to transform like this to subtract infinite bus voltage 
+        I_Re = i_d * np.sin(delta_r) + i_q * np.cos(delta_r)
+        I_Im = -i_d * np.cos(delta_r) + i_q * np.sin(delta_r)
+        # Machine terminal voltages in network coordinates
+        # Need to transform like this to subtract infinite bus voltage
         V_comp = self.E_B - self.Z_line * (-1) * (I_Re + 1j * I_Im)
-        # Terminal voltages in dq0 coordinates 
+        # Terminal voltages in dq0 coordinates
         v_d = np.real(V_comp) * np.sin(delta_r) - np.imag(V_comp) * np.cos(delta_r)
         v_q = np.real(V_comp) * np.cos(delta_r) + np.imag(V_comp) * np.sin(delta_r)
-    
-        # algebraic variables are i_d, i_q, i_F, i_D, i_Q1, i_Q2, il_d, il_q 
+
+        # algebraic variables are i_d, i_q, i_F, i_D, i_Q1, i_Q2, il_d, il_q
         f[:] = (
             # differential generator
             -dpsi_d + self.omega_b * (v_d - self.R_s * i_d + omega_m * psi_q),
@@ -100,15 +100,16 @@ class synchronous_machine_infinite_bus(ptype_dae):
             -dpsi_D - self.omega_b * self.R_D * i_D,
             -dpsi_Q1 - self.omega_b * self.R_Q1 * i_Q1,
             -dpsi_Q2 - self.omega_b * self.R_Q2 * i_Q2,
-            -ddelta_r + self.omega_b * (omega_m-1),
-            -domega_m + 1 / (2 * self.H_) * (self.T_m - (psi_q * i_d - psi_d * i_q) - self.K_D * self.omega_b * (omega_m-1)),
+            -ddelta_r + self.omega_b * (omega_m - 1),
+            -domega_m
+            + 1 / (2 * self.H_) * (self.T_m - (psi_q * i_d - psi_d * i_q) - self.K_D * self.omega_b * (omega_m - 1)),
             # algebraic generator
             -psi_d + self.L_d * i_d + self.L_md * i_F + self.L_md * i_D,
             -psi_q + self.L_q * i_q + self.L_mq * i_Q1 + self.L_mq * i_Q2,
             -psi_F + self.L_md * i_d + self.L_F * i_F + self.L_md * i_D,
             -psi_D + self.L_md * i_d + self.L_md * i_F + self.L_D * i_D,
             -psi_Q1 + self.L_mq * i_q + self.L_Q1 * i_Q1 + self.L_mq * i_Q2,
-            -psi_Q2 + self.L_mq * i_q + self.L_mq * i_Q1 + self.L_Q2 * i_Q2
+            -psi_Q2 + self.L_mq * i_q + self.L_mq * i_Q1 + self.L_Q2 * i_Q2,
         )
         return f
 
@@ -122,7 +123,7 @@ class synchronous_machine_infinite_bus(ptype_dae):
         """
         me = self.dtype_u(self.init)
 
-        if t == 0: 
+        if t == 0:
             psi_d = 0.7770802016688648
             psi_q = -0.6337183129426077
             psi_F = 1.152966888216155
@@ -136,15 +137,12 @@ class synchronous_machine_infinite_bus(ptype_dae):
             i_Q1 = 0.0
             i_Q2 = 0.0
 
-            delta_r = 39.1 * np.pi/180
-            omega_0 = 2*np.pi*60
-            omega_b = 2*np.pi*60
-            omega_m = omega_0/omega_b #= omega_r since pf = 2 i.e. two pole machine 
+            delta_r = 39.1 * np.pi / 180
+            omega_0 = 2 * np.pi * 60
+            omega_b = 2 * np.pi * 60
+            omega_m = omega_0 / omega_b  # = omega_r since pf = 2 i.e. two pole machine
 
-            me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
-                i_d, i_q, i_F, i_D, i_Q1, i_Q2,
-                delta_r,
-                omega_m)
+            me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, i_d, i_q, i_F, i_D, i_Q1, i_Q2, delta_r, omega_m)
         elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
@@ -209,37 +207,37 @@ class synchronous_machine_infinite_bus(ptype_dae):
 #         Returns:
 #             Current value of F(), 21 components
 #         """
-        
+
 #         # simulate torque change at t = 0.05
-#         if t >= 0.05: 
+#         if t >= 0.05:
 #             self.T_m = 0.354
 
 #         f = self.dtype_f(self.init)
 
-#         # u = [psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
+#         # u = [psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2,
 #         #       i_d, i_q, i_F, i_D, i_Q1, i_Q2
-#         #       omega_m, 
-#         #       v_d, v_q, 
+#         #       omega_m,
+#         #       v_d, v_q,
 #         #       iz_d, iz_q, il_d, il_q, vl_d, vl_q]
 
-#         # extract variables for readability 
-#         # algebraic components 
-#         psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2 = u[0], u[1], u[2], u[3], u[4], u[5] 
-#         i_d, i_q, i_F, i_D, i_Q1, i_Q2 = u[6], u[7], u[8], u[9], u[10], u[11] 
+#         # extract variables for readability
+#         # algebraic components
+#         psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2 = u[0], u[1], u[2], u[3], u[4], u[5]
+#         i_d, i_q, i_F, i_D, i_Q1, i_Q2 = u[6], u[7], u[8], u[9], u[10], u[11]
 #         # delta_r = u[12]
 #         omega_m = u[12]
 #         v_d, v_q = u[13], u[14]
 #         iz_d, iz_q, il_d, il_q, vl_d, vl_q = u[15], u[16], u[17], u[18], u[19], u[20]
 
-#         # differential components 
+#         # differential components
 #         # these result directly from the voltage equations, introduced e.g. pg. 145 Krause
-#         dpsi_d, dpsi_q, dpsi_F, dpsi_D, dpsi_Q1, dpsi_Q2 = du[0], du[1], du[2], du[3], du[4], du[5] 
+#         dpsi_d, dpsi_q, dpsi_F, dpsi_D, dpsi_Q1, dpsi_Q2 = du[0], du[1], du[2], du[3], du[4], du[5]
 #         # ddelta_r = du[12]
 #         domega_m = du[12]
 #         dv_d, dv_q = du[13], du[14]
 #         diz_d, diz_q, dvl_d, dvl_q = du[15], du[16],du[19], du[20]
-        
-#         # algebraic variables are i_d, i_q, i_F, i_D, i_Q1, i_Q2, il_d, il_q 
+
+#         # algebraic variables are i_d, i_q, i_F, i_D, i_Q1, i_Q2, il_d, il_q
 
 #         f[:] = (
 #             # differential generator
@@ -279,9 +277,9 @@ class synchronous_machine_infinite_bus(ptype_dae):
 #             Mesh containing fixed initial value, 5 components
 #         """
 #         me = self.dtype_u(self.init)
-        
+
 #         if t == 0:
-#             psi_d = 0.3971299 
+#             psi_d = 0.3971299
 #             psi_q = 0.9219154
 #             psi_F = 0.8374232
 #             psi_D = 0.5795112
@@ -291,7 +289,7 @@ class synchronous_machine_infinite_bus(ptype_dae):
 #             i_q = 0.5238156
 #             i_F = 1.565
 #             i_D = 0
-#             i_Q1 = 0 
+#             i_Q1 = 0
 #             i_Q2 = 0
 #             v_d = -0.9362397
 #             v_q = 0.4033005
@@ -303,15 +301,15 @@ class synchronous_machine_infinite_bus(ptype_dae):
 #             il_q = 0.5238147
 #             vl_d = -0.9119063
 #             vl_q = 0.3928611
-#             me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2, 
+#             me[:] = (psi_d, psi_q, psi_F, psi_D, psi_Q1, psi_Q2,
 #                 i_d, i_q, i_F, i_D, i_Q1, i_Q2,
-#                 omega_m, 
-#                 v_d, v_q, 
+#                 omega_m,
+#                 v_d, v_q,
 #                 iz_d, iz_q, il_d, il_q, vl_d, vl_q)
 #         elif t < self.t_end:
 #             me[:] = self.u_ref(t)
 #         else:
 #             warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
 #             me[:] = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-        
+
 #         return me

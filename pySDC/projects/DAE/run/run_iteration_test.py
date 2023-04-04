@@ -19,7 +19,7 @@ def setup():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = -1
-    # Used for generating the first set of plots. Chose this because in the convergence plots the three collocation methods investigated had converged. Maybe too big? -> actually looked at results for different step sizes. There was no real difference. 
+    # Used for generating the first set of plots. Chose this because in the convergence plots the three collocation methods investigated had converged. Maybe too big? -> actually looked at results for different step sizes. There was no real difference.
     # level_params['dt'] = 1e-3
     level_params['dt'] = 1e-4
 

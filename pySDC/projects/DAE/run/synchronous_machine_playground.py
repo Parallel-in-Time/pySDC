@@ -14,7 +14,7 @@ from pySDC.helpers.stats_helper import filter_stats
 
 def main():
     """
-    A testing ground for the synchronous machine model 
+    A testing ground for the synchronous machine model
     """
     # initialize level parameters
     level_params = dict()
@@ -29,7 +29,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1e-3 # tollerance for implicit solver
+    problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
     problem_params['nvars'] = 14
 
     # initialize step parameters
@@ -71,26 +71,38 @@ def main():
     # err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
     # print(f"Error is {err}")
 
-    print("HERE",uend)
+    print("HERE", uend)
 
-    uend_ref = [ 8.30823565e-01, -4.02584174e-01,  1.16966755e+00,  9.47592808e-01,
- -3.68076863e-01, -3.87492326e-01, -7.77837831e-01, -1.67347611e-01,
-  1.34810867e+00,  5.46223705e-04,  1.29690691e-02, -8.00823474e-02,
-  3.10281509e-01,  9.94039645e-01]
-    err = np.linalg.norm(uend-uend_ref, np.inf)
-    assert np.isclose(err,0, atol=1e-4), "Error too large."
+    uend_ref = [
+        8.30823565e-01,
+        -4.02584174e-01,
+        1.16966755e00,
+        9.47592808e-01,
+        -3.68076863e-01,
+        -3.87492326e-01,
+        -7.77837831e-01,
+        -1.67347611e-01,
+        1.34810867e00,
+        5.46223705e-04,
+        1.29690691e-02,
+        -8.00823474e-02,
+        3.10281509e-01,
+        9.94039645e-01,
+    ]
+    err = np.linalg.norm(uend - uend_ref, np.inf)
+    assert np.isclose(err, 0, atol=1e-4), "Error too large."
 
     # store results
     sol = get_sorted(stats, type='approx_solution', sortby='time')
     sol_dt = np.array([sol[i][0] for i in range(len(sol))])
     sol_data = np.array([[sol[j][1][i] for j in range(len(sol))] for i in range(problem_params['nvars'])])
     niter = filter_stats(stats, type='niter')
-    niter = np.fromiter(niter.values(),int)
-    
+    niter = np.fromiter(niter.values(), int)
+
     data = dict()
     data['dt'] = sol_dt
     data['solution'] = sol_data
-    data['niter']= round(statistics.mean(niter))
+    data['niter'] = round(statistics.mean(niter))
     pickle.dump(data, open("data/dae_conv_data.p", 'wb'))
 
     print("Done")
