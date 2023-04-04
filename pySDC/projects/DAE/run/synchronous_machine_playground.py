@@ -71,8 +71,6 @@ def main():
     # err = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
     # print(f"Error is {err}")
 
-    print("HERE", uend)
-
     uend_ref = [
         8.30823565e-01,
         -4.02584174e-01,

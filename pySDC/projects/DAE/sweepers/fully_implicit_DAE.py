@@ -121,7 +121,7 @@ class fully_implicit_DAE(sweeper):
                 impl_fn,
                 L.f[m],
                 method='hybr',
-                tol=P.params.newton_tol,
+                tol=P.newton_tol
                 # callback= lambda x, f: print("solution:", x, " residual: ", f)
             )
             # update gradient (recall L.f is being used to store the gradient)

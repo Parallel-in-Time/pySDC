@@ -12,8 +12,8 @@ class synchronous_machine_infinite_bus(ptype_dae):
     attached to infinite bus
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        super(synchronous_machine_infinite_bus, self).__init__(problem_params, dtype_u, dtype_f)
+    def __init__(self, nvars, newton_tol):
+        super(synchronous_machine_infinite_bus, self).__init__(nvars, newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/synch_gen.npy')
