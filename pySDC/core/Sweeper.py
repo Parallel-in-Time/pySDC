@@ -118,6 +118,9 @@ class sweeper(object):
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
             self.parallelizable = True
+        elif qd_type == 'MIN_TG':
+            m = QDmat.shape[0] - 1
+            QDmat[1:, 1:] = np.diag(coll.nodes) / m
         elif qd_type == 'MIN3':
             m = QDmat.shape[0] - 1
             x = None

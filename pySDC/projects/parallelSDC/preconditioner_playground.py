@@ -36,7 +36,7 @@ def main():
     controller_params['logger_level'] = 30
 
     # set up list of Q-delta types and setups
-    qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN']
+    qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_TG']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
@@ -146,7 +146,7 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    assert len(results) == (6 + 6 + 10 + 5) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
+    assert len(results) == (6 + 6 + 10 + 5) * 7 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     # write out for later visualization
     file = open('data/parallelSDC_iterations_precond.pkl', 'wb')
@@ -175,12 +175,12 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
+    assert len(qd_type_list) == 7, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN']
-    marker_list = [None, None, 's', 'o', '^']
-    color_list = ['k', 'k', 'r', 'g', 'b']
+    qd_type_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_TG']
+    marker_list = [None, None, 's', 'o', '^', 'd', 'x']
+    color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 
     plt_helper.setup_mpl()
 
