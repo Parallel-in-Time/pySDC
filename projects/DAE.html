@@ -54,15 +54,10 @@
 <h2>Project overview<a class="headerlink" href="#project-overview" title="Permalink to this heading">¶</a></h2>
 <ul>
 <li><dl>
-<dt>hooks</dt><dd><ul>
+<dt>misc</dt><dd><ul>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_approx_solution.py</span></code></div>
-<div class="line">Simple hook class to read out the approximate solution after each time step.</div>
-</div>
-</li>
-<li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_error.py</span></code></div>
-<div class="line">Simple hook class to read out the error between approximate and exact solution after each time step. Note that for some problems the exact solution is only implemented to return initial conditions. In these cases this hook should not be used.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">HookClass_DAE.py</span></code></div>
+<div class="line">Simple hook classes to read out the approximate solution and error after each time step.</div>
 </div>
 </li>
 </ul>
@@ -81,6 +76,11 @@
 <div class="line">Reads a previously generated data file in <cite>.npy</cite> format and generates a plot on logarithmic axis of the specified parameters. Commonly used to generate convergence plots.</div>
 </div>
 </li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">semilogy_plot.py</span></code></div>
+<div class="line">Reads a previously generated data file in <cite>.npy</cite> format and generates a plot on logarithmic y-axis and linear x-axis.</div>
+</div>
+</li>
 </ul>
 </dd>
 </dl>
@@ -90,6 +90,11 @@
 <li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">simple_DAE.py</span></code></div>
 <div class="line">A number of simple examples of differential algebraic equations are implemented here: a linear index-2 system with known analytical solution, the 2D pendulum as an index-3 system and a very simple fully implicit index-2 system that is not solvable by most numerical methods for certain values of a parameter.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">synchronous_machine.py</span></code></div>
+<div class="line">Synchronous machine model attached to an infinite bus undergoing torque disturbance test. Results in an index-1 system.</div>
 </div>
 </li>
 <li><div class="line-block">
@@ -109,8 +114,18 @@
 </div>
 </li>
 <li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">run_iteration_test.py</span></code></div>
+<div class="line">Script to generate data describing behaviour of error and residual of applying SDC to the simple linear index-2 differential algebraic system mentioned above.</div>
+</div>
+</li>
+<li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_dae_playground.py</span></code></div>
 <div class="line">Testing arena for the fully implicit sweeper.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">synchronous_machine_playground.py</span></code></div>
+<div class="line">Testing arena for the synchronous machine model.</div>
 </div>
 </li>
 </ul>
@@ -122,11 +137,6 @@
 <li><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">fully_implicit_DAE.py</span></code></div>
 <div class="line">Sweeper that accepts a fully implicit formulation of a system of differential equations and applies to it a modified version of spectral deferred correction</div>
-</div>
-</li>
-<li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">semi_explicit_DAE.py</span></code></div>
-<div class="line">Sweeper that accepts a semi-explicit formulation of a system of differential algebraic equations and applies to it a modified version of spectral deferred correction</div>
 </div>
 </li>
 </ul>
