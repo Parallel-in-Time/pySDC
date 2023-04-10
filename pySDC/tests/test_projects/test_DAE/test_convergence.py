@@ -12,8 +12,8 @@ def test_main():
     num_samples = 2
     run_params = dict()
     run_params['t0'] = 0.0
-    run_params['tend'] = 1e-3
-    run_params['dt_list'] = np.logspace(-3, -5, num=num_samples)
+    run_params['tend'] = 1e-1
+    run_params['dt_list'] = np.logspace(-2, -3, num=num_samples)
     run_params['qd_list'] = ['IE', 'LU']
     run_params['num_nodes_list'] = [3]
     conv_data = run(description, controller_params, run_params)
@@ -32,4 +32,4 @@ def test_main():
 #   qd_list = ['IE', 'LU']
 #   num_nodes_list = [3]
 
-test_dict = {'IE': {3: {1e-3: 2.4e-4, 1e-5: 7.12e-13}}, 'LU': {3: {1e-3: 2.4e-4, 1e-5: 7.12e-13}}}
+test_dict = {'IE': {3: {1e-2: 1.4e-12, 1e-3: 2.0e-14}}, 'LU': {3: {1e-2: 1.4e-12, 1e-3: 2.2e-14}}}
