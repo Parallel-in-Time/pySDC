@@ -40,7 +40,7 @@ def main(comm=None):
     controller_params['logger_level'] = 30
 
     # set up list of Q-delta types and setups
-    qd_list = ['IEpar', 'Qpar', 'MIN', 'MIN3']
+    qd_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
@@ -151,7 +151,7 @@ def main(comm=None):
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    assert len(results) == (6 + 6 + 10 + 5) * 4 + 4, 'ERROR: did not get all results, got %s' % len(results)
+    assert len(results) == (6 + 6 + 10 + 5) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     if comm.Get_rank() == 0:
         # write out for later visualization
@@ -181,12 +181,12 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 4, 'ERROR did not find four preconditioners, got %s' % qd_type_list
-    assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
+    assert len(qd_type_list) == 5, 'ERROR did not find four preconditioners, got %s' % qd_type_list
+    assert len(setup_list) == 4, 'ERROR: did not find four setup, got %s' % setup_list
 
-    qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3']
-    marker_list = ['s', 'o', '^', 'v']
-    color_list = ['r', 'g', 'b', 'c']
+    qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    marker_list = ['s', 'o', '^', 'v', 'x']
+    color_list = ['r', 'g', 'b', 'c', 'm']
 
     plt_helper.setup_mpl()
 
