@@ -9,6 +9,7 @@ from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.advection import run_advection
+from pySDC.projects.Resilience.vdp import run_vdp
 
 
 def mutiple_runs(prob, dts, Tend, num_nodes, quad_type='RADAU-RIGHT'):
@@ -107,7 +108,7 @@ def main():
     fig, ax = plt.subplots()
     num_nodes = 3
     quad_type = 'RADAU-RIGHT'
-    check_order(ax, run_advection, [1e-1, 5e-2, 1e-2], 5e-1, num_nodes, quad_type)
+    check_order(ax, run_vdp, [1e-1, 5e-2, 1e-2], 5e-1, num_nodes, quad_type)
     plt.show()
 
 

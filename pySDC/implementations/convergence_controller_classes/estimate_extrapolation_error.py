@@ -412,6 +412,20 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
 
 class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
+    """
+    This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated
+    solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
+    of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don't share the order of
+    accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
+    nodes + 1 (locally).
+    That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling
+    terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error
+    estimate that is of the order accuracy of the stages.
+    This can be used for adaptivity, for instance, with the nice property that it doesn't matter how we arrived at the
+    converged collocation solution, as long as we did. We don't rely on knowing the order of accuracy after every sweep,
+    only after convergence of the collocation problem has been achieved, which we can check from the residual.
+    """
+
     def setup(self, controller, params, description, **kwargs):
         """
         We need this convergence controller to become active after the check for convergence, because we need the step
