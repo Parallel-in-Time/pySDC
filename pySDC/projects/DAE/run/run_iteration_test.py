@@ -4,6 +4,7 @@ import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
+from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 from pySDC.helpers.stats_helper import get_sorted
@@ -18,7 +19,9 @@ def setup():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = -1
-    level_params['dt'] = 1e-3
+    # Used for generating the first set of plots. Chose this because in the convergence plots the three collocation methods investigated had converged. Maybe too big? -> actually looked at results for different step sizes. There was no real difference.
+    # level_params['dt'] = 1e-3
+    level_params['dt'] = 1e-4
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
@@ -99,15 +102,15 @@ def run(description, controller_params, run_params):
                 residual = get_sorted(stats, type='residual_post_step', sortby='time')
                 niter = filter_stats(stats, type='niter')
 
-                conv_data[qd_type][num_nodes]['error'][i] = np.linalg.norm([err[i][1] for i in range(len(err))], np.inf)
+                conv_data[qd_type][num_nodes]['error'][i] = np.linalg.norm([err[j][1] for j in range(len(err))], np.inf)
                 conv_data[qd_type][num_nodes]['residual'][i] = np.linalg.norm(
-                    [residual[i][1] for i in range(len(residual))], np.inf
+                    [residual[j][1] for j in range(len(residual))], np.inf
                 )
                 conv_data[qd_type][num_nodes]['niter'][i] = round(statistics.mean(niter.values()))
                 print(
                     "Error=",
                     conv_data[qd_type][num_nodes]['error'][i],
-                    ".  Residual=",
+                    "  Residual=",
                     conv_data[qd_type][num_nodes]['residual'][i],
                 )
 
@@ -123,5 +126,5 @@ if __name__ == "__main__":
 
     description, controller_params, run_params = setup()
     conv_data = run(description, controller_params, run_params)
-    pickle.dump(conv_data, open("data/dae_conv_data.p", 'wb'))
+    pickle.dump(conv_data, open("data/dae_iter_data.p", 'wb'))
     print("Done")

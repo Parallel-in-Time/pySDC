@@ -17,11 +17,17 @@ def plot_convergence():  # pragma: no cover
     # Configure specific line and symbol style_lists
     # These must match the data being loaded
     # General style_list settings e.g. font, should be changed in pySDC.helpers.plot_helper
-    num_nodes_list = [3, 4, 5]
-    color_list = ["r", "blue", "g"]
-    shape_list = ["o", "d", "s"]
-    style_list = [":", "-.", "--"]
-    order_list = [5, 7, 9]
+    # num_nodes_list = [3, 4, 5]
+    # color_list = ["r", "blue", "g"]
+    # shape_list = ["o", "d", "s"]
+    # style_list = [":", "-.", "--"]
+    # order_list = [5, 7, 9]
+
+    num_nodes_list = [3]
+    color_list = ["blue"]
+    shape_list = ["d"]
+    style_list = ["-."]
+    order_list = [5]
 
     # Some nasty hacking to get the iteration numbers positioned correctly individually in each plot
     num_data_points = len(data[next(iter(data))][num_nodes_list[0]]['error'])
@@ -65,14 +71,9 @@ def plot_convergence():  # pragma: no cover
             num_nodes_list, color_list, shape_list, style_list, order_list
         ):
             # Plot convergence data
-            if num_nodes == 4:
-                data_start_point = 3
-            else:
-                data_start_point = 0
-
             ax.loglog(
-                data[qd_type][num_nodes]['dt'][data_start_point:],
-                data[qd_type][num_nodes]['error'][data_start_point:],
+                data[qd_type][num_nodes]['dt'][:],
+                data[qd_type][num_nodes]['error'][:],
                 label="node count = {}".format(num_nodes),
                 color=color,
                 marker=shape,
@@ -109,8 +110,8 @@ def plot_convergence():  # pragma: no cover
             # Update the current y limits of the data
             # Ensures that final plot fits the data but cuts off the excess reference lines
             ylim = (
-                min(np.append(data[qd_type][num_nodes]['error'][data_start_point:], ylim[0])),
-                max(np.append(data[qd_type][num_nodes]['error'][data_start_point:], ylim[1])),
+                min(np.append(data[qd_type][num_nodes]['error'][:], ylim[0])),
+                max(np.append(data[qd_type][num_nodes]['error'][:], ylim[1])),
             )
 
         ax.set(ylim=((1e-2 * ylim[0], 5e1 * ylim[1])))

@@ -17,11 +17,12 @@ class pendulum_2d(ptype_dae):
         """
         super().__init__(nvars, newton_tol)
         # load reference solution
-        data = np.load(r'pySDC/projects/DAE/misc/data/pendulum.npy')
-        t = data[:, 0]
-        solution = data[:, 1:]
-        self.u_ref = interp1d(t, solution, kind='cubic', axis=0, fill_value='extrapolate')
-        self.t_end = t[-1]
+        # data file must be generated and stored under misc/data and self.t_end = t[-1]
+        # data = np.load(r'pySDC/projects/DAE/misc/data/pendulum.npy')
+        # t = data[:, 0]
+        # solution = data[:, 1:]
+        # self.u_ref = interp1d(t, solution, kind='cubic', axis=0, fill_value='extrapolate')
+        self.t_end = 0.0
 
     def eval_f(self, u, du, t):
         """
@@ -48,8 +49,9 @@ class pendulum_2d(ptype_dae):
             Mesh containing fixed initial value, 5 components
         """
         me = self.dtype_u(self.init)
-
-        if t < self.t_end:
+        if t == 0:
+            me[:] = (-1, 0, 0, 0, 0)
+        elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
             warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
