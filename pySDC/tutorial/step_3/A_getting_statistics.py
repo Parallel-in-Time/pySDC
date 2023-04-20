@@ -40,7 +40,7 @@ def main():
 
     f.close()
 
-    assert all([item[1] == 12 for item in iter_counts]), (
+    assert all(item[1] == 12 for item in iter_counts), (
         'ERROR: number of iterations are not as expected, got %s' % iter_counts
     )
 
@@ -50,32 +50,32 @@ def run_simulation():
     A simple test program to run IMEX SDC for a single time step
     """
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['restol'] = 1e-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters
-    problem_params = dict()
+    problem_params = {}
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 20
 
     # initialize controller parameters (<-- this is new!)
-    controller_params = dict()
+    controller_params = {}
     controller_params['logger_level'] = 30  # reduce verbosity of each run
 
     # Fill description dictionary for easy hierarchy creation
-    description = dict()
+    description = {}
     description['problem_class'] = heatNd_forced
     description['problem_params'] = problem_params
     description['sweeper_class'] = imex_1st_order

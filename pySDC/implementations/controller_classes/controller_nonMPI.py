@@ -326,7 +326,7 @@ class controller_nonMPI(controller):
 
         switcher.get(stage, self.default)(MS_running)
 
-        return all([S.status.done for S in local_MS_active])
+        return all(S.status.done for S in local_MS_active)
 
     def spread(self, local_MS_running):
         """
@@ -511,7 +511,7 @@ class controller_nonMPI(controller):
             if self.params.all_to_done:
                 for hook in self.hooks:
                     hook.pre_comm(step=S, level_number=0)
-                S.status.done = all([T.status.done for T in local_MS_running])
+                S.status.done = all(T.status.done for T in local_MS_running)
                 for hook in self.hooks:
                     hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
