@@ -1,7 +1,6 @@
 import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.core.Collocation import CollBase
 
 
 class InterpolateBetweenRestarts(ConvergenceController):
@@ -74,7 +73,7 @@ class InterpolateBetweenRestarts(ConvergenceController):
             controller (pySDC.Controller): The controller
             step (pySDC.Step.step): The current step
         """
-        if step.status.restart and all([level.status.dt_new for level in step.levels]):
+        if step.status.restart and all(level.status.dt_new for level in step.levels):
             for level in step.levels:
                 nodes_old = level.sweep.coll.nodes.copy()
                 nodes_new = level.sweep.coll.nodes.copy() * level.status.dt_new / level.params.dt

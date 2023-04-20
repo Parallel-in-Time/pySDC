@@ -100,11 +100,11 @@ def run_leaky_superconductor(
     """
 
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['dt'] = 10.0
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
@@ -116,11 +116,11 @@ def run_leaky_superconductor(
         problem_params = {**problem_params, **custom_problem_params}
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 5
 
     # initialize controller parameters
-    controller_params = dict()
+    controller_params = {}
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
@@ -129,7 +129,7 @@ def run_leaky_superconductor(
         controller_params = {**controller_params, **custom_controller_params}
 
     # fill description dictionary for easy step instantiation
-    description = dict()
+    description = {}
     description['problem_class'] = LeakySuperconductorIMEX if imex else LeakySuperconductor
     description['problem_params'] = problem_params
     description['sweeper_class'] = imex_1st_order if imex else generic_implicit
@@ -240,7 +240,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
         error[imex] = get_sorted(stats, type='e_global_post_run')[-1][1]
 
         if imex:
-            assert all([me == 0 for me in newton_iter]), "IMEX is not supposed to do Newton iterations!"
+            assert all(me == 0 for me in newton_iter), "IMEX is not supposed to do Newton iterations!"
         else:
             assert (
                 max(newton_iter) / num_nodes / maxiter <= newton_iter_max

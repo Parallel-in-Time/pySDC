@@ -64,7 +64,7 @@ def main(num_proc_list=None, fname=None, multi_level=True):
         f.write('\n')
         print()
 
-        assert all([item[1] <= 8 for item in iter_counts]), "ERROR: weird iteration counts, got %s" % iter_counts
+        assert all(item[1] <= 8 for item in iter_counts), "ERROR: weird iteration counts, got %s" % iter_counts
 
     f.close()
 
@@ -80,40 +80,40 @@ def set_parameters_ml():
         float: end time
     """
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     # initialize problem parameters
-    problem_params = dict()
+    problem_params = {}
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
     problem_params['nvars'] = [63, 31]  # number of degrees of freedom for each level
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 50
     step_params['errtol'] = 1e-05
 
     # initialize space transfer parameters
-    space_transfer_params = dict()
+    space_transfer_params = {}
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 6
 
     # initialize controller parameters
-    controller_params = dict()
+    controller_params = {}
     controller_params['logger_level'] = 30
     controller_params['all_to_done'] = True  # can ask the controller to keep iterating all steps until the end
     controller_params['predict_type'] = 'pfasst_burnin'  # activate iteration estimator
 
     # fill description dictionary for easy step instantiation
-    description = dict()
+    description = {}
     description['problem_class'] = heatNd_unforced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_LU  # pass sweeper
@@ -141,32 +141,32 @@ def set_parameters_sl():
         float: end time
     """
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters
-    problem_params = dict()
+    problem_params = {}
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
     problem_params['nvars'] = 63  # number of degrees of freedom for each level
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 50
 
     # initialize controller parameters
-    controller_params = dict()
+    controller_params = {}
     controller_params['logger_level'] = 30
 
     # fill description dictionary for easy step instantiation
-    description = dict()
+    description = {}
     description['problem_class'] = heatNd_unforced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_LU  # pass sweeper

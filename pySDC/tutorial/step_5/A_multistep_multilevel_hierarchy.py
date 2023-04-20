@@ -13,33 +13,33 @@ def main():
     """
 
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['restol'] = 1e-10
     level_params['dt'] = 0.5
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     # initialize problem parameters
-    problem_params = dict()
+    problem_params = {}
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [31, 15, 7]  # number of degrees of freedom for each level
     problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 20
 
     # initialize space transfer parameters
-    space_transfer_params = dict()
+    space_transfer_params = {}
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 6
 
     # fill description dictionary for easy step instantiation
-    description = dict()
+    description = {}
     description['problem_class'] = heatNd_forced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
@@ -61,7 +61,7 @@ def main():
         print(out)
     f.close()
 
-    assert all([len(S.levels) == 3 for S in controller.MS]), "ERROR: not all steps have the same number of levels"
+    assert all(len(S.levels) == 3 for S in controller.MS), "ERROR: not all steps have the same number of levels"
 
 
 if __name__ == "__main__":

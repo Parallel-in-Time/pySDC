@@ -61,7 +61,7 @@ class LogError(hooks):
             iter=step.status.iter,
             sweep=L.status.sweep,
             type=f'e_local{suffix}',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.uend),
+            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend),
         )
 
 

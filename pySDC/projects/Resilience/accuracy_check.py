@@ -206,7 +206,7 @@ def plot(res, ax, k, var='dt'):
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
-        if all([me == 0.0 for me in res[keys[i]]]):
+        if all(me == 0.0 for me in res[keys[i]]):
             continue
         order = get_accuracy_order(res, key=keys[i], var=var)
         if keys[i] == 'e_embedded':

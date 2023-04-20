@@ -58,7 +58,7 @@ class ButcherTableau(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any([matrix[i, i] != 0 for i in range(self.num_nodes - 1)])
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 1))
 
 
 class ButcherTableauEmbedded(object):
@@ -116,7 +116,7 @@ class ButcherTableauEmbedded(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any([matrix[i, i] != 0 for i in range(self.num_nodes - 2)])
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 2))
 
 
 class RungeKutta(generic_implicit):

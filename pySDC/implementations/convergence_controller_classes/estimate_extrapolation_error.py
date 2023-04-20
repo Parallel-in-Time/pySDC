@@ -52,8 +52,8 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
 
         default_params = {
             "control_order": -75,
-            "use_adaptivity": any([me == Adaptivity for me in description.get("convergence_controllers", {})]),
-            "use_HotRod": any([me == HotRod for me in description.get("convergence_controllers", {})]),
+            "use_adaptivity": True in [me == Adaptivity for me in description.get("convergence_controllers", {})],
+            "use_HotRod": True in [me == HotRod for me in description.get("convergence_controllers", {})],
             "order_time_marching": description["step_params"]["maxiter"],
         }
 
@@ -410,4 +410,88 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         else:
             S.levels[0].status.error_extrapolation_estimate = None
 
+
+class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
+    """
+    This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated
+    solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
+    of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don't share the order of
+    accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
+    nodes + 1 (locally).
+    That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling
+    terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error
+    estimate that is of the order accuracy of the stages.
+    This can be used for adaptivity, for instance, with the nice property that it doesn't matter how we arrived at the
+    converged collocation solution, as long as we did. We don't rely on knowing the order of accuracy after every sweep,
+    only after convergence of the collocation problem has been achieved, which we can check from the residual.
+    """
+
+    def setup(self, controller, params, description, **kwargs):
+        """
+        We need this convergence controller to become active after the check for convergence, because we need the step
+        to be converged.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters with default values
+        """
+        num_nodes = description['sweeper_params']['num_nodes']
+
+        default_params = {
+            "control_order": 400,
+            'Taylor_order': 2 * num_nodes,
+            'n': num_nodes,
+        }
+
+        return {**super().setup(controller, params, description, **kwargs), **default_params}
+
+    def post_iteration_processing(self, controller, S, **kwargs):
+        """
+        Compute the extrapolated error estimate here if the step is converged.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        if not S.status.done:
+            return None
+
+        lvl = S.levels[0]
+
+        nodes_ = lvl.sweep.coll.nodes * S.dt
+        nodes = S.time + np.append(0, nodes_[:-1])
+        t_eval = S.time + nodes_[-1]
+
+        dts = np.append(nodes_[0], nodes_[1:] - nodes_[:-1])
+        self.params.Taylor_order = 2 * len(nodes)
+        self.params.n = len(nodes)
+
+        # compute the extrapolation coefficients
+        # TODO: Maybe this can be reused
+        self.get_extrapolation_coefficients(nodes, dts, t_eval)
+
+        # compute the extrapolated solution
+        if type(lvl.f[0]) == imex_mesh:
+            f = [me.impl + me.expl for me in lvl.f]
+        elif type(lvl.f[0]) == mesh:
+            f = lvl.f
+        else:
+            raise DataError(
+                f"Unable to store f from datatype {type(lvl.f[0])}, extrapolation based error estimate only\
+ works with types imex_mesh and mesh"
+            )
+
+        u_ex = lvl.u[-1] * 0.0
+        for i in range(self.params.n):
+            u_ex += self.coeff.u[i] * lvl.u[i] + self.coeff.f[i] * f[i]
+
+        # store the error
+        lvl.status.error_extrapolation_estimate = abs(u_ex - lvl.u[-1]) * self.coeff.prefactor
         return None

@@ -70,4 +70,4 @@ if __name__ == "__main__":
         f.write('\n')
         print()
 
-        assert all([item[1] <= 8 for item in iter_counts]), "ERROR: weird iteration counts, got %s" % iter_counts
+        assert all(item[1] <= 8 for item in iter_counts), "ERROR: weird iteration counts, got %s" % iter_counts
