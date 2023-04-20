@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_adaptive_collocation_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.3">coverage.py v7.2.3</a>,
-            created at 2023-04-11 09:28 +0000
+            created at 2023-04-20 11:46 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -408,7 +408,7 @@
     <p class="pln"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">        <span class="nam">switcher</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">stage</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">default</span><span class="op">)</span><span class="op">(</span><span class="nam">MS_running</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">        <span class="key">return</span> <span class="nam">all</span><span class="op">(</span><span class="op">[</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="key">for</span> <span class="nam">S</span> <span class="key">in</span> <span class="nam">local_MS_active</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">        <span class="key">return</span> <span class="nam">all</span><span class="op">(</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="key">for</span> <span class="nam">S</span> <span class="key">in</span> <span class="nam">local_MS_active</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t330" href="#t330">330</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t331" href="#t331">331</a></span><span class="t">    <span class="key">def</span> <span class="nam">spread</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">local_MS_running</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t332" href="#t332">332</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -593,7 +593,7 @@
     <p class="run"><span class="n"><a id="t511" href="#t511">511</a></span><span class="t">            <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">all_to_done</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t512" href="#t512">512</a></span><span class="t">                <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t513" href="#t513">513</a></span><span class="t">                    <span class="nam">hook</span><span class="op">.</span><span class="nam">pre_comm</span><span class="op">(</span><span class="nam">step</span><span class="op">=</span><span class="nam">S</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">=</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t514" href="#t514">514</a></span><span class="t">                <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="op">=</span> <span class="nam">all</span><span class="op">(</span><span class="op">[</span><span class="nam">T</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="key">for</span> <span class="nam">T</span> <span class="key">in</span> <span class="nam">local_MS_running</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t514" href="#t514">514</a></span><span class="t">                <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="op">=</span> <span class="nam">all</span><span class="op">(</span><span class="nam">T</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="key">for</span> <span class="nam">T</span> <span class="key">in</span> <span class="nam">local_MS_running</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t515" href="#t515">515</a></span><span class="t">                <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t516" href="#t516">516</a></span><span class="t">                    <span class="nam">hook</span><span class="op">.</span><span class="nam">post_comm</span><span class="op">(</span><span class="nam">step</span><span class="op">=</span><span class="nam">S</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">=</span><span class="num">0</span><span class="op">,</span> <span class="nam">add_to_stats</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t517" href="#t517">517</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -772,7 +772,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_adaptive_collocation_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.3">coverage.py v7.2.3</a>,
-            created at 2023-04-11 09:28 +0000
+            created at 2023-04-20 11:46 +0000
         </p>
     </div>
 </footer>

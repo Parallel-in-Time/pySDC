@@ -305,6 +305,62 @@ where only values are used for extrapolation which are in memory of other proces
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimateExtrapolationErrorWithinQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorWithinQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase</span></code></a></p>
+<p>This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated
+solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
+of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don’t share the order of
+accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
+nodes + 1 (locally).
+That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling
+terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error
+estimate that is of the order accuracy of the stages.
+This can be used for adaptivity, for instance, with the nice property that it doesn’t matter how we arrived at the
+converged collocation solution, as long as we did. We don’t rely on knowing the order of accuracy after every sweep,
+only after convergence of the collocation problem has been achieved, which we can check from the residual.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorWithinQ.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the extrapolated error estimate here if the step is converged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorWithinQ.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>We need this convergence controller to become active after the check for convergence, because we need the step
+to be converged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters with default values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -334,6 +390,11 @@ where only values are used for extrapolation which are in memory of other proces
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><code class="docutils literal notranslate"><span class="pre">prepare_next_block_nonMPI()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorWithinQ</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 </ul>

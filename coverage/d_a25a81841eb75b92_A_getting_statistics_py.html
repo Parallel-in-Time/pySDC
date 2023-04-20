@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_a25a81841eb75b92_B_adding_statistics_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.3">coverage.py v7.2.3</a>,
-            created at 2023-04-11 09:28 +0000
+            created at 2023-04-20 11:46 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -122,7 +122,7 @@
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">    <span class="nam">f</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">    <span class="key">assert</span> <span class="nam">all</span><span class="op">(</span><span class="op">[</span><span class="nam">item</span><span class="op">[</span><span class="num">1</span><span class="op">]</span> <span class="op">==</span> <span class="num">12</span> <span class="key">for</span> <span class="nam">item</span> <span class="key">in</span> <span class="nam">iter_counts</span><span class="op">]</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">    <span class="key">assert</span> <span class="nam">all</span><span class="op">(</span><span class="nam">item</span><span class="op">[</span><span class="num">1</span><span class="op">]</span> <span class="op">==</span> <span class="num">12</span> <span class="key">for</span> <span class="nam">item</span> <span class="key">in</span> <span class="nam">iter_counts</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">        <span class="str">'ERROR: number of iterations are not as expected, got %s'</span> <span class="op">%</span> <span class="nam">iter_counts</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -132,32 +132,32 @@
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t"><span class="str">    A simple test program to run IMEX SDC for a single time step</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">    <span class="com"># initialize level parameters</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="nam">level_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="nam">level_params</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">    <span class="nam">level_params</span><span class="op">[</span><span class="str">'restol'</span><span class="op">]</span> <span class="op">=</span> <span class="num">1e-10</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">    <span class="nam">level_params</span><span class="op">[</span><span class="str">'dt'</span><span class="op">]</span> <span class="op">=</span> <span class="num">0.1</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">    <span class="com"># initialize sweeper parameters</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">    <span class="nam">sweeper_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">    <span class="nam">sweeper_params</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">    <span class="nam">sweeper_params</span><span class="op">[</span><span class="str">'quad_type'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'RADAU-RIGHT'</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">    <span class="nam">sweeper_params</span><span class="op">[</span><span class="str">'num_nodes'</span><span class="op">]</span> <span class="op">=</span> <span class="num">3</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">    <span class="com"># initialize problem parameters</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">    <span class="nam">problem_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">    <span class="nam">problem_params</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'nu'</span><span class="op">]</span> <span class="op">=</span> <span class="num">0.1</span>  <span class="com"># diffusion coefficient</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'freq'</span><span class="op">]</span> <span class="op">=</span> <span class="num">4</span>  <span class="com"># frequency for the test value</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'nvars'</span><span class="op">]</span> <span class="op">=</span> <span class="num">1023</span>  <span class="com"># number of degrees of freedom</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'bc'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'dirichlet-zero'</span>  <span class="com"># boundary conditions</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">    <span class="com"># initialize step parameters</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">    <span class="nam">step_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">    <span class="nam">step_params</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">    <span class="nam">step_params</span><span class="op">[</span><span class="str">'maxiter'</span><span class="op">]</span> <span class="op">=</span> <span class="num">20</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">    <span class="com"># initialize controller parameters (&lt;-- this is new!)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">    <span class="nam">controller_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">    <span class="nam">controller_params</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">'logger_level'</span><span class="op">]</span> <span class="op">=</span> <span class="num">30</span>  <span class="com"># reduce verbosity of each run</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">    <span class="com"># Fill description dictionary for easy hierarchy creation</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">    <span class="nam">description</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">    <span class="nam">description</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'problem_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">heatNd_forced</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'problem_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">problem_params</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'sweeper_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">imex_1st_order</span>&nbsp;</span><span class="r"></span></p>
@@ -193,7 +193,7 @@
             <a id="nextFileLink" class="nav" href="d_a25a81841eb75b92_B_adding_statistics_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.3">coverage.py v7.2.3</a>,
-            created at 2023-04-11 09:28 +0000
+            created at 2023-04-20 11:46 +0000
         </p>
     </div>
 </footer>

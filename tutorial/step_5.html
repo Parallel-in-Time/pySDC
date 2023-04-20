@@ -77,33 +77,33 @@ Also, the instantiation of (the list of) steps via the controllers is implemente
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># initialize level parameters</span>
-    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
 
     <span class="c1"># initialize sweeper parameters</span>
-    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 
     <span class="c1"># initialize problem parameters</span>
-    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
-    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
 
     <span class="c1"># initialize space transfer parameters</span>
-    <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
-    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>  <span class="c1"># pass problem class</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>  <span class="c1"># pass sweeper (see part B)</span>
@@ -125,7 +125,7 @@ Also, the instantiation of (the list of) steps via the controllers is implemente
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">]),</span> <span class="s2">&quot;ERROR: not all steps have the same number of levels&quot;</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">),</span> <span class="s2">&quot;ERROR: not all steps have the same number of levels&quot;</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
