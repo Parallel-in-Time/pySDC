@@ -110,7 +110,7 @@ class ptype(RegisterParams):
             t_init (float): the starting time
 
         Returns:
-            numpy.ndarray: exact solution
+            numpy.ndarray: Reference solution
         """
         import numpy as np
         from scipy.integrate import solve_ivp
