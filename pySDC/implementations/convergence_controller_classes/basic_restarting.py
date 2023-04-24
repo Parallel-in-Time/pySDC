@@ -70,6 +70,10 @@ class BasicRestarting(ConvergenceController):
             "crash_after_max_restarts": True,
         }
 
+        from pySDC.implementations.hooks.log_restarts import LogRestarts
+
+        controller.add_hook(LogRestarts)
+
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def setup_status_variables(self, controller, **kwargs):
