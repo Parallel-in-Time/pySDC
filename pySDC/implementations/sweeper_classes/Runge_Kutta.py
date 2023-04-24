@@ -1,12 +1,9 @@
 import numpy as np
 import logging
 
-from pySDC.core.Sweeper import _Pars
+from pySDC.core.Sweeper import sweeper, _Pars
 from pySDC.core.Errors import ParameterError
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.datatype_classes.mesh import imex_mesh, mesh
-from pySDC.core.Sweeper import sweeper
 
 
 class ButcherTableau(object):
