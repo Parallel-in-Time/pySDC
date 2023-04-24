@@ -247,18 +247,12 @@ def test_embedded_estimate_order(sweeper):
 
     custom_controller_params = {'logger_level': 40}
 
-    expected_order = {
-        Cash_Karp: [5],
-        Heun_Euler: [2],
-        DIRK34: [4],
-    }
-
     Tend = 7e-2
     dt_list = Tend * 2.0 ** (-np.arange(8))
     prob = run_vdp
     plot_all_errors(
         ax,
-        expected_order.get(sweeper, None),
+        [sweeper.get_update_order()],
         True,
         Tend_fixed=Tend,
         custom_description=description,
