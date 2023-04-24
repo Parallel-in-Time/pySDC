@@ -22,7 +22,7 @@ class LorenzAttractor(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, sigma=10.0, rho=28.0, beta=8 / 3, newton_tol=1e-9, newton_maxiter=99):
+    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99):
         """
         Initialization routine
 
@@ -37,6 +37,7 @@ class LorenzAttractor(ptype):
             'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=True
         )
         self.work_counters['newton'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
@@ -59,14 +60,13 @@ class LorenzAttractor(ptype):
         f[0] = sigma * (u[1] - u[0])
         f[1] = rho * u[0] - u[1] - u[0] * u[2]
         f[2] = u[0] * u[1] - beta * u[2]
+
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, dt, u0, t):
         """
         Simple Newton solver for the nonlinear system.
-        Notice that I did not go through the trouble of inverting the Jacobian beforehand. If you have some time on your
-        hands feel free to do that! In the current implementation it is inverted using `numpy.linalg.solve`, which is a
-        bit more expensive than simple matrix-vector multiplication.
 
         Args:
             rhs (dtype_f): right-hand side for the linear system
@@ -101,17 +101,35 @@ class LorenzAttractor(ptype):
             if res <= self.newton_tol or np.isnan(res):
                 break
 
-            # assemble Jacobian J of G
-            J = np.array(
+            # assemble inverse of Jacobian J of G
+            prefactor = 1.0 / (
+                dt**3 * sigma * (u[0] ** 2 + u[0] * u[1] + beta * (-rho + u[2] + 1))
+                + dt**2 * (beta * sigma + beta - rho * sigma + sigma + u[0] ** 2 + sigma * u[2])
+                + dt * (beta + sigma + 1)
+                + 1
+            )
+            J_inv = prefactor * np.array(
                 [
-                    [1.0 + dt * sigma, -dt * sigma, 0],
-                    [-dt * (rho - u[2]), 1 + dt, dt * u[0]],
-                    [-dt * u[1], -dt * u[0], 1.0 + dt * beta],
+                    [
+                        beta * dt**2 + dt**2 * u[0] ** 2 + beta * dt + dt + 1,
+                        beta * dt**2 * sigma + dt * sigma,
+                        -(dt**2) * sigma * u[0],
+                    ],
+                    [
+                        beta * dt**2 * rho + dt**2 * (-u[0]) * u[1] - beta * dt**2 * u[2] + dt * rho - dt * u[2],
+                        beta * dt**2 * sigma + beta * dt + dt * sigma + 1,
+                        dt**2 * sigma * (-u[0]) - dt * u[0],
+                    ],
+                    [
+                        dt**2 * rho * u[0] - dt**2 * u[0] * u[2] + dt**2 * u[1] + dt * u[1],
+                        dt**2 * sigma * u[0] + dt**2 * sigma * u[1] + dt * u[0],
+                        -(dt**2) * rho * sigma + dt**2 * sigma + dt**2 * sigma * u[2] + dt * sigma + dt + 1,
+                    ],
                 ]
             )
 
             # solve the linear system for the Newton correction J delta = G
-            delta = np.linalg.solve(J, G)
+            delta = J_inv @ G
 
             # update solution
             u = u - delta
