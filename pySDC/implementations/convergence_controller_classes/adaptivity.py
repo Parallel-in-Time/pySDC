@@ -268,28 +268,10 @@ class AdaptivityRK(Adaptivity):
     Adaptivity for Runge-Kutta methods. Basically, we need to change the order in the step size update
     """
 
-    def check_parameters(self, controller, params, description, **kwargs):
-        """
-        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
-        For adaptivity, we need to know the order of the scheme.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): The params passed for this specific convergence controller
-            description (dict): The description object used to instantiate the controller
-
-        Returns:
-            bool: Whether the parameters are compatible
-            str: The error message
-        """
-        if "update_order" not in params.keys():
-            return (
-                False,
-                "Adaptivity needs an order for the update rule! Please set some up in \
-description['convergence_control_params']['update_order']!",
-            )
-
-        return super(AdaptivityRK, self).check_parameters(controller, params, description)
+    def setup(self, controller, params, description, **kwargs):
+        defaults = {}
+        defaults['update_order'] = params.get('update_order', description['sweeper_class'].get_update_order())
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def get_new_step_size(self, controller, S, **kwargs):
         """

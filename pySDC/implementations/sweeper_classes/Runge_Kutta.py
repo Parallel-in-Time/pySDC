@@ -1,9 +1,9 @@
 import numpy as np
 import logging
 
-from pySDC.core.Sweeper import _Pars
+from pySDC.core.Sweeper import sweeper, _Pars
 from pySDC.core.Errors import ParameterError
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.datatype_classes.mesh import imex_mesh, mesh
 
 
 class ButcherTableau(object):
@@ -119,7 +119,7 @@ class ButcherTableauEmbedded(object):
         self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 2))
 
 
-class RungeKutta(generic_implicit):
+class RungeKutta(sweeper):
     """
     Runge-Kutta scheme that fits the interface of a sweeper.
     Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
@@ -184,6 +184,55 @@ class RungeKutta(generic_implicit):
         self.parallelizable = False
         self.QI = self.coll.Qmat
 
+    @classmethod
+    def get_update_order(cls):
+        """
+        Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.
+        """
+        raise NotImplementedError(
+            f"There is not an update order for RK scheme \"{cls.__name__}\" implemented. Maybe it is not an embedded scheme?"
+        )
+
+    def get_full_f(self, f):
+        """
+        Get the full right hand side as a `mesh` from the right hand side
+
+        Args:
+            f (dtype_f): Right hand side at a single node
+
+        Returns:
+            mesh: Full right hand side as a mesh
+        """
+        if type(f) == mesh:
+            return f
+        elif type(f) == imex_mesh:
+            return f.impl + f.expl
+        else:
+            raise NotImplementedError(f'Type \"{type(f)}\" not implemented in Runge-Kutta sweeper')
+
+    def integrate(self):
+        """
+        Integrates the right-hand side
+
+        Returns:
+            list of dtype_u: containing the integral as values
+        """
+
+        # get current level and problem description
+        L = self.level
+        P = L.prob
+
+        me = []
+
+        # integrate RHS over all collocation nodes
+        for m in range(1, self.coll.num_nodes + 1):
+            # new instance of dtype_u, initialize values with 0
+            me.append(P.dtype_u(P.init, val=0.0))
+            for j in range(1, self.coll.num_nodes + 1):
+                me[-1] += L.dt * self.coll.Qmat[m, j] * self.get_full_f(L.f[j])
+
+        return me
+
     def update_nodes(self):
         """
         Update the u- and f-values at the collocation nodes
@@ -207,7 +256,7 @@ class RungeKutta(generic_implicit):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = L.u[0]
             for j in range(1, m + 1):
-                rhs += L.dt * self.QI[m + 1, j] * L.f[j]
+                rhs += L.dt * self.QI[m + 1, j] * self.get_full_f(L.f[j])
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
@@ -223,6 +272,12 @@ class RungeKutta(generic_implicit):
         L.status.updated = True
 
         return None
+
+    def compute_end_point(self):
+        """
+        In this Runge-Kutta implementation, the solution to the step is always stored in the last node
+        """
+        self.level.uend = self.level.u[-1]
 
 
 class RK1(RungeKutta):
@@ -284,7 +339,7 @@ class MidpointMethod(RungeKutta):
 
 class RK4(RungeKutta):
     """
-    Explicit Runge-Kutta of fourth order: Everybodies darling.
+    Explicit Runge-Kutta of fourth order: Everybody's darling.
     """
 
     def __init__(self, params):
@@ -311,10 +366,14 @@ class Heun_Euler(RungeKutta):
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
         super(Heun_Euler, self).__init__(params)
 
+    @classmethod
+    def get_update_order(cls):
+        return 2
+
 
 class Cash_Karp(RungeKutta):
     """
-    Fifth order explicit embedded Runge-Kutta
+    Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).
     """
 
     def __init__(self, params):
@@ -333,6 +392,10 @@ class Cash_Karp(RungeKutta):
         matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
         super(Cash_Karp, self).__init__(params)
+
+    @classmethod
+    def get_update_order(cls):
+        return 5
 
 
 class DIRK34(RungeKutta):
@@ -354,3 +417,7 @@ class DIRK34(RungeKutta):
         matrix[3, :] = [4007.0 / 6075.0, -31031.0 / 24300.0, -133.0 / 2700.0, 5.0 / 6.0]
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
         super().__init__(params)
+
+    @classmethod
+    def get_update_order(cls):
+        return 4
