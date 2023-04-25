@@ -65,7 +65,13 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Cash_Karp">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cash_Karp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Cash_Karp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Fifth order explicit embedded Runge-Kutta</p>
+<p>Fifth order explicit embedded Runge-Kutta. See [here](<a class="reference external" href="https://doi.org/10.1145/79505.79507">https://doi.org/10.1145/79505.79507</a>).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Cash_Karp.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -81,6 +87,12 @@
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Embedded A-stable diagonally implicit RK pair of order 3 and 4.</p>
 <p>Taken from [here](<a class="reference external" href="https://doi.org/10.1007/BF01934920">https://doi.org/10.1007/BF01934920</a>).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK34.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -88,6 +100,12 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heun_Euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Second order explicit embedded Runge-Kutta</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -107,13 +125,13 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RK4">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RK4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RK4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK4" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Explicit Runge-Kutta of fourth order: Everybodies darling.</p>
+<p>Explicit Runge-Kutta of fourth order: Everybody’s darling.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKutta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Runge-Kutta scheme that fits the interface of a sweeper.
 Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
 at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</p>
@@ -138,6 +156,49 @@ method, which does not require us to solve a system of equations to compute the 
 <dt>Attribues:</dt><dd><p>butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</p>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>In this Runge-Kutta implementation, the solution to the step is always stored in the last node</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">
+<span class="sig-name descname"><span class="pre">get_full_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.get_full_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the full right hand side as a <cite>mesh</cite> from the right hand side</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>dtype_f</em>) – Right hand side at a single node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Full right hand side as a mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrates the right-hand side</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>containing the integral as values</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes" title="Permalink to this definition">¶</a></dt>
@@ -166,14 +227,27 @@ method, which does not require us to solve a system of equations to compute the 
 <li><a class="reference internal" href="#">implementations.sweeper_classes.Runge_Kutta module</a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34"><code class="docutils literal notranslate"><span class="pre">DIRK34</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34"><code class="docutils literal notranslate"><span class="pre">DIRK34</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod"><code class="docutils literal notranslate"><span class="pre">MidpointMethod</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK1"><code class="docutils literal notranslate"><span class="pre">RK1</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="docutils literal notranslate"><span class="pre">RungeKutta</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f"><code class="docutils literal notranslate"><span class="pre">get_full_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
 </ul>
 </li>

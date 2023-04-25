@@ -298,8 +298,6 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters">(AdaptivityResidual method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.check_parameters">(AdaptivityRK method)</a>
-</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI.check_parameters">(CheckIterationEstimatorNonMPI method)</a>
 </li>
         <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.check_parameters">(ConvergenceController method)</a>
@@ -365,6 +363,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point">(imex_1st_order_mass method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.compute_end_point">(multi_implicit method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">(RungeKutta method)</a>
 </li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.compute_end_point">(sweeper method)</a>
 </li>
@@ -1170,6 +1170,8 @@
 </li>
       <li><a href="pySDC/helpers.problem_helper.html#helpers.problem_helper.get_finite_difference_stencil">get_finite_difference_stencil() (in module helpers.problem_helper)</a>
 </li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">get_full_f() (RungeKutta method)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.get_implementation">get_implementation() (BasicRestarting class method)</a>
 
       <ul>
@@ -1220,14 +1222,14 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">get_scalar_problems_picardsweep_mats() (boris_2nd_order method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">get_scalar_problems_sweeper_mats() (boris_2nd_order method)</a>
 
       <ul>
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats">(imex_1st_order method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.stats_helper.html#helpers.stats_helper.get_sorted">get_sorted() (in module helpers.stats_helper)</a>
 </li>
       <li><a href="pySDC/helpers.problem_helper.html#helpers.problem_helper.get_steps">get_steps() (in module helpers.problem_helper)</a>
@@ -1244,6 +1246,16 @@
 </li>
       <li><a href="pySDC/core.BaseTransfer.html#core.BaseTransfer.base_transfer.get_transfer_matrix_Q">get_transfer_matrix_Q() (base_transfer static method)</a>
 </li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">get_update_order() (Cash_Karp class method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order">(DIRK34 class method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">(Heun_Euler class method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order">(RungeKutta class method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal">getBCHorizontal() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.buildFDMatrix.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getBCLeft">getBCLeft() (in module implementations.problem_classes.acoustic_helpers.buildFDMatrix)</a>
@@ -2106,6 +2118,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate">(imex_1st_order method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.multi_implicit.html#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate">(multi_implicit method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate">(RungeKutta method)</a>
 </li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.integrate">(sweeper method)</a>
 </li>
@@ -3009,6 +3023,8 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.setup">(AdaptivityCollocation method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.setup">(AdaptivityResidual method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.setup">(AdaptivityRK method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup">(BasicRestarting method)</a>
 </li>
