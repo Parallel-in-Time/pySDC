@@ -68,6 +68,29 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
+<div class="viewcode-block" id="StepSizeLimiter.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the slope limiter if needed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">slope_limiter_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dt_slope_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_max&#39;</span><span class="p">]</span>
+        <span class="n">available_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">slope_limiter_keys</span> <span class="k">if</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">slope_limiter_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">}</span>
+            <span class="n">slope_limiter_params</span><span class="p">[</span><span class="s1">&#39;control_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+                <span class="n">StepSizeSlopeLimiter</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">slope_limiter_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="StepSizeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enforce an upper and lower limit to the step size here.</span>
@@ -100,6 +123,67 @@
                         <span class="n">S</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_max</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="StepSizeSlopeLimiter"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter">[docs]</a><span class="k">class</span> <span class="nc">StepSizeSlopeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to set limits to adaptive step size computation during run time</span>
+
+<span class="sd">    Please supply dt_min or dt_max in the params to limit in either direction</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StepSizeSlopeLimiter.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define parameters here</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): The updated params dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">91</span><span class="p">,</span>
+            <span class="s2">&quot;dt_slope_min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;dt_slope_max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+<div class="viewcode-block" id="StepSizeSlopeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enforce an upper and lower limit to the slope of the step size here.</span>
+<span class="sd">        The final step is adjusted such that we reach Tend as best as possible, which might give step sizes below</span>
+<span class="sd">        the lower limit set here.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">/</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_slope_min</span><span class="p">:</span>
+                    <span class="n">dt_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_slope_min</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Step size slope is below minimum, increasing from </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> to </span><span class="se">\</span>
+<span class="si">{</span><span class="n">dt_new</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">S</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="n">dt_new</span>
+                <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">/</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_slope_max</span><span class="p">:</span>
+                    <span class="n">dt_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_slope_max</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Step size slope exceeds maximum, decreasing from </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> to </span><span class="se">\</span>
+<span class="si">{</span><span class="n">dt_new</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">S</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="n">dt_new</span>
 
         <span class="k">return</span> <span class="kc">None</span></div></div>
 </pre></div>
@@ -140,7 +224,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

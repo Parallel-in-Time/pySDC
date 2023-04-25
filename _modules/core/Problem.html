@@ -156,7 +156,7 @@
         <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">solve_ivp</span>
 
         <span class="n">tol</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
-        <span class="n">u_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">u_init</span>
+        <span class="n">u_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">u_init</span> <span class="o">*</span> <span class="mf">1.0</span>
         <span class="n">t_init</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">t_init</span>
 
         <span class="n">u_shape</span> <span class="o">=</span> <span class="n">u_init</span><span class="o">.</span><span class="n">shape</span>
@@ -201,7 +201,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

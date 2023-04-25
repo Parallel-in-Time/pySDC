@@ -56,6 +56,23 @@
 <p>Class to set limits to adaptive step size computation during run time</p>
 <p>Please supply dt_min or dt_max in the params to limit in either direction</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/step_size_limiter.html#StepSizeLimiter.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the slope limiter if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">
 <span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/step_size_limiter.html#StepSizeLimiter.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enforce an upper and lower limit to the step size here.
@@ -100,6 +117,54 @@ the lower limit set here.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StepSizeSlopeLimiter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/step_size_limiter.html#StepSizeSlopeLimiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<p>Class to set limits to adaptive step size computation during run time</p>
+<p>Please supply dt_min or dt_max in the params to limit in either direction</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/step_size_limiter.html#StepSizeSlopeLimiter.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enforce an upper and lower limit to the slope of the step size here.
+The final step is adjusted such that we reach Tend as best as possible, which might give step sizes below
+the lower limit set here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/step_size_limiter.html#StepSizeSlopeLimiter.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define parameters here</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -114,8 +179,14 @@ the lower limit set here.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.convergence_controller_classes.step_size_limiter module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter"><code class="docutils literal notranslate"><span class="pre">StepSizeLimiter</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter"><code class="docutils literal notranslate"><span class="pre">StepSizeSlopeLimiter</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -177,7 +248,7 @@ the lower limit set here.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

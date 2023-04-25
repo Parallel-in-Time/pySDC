@@ -46,7 +46,6 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BasicRestartingNonMPI</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_step_size</span> <span class="kn">import</span> <span class="n">LogStepSize</span>
 
 
 <div class="viewcode-block" id="AdaptivityBase"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase">[docs]</a><span class="k">class</span> <span class="nc">AdaptivityBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
@@ -75,6 +74,8 @@
             <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span>
             <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
         <span class="p">}</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_step_size</span> <span class="kn">import</span> <span class="n">LogStepSize</span>
+
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogStepSize</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
@@ -90,10 +91,11 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="s2">&quot;dt_min&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;dt_max&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">step_limiter_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">step_limiter_params</span><span class="p">[</span><span class="s2">&quot;dt_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dt_min&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="n">step_limiter_params</span><span class="p">[</span><span class="s2">&quot;dt_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dt_max&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">step_limiter_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dt_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_max&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_min&#39;</span><span class="p">,</span> <span class="s1">&#39;dt_slope_max&#39;</span><span class="p">]</span>
+        <span class="n">available_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">step_limiter_keys</span> <span class="k">if</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">step_limiter_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">}</span>
             <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">StepSizeLimiter</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">step_limiter_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
@@ -658,7 +660,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

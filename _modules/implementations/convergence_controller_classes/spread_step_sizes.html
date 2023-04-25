@@ -160,7 +160,9 @@
                 <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">new_steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">l</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Overwriting stepsize control to reach Tend&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Overwriting stepsize control to reach Tend: </span><span class="si">{</span><span class="n">Tend</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">! New step size: </span><span class="si">{</span><span class="n">new_steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">S</span>
+                    <span class="p">)</span>
         <span class="n">new_steps</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">new_steps</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">restart_at</span><span class="p">)</span>
 
         <span class="c1"># spread the step sizes to all levels</span>
@@ -206,7 +208,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>
