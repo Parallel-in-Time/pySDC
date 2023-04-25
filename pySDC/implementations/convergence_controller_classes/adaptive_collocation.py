@@ -63,7 +63,7 @@ class AdaptiveCollocation(ConvergenceController):
         }
 
         # only these keys can be changed by this convergence controller
-        self.allowed_sweeper_keys = ['quad_type', 'num_nodes', 'node_type']
+        self.allowed_sweeper_keys = ['quad_type', 'num_nodes', 'node_type', 'do_coll_update']
         self.allowed_level_keys = ['restol']
 
         # add the keys to lists so we know what we need to change later

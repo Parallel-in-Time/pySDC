@@ -352,6 +352,7 @@ def main():
         if use_adaptivity:
             custom_description['convergence_controllers'][Adaptivity] = {
                 'e_tol': 1e-7,
+                'embedded_error_flavor': 'linearized',
             }
 
         for num_procs in [1, 4]:

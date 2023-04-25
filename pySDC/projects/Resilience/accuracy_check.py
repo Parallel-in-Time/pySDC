@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
@@ -123,7 +123,7 @@ def multiple_runs(
         desc = {
             'step_params': {'maxiter': k},
             'convergence_controllers': {
-                EstimateEmbeddedErrorNonMPI: {},
+                EstimateEmbeddedError: {},
                 EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
             },
         }

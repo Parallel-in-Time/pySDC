@@ -37,6 +37,7 @@ class AdaptivityBase(ConvergenceController):
         from pySDC.implementations.hooks.log_step_size import LogStepSize
 
         controller.add_hook(LogStepSize)
+
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
@@ -50,7 +51,6 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             None
         """
-
         step_limiter_keys = ['dt_min', 'dt_max', 'dt_slope_min', 'dt_slope_max']
         available_keys = [me for me in step_limiter_keys if me in self.params.__dict__.keys()]
 
@@ -123,14 +123,24 @@ class AdaptivityBase(ConvergenceController):
                 # see if we try to avoid restarts
                 if self.params.get('avoid_restarts'):
                     more_iter_needed = max([L.status.iter_to_convergence for L in S.levels])
+                    k_final = S.status.iter + more_iter_needed
                     rho = max([L.status.contraction_factor for L in S.levels])
+                    coll_order = S.levels[0].sweep.coll.order
 
                     if rho > 1:
                         S.status.restart = True
                         self.log(f"Convergence factor = {rho:.2e} > 1 -> restarting", S)
-                    elif S.status.iter + more_iter_needed > 2 * S.params.maxiter:
+                    elif k_final > 2 * S.params.maxiter:
                         S.status.restart = True
-                        self.log(f"{more_iter_needed} more iterations needed for convergence -> restart", S)
+                        self.log(
+                            f"{more_iter_needed} more iterations needed for convergence -> restart is more efficient", S
+                        )
+                    elif k_final > coll_order:
+                        S.status.restart = True
+                        self.log(
+                            f"{more_iter_needed} more iterations needed for convergence -> restart because collocation problem would be over resolved",
+                            S,
+                        )
                     else:
                         S.status.force_continue = True
                         self.log(f"{more_iter_needed} more iterations needed for convergence -> no restart", S)
@@ -160,6 +170,27 @@ class Adaptivity(AdaptivityBase):
     The behaviour in multi-step SDC is not well studied and it is unclear if anything useful happens there.
     """
 
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Define default parameters here.
+
+        Default parameters are:
+         - control_order (int): The order relative to other convergence controllers
+         - beta (float): The safety factor
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        """
+        defaults = {
+            "embedded_error_flavor": 'standard',
+        }
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
     def dependencies(self, controller, description, **kwargs):
         """
         Load the embedded error estimator.
@@ -173,10 +204,10 @@ class Adaptivity(AdaptivityBase):
         """
         from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 
-        super(Adaptivity, self).dependencies(controller, description)
+        super().dependencies(controller, description)
 
         controller.add_convergence_controller(
-            EstimateEmbeddedError.get_implementation("nonMPI" if not self.params.useMPI else "MPI"),
+            EstimateEmbeddedError.get_implementation(self.params.embedded_error_flavor, self.params.useMPI),
             description=description,
         )
 
@@ -335,6 +366,7 @@ class AdaptivityResidual(AdaptivityBase):
             "e_tol_low": 0,
             "e_tol": np.inf,
             "max_restarts": 99 if "e_tol_low" in params else None,
+            "allowed_modifications": ['increase', 'decrease'],  # what we are allowed to do with the step size
         }
         return {**defaults, **params}
 
@@ -408,10 +440,10 @@ smaller than 0!",
 
             dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
-            if res > self.params.e_tol:
+            if res > self.params.e_tol and 'decrease' in self.params.allowed_modifications:
                 L.status.dt_new = min([dt_planned, L.params.dt / 2.0])
                 self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
-            elif res < self.params.e_tol_low:
+            elif res < self.params.e_tol_low and 'increase' in self.params.allowed_modifications:
                 L.status.dt_new = max([dt_planned, L.params.dt * 2.0])
                 self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
