@@ -50,10 +50,11 @@ class AdaptivityBase(ConvergenceController):
             None
         """
 
-        if "dt_min" in self.params.__dict__.keys() or "dt_max" in self.params.__dict__.keys():
-            step_limiter_params = dict()
-            step_limiter_params["dt_min"] = self.params.__dict__.get("dt_min", 0)
-            step_limiter_params["dt_max"] = self.params.__dict__.get("dt_max", np.inf)
+        step_limiter_keys = ['dt_min', 'dt_max', 'dt_slope_min', 'dt_slope_max']
+        available_keys = [me for me in step_limiter_keys if me in self.params.__dict__.keys()]
+
+        if len(available_keys) > 0:
+            step_limiter_params = {key: self.params.__dict__[key] for key in available_keys}
             controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
 
         return None
