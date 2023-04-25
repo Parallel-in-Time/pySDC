@@ -6,7 +6,6 @@ from pySDC.implementations.convergence_controller_classes.step_size_limiter impo
 from pySDC.implementations.convergence_controller_classes.basic_restarting import (
     BasicRestartingNonMPI,
 )
-from pySDC.implementations.hooks.log_step_size import LogStepSize
 
 
 class AdaptivityBase(ConvergenceController):
@@ -35,6 +34,8 @@ class AdaptivityBase(ConvergenceController):
             "control_order": -50,
             "beta": 0.9,
         }
+        from pySDC.implementations.hooks.log_step_size import LogStepSize
+
         controller.add_hook(LogStepSize)
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 

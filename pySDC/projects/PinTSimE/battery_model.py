@@ -36,15 +36,6 @@ class log_data(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='restart',
-            value=int(step.status.get('restart')),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
             time=L.time + L.dt,
             level=L.level_index,
             iter=0,
@@ -112,7 +103,7 @@ def generate_description(
     if problem == battery_implicit:
         problem_params['newton_maxiter'] = 200
         problem_params['newton_tol'] = 1e-08
-    problem_params['ncapacitors'] = ncapacitors  # number of condensators
+    problem_params['ncapacitors'] = ncapacitors  # number of capacitors
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
     problem_params['C'] = C
