@@ -112,11 +112,11 @@ def run_vdp(
     """
 
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['dt'] = 1e-2
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
@@ -132,11 +132,11 @@ def run_vdp(
         problem_params = {**problem_params, **custom_problem_params}
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 4
 
     # initialize controller parameters
-    controller_params = dict()
+    controller_params = {}
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
@@ -145,7 +145,7 @@ def run_vdp(
         controller_params = {**controller_params, **custom_controller_params}
 
     # fill description dictionary for easy step instantiation
-    description = dict()
+    description = {}
     description['problem_class'] = vanderpol  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper
@@ -219,7 +219,7 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
         if type not in get_list_of_types(stats):
             raise ValueError(f"Can't read type \"{type}\" from stats, only got", get_list_of_types(stats))
 
-        if comm is None or use_MPI == False:
+        if comm is None or use_MPI is False:
             data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time')]
         else:
             data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time', comm=comm)]
@@ -399,9 +399,11 @@ def check_step_size_limiter(size=4, comm=None):
         if limit_step_sizes:
             params['dt_max'] = expect['dt_max'] * 0.9
             params['dt_min'] = np.inf
+            params['dt_slope_max'] = expect['dt_slope_max'] * 0.9
+            params['dt_slope_min'] = expect['dt_slope_min'] * 1.1
             custom_description['convergence_controllers'][StepSizeLimiter] = {'dt_min': expect['dt_min'] * 1.1}
         else:
-            for k in ['dt_max', 'dt_min']:
+            for k in ['dt_max', 'dt_min', 'dt_slope_max', 'dt_slope_min']:
                 params.pop(k, None)
                 custom_description['convergence_controllers'].pop(StepSizeLimiter, None)
 
@@ -416,19 +418,24 @@ def check_step_size_limiter(size=4, comm=None):
         )
 
         # plot the step sizes
-        dt = get_sorted(stats, type='dt', recomputed=False, comm=comm)
+        dt = get_sorted(stats, type='dt', recomputed=None, comm=comm)
 
         # make sure that the convergence controllers are only added once
         convergence_controller_classes = [type(me) for me in controller.convergence_controllers]
         for c in convergence_controller_classes:
             assert convergence_controller_classes.count(c) == 1, f'Convergence controller {c} added multiple times'
 
+        dt_numpy = np.array([me[1] for me in dt])
         if not limit_step_sizes:
-            expect['dt_max'] = max([me[1] for me in dt])
-            expect['dt_min'] = min([me[1] for me in dt])
+            expect['dt_max'] = max(dt_numpy)
+            expect['dt_min'] = min(dt_numpy)
+            expect['dt_slope_max'] = max(dt_numpy[:-2] / dt_numpy[1:-1])
+            expect['dt_slope_min'] = min(dt_numpy[:-2] / dt_numpy[1:-1])
         else:
-            dt_max = max([me[1] for me in dt])
-            dt_min = min([me[1] for me in dt[size:-size]])  # The first and last step might fall below the limits
+            dt_max = max(dt_numpy)
+            dt_min = min(dt_numpy[size:-size])  # The first and last step might fall below the limits
+            dt_slope_max = max(dt_numpy[:-2] / dt_numpy[1:-1])
+            dt_slope_min = min(dt_numpy[:-2] / dt_numpy[1:-1])
             assert (
                 dt_max <= expect['dt_max']
             ), f"Exceeded maximum allowed step size! Got {dt_max:.4e}, allowed {params['dt_max']:.4e}."
@@ -436,7 +443,14 @@ def check_step_size_limiter(size=4, comm=None):
                 dt_min >= expect['dt_min']
             ), f"Exceeded minimum allowed step size! Got {dt_min:.4e}, allowed {params['dt_min']:.4e}."
 
-    if comm == None:
+            assert (
+                dt_slope_max <= expect['dt_slope_max']
+            ), f"Exceeded maximum allowed step size slope! Got {dt_slope_max:.4e}, allowed {params['dt_slope_max']:.4e}."
+            assert (
+                dt_slope_min >= expect['dt_slope_min']
+            ), f"Exceeded minimum allowed step size slope! Got {dt_slope_min:.4e}, allowed {params['dt_slope_min']:.4e}."
+
+    if comm is None:
         print(f'Passed step size limiter test with {size} ranks in nonMPI implementation')
     else:
         if comm.rank == 0:
