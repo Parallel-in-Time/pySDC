@@ -228,13 +228,14 @@ class FaultStats:
             # record the new data point
             if faults:
                 if len(faults_run) > 0:
-                    assert self.mode == 'regular', f'No faults where recorded in run {i} of strategy {strategy.name}!'
                     dat['level'][i] = faults_run[0][1][0]
                     dat['iteration'][i] = faults_run[0][1][1]
                     dat['node'][i] = faults_run[0][1][2]
                     dat['problem_pos'] += [faults_run[0][1][3]]
                     dat['bit'][i] = faults_run[0][1][4]
                     dat['target'][i] = faults_run[0][1][5]
+                else:
+                    assert self.mode == 'regular', f'No faults where recorded in run {i} of strategy {strategy.name}!'
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
             dat['total_newton_iteration'][i] = total_newton_iteration
@@ -1396,7 +1397,7 @@ def main():
         recovery_thresh=1.1,
         # recovery_thresh_abs=1e-5,
         num_procs=1,
-        mode='regular',
+        mode='random',
         stats_path='data/stats-jusuf',
     )
     ########################

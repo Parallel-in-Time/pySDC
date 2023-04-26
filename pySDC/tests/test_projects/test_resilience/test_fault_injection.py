@@ -60,7 +60,7 @@ def test_complex_conversion():
 
     injector = FaultInjector()
     num_tests = int(1e3)
-    for i in range(num_tests):
+    for _i in range(num_tests):
         rand_complex = get_random_float() + get_random_float() * 1j
 
         # convert to bytes and back
@@ -144,6 +144,7 @@ def test_fault_injection():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.slow
 @pytest.mark.parametrize("numprocs", [5])
 def test_fault_stats(numprocs):
     """
@@ -156,7 +157,7 @@ def test_fault_stats(numprocs):
         AdaptivityStrategy,
         IterateStrategy,
         HotRodStrategy,
-        run_vdp,
+        run_Lorenz,
     )
 
     # Set python path once
@@ -174,12 +175,13 @@ def test_fault_stats(numprocs):
         numprocs,
     )
 
-    vdp_stats = generate_stats(True)
+    stats = generate_stats(True)
 
     # test number of possible combinations for faults
+    expected_max_combinations = 3840
     assert (
-        vdp_stats.get_max_combinations() == 1536
-    ), f"Expected 1536 possible combinations for faults in van der Pol problem, but got {vdp_stats.get_max_combinations()}!"
+        stats.get_max_combinations() == expected_max_combinations
+    ), f"Expected {expected_max_combinations} possible combinations for faults in van der Pol problem, but got {stats.get_max_combinations()}!"
 
     recovered_reference = {
         'base': 1,
@@ -187,12 +189,12 @@ def test_fault_stats(numprocs):
         'iterate': 1,
         'Hot Rod': 2,
     }
-    vdp_stats.get_recovered()
+    stats.get_recovered()
 
-    for strategy in vdp_stats.strategies:
-        dat = vdp_stats.load(strategy, True)
-        fixable_mask = vdp_stats.get_fixable_faults_only(strategy)
-        recovered_mask = vdp_stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
+    for strategy in stats.strategies:
+        dat = stats.load(strategy=strategy, faults=True)
+        fixable_mask = stats.get_fixable_faults_only(strategy)
+        recovered_mask = stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
 
         assert all(fixable_mask[:-1] == [False, True, False]), "Error in generating mask of fixable faults"
 
@@ -219,14 +221,14 @@ def generate_stats(load=False):
         AdaptivityStrategy,
         IterateStrategy,
         HotRodStrategy,
-        run_vdp,
+        run_Lorenz,
     )
     import matplotlib.pyplot as plt
 
     np.seterr(all='warn')  # get consistent behaviour across platforms
 
-    vdp_stats = FaultStats(
-        prob=run_vdp,
+    stats = FaultStats(
+        prob=run_Lorenz,
         faults=[False, True],
         reload=load,
         recovery_thresh=1.1,
@@ -235,8 +237,8 @@ def generate_stats(load=False):
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         stats_path='data',
     )
-    vdp_stats.run_stats_generation(runs=4, step=2)
-    return vdp_stats
+    stats.run_stats_generation(runs=4, step=2)
+    return stats
 
 
 if __name__ == "__main__":
