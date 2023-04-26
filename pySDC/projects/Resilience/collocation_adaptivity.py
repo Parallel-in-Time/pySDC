@@ -244,7 +244,7 @@ def check_order(prob, coll_name, ax, k_ax):
             order = get_accuracy_order(me, key=i, thresh=1e-9)
             assert np.isclose(
                 np.mean(order), expected_order, atol=0.3
-            ), f"Expected order: {expected_order}, got {order:.2f}!"
+            ), f"Expected order: {expected_order}, got {np.mean(order):.2f}!"
         ax.loglog(result['dt'], result[i], label=f'{label} nodes: order: {np.mean(order):.1f}', color=CMAP[i])
 
         if i > 0:

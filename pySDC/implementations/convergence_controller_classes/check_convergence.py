@@ -47,7 +47,7 @@ class CheckConvergence(ConvergenceController):
             )
 
             controller.add_convergence_controller(
-                EstimateEmbeddedError.get_implementation("nonMPI" if not self.params.useMPI else "MPI"),
+                EstimateEmbeddedError,
                 description=description,
             )
 

@@ -48,21 +48,17 @@ class HotRod(ConvergenceController):
         Returns:
             None
         """
-        if not self.params.useMPI:
-            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
-                EstimateEmbeddedErrorNonMPI,
-            )
+        from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 
-            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
+        controller.add_convergence_controller(
+            EstimateEmbeddedError.get_implementation(flavor='linearized', useMPI=self.params.useMPI),
+            description=description,
+        )
+        if not self.params.useMPI:
             controller.add_convergence_controller(
                 EstimateExtrapolationErrorNonMPI, description=description, params={'no_storage': self.params.no_storage}
             )
         else:
-            from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import (
-                EstimateEmbeddedErrorMPI,
-            )
-
-            controller.add_convergence_controller(EstimateEmbeddedErrorMPI, description=description)
             raise NotImplementedError("Don't know how to estimate extrapolated error with MPI")
 
     def check_parameters(self, controller, params, description, **kwargs):
