@@ -88,21 +88,17 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span> <span class="kn">import</span> <span class="p">(</span>
-                <span class="n">EstimateEmbeddedErrorNonMPI</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span> <span class="kn">import</span> <span class="n">EstimateEmbeddedError</span>
 
-            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">EstimateEmbeddedErrorNonMPI</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+            <span class="n">EstimateEmbeddedError</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">flavor</span><span class="o">=</span><span class="s1">&#39;linearized&#39;</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">),</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
             <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
                 <span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;no_storage&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">}</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span> <span class="kn">import</span> <span class="p">(</span>
-                <span class="n">EstimateEmbeddedErrorMPI</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">EstimateEmbeddedErrorMPI</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Don&#39;t know how to estimate extrapolated error with MPI&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="HotRod.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

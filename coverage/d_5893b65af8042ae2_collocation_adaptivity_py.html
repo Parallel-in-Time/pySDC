@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_dahlquist_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.3">coverage.py v7.2.3</a>,
-            created at 2023-04-25 13:19 +0000
+            created at 2023-04-26 06:36 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -326,7 +326,7 @@
     <p class="run"><span class="n"><a id="t244" href="#t244">244</a></span><span class="t">            <span class="nam">order</span> <span class="op">=</span> <span class="nam">get_accuracy_order</span><span class="op">(</span><span class="nam">me</span><span class="op">,</span> <span class="nam">key</span><span class="op">=</span><span class="nam">i</span><span class="op">,</span> <span class="nam">thresh</span><span class="op">=</span><span class="num">1e-9</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t245" href="#t245">245</a></span><span class="t">            <span class="key">assert</span> <span class="nam">np</span><span class="op">.</span><span class="nam">isclose</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t246" href="#t246">246</a></span><span class="t">                <span class="nam">np</span><span class="op">.</span><span class="nam">mean</span><span class="op">(</span><span class="nam">order</span><span class="op">)</span><span class="op">,</span> <span class="nam">expected_order</span><span class="op">,</span> <span class="nam">atol</span><span class="op">=</span><span class="num">0.3</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t247" href="#t247">247</a></span><span class="t">            <span class="op">)</span><span class="op">,</span> <span class="str">f"Expected order: {expected_order}, got {order:.2f}!"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t247" href="#t247">247</a></span><span class="t">            <span class="op">)</span><span class="op">,</span> <span class="str">f"Expected order: {expected_order}, got {np.mean(order):.2f}!"</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t248" href="#t248">248</a></span><span class="t">        <span class="nam">ax</span><span class="op">.</span><span class="nam">loglog</span><span class="op">(</span><span class="nam">result</span><span class="op">[</span><span class="str">'dt'</span><span class="op">]</span><span class="op">,</span> <span class="nam">result</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">,</span> <span class="nam">label</span><span class="op">=</span><span class="str">f'{label} nodes: order: {np.mean(order):.1f}'</span><span class="op">,</span> <span class="nam">color</span><span class="op">=</span><span class="nam">CMAP</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t249" href="#t249">249</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t250" href="#t250">250</a></span><span class="t">        <span class="key">if</span> <span class="nam">i</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -417,7 +417,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_dahlquist_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.3">coverage.py v7.2.3</a>,
-            created at 2023-04-25 13:19 +0000
+            created at 2023-04-26 06:36 +0000
         </p>
     </div>
 </footer>

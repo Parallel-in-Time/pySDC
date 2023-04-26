@@ -143,6 +143,34 @@ str: The error message</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.Adaptivity.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#Adaptivity.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define default parameters here.</p>
+<dl class="simple">
+<dt>Default parameters are:</dt><dd><ul class="simple">
+<li><p>control_order (int): The order relative to other convergence controllers</p></li>
+<li><p>beta (float): The safety factor</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -636,6 +664,7 @@ size.</p>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.Adaptivity.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a><ul>

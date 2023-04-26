@@ -42,7 +42,6 @@
 
 <span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span><span class="p">,</span> <span class="n">Status</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.store_uold</span> <span class="kn">import</span> <span class="n">StoreUOld</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span> <span class="kn">import</span> <span class="n">RungeKutta</span>
 
@@ -57,19 +56,20 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialisation routine. Add the buffers for communication.</span>
+<span class="sd">        Initialisation routine. Add the hook for recording the local error.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s1">&#39;e_em_last&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogEmbeddedErrorEstimate</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EstimateEmbeddedError.get_implementation"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.get_implementation">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flavor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the implementation for a specific flavor of this class.</span>
 
@@ -79,10 +79,15 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            cls: The child class that implements the desired flavor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;MPI&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">EstimateEmbeddedErrorMPI</span>
-        <span class="k">elif</span> <span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;nonMPI&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">EstimateEmbeddedErrorNonMPI</span>
+        <span class="k">if</span> <span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;standard&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span>
+        <span class="k">elif</span> <span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;linearized&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">useMPI</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">EstimateEmbeddedErrorLinearizedMPI</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">EstimateEmbeddedErrorLinearizedNonMPI</span>
+        <span class="k">elif</span> <span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;collocation&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">EstimateEmbeddedErrorCollocation</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Flavor </span><span class="si">{</span><span class="n">flavor</span><span class="si">}</span><span class="s1"> of EstimateEmbeddedError is not implemented!&#39;</span><span class="p">)</span></div>
 
@@ -163,11 +168,44 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;error_embedded_estimate&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateEmbeddedError.reset_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.reset_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EstimateEmbeddedError.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimate the local error here.</span>
+
+<span class="sd">        If you are doing MSSDC, this is the global error within the block in Gauss-Seidel mode.</span>
+<span class="sd">        In Jacobi mode, I haven&#39;t thought about what this is.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sweeper_type</span> <span class="o">==</span> <span class="s2">&quot;RK&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">estimate_embedded_error_serial</span><span class="p">(</span><span class="n">L</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div></div>
 
 
-<div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorNonMPI</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">):</span>
-<div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI.reset_buffers_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateEmbeddedErrorLinearizedNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorLinearizedNonMPI</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialisation routine. Add the buffers for communication.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s1">&#39;e_em_last&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorLinearizedNonMPI.reset_buffers_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.reset_buffers_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset buffers for imitated communication.</span>
 
@@ -180,7 +218,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">e_em_last</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EstimateEmbeddedErrorNonMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorNonMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateEmbeddedErrorLinearizedNonMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute embedded error estimate on the last node of each level</span>
 <span class="sd">        In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block</span>
@@ -208,8 +246,20 @@
         <span class="k">return</span> <span class="kc">None</span></div></div>
 
 
-<div class="viewcode-block" id="EstimateEmbeddedErrorMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorMPI</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">):</span>
-<div class="viewcode-block" id="EstimateEmbeddedErrorMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateEmbeddedErrorLinearizedMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedMPI">[docs]</a><span class="k">class</span> <span class="nc">EstimateEmbeddedErrorLinearizedMPI</span><span class="p">(</span><span class="n">EstimateEmbeddedError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialisation routine. Add the buffers for communication.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s1">&#39;e_em_last&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">})</span>
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorLinearizedMPI.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedMPI.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute embedded error estimate on the last node of each level</span>
 <span class="sd">        In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block</span>
