@@ -298,4 +298,3 @@ def test_rk():
     test_vdp()
     test_advection()
     test_all_stability()
-    plt.show()
