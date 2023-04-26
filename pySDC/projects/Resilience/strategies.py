@@ -149,7 +149,7 @@ class Strategy:
             return 1.5
         elif problem.__name__ == "run_Schroedinger":
             return 1.0
-        elif problem.__name__ == "run_leaky_superconductor":
+        elif problem.__name__ == "run_quench":
             return 500.0
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
@@ -182,7 +182,7 @@ class Strategy:
         elif problem.__name__ == "run_Schroedinger":
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
-        elif problem.__name__ == "run_leaky_superconductor":
+        elif problem.__name__ == "run_quench":
             custom_description['level_params'] = {'restol': -1, 'dt': 8.0}
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-11}
@@ -281,7 +281,7 @@ class AdaptivityStrategy(Strategy):
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 4e-6
             dt_min = 1e-3
-        elif problem.__name__ == "run_leaky_superconductor":
+        elif problem.__name__ == "run_quench":
             e_tol = 1e-5
             dt_min = 1e-3
             # dt_max = 25
@@ -408,7 +408,7 @@ class IterateStrategy(Strategy):
             restol = 16e-7
         elif problem.__name__ == "run_Schroedinger":
             restol = 6.5e-7
-        elif problem.__name__ == "run_leaky_superconductor":
+        elif problem.__name__ == "run_quench":
             restol = 1e-7
         else:
             raise NotImplementedError(
@@ -421,7 +421,7 @@ strategy'
             'level_params': {'restol': restol, 'e_tol': e_tol},
         }
 
-        if problem.__name__ == "run_leaky_superconductor":
+        if problem.__name__ == "run_quench":
             custom_description['level_params']['dt'] = 1
 
         return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
@@ -467,7 +467,7 @@ class HotRodStrategy(Strategy):
         elif problem.__name__ == "run_Schroedinger":
             HotRod_tol = 3e-7
             maxiter = 6
-        elif problem.__name__ == "run_leaky_superconductor":
+        elif problem.__name__ == "run_quench":
             HotRod_tol = 3e-5
             maxiter = 6
         else:
@@ -554,7 +554,7 @@ class AdaptivityCollocationStrategy(Strategy):
         elif problem.__name__ == "run_Schroedinger":
             e_tol = 4e-6
             dt_min = 1e-3
-        elif problem.__name__ == "run_leaky_superconductor":
+        elif problem.__name__ == "run_quench":
             e_tol = 1e-5
             dt_min = 1e-3
             dt_max = 1e2

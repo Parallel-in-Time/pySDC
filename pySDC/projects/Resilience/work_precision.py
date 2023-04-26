@@ -7,7 +7,7 @@ from pySDC.projects.Resilience.strategies import merge_descriptions
 from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
-from pySDC.projects.Resilience.leaky_superconductor import run_leaky_superconductor
+from pySDC.projects.Resilience.quench import run_quench
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -48,7 +48,7 @@ def single_run(problem, strategy, data, custom_description, num_procs=1, comm_wo
     Returns:
         None
     """
-    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRunMPI, LogLocalErrorPostStep
+    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRunMPI
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.projects.Resilience.hook import LogData
 
@@ -196,7 +196,7 @@ def record_work_precision(
     default = get_parameter(description, where)
     param_range = [default * power**i for i in exponents] if param_range is None else param_range
 
-    if problem.__name__ == 'run_leaky_superconductor':
+    if problem.__name__ == 'run_quench':
         if param == 'restol':
             param_range = [1e-5, 1e-6, 1e-7, 1e-8, 1e-9]
         elif param == 'e_tol':
@@ -286,7 +286,7 @@ def plot_work_precision(
 
     for key in [work_key, precision_key]:
         rel_variance = [np.std(data[me][key]) / max([np.nanmean(data[me][key]), 1.0]) for me in keys]
-        if not all([me < 1e-1 or not np.isfinite(me) for me in rel_variance]):
+        if not all(me < 1e-1 or not np.isfinite(me) for me in rel_variance):
             print(
                 f"WARNING: Variance in \"{key}\" for {get_path(problem, strategy, num_procs, handle)} too large! Got {rel_variance}"
             )
@@ -347,7 +347,7 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'run_vdp': 'Van der Pol',
         'run_Lorenz': 'Lorenz attractor',
         'run_Schroedinger': r'Schr\"odinger',
-        'run_leaky_superconductor': 'Quench',
+        'run_quench': 'Quench',
     }
     ax.set_title(titles.get(problem.__name__, ''))
 
@@ -482,12 +482,8 @@ def get_configs(mode, problem):
             'plotting_params': dashed,
         }
 
-        description_large_step = {
-            'level_params': {'dt': 5.0 if problem.__name__ == 'run_leaky_superconductor' else 3e-2}
-        }
-        description_small_step = {
-            'level_params': {'dt': 1.0 if problem.__name__ == 'run_leaky_superconductor' else 1e-2}
-        }
+        description_large_step = {'level_params': {'dt': 5.0 if problem.__name__ == 'run_quench' else 3e-2}}
+        description_small_step = {'level_params': {'dt': 1.0 if problem.__name__ == 'run_quench' else 1e-2}}
 
         configurations[2] = {
             'custom_description': description_large_step,
@@ -503,8 +499,7 @@ def get_configs(mode, problem):
     elif mode == 'RK':
         from pySDC.projects.Resilience.strategies import AdaptivityStrategy, DIRKStrategy, ERKStrategy
 
-        from pySDC.implementations.sweeper_classes.explicit import explicit
-
+        # from pySDC.implementations.sweeper_classes.explicit import explicit
         # configurations[3] = {
         #    'custom_description': {
         #        'step_params': {'maxiter': 5},
@@ -829,7 +824,7 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         **kwargs,
     }
 
-    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_leaky_superconductor]
+    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_quench]
 
     for i in range(len(problems)):
         execute_configurations(
@@ -994,7 +989,7 @@ if __name__ == "__main__":
         'plotting': comm_world.rank == 0,
     }
 
-    for mode in ['parallel_efficiency']:  # , 'preconditioners', 'compare_adaptivity']:
+    for _mode in ['parallel_efficiency']:  # , 'preconditioners', 'compare_adaptivity']:
         # all_problems(**all_params, mode=mode)
         comm_world.Barrier()
 

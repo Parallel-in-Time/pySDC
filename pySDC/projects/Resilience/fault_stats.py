@@ -19,7 +19,7 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
-from pySDC.projects.Resilience.leaky_superconductor import run_leaky_superconductor
+from pySDC.projects.Resilience.quench import run_quench
 
 from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
 
@@ -546,7 +546,7 @@ class FaultStats:
             prob_name = 'Lorenz'
         elif self.prob == run_Schroedinger:
             prob_name = 'Schroedinger'
-        elif self.prob == run_leaky_superconductor:
+        elif self.prob == run_quench:
             prob_name = 'Quench'
         else:
             raise NotImplementedError(f'Name not implemented for problem {self.prob}')
@@ -1345,7 +1345,7 @@ class FaultStats:
         results = {}
         results['frequencies'] = list(all_data.keys())
         results['recovery_rate'] = [
-            len(all_data[key]['recovered'][all_data[key]['recovered'] == True]) / len(all_data[key]['recovered'])
+            len(all_data[key]['recovered'][all_data[key]['recovered'] is True]) / len(all_data[key]['recovered'])
             for key in all_data.keys()
         ]
         # results['iterations'] = [np.mean(all_data[key]['total_iteration']) for key in all_data.keys()]
@@ -1369,8 +1369,8 @@ def check_local_error():
     """
     Make a plot of the resolution over time for all problems
     """
-    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_leaky_superconductor]
-    problems = [run_leaky_superconductor]
+    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_quench]
+    problems = [run_quench]
     strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
 
     for i in range(len(problems)):

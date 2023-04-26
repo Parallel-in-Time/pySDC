@@ -9,7 +9,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
-class LeakySuperconductor(ptype):
+class Quench(ptype):
     """
     This is a toy problem to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
     However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
@@ -314,7 +314,7 @@ class LeakySuperconductor(ptype):
                 from pySDC.helpers.stats_helper import get_sorted
 
                 description = {}
-                description['problem_class'] = LeakySuperconductor
+                description['problem_class'] = Quench
                 description['problem_params'] = {
                     'newton_tol': 1e-10,
                     'newton_iter': 99,
@@ -363,7 +363,7 @@ class LeakySuperconductor(ptype):
         return me
 
 
-class LeakySuperconductorIMEX(LeakySuperconductor):
+class QuenchIMEX(Quench):
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):

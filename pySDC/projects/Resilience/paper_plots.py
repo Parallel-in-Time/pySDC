@@ -11,7 +11,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_Lorenz,
     run_Schroedinger,
     run_vdp,
-    run_leaky_superconductor,
+    run_quench,
 )
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 from pySDC.helpers.stats_helper import get_sorted
@@ -41,7 +41,7 @@ def get_stats(problem, path='data/stats-jusuf'):
         mode = 'random'
 
     recovery_thresh_abs = {
-        run_leaky_superconductor: 5e-3,
+        run_quench: 5e-3,
     }
 
     strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
@@ -194,7 +194,7 @@ def compare_recovery_rate_problems():  # pragma: no cover
         get_stats(run_vdp),
         get_stats(run_Lorenz),
         get_stats(run_Schroedinger),
-        get_stats(run_leaky_superconductor),
+        get_stats(run_quench),
     ]
     titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger', 'Quench']
 
@@ -231,7 +231,7 @@ def plot_efficiency_polar_vdp(problem, path='data/stats'):  # pragma: no cover
 
 
 def plot_efficiency_polar_other():  # pragma: no cover
-    problems = [run_Lorenz, run_Schroedinger, run_leaky_superconductor]
+    problems = [run_Lorenz, run_Schroedinger, run_quench]
     paths = ['./data/stats/', './data/stats-jusuf', './data/stats-jusuf']
     titles = ['Lorenz attractor', r'Schr\"odinger', 'Quench']
 
@@ -459,11 +459,9 @@ def plot_quench_solution():  # pragma: no cover
 
     strategy = BaseStrategy()
 
-    custom_description = strategy.get_custom_description(run_leaky_superconductor)
+    custom_description = strategy.get_custom_description(run_quench)
 
-    stats, controller, _ = run_leaky_superconductor(
-        custom_description=custom_description, Tend=strategy.get_Tend(run_leaky_superconductor)
-    )
+    stats, controller, _ = run_quench(custom_description=custom_description, Tend=strategy.get_Tend(run_quench))
 
     prob = controller.MS[0].levels[0].prob
 
@@ -593,9 +591,9 @@ def work_precision():
     fig, axs = get_fig(x=3, y=1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.47))
     quench_params = {
         **all_params,
-        'problem': run_leaky_superconductor,
+        'problem': run_quench,
         'decorate': True,
-        'configurations': get_configs('step_size_limiting', run_leaky_superconductor),
+        'configurations': get_configs('step_size_limiting', run_quench),
         'num_procs': 1,
         'runs': 1,
         'comm_world': MPI.COMM_WORLD,
@@ -615,7 +613,7 @@ def work_precision():
     fig.suptitle('Quench')
     save_fig(
         fig=fig,
-        name=f'{run_leaky_superconductor.__name__}',
+        name=f'{run_quench.__name__}',
         work_key='step-size',
         precision_key='limiting',
         legend=True,
@@ -683,7 +681,7 @@ def make_plots_for_notes():  # pragma: no cover
     BASE_PATH = 'notes/Lorenz'
 
     analyse_resilience(run_Lorenz, format='png')
-    analyse_resilience(run_leaky_superconductor, format='png')
+    analyse_resilience(run_quench, format='png')
 
 
 if __name__ == "__main__":

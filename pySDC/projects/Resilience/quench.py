@@ -1,5 +1,5 @@
 # script to run a quench problem
-from pySDC.implementations.problem_classes.LeakySuperconductor import LeakySuperconductor, LeakySuperconductorIMEX
+from pySDC.implementations.problem_classes.Quench import Quench, QuenchIMEX
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -67,7 +67,7 @@ class live_plot(hooks):  # pragma: no cover
         self._plot_state(step, level_number)
 
 
-def run_leaky_superconductor(
+def run_quench(
     custom_description=None,
     num_procs=1,
     Tend=6e2,
@@ -131,7 +131,7 @@ def run_leaky_superconductor(
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = LeakySuperconductorIMEX if imex else LeakySuperconductor
+    description['problem_class'] = QuenchIMEX if imex else Quench
     description['problem_params'] = problem_params
     description['sweeper_class'] = imex_1st_order if imex else generic_implicit
     description['sweeper_params'] = sweeper_params
@@ -190,19 +190,17 @@ def faults(seed=0):  # pragma: no cover
 
     controller_params = {'logger_level': 30}
     description = {'level_params': {'dt': 1e1}, 'step_params': {'maxiter': 5}}
-    stats, controller, _ = run_leaky_superconductor(
-        custom_controller_params=controller_params, custom_description=description
-    )
+    stats, controller, _ = run_quench(custom_controller_params=controller_params, custom_description=description)
     plot_solution_faults(stats, controller, ax, plot_lines=True, label='ref')
 
-    stats, controller, _ = run_leaky_superconductor(
+    stats, controller, _ = run_quench(
         fault_stuff=fault_stuff,
         custom_controller_params=controller_params,
     )
     plot_solution_faults(stats, controller, ax, label='fixed')
 
     description['convergence_controllers'] = {Adaptivity: {'e_tol': 1e-7, 'dt_max': 1e2, 'dt_min': 1e-3}}
-    stats, controller, _ = run_leaky_superconductor(
+    stats, controller, _ = run_quench(
         fault_stuff=fault_stuff, custom_controller_params=controller_params, custom_description=description
     )
 
@@ -338,7 +336,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
 
     custom_controller_params = {'logger_level': 30}
     for imex in [False, True]:
-        stats, controller, _ = run_leaky_superconductor(
+        stats, controller, _ = run_quench(
             custom_description=custom_description,
             custom_controller_params=custom_controller_params,
             imex=imex,
@@ -413,11 +411,11 @@ def compare_reference_solutions_single():
         }
 
         description['level_params'] = {'dt': 5.0, 'restol': -1}
-        description = merge_descriptions(description, strategy.get_custom_description(run_leaky_superconductor, 1))
+        description = merge_descriptions(description, strategy.get_custom_description(run_quench, 1))
         description['step_params'] = {'maxiter': 5}
         description['convergence_controllers'][Adaptivity]['e_tol'] = 1e-4
 
-        stats, controller, _ = run_leaky_superconductor(
+        stats, controller, _ = run_quench(
             custom_description=description,
             hook_class=[LogGlobalErrorPostStep, LogLocalErrorPostStep, LogSolution],
             Tend=Tend,
@@ -471,7 +469,7 @@ def compare_reference_solutions():
                 'reference_sol_type': types[j],
             }
 
-            stats, controller, _ = run_leaky_superconductor(
+            stats, controller, _ = run_quench(
                 custom_description=description,
                 hook_class=[LogGlobalErrorPostRun, LogLocalErrorPostStep],
                 Tend=Tend,
@@ -524,7 +522,7 @@ def check_order(reference_sol_type='scipy'):
             #    description['sweeper_class'] = DIRK34
             #    description['sweeper_params'] = {'maxiter': 1}
 
-            stats, controller, _ = run_leaky_superconductor(
+            stats, controller, _ = run_quench(
                 custom_description=description, hook_class=[LogGlobalErrorPostRun], Tend=Tend, imex=False
             )
             # errors[i] = max([me[1] for me in get_sorted(stats, type='error_embedded_estimate')])
