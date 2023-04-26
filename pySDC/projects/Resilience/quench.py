@@ -458,7 +458,6 @@ def compare_reference_solutions():
     for j in range(len(types)):
         errors = [None] * len(dt_list)
         for i in range(len(dt_list)):
-
             description = {}
             description['level_params'] = {'dt': dt_list[i], 'restol': 1e-10}
             description['sweeper_params'] = {'QI': 'IE', 'num_nodes': 3}
