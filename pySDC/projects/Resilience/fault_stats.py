@@ -1,10 +1,7 @@
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
-from matplotlib.colors import TABLEAU_COLORS
 from mpi4py import MPI
-import sys
-import matplotlib as mpl
 
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
@@ -13,7 +10,6 @@ from pySDC.projects.Resilience.hook import hook_collection, LogUAllIter, LogData
 from pySDC.projects.Resilience.fault_injection import get_fault_injector_hook
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
 from pySDC.implementations.hooks.log_work import LogWork
 
@@ -25,379 +21,9 @@ from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.leaky_superconductor import run_leaky_superconductor
 
+from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
+
 plot_helper.setup_mpl(reset=True)
-cmap = TABLEAU_COLORS
-
-
-class Strategy:
-    '''
-    Abstract class for resilience strategies
-    '''
-
-    def __init__(self):
-        '''
-        Initialization routine
-        '''
-
-        # set default values for plotting
-        self.linestyle = '-'
-        self.marker = '.'
-        self.name = ''
-        self.bar_plot_x_label = ''
-        self.color = list(cmap.values())[0]
-
-        # setup custom descriptions
-        self.custom_description = {}
-
-        # prepare parameters for masks to identify faults that cannot be fixed by this strategy
-        self.fixable = []
-        self.fixable += [
-            {
-                'key': 'node',
-                'op': 'gt',
-                'val': 0,
-            }
-        ]
-        self.fixable += [
-            {
-                'key': 'error',
-                'op': 'isfinite',
-            }
-        ]
-
-    def get_fixable_params(self, **kwargs):
-        """
-        Return a list containing dictionaries which can be passed to `FaultStats.get_mask` as keyword arguments to
-        obtain a mask of faults that can be fixed
-
-        Returns:
-            list: Dictionary of parameters
-        """
-        return self.fixable
-
-    def get_custom_description(self, problem, num_procs):
-        '''
-        Routine to get a custom description that realizes the resilience strategy and tailors it to the problem at hand
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            dict: The custom descriptions you can supply to the problem when running it
-        '''
-
-        return self.custom_description
-
-    def get_fault_args(self, problem, num_procs):
-        '''
-        Routine to get arguments for the faults that are exempt from randomization
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            dict: Arguments for the faults that are exempt from randomization
-        '''
-
-        return {}
-
-    def get_random_params(self, problem, num_procs):
-        '''
-        Routine to get parameters for the randomization of faults
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            dict: Randomization parameters
-        '''
-
-        return {}
-
-    @property
-    def style(self):
-        """
-        Get the plotting parameters for the strategy.
-        Supply them to a plotting function using `**`
-
-        Returns:
-            (dict): The plotting parameters as a dictionary
-        """
-        return {
-            'marker': self.marker,
-            'label': self.label,
-            'color': self.color,
-            'ls': self.linestyle,
-        }
-
-    @property
-    def label(self):
-        """
-        Get a label for plotting
-        """
-        return self.name
-
-
-class BaseStrategy(Strategy):
-    '''
-    Do a fixed iteration count
-    '''
-
-    def __init__(self):
-        '''
-        Initialization routine
-        '''
-        super(BaseStrategy, self).__init__()
-        self.color = list(cmap.values())[0]
-        self.marker = 'o'
-        self.name = 'base'
-        self.bar_plot_x_label = 'base'
-
-
-class AdaptivityStrategy(Strategy):
-    '''
-    Adaptivity as a resilience strategy
-    '''
-
-    def __init__(self):
-        '''
-        Initialization routine
-        '''
-        super(AdaptivityStrategy, self).__init__()
-        self.color = list(cmap.values())[1]
-        self.marker = '*'
-        self.name = 'adaptivity'
-        self.bar_plot_x_label = 'adaptivity'
-
-    def get_fixable_params(self, maxiter, **kwargs):
-        """
-        Here faults occurring in the last iteration cannot be fixed.
-
-        Args:
-            maxiter (int): Max. iterations until convergence is declared
-
-        Returns:
-            (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
-        """
-        self.fixable += [
-            {
-                'key': 'iteration',
-                'op': 'lt',
-                'val': maxiter,
-            }
-        ]
-        return self.fixable
-
-    def get_custom_description(self, problem, num_procs):
-        '''
-        Routine to get a custom description that adds adaptivity
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            The custom descriptions you can supply to the problem when running it
-        '''
-        custom_description = {}
-
-        dt_max = np.inf
-        dt_min = 1e-5
-
-        if problem == run_piline:
-            e_tol = 1e-7
-            dt_min = 1e-2
-        elif problem == run_vdp:
-            e_tol = 2e-5
-            dt_min = 1e-3
-        elif problem == run_Lorenz:
-            e_tol = 2e-5
-            dt_min = 1e-3
-        elif problem == run_Schroedinger:
-            e_tol = 4e-6
-            dt_min = 1e-3
-        elif problem == run_leaky_superconductor:
-            e_tol = 1e-7
-            dt_min = 1e-3
-            dt_max = 1e2
-        else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
- strategy'
-            )
-
-        custom_description['convergence_controllers'] = {
-            Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min, 'dt_max': dt_max}
-        }
-        return {**custom_description, **self.custom_description}
-
-
-class AdaptiveHotRodStrategy(Strategy):
-    '''
-    Adaptivity + Hot Rod as a resilience strategy
-    '''
-
-    def __init__(self):
-        '''
-        Initialization routine
-        '''
-        super(AdaptiveHotRodStrategy, self).__init__()
-        self.color = list(cmap.values())[4]
-        self.marker = '.'
-        self.name = 'adaptive Hot Rod'
-        self.bar_plot_x_label = 'adaptive\nHot Rod'
-
-    def get_custom_description(self, problem, num_procs):
-        '''
-        Routine to get a custom description that adds adaptivity and Hot Rod
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            The custom description you can supply to the problem when running it
-        '''
-        if problem == run_vdp:
-            e_tol = 3e-7
-            dt_min = 1e-3
-            maxiter = 4
-            HotRod_tol = 3e-7
-        else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
-to the strategy'
-            )
-
-        no_storage = num_procs > 1
-
-        custom_description = {
-            'convergence_controllers': {
-                Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min},
-                HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
-            },
-            'step_params': {'maxiter': maxiter},
-        }
-
-        return {**custom_description, **self.custom_description}
-
-
-class IterateStrategy(Strategy):
-    '''
-    Iterate for as much as you want
-    '''
-
-    def __init__(self):
-        '''
-        Initialization routine
-        '''
-        super(IterateStrategy, self).__init__()
-        self.color = list(cmap.values())[2]
-        self.marker = 'v'
-        self.name = 'iterate'
-        self.bar_plot_x_label = 'iterate'
-
-    @property
-    def label(self):
-        return r'$k$ adaptivity'
-
-    def get_custom_description(self, problem, num_procs):
-        '''
-        Routine to get a custom description that allows for adaptive iteration counts
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            The custom description you can supply to the problem when running it
-        '''
-        restol = -1
-        e_tol = -1
-
-        if problem == run_piline:
-            restol = 2.3e-8
-        elif problem == run_vdp:
-            restol = 9e-7
-        elif problem == run_Lorenz:
-            restol = 16e-7
-        elif problem == run_Schroedinger:
-            restol = 6.5e-7
-        elif problem == run_leaky_superconductor:
-            # e_tol = 1e-6
-            restol = 1e-11
-        else:
-            raise NotImplementedError(
-                'I don\'t have a residual tolerance for your problem. Please add one to the \
-strategy'
-            )
-
-        custom_description = {
-            'step_params': {'maxiter': 99},
-            'level_params': {'restol': restol, 'e_tol': e_tol},
-        }
-
-        return {**custom_description, **self.custom_description}
-
-
-class HotRodStrategy(Strategy):
-    '''
-    Hot Rod as a resilience strategy
-    '''
-
-    def __init__(self):
-        '''
-        Initialization routine
-        '''
-        super(HotRodStrategy, self).__init__()
-        self.color = list(cmap.values())[3]
-        self.marker = '^'
-        self.name = 'Hot Rod'
-        self.bar_plot_x_label = 'Hot Rod'
-
-    def get_custom_description(self, problem, num_procs):
-        '''
-        Routine to get a custom description that adds Hot Rod
-
-        Args:
-            problem: A function that runs a pySDC problem, see imports for available problems
-            num_procs (int): Number of processes you intend to run with
-
-        Returns:
-            The custom description you can supply to the problem when running it
-        '''
-        if problem == run_vdp:
-            HotRod_tol = 5e-7
-            maxiter = 4
-        elif problem == run_Lorenz:
-            HotRod_tol = 4e-7
-            maxiter = 6
-        elif problem == run_Schroedinger:
-            HotRod_tol = 3e-7
-            maxiter = 6
-        elif problem == run_leaky_superconductor:
-            HotRod_tol = 3e-5
-            maxiter = 6
-        else:
-            raise NotImplementedError(
-                'I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
- strategy'
-            )
-
-        no_storage = num_procs > 1
-
-        custom_description = {
-            'convergence_controllers': {
-                HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
-                BasicRestartingNonMPI: {'max_restarts': 2, 'crash_after_max_restarts': False},
-            },
-            'step_params': {'maxiter': maxiter},
-        }
-
-        return {**custom_description, **self.custom_description}
 
 
 class FaultStats:
@@ -412,10 +38,11 @@ class FaultStats:
         faults=None,
         reload=True,
         recovery_thresh=1 + 1e-3,
-        recovery_thresh_abs=1e9,
+        recovery_thresh_abs=0.0,
         num_procs=1,
         mode='combination',
         stats_path='data/stats',
+        **kwargs,
     ):
         '''
         Initialization routine
@@ -438,6 +65,10 @@ class FaultStats:
         self.num_procs = num_procs
         self.mode = mode
         self.stats_path = stats_path
+        self.kwargs = {
+            'fault_frequency_iter': 500,
+            **kwargs,
+        }
 
     def get_Tend(self):
         '''
@@ -446,56 +77,9 @@ class FaultStats:
         Returns:
             float: Tend to put into the run
         '''
-        if self.prob == run_vdp:
-            return 2.3752559741400825
-        elif self.prob == run_piline:
-            return 20.0
-        elif self.prob == run_Lorenz:
-            return 1.5
-        elif self.prob == run_Schroedinger:
-            return 1.0
-        elif self.prob == run_leaky_superconductor:
-            return 450
-        else:
-            raise NotImplementedError('I don\'t have a final time for your problem!')
+        return self.strategies[0].get_Tend(self.prob, self.num_procs)
 
-    def get_custom_description(self):
-        '''
-        Get a custom description based on the problem
-
-        Returns:
-            dict: Custom description
-        '''
-        custom_description = {}
-        if self.prob == run_vdp:
-            custom_description['step_params'] = {'maxiter': 3}
-        elif self.prob == run_Lorenz:
-            custom_description['step_params'] = {'maxiter': 5}
-        elif self.prob == run_Schroedinger:
-            custom_description['step_params'] = {'maxiter': 5}
-            custom_description['level_params'] = {'dt': 1e-2, 'restol': -1}
-        elif self.prob == run_leaky_superconductor:
-            custom_description['level_params'] = {'restol': -1, 'dt': 10.0}
-            custom_description['step_params'] = {'maxiter': 5}
-            custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-10}
-        return custom_description
-
-    def get_custom_problem_params(self):
-        '''
-        Get a custom problem parameters based on the problem
-
-        Returns:
-            dict: Custom problem params
-        '''
-        custom_params = {}
-        if self.prob == run_vdp:
-            custom_params = {
-                'u0': np.array([0.99995, -0.00999985], dtype=np.float64),
-                'crash_at_maxiter': False,
-            }
-        return custom_params
-
-    def run_stats_generation(self, runs=1000, step=None, comm=None, _reload=False, _runs_partial=0):
+    def run_stats_generation(self, runs=1000, step=None, comm=None, kwargs_range=None, _reload=False, _runs_partial=0):
         '''
         Run the generation of stats for all strategies in the `self.strategies` variable
 
@@ -503,11 +87,21 @@ class FaultStats:
             runs (int): Number of runs you want to do
             step (int): Number of runs you want to do between saving
             comm (MPI.Communicator): Communicator for distributing runs
+            kw_args_range (dict): Range for the parameters
             _reload, _runs_partial: Variables only used for recursion. Do not change!
 
         Returns:
             None
         '''
+        for key, val in kwargs_range.items() if kwargs_range is not None else {}:
+            if type(val) == int:
+                self.kwargs[key] = val
+            else:
+                for me in val:
+                    kwargs_range_me = {**kwargs_range, key: me}
+                    self.run_stats_generation(runs=runs, step=step, comm=comm, kwargs_range=kwargs_range_me)
+                return None
+
         comm = MPI.COMM_WORLD if comm is None else comm
         step = (runs if step is None else step) if comm.size == 1 else comm.size
         _runs_partial = step if _runs_partial == 0 else _runs_partial
@@ -519,9 +113,11 @@ class FaultStats:
             # sort the strategies to do some load balancing
             sorting_index = None
             if comm.rank == 0:
-                already_completed = np.array([self.load(strategy, True).get('runs', 0) for strategy in self.strategies])
+                already_completed = np.array(
+                    [self.load(strategy=strategy, faults=True).get('runs', 0) for strategy in self.strategies]
+                )
                 sorting_index_ = np.argsort(already_completed)
-                sorting_index = sorting_index_[already_completed[sorting_index_] < runs]
+                sorting_index = sorting_index_[already_completed[sorting_index_] < max_runs]
 
             # tell all ranks what strategies to use
             sorting_index = comm.bcast(sorting_index, root=0)
@@ -583,11 +179,17 @@ class FaultStats:
             'target': np.zeros(runs),
         }
 
+        # store arguments for storing and loading
+        identifier_args = {
+            'faults': faults,
+            'strategy': strategy,
+        }
+
         # reload previously recorded stats and write them to dat
         if reload:
             already_completed_ = None
             if comm.rank == 0:
-                already_completed_ = self.load(strategy, faults)
+                already_completed_ = self.load(**identifier_args)
             already_completed = comm.bcast(already_completed_, root=0)
             if already_completed['runs'] > 0 and already_completed['runs'] <= runs and comm.rank == 0:
                 for k in dat.keys():
@@ -625,13 +227,14 @@ class FaultStats:
 
             # record the new data point
             if faults:
-                assert len(faults_run) > 0, f'No faults where recorded in run {i} of strategy {strategy.name}!'
-                dat['level'][i] = faults_run[0][1][0]
-                dat['iteration'][i] = faults_run[0][1][1]
-                dat['node'][i] = faults_run[0][1][2]
-                dat['problem_pos'] += [faults_run[0][1][3]]
-                dat['bit'][i] = faults_run[0][1][4]
-                dat['target'][i] = faults_run[0][1][5]
+                if len(faults_run) > 0:
+                    assert self.mode == 'regular', f'No faults where recorded in run {i} of strategy {strategy.name}!'
+                    dat['level'][i] = faults_run[0][1][0]
+                    dat['iteration'][i] = faults_run[0][1][1]
+                    dat['node'][i] = faults_run[0][1][2]
+                    dat['problem_pos'] += [faults_run[0][1][3]]
+                    dat['bit'][i] = faults_run[0][1][4]
+                    dat['target'][i] = faults_run[0][1][5]
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
             dat['total_newton_iteration'][i] = total_newton_iteration
@@ -646,10 +249,10 @@ class FaultStats:
 
         if already_completed['runs'] < runs:
             if comm.rank == 0:
-                self.store(strategy, faults, dat_full)
+                self.store(dat_full, **identifier_args)
                 if self.faults:
                     try:
-                        self.get_recovered(strategy)
+                        self.get_recovered(strategy=strategy)
                     except KeyError:
                         print('Warning: Can\'t compute recovery rate right now')
 
@@ -668,18 +271,9 @@ class FaultStats:
         Returns:
             float: Error
         """
-        if self.prob == run_leaky_superconductor:
-            ref = {
-                AdaptivityStrategy: 0.036832240840408426,
-                IterateStrategy: 0.0368214748207781,
-                HotRodStrategy: 0.03682153860683977,
-                BaseStrategy: 0.03682153860683977,
-            }
-            return abs(max(u) - ref[type(strategy)])
-        else:
-            return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+        return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
 
-    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None, space_comm=None):
+    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None, space_comm=None, Tend=None):
         '''
         Run the problem once with the specified parameters
 
@@ -699,34 +293,34 @@ class FaultStats:
         force_params = {} if force_params is None else force_params
 
         # build the custom description
-        custom_description_prob = self.get_custom_description()
-        custom_description_strategy = strategy.get_custom_description(self.prob, self.num_procs)
-        custom_description = {}
-        for key in list(custom_description_strategy.keys()) + list(custom_description_prob.keys()):
-            custom_description[key] = {
-                **custom_description_prob.get(key, {}),
-                **custom_description_strategy.get(key, {}),
-            }
+        custom_description = strategy.get_custom_description(self.prob, self.num_procs)
         for k in force_params.keys():
             custom_description[k] = {**custom_description.get(k, {}), **force_params[k]}
 
         custom_controller_params = force_params.get('controller_params', {})
-        custom_problem_params = self.get_custom_problem_params()
 
         if faults:
-            # make parameters for faults:
-            if self.mode == 'random':
-                rng = np.random.RandomState(run)
-            elif self.mode == 'combination':
-                rng = run
-            else:
-                raise NotImplementedError(f'Don\'t know how to add faults in mode {self.mode}')
-
             fault_stuff = {
-                'rng': rng,
+                'rng': None,
                 'args': strategy.get_fault_args(self.prob, self.num_procs),
                 'rnd_params': strategy.get_fault_args(self.prob, self.num_procs),
             }
+
+            # make parameters for faults:
+            if self.mode == 'random':
+                fault_stuff['rng'] = np.random.RandomState(run)
+            elif self.mode == 'combination':
+                fault_stuff['rng'] = run
+            elif self.mode == 'regular':
+                fault_stuff['rng'] = np.random.RandomState(run)
+                fault_stuff['fault_frequency_iter'] = self.kwargs['fault_frequency_iter']
+                fault_stuff['rnd_params'] = {
+                    'bit': 12,
+                    'min_node': 1,
+                }
+            else:
+                raise NotImplementedError(f'Don\'t know how to add faults in mode {self.mode}')
+
         else:
             fault_stuff = None
 
@@ -735,9 +329,8 @@ class FaultStats:
             num_procs=self.num_procs,
             hook_class=hook_class,
             fault_stuff=fault_stuff,
-            Tend=self.get_Tend(),
+            Tend=self.get_Tend() if Tend is None else Tend,
             custom_controller_params=custom_controller_params,
-            custom_problem_params=custom_problem_params,
             space_comm=space_comm,
         )
 
@@ -792,7 +385,7 @@ class FaultStats:
         else:
             store = False
 
-        force_params = dict()
+        force_params = {}
 
         stats, controller, Tend = self.single_run(
             strategy=strategy,
@@ -843,7 +436,7 @@ class FaultStats:
         Returns:
             None
         '''
-        force_params = dict()
+        force_params = {}
         force_params['controller_params'] = {'logger_level': 15}
 
         stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params)
@@ -856,7 +449,7 @@ class FaultStats:
         print(f'\nOverview for {strategy.name} strategy')
 
         # see if we can determine if the faults where recovered
-        no_faults = self.load(strategy, False)
+        no_faults = self.load(strategy=strategy, faults=False)
         e_star = np.mean(no_faults.get('error', [0]))
         if t < Tend:
             error = np.inf
@@ -889,10 +482,10 @@ class FaultStats:
         # print faults
         faults = get_sorted(stats, type='bitflip')
         print('\nfaults:')
-        print('   t  | level | iter | node | bit | trgt | pos')
-        print('------+-------+------+------+-----+------+----')
+        print('    t   | level | iter | node | bit | trgt | pos')
+        print('--------+-------+------+------+-----+------+----')
         for f in faults:
-            print(f' {f[0]:.2f} | {f[1][0]:5d} | {f[1][1]:4d} | {f[1][2]:4d} | {f[1][4]:3d} | {f[1][5]:4d} |', f[1][3])
+            print(f' {f[0]:6.2f} | {f[1][0]:5d} | {f[1][1]:4d} | {f[1][2]:4d} | {f[1][4]:3d} | {f[1][5]:4d} |', f[1][3])
 
         return None
 
@@ -919,7 +512,7 @@ class FaultStats:
         bit = [faults[i][1][4] for i in range(len(faults))]
         return time, level, iteration, node, problem_pos, bit
 
-    def get_path(self, strategy, faults):
+    def get_path(self, **kwargs):
         '''
         Get the path to where the stats are stored
 
@@ -930,9 +523,9 @@ class FaultStats:
         Returns:
             str: The path to what you are looking for
         '''
-        return f'{self.stats_path}/{self.get_name(strategy, faults)}.pickle'
+        return f'{self.stats_path}/{self.get_name(**kwargs)}.pickle'
 
-    def get_name(self, strategy=None, faults=False):
+    def get_name(self, strategy=None, faults=True, mode=None):
         '''
         Function to get a unique name for a kind of statistics based on the problem and strategy that was used
 
@@ -968,42 +561,41 @@ class FaultStats:
         else:
             strategy_name = ''
 
-        return f'{prob_name}{strategy_name}{fault_name}-{self.num_procs}procs'
+        mode = self.mode if mode is None else mode
+        if mode == 'regular':
+            mode_thing = f'-regular{self.kwargs["fault_frequency_iter"] if faults else ""}'
+        else:
+            mode_thing = ''
 
-    def store(self, strategy, faults, dat):
+        return f'{prob_name}{strategy_name}{fault_name}-{self.num_procs}procs{mode_thing}'
+
+    def store(self, dat, **kwargs):
         '''
         Stores the data for a run at a predefined path
 
         Args:
-            strategy (Strategy): Resilience strategy
-            faults (bool): Whether or not faults where inserted
             dat (dict): The data of the recorded statistics
 
         Returns:
             None
         '''
-        with open(self.get_path(strategy, faults), 'wb') as f:
+        with open(self.get_path(**kwargs), 'wb') as f:
             pickle.dump(dat, f)
         return None
 
-    def load(self, strategy=None, faults=True):
+    def load(self, **kwargs):
         '''
         Loads the stats belonging to a specific strategy and whether or not faults where inserted.
         When no data has been generated yet, a dictionary is returned which only contains the number of completed runs,
         which is 0 of course.
 
-        Args:
-            strategy (Strategy): Resilience strategy
-            faults (bool): Whether or not faults where inserted
-
         Returns:
             dict: Data from previous run or if it is not available a placeholder dictionary
         '''
-        if strategy is None:
-            strategy = self.strategies[MPI.COMM_WORLD.rank % len(self.strategies)]
+        kwargs['strategy'] = kwargs.get('strategy', self.strategies[MPI.COMM_WORLD.rank % len(self.strategies)])
 
         try:
-            with open(self.get_path(strategy, faults), 'rb') as f:
+            with open(self.get_path(**kwargs), 'rb') as f:
                 dat = pickle.load(f)
         except FileNotFoundError:
             return {'runs': 0}
@@ -1016,27 +608,26 @@ class FaultStats:
         Args:
             strategy (Strategy): The resilience strategy
         """
-        fault_free = self.load(strategy, False)
+        fault_free = self.load(strategy=strategy, faults=False)
         assert fault_free['error'].std() / fault_free['error'].mean() < 1e-5
         return self.recovery_thresh_abs + self.recovery_thresh * fault_free["error"].mean()
 
-    def get_recovered(self, strategy=None):
+    def get_recovered(self, **kwargs):
         '''
         Determine the recovery rate for a specific strategy and store it to disk.
-
-        Args:
-            strategy (Strategy): The resilience strategy you want to get the recovery rate for. If left at None, it will
-                                 be computed for all available strategies
 
         Returns:
             None
         '''
-        if strategy is None:
-            [self.get_recovered(strat) for strat in self.strategies]
-
-        with_faults = self.load(strategy, True)
-        with_faults['recovered'] = with_faults['error'] < self.get_thresh(strategy)
-        self.store(strategy, True, with_faults)
+        if 'strategy' not in kwargs.keys():
+            [self.get_recovered(strategy=strat, **kwargs) for strat in self.strategies]
+        else:
+            try:
+                with_faults = self.load(faults=True, **kwargs)
+                with_faults['recovered'] = with_faults['error'] < self.get_thresh(kwargs['strategy'])
+                self.store(faults=True, dat=with_faults, **kwargs)
+            except (KeyError):
+                print("Can\'t compute recovery rate right now")
 
         return None
 
@@ -1112,7 +703,9 @@ class FaultStats:
         else:
             return None
 
-    def plot_thingA_per_thingB(self, strategy, thingA, thingB, ax=None, mask=None, recovered=False, op=None):
+    def plot_thingA_per_thingB(
+        self, strategy, thingA, thingB, ax=None, mask=None, recovered=False, op=None
+    ):  # pragma: no cover
         '''
         Plot thingA vs. thingB for a single strategy
 
@@ -1129,8 +722,8 @@ class FaultStats:
             None
         '''
         op = self.rec_rate if op is None else op
-        dat = self.load(strategy, True)
-        no_faults = self.load(strategy, False)
+        dat = self.load(strategy=strategy, faults=True)
+        no_faults = self.load(strategy=strategy, faults=False)
 
         if mask is None:
             mask = np.ones_like(dat[thingB], dtype=bool)
@@ -1178,7 +771,7 @@ class FaultStats:
         store=True,
         ax=None,
         fig=None,
-    ):
+    ):  # pragma: no cover
         '''
         Plot thingA vs thingB for multiple strategies
 
@@ -1221,7 +814,7 @@ class FaultStats:
 
         return None
 
-    def plot_recovery_thresholds(self, strategies=None, thresh_range=None, ax=None):
+    def plot_recovery_thresholds(self, strategies=None, thresh_range=None, ax=None):  # pragma: no cover
         '''
         Plot the recovery rate for a range of thresholds
 
@@ -1243,8 +836,8 @@ class FaultStats:
         for strategy_idx in range(len(strategies)):
             strategy = strategies[strategy_idx]
             # load the stats
-            fault_free = self.load(strategy, False)
-            with_faults = self.load(strategy, True)
+            fault_free = self.load(strategy=strategy, faults=False)
+            with_faults = self.load(strategy=strategy, faults=True)
 
             for thresh_idx in range(len(thresh_range)):
                 rec_mask = with_faults['error'] < thresh_range[thresh_idx] * fault_free['error'].mean()
@@ -1257,7 +850,7 @@ class FaultStats:
 
         return None
 
-    def analyse_adaptivity(self, mask):
+    def analyse_adaptivity(self, mask):  # pragma: no cover
         '''
         Analyse a set of runs with adaptivity
 
@@ -1286,7 +879,7 @@ class FaultStats:
         print(f'We only restart when e_em > e_tol = {e_tol:.2e}!')
         return None
 
-    def analyse_adaptivity_single(self, run):
+    def analyse_adaptivity_single(self, run):  # pragma: no cover
         '''
         Compute what the difference in embedded and global error are for a specific run with adaptivity
 
@@ -1322,7 +915,7 @@ class FaultStats:
 
         return [e_em[i][-1] for i in [0, 1]], e_glob
 
-    def analyse_HotRod(self, mask):
+    def analyse_HotRod(self, mask):  # pragma: no cover
         '''
         Analyse a set of runs with Hot Rod
 
@@ -1358,7 +951,7 @@ class FaultStats:
         print(f'We only restart when diff > tol = {tol:.2e}!')
         return None
 
-    def analyse_HotRod_single(self, run):
+    def analyse_HotRod_single(self, run):  # pragma: no cover
         '''
         Compute what the difference in embedded, extrapolated and global error are for a specific run with Hot Rod
 
@@ -1400,7 +993,7 @@ class FaultStats:
 
         return [e_em[i][-1] for i in [0, 1]], [e_ex[i][-1] for i in [0, 1]], e_glob
 
-    def print_faults(self, mask=None):
+    def print_faults(self, mask=None):  # pragma: no cover
         '''
         Print all faults that happened within a certain mask
 
@@ -1441,16 +1034,16 @@ class FaultStats:
             Numpy.ndarray with boolean entries that can be used as a mask
         '''
         strategy = self.strategies[0] if strategy is None else strategy
-        dat = self.load(strategy, True)
+        dat = self.load(strategy=strategy, faults=True)
 
         if compare_faults:
             if val is not None:
                 raise ValueError('Can\'t use val and compare_faults in get_mask at the same time!')
             else:
-                vals = self.load(strategy, False)[key]
+                vals = self.load(strategy=strategy, faults=False)[key]
                 val = sum(vals) / len(vals)
 
-        if None in [key, val] and not op in ['isfinite']:
+        if None in [key, val] and op not in ['isfinite']:
             mask = dat['bit'] == dat['bit']
         else:
             if op == 'uneq':
@@ -1485,7 +1078,9 @@ class FaultStats:
         Returns:
             Numpy.ndarray with boolean entries that can be used as a mask
         """
-        fixable = strategy.get_fixable_params(maxiter=self.get_custom_description()['step_params']['maxiter'])
+        fixable = strategy.get_fixable_params(
+            maxiter=strategy.get_custom_description(self.prob, self.num_procs)['step_params']['maxiter']
+        )
         mask = self.get_mask(strategy=strategy)
 
         for kwargs in fixable:
@@ -1509,7 +1104,7 @@ class FaultStats:
         else:
             return np.arange(len(mask))[mask]
 
-    def get_statistics_info(self, mask=None, strategy=None, print_all=False, ax=None):
+    def get_statistics_info(self, mask=None, strategy=None, print_all=False, ax=None):  # pragma: no cover
         '''
         Get information about how many data points for faults we have given a particular mask
 
@@ -1526,7 +1121,7 @@ class FaultStats:
 
         # load some data from which to infer the number occurrences of some event
         strategy = self.strategies[0] if strategy is None else strategy
-        dat = self.load(strategy, True)
+        dat = self.load(stratagy=strategy, faults=True)
 
         # make a dummy mask in case none is supplied
         if mask is None:
@@ -1548,7 +1143,7 @@ class FaultStats:
 
         return None
 
-    def combinations_histogram(self, dat=None, keys=None, mask=None, ax=None):
+    def combinations_histogram(self, dat=None, keys=None, mask=None, ax=None):  # pragma: no cover
         '''
         Make a histogram ouf of the occurrences of combinations
 
@@ -1571,7 +1166,7 @@ class FaultStats:
 
         return ax
 
-    def get_combination_histogram(self, dat=None, keys=None, mask=None):
+    def get_combination_histogram(self, dat=None, keys=None, mask=None):  # pragma: no cover
         '''
         Check how many combinations of values we expect and how many we find to see if we need to do more experiments.
         It is assumed that each allowed value for each key appears at least once in dat after the mask was applied
@@ -1587,7 +1182,7 @@ class FaultStats:
         '''
 
         # load default values
-        dat = self.load(self.strategies[0], True) if dat is None else dat
+        dat = self.load(strategy=self.strategies[0], faults=True) if dat is None else dat
         keys = ['iteration', 'bit', 'node'] if keys is None else keys
         if mask is None:
             mask = np.ones_like(dat['error'], dtype=bool)
@@ -1673,7 +1268,7 @@ class FaultStats:
 
     def bar_plot_thing(
         self, x=None, thing=None, ax=None, mask=None, store=False, faults=False, name=None, op=None, args=None
-    ):
+    ):  # pragma: no cover
         '''
         Make a bar plot about something!
 
@@ -1701,8 +1296,8 @@ class FaultStats:
             strategy = self.strategies[strategy_idx]
 
             # load the values
-            dat = self.load(strategy, faults)
-            no_faults = self.load(strategy, False)
+            dat = self.load(strategy=strategy, faults=faults)
+            no_faults = self.load(strategy=strategy, faults=False)
 
             # check if we have a mask
             if mask is None:
@@ -1730,21 +1325,98 @@ class FaultStats:
 
         return None
 
+    def fault_frequency_plot(self, ax, iter_ax, kwargs_range, strategy=None):
+        func_args = locals()
+        func_args.pop('self', None)
+        if strategy is None:
+            for strat in self.strategies:
+                args = {**func_args, 'strategy': strat}
+                self.fault_frequency_plot(**args)
+            return None
+
+        # load data
+        all_data = {}
+        for me in kwargs_range['fault_frequency_iter']:
+            self.kwargs['fault_frequency_iter'] = me
+            self.get_recovered()
+            all_data[me] = self.load(strategy=strategy, faults=True, mode='regular')
+
+        # get_recovery_rate
+        results = {}
+        results['frequencies'] = list(all_data.keys())
+        results['recovery_rate'] = [
+            len(all_data[key]['recovered'][all_data[key]['recovered'] == True]) / len(all_data[key]['recovered'])
+            for key in all_data.keys()
+        ]
+        # results['iterations'] = [np.mean(all_data[key]['total_iteration']) for key in all_data.keys()]
+        results['iterations'] = [
+            np.mean(all_data[key]['total_iteration'][all_data[key]['error'] != np.inf]) for key in all_data.keys()
+        ]
+
+        ax.plot(results['frequencies'], results['recovery_rate'], **strategy.style)
+        iter_ax.plot(results['frequencies'], results['iterations'], **{**strategy.style, 'ls': '--'})
+
+        ax.set_xscale('log')
+        ax.set_xlabel('iterations between fault')
+        ax.set_ylabel('recovery rate')
+        iter_ax.set_ylabel('average total iterations if not crashed (dashed)')
+        ax.legend(frameon=False)
+
+        return None
+
+
+def check_local_error():
+    """
+    Make a plot of the resolution over time for all problems
+    """
+    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_leaky_superconductor]
+    problems = [run_leaky_superconductor]
+    strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
+
+    for i in range(len(problems)):
+        stats_analyser = FaultStats(
+            prob=problems[i],
+            strategies=strategies,
+            faults=[False],
+            reload=True,
+            recovery_thresh=1.1,
+            num_procs=1,
+            mode='random',
+        )
+        stats_analyser.compare_strategies()
+    plt.show()
+
 
 def main():
     stats_analyser = FaultStats(
-        prob=run_leaky_superconductor,
+        prob=run_vdp,
         strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
         faults=[False, True],
         reload=True,
         recovery_thresh=1.1,
-        recovery_thresh_abs=5e-5,
+        # recovery_thresh_abs=1e-5,
         num_procs=1,
-        mode='random',
+        mode='regular',
         stats_path='data/stats-jusuf',
     )
+    ########################
+    # msk = stats_analyser.get_mask(AdaptivityStrategy(), val=False, key='recovered')
+    # stats_analyser.print_faults(msk)
+    fig, ax = plt.subplots()
+    iter_ax = ax.twinx()
+    kwargs_range = {'fault_frequency_iter': (10, 100, 1000, 10000)}
+    stats_analyser.run_stats_generation(runs=10, kwargs_range=kwargs_range)
+    stats_analyser.fault_frequency_plot(ax=ax, iter_ax=iter_ax, kwargs_range=kwargs_range)
+    # stats_analyser.scrutinize(AdaptivityStrategy(), 4, True)
+    plt.show()
+    return None
+    ########################
 
-    stats_analyser.run_stats_generation(runs=1000)
+    stats_analyser.run_stats_generation(runs=5000)
+
+    if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
+        return None
+
     stats_analyser.get_recovered()
     mask = None
 
@@ -1811,4 +1483,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # check_local_error()
     main()

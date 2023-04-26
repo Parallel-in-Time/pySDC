@@ -34,6 +34,7 @@ class LeakySuperconductor(ptype):
         Q_max=1.0,
         leak_range=(0.45, 0.55),
         leak_type='linear',
+        leak_transition='step',
         order=2,
         stencil_type='center',
         bc='neumann-zero',
@@ -43,6 +44,7 @@ class LeakySuperconductor(ptype):
         lintol=1e-8,
         liniter=99,
         direct_solver=True,
+        reference_sol_type='scipy',
     ):
         """
         Initialization routine
@@ -62,6 +64,7 @@ class LeakySuperconductor(ptype):
             'Q_max',
             'leak_range',
             'leak_type',
+            'leak_transition',
             'order',
             'stencil_type',
             'bc',
@@ -71,6 +74,7 @@ class LeakySuperconductor(ptype):
             'lintol',
             'liniter',
             'direct_solver',
+            'reference_sol_type',
             localVars=locals(),
             readOnly=True,
         )
@@ -130,15 +134,17 @@ class LeakySuperconductor(ptype):
         elif self.leak_type == 'exponential':
             me[:] = Q_max * (np.exp(u) - np.exp(u_thresh)) / (np.exp(u_max) - np.exp(u_thresh))
         else:
-            raise NotImplementedError(f'Leak type {self.leak_type} not implemented!')
+            raise NotImplementedError(f'Leak type \"{self.leak_type}\" not implemented!')
 
         me[u < u_thresh] = 0
-        me[self.leak] = Q_max
-        me[u >= u_max] = Q_max
+        if self.leak_transition == 'step':
+            me[self.leak] = Q_max
+        elif self.leak_transition == 'Gaussian':
+            me[:] = np.max([me, Q_max * np.exp(-((self.xv - 0.5) ** 2) / 3e-2)], axis=0)
+        else:
+            raise NotImplementedError(f'Leak transition \"{self.leak_transition}\" not implemented!')
 
-        # boundary conditions
-        me[0] = 0.0
-        me[-1] = 0.0
+        me[u >= u_max] = Q_max
 
         me[:] /= self.Cv
 
@@ -183,12 +189,14 @@ class LeakySuperconductor(ptype):
             raise NotImplementedError(f'Leak type {self.leak_type} not implemented!')
 
         me[u < u_thresh] = 0
+        if self.leak_transition == 'step':
+            me[self.leak] = 0
+        elif self.leak_transition == 'Gaussian':
+            me[self.leak] = 0
+            me[self.leak][u[self.leak] > Q_max * np.exp(-((self.xv[self.leak] - 0.5) ** 2) / 3e-2)] = 1
+        else:
+            raise NotImplementedError(f'Leak transition \"{self.leak_transition}\" not implemented!')
         me[u > u_max] = 0
-        me[self.leak] = 0
-
-        # boundary conditions
-        me[0] = 0.0
-        me[-1] = 0.0
 
         me[:] /= self.Cv
 
@@ -270,34 +278,88 @@ class LeakySuperconductor(ptype):
         me = self.dtype_u(self.init, val=0.0)
 
         if t > 0:
+            if self.reference_sol_type == 'scipy':
 
-            def jac(t, u):
-                """
-                Get the Jacobian for the implicit BDF method to use in `scipy.odeint`
+                def jac(t, u):
+                    """
+                    Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`
 
-                Args:
-                    t (float): The current time
-                    u (dtype_u): Current solution
+                    Args:
+                        t (float): The current time
+                        u (dtype_u): Current solution
 
-                Returns:
-                    scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
-                """
-                return self.A + self.get_non_linear_Jacobian(u)
+                    Returns:
+                        scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                    """
+                    return self.A + self.get_non_linear_Jacobian(u)
 
-            def eval_rhs(t, u):
-                """
-                Function to pass to `scipy.solve_ivp` to evaluate the full RHS
+                def eval_rhs(t, u):
+                    """
+                    Function to pass to `scipy.solve_ivp` to evaluate the full RHS
 
-                Args:
-                    t (float): Current time
-                    u (numpy.1darray): Current solution
+                    Args:
+                        t (float): Current time
+                        u (numpy.1darray): Current solution
 
-                Returns:
-                    (numpy.1darray): RHS
-                """
-                return self.eval_f(u.reshape(self.init[0]), t).flatten()
+                    Returns:
+                        (numpy.1darray): RHS
+                    """
+                    return self.eval_f(u.reshape(self.init[0]), t).flatten()
 
-            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init, method='BDF', jac=jac)
+                me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init, method='BDF', jac=jac)
+
+            elif self.reference_sol_type in ['DIRK', 'SDC']:
+                from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+                from pySDC.implementations.hooks.log_solution import LogSolution
+                from pySDC.helpers.stats_helper import get_sorted
+
+                description = {}
+                description['problem_class'] = LeakySuperconductor
+                description['problem_params'] = {
+                    'newton_tol': 1e-10,
+                    'newton_iter': 99,
+                    'nvars': 2**10,
+                    **self.params,
+                }
+
+                if self.reference_sol_type == 'DIRK':
+                    from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
+                    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
+
+                    description['sweeper_class'] = DIRK34
+                    description['sweeper_params'] = {}
+                    description['step_params'] = {'maxiter': 1}
+                    description['level_params'] = {'dt': 1e-4}
+                    description['convergence_controllers'] = {AdaptivityRK: {'e_tol': 1e-9, 'update_order': 4}}
+                elif self.reference_sol_type == 'SDC':
+                    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+                    description['sweeper_class'] = generic_implicit
+                    description['sweeper_params'] = {'num_nodes': 3, 'QI': 'IE', 'quad_type': 'RADAU-RIGHT'}
+                    description['step_params'] = {'maxiter': 99}
+                    description['level_params'] = {'dt': 0.5, 'restol': 1e-10}
+
+                controller_params = {'hook_class': LogSolution, 'mssdc_jac': False, 'logger_level': 99}
+
+                controller = controller_nonMPI(
+                    description=description, controller_params=controller_params, num_procs=1
+                )
+
+                uend, stats = controller.run(
+                    u0=u_init if u_init is not None else self.u_exact(t=0.0),
+                    t0=t_init if t_init is not None else 0,
+                    Tend=t,
+                )
+
+                u_last = get_sorted(stats, type='u', recomputed=False)[-1]
+
+                if abs(u_last[0] - t) > 1e-2:
+                    self.logger.warning(
+                        f'Time difference between reference solution and requested time is {abs(u_last[0]-t):.2e}!'
+                    )
+
+                me[:] = u_last[1]
+
         return me
 
 
@@ -360,8 +422,7 @@ class LeakySuperconductorIMEX(LeakySuperconductor):
 
             def jac(t, u):
                 """
-                Get the Jacobian for the implicit BDF method to use in `scipy.odeint`
-
+                Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`
                 Args:
                     t (float): The current time
                     u (dtype_u): Current solution

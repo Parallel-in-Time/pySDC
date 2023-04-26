@@ -7,6 +7,7 @@ from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 import numpy as np
+from pySDC.projects.Resilience.strategies import merge_descriptions
 
 
 def run_heat(
@@ -16,7 +17,6 @@ def run_heat(
     hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
-    custom_problem_params=None,
 ):
     """
     Run a heat problem with default parameters.
@@ -28,7 +28,6 @@ def run_heat(
         hook_class (pySDC.Hook): A hook to store data
         fault_stuff (dict): A dictionary with information on how to add faults
         custom_controller_params (dict): Overwrite presets
-        custom_problem_params (dict): Overwrite presets
 
     Returns:
         dict: The stats object
@@ -58,9 +57,6 @@ def run_heat(
         'liniter': None,
     }
 
-    if custom_problem_params is not None:
-        problem_params = {**problem_params, **custom_problem_params}
-
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 5
@@ -84,11 +80,7 @@ def run_heat(
     description['step_params'] = step_params
 
     if custom_description is not None:
-        for k in custom_description.keys():
-            if k == 'sweeper_class':
-                description[k] = custom_description[k]
-                continue
-            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
+        description = merge_descriptions(description, custom_description)
 
     # set time parameters
     t0 = 0.0

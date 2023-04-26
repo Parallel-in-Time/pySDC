@@ -254,6 +254,8 @@ class FaultInjector(hooks):
             None
         '''
         L = step.levels[f.level_number]
+        _abs_before = None
+        _abs_after = None
 
         # insert the fault in some target
         if f.target == 0:
@@ -268,14 +270,18 @@ class FaultInjector(hooks):
             fault happens in the last iteration, it will not show up in the residual and the iteration is wrongly
             stopped.
             '''
+            _abs_before = abs(L.u[f.node][tuple(f.problem_pos)])
             L.u[f.node][tuple(f.problem_pos)] = self.flip_bit(L.u[f.node][tuple(f.problem_pos)], f.bit)
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
             L.sweep.compute_residual()
+            _abs_after = abs(L.u[f.node][tuple(f.problem_pos)])
         else:
             raise NotImplementedError(f'Target {f.target} for faults not implemented!')
 
         # log what happened to stats and screen
-        self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
+        self.logger.info(
+            f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}. Abs: {_abs_before:.2e} -> {_abs_after:.2e}'
+        )
         self.add_to_stats(
             process=step.status.slot,
             time=L.time,
@@ -326,6 +332,7 @@ class FaultInjector(hooks):
             'iteration': step.params.maxiter,
             'problem_pos': step.levels[level_number].u[0].shape,
             'bit': bit,  # change manually if you ever have something else
+            **self.rnd_params,
         }
 
         # initialize the faults have been added before we knew the random parameters
@@ -420,7 +427,8 @@ class FaultInjector(hooks):
 
         return None
 
-    def to_binary(self, f):
+    @classmethod
+    def to_binary(cls, f):
         '''
         Converts a single float in a string containing its binary representation in memory following IEEE754
         The struct.pack function returns the input with the applied conversion code in 8 bit blocks, which are then
@@ -437,13 +445,14 @@ class FaultInjector(hooks):
         elif type(f) in [np.float32]:
             conversion_code = '>f'  # big endian, float
         elif type(f) in [np.complex128]:
-            return f'{self.to_binary(f.real)}{self.to_binary(f.imag)}'
+            return f'{cls.to_binary(f.real)}{cls.to_binary(f.imag)}'
         else:
             raise NotImplementedError(f'Don\'t know how to convert number of type {type(f)} to binary')
 
         return ''.join('{:0>8b}'.format(c) for c in struct.pack(conversion_code, f))
 
-    def to_float(self, s):
+    @classmethod
+    def to_float(cls, s):
         '''
         Converts a string of a IEEE754 binary representation in a float. The string is converted to integer with base 2
         and converted to bytes, which can be unpacked into a Python float by the struct module.
@@ -463,14 +472,15 @@ class FaultInjector(hooks):
         elif len(s) == 128:  # complex floats
             real = s[0:64]
             imag = s[64:128]
-            return self.to_float(real) + self.to_float(imag) * 1j
+            return cls.to_float(real) + cls.to_float(imag) * 1j
 
         else:
             raise NotImplementedError(f'Don\'t know how to convert string of length {len(s)} to float')
 
         return struct.unpack(conversion_code, int(s, 2).to_bytes(byte_count, 'big'))[0]
 
-    def flip_bit(self, target, bit):
+    @classmethod
+    def flip_bit(cls, target, bit):
         '''
         Flips a bit at position bit in a target using the bitwise xor operator
 
@@ -481,8 +491,8 @@ class FaultInjector(hooks):
         Returns:
             (float) The floating point number resulting from flipping the respective bit in target
         '''
-        binary = self.to_binary(target)
-        return self.to_float(f'{binary[:bit]}{int(binary[bit]) ^ 1}{binary[bit+1:]}')
+        binary = cls.to_binary(target)
+        return cls.to_float(f'{binary[:bit]}{int(binary[bit]) ^ 1}{binary[bit+1:]}')
 
 
 def prepare_controller_for_faults(controller, fault_stuff, rnd_args, args):
@@ -501,10 +511,19 @@ def prepare_controller_for_faults(controller, fault_stuff, rnd_args, args):
     """
     faultHook = get_fault_injector_hook(controller)
     faultHook.random_generator = fault_stuff['rng']
-    faultHook.add_fault(
-        rnd_args={**rnd_args, **fault_stuff.get('rnd_params', {})},
-        args={**args, **fault_stuff.get('args', {})},
-    )
+
+    for key in ['fault_frequency_iter']:
+        if key in fault_stuff.keys():
+            faultHook.__dict__[key] = fault_stuff[key]
+
+    for key, val in fault_stuff.get('rnd_params', {}).items():
+        faultHook.rnd_params[key] = val
+
+    if not len(faultHook.rnd_params.keys()) > 0:
+        faultHook.add_fault(
+            rnd_args={**rnd_args, **fault_stuff.get('rnd_params', {})},
+            args={**args, **fault_stuff.get('args', {})},
+        )
 
 
 def get_fault_injector_hook(controller):
