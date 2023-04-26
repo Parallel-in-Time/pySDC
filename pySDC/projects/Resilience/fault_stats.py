@@ -626,7 +626,7 @@ class FaultStats:
                 with_faults = self.load(faults=True, **kwargs)
                 with_faults['recovered'] = with_faults['error'] < self.get_thresh(kwargs['strategy'])
                 self.store(faults=True, dat=with_faults, **kwargs)
-            except (KeyError):
+            except KeyError:
                 print("Can\'t compute recovery rate right now")
 
         return None
