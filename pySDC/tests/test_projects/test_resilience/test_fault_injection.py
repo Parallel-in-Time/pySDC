@@ -151,14 +151,6 @@ def test_fault_stats(numprocs):
     Test generation of fault statistics and their recovery rates
     """
     import numpy as np
-    from pySDC.projects.Resilience.fault_stats import (
-        FaultStats,
-        BaseStrategy,
-        AdaptivityStrategy,
-        IterateStrategy,
-        HotRodStrategy,
-        run_Lorenz,
-    )
 
     # Set python path once
     my_env = os.environ.copy()
@@ -188,6 +180,8 @@ def test_fault_stats(numprocs):
         'adaptivity': 2,
         'iterate': 1,
         'Hot Rod': 2,
+        'adaptivity_coll': 0,
+        'double_adaptivity': 0,
     }
     stats.get_recovered()
 
@@ -195,8 +189,13 @@ def test_fault_stats(numprocs):
         dat = stats.load(strategy=strategy, faults=True)
         fixable_mask = stats.get_fixable_faults_only(strategy)
         recovered_mask = stats.get_mask(strategy=strategy, key='recovered', op='eq', val=True)
+        index = stats.get_index(mask=fixable_mask)
 
         assert all(fixable_mask[:-1] == [False, True, False]), "Error in generating mask of fixable faults"
+        assert all(index == [1, 3]), "Error when converting to  index"
+
+        combinations = np.array(stats.get_combination_counts(dat, keys=['bit'], mask=fixable_mask))
+        assert all(combinations == [1.0, 1.0]), "Error when counting combinations"
 
         recovered = len(dat['recovered'][recovered_mask])
         crashed = len(dat['error'][dat['error'] == np.inf])  # on some systems the last run crashes...
@@ -215,15 +214,20 @@ def generate_stats(load=False):
     Returns:
         Object containing the stats
     """
-    from pySDC.projects.Resilience.fault_stats import (
-        FaultStats,
+    from pySDC.projects.Resilience.strategies import (
         BaseStrategy,
         AdaptivityStrategy,
         IterateStrategy,
         HotRodStrategy,
-        run_Lorenz,
+        AdaptivityCollocationRefinementStrategy,
+        DoubleAdaptivityStrategy,
+        AdaptivityAvoidRestartsStrategy,
+        AdaptivityInterpolationStrategy,
     )
-    import matplotlib.pyplot as plt
+    from pySDC.projects.Resilience.fault_stats import (
+        FaultStats,
+    )
+    from pySDC.projects.Resilience.Lorenz import run_Lorenz
 
     np.seterr(all='warn')  # get consistent behaviour across platforms
 
@@ -234,7 +238,16 @@ def generate_stats(load=False):
         recovery_thresh=1.1,
         num_procs=1,
         mode='random',
-        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        strategies=[
+            BaseStrategy(),
+            AdaptivityStrategy(),
+            IterateStrategy(),
+            HotRodStrategy(),
+            AdaptivityCollocationRefinementStrategy(),
+            DoubleAdaptivityStrategy(),
+            AdaptivityAvoidRestartsStrategy(),
+            AdaptivityInterpolationStrategy(),
+        ],
         stats_path='data',
     )
     stats.run_stats_generation(runs=4, step=2)

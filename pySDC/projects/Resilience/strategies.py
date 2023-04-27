@@ -141,7 +141,6 @@ class Strategy:
         '''
         if problem.__name__ == "run_vdp":
             return 11.5
-            return 7.0
             # return 2.3752559741400825  # old stuff
         elif problem.__name__ == "run_piline":
             return 20.0
@@ -510,18 +509,6 @@ class AdaptivityCollocationStrategy(Strategy):
         self.precision_parameter_loc = ['convergence_controllers', AdaptivityCollocation, 'e_tol']
         self.restol = None
         self.maxiter = 99
-
-    def get_fixable_params(self, maxiter, **kwargs):
-        """
-        Here faults occurring in the last iteration cannot be fixed.
-
-        Args:
-            maxiter (int): Max. iterations until convergence is declared
-
-        Returns:
-            (list): Contains dictionaries of keyword arguments for `FaultStats.get_mask`
-        """
-        raise NotImplementedError
 
     def get_custom_description(self, problem, num_procs):
         '''

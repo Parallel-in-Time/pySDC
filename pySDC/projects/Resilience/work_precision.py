@@ -256,7 +256,7 @@ def plot_work_precision(
     handle='',
     plotting_params=None,
     comm_world=None,
-):
+):  # pragma: no cover
     """
     Plot data from running a problem with a strategy.
 
@@ -307,7 +307,7 @@ def plot_work_precision(
             ax.text(0.1, 0.2, "No sampling!", transform=ax.transAxes)
 
 
-def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only=False):
+def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only=False):  # pragma: no cover
     """
     Decorate a plot
 
@@ -747,7 +747,7 @@ def get_configs(mode, problem):
     return configurations
 
 
-def get_fig(x=1, y=1, **kwargs):
+def get_fig(x=1, y=1, **kwargs):  # pragma: no cover
     """
     Get a figure to plot in.
 
@@ -768,7 +768,9 @@ def get_fig(x=1, y=1, **kwargs):
     return plt.subplots(y, x, **keyword_arguments)
 
 
-def save_fig(fig, name, work_key, precision_key, legend=True, format='pdf', base_path='data', **kwargs):
+def save_fig(
+    fig, name, work_key, precision_key, legend=True, format='pdf', base_path='data', **kwargs
+):  # pragma: no cover
     """
     Save a figure with a legend on the bottom.
 
@@ -799,7 +801,7 @@ def save_fig(fig, name, work_key, precision_key, legend=True, format='pdf', base
     print(f'Stored figure \"{path}\"')
 
 
-def all_problems(mode='compare_strategies', plotting=True, base_path='data', **kwargs):
+def all_problems(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
     """
     Make a plot comparing various strategies for all problems.
 
@@ -846,7 +848,7 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         )
 
 
-def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs):
+def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs):  # pragma: no cover
     """
     Make a plot comparing various strategies for the two ODEs.
 
@@ -893,7 +895,7 @@ def ODEs(mode='compare_strategies', plotting=True, base_path='data', **kwargs):
         )
 
 
-def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):
+def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):  # pragma: no cover
     """
     Make a plot for a single problem
 
@@ -927,7 +929,7 @@ def single_problem(mode, problem, plotting=True, base_path='data', **kwargs):
         )
 
 
-def vdp_stiffness_plot(base_path='data', format='pdf', **kwargs):
+def vdp_stiffness_plot(base_path='data', format='pdf', **kwargs):  # pragma: no cover
     fig, axs = get_fig(2, 2, sharex=True)
 
     mus = [0, 5, 10, 15]

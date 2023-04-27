@@ -136,7 +136,7 @@ class FaultStats:
                 else:
                     runs_partial = min([5, _runs_partial])
                 self.generate_stats(
-                    strategy=strategies[j + comm.rank % len(strategies)],
+                    strategy=strategies[j + (comm.rank % len(strategies) % (len(strategies)) - j)],
                     runs=runs_partial,
                     faults=f,
                     reload=reload,
@@ -335,7 +335,7 @@ class FaultStats:
             space_comm=space_comm,
         )
 
-    def compare_strategies(self, run=0, faults=False, ax=None):
+    def compare_strategies(self, run=0, faults=False, ax=None):  # pragma: no cover
         '''
         Take a closer look at how the strategies compare for a specific run
 
@@ -365,7 +365,9 @@ class FaultStats:
             fig.tight_layout()
             plt.savefig(f'data/{self.get_name()}-comparison.pdf', transparent=True)
 
-    def scrutinize_visual(self, strategy, run, faults, ax=None, k_ax=None, ls='-', plot_restarts=False):
+    def scrutinize_visual(
+        self, strategy, run, faults, ax=None, k_ax=None, ls='-', plot_restarts=False
+    ):  # pragma: no cover
         '''
         Take a closer look at a specific run with a plot
 
@@ -1326,7 +1328,7 @@ class FaultStats:
 
         return None
 
-    def fault_frequency_plot(self, ax, iter_ax, kwargs_range, strategy=None):
+    def fault_frequency_plot(self, ax, iter_ax, kwargs_range, strategy=None):  # pragma: no cover
         func_args = locals()
         func_args.pop('self', None)
         if strategy is None:
@@ -1366,7 +1368,7 @@ class FaultStats:
         return None
 
 
-def check_local_error():
+def check_local_error():  # pragma: no cover
     """
     Make a plot of the resolution over time for all problems
     """

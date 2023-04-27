@@ -563,7 +563,7 @@ def plot_vdp_solution():  # pragma: no cover
     savefig(fig, 'vdp_sol')
 
 
-def work_precision():
+def work_precision():  # pragma: no cover
     from pySDC.projects.Resilience.work_precision import (
         all_problems,
         single_problem,
@@ -623,7 +623,7 @@ def work_precision():
     vdp_stiffness_plot(base_path='data/paper')
 
 
-def make_plots_for_TIME_X_website():
+def make_plots_for_TIME_X_website():  # pragma: no cover
     global JOURNAL, BASE_PATH
     JOURNAL = 'JSC_beamer'
     BASE_PATH = 'data/paper/time-x_website'
