@@ -1,0 +1,7 @@
+implementations.problem\_classes.Quench module
+==============================================
+
+.. automodule:: implementations.problem_classes.Quench
+   :members:
+   :undoc-members:
+   :show-inheritance:

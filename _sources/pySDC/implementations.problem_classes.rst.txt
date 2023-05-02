@@ -45,13 +45,13 @@ Submodules
    implementations.problem_classes.HeatEquation_ND_FD
    implementations.problem_classes.HeatEquation_ND_FD_CuPy
    implementations.problem_classes.HenonHeiles
-   implementations.problem_classes.LeakySuperconductor
    implementations.problem_classes.LogisticEquation
    implementations.problem_classes.Lorenz
    implementations.problem_classes.NonlinearSchroedinger_MPIFFT
    implementations.problem_classes.OuterSolarSystem
    implementations.problem_classes.PenningTrap_3D
    implementations.problem_classes.Piline
+   implementations.problem_classes.Quench
    implementations.problem_classes.TestEquation_0D
    implementations.problem_classes.Van_der_Pol_implicit
    implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic

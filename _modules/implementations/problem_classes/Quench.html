@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.LeakySuperconductor &#8212; pySDC 5.2.0 documentation</title>
+    <title>implementations.problem_classes.Quench &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -28,7 +27,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.LeakySuperconductor</a></li> 
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Quench</a></li> 
       </ul>
     </div>  
 
@@ -37,7 +36,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for implementations.problem_classes.LeakySuperconductor</h1><div class="highlight"><pre>
+  <h1>Source code for implementations.problem_classes.Quench</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">spsolve</span><span class="p">,</span> <span class="n">gmres</span><span class="p">,</span> <span class="n">inv</span>
@@ -49,7 +48,7 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="LeakySuperconductor"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor">[docs]</a><span class="k">class</span> <span class="nc">LeakySuperconductor</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="Quench"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench">[docs]</a><span class="k">class</span> <span class="nc">Quench</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a toy problem to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
 <span class="sd">    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment</span>
@@ -74,6 +73,7 @@
         <span class="n">Q_max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">leak_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">),</span>
         <span class="n">leak_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+        <span class="n">leak_transition</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
         <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">stencil_type</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
         <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;neumann-zero&#39;</span><span class="p">,</span>
@@ -83,6 +83,7 @@
         <span class="n">lintol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
         <span class="n">liniter</span><span class="o">=</span><span class="mi">99</span><span class="p">,</span>
         <span class="n">direct_solver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">reference_sol_type</span><span class="o">=</span><span class="s1">&#39;scipy&#39;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
@@ -102,6 +103,7 @@
             <span class="s1">&#39;Q_max&#39;</span><span class="p">,</span>
             <span class="s1">&#39;leak_range&#39;</span><span class="p">,</span>
             <span class="s1">&#39;leak_type&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;leak_transition&#39;</span><span class="p">,</span>
             <span class="s1">&#39;order&#39;</span><span class="p">,</span>
             <span class="s1">&#39;stencil_type&#39;</span><span class="p">,</span>
             <span class="s1">&#39;bc&#39;</span><span class="p">,</span>
@@ -111,6 +113,7 @@
             <span class="s1">&#39;lintol&#39;</span><span class="p">,</span>
             <span class="s1">&#39;liniter&#39;</span><span class="p">,</span>
             <span class="s1">&#39;direct_solver&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;reference_sol_type&#39;</span><span class="p">,</span>
             <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
             <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
@@ -149,7 +152,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">direct_solver</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
-<div class="viewcode-block" id="LeakySuperconductor.eval_f_non_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f_non_linear">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f_non_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="Quench.eval_f_non_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.eval_f_non_linear">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f_non_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the non-linear part of f</span>
 
@@ -170,21 +173,23 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">leak_type</span> <span class="o">==</span> <span class="s1">&#39;exponential&#39;</span><span class="p">:</span>
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Q_max</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">u_thresh</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">u_max</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">u_thresh</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Leak type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leak_type</span><span class="si">}</span><span class="s1"> not implemented!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Leak type </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leak_type</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented!&#39;</span><span class="p">)</span>
 
         <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&lt;</span> <span class="n">u_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_max</span>
-        <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&gt;=</span> <span class="n">u_max</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_max</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">leak_transition</span> <span class="o">==</span> <span class="s1">&#39;step&#39;</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_max</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">leak_transition</span> <span class="o">==</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">me</span><span class="p">,</span> <span class="n">Q_max</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">xv</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3e-2</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Leak transition </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leak_transition</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented!&#39;</span><span class="p">)</span>
 
-        <span class="c1"># boundary conditions</span>
-        <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&gt;=</span> <span class="n">u_max</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_max</span>
 
         <span class="n">me</span><span class="p">[:]</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cv</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="LeakySuperconductor.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="Quench.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the full right hand side.</span>
 
@@ -200,7 +205,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="LeakySuperconductor.get_non_linear_Jacobian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.get_non_linear_Jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">get_non_linear_Jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<div class="viewcode-block" id="Quench.get_non_linear_Jacobian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.get_non_linear_Jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">get_non_linear_Jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the non-linear part of the Jacobian only</span>
 
@@ -223,18 +228,20 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Leak type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leak_type</span><span class="si">}</span><span class="s1"> not implemented!&#39;</span><span class="p">)</span>
 
         <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&lt;</span> <span class="n">u_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">leak_transition</span> <span class="o">==</span> <span class="s1">&#39;step&#39;</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">leak_transition</span> <span class="o">==</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">][</span><span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">Q_max</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">xv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3e-2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Leak transition </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leak_transition</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented!&#39;</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[</span><span class="n">u</span> <span class="o">&gt;</span> <span class="n">u_max</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">me</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">leak</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="c1"># boundary conditions</span>
-        <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
         <span class="n">me</span><span class="p">[:]</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cv</span>
 
         <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LeakySuperconductor.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="Quench.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for (I-factor*f)(u) = rhs</span>
 
@@ -296,7 +303,7 @@
 
         <span class="k">return</span> <span class="n">u</span></div>
 
-<div class="viewcode-block" id="LeakySuperconductor.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductor.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Quench.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
@@ -310,41 +317,95 @@
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sol_type</span> <span class="o">==</span> <span class="s1">&#39;scipy&#39;</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">                Get the Jacobian for the implicit BDF method to use in `scipy.odeint`</span>
+                <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`</span>
 
-<span class="sd">                Args:</span>
-<span class="sd">                    t (float): The current time</span>
-<span class="sd">                    u (dtype_u): Current solution</span>
+<span class="sd">                    Args:</span>
+<span class="sd">                        t (float): The current time</span>
+<span class="sd">                        u (dtype_u): Current solution</span>
 
-<span class="sd">                Returns:</span>
-<span class="sd">                    scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="sd">                    Returns:</span>
+<span class="sd">                        scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">                Function to pass to `scipy.solve_ivp` to evaluate the full RHS</span>
+                <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    Function to pass to `scipy.solve_ivp` to evaluate the full RHS</span>
 
-<span class="sd">                Args:</span>
-<span class="sd">                    t (float): Current time</span>
-<span class="sd">                    u (numpy.1darray): Current solution</span>
+<span class="sd">                    Args:</span>
+<span class="sd">                        t (float): Current time</span>
+<span class="sd">                        u (numpy.1darray): Current solution</span>
 
-<span class="sd">                Returns:</span>
-<span class="sd">                    (numpy.1darray): RHS</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="sd">                    Returns:</span>
+<span class="sd">                        (numpy.1darray): RHS</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BDF&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">jac</span><span class="p">)</span>
+                <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BDF&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">jac</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sol_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DIRK&#39;</span><span class="p">,</span> <span class="s1">&#39;SDC&#39;</span><span class="p">]:</span>
+                <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+                <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_solution</span> <span class="kn">import</span> <span class="n">LogSolution</span>
+                <span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
+                <span class="n">description</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Quench</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;newton_tol&#39;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+                    <span class="s1">&#39;newton_iter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+                    <span class="s1">&#39;nvars&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="o">**</span><span class="mi">10</span><span class="p">,</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                <span class="p">}</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sol_type</span> <span class="o">==</span> <span class="s1">&#39;DIRK&#39;</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span> <span class="kn">import</span> <span class="n">DIRK34</span>
+                    <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.adaptivity</span> <span class="kn">import</span> <span class="n">AdaptivityRK</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DIRK34</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">}</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">AdaptivityRK</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;e_tol&#39;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;update_order&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}}</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sol_type</span> <span class="o">==</span> <span class="s1">&#39;SDC&#39;</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;QI&#39;</span><span class="p">:</span> <span class="s1">&#39;IE&#39;</span><span class="p">,</span> <span class="s1">&#39;quad_type&#39;</span><span class="p">:</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">}</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">}</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;restol&#39;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">}</span>
+
+                <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hook_class&#39;</span><span class="p">:</span> <span class="n">LogSolution</span><span class="p">,</span> <span class="s1">&#39;mssdc_jac&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;logger_level&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">}</span>
+
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">)</span>
+
+                <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                    <span class="n">u0</span><span class="o">=</span><span class="n">u_init</span> <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">),</span>
+                    <span class="n">t0</span><span class="o">=</span><span class="n">t_init</span> <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">Tend</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">u_last</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_last</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;Time difference between reference solution and requested time is </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">u_last</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">!&#39;</span>
+                    <span class="p">)</span>
+
+                <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_last</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">me</span></div></div>
 
 
-<div class="viewcode-block" id="LeakySuperconductorIMEX"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX">[docs]</a><span class="k">class</span> <span class="nc">LeakySuperconductorIMEX</span><span class="p">(</span><span class="n">LeakySuperconductor</span><span class="p">):</span>
+<div class="viewcode-block" id="QuenchIMEX"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX">[docs]</a><span class="k">class</span> <span class="nc">QuenchIMEX</span><span class="p">(</span><span class="n">Quench</span><span class="p">):</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-<div class="viewcode-block" id="LeakySuperconductorIMEX.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="QuenchIMEX.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -363,7 +424,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="LeakySuperconductorIMEX.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="QuenchIMEX.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for (I-factor*f_expl)(u) = rhs</span>
 
@@ -381,7 +442,7 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="LeakySuperconductorIMEX.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LeakySuperconductor.html#implementations.problem_classes.LeakySuperconductor.LeakySuperconductorIMEX.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="QuenchIMEX.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
@@ -400,8 +461,7 @@
 
             <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">                Get the Jacobian for the implicit BDF method to use in `scipy.odeint`</span>
-
+<span class="sd">                Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`</span>
 <span class="sd">                Args:</span>
 <span class="sd">                    t (float): The current time</span>
 <span class="sd">                    u (dtype_u): Current solution</span>
@@ -460,12 +520,12 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.LeakySuperconductor</a></li> 
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Quench</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
     </div>
   </body>
 </html>
