@@ -32,6 +32,9 @@ def multiple_runs(prob, dts, num_nodes, quad_type='RADAU-RIGHT'):
     description['sweeper_params'] = {'num_nodes': num_nodes, 'quad_type': quad_type}
     description['convergence_controllers'] = {EstimateExtrapolationErrorWithinQ: {}}
 
+    if prob.__name__ == 'run_advection':
+        description['problem_params'] = {'order': 6, 'stencil_type': 'center'}
+
     res = {}
 
     for dt in dts:
@@ -104,9 +107,9 @@ def check_order(ax, prob, dts, num_nodes, quad_type):
 
 def main():
     fig, ax = plt.subplots()
-    num_nodes = 2
+    num_nodes = 3
     quad_type = 'RADAU-RIGHT'
-    check_order(ax, run_vdp, [5e-1, 1e-1, 5e-2, 1e-2], num_nodes, quad_type)
+    check_order(ax, run_advection, [5e-1, 1e-1, 5e-2, 1e-2], num_nodes, quad_type)
     plt.show()
 
 

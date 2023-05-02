@@ -7,6 +7,7 @@ from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
+from pySDC.projects.Resilience.strategies import merge_descriptions
 
 
 def plot_embedded(stats, ax):
@@ -28,7 +29,6 @@ def run_advection(
     hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
-    custom_problem_params=None,
 ):
     # initialize level parameters
     level_params = dict()
@@ -40,10 +40,7 @@ def run_advection(
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
 
-    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'order': 5, 'bc': 'periodic'}
-
-    if custom_problem_params is not None:
-        problem_params = {**problem_params, **custom_problem_params}
+    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'stencil_type': 'center', 'order': 4, 'bc': 'periodic'}
 
     # initialize step parameters
     step_params = dict()
@@ -60,19 +57,15 @@ def run_advection(
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advectionNd  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = generic_implicit  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
+    description['problem_class'] = advectionNd
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = generic_implicit
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
     description['step_params'] = step_params
 
     if custom_description is not None:
-        for k in custom_description.keys():
-            if k == 'sweeper_class':
-                description[k] = custom_description[k]
-                continue
-            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
+        description = merge_descriptions(description, custom_description)
 
     # set time parameters
     t0 = 0.0
