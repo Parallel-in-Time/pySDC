@@ -95,27 +95,71 @@ jobs:
             data_3.10
             coverage_${{ matrix.env }}_3.10.dat
 
+  user_libpressio_tests:
+    runs-on: ubuntu-latest
 
-  user_cpu_tests_macos:
-    runs-on: macos-12
-
-    strategy:
-      matrix:
-        env: ['base', 'fenics', 'mpi4py', 'petsc']
+    container:
+      image: brownbaerchen/libpressio:test
+      volumes:
+        - ${{ github.workspace }}:/pySDC
 
     defaults:
       run:
         shell: bash -l {0}
 
     steps:
+           
       - name: Checkout
         uses: actions/checkout@v3
+           
+      - name: Install pySDC and pytest
+        run: |
+          source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
 
+      - name: Run pytest
+        run: |
+          source /opt/spack/share/spack/setup-env.sh
+          spack load libpressio
+           
+          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m libpressio
+
+      - name: Make coverage report
+        run: |
+          source /opt/spack/share/spack/setup-env.sh
+          spack load libpressio
+
+          mv data data_libpressio
+          coverage combine
+          mv .coverage coverage_libpressio_3.10.dat
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: cpu-test-artifacts
+          path: |
+            data_libpressio
+            coverage_libpressio_3.10.dat
+           
+  user_cpu_tests_macos:
+    runs-on: macos-12
+  
+    strategy:
+      matrix:
+        env: ['base', 'fenics', 'mpi4py', 'petsc']
+  
+    defaults:
+      run:
+        shell: bash -l {0}
+  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+  
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
         with:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
-
+  
       - name: Run pytest for CPU stuff
         run: |
           pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
@@ -156,6 +200,7 @@ jobs:
     needs:
       - lint
       - user_cpu_tests_linux
+      - user_libpressio_tests
 #       - wait_for_gitlab
 
     defaults:
