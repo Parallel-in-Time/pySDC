@@ -24,7 +24,7 @@ For PinT, this interface corresponds to the solution of the time step allotted t
 As this is a large object, communication can become expensive and compressed communication can speed this up.
 
 We are also interested in compression with respect to resilience.
-Mainly, we introduce inexactness during lossy compression, which provides significantly greater compression factors than lossless compression, and we want to be able to answer the question of how large of an inexactness we can afford while maintaining the accuracy we desire from the final outcome.
+For instance, we introduce inexactness during lossy compression, which provides significantly greater compression factors than lossless compression, and we want to be able to answer the question of how large of an inexactness we can afford while maintaining the accuracy we desire from the final outcome.
 This is interesting for algorithms detecting soft faults.
 Picture SDC in an early iteration, where the solution is not yet converged and a soft fault occurs.
 A resilient algorithm might trigger a costly restart which is unnecessary as the impact of the soft fault may not be noticeable in the converged solution.
@@ -42,3 +42,29 @@ For compression, we use the `libpressio <https://github.com/robertu94/libpressio
 As a starting point we use the `SZ3 <https://github.com/szcompressor/SZ3>`_ compressor.
 We use a docker container with an installation of libpressio and pySDC working together.
 See the `guide <https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/compression/Docker>`_ on how to use the container.
+
+
+Proof of Concept
+________________
+For a proof of concept, we take the solution and right hand sides and compress and immediately decompress them every time they get updated during the sweeps.
+While this provides no benefit, it should capture the downsides of compression.
+We measure the local order of accuracy in time and verify that it increases by one with each sweep for an advection problem.
+While the order is typically only maintained up to machine precision or the discretization error, we find now that accuracy now stalls at the error bound that we set for the compressor.
+See below for corresponding figures, where the difference between the colored lines is the number of SDC iterations and the dashed line marks the error bound for SZ3.
+ 
+.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png
+    :width: 45%
+
+.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png
+    :width: 45%
+
+It has recently been `demonstrated <https://tore.tuhh.de/handle/11420/12370>`_ that the small scale PinT algorithm Block Gauss Seidel SDC maintains the order of single step SDC, so we can repeat the same test but with multiple processors, each with their own time step to solve:
+
+.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png
+    :width: 45%
+
+.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png
+    :width: 45%
+
+The above plots showcase that both time-serial SDC as well as time-parallel Block Gauss-Seidel SDC do not suffer from compression when the compression error bound is below other numerical errors and that both the MPI and simulated parallelism versions work.
+After establishing that the downsides of compression can be controlled, it remains to apply compression in a manner that is beneficial to the algorithm.

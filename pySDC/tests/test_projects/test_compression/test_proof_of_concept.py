@@ -32,7 +32,7 @@ def run_single_test(thresh, useMPI, num_procs):
     import os
     from pySDC.projects.compression.order import plot_order_in_time
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(3, 2))
     plot_order_in_time(ax=ax, thresh=thresh, useMPI=useMPI, num_procs=num_procs)
     if os.path.exists('data'):
         ax.set_title(f'{num_procs} procs, {"MPI" if useMPI else "non MPI"}')
