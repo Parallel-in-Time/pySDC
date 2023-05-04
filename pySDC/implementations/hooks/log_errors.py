@@ -142,27 +142,26 @@ class LogGlobalErrorPostRun(hooks):
             u_num = self.get_final_solution(L)
             u_ref = L.prob.u_exact(t=self.t_last_solution)
 
-            if step.status.last:
-                self.logger.info(f'Finished with a global error of e={abs(u_num-u_ref):.2e}')
+            self.logger.info(f'Finished with a global error of e={abs(u_num-u_ref):.2e}')
 
-                self.add_to_stats(
-                    process=step.status.slot,
-                    time=self.t_last_solution,
-                    level=L.level_index,
-                    iter=step.status.iter,
-                    sweep=L.status.sweep,
-                    type='e_global_post_run',
-                    value=abs(u_num - u_ref),
-                )
-                self.add_to_stats(
-                    process=step.status.slot,
-                    time=self.t_last_solution,
-                    level=L.level_index,
-                    iter=step.status.iter,
-                    sweep=L.status.sweep,
-                    type='e_global_rel_post_run',
-                    value=abs((u_num - u_ref) / u_ref),
-                )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=self.t_last_solution,
+                level=L.level_index,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='e_global_post_run',
+                value=abs(u_num - u_ref),
+            )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=self.t_last_solution,
+                level=L.level_index,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='e_global_rel_post_run',
+                value=abs((u_num - u_ref) / u_ref),
+            )
 
     def get_final_solution(self, lvl):
         """
@@ -171,7 +170,6 @@ class LogGlobalErrorPostRun(hooks):
         Args:
             lvl (pySDC.Level.level): The level
         """
-        lvl.sweep.compute_end_point()
         return lvl.uend
 
 

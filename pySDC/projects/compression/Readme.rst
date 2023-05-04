@@ -1,43 +1,44 @@
-Instructions for using libpressio in the Docker container
----------------------------------------------------------
+Compression in pySDC
+--------------------
 
-As docker desktop is no longer available for commercial use for free, you may need to install an alternative, such as `colima <https://github.com/abiosoft/colima>`_ first.
+This project aims to implement compression in pySDC in whatever way proves to be useful.
+It is a collaboration between Clemson University, Argonne National Laboratory and Forschungszentrum Juelich under the umbrella of `JLESC <https://jlesc.github.io>`_.
+See the project web page `here <https://jlesc.github.io/projects/lossy-compress-linear-algebra/>`_.
 
-If you haven't done this already, build the container using
-
-.. code-block:: bash
-    
-    cd <local_path_to_pySDC>/pySDC/projects/compression/Docker
-    docker build -t libpressio .
+Introduction
+____________
+PDE solvers provide ample opportunity for compression to improve certain aspects of the code.
+See for instance `Sebastian Goetschel's and Martin Weiser's nice review <https://doi.org/10.3390/a12090197>`_ on the topic.
  
-This creates an image with the name 'libpressio'.
-Please pay attention to the platform you are using and you intend to run on. If you use this command on an ARM machine and try to use the image in a GitHub action, it will not run because it requires AMD architecture. You can build a platform specific version for GitHub using
+Due to current hardware trends, codes are often memory bound rather than compute bound, which means computational resources are perhaps more wisely spent on compression such that memory access can be reduced and more performance can be leveraged.
+This applies, in particular, to distributed systems where interconnect speeds are yet slower than memory access speeds.
+As PinT algorithms target large scale distributed systems because concurrency in the time direction usually comes with lower parallel efficiency than in the space direction and is hence best implemented on top of spatial parallelism, it is an ideal candidate to benefit from compression.
 
-.. code-block:: bash
+SDC, in particular, is a collocation method, which approximates the integral in time by a weighted sum of right hand side evaluations at intermediate time points (collocation nodes).
+All of these need to be available in memory during the sweeps where the solutions at the collocation nodes are updated.
+For PDEs, this can be substantial in size and the algorithm could benefit greatly from compressing these data.
+As right hand side evaluations at individual collocation nodes are required during the sweeps, they either need to be compressed separately, or random access needs to be maintained.
 
-    docker buildx build --platform linux/amd64 -t libpressio:amd64 .
+In parallel computation based on decomposition of the domain, the interface needs to be communicated between processors.
+For PinT, this interface corresponds to the solution of the time step allotted to a process, which becomes the initial conditions for the next process.
+As this is a large object, communication can become expensive and compressed communication can speed this up.
+
+We are also interested in compression with respect to resilience.
+Mainly, we introduce inexactness during lossy compression, which provides significantly greater compression factors than lossless compression, and we want to be able to answer the question of how large of an inexactness we can afford while maintaining the accuracy we desire from the final outcome.
+This is interesting for algorithms detecting soft faults.
+Picture SDC in an early iteration, where the solution is not yet converged and a soft fault occurs.
+A resilient algorithm might trigger a costly restart which is unnecessary as the impact of the soft fault may not be noticeable in the converged solution.
+
+Opportunities for compression to be useful in PDE solvers are endless.
+We will see how the project progresses and update this page accordingly.
 
 
-If you are on an ARM machine like me, replace `amd64` by `arm64` to build an image for your local machine. Remember to replace the tag with something useful, such as  ``-t libpressio:arm64``.
- 
-Start the image using
+Methods
+_______
+Since pySDC is a prototyping library, it provides a good playground to easily implement compression.
+However, we may not be able to measure a reduction in memory footprint due to Python's memory management.
 
-.. code-block:: bash
-
-    docker run -v <local_absolute_path_to_pySDC_installation>:/pySDC -ti --rm libpressio
-
-
-You may have to change the tag to the platform specific version.
-The `-v` does a `"bind_mount" <https://docs.docker.com/storage/bind-mounts/>`_ to pySDC on your local machine.
-We want that because it let's us access the same version of pySDC that we have locally inside the container, in particular with all modifications that we make while the container is running.
-The ``-ti`` flag opens the image in an interactive manner, which allows us to run things inside the container and the ``--rm`` flag removes the image once we are done with it.
-
-We have specified an entry point in the Docker file which will install the local version of pySDC using ``pip``.
-If you run into trouble, you may consult the file ``Docker/docker-entrypoint.sh`` in the compression project folder for what is required to install pySDC.
-Keep in mind that spack wants its own python, which means we are not working with Conda here. Just use ``pip`` to install more dependencies. You can also add ``pip`` commands to the entry point file in order to make persistent changes to the container or you can create a new Dockerfile based on the current one and replace the entry point by whatever you want if you're doing something non-generic.
-
-Have fun!
-
-TODOs
-_____
- - Streamline the multiplatform business. See, for instance `here <https://docs.docker.com/build/building/multi-platform/>`_.
+For compression, we use the `libpressio <https://github.com/robertu94/libpressio>`_ library maintained by Robert Underwood at Argonne National Laboratory.
+As a starting point we use the `SZ3 <https://github.com/szcompressor/SZ3>`_ compressor.
+We use a docker container with an installation of libpressio and pySDC working together.
+See the `guide <https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/compression/Docker>`_ on how to use the container.

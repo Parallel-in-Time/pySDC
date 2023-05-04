@@ -1,33 +1,56 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.projects.Resilience.strategies import BaseStrategy
 from pySDC.projects.Resilience.advection import run_advection
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.plot_helper import figsize_by_journal
-from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
+import pySDC.implementations.hooks.log_errors as error_hooks
 
 from pySDC.projects.compression.compression_convergence_controller import Compression
 
 MACHINEPRECISION = (
     1e-8  # generous tolerance below which we ascribe errors to floating point rounding errors rather than compression
 )
+LOGGER_LEVEL = 30
 
 
-def single_run(problem, description=None, thresh=1e-10, Tend=2e-1):
+def single_run(problem, description=None, thresh=1e-10, Tend=2e-1, useMPI=False, num_procs=1):
     description = {} if description is None else description
 
     compressor_args = {}
     compressor_args['compressor_config'] = {'pressio:abs': thresh}
 
-    description['convergence_controllers'] = {Compression: {'compressor_args': compressor_args}}
-    stats, _, _ = problem(custom_description=description, hook_class=LogGlobalErrorPostRun, Tend=Tend)
-    e = get_sorted(stats, type='e_global_post_run')[-1][1]
+    if thresh > 0:
+        description['convergence_controllers'] = {Compression: {'compressor_args': compressor_args}}
+
+    controller_params = {
+        'mssdc_jac': False,
+        'logger_level': LOGGER_LEVEL,
+    }
+
+    error_hook = error_hooks.LogGlobalErrorPostRunMPI if useMPI else error_hooks.LogGlobalErrorPostRun
+
+    stats, _, _ = problem(
+        custom_description=description,
+        hook_class=error_hook,
+        Tend=Tend,
+        use_MPI=useMPI,
+        num_procs=num_procs,
+        custom_controller_params=controller_params,
+    )
+
+    if useMPI:
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+    else:
+        comm = None
+    e = min([me[1] for me in get_sorted(stats, type='e_global_post_run', comm=comm)])
     return e
 
 
-def multiple_runs(problem, values, expected_order, mode='dt', thresh=1e-10, **kwargs):
+def multiple_runs(problem, values, expected_order, mode='dt', thresh=1e-10, useMPI=False, num_procs=1, **kwargs):
     errors = np.zeros_like(values)
 
     description = {
@@ -43,12 +66,12 @@ def multiple_runs(problem, values, expected_order, mode='dt', thresh=1e-10, **kw
     for i in range(len(values)):
         if mode == 'dt':
             description['level_params']['dt'] = values[i]
-            Tend = values[i] * 5
+            Tend = values[i] * (5 if num_procs == 1 else 2 * num_procs)
         elif mode == 'nvars':
             description['problem_params']['nvars'] = values[i]
             Tend = 2e-1
 
-        errors[i] = single_run(problem, description, thresh=thresh, Tend=Tend)
+        errors[i] = single_run(problem, description, thresh=thresh, Tend=Tend, useMPI=useMPI, num_procs=num_procs)
     return values, errors
 
 
@@ -69,7 +92,7 @@ def plot_order(values, errors, ax, thresh=1e-16, color='black', expected_order=N
     ax.loglog(values, errors[0] * (values / values[0]) ** order, color=color, label=f'p={order:.2f}', **kwargs)
 
 
-def plot_order_in_time(ax, thresh):
+def plot_order_in_time(ax, thresh, useMPI=False, num_procs=1):
     problem = run_advection
 
     base_configs_dt = {
@@ -87,7 +110,9 @@ def plot_order_in_time(ax, thresh):
     # configs_dt[6] = {**base_configs_dt, 'color': 'blue'}
 
     for key in configs_dt.keys():
-        values, errors = multiple_runs(problem, expected_order=key, **configs_dt[key])
+        values, errors = multiple_runs(
+            problem, expected_order=key, useMPI=useMPI, **configs_dt[key], num_procs=num_procs
+        )
         plot_order(
             values,
             errors,

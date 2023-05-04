@@ -4,7 +4,7 @@ FROM spack/ubuntu-jammy
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update Ubuntu Software repository
-RUN apt update -y && apt install -y cmake ccache pkg-config python3 pip
+RUN apt update -y && apt install -y cmake ccache pkg-config python3 pip mpich
 
 # Install libpressio with Python and SZ3 support
 RUN spack install libpressio+python+sz3
