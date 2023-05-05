@@ -1,0 +1,120 @@
+Working with  1 processes...
+Number of iterations for time 0.00:  5
+Number of iterations for time 0.25:  5
+Number of iterations for time 0.50:  5
+Number of iterations for time 0.75:  5
+Number of iterations for time 1.00:  5
+Number of iterations for time 1.25:  5
+Number of iterations for time 1.50:  5
+Number of iterations for time 1.75:  5
+Number of iterations for time 2.00:  5
+Number of iterations for time 2.25:  5
+Number of iterations for time 2.50:  5
+Number of iterations for time 2.75:  5
+Number of iterations for time 3.00:  4
+Number of iterations for time 3.25:  5
+Number of iterations for time 3.50:  5
+Number of iterations for time 3.75:  5
+
+   Mean number of iterations: 4.94
+   Range of values for number of iterations:  1 
+   Position of max/min number of iterations:  0 -- 12
+   Std and var for number of iterations: 0.24 -- 0.06
+
+
+Working with  2 processes...
+Number of iterations for time 0.00:  5
+Number of iterations for time 0.25:  5
+Number of iterations for time 0.50:  5
+Number of iterations for time 0.75:  5
+Number of iterations for time 1.00:  5
+Number of iterations for time 1.25:  5
+Number of iterations for time 1.50:  5
+Number of iterations for time 1.75:  5
+Number of iterations for time 2.00:  5
+Number of iterations for time 2.25:  5
+Number of iterations for time 2.50:  5
+Number of iterations for time 2.75:  5
+Number of iterations for time 3.00:  4
+Number of iterations for time 3.25:  4
+Number of iterations for time 3.50:  5
+Number of iterations for time 3.75:  5
+
+   Mean number of iterations: 4.88
+   Range of values for number of iterations:  1 
+   Position of max/min number of iterations:  0 -- 12
+   Std and var for number of iterations: 0.33 -- 0.11
+
+
+Working with  4 processes...
+Number of iterations for time 0.00:  5
+Number of iterations for time 0.25:  5
+Number of iterations for time 0.50:  5
+Number of iterations for time 0.75:  5
+Number of iterations for time 1.00:  5
+Number of iterations for time 1.25:  5
+Number of iterations for time 1.50:  5
+Number of iterations for time 1.75:  5
+Number of iterations for time 2.00:  5
+Number of iterations for time 2.25:  5
+Number of iterations for time 2.50:  5
+Number of iterations for time 2.75:  5
+Number of iterations for time 3.00:  4
+Number of iterations for time 3.25:  4
+Number of iterations for time 3.50:  4
+Number of iterations for time 3.75:  4
+
+   Mean number of iterations: 4.75
+   Range of values for number of iterations:  1 
+   Position of max/min number of iterations:  0 -- 12
+   Std and var for number of iterations: 0.43 -- 0.19
+
+
+Working with  8 processes...
+Number of iterations for time 0.00:  5
+Number of iterations for time 0.25:  5
+Number of iterations for time 0.50:  5
+Number of iterations for time 0.75:  5
+Number of iterations for time 1.00:  5
+Number of iterations for time 1.25:  5
+Number of iterations for time 1.50:  5
+Number of iterations for time 1.75:  5
+Number of iterations for time 2.00:  5
+Number of iterations for time 2.25:  5
+Number of iterations for time 2.50:  5
+Number of iterations for time 2.75:  5
+Number of iterations for time 3.00:  5
+Number of iterations for time 3.25:  5
+Number of iterations for time 3.50:  5
+Number of iterations for time 3.75:  5
+
+   Mean number of iterations: 5.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+
+
+Working with 16 processes...
+Number of iterations for time 0.00:  5
+Number of iterations for time 0.25:  5
+Number of iterations for time 0.50:  5
+Number of iterations for time 0.75:  5
+Number of iterations for time 1.00:  5
+Number of iterations for time 1.25:  5
+Number of iterations for time 1.50:  5
+Number of iterations for time 1.75:  5
+Number of iterations for time 2.00:  5
+Number of iterations for time 2.25:  5
+Number of iterations for time 2.50:  5
+Number of iterations for time 2.75:  5
+Number of iterations for time 3.00:  5
+Number of iterations for time 3.25:  5
+Number of iterations for time 3.50:  5
+Number of iterations for time 3.75:  5
+
+   Mean number of iterations: 5.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+
+

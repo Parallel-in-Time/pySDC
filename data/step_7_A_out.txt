@@ -1,0 +1,49 @@
+Variant mass_inv with ml=False and num_procs=1 -- error at time 1.0: 4.038018928430278e-08
+   Mean number of iterations: 6.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Time to solution: 3.4511 sec.
+
+Variant mass with ml=False and num_procs=1 -- error at time 1.0: 4.037998750179539e-08
+   Mean number of iterations: 6.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Time to solution: 2.8329 sec.
+
+Variant weak with ml=False and num_procs=1 -- error at time 1.0: 4.0388218372050104e-08
+   Mean number of iterations: 6.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Time to solution: 8.7114 sec.
+
+Variant mass_inv with ml=True and num_procs=1 -- error at time 1.0: 4.038030058561979e-08
+   Mean number of iterations: 6.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Time to solution: 4.6164 sec.
+
+Variant mass with ml=True and num_procs=1 -- error at time 1.0: 4.0380468789990663e-08
+   Mean number of iterations: 6.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Time to solution: 4.3317 sec.
+
+Variant weak with ml=True and num_procs=1 -- error at time 1.0: 4.038821713998089e-08
+   Mean number of iterations: 6.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Time to solution: 7.0032 sec.
+
+Variant mass_inv with ml=True and num_procs=5 -- error at time 1.0: 3.9537709137400506e-08
+   Mean number of iterations: 11.60
+   Range of values for number of iterations:  9 
+   Position of max/min number of iterations:  4 --  0
+   Std and var for number of iterations: 3.26 -- 10.64
+Time to solution: 8.1634 sec.
+

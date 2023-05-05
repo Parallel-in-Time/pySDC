@@ -1,0 +1,1 @@
+Error of the spatial accuracy test: 1.981783e-04

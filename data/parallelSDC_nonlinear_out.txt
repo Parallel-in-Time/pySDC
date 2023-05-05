@@ -1,0 +1,24 @@
+   Mean number of iterations: 7.50
+   Range of values for number of iterations:  1 
+   Position of max/min number of iterations:  0 --  5
+   Std and var for number of iterations: 0.50 -- 0.25
+   Std and var for number of iterations: 0.50 -- 0.25
+
+   Mean number of iterations: 7.50
+   Range of values for number of iterations:  1 
+   Position of max/min number of iterations:  0 --  5
+   Std and var for number of iterations: 0.50 -- 0.25
+   Std and var for number of iterations: 0.50 -- 0.25
+
+   Mean number of iterations: 4.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+   Std and var for number of iterations: 0.00 -- 0.00
+
+   Mean number of iterations: 7.50
+   Range of values for number of iterations:  1 
+   Position of max/min number of iterations:  0 --  5
+   Std and var for number of iterations: 0.50 -- 0.25
+   Std and var for number of iterations: 0.50 -- 0.25
+

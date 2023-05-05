@@ -1,0 +1,5 @@
+Running outer_solar_system problem with 100 processors...
+   Mean number of iterations: 5.06
+   Range of values for number of iterations:  4 
+   Position of max/min number of iterations: 74 --  0
+   Std and var for number of iterations: 0.75 -- 0.56

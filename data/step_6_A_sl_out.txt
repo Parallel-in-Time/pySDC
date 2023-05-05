@@ -1,0 +1,11 @@
+Working with  1 processes...
+Error vs. exact solution: 2.87627033e-07
+Number of iterations for time 0.00: 8 
+Number of iterations for time 0.12: 8 
+Number of iterations for time 0.25: 8 
+Number of iterations for time 0.38: 8 
+Number of iterations for time 0.50: 7 
+Number of iterations for time 0.62: 7 
+Number of iterations for time 0.75: 7 
+Number of iterations for time 0.88: 7 
+

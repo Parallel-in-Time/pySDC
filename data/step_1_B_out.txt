@@ -1,0 +1,10 @@
+Expected order:  2 -- Computed order 1.888
+Expected order:  2 -- Computed order 1.949
+Expected order:  2 -- Computed order 1.976
+Expected order:  2 -- Computed order 1.988
+Expected order:  2 -- Computed order 1.994
+Expected order:  2 -- Computed order 1.997
+Expected order:  2 -- Computed order 1.999
+Expected order:  2 -- Computed order 1.999
+Expected order:  2 -- Computed order 1.999
+Expected order:  2 -- Computed order 1.982
