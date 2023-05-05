@@ -59,7 +59,7 @@ class SwitchEstimator(ConvergenceController):
 
         self.setup_status_variables(controller, **kwargs)
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         """
         Determine a new step size when a switch is found such that the switch happens at the time step.
 
@@ -124,7 +124,7 @@ class SwitchEstimator(ConvergenceController):
                 else:
                     self.status.switch_detected = False
 
-    def determine_restart(self, controller, S):
+    def determine_restart(self, controller, S, **kwargs):
         """
         Check if the step needs to be restarted due to a predicting switch.
 
@@ -140,9 +140,9 @@ class SwitchEstimator(ConvergenceController):
             S.status.restart = True
             S.status.force_done = True
 
-        super(SwitchEstimator, self).determine_restart(controller, S)
+        super().determine_restart(controller, S, **kwargs)
 
-    def post_step_processing(self, controller, S):
+    def post_step_processing(self, controller, S, **kwargs):
         """
         After a step is done, some variables will be prepared for predicting a possibly new switch.
         If no Adaptivity is used, the next time step will be set as the default one from the front end.
@@ -160,7 +160,7 @@ class SwitchEstimator(ConvergenceController):
         if self.status.t_switch is None:
             L.status.dt_new = L.status.dt_new if L.status.dt_new is not None else L.params.dt_initial
 
-        super(SwitchEstimator, self).post_step_processing(controller, S)
+        super().post_step_processing(controller, S, **kwargs)
 
     @staticmethod
     def get_switch(t_interp, vC_switch, m_guess):
