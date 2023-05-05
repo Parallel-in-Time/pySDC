@@ -6,5 +6,5 @@ Results:
 
 .. literalinclude:: ./data/step_1_B_out.txt
 
-.. image:: ./data/step_1_accuracy_test_space.png
+.. image:: ../data/step_1_accuracy_test_space.png
    :scale: 50 %
