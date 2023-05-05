@@ -1,49 +1,49 @@
-Variant mass_inv with ml=False and num_procs=1 -- error at time 1.0: 4.038018928430278e-08
+Variant mass_inv with ml=False and num_procs=1 -- error at time 1.0: 4.0467402199216237e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 3.5580 sec.
+Time to solution: 2.1028 sec.
 
-Variant mass with ml=False and num_procs=1 -- error at time 1.0: 4.037998750179539e-08
+Variant mass with ml=False and num_procs=1 -- error at time 1.0: 4.046761177025691e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 3.0797 sec.
+Time to solution: 1.6354 sec.
 
-Variant weak with ml=False and num_procs=1 -- error at time 1.0: 4.0388218372050104e-08
+Variant weak with ml=False and num_procs=1 -- error at time 1.0: 4.038068772113821e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 9.2007 sec.
+Time to solution: 5.9065 sec.
 
-Variant mass_inv with ml=True and num_procs=1 -- error at time 1.0: 4.038030058561979e-08
+Variant mass_inv with ml=True and num_procs=1 -- error at time 1.0: 4.0467880206951514e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 4.9969 sec.
+Time to solution: 2.7733 sec.
 
-Variant mass with ml=True and num_procs=1 -- error at time 1.0: 4.0380468789990663e-08
+Variant mass with ml=True and num_procs=1 -- error at time 1.0: 4.0466577002423495e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 4.4762 sec.
+Time to solution: 2.3568 sec.
 
-Variant weak with ml=True and num_procs=1 -- error at time 1.0: 4.038821713998089e-08
+Variant weak with ml=True and num_procs=1 -- error at time 1.0: 4.0380688838876016e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 7.0669 sec.
+Time to solution: 4.3315 sec.
 
-Variant mass_inv with ml=True and num_procs=5 -- error at time 1.0: 3.9537709137400506e-08
+Variant mass_inv with ml=True and num_procs=5 -- error at time 1.0: 3.9624688218753e-08
    Mean number of iterations: 11.60
    Range of values for number of iterations:  9 
    Position of max/min number of iterations:  4 --  0
    Std and var for number of iterations: 3.26 -- 10.64
-Time to solution: 8.3761 sec.
+Time to solution: 4.6020 sec.
 

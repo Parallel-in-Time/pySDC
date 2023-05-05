@@ -7,4 +7,4 @@ Expected order:  2 -- Computed order 1.997
 Expected order:  2 -- Computed order 1.999
 Expected order:  2 -- Computed order 1.999
 Expected order:  2 -- Computed order 1.999
-Expected order:  2 -- Computed order 1.976
+Expected order:  2 -- Computed order 1.982

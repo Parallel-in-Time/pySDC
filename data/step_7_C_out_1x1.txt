@@ -5,5 +5,5 @@ Number of iterations for time 0.12: 12
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 2.4229 sec.
+Time to solution: 1.8231 sec.
 Error vs. PDE solution: 1.9479e-04
