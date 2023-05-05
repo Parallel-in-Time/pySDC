@@ -1,7 +1,6 @@
 from pySDC.core.ConvergenceController import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.spread_step_sizes import (
-    SpreadStepSizesBlockwiseNonMPI,
-    SpreadStepSizesBlockwiseMPI,
+    SpreadStepSizesBlockwise,
 )
 from pySDC.core.Errors import ConvergenceError
 
@@ -42,7 +41,7 @@ class BasicRestarting(ConvergenceController):
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         """
-        super(BasicRestarting, self).__init__(controller, params, description)
+        super().__init__(controller, params, description)
         self.buffers = Pars({"restart": False, "max_restart_reached": False})
 
     def setup(self, controller, params, description, **kwargs):
@@ -68,6 +67,7 @@ class BasicRestarting(ConvergenceController):
             "control_order": 95,
             "max_restarts": 10,
             "crash_after_max_restarts": True,
+            "step_size_spreader": SpreadStepSizesBlockwise.get_implementation(useMPI=params['useMPI']),
         }
 
         from pySDC.implementations.hooks.log_restarts import LogRestarts
@@ -174,33 +174,6 @@ class BasicRestartingNonMPI(BasicRestarting):
 
         return None
 
-    def setup(self, controller, params, description, **kwargs):
-        """
-        Define parameters here.
-
-        Default parameters are:
-         - control_order (int): The order relative to other convergence controllers
-         - max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we
-                               have
-         - step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing
-                                                             the steps sizes between blocks
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): The params passed for this specific convergence controller
-            description (dict): The description object used to instantiate the controller
-
-        Returns:
-            (dict): The updated params dictionary
-        """
-        defaults = {
-            "step_size_spreader": SpreadStepSizesBlockwiseNonMPI,
-        }
-        return {
-            **defaults,
-            **super(BasicRestartingNonMPI, self).setup(controller, params, description),
-        }
-
     def determine_restart(self, controller, S, **kwargs):
         """
         Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience
@@ -245,35 +218,8 @@ class BasicRestartingMPI(BasicRestarting):
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         """
-        super(BasicRestartingMPI, self).__init__(controller, params, description)
+        super().__init__(controller, params, description)
         self.buffers = Pars({"restart": False, "max_restart_reached": False, 'restart_earlier': False})
-
-    def setup(self, controller, params, description, **kwargs):
-        """
-        Define parameters here.
-
-        Default parameters are:
-         - control_order (int): The order relative to other convergence controllers
-         - max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we
-                               have
-         - step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing
-                                                             the steps sizes between blocks
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): The params passed for this specific convergence controller
-            description (dict): The description object used to instantiate the controller
-
-        Returns:
-            (dict): The updated params dictionary
-        """
-        defaults = {
-            "step_size_spreader": SpreadStepSizesBlockwiseMPI,
-        }
-        return {
-            **defaults,
-            **super(BasicRestartingMPI, self).setup(controller, params, description),
-        }
 
     def determine_restart(self, controller, S, **kwargs):
         """

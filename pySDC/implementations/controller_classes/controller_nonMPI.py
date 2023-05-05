@@ -80,7 +80,7 @@ class controller_nonMPI(controller):
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
-            C.setup_status_variables(self)
+            C.setup_status_variables(self, MS=self.MS)
 
     def run(self, u0, t0, Tend):
         """
@@ -153,7 +153,7 @@ class controller_nonMPI(controller):
                     C.post_step_processing(self, S)
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                [C.prepare_next_block(self, S, len(active_slots), time, Tend) for S in self.MS]
+                [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in self.MS]
                 C.prepare_next_block_nonMPI(self, self.MS, active_slots, time, Tend)
 
             # setup the times of the steps for the next block
