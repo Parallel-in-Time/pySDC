@@ -154,7 +154,6 @@ class controller_nonMPI(controller):
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in self.MS]
-                C.prepare_next_block_nonMPI(self, self.MS, active_slots, time, Tend)
 
             # setup the times of the steps for the next block
             for i in range(1, len(active_slots)):
