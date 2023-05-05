@@ -75,12 +75,12 @@ class controller_nonMPI(controller):
 
         if self.nlevels == 1 and self.params.predict_type is not None:
             self.logger.warning(
-                'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
+                'you have specified a predictor type but only a single level.. predictor will be ignored'
             )
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_buffers_nonMPI(self)
-            C.setup_status_variables(self)
+            C.setup_status_variables(self, MS=self.MS)
 
     def run(self, u0, t0, Tend):
         """
@@ -153,8 +153,7 @@ class controller_nonMPI(controller):
                     C.post_step_processing(self, S)
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                [C.prepare_next_block(self, S, len(active_slots), time, Tend) for S in self.MS]
-                C.prepare_next_block_nonMPI(self, self.MS, active_slots, time, Tend)
+                [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in self.MS]
 
             # setup the times of the steps for the next block
             for i in range(1, len(active_slots)):
@@ -351,7 +350,7 @@ class controller_nonMPI(controller):
                 S.status.stage = 'IT_CHECK'
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_spread_processing(self, S)
+                C.post_spread_processing(self, S, MS=local_MS_running)
 
     def predict(self, local_MS_running):
         """
@@ -496,8 +495,8 @@ class controller_nonMPI(controller):
 
             # decide if the step is done, needs to be restarted and other things convergence related
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_iteration_processing(self, S)
-                C.convergence_control(self, S)
+                C.post_iteration_processing(self, S, MS=local_MS_running)
+                C.convergence_control(self, S, MS=local_MS_running)
 
         for S in local_MS_running:
             if not S.status.first:
@@ -521,7 +520,7 @@ class controller_nonMPI(controller):
                 for hook in self.hooks:
                     hook.pre_iteration(step=S, level_number=0)
                 for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                    C.pre_iteration_processing(self, S)
+                    C.pre_iteration_processing(self, S, MS=local_MS_running)
 
                 if len(S.levels) > 1:  # MLSDC or PFASST
                     S.status.stage = 'IT_DOWN'

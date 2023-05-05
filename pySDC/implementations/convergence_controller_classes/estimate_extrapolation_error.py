@@ -27,7 +27,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         """
         self.prev = Status(["t", "u", "f", "dt"])  # store solutions etc. of previous steps here
         self.coeff = Status(["u", "f", "prefactor"])  # store coefficients for extrapolation here
-        super(EstimateExtrapolationErrorBase, self).__init__(controller, params, description)
+        super().__init__(controller, params, description)
         controller.add_hook(LogExtrapolationErrorEstimate)
 
     def setup(self, controller, params, description, **kwargs):
@@ -265,7 +265,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         Returns:
             dict: Updated parameters with default values
         """
-        default_params = super(EstimateExtrapolationErrorNonMPI, self).setup(controller, params, description)
+        default_params = super().setup(controller, params, description)
 
         non_mpi_defaults = {
             "no_storage": False,
@@ -283,7 +283,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         Returns:
             None
         """
-        super(EstimateExtrapolationErrorNonMPI, self).setup_status_variables(controller, **kwargs)
+        super().setup_status_variables(controller, **kwargs)
 
         self.prev.t = np.array([None] * self.params.n)
         self.prev.dt = np.array([None] * self.params.n)
@@ -327,21 +327,23 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return None
 
-    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend, **kwargs):
+    def prepare_next_block(self, controller, S, size, time, Tend, MS, **kwargs):
         """
         If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available. Otherwise, we
         need to store all the stuff that we can.
 
         Args:
             controller (pySDC.Controller): The controller
-            MS (list): All steps of the controller
-            active_slots (list): Index list of active steps
+            S (pySDC.step): The current step
+            size (int): Number of ranks
             time (float): The current time
             Tend (float): The final time
+            MS (list): Active steps
 
         Returns:
             None
         """
+
         # delete values that should not be available in the next step
         if self.params.no_storage:
             self.prev.t = np.array([None] * self.params.n)
@@ -351,13 +353,12 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         else:
             # decide where we need to restart to store everything up to that point
-            MS_active = [MS[i] for i in range(len(MS)) if i in active_slots]
-            restarts = [S.status.restart for S in MS_active]
-            restart_at = np.where(restarts)[0][0] if True in restarts else len(MS_active)
+            restarts = [S.status.restart for S in MS]
+            restart_at = np.where(restarts)[0][0] if True in restarts else len(MS)
 
             # store values in the current block that don't need restarting
-            if restart_at > 0:
-                [self.store_values(S) for S in MS_active[:restart_at]]
+            if restart_at > S.status.slot:
+                self.store_values(S)
 
         return None
 
