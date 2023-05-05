@@ -267,6 +267,7 @@ jobs:
           sphinx-build -b html docs/source docs/build/html
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
+          cp -r data docs/build/html/
 
 #      - name: Build html II
 #        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
