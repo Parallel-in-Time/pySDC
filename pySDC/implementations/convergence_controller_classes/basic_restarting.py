@@ -141,8 +141,8 @@ class BasicRestarting(ConvergenceController):
 
         Args:
             controller (pySDC.Controller): The controller
-            MS (list): List of the steps of the controller
-            active_slots (list): Index list of active steps
+            S (pySDC.Step): The current step
+            size (int): The number of ranks
             time (list): List containing the time of all the steps
             Tend (float): Final time of the simulation
 
@@ -221,7 +221,7 @@ class BasicRestartingMPI(BasicRestarting):
         super().__init__(controller, params, description)
         self.buffers = Pars({"restart": False, "max_restart_reached": False, 'restart_earlier': False})
 
-    def determine_restart(self, controller, S, **kwargs):
+    def determine_restart(self, controller, S, comm, **kwargs):
         """
         Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience
         with the restarts and want to move on anyways.
@@ -229,11 +229,11 @@ class BasicRestartingMPI(BasicRestarting):
         Args:
             controller (pySDC.Controller): The controller
             S (pySDC.Step): The current step
+            comm (mpi4py.MPI.Intracomm): Communicator
 
         Returns:
             None
         """
-        comm = kwargs['comm']
         assert S.status.slot == comm.rank
 
         if S.status.first:

@@ -52,7 +52,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
     Non-MPI version
     """
 
-    def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
+    def prepare_next_block(self, controller, S, size, time, Tend, MS, **kwargs):
         """
         Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based
         on Tend
@@ -63,12 +63,11 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
             size (int): The number of ranks
             time (list): List containing the time of all the steps handled by the controller (or float in MPI implementation)
             Tend (float): Final time of the simulation
+            MS (list): Active steps
 
         Returns:
             None
         """
-        MS = kwargs['MS']
-
         # figure out where the block is restarted
         restarts = [me.status.restart for me in MS]
         if True in restarts:
@@ -91,7 +90,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
                 ]
             )
 
-            if new_steps[i] < l.status.dt_new if l.status.dt_new is not None else l.params.dt:
+            if new_steps[i] < (l.status.dt_new if l.status.dt_new is not None else l.params.dt) and i == 0:
                 self.log(
                     f"Overwriting stepsize control to reach Tend: {Tend:.2e}! New step size: {new_steps[i]:.2e}", S
                 )
@@ -104,7 +103,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
 
 
 class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwise):
-    def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
+    def prepare_next_block(self, controller, S, size, time, Tend, comm, **kwargs):
         """
         Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based
         on Tend
@@ -115,11 +114,11 @@ class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwise):
             size (int): The number of ranks
             time (list): List containing the time of all the steps handled by the controller (or float in MPI implementation)
             Tend (float): Final time of the simulation
+            comm (mpi4py.MPI.Intracomm): Communicator
 
         Returns:
             None
         """
-        comm = kwargs['comm']
 
         # figure out where the block is restarted
         restarts = comm.allgather(S.status.restart)

@@ -327,7 +327,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return None
 
-    def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
+    def prepare_next_block(self, controller, S, size, time, Tend, MS, **kwargs):
         """
         If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available. Otherwise, we
         need to store all the stuff that we can.
@@ -338,11 +338,11 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             size (int): Number of ranks
             time (float): The current time
             Tend (float): The final time
+            MS (list): Active steps
 
         Returns:
             None
         """
-        MS = kwargs["MS"]
 
         # delete values that should not be available in the next step
         if self.params.no_storage:

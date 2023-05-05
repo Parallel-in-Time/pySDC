@@ -75,7 +75,7 @@ class controller_nonMPI(controller):
 
         if self.nlevels == 1 and self.params.predict_type is not None:
             self.logger.warning(
-                'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
+                'you have specified a predictor type but only a single level.. predictor will be ignored'
             )
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
@@ -350,7 +350,7 @@ class controller_nonMPI(controller):
                 S.status.stage = 'IT_CHECK'
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_spread_processing(self, S)
+                C.post_spread_processing(self, S, MS=local_MS_running)
 
     def predict(self, local_MS_running):
         """
@@ -495,8 +495,8 @@ class controller_nonMPI(controller):
 
             # decide if the step is done, needs to be restarted and other things convergence related
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_iteration_processing(self, S)
-                C.convergence_control(self, S)
+                C.post_iteration_processing(self, S, MS=local_MS_running)
+                C.convergence_control(self, S, MS=local_MS_running)
 
         for S in local_MS_running:
             if not S.status.first:
@@ -520,7 +520,7 @@ class controller_nonMPI(controller):
                 for hook in self.hooks:
                     hook.pre_iteration(step=S, level_number=0)
                 for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                    C.pre_iteration_processing(self, S)
+                    C.pre_iteration_processing(self, S, MS=local_MS_running)
 
                 if len(S.levels) > 1:  # MLSDC or PFASST
                     S.status.stage = 'IT_DOWN'

@@ -62,7 +62,7 @@ class controller_MPI(controller):
 
         if num_levels == 1 and self.params.predict_type is not None:
             self.logger.warning(
-                'you have specified a predictor type but only a single level.. ' 'predictor will be ignored'
+                'you have specified a predictor type but only a single level.. predictor will be ignored'
             )
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
@@ -632,7 +632,7 @@ class controller_MPI(controller):
                 C.pre_iteration_processing(self, self.S, comm=comm)
 
             if self.params.use_iteration_estimator:
-                # store pervious iterate to compute difference later on
+                # store previous iterate to compute difference later on
                 self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
 
             if len(self.S.levels) > 1:  # MLSDC or PFASST
