@@ -6,11 +6,11 @@ Residual in iteration  4: 1.2171e-05
 Residual in iteration  5: 1.3827e-06
 Residual in iteration  6: 6.3645e-07
 Residual in iteration  7: 1.6895e-07
-Residual in iteration  8: 3.5260e-08
-Residual in iteration  9: 6.0715e-09
-Residual in iteration 10: 8.2775e-10
-Residual in iteration 11: 1.1850e-10
-Residual in iteration 12: 1.4152e-11
+Residual in iteration  8: 3.5261e-08
+Residual in iteration  9: 6.0742e-09
+Residual in iteration 10: 8.2757e-10
+Residual in iteration 11: 1.1908e-10
+Residual in iteration 12: 1.4679e-11
 Number of iterations at time 0.10: 12
 Number of iterations at time 0.20: 12
 Number of iterations at time 0.30: 12

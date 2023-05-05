@@ -66,7 +66,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">])</span>  <span class="c1"># store solutions etc. of previous steps here</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;prefactor&quot;</span><span class="p">])</span>  <span class="c1"># store coefficients for extrapolation here</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogExtrapolationErrorEstimate</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -304,7 +304,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Updated parameters with default values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">default_params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="n">default_params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="n">non_mpi_defaults</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;no_storage&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -322,7 +322,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorNonMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -366,21 +366,23 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If the no-memory-overhead version is used, we need to delete stuff that shouldn&#39;t be available. Otherwise, we</span>
 <span class="sd">        need to store all the stuff that we can.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            MS (list): All steps of the controller</span>
-<span class="sd">            active_slots (list): Index list of active steps</span>
+<span class="sd">            S (pySDC.step): The current step</span>
+<span class="sd">            size (int): Number of ranks</span>
 <span class="sd">            time (float): The current time</span>
 <span class="sd">            Tend (float): The final time</span>
+<span class="sd">            MS (list): Active steps</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># delete values that should not be available in the next step</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
@@ -390,13 +392,12 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># decide where we need to restart to store everything up to that point</span>
-            <span class="n">MS_active</span> <span class="o">=</span> <span class="p">[</span><span class="n">MS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">active_slots</span><span class="p">]</span>
-            <span class="n">restarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS_active</span><span class="p">]</span>
-            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS_active</span><span class="p">)</span>
+            <span class="n">restarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">]</span>
+            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)</span>
 
             <span class="c1"># store values in the current block that don&#39;t need restarting</span>
-            <span class="k">if</span> <span class="n">restart_at</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">store_values</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS_active</span><span class="p">[:</span><span class="n">restart_at</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">restart_at</span> <span class="o">&gt;</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_values</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 

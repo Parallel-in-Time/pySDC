@@ -1,3 +1,3 @@
-Error SDC and MLSDC: 3.96232017e-08 -- 3.95409335e-08
-Difference SDC vs. MLSDC: 8.22683310e-11
+Error SDC and MLSDC: 3.96227149e-08 -- 3.95404452e-08
+Difference SDC vs. MLSDC: 8.22714952e-11
 Number of iterations SDC and MLSDC: 12 --  6

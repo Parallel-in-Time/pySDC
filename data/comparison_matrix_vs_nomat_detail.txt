@@ -1,42 +1,42 @@
 
 Working with diffusion setup and parameter 1.0e-02..
   Error (mat/nomat) vs. exact solution: 4.0681e-07 -- 4.0681e-07
-  Difference between both results: 7.7716e-16
+  Difference between both results: 5.2736e-16
   Iteration counts for matrix-based version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
   Iteration counts for matrix-free version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
 
 Working with advection setup and parameter 1.0e-02..
   Error (mat/nomat) vs. exact solution: 2.0169e-04 -- 2.0169e-04
-  Difference between both results: 4.4409e-16
+  Difference between both results: 5.5511e-16
   Iteration counts for matrix-based version: [(0.0, 2), (0.25, 2), (0.5, 2), (0.75, 2)]
   Iteration counts for matrix-free version: [(0.0, 2), (0.25, 2), (0.5, 2), (0.75, 2)]
 
 Working with diffusion setup and parameter 1.0e+00..
   Error (mat/nomat) vs. exact solution: 5.8573e-06 -- 5.8573e-06
-  Difference between both results: 3.1891e-18
+  Difference between both results: 2.4742e-18
   Iteration counts for matrix-based version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
   Iteration counts for matrix-free version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
 
 Working with advection setup and parameter 1.0e+00..
   Error (mat/nomat) vs. exact solution: 2.9363e-01 -- 2.9363e-01
-  Difference between both results: 1.4988e-15
+  Difference between both results: 1.5543e-15
   Iteration counts for matrix-based version: [(0.0, 7), (0.25, 7), (0.5, 7), (0.75, 7)]
   Iteration counts for matrix-free version: [(0.0, 7), (0.25, 7), (0.5, 7), (0.75, 7)]
 
 Working with diffusion setup and parameter 1.0e+02..
   Error (mat/nomat) vs. exact solution: 3.2887e-13 -- 3.2887e-13
-  Difference between both results: 8.6242e-22
+  Difference between both results: 1.0822e-21
   Iteration counts for matrix-based version: [(0.0, 2), (0.25, 2), (0.5, 2), (0.75, 2)]
   Iteration counts for matrix-free version: [(0.0, 2), (0.25, 2), (0.5, 2), (0.75, 2)]
 
 Working with advection setup and parameter 1.0e+02..
   Error (mat/nomat) vs. exact solution: 1.0000e+00 -- 1.0000e+00
-  Difference between both results: 4.3723e-17
+  Difference between both results: 2.6242e-17
   Iteration counts for matrix-based version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
   Iteration counts for matrix-free version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
 
 Working with testequation setup and parameter 0.0e+00..
   Error (mat/nomat) vs. exact solution: 5.7992e-06 -- 5.7992e-06
-  Difference between both results: 3.3372e-16
+  Difference between both results: 3.8858e-16
   Iteration counts for matrix-based version: [(0.0, 4), (0.25, 4), (0.5, 4), (0.75, 4)]
   Iteration counts for matrix-free version: [(0.0, 4), (0.25, 4), (0.5, 4), (0.75, 4)]

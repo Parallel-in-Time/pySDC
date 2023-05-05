@@ -120,8 +120,8 @@ with the restarts and want to move on anyways.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>MS</strong> (<em>list</em>) – List of the steps of the controller</p></li>
-<li><p><strong>active_slots</strong> (<em>list</em>) – Index list of active steps</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – The number of ranks</p></li>
 <li><p><strong>time</strong> (<em>list</em>) – List containing the time of all the steps</p></li>
 <li><p><strong>Tend</strong> (<em>float</em>) – Final time of the simulation</p></li>
 </ul>
@@ -214,7 +214,7 @@ Steps</p>
 <p>MPI specific version of basic restarting</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">
-<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingMPI.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingMPI.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience
 with the restarts and want to move on anyways.</p>
 <dl class="field-list simple">
@@ -222,47 +222,11 @@ with the restarts and want to move on anyways.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
 <li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingMPI.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define parameters here.</p>
-<dl class="simple">
-<dt>Default parameters are:</dt><dd><ul class="simple">
-<li><p>control_order (int): The order relative to other convergence controllers</p></li>
-<li><dl class="simple">
-<dt>max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we</dt><dd><p>have</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing</dt><dd><p>the steps sizes between blocks</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
-<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The updated params dictionary</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -306,43 +270,6 @@ with the restarts and want to move on anyways.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/basic_restarting.html#BasicRestartingNonMPI.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define parameters here.</p>
-<dl class="simple">
-<dt>Default parameters are:</dt><dd><ul class="simple">
-<li><p>control_order (int): The order relative to other convergence controllers</p></li>
-<li><dl class="simple">
-<dt>max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we</dt><dd><p>have</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing</dt><dd><p>the steps sizes between blocks</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
-<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The updated params dictionary</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(dict)</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -370,13 +297,11 @@ with the restarts and want to move on anyways.</p>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI"><code class="docutils literal notranslate"><span class="pre">BasicRestartingMPI</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI"><code class="docutils literal notranslate"><span class="pre">BasicRestartingNonMPI</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">reset_buffers_nonMPI()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 </ul>

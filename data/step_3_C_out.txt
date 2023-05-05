@@ -1,3 +1,3 @@
 Energy deviation for RADAU-RIGHT: 1.44960920e+01
-Energy deviation for GAUSS: 2.33862938e-05
-Energy deviation for LOBATTO: 9.32710645e-06
+Energy deviation for GAUSS: 2.33862975e-05
+Energy deviation for LOBATTO: 9.32710282e-06

@@ -302,26 +302,7 @@
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            S (pySDC.Step): The current step</span>
 <span class="sd">            size (int): The number of ranks</span>
-<span class="sd">            time (float): The current time</span>
-<span class="sd">            Tend (float): The final time</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="ConvergenceController.prepare_next_block_nonMPI"><a class="viewcode-back" href="../../pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This is an extension to the function `prepare_next_block`, which is only called in the non MPI controller and</span>
-<span class="sd">        is needed because there is no chance to communicate backwards otherwise. While you should not do this in the</span>
-<span class="sd">        first place, the first step in the new block comes after the last step in the last block, such that it is still</span>
-<span class="sd">        in fact forwards communication, even though it looks backwards.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            MS (list): All steps of the controller</span>
-<span class="sd">            active_slots (list): Index list of active steps</span>
-<span class="sd">            time (float): The current time</span>
+<span class="sd">            time (float): The current time will be list in nonMPI controller implementation</span>
 <span class="sd">            Tend (float): The final time</span>
 
 <span class="sd">        Returns:</span>

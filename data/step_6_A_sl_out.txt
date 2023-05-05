@@ -1,5 +1,5 @@
 Working with  1 processes...
-Error vs. exact solution: 2.87627033e-07
+Error vs. exact solution: 2.87627037e-07
 Number of iterations for time 0.00: 8 
 Number of iterations for time 0.12: 8 
 Number of iterations for time 0.25: 8 

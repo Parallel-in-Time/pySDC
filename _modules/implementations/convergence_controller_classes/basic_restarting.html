@@ -39,8 +39,7 @@
   <h1>Source code for implementations.convergence_controller_classes.basic_restarting</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.spread_step_sizes</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpreadStepSizesBlockwiseNonMPI</span><span class="p">,</span>
-    <span class="n">SpreadStepSizesBlockwiseMPI</span><span class="p">,</span>
+    <span class="n">SpreadStepSizesBlockwise</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ConvergenceError</span>
 
@@ -81,7 +80,7 @@
 <span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BasicRestarting</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
 <div class="viewcode-block" id="BasicRestarting.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -107,6 +106,7 @@
             <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
             <span class="s2">&quot;max_restarts&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
             <span class="s2">&quot;crash_after_max_restarts&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;step_size_spreader&quot;</span><span class="p">:</span> <span class="n">SpreadStepSizesBlockwise</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">useMPI</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;useMPI&#39;</span><span class="p">]),</span>
         <span class="p">}</span>
 
         <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_restarts</span> <span class="kn">import</span> <span class="n">LogRestarts</span>
@@ -180,8 +180,8 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            MS (list): List of the steps of the controller</span>
-<span class="sd">            active_slots (list): Index list of active steps</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+<span class="sd">            size (int): The number of ranks</span>
 <span class="sd">            time (list): List containing the time of all the steps</span>
 <span class="sd">            Tend (float): Final time of the simulation</span>
 
@@ -212,33 +212,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="BasicRestartingNonMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Define parameters here.</span>
-
-<span class="sd">        Default parameters are:</span>
-<span class="sd">         - control_order (int): The order relative to other convergence controllers</span>
-<span class="sd">         - max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we</span>
-<span class="sd">                               have</span>
-<span class="sd">         - step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing</span>
-<span class="sd">                                                             the steps sizes between blocks</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            (dict): The updated params dictionary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;step_size_spreader&quot;</span><span class="p">:</span> <span class="n">SpreadStepSizesBlockwiseNonMPI</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="o">**</span><span class="n">defaults</span><span class="p">,</span>
-            <span class="o">**</span><span class="nb">super</span><span class="p">(</span><span class="n">BasicRestartingNonMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">),</span>
-        <span class="p">}</span></div>
 
 <div class="viewcode-block" id="BasicRestartingNonMPI.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingNonMPI.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -284,37 +257,10 @@
 <span class="sd">            params (dict): Parameters for the convergence controller</span>
 <span class="sd">            description (dict): The description object used to instantiate the controller</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BasicRestartingMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;restart_earlier&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
-<div class="viewcode-block" id="BasicRestartingMPI.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Define parameters here.</span>
-
-<span class="sd">        Default parameters are:</span>
-<span class="sd">         - control_order (int): The order relative to other convergence controllers</span>
-<span class="sd">         - max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we</span>
-<span class="sd">                               have</span>
-<span class="sd">         - step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing</span>
-<span class="sd">                                                             the steps sizes between blocks</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            (dict): The updated params dictionary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;step_size_spreader&quot;</span><span class="p">:</span> <span class="n">SpreadStepSizesBlockwiseMPI</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="o">**</span><span class="n">defaults</span><span class="p">,</span>
-            <span class="o">**</span><span class="nb">super</span><span class="p">(</span><span class="n">BasicRestartingMPI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">),</span>
-        <span class="p">}</span></div>
-
-<div class="viewcode-block" id="BasicRestartingMPI.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="BasicRestartingMPI.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience</span>
 <span class="sd">        with the restarts and want to move on anyways.</span>
@@ -322,11 +268,11 @@
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            S (pySDC.Step): The current step</span>
+<span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">comm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">==</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
 
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
