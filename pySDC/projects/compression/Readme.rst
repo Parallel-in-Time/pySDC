@@ -52,18 +52,18 @@ We measure the local order of accuracy in time and verify that it increases by o
 While the order is typically only maintained up to machine precision or the discretization error, we find now that accuracy now stalls at the error bound that we set for the compressor.
 See below for corresponding figures, where the difference between the colored lines is the number of SDC iterations and the dashed line marks the error bound for SZ3.
  
-.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png
+.. image:: ./data/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png
     :width: 45%
 
-.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png
+.. image:: ./data/compression_order_time_advection_d=1.00e-06_n=1_MPI=True.png
     :width: 45%
 
 It has recently been `demonstrated <https://tore.tuhh.de/handle/11420/12370>`_ that the small scale PinT algorithm Block Gauss Seidel SDC maintains the order of single step SDC, so we can repeat the same test but with multiple processors, each with their own time step to solve:
 
-.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png
+.. image:: ./data/compression_order_time_advection_d=1.00e-06_n=4_MPI=False.png
     :width: 45%
 
-.. image:: ../../../data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png
+.. image:: ./data/compression_order_time_advection_d=1.00e-06_n=4_MPI=True.png
     :width: 45%
 
 The above plots showcase that both time-serial SDC as well as time-parallel Block Gauss-Seidel SDC do not suffer from compression when the compression error bound is below other numerical errors and that both the MPI and simulated parallelism versions work.

@@ -20,6 +20,7 @@ class Compression(ConvergenceController):
             'control_order': 0,
             **super().setup(controller, params, description, **kwargs),
             'compressor_args': {**default_compressor_args, **params.get('compressor_args', {})},
+            'min_buffer_length': 12,
         }
 
         self.compressor = libpressio.PressioCompressor.from_config(defaults['compressor_args'])
@@ -35,9 +36,15 @@ class Compression(ConvergenceController):
         prob = lvl.prob
         nodes = np.append(0, lvl.sweep.coll.nodes)
 
+        encode_buffer = np.zeros(max([len(lvl.u[0]), self.params.min_buffer_length]))
+        decode_buffer = np.zeros_like(encode_buffer)
+
         for i in range(len(lvl.u)):
-            comp_data = self.compressor.encode(lvl.u[i])
-            lvl.u[i][:] = self.compressor.decode(comp_data, lvl.u[i][:])
+            encode_buffer[: len(lvl.u[i])] = lvl.u[i][:]
+            comp_data = self.compressor.encode(encode_buffer)
+            decode_buffer = self.compressor.decode(comp_data, decode_buffer)
+
+            lvl.u[i][:] = decode_buffer[: len(lvl.u[i])]
             lvl.f[i] = prob.eval_f(lvl.u[i], lvl.time + lvl.dt * nodes[i])
 
             # metrics = self.compressor.get_metrics()
