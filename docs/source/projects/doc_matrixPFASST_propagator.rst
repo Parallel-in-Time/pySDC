@@ -4,4 +4,4 @@ Full code: `pySDC/projects/matrixPFASST/compare_to_propagator.py <https://github
 
 Results:
 
-.. literalinclude:: ../../../data/comparison_matrix_vs_propagator_detail.txt
+.. literalinclude:: ./data/comparison_matrix_vs_propagator_detail.txt

@@ -4,7 +4,7 @@ Full code: `pySDC/projects/SDC_showdown/SDC_timing_Fisher.py <https://github.com
 
 Results:
 
-.. image:: ../../../data/timings_SDC_variants_Fisher.png
+.. image:: ./data/timings_SDC_variants_Fisher.png
    :scale: 100 %
 
 
@@ -14,5 +14,5 @@ Full code: `pySDC/projects/SDC_showdown/SDC_timing_GrayScott.py <https://github.
 
 Results:
 
-.. image:: ../../../data/timings_SDC_variants_GrayScott.png
+.. image:: ./data/timings_SDC_variants_GrayScott.png
    :scale: 100 %

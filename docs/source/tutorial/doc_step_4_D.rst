@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_4/D_MLSDC_with_particles.py <https://github.com/
 
 Results:
 
-.. literalinclude:: ../../../data/step_4_D_out.txt
+.. literalinclude:: ./data/step_4_D_out.txt
