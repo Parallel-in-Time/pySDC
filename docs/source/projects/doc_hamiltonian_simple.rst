@@ -4,10 +4,10 @@ Full code: `pySDC/projects/Hamiltonian/simple_problems.py <https://github.com/Pa
 
 Results:
 
-.. image:: ../../../docs/build/html/data/harmonic_hamiltonian.png
+.. image:: ../data/harmonic_hamiltonian.png
    :scale: 50 %
 
-.. image:: ../../../docs/build/html/data/henonheiles_hamiltonian.png
+.. image:: ../data/henonheiles_hamiltonian.png
    :scale: 50 %
 
 

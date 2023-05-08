@@ -13,7 +13,7 @@ The pi-line test case
 ---------------------
 The plot below shows the simulation of the pi-line model. There can be seen the two voltages along the capacitor and the current along the coil. Both the voltages and the current settle down over the time. As a background information: the pi-line model serves as transmission line, which transports the energy. The behavior which can be seen in the plot is what we would expect. 
 
-.. image:: ../../../docs/build/html/data/piline_model_solution.png
+.. image:: ../data/piline_model_solution.png
     :width: 35%
     :align: center
 
@@ -22,7 +22,7 @@ The buck converter test case
 ----------------------------
 In the test case of the buck converter there are multiple switches in the considered time domain. In the so-called open-loop control, a controller monitors the actual output voltage. It compares the output with a target output voltage. Regularly, after a fixed number of time steps, the duty cycle to control the switching is recalculated based on the error. The simulation illustrates the switching behavior in the simulation: The voltage values settle down between the reference. 
 
-.. image:: ../../../docs/build/html/data/buck_model_solution.png
+.. image:: ../data/buck_model_solution.png
     :width: 35%
     :align: center
 
@@ -30,6 +30,6 @@ The battery drain model test case
 ---------------------------------
 This model is a simple example for system internal switching, which means switching depends on system dynamics. When the capacitor voltage drops below the reference value, the circuit switches to the voltage source. An illustration of the process is clarified in the plot below: The capacitor voltage drops down, and after switching the voltage value along the capacitor no longer changes. 
 
-.. image:: ../../../docs/build/html/data/battery_model_solution.png
+.. image:: ../data/battery_model_solution.png
     :width: 35%
     :align: center

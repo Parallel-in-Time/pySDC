@@ -4,13 +4,13 @@ Full code: `pySDC/projects/Hamiltonian/fput.py <https://github.com/Parallel-in-T
 
 Results:
 
-.. literalinclude:: ../../../docs/build/html/data/fput_out.txt
+.. literalinclude:: ../data/fput_out.txt
 
-.. image:: ../../../docs/build/html/data/fput_hamiltonian.png
+.. image:: ../data/fput_hamiltonian.png
    :scale: 100 %
-.. image:: ../../../docs/build/html/data/fput_positions.png
+.. image:: ../data/fput_positions.png
    :scale: 100 %
-.. image:: ../../../docs/build/html/data/fput_energy.png
+.. image:: ../data/fput_energy.png
    :scale: 100 %
-.. image:: ../../../docs/build/html/data/fput_energy_full.png
+.. image:: ../data/fput_energy_full.png
    :scale: 100 %
