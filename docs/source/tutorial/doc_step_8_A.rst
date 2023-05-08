@@ -4,7 +4,7 @@ Full code: `pySDC/tutorial/step_8/A_visualize_residuals.py <https://github.com/P
 
 Results:
 
-.. literalinclude:: ./data/step_8_A_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_8_A_out.txt
 
 .. image:: ../../data/step_8_residuals.png
    :scale: 50 %

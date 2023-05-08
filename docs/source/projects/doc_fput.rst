@@ -4,7 +4,7 @@ Full code: `pySDC/projects/Hamiltonian/fput.py <https://github.com/Parallel-in-T
 
 Results:
 
-.. literalinclude:: ./data/fput_out.txt
+.. literalinclude:: ../../../docs/build/html/data/fput_out.txt
 
 .. image:: ../../data/fput_hamiltonian.png
    :scale: 100 %

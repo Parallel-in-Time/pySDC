@@ -4,7 +4,7 @@ Full code: `pySDC/tutorial/step_8/B_multistep_SDC.py <https://github.com/Paralle
 
 Results:
 
-.. literalinclude:: ./data/step_8_B_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_8_B_out.txt
 
 .. image:: ../../data/step_8_residuals_mssdc_jac.png
    :scale: 50 %
