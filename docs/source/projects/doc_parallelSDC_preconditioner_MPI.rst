@@ -4,15 +4,15 @@ Full code: `pySDC/projects/parallelSDC/preconditioner_playground_MPI.py <https:/
 
 Results:
 
-.. image:: ../../data/parallelSDC_preconditioner_MPI_heat.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_MPI_heat.png
    :scale: 100 %
 
-.. image:: ../../data/parallelSDC_preconditioner_MPI_advection.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_MPI_advection.png
    :scale: 100 %
 
-.. image:: ../../data/parallelSDC_preconditioner_MPI_vanderpol.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_MPI_vanderpol.png
    :scale: 100 %
 
-.. image:: ../../data/parallelSDC_preconditioner_MPI_fisher.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_MPI_fisher.png
    :scale: 100 %
 

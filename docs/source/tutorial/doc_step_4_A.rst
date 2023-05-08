@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_4/A_spatial_transfer_operators.py <https://githu
 
 Results:
 
-.. literalinclude:: ./data/step_4_A_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_4_A_out.txt

@@ -4,5 +4,5 @@ Full code: `pySDC/tutorial/step_6/A_run_non_MPI_controller.py <https://github.co
 
 Results:
 
-.. literalinclude:: ./data/step_6_A_sl_out.txt
-.. literalinclude:: ./data/step_6_A_ml_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_6_A_sl_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_6_A_ml_out.txt

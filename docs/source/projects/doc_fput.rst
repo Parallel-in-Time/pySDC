@@ -6,11 +6,11 @@ Results:
 
 .. literalinclude:: ../../../docs/build/html/data/fput_out.txt
 
-.. image:: ../../data/fput_hamiltonian.png
+.. image:: ../../../docs/build/html/data/fput_hamiltonian.png
    :scale: 100 %
-.. image:: ../../data/fput_positions.png
+.. image:: ../../../docs/build/html/data/fput_positions.png
    :scale: 100 %
-.. image:: ../../data/fput_energy.png
+.. image:: ../../../docs/build/html/data/fput_energy.png
    :scale: 100 %
-.. image:: ../../data/fput_energy_full.png
+.. image:: ../../../docs/build/html/data/fput_energy_full.png
    :scale: 100 %

@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_3/B_adding_statistics.py <https://github.com/Par
 
 Results:
 
-.. literalinclude:: ./data/step_3_B_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_3_B_out.txt

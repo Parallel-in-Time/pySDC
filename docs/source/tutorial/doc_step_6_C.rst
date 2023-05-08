@@ -6,5 +6,5 @@ Full code: `pySDC/tutorial/step_6/C_MPI_parallelization.py <https://github.com/P
 
 Results:
 
-.. literalinclude:: ./data/step_6_C1_out.txt
-.. literalinclude:: ./data/step_6_C2_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_6_C1_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_6_C2_out.txt

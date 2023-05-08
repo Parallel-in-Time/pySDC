@@ -6,8 +6,8 @@ Results:
 
 .. literalinclude:: ../../../docs/build/html/data/step_8_B_out.txt
 
-.. image:: ../../data/step_8_residuals_mssdc_jac.png
+.. image:: ../../../docs/build/html/data/step_8_residuals_mssdc_jac.png
    :scale: 50 %
 
-.. image:: ../../data/step_8_residuals_mssdc_gs.png
+.. image:: ../../../docs/build/html/data/step_8_residuals_mssdc_gs.png
    :scale: 50 %

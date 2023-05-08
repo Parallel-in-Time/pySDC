@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py <https://github.com/Par
 
 Results:
 
-.. literalinclude:: ./data/step_7_A_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_7_A_out.txt

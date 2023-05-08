@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_2/B_my_first_sweeper.py <https://github.com/Para
 
 Results:
 
-.. literalinclude:: ./data/step_2_B_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_2_B_out.txt

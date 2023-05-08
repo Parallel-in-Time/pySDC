@@ -4,7 +4,7 @@ Full code: `pySDC/tutorial/step_1/D_collocation_accuracy_check.py <https://githu
 
 Results:
 
-.. literalinclude:: ./data/step_1_D_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_1_D_out.txt
 
-.. image:: ../../data/step_1_accuracy_test_coll.png
+.. image:: ../../../docs/build/html/data/step_1_accuracy_test_coll.png
    :scale: 50 %

@@ -21,21 +21,21 @@ See below for, in the order of mention, plots of the solution, the error estimat
 The last plot was made without Hot Rod, meaning the last sweep is taken to be the solution of the time step, making it one order higher than the embedded estimate, and it can be seen that the extrapolation error estimate lies on top of the embedded error estimate with one fewer sweep.
 These plots were generated with serial SDC.
 
-.. image:: ../../../data/piline_solution_adaptive.png
+.. image:: ../../../docs/build/html/data/piline_solution_adaptive.png
     :width: 20%
-.. image:: ../../../data/piline_hotrod_adaptive_1procs.png
+.. image:: ../../../docs/build/html/data/piline_hotrod_adaptive_1procs.png
     :width: 24%
-.. image:: ../../../data/piline_hotrod_1procs.png
+.. image:: ../../../docs/build/html/data/piline_hotrod_1procs.png
     :width: 24%
-.. image:: ../../../data/error_estimate_order.png
+.. image:: ../../../docs/build/html/data/error_estimate_order.png
     :width: 23%
 
 We also have an implementation for Block Gauss-Seidel multi-step SDC in a simulated parallelism version without MPI.
 You can see the results below, except for the solution, which looks the same as the serial solution to the naked eye.
  
-.. image:: ../../../data/piline_hotrod_adaptive_4procs.png
+.. image:: ../../../docs/build/html/data/piline_hotrod_adaptive_4procs.png
     :width: 24%
-.. image:: ../../../data/piline_hotrod_4procs.png
+.. image:: ../../../docs/build/html/data/piline_hotrod_4procs.png
     :width: 24%
-.. image:: ../../../data/error_estimate_order_parallel.png
+.. image:: ../../../docs/build/html/data/error_estimate_order_parallel.png
     :width: 23%

@@ -1,10 +1,10 @@
 Results:
 
-.. image:: ../../data/convergence.png
+.. image:: ../../../docs/build/html/data/convergence.png
    :width: 19%
 
-.. image:: ../../data/iteration.png
+.. image:: ../../../docs/build/html/data/iteration.png
    :width: 19%
 
-.. image:: ../../data/multiscale-K2-M2.png
+.. image:: ../../../docs/build/html/data/multiscale-K2-M2.png
    :width: 19%

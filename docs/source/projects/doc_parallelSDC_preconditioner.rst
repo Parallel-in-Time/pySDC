@@ -4,15 +4,15 @@ Full code: `pySDC/projects/parallelSDC/preconditioner_playground.py <https://git
 
 Results:
 
-.. image:: ../../data/parallelSDC_preconditioner_heat.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_heat.png
    :scale: 100 %
 
-.. image:: ../../data/parallelSDC_preconditioner_advection.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_advection.png
    :scale: 100 %
 
-.. image:: ../../data/parallelSDC_preconditioner_vanderpol.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_vanderpol.png
    :scale: 100 %
 
-.. image:: ../../data/parallelSDC_preconditioner_fisher.png
+.. image:: ../../../docs/build/html/data/parallelSDC_preconditioner_fisher.png
    :scale: 100 %
 

@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py <https://github.com/Parallel
 
 Results:
 
-.. literalinclude:: ./data/step_4_C_out.txt
+.. literalinclude:: ../../../docs/build/html/data/step_4_C_out.txt
