@@ -1,3 +1,0 @@
-Expected order:  5 -- Computed order 4.791
-Expected order:  5 -- Computed order 5.364
-Expected order:  5 -- Computed order 5.671

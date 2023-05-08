@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_2/C_using_pySDCs_frontend.py <https://github.com
 
 Results:
 
-.. literalinclude:: ./data/step_2_C_out.txt
+.. literalinclude:: ../../../data/step_2_C_out.txt

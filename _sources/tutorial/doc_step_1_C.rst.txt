@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_1/C_collocation_problem_setup.py <https://github
 
 Results:
 
-.. literalinclude:: ./data/step_1_C_out.txt
+.. literalinclude:: ../../../data/step_1_C_out.txt

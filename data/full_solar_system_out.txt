@@ -1,5 +1,0 @@
-Running full_solar_system problem with 100 processors...
-   Mean number of iterations: 18.02
-   Range of values for number of iterations: 24 
-   Position of max/min number of iterations: 96 --  0
-   Std and var for number of iterations: 6.37 -- 40.54

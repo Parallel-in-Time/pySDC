@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_4/B_multilevel_hierarchy.py <https://github.com/
 
 Results:
 
-.. literalinclude:: ./data/step_4_B_out.txt
+.. literalinclude:: ../../../data/step_4_B_out.txt

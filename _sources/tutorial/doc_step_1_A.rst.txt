@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_1/A_spatial_problem_setup.py <https://github.com
 
 Results:
 
-.. literalinclude:: ./data/step_1_A_out.txt
+.. literalinclude:: ../../../data/step_1_A_out.txt
