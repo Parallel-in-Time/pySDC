@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_7/B_pySDC_with_mpi4pyfft.py <https://github.com/
 
 Results:
 
-.. literalinclude:: ./data/step_7_B_out.txt
+.. literalinclude:: ../../../data/step_7_B_out.txt
