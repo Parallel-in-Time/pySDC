@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_3/A_getting_statistics.py <https://github.com/Pa
 
 Results:
 
-.. literalinclude:: ../../../docs/build/html/data/step_3_A_out.txt
+.. literalinclude:: ../../../data/step_3_A_out.txt

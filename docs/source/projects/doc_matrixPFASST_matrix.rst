@@ -4,4 +4,4 @@ Full code: `pySDC/projects/matrixPFASST/compare_to_matrixbased.py <https://githu
 
 Results:
 
-.. literalinclude:: ../data/comparison_matrix_vs_nomat_detail.txt
+.. literalinclude:: ../../../data/comparison_matrix_vs_nomat_detail.txt

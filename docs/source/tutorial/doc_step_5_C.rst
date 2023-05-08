@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_5/C_advection_and_PFASST.py <https://github.com/
 
 Results:
 
-.. literalinclude:: ../../../docs/build/html/data/step_5_C_out.txt
+.. literalinclude:: ../../../data/step_5_C_out.txt

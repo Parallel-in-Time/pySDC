@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_5/B_my_first_PFASST_run.py <https://github.com/P
 
 Results:
 
-.. literalinclude:: ../../../docs/build/html/data/step_5_B_out.txt
+.. literalinclude:: ../../../data/step_5_B_out.txt
