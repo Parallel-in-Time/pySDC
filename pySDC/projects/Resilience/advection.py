@@ -2,9 +2,7 @@
 
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.helpers.stats_helper import get_sorted
-import numpy as np
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 from pySDC.projects.Resilience.strategies import merge_descriptions
@@ -29,13 +27,32 @@ def run_advection(
     hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
+    use_MPI=False,
+    **kwargs,
 ):
+    """
+    Run an advection problem with default parameters.
+
+    Args:
+        custom_description (dict): Overwrite presets
+        num_procs (int): Number of steps for MSSDC
+        Tend (float): Time to integrate to
+        hook_class (pySDC.Hook): A hook to store data
+        fault_stuff (dict): A dictionary with information on how to add faults
+        custom_controller_params (dict): Overwrite presets
+        use_MPI (bool): Whether or not to use MPI
+
+    Returns:
+        dict: The stats object
+        controller: The controller
+        Tend: The time that was supposed to be integrated to
+    """
     # initialize level parameters
-    level_params = dict()
+    level_params = {}
     level_params['dt'] = 0.05
 
     # initialize sweeper parameters
-    sweeper_params = dict()
+    sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
@@ -43,11 +60,11 @@ def run_advection(
     problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'stencil_type': 'center', 'order': 4, 'bc': 'periodic'}
 
     # initialize step parameters
-    step_params = dict()
+    step_params = {}
     step_params['maxiter'] = 5
 
     # initialize controller parameters
-    controller_params = dict()
+    controller_params = {}
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
@@ -56,7 +73,7 @@ def run_advection(
         controller_params = {**controller_params, **custom_controller_params}
 
     # fill description dictionary for easy step instantiation
-    description = dict()
+    description = {}
     description['problem_class'] = advectionNd
     description['problem_params'] = problem_params
     description['sweeper_class'] = generic_implicit
@@ -71,7 +88,26 @@ def run_advection(
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+    if use_MPI:
+        from mpi4py import MPI
+        from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
+        comm = kwargs.get('comm', MPI.COMM_WORLD)
+        controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
+
+        # get initial values on finest level
+        P = controller.S.levels[0].prob
+        uinit = P.u_exact(t0)
+    else:
+        from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params=controller_params, description=description
+        )
+
+        # get initial values on finest level
+        P = controller.MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
 
     # insert faults
     if fault_stuff is not None:
@@ -84,10 +120,6 @@ def run_advection(
         }
         prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     return stats, controller, Tend
@@ -98,13 +130,13 @@ if __name__ == '__main__':
     from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
     from pySDC.projects.Resilience.hook import LogUold
 
-    adaptivity_params = dict()
+    adaptivity_params = {}
     adaptivity_params['e_tol'] = 1e-8
 
-    convergence_controllers = dict()
+    convergence_controllers = {}
     convergence_controllers[Adaptivity] = adaptivity_params
 
-    description = dict()
+    description = {}
     description['convergence_controllers'] = convergence_controllers
 
     fig, axs = plt.subplots(1, 2, figsize=(12, 4), sharex=True, sharey=True)
