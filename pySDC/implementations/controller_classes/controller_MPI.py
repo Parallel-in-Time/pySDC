@@ -693,7 +693,6 @@ class controller_MPI(controller):
             for hook in self.hooks:
                 hook.pre_sweep(step=self.S, level_number=0)
             self.S.levels[0].sweep.update_nodes()
-            self.S.levels[0].sweep.compute_residual()
             for hook in self.hooks:
                 hook.post_sweep(step=self.S, level_number=0)
 

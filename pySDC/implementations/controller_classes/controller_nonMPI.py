@@ -564,7 +564,6 @@ class controller_nonMPI(controller):
                 for hook in self.hooks:
                     hook.pre_sweep(step=S, level_number=0)
                 S.levels[0].sweep.update_nodes()
-                S.levels[0].sweep.compute_residual()
                 for hook in self.hooks:
                     hook.post_sweep(step=S, level_number=0)
 
