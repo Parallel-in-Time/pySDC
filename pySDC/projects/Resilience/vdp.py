@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted, get_list_of_types
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ProblemError, ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.strategies import merge_descriptions
+from pySDC.projects.Resilience.sweepers import generic_implicit_efficient
 
 
 def plot_step_sizes(stats, ax, e_em_key='error_embedded_estimate'):
@@ -142,11 +142,11 @@ def run_vdp(
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = vanderpol  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = generic_implicit  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
+    description['problem_class'] = vanderpol
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = generic_implicit_efficient
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
     description['step_params'] = step_params
 
     if custom_description is not None:

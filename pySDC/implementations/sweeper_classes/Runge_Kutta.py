@@ -174,6 +174,11 @@ class RungeKutta(sweeper):
         params['collocation_class'] = type(params['butcher_tableau'])
         params['num_nodes'] = params['butcher_tableau'].num_nodes
 
+        # disable residual computation by default
+        params['skip_residual_computation'] = params.get(
+            'skip_residual_computation', ('IT_CHECK', 'IT_FINE', 'IT_COARSE', 'IT_UP', 'IT_DOWN')
+        )
+
         self.params = _Pars(params)
 
         self.coll = params['butcher_tableau']

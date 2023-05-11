@@ -31,7 +31,7 @@ class Strategy:
     Abstract class for resilience strategies
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='none'):
         '''
         Initialization routine
         '''
@@ -44,8 +44,17 @@ class Strategy:
         self.bar_plot_x_label = ''
         self.color = list(cmap.values())[0]
 
+        # parameters for computational efficiency
+        if skip_residual_computation == 'all':
+            self.skip_residual_computation = ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        elif skip_residual_computation == 'most':
+            self.skip_residual_computation = ('IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+        else:
+            self.skip_residual_computation = ()
+
         # setup custom descriptions
         self.custom_description = {}
+        self.custom_description['sweeper_params'] = {'skip_residual_computation': self.skip_residual_computation}
 
         # prepare parameters for masks to identify faults that cannot be fixed by this strategy
         self.fixable = []
@@ -193,11 +202,11 @@ class BaseStrategy(Strategy):
     Do a fixed iteration count
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[0]
         self.marker = 'o'
         self.name = 'base'
@@ -215,13 +224,13 @@ class AdaptivityStrategy(Strategy):
     Adaptivity as a resilience strategy
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[1]
         self.marker = '*'
         self.name = 'adaptivity'
@@ -312,13 +321,13 @@ class AdaptiveHotRodStrategy(Strategy):
     Adaptivity + Hot Rod as a resilience strategy
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[4]
         self.marker = '.'
         self.name = 'adaptive Hot Rod'
@@ -369,11 +378,11 @@ class IterateStrategy(Strategy):
     Iterate for as much as you want
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='most'):
         '''
         Initialization routine
         '''
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[2]
         self.marker = 'v'
         self.name = 'iterate'
@@ -431,11 +440,11 @@ class HotRodStrategy(Strategy):
     Hot Rod as a resilience strategy
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[3]
         self.marker = '^'
         self.name = 'Hot Rod'
@@ -493,13 +502,13 @@ class AdaptivityCollocationStrategy(Strategy):
     Adaptivity based on collocation as a resilience strategy
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='most'):
         '''
         Initialization routine
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityCollocation
 
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[1]
         self.marker = '*'
         self.name = 'adaptivity_coll'
@@ -564,8 +573,8 @@ class AdaptivityCollocationStrategy(Strategy):
 
 
 class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
-    def __init__(self, useMPI=False):
-        super().__init__(useMPI=useMPI)
+    def __init__(self, useMPI=False, skip_residual_computation='most'):
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[4]
         self.marker = '.'
         self.adaptive_coll_params = {
@@ -580,8 +589,8 @@ class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
 
 
 class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
-    def __init__(self, useMPI=False):
-        super().__init__(useMPI=useMPI)
+    def __init__(self, useMPI=False, skip_residual_computation='most'):
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[5]
         self.marker = '^'
         self.adaptive_coll_params = {
@@ -596,8 +605,8 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
 
 
 class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
-    def __init__(self, useMPI=False):
-        super().__init__(useMPI=useMPI)
+    def __init__(self, useMPI=False, skip_residual_computation='most'):
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[6]
         self.marker = '^'
         self.adaptive_coll_params = {'num_nodes': [4, 3]}
@@ -612,13 +621,13 @@ class DIRKStrategy(AdaptivityStrategy):
     DIRK4(3)
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
 
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[7]
         self.marker = '^'
         self.name = 'DIRK'
@@ -667,11 +676,11 @@ class ERKStrategy(DIRKStrategy):
     Explicit embedded RK using Cash-Karp's method
     """
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[9]
         self.marker = 'x'
         self.name = 'ERK'
@@ -698,13 +707,13 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
     Adaptivity based both on embedded estimate and on residual
     '''
 
-    def __init__(self, useMPI=False):
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
         '''
         Initialization routine
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
-        super().__init__(useMPI=useMPI)
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
         self.color = list(cmap.values())[7]
         self.marker = '^'
         self.name = 'double_adaptivity'
