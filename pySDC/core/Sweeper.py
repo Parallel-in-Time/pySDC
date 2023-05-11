@@ -335,6 +335,9 @@ class sweeper(object):
     def compute_residual(self, stage=None):
         """
         Computation of the residual using the collocation matrix Q
+
+        Args:
+            stage (str): The current stage of the step the level belongs to
         """
 
         # get current level and problem description
