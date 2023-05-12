@@ -133,7 +133,7 @@ class LogGlobalErrorPostRun(hooks):
         Returns:
             None
         """
-        super().post_step(step, level_number)
+        super().post_run(step, level_number)
         self._hooks__num_restarts = self.num_restarts
 
         if level_number == 0 and step.status.last:
@@ -178,9 +178,6 @@ class LogGlobalErrorPostRunMPI(LogGlobalErrorPostRun):
     The MPI controller shows slightly different behaviour which is why the final solution is stored in a different place
     than in the nonMPI controller.
     """
-
-    def __init__(self):
-        super().__init__()
 
     def post_step(self, step, level_number):
         super().post_step(step, level_number)
