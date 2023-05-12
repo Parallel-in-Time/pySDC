@@ -90,14 +90,23 @@ class imex_1st_order_mass(imex_1st_order):
 
         return None
 
-    def compute_residual(self):
+    def compute_residual(self, stage=None):
         """
         Computation of the residual using the collocation matrix Q
+
+        Args:
+            stage (str): The current stage of the step the level belongs to
         """
 
         # get current level and problem description
         L = self.level
         P = L.prob
+
+        # Check if we want to skip the residual computation to gain performance
+        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
+        if stage in self.params.skip_residual_computation:
+            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
+            return None
 
         # check if there are new values (e.g. from a sweep)
         # assert L.status.updated

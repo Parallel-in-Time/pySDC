@@ -67,7 +67,6 @@ class CheckConvergence(ConvergenceController):
         """
         # do all this on the finest level
         L = S.levels[0]
-        L.sweep.compute_residual()
 
         # get residual and check against prescribed tolerance (plus check number of iterations)
         iter_converged = S.status.iter >= S.params.maxiter

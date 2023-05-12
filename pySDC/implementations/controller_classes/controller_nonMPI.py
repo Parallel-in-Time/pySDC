@@ -486,7 +486,7 @@ class controller_nonMPI(controller):
             # receive values
             self.recv_full(S, level=0)
             # compute current residual
-            S.levels[0].sweep.compute_residual()
+            S.levels[0].sweep.compute_residual(stage='IT_CHECK')
 
         for S in local_MS_running:
             if S.status.iter > 0:
@@ -564,7 +564,7 @@ class controller_nonMPI(controller):
                 for hook in self.hooks:
                     hook.pre_sweep(step=S, level_number=0)
                 S.levels[0].sweep.update_nodes()
-                S.levels[0].sweep.compute_residual()
+                S.levels[0].sweep.compute_residual(stage='IT_FINE')
                 for hook in self.hooks:
                     hook.post_sweep(step=S, level_number=0)
 
@@ -597,7 +597,7 @@ class controller_nonMPI(controller):
                     for hook in self.hooks:
                         hook.pre_sweep(step=S, level_number=l)
                     S.levels[l].sweep.update_nodes()
-                    S.levels[l].sweep.compute_residual()
+                    S.levels[l].sweep.compute_residual(stage='IT_DOWN')
                     for hook in self.hooks:
                         hook.post_sweep(step=S, level_number=l)
 
@@ -625,7 +625,7 @@ class controller_nonMPI(controller):
             for hook in self.hooks:
                 hook.pre_sweep(step=S, level_number=len(S.levels) - 1)
             S.levels[-1].sweep.update_nodes()
-            S.levels[-1].sweep.compute_residual()
+            S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
             for hook in self.hooks:
                 hook.post_sweep(step=S, level_number=len(S.levels) - 1)
 
@@ -664,7 +664,7 @@ class controller_nonMPI(controller):
                         for hook in self.hooks:
                             hook.pre_sweep(step=S, level_number=l - 1)
                         S.levels[l - 1].sweep.update_nodes()
-                        S.levels[l - 1].sweep.compute_residual()
+                        S.levels[l - 1].sweep.compute_residual(stage='IT_UP')
                         for hook in self.hooks:
                             hook.post_sweep(step=S, level_number=l - 1)
 
