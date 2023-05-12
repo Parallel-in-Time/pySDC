@@ -54,18 +54,18 @@
             </div>
         </aside>
         <h2>
-            <span class="text">193 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">178<span class="text"> run</span></button>
+            <span class="text">198 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">183<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">15<span class="text"> missing</span></button>
-            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">62<span class="text"> excluded</span></button>
+            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">57<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_strategies_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_sweepers_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_work_precision_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.5">coverage.py v7.2.5</a>,
-            created at 2023-05-11 11:47 +0000
+            created at 2023-05-12 07:09 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -86,12 +86,12 @@
     <p class="pln"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">helpers</span><span class="op">.</span><span class="nam">stats_helper</span> <span class="key">import</span> <span class="nam">get_sorted</span><span class="op">,</span> <span class="nam">get_list_of_types</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">problem_classes</span><span class="op">.</span><span class="nam">Van_der_Pol_implicit</span> <span class="key">import</span> <span class="nam">vanderpol</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">generic_implicit</span> <span class="key">import</span> <span class="nam">generic_implicit</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">controller_classes</span><span class="op">.</span><span class="nam">controller_nonMPI</span> <span class="key">import</span> <span class="nam">controller_nonMPI</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">adaptivity</span> <span class="key">import</span> <span class="nam">Adaptivity</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Errors</span> <span class="key">import</span> <span class="nam">ProblemError</span><span class="op">,</span> <span class="nam">ConvergenceError</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">hook</span> <span class="key">import</span> <span class="nam">LogData</span><span class="op">,</span> <span class="nam">hook_collection</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">strategies</span> <span class="key">import</span> <span class="nam">merge_descriptions</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">controller_classes</span><span class="op">.</span><span class="nam">controller_nonMPI</span> <span class="key">import</span> <span class="nam">controller_nonMPI</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">adaptivity</span> <span class="key">import</span> <span class="nam">Adaptivity</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">Errors</span> <span class="key">import</span> <span class="nam">ProblemError</span><span class="op">,</span> <span class="nam">ConvergenceError</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">hook</span> <span class="key">import</span> <span class="nam">LogData</span><span class="op">,</span> <span class="nam">hook_collection</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">strategies</span> <span class="key">import</span> <span class="nam">merge_descriptions</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">sweepers</span> <span class="key">import</span> <span class="nam">generic_implicit_efficient</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="key">def</span> <span class="nam">plot_step_sizes</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">ax</span><span class="op">,</span> <span class="nam">e_em_key</span><span class="op">=</span><span class="str">'error_embedded_estimate'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -224,11 +224,11 @@
     <p class="pln"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">    <span class="com"># fill description dictionary for easy step instantiation</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">    <span class="nam">description</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'problem_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">vanderpol</span>  <span class="com"># pass problem class</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'problem_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">problem_params</span>  <span class="com"># pass problem parameters</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'sweeper_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">generic_implicit</span>  <span class="com"># pass sweeper</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'sweeper_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">sweeper_params</span>  <span class="com"># pass sweeper parameters</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'level_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">level_params</span>  <span class="com"># pass level parameters</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'problem_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">vanderpol</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'problem_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">problem_params</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'sweeper_class'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">generic_implicit_efficient</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'sweeper_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">sweeper_params</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'level_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">level_params</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'step_params'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">step_params</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t">    <span class="key">if</span> <span class="nam">custom_description</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -631,12 +631,12 @@
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_strategies_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_5893b65af8042ae2_sweepers_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_work_precision_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.5">coverage.py v7.2.5</a>,
-            created at 2023-05-11 11:47 +0000
+            created at 2023-05-12 07:09 +0000
         </p>
     </div>
 </footer>

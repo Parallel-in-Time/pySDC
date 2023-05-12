@@ -129,14 +129,23 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="imex_1st_order_mass.compute_residual"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">[docs]</a>    <span class="k">def</span> <span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="imex_1st_order_mass.compute_residual"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">[docs]</a>    <span class="k">def</span> <span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computation of the residual using the collocation matrix Q</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stage (str): The current stage of the step the level belongs to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="c1"># Check if we want to skip the residual computation to gain performance</span>
+        <span class="c1"># Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">skip_residual_computation</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># check if there are new values (e.g. from a sweep)</span>
         <span class="c1"># assert L.status.updated</span>
