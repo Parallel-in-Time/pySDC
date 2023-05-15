@@ -4,7 +4,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError
 
-from pySDC.projects.ExplicitStabilized.problem_classes.ParabolicSystem_FEniCSx import parabolic_system, parabolic_system_multirate, parabolic_system_imex
+from pySDC.projects.ExplicitStabilized.problem_classes.ParabolicSystem_FEniCSx import parabolic_system, parabolic_system_multirate, parabolic_system_imex, parabolic_system_exp_expl_impl
 import pySDC.projects.ExplicitStabilized.problem_classes.parabolic_system_helpers.problems as problems
 from pySDC.projects.ExplicitStabilized.transfer_classes.TransferFenicsxMesh import mesh_to_mesh_fenicsx
 from pySDC.projects.ExplicitStabilized.hooks.HookClass_pde import pde_hook
@@ -13,7 +13,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.sweeper_classes.explicit import explicit
+from pySDC.projects.ExplicitStabilized.sweeper_classes.imexexp_1st_order import imexexp_1st_order
 
 from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.es_methods import RKW1, RKC1, RKU1, HSRKU1, mRKC1
 
@@ -21,7 +21,7 @@ def main():
 
     # define integration methods
     integrators = ['IMEX']
-    # integrators = ['MS_EE']
+    integrators = ['IMEXEXP']
     # integrators = ['MS_ES']
     # integrators = ['MS_mES']
     # # integrators = ['ES']
@@ -29,13 +29,14 @@ def main():
     
     num_procs = 1
 
-    ref = 0
+    ref = 1
+    time_order = 3
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 5e-6
-    level_params['dt'] = 0.1
-    level_params['nsweeps'] = [1]
+    level_params['dt'] = 0.1/2**ref
+    level_params['nsweeps'] = [3]
     level_params['residual_type'] = 'full_rel'
 
     # initialize sweeper parameters
@@ -60,10 +61,16 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['family'] = 'CG'
-    problem_params['order'] = 1
-    problem_params['mass_lumping'] = True # has effect for family=CG and order=1
-    problem_params['n_elems'] = [40]
+    problem_params['family'] = 'CG'    
+    if problem_params['family']=='CG':
+        problem_params['order'] = 1
+        problem_params['mass_lumping'] = False # has effect for family=CG and order=1    
+        problem_params['n_elems'] = [10*2**(ref*time_order/2.)]
+    elif problem_params['family']=='DG':
+        problem_params['order'] = max(time_order-1,1)
+        p = ref/2. if time_order==1 else ref
+        problem_params['n_elems'] = [10*2**p]        
+        problem_params['mass_lumping'] = False
     problem_params['refinements'] = [0]
     problem_params['dim'] = 2
     problem_params['f_interp'] = True
@@ -71,10 +78,10 @@ def main():
     # problem_params['solver_pc'] = 'hypre' # work in parallel with cg: hypre, hmg, gamg, jacobi,
     # problem_params['solver_ksp'] = 'preonly' # comment these two lines to use default solver (cholesky for dim<=2 and cg+hypre for dim=3)
     # problem_params['solver_pc'] = 'cholesky'
-    problem_params['enable_output'] = False
+    problem_params['enable_output'] = True
     problem_params['output_folder'] = './data/results/'
-    problem_params['output_file_name'] = 'bruss'
-    problem_params['exact_solution_class'] = problems.brusselator
+    problem_params['output_file_name'] = 'monodomain'
+    problem_params['exact_solution_class'] = problems.Monodomain
 
 
     # base transfer parameters
@@ -98,6 +105,11 @@ def main():
         if integrator == 'IMEX':
             parabolic_system_type = parabolic_system_imex
             description['sweeper_class'] = imex_1st_order        
+        elif integrator == 'IMEXEXP':
+            problem_params['splitting'] = 'exp_nonstiff'
+            parabolic_system_type = parabolic_system_exp_expl_impl
+            # parabolic_system_type = parabolic_system_imex
+            description['sweeper_class'] = imexexp_1st_order
         # elif integrator == 'ES':                     
         #     ParabolicProblemType = parabolic_system
         #     description['sweeper_class'] = explicit_stabilized
@@ -109,10 +121,7 @@ def main():
         #     description['sweeper_class'] = ms_explicit_stabilized
         # elif integrator == 'MS_mES':
         #     ParabolicProblemType = parabolic_system_multirate
-        #     description['sweeper_class'] = ms_multirate_explicit_stabilized
-        # elif integrator == 'EE':
-        #     ParabolicProblemType = parabolic_system
-        #     description['sweeper_class'] = explicit
+        #     description['sweeper_class'] = ms_multirate_explicit_stabilized        
         # elif integrator == 'MS_EE':
         #     ParabolicProblemType = parabolic_system
         #     description['sweeper_class'] = ms_explicit      

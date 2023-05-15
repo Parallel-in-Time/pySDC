@@ -1,5 +1,5 @@
 import numpy as np
-from dolfinx import fem, mesh
+from dolfinx import fem, mesh, geometry
 from mpi4py import MPI
 import ufl
 from pySDC.core.Errors import ParameterError
@@ -66,6 +66,10 @@ class parabolic_system_problem():
     @property
     def u_exp_expr(self):
         return self.u_exp
+    
+    @property
+    def phi_one_expr(self):
+        return self.phi_one
     
     @property
     def rhs_exp_expr(self):
@@ -164,35 +168,36 @@ class parabolic_system_problem():
     def define_standard_splittings(self):
         
         self.lmbda = -1.
-        self.C = 1.
+        self.C = 0.
 
         # Here we define different splittings of the rhs into stiff, nonstiff and exponential terms
         self.rhs_stiff = dict()
         self.rhs_nonstiff = dict()
         self.rhs_exp = dict()
-        self.u_exp = dict()
+        # self.u_exp = dict()
+        self.phi_one = dict()
         self.rhs_stiff_args = dict()
 
         # here we consider only a stiff and a nonstiff part
         self.rhs_nonstiff['stiff_nonstiff'] = [self.rhs[0],None] #this is random splitting (i.e. not really in stiff-nonstiff) just for debugging
         self.rhs_stiff['stiff_nonstiff'] = [None,self.rhs[1]]      
         self.rhs_stiff_args['stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
-        self.u_exp['stiff_nonstiff'] = [None,None]
+        self.phi_one['stiff_nonstiff'] = [None,None]
         self.rhs_exp['stiff_nonstiff'] = [None,None]
         
         # here we add (artificially) an exponential term and remove the stiff term
-        self.rhs_nonstiff['exp_nonstiff'] = [self.rhs[0],self.rhs[1]+self.lmbda*(self.C-self.sol[1])]
+        self.rhs_nonstiff['exp_nonstiff'] = [self.rhs[0],self.rhs[1]-self.lmbda*self.sol[1]]
         self.rhs_stiff['exp_nonstiff'] = [None,None]      
         self.rhs_stiff_args['exp_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
-        self.u_exp['exp_nonstiff'] = [None, self.C+ufl.exp(self.dt*self.lmbda)*(self.uh.values.sub(1)-self.C)]  
-        self.rhs_exp['exp_nonstiff'] = [None,self.lmbda*(self.uh.values.sub(1)-self.C)]
+        self.phi_one['exp_nonstiff'] = [None, (ufl.exp(self.dt*self.lmbda)-1.)/(self.dt*self.lmbda)*self.uh.values.sub(1)]  
+        self.rhs_exp['exp_nonstiff'] = [None,self.lmbda*self.uh.values.sub(1)]
 
         # here we consider the three terms
-        self.rhs_nonstiff['exp_stiff_nonstiff'] = [self.rhs[0],self.lmbda*(self.C-self.sol[1])]
+        self.rhs_nonstiff['exp_stiff_nonstiff'] = [self.rhs[0],-self.lmbda*self.sol[1]]
         self.rhs_stiff['exp_stiff_nonstiff'] = [None,self.rhs[1]]      
         self.rhs_stiff_args['exp_stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
-        self.u_exp['exp_stiff_nonstiff'] = [None, self.C+ufl.exp(self.dt*self.lmbda)*(self.uh.values.sub(1)-self.C)]  
-        self.rhs_exp['exp_stiff_nonstiff'] = [None,self.lmbda*(self.uh.values.sub(1)-self.C)]
+        self.phi_one['exp_stiff_nonstiff'] = [None, (ufl.exp(self.dt*self.lmbda)-1.)/(self.dt*self.lmbda)*self.uh.values.sub(1)]  
+        self.rhs_exp['exp_stiff_nonstiff'] = [None,self.lmbda*self.uh.values.sub(1)]
 
 
 class linlin_solution(parabolic_system_problem):
@@ -229,6 +234,113 @@ class linlin_solution(parabolic_system_problem):
         
         self.define_standard_splittings()
 
+
+class dahlquist_test_equation(parabolic_system_problem):
+    def __init__(self,dim,n_elems):
+        dom_size=[[0.,0.,0.],[1.,1.,1.]]
+        super(dahlquist_test_equation,self).__init__(dim,n_elems,dom_size)
+
+        self.lmbda = [-0.01, -0.1, -1., -10.]
+        self.size = len(self.lmbda)
+        self.sp_ind = [0,1,2,3]
+
+        self.t0 = 0.0
+        self.Tend = 1.
+        self.diff = [1e-1]*self.size                
+
+        self.know_exact = True
+        self.cte_Dirichlet = False
+        self.rhs_or_N_bnd_dep_t = True 
+        self.bnd_cond = 'N' 
+
+    def define_domain_dependent_variables(self,domain,V):
+        super().define_domain_dependent_variables(domain,V)
+        self.uh = fenicsx_mesh(init=self.V,val=0.)  
+        self.lmbda = [fem.Constant(self.domain,self.lmbda[i]) for i in range(self.size)]
+
+        self.u0 = [ufl.cos(2.*np.pi*self.x[0]*(i+1))*ufl.cos(2.*np.pi*self.x[1]*(i+1)) for i in range(self.size)]  
+        self.sol = [ufl.exp(self.lmbda[i]*self.t)*self.u0[i] for i in range(self.size)]        
+        self.g = [-ufl.dot(self.diff[i]*ufl.grad(self.sol[i]),self.n) for i in range(self.size)]        
+        
+        self.rhs = [-ufl.div(self.diff[i]*ufl.grad(self.sol[i])) + self.lmbda[i]*self.uh.values.sub(i) for i in range(self.size)]        
+
+        self.define_splittings()
+        
+    def define_splittings(self):
+        
+        self.rhs_stiff = dict()
+        self.rhs_nonstiff = dict()
+        self.rhs_exp = dict()
+        # self.u_exp = dict()
+        self.phi_one = dict()
+        self.rhs_stiff_args = dict()
+
+        # here we consider only a stiff and a nonstiff part         
+        self.rhs_nonstiff['stiff_nonstiff'] = [self.rhs[0],self.rhs[1],None,None]
+        self.rhs_stiff['stiff_nonstiff'] = [None,None,self.rhs[2],self.rhs[3]]     
+        self.rhs_stiff_args['stiff_nonstiff'] = [0,1,2,3]
+        # self.u_exp['stiff_nonstiff'] = [None]*self.size
+        self.phi_one['stiff_nonstiff'] = [None]*self.size
+        self.rhs_exp['stiff_nonstiff'] = [None]*self.size
+        
+        self.rhs_nonstiff['exp_nonstiff'] = [-ufl.div(self.diff[i]*ufl.grad(self.sol[i]))+self.sol[i]-self.uh.values.sub(i) for i in range(self.size)]
+        self.rhs_stiff['exp_nonstiff'] = [None]*self.size 
+        self.rhs_stiff_args['exp_nonstiff'] = [0,1,2,3]
+        # self.u_exp['exp_nonstiff'] = [ufl.exp(self.dt*self.lmbda[i])*self.uh.values.sub(i) for i in range(self.size)]  
+        self.phi_one['exp_nonstiff'] = [((ufl.exp(self.dt*self.lmbda[i])-1.)/(self.dt*self.lmbda[i]))*self.uh.values.sub(i) for i in range(self.size)]  
+        self.rhs_exp['exp_nonstiff'] = [self.lmbda[i]*self.uh.values.sub(i) for i in range(self.size)]
+
+class eq_with_exp_term(parabolic_system_problem):
+    # an equation with a natural splitting into explicit part and exponential part
+    def __init__(self,dim,n_elems):
+        dom_size=[[0.,0.,0.],[1.,1.,1.]]
+        super(eq_with_exp_term,self).__init__(dim,n_elems,dom_size)
+
+        self.size = 2
+        self.sp_ind = [0,1]
+
+        self.t0 = 0.0
+        self.Tend = 1.
+        self.diff = [1e-30]*self.size                
+
+        self.know_exact = True
+        self.cte_Dirichlet = False
+        self.rhs_or_N_bnd_dep_t = True 
+        self.bnd_cond = 'N' 
+
+    def define_domain_dependent_variables(self,domain,V):
+        super().define_domain_dependent_variables(domain,V)
+        self.uh = fenicsx_mesh(init=self.V,val=0.)  
+        self.u0 = [ufl.cos(2.*np.pi*self.x[0]*(i+1))*ufl.cos(2.*np.pi*self.x[1]*(i+1)) for i in range(self.size)]
+        self.sol = [ self.u0[i]*ufl.exp(-self.t) + (1./6.)*(2.*ufl.exp(2.*self.t) + 3.*ufl.exp(self.t) - 9.*ufl.cos(self.t) + 9.*ufl.sin(self.t)) for i in range(self.size) ]
+        
+        self.g = [-ufl.dot(self.diff[i]*ufl.grad(self.sol[i]),self.n) for i in range(self.size)]
+        
+        self.rhs = [-ufl.div(self.diff[i]*ufl.grad(self.sol[i])) - self.uh.values.sub(i) + ufl.exp(2.*self.t) + ufl.exp(self.t) + 3.*ufl.sin(self.t) for i in range(self.size)]        
+
+        self.define_splittings()
+        
+    def define_splittings(self):
+        
+        self.rhs_stiff = dict()
+        self.rhs_nonstiff = dict()
+        self.rhs_exp = dict()
+        self.phi_one = dict()
+        self.rhs_stiff_args = dict()
+
+        # here we consider only a stiff and a nonstiff part         
+        self.rhs_nonstiff['stiff_nonstiff'] = [-ufl.div(self.diff[i]*ufl.grad(self.sol[i]))+ ufl.exp(2.*self.t) + ufl.exp(self.t) + 3.*ufl.sin(self.t) for i in range(self.size)]       
+        self.rhs_stiff['stiff_nonstiff'] = [-self.uh.values.sub(i) for i in range(self.size)] 
+        self.rhs_stiff_args['stiff_nonstiff'] = [0]
+        self.phi_one['stiff_nonstiff'] = [None]*self.size
+        self.rhs_exp['stiff_nonstiff'] = [None]*self.size
+        
+        self.rhs_nonstiff['exp_nonstiff'] = [-ufl.div(self.diff[i]*ufl.grad(self.sol[i]))+ ufl.exp(2.*self.t) + ufl.exp(self.t) + 3.*ufl.sin(self.t) for i in range(self.size)]      
+        self.rhs_stiff['exp_nonstiff'] = [None]*self.size 
+        self.rhs_stiff_args['exp_nonstiff'] = [0]
+        self.phi_one['exp_nonstiff'] = [((ufl.exp(-self.dt)-1.)/(-self.dt))*self.uh.values.sub(i) for i in range(self.size)]  
+        self.rhs_exp['exp_nonstiff'] = [-self.uh.values.sub(i) for i in range(self.size)]
+        
 # Exactly the same as in NonLinProbDef.py, used for debugging
 class coscoscos(parabolic_system_problem):
     def __init__(self,dim,n_elems,dom_size=[[0.,0.,0.],[1.,1.,1.]]):        
@@ -381,7 +493,7 @@ class Monodomain(parabolic_system_problem):
         self.bnd_cond = 'N' 
 
         # self.ionic_model = ionicmodels.HodgkinHuxley() # Available: HodgkinHuxley, RogersMcCulloch
-        self.ionic_model = ionicmodels_myokit.TenTusscher2006_epi() # Available: HodgkinHuxley, Courtemanche1998, Fox2002, TenTusscher2006_epi
+        self.ionic_model = ionicmodels_myokit.HodgkinHuxley() # Available: HodgkinHuxley, Courtemanche1998, Fox2002, TenTusscher2006_epi
         self.size = self.ionic_model.size
         self.sp_ind = [0]
         self.diff = [0] # defined later
@@ -452,11 +564,13 @@ class Monodomain(parabolic_system_problem):
         self.rhs_stiff = dict()
         self.rhs_nonstiff = dict()
         self.rhs_exp = dict()
-        self.u_exp = dict()
+        self.phi_one = dict()
         self.rhs_stiff_args = dict()
 
         def u_exp(y0,yinf,tau):
             return yinf+ufl.exp(-self.dt/tau)*(y0-yinf)   
+        def phi_one(y,tau):
+            return ((ufl.exp(-self.dt/tau)-1.)/(-self.dt/tau))*y   
         def rhs_exp(y0,yinf,tau):
             return (yinf-y0)/tau
 
@@ -476,7 +590,7 @@ class Monodomain(parabolic_system_problem):
         if 0 not in self.rhs_stiff_args['stiff_nonstiff']:
             self.rhs_stiff_args['stiff_nonstiff'] = [0]+self.rhs_stiff_args['stiff_nonstiff']
         self.rhs_exp['stiff_nonstiff'] = [None]*self.size
-        self.u_exp['stiff_nonstiff'] = [None]*self.size
+        self.phi_one['stiff_nonstiff'] = [None]*self.size
         
         # this splitting is to be used in Rush-Larsen methods
         self.rhs_nonstiff['exp_nonstiff'] = self.ionic_model.f_expl(self.uh)
@@ -490,15 +604,15 @@ class Monodomain(parabolic_system_problem):
         self.rhs_stiff_args['exp_nonstiff'] = []
         if 0 not in self.rhs_stiff_args['exp_nonstiff']:
             self.rhs_stiff_args['exp_nonstiff'] = [0]+self.rhs_stiff_args['exp_nonstiff']
-        self.u_exp['exp_nonstiff'] = [None]*self.size
+        self.phi_one['exp_nonstiff'] = [None]*self.size
         self.rhs_exp['exp_nonstiff'] = [None]*self.size
         yinf, tau = self.ionic_model.u_exp_coeffs(self.uh)
         for i in range(self.size):
             if yinf[i] is not None:
-                self.u_exp['exp_nonstiff'][i] = u_exp(self.uh.values.sub(i),yinf[i],tau[i])
+                self.phi_one['exp_nonstiff'][i] = phi_one(self.uh.values.sub(i),tau[i])
                 self.rhs_exp['exp_nonstiff'][i] = rhs_exp(self.uh.values.sub(i),yinf[i],tau[i])
 
-        # This is a splitting similar to the one for stabilized methods but where the stiff varriables are
+        # This is a splitting similar to the one for stabilized methods but where the stiff variables are
         # integrated exponentially. The difference with respect to Rush-Larsen is that less variables are integrated
         # exponentially (usually only one)
         self.rhs_nonstiff['exp_stiff_nonstiff'] = self.rhs_nonstiff['stiff_nonstiff']
@@ -507,11 +621,11 @@ class Monodomain(parabolic_system_problem):
         if 0 not in self.rhs_stiff_args['exp_stiff_nonstiff']:
             self.rhs_stiff_args['exp_stiff_nonstiff'] = [0]+self.rhs_stiff_args['exp_stiff_nonstiff']
         self.rhs_exp['exp_stiff_nonstiff'] = [None]*self.size
-        self.u_exp['exp_stiff_nonstiff'] = [None]*self.size
+        self.phi_one['exp_stiff_nonstiff'] = [None]*self.size
         yinf, tau = self.ionic_model.u_stiff_coeffs(self.uh)
         for i in range(self.size):
             if yinf[i] is not None:
-                self.u_exp['exp_stiff_nonstiff'][i] = u_exp(self.uh.values.sub(i),yinf[i],tau[i]) 
+                self.phi_one['exp_stiff_nonstiff'][i] = phi_one(self.uh.values.sub(i),tau[i]) 
                 self.rhs_exp['exp_stiff_nonstiff'][i] = rhs_exp(self.uh.values.sub(i),yinf[i],tau[i]) 
 
         self.u0 = [fem.Constant(self.domain,y0) for y0 in self.ionic_model.initial_values()]        
