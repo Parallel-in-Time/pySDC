@@ -8,6 +8,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 class battery_n_capacitors(ptype):
     """
     Example implementing the battery drain model with N capacitors, where N is an arbitrary integer greater than 0.
+
     Attributes:
         nswitches: number of switches
     """
