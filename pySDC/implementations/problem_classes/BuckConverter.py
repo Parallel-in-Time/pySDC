@@ -5,12 +5,39 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class buck_converter(ptype):
-    """
-    Example implementing the buck converter model as in the description in the PinTSimE project
+    r"""
+    Example implementing the model of a buck converter, which is also called a step-down converter. The problem of simulating the
+    converter consists of a nonhomogeneous linear system of ordinary differential equations (ODEs)
 
-    TODO : doku
+    .. math::
+        \frac{\partial u}{\partial t} = Au+\vec{f}
 
-    Attributes:
+    using an initial condition. A fully description of the buck converter can be found in the description of the PinTSimE project.
+
+    Parameters
+    ----------
+    duty : float
+        Cycle between zero and one indicates the time period how long the converter stays on one switching state
+        until it switches to the other state.
+    fsw : int
+        Switching frequency, it is used to determine the number of time steps after the switching state is changed.
+    Vs : float
+        Voltage at the voltage source :math:`V_s`.
+    Rs : float
+        Resistance of the resistor :math:`R_s` at the voltage source.
+    C1 : float
+        Capacitance of the capacitor :math:`C_1`.
+    Rp : float
+        Resistance of the resistor in front of the inductor.
+    L1 : float
+        Inductance of the inductor :math:`L_1`.
+    C2 : float
+        Capacitance of the capacitor :math:`C_2`.
+    Rl : float
+        Resistance of the resistor :math:`R_{\pi}`
+
+    Attributes
+    ----------
         A: system matrix, representing the 3 ODEs
     """
 
@@ -31,12 +58,19 @@ class buck_converter(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
-        Args:
-            u (dtype_u): current values
-            t (float): current time
-        Returns:
-            dtype_f: the RHS
+        Routine to evaluate the right-hand side of the problem.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         Tsw = 1 / self.fsw
 
@@ -54,15 +88,24 @@ class buck_converter(ptype):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
-        Returns:
-            dtype_u: solution as mesh
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
+
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
         Tsw = 1 / self.fsw
         self.A = np.zeros((3, 3))
@@ -93,11 +136,17 @@ class buck_converter(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact solution
+        Routine to compute the exact solution at time t.
+
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
