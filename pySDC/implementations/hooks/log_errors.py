@@ -12,7 +12,7 @@ class LogError(hooks):
     to work, be it a reference solution or something analytical.
     """
 
-    def log_global_error(self, step, level_number, suffix=''):
+    def log_global_error(self, step, level_number, suffix=""):
         """
         Function to add the global error to the stats
 
@@ -36,7 +36,7 @@ class LogError(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type=f'e_global{suffix}',
+            type=f"e_global{suffix}",
             value=abs(u_ref - L.uend),
         )
         self.add_to_stats(
@@ -45,11 +45,11 @@ class LogError(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type=f'e_global_rel{suffix}',
+            type=f"e_global_rel{suffix}",
             value=abs((u_ref - L.uend / u_ref)),
         )
 
-    def log_local_error(self, step, level_number, suffix=''):
+    def log_local_error(self, step, level_number, suffix=""):
         """
         Function to add the local error to the stats
 
@@ -71,15 +71,18 @@ class LogError(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type=f'e_local{suffix}',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend),
+            type=f"e_local{suffix}",
+            value=abs(
+                L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time)
+                - L.uend
+            ),
         )
 
 
 class LogGlobalErrorPostStep(LogError):
     def post_step(self, step, level_number):
         super().post_step(step, level_number)
-        self.log_global_error(step, level_number, '_post_step')
+        self.log_global_error(step, level_number, "_post_step")
 
 
 class LogGlobalErrorPostRun(hooks):
@@ -120,7 +123,7 @@ class LogGlobalErrorPostRun(hooks):
         """
         super().post_step(step, level_number)
         self.t_last_solution = step.levels[0].time + step.levels[0].dt
-        self.num_restarts = step.status.get('restarts_in_a_row', 0)
+        self.num_restarts = step.status.get("restarts_in_a_row", 0)
 
     def post_run(self, step, level_number):
         """
@@ -142,7 +145,9 @@ class LogGlobalErrorPostRun(hooks):
             u_num = self.get_final_solution(L)
             u_ref = L.prob.u_exact(t=self.t_last_solution)
 
-            self.logger.info(f'Finished with a global error of e={abs(u_num-u_ref):.2e}')
+            self.logger.info(
+                f"Finished with a global error of e={abs(u_num-u_ref):.2e}"
+            )
 
             self.add_to_stats(
                 process=step.status.slot,
@@ -150,7 +155,7 @@ class LogGlobalErrorPostRun(hooks):
                 level=L.level_index,
                 iter=step.status.iter,
                 sweep=L.status.sweep,
-                type='e_global_post_run',
+                type="e_global_post_run",
                 value=abs(u_num - u_ref),
             )
             self.add_to_stats(
@@ -159,8 +164,8 @@ class LogGlobalErrorPostRun(hooks):
                 level=L.level_index,
                 iter=step.status.iter,
                 sweep=L.status.sweep,
-                type='e_global_rel_post_run',
-                value=abs((u_num - u_ref) / u_ref),
+                type="e_global_rel_post_run",
+                value=abs(u_num - u_ref) / abs(u_ref),
             )
 
     def get_final_solution(self, lvl):
@@ -205,7 +210,7 @@ class LogLocalErrorPostStep(LogError):
 
     def post_step(self, step, level_number):
         super().post_step(step, level_number)
-        self.log_local_error(step, level_number, suffix='_post_step')
+        self.log_local_error(step, level_number, suffix="_post_step")
 
 
 class LogLocalErrorPostIter(LogError):
@@ -224,4 +229,4 @@ class LogLocalErrorPostIter(LogError):
         """
         super().post_iteration(step, level_number)
 
-        self.log_local_error(step, level_number, suffix='_post_iteration')
+        self.log_local_error(step, level_number, suffix="_post_iteration")

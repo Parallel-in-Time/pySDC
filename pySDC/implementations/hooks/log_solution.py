@@ -28,8 +28,8 @@ class LogSolution(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
+            type="u",
+            value=L.uend[:],
         )
 
 
@@ -60,6 +60,6 @@ class LogSolutionAfterIteration(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type='u',
+            type="u",
             value=L.uend,
         )
