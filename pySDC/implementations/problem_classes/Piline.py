@@ -9,12 +9,23 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 class piline(ptype):
     r"""
     Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the
-    piline consists of a nonhomogeneous linear system of ordinary differential equations (ODEs)
+    piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:
 
     .. math::
-        \frac{\partial u}{\partial t} = Au+\vec{f}
+        \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_\pi} (t) + \frac{V_s}{R_s C_1},
 
-    using an initial condition. A fully description of the piline can be found in the description of the PinTSimE project.
+    .. math::
+        \frac{d v_{C_2} (t)}{dt} = -\frac{1}{R_\ell C_2}v_{C_2} (t) + \frac{1}{C_2} i_{L_\pi} (t),
+
+    .. math::
+        \frac{d i_{L_\pi} (t)}{dt} = \frac{1}{L_\pi} v_{C_1} (t) - \frac{1}{L_\pi} v_{C_2} (t) - \frac{R_\pi}{L_\pi} i_{L_\pi} (t),
+
+    which can be expressed as a nonhomogeneous linear system of ODEs
+
+    .. math::
+        \frac{d u(t)}{dt} = A u(t) + f(t)
+
+    using an initial condition.
 
     Parameters
     ----------
@@ -25,13 +36,13 @@ class piline(ptype):
     C1 : float
         Capacitance of the capacitor :math:`C_1`.
     Rpi : float
-        Resistance of the resistor :math:`R_{\pi}`.
+        Resistance of the resistor :math:`R_\pi`.
     Lpi : float
-        Inductance of the inductor :math:`L_{\pi}`.
+        Inductance of the inductor :math:`L_\pi`.
     C2 : float
         Capacitance of the capacitor :math:`C_2`.
     Rl : float
-        Resistance of the resistive load :math:`R_{\ell}`.
+        Resistance of the resistive load :math:`R_\ell`.
 
     Attributes:
         A: system matrix, representing the 3 ODEs

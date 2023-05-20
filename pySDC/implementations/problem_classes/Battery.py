@@ -8,26 +8,27 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 class battery_n_capacitors(ptype):
     r"""
     Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.
-    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`v_{C_n}` for
-    :math:`n=1,..,N` drops below the reference value :math:`V_{ref,n}', the circuit switches to the next capacitor. If all capacitors
+    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`u_{C_n}` for
+    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}', the circuit switches to the next capacitor. If all capacitors
     has dropped below their reference value, the voltage source :math:`V_s` provides further energy. The problem of simulating the
-    battery draining consists of a nonhomogeneous linear system of ordinary differential equations (ODEs)
+    battery draining has :math:`N + 1` different states. Each of this state can be expressed as a nonhomogeneous linear system of
+    ordinary differential equations (ODEs)
 
     .. math::
-        \frac{\partial u}{\partial t} = Au+\vec{f}
+        \frac{d u(t)}{dt} = A_k u(t) + f_k (t)
 
-    using an initial condition. A fully description of the battery drain model can be found in the description of the PinTSimE project.
+    for :math:`k=1,..,N+1` using an initial condition.
 
     Parameters
     ----------
     ncapacitors : int
-        Number of capacitors in the circuit.
+        Number of capacitors :math:`n_{capacitors}` in the circuit.
     Vs : float
         Voltage at the voltage source :math:`V_s`.
     Rs : float
         Resistance of the resistor :math:`R_s` at the voltage source.
     C : np.ndarray
-        Capacitances of the capacitors. Length of array must equal to number of capacitors.
+        Capacitances of the capacitors.
     R : float
         Resistance for the load.
     L : float
@@ -49,6 +50,11 @@ class battery_n_capacitors(ptype):
         Time point of the discrete event found by switch estimation.
     nswitches: int
         Number of switches found by switch estimation.
+
+    Note
+    ----
+    The array containing the capacitances :math:`C_n` and the array containing the reference values :math:`V_{ref, n-1}`
+    for each capacitor must be equal to the number of capacitors :math:`n_{capacitors}`.
     """
 
     dtype_u = mesh
@@ -72,21 +78,28 @@ class battery_n_capacitors(ptype):
 
     def eval_f(self, u, t):
         r"""
-        Routine to evaluate the right-hand side of the problem. No switch estimator is used: For :math:`N = 3` there are
-        :math:`N + 1 = 4` different states of the battery:
+        Routine to evaluate the right-hand side of the problem. Let :math:`v_k:=v_{C_k}` be the voltage of capacitor :math:`C_k` for :math:`k=1,..,N`
+        with reference value :math:`V_{ref, k-1}`. No switch estimator is used: For :math:`N = 3` there are :math:`N + 1 = 4` different states of the battery:
 
         :math:`C_1` supplies energy if:
+
         .. math::
-            \vec{u}_1 > V_{ref,0}, \vec{u}_2 > V_{ref,1}, \vec{u}_3 > V_{ref,2},
+            v_1 > V_{ref,0}, v_2 > V_{ref,1}, v_3 > V_{ref,2},
+
         :math:`C_2` supplies energy if:
-            .. math::
-            \vec{u}_1 \leq V_{ref,0}, \vec{u}_2 > V_{ref,1}, \vec{u}_3 > V_{ref,2},
+
+        .. math::
+            v_1 \leq V_{ref,0}, v_2 > V_{ref,1}, v_3 > V_{ref,2},
+
         :math:`C_3` supplies energy if:
-            .. math::
-            \vec{u}_1 \leq V_{ref,0}, \vec{u}_2 \leq V_{ref,1}, \vec{u}_3 > V_{ref,2},
+
+        .. math::
+            v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 > V_{ref,2},
+
         :math:`V_s` supplies energy if:
-            .. math::
-            \vec{u}_1 \leq V_{ref,0}, \vec{u}_2 \leq V_{ref,1}, \vec{u}_3 \leq V_{ref,2}.
+
+        .. math::
+            v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.
 
         :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`u_k \leq V_{ref,k-1}` is satisfied.
             - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.
@@ -253,21 +266,28 @@ class battery_n_capacitors(ptype):
 
 
 class battery(battery_n_capacitors):
-    """
-    Example implementing the battery drain model with one capacitor, inherits from battery_n_capacitors.
+    r"""
+    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. The ODE system
+    of this model is given by the following equations. If :math:`v_1 > V_{ref, 0}:`
 
-    Attributes
-    ----------
-    A: matrix
-        Coefficients matrix of the linear system of ordinary differential equations (ODEs).
-    switch_A: dict
-        Dictionary that contains the coefficients for the coefficient matrix A.
-    switch_f: dict
-        Dictionary that contains the coefficients of the right-hand side f of the ODE system.
-    t_switch: float
-        Time point of the discrete event found by switch estimation.
-    nswitches: int
-        Number of switches found by switch estimation.
+    .. math::
+        \frac{d i_L (t)}{dt} = 0,
+
+    .. math::
+        \frac{d v_1 (t)}{dt} = -\frac{1}{CR}v_1 (t),
+
+    where :math:`i_L` denotes the function of the current over time :math:`t`.
+    If :math:`v_1 \leq V_{ref, 0}:`
+
+    .. math::
+        \frac{d i_L(t)}{dt} = -\frac{R_s + R}{L}i_L (t) + \frac{1}{L} V_s,
+
+    .. math::
+        \frac{d v_1(t)}{dt} = 0.
+
+    Note
+    ----
+    This class has the same attributes as the class it inherits from.
     """
 
     dtype_f = imex_mesh
@@ -389,16 +409,6 @@ class battery_implicit(battery):
 
     Attributes
     ----------
-    A: matrix
-        Coefficients matrix of the linear system of ordinary differential equations (ODEs).
-    switch_A: dict
-        Dictionary that contains the coefficients for the coefficient matrix A.
-    switch_f: dict
-        Dictionary that contains the coefficients of the right-hand side f of the ODE system.
-    t_switch: float
-        Time point of the discrete event found by switch estimation.
-    nswitches: int
-        Number of switches found by switch estimation.
     newton_itercount: int
         Counts the number of Newton iterations.
     newton_ncalls: int
