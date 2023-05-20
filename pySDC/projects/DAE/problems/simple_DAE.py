@@ -6,14 +6,25 @@ from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
 
 
 class pendulum_2d(ptype_dae):
-    """
-    Example implementing the well known 2D pendulum as a first order differential-algebraic equation (DAE) of index 3. The pendulum is
-    used in most introductory literature on DAEs, for example on page 8 of [1]_.
+    r"""
+    Example implementing the well known 2D pendulum as a first order differential-algebraic equation (DAE) of index 3.
+    The DAE system is given by the equations
+
+    .. math::
+        x' = u,
+
+    .. math::
+        \frac{d}{dt} \frac{\partial}{\partial u} L = \frac{\partial L}{\partial x} + f + G^{T} \lambda,
+
+    .. math::
+        0 = \phi.
+
+    The pendulum is used in most introductory literature on DAEs, for example on page 8 of [1]_.
 
     Parameters
     ----------
     nvars : int
-        Number of unknowns of the system of differential-algebraic equations.
+        Number of unknowns of the system of DAEs.
     newton_tol : float
         Tolerance for Newton solver.
 
@@ -40,8 +51,8 @@ class pendulum_2d(ptype_dae):
         self.t_end = 0.0
 
     def eval_f(self, u, du, t):
-        """
-        Routine to evaluate the implicit representation of the problem i.e. F(u', u, t).
+        r"""
+        Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u', t)`.
 
         Parameters
         ----------
@@ -50,7 +61,7 @@ class pendulum_2d(ptype_dae):
         du : dtype_u
             Current values of the derivative of the numerical solution at time t.
         t : float
-            current time of the numerical solution.
+            Current time of the numerical solution.
 
         Returns
         -------
@@ -90,15 +101,34 @@ class pendulum_2d(ptype_dae):
 
 
 class simple_dae_1(ptype_dae):
-    """
-    Example implementing a smooth linear index-2 DAE with known analytical solution
+    r"""
+    Example implementing a smooth linear index-2 differential-algebraic equation (DAE) with known analytical solution.
+    The DAE system is given by
+
+    .. math::
+        \frac{d u_1 (t)}{dt} = (\alpha - \frac{1}{2 - t}) u_1 (t) + (2-t) \alpha z (t) + \frac{3 - t}{2 - t},
+
+    .. math::
+        \frac{d u_2 (t)}{dt} = \frac{1 - \alpha}{t - 2} u_1 (t) - u_2 (t) + (\alpha - 1) z (t) + 2 e^{t},
+
+    .. math::
+        0 = (t + 2) u_1 (t) + (t^{2} - 4) u_2 (t) - (t^{2} + t - 2) e^{t}.
+
+    The exact solution of this system is
+
+    .. math::
+        u_1 (t) = u_2 (t) = e^{t},
+
+    .. math::
+        z (t) = -\frac{e^{t}}{2 - t}.
+
     This example is commonly used to test that numerical implementations are functioning correctly. See, for example,
     page 267 of [1]_.
 
     Parameters
     ----------
     nvars : int
-        Number of unknowns of the system of differential-algebraic equations.
+        Number of unknowns of the system of DAEs.
     newton_tol : float
         Tolerance for Newton solver.
 
@@ -109,8 +139,8 @@ class simple_dae_1(ptype_dae):
     """
 
     def eval_f(self, u, du, t):
-        """
-        Routine to evaluate the implicit representation of the problem i.e. F(u', u, t).
+        r"""
+        Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u', t)`.
 
         Parameters
         ----------
@@ -119,7 +149,7 @@ class simple_dae_1(ptype_dae):
         du : dtype_u
             Current values of the derivative of the numerical solution at time t.
         t : float
-            current time of the numerical solution.
+            Current time of the numerical solution.
 
         Returns
         -------
@@ -156,14 +186,22 @@ class simple_dae_1(ptype_dae):
 
 
 class problematic_f(ptype_dae):
-    """
-    Standard example of a very simple fully implicit index-2 DAE that is not numerically solvable for certain choices of the parameter
-    :math:`\eta`. See, for example, page 264 of [1]_.
+    r"""
+    Standard example of a very simple fully implicit index-2 differential algebraic equation (DAE) that is not
+    numerically solvable for certain choices of the parameter :math:`\eta`. The DAE system is given by
+
+    .. math::
+        y (t) + \eta t z (t) = f(t),
+
+    .. math::
+        \frac{d y(t)}{dt} + \eta t \frac{d z(t)}{dt} + (1 + \eta) z (t) = g (t).
+
+    See, for example, page 264 of [1]_.
 
     Parameters
     ----------
     nvars : int
-        Number of unknowns of the system of differential-algebraic equations.
+        Number of unknowns of the system of DAEs.
     newton_tol : float
         Tolerance for Newton solver.
 
@@ -184,8 +222,8 @@ class problematic_f(ptype_dae):
         self._makeAttributeAndRegister('eta', localVars=locals())
 
     def eval_f(self, u, du, t):
-        """
-        Routine to evaluate the implicit representation of the problem i.e. F(u', u, t).
+        r"""
+        Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u', t)`.
 
         Parameters
         ----------
@@ -194,7 +232,7 @@ class problematic_f(ptype_dae):
         du : dtype_u
             Current values of the derivative of the numerical solution at time t.
         t : float
-            current time of the numerical solution.
+            Current time of the numerical solution.
 
         Returns
         -------
