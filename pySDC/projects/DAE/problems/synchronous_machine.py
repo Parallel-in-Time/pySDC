@@ -7,9 +7,146 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class synchronous_machine_infinite_bus(ptype_dae):
-    """
-    Synchronous machine model from Kundur (equiv. circuits fig. 3.18)
-    attached to infinite bus
+    r"""
+    Synchronous machine model from Kundur (equiv. circuits fig. 3.18 in [1]_) attached to infinite bus. The machine can be
+    represented as two different circuits at the direct-axis and the quadrature-axis. Detailed information can be found in
+    [1]_. The system of differential-algebraic equations (DAEs) consists of the equations for
+
+        - the stator voltage equations
+
+        .. math::
+            \frac{d \Psi_d (t)}{dt} = \omega_b (v_d + R_a i_d (t) + \omega_r \Psi_q (t)),
+
+        .. math::
+            \frac{d \Psi_q (t)}{dt} = \omega_b (v_q + R_a i_q (t) - \omega_r \Psi_d (t)),
+
+        .. math::
+            \frac{d \Psi_0 (t)}{dt} = \omega_b (v_0 + R_a i_0 (t)),
+
+        - the rotor voltage equations
+
+        .. math::
+            \frac{d \Psi_F (t)}{dt} = \omega_b (v_F - R_F i_F (t)),
+
+        .. math::
+            \frac{d \Psi_D (t)}{dt} = -\omega_b (R_D i_D (t)),
+
+        .. math::
+            \frac{d \Psi_{Q1} (t)}{dt} = -\omega_b (R_{Q1} i_{Q1} (t)),
+
+        .. math::
+            \frac{d \Psi_{Q2} (t)}{dt} = -\omega_b (R_{Q2} i_{Q2} (t)),
+
+        - the stator flux linkage equations
+
+        .. math::
+            \Psi_d (t) = L_d i_d (t)  + L_{md} i_F (t) + L_{md} i_D (t),
+
+        .. math::
+            \Psi_q (t) = L_q i_q (t) + L_{mq} i_{Q1} (t) + L_{mq} i_{Q2} (t),
+
+        .. math::
+            \Psi_0 (t) = L_0 i_0 (t)
+
+        - the rotor flux linkage equations
+
+        .. math::
+            \Psi_F = L_F i_F (t) + L_D i_D + L_{md} i_d (t),
+
+        .. math::
+            \Psi_D = L_F i_F (t) + L_D i_D + L_{md} i_d (t),
+
+        .. math::
+            \Psi_{Q1} = L_{Q1} i_{Q1} (t) + L_{mq} i_{Q2} + L_{mq} i_q (t),
+
+        .. math::
+            \Psi_{Q2} = L_{mq} i_{Q1} (t) + L_{Q2} i_{Q2} + L_{mq} i_q (t),
+
+        - the swing equations
+
+        .. math::
+            \frac{d \delta (t)}{dt} = \omega_b (\omega_r (t) - 1),
+
+        .. math::
+            \frac{d \omega_r (t)}{dt} = \frac{1}{2 H}(T_m - T_e - K_D \omega_b (\omega_r (t) - 1)).
+
+    The voltages :math:`v_d`, :math:`v_q` can be updated via the following procedure. The stator's currents are mapped
+    to the comlex-valued external reference frame current :math:`I` with
+
+    .. math::
+        \Re(I) = i_d (t) \sin(\delta (t)) + i_q (t) \cos(\delta (t)),
+
+    .. math::
+        \Im(I) = -i_d (t) \cos(\delta (t)) + i_q (t) \sin(\delta (t)).
+
+    The voltage V across the stator terminals can then be computed as complex-value via
+
+    .. math::
+        V_{comp} = E_B + Z_{line} (\Re(I) + i \Im(I))
+
+    with impedance :math:`Z_{line}\in\mathbb{C}`. Then, :math:`v_d`, :math:`v_q` can be computed via the network equations
+
+    .. math::
+        v_d = \Re(V_{comp}) \sin(\delta (t)) - \Im(V_{comp}) \cos(\delta (t)),
+
+    .. math::
+       v_q = \Re(V_{comp}) \cos(\delta (t)) + \Im(V_{comp}) \sin(\delta (t)),
+
+    which describes the connection between the machine and the infinite bus.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns of the system of DAEs.
+    newton_tol : float
+        Tolerance for Newton solver.
+
+    Attributes
+    ----------
+    L_d: float
+        Inductance of inductor :math:'L_d', see [1]_.
+    L_q: float
+        Inductance of inductor :math:'L_q', see [1]_.
+    L_F: float
+        Inductance of inductor :math:'L_F', see [1]_.
+    L_D: float
+        Inductance of inductor :math:'L_D', see [1]_.
+    L_Q1: float
+        Inductance of inductor :math:'L_{Q1}', see [1]_.
+    L_Q2: float
+        Inductance of inductor :math:'L_{Q2}', see [1]_.
+    L_md: float
+        Inductance of inductor :math:'L_{md}', see [1]_.
+    L_mq: float
+        Inductance of inductor :math:'L_{mq}', see [1]_.
+    R_s: float
+        Resistance of resistor :math:`R_s`, see [1]_.
+    R_F: float
+        Resistance of resistor :math:`R_F`, see [1]_.
+    R_D: float
+        Resistance of resistor :math:`R_D`, see [1]_.
+    R_Q1: float
+        Resistance of resistor :math:`R_{Q1}`, see [1]_.
+    R_Q2: float
+        Resistance of resistor :math:`R_{Q2}`, see [1]_.
+    omega_b: float
+        Base frequency of the rotor in mechanical :math:`rad/s`.
+    H_: float
+        Defines the per unit inertia constant.
+    K_D: float
+        Factor that accounts for damping losses.
+    Z_line: complex
+        Impedance of the transmission line that connects the infinite bus to the generator.
+    E_B: float
+        Voltage of infinite bus.
+    v_F: float
+        Voltage at the field winding.
+    T_m: float
+        Defines the mechanical torque applied to the rotor shaft.
+
+    References
+    ----------
+    .. [1] P. Kundur, N. J. Balu, M. G. Lauby. Power system stability and control. The EPRI power system series (1994).
     """
 
     def __init__(self, nvars, newton_tol):
@@ -48,13 +185,22 @@ class synchronous_machine_infinite_bus(ptype_dae):
         self.T_m = 0.854
 
     def eval_f(self, u, du, t):
-        """
-        Routine to evaluate the implicit representation of the problem i.e. F(u', u, t)
-        Args:
-            u (dtype_u): the current values. This parameter has been "hijacked" to contain [u', u] in this case to enable evaluation of the implicit representation
-            t (float): current time
-        Returns:
-            Current value of F(), 14 components
+        r"""
+        Routine to evaluate the implicit representation of the problem, i.e., :math:`F(u, u', t)`.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution at time t.
+        du : dtype_u
+            Current values of the derivative of the numerical solution at time t.
+        t : float
+            Current time of the numerical solution.
+
+        Returns
+        -------
+        f : dtype_f
+            Current value of the right-hand side of f (which includes 14 components).
         """
 
         # simulate torque change at t = 0.05
@@ -116,10 +262,17 @@ class synchronous_machine_infinite_bus(ptype_dae):
     def u_exact(self, t):
         """
         Approximation of the exact solution generated by spline interpolation of an extremely accurate numerical reference solution.
-        Args:
-            t (float): current time
-        Returns:
-            Mesh containing fixed initial value, 5 components
+
+        Parameters
+        ----------
+        t : float
+            The time of the reference solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The reference solution as mesh object. It contains fixed initial conditions at initial time (which includes
+            14 components).
         """
         me = self.dtype_u(self.init)
 

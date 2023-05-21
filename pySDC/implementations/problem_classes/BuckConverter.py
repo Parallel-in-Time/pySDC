@@ -5,13 +5,75 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class buck_converter(ptype):
-    """
-    Example implementing the buck converter model as in the description in the PinTSimE project
+    r"""
+    Example implementing the model of a buck converter, which is also called a step-down converter. The converter has two different
+    states and each of this state can be expressed as a nonhomogeneous linear system of ordinary differential equations (ODEs)
 
-    TODO : doku
+    .. math::
+        \frac{d u(t)}{dt} = A_k u(t) + f_k (t)
 
-    Attributes:
+    for :math:`k=1,2`. The two states are the following. Define :math:`T_{sw}:=\frac{1}{f_{sw}}` as the switching period with
+    switching frequency :math:`f_{sw}`. The duty cycle :math:`duty`defines the period of how long the switches are in one state
+    until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage. A duty cycle of one means
+    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} mod 1 \leq duty`:
+
+    .. math::
+        \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_1} (t) + \frac{V_s}{R_s C_1},
+
+    .. math::
+        \frac{d v_{C_2} (t)}{dt} = -\frac{1}{R_\ell C_2}v_{C_2} (t) + \frac{1}{C_2} i_{L_1} (t),
+
+    .. math::
+        \frac{d i_{L_1} (t)}{dt} = \frac{1}{L_1} v_{C_1} (t) - \frac{1}{L_1} v_{C_2} (t) - \frac{R_\pi}{L_1} i_{L_1} (t),
+
+    Otherwise, the equations are
+
+    .. math::
+        \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) + \frac{V_s}{R_s C_1},
+
+    .. math::
+        \frac{d v_{C_2} (t)}{dt} = -\frac{1}{R_\ell C_2}v_{C_2} (t) + \frac{1}{C_2} i_{L_1} (t),
+
+    .. math::
+        \frac{d i_{L_1} (t)}{dt} = \frac{R_\pi}{R_s L_1} v_{C_1} (t) - \frac{1}{L_1} v_{C_2} (t) -  \frac{R_\pi V_s}{L_1 R_s}.
+
+    using an initial condition.
+
+    Parameters
+    ----------
+    duty : float
+        Cycle between zero and one indicates the time period how long the converter stays on one switching state
+        until it switches to the other state.
+    fsw : int
+        Switching frequency, it is used to determine the number of time steps after the switching state is changed.
+    Vs : float
+        Voltage at the voltage source :math:`V_s`.
+    Rs : float
+        Resistance of the resistor :math:`R_s` at the voltage source.
+    C1 : float
+        Capacitance of the capacitor :math:`C_1`.
+    Rp : float
+        Resistance of the resistor in front of the inductor.
+    L1 : float
+        Inductance of the inductor :math:`L_1`.
+    C2 : float
+        Capacitance of the capacitor :math:`C_2`.
+    Rl : float
+        Resistance of the resistor :math:`R_\pi`
+
+    Attributes
+    ----------
         A: system matrix, representing the 3 ODEs
+
+    Note
+    ----
+    The duty cycle needs to be a value in :math:`[0,1]`.
+
+    References
+    ----------
+    .. [1] J. Sun. Pulse-Width Modulation. 25-61. Springer, (2012).
+    .. [2] J. Gyselinck, C. Martis, R. V. Sabariego. Using dedicated time-domain basis functions for the simulation of
+        pulse-width-modulation controlled devices - application to the steady-state regime of a buck converter. Electromotion (2013).
     """
 
     dtype_u = mesh
@@ -31,12 +93,19 @@ class buck_converter(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
-        Args:
-            u (dtype_u): current values
-            t (float): current time
-        Returns:
-            dtype_f: the RHS
+        Routine to evaluate the right-hand side of the problem.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         Tsw = 1 / self.fsw
 
@@ -54,15 +123,24 @@ class buck_converter(ptype):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
-        Returns:
-            dtype_u: solution as mesh
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
+
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
         Tsw = 1 / self.fsw
         self.A = np.zeros((3, 3))
@@ -93,11 +171,17 @@ class buck_converter(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact solution
+        Routine to compute the exact solution at time t.
+
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
