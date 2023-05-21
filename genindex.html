@@ -103,6 +103,8 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A">(allencahn_periodic_fullyimplicit attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.A">(battery_n_capacitors attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.BuckConverter.html#implementations.problem_classes.BuckConverter.buck_converter.A">(buck_converter attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.A">(generalized_fisher attribute)</a>
@@ -110,8 +112,6 @@
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.A">(heat2d_petsc_forced attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.A">(heatNd_forced attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.A">(piline attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.A">(testequation0d attribute)</a>
 </li>
@@ -2585,16 +2585,20 @@
       </ul></li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">newfig() (in module helpers.plot_helper)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.newton_itercount">newton_itercount (battery_implicit attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.newton_ncalls">newton_ncalls (battery_implicit attribute)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness">NewtonInexactness (class in implementations.convergence_controller_classes.inexactness)</a>
 </li>
       <li><a href="pySDC/core.Step.html#core.Step.step.next">next (step property)</a>
 </li>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors">next_neighbors() (in module helpers.transfer_helper)</a>
 </li>
-      <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors_periodic">next_neighbors_periodic() (in module helpers.transfer_helper)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors_periodic">next_neighbors_periodic() (in module helpers.transfer_helper)</a>
+</li>
       <li><a href="pySDC/core.Nodes.html#core.Nodes.NodesGenerator.node_type">node_type (NodesGenerator attribute)</a>
 </li>
       <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.nodes">nodes (CollBase attribute)</a>
@@ -2606,6 +2610,8 @@
       <li><a href="pySDC/implementations.problem_classes.nonlinear_ODE_1.html#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1">nonlinear_ODE_1 (class in implementations.problem_classes.nonlinear_ODE_1)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">nonlinearschroedinger_imex (class in implementations.problem_classes.NonlinearSchroedinger_MPIFFT)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.nswitches">nswitches (battery_n_capacitors attribute)</a>
 </li>
       <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.num_nodes">num_nodes (CollBase attribute)</a>
 </li>
@@ -3285,6 +3291,10 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar">swfw_scalar (class in implementations.problem_classes.FastWaveSlowWave_0D)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.switch_A">switch_A (battery_n_capacitors attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.switch_f">switch_f (battery_n_capacitors attribute)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.switch_sweeper">switch_sweeper() (AdaptiveCollocation method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx">Sx (boris_2nd_order attribute)</a>
@@ -3295,6 +3305,8 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.t_switch">t_switch (battery_n_capacitors attribute)</a>
+</li>
       <li><a href="pySDC/core.Level.html#core.Level.level.tag">tag (level property)</a>
 </li>
       <li><a href="pySDC/core.Level.html#core.Level.level.tau">tau (level attribute)</a>
@@ -3595,7 +3607,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
     </div>
   </body>
 </html>

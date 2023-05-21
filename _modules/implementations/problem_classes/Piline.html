@@ -46,8 +46,42 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="piline"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline">[docs]</a><span class="k">class</span> <span class="nc">piline</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Piline model as in the description in the PinTSimE project</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the</span>
+<span class="sd">    piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_\pi} (t) + \frac{V_s}{R_s C_1},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d v_{C_2} (t)}{dt} = -\frac{1}{R_\ell C_2}v_{C_2} (t) + \frac{1}{C_2} i_{L_\pi} (t),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d i_{L_\pi} (t)}{dt} = \frac{1}{L_\pi} v_{C_1} (t) - \frac{1}{L_\pi} v_{C_2} (t) - \frac{R_\pi}{L_\pi} i_{L_\pi} (t),</span>
+
+<span class="sd">    which can be expressed as a nonhomogeneous linear system of ODEs</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u(t)}{dt} = A u(t) + f(t)</span>
+
+<span class="sd">    using an initial condition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Vs : float</span>
+<span class="sd">        Voltage at the voltage source :math:`V_s`.</span>
+<span class="sd">    Rs : float</span>
+<span class="sd">        Resistance of the resistor :math:`R_s` at the voltage source.</span>
+<span class="sd">    C1 : float</span>
+<span class="sd">        Capacitance of the capacitor :math:`C_1`.</span>
+<span class="sd">    Rpi : float</span>
+<span class="sd">        Resistance of the resistor :math:`R_\pi`.</span>
+<span class="sd">    Lpi : float</span>
+<span class="sd">        Inductance of the inductor :math:`L_\pi`.</span>
+<span class="sd">    C2 : float</span>
+<span class="sd">        Capacitance of the capacitor :math:`C_2`.</span>
+<span class="sd">    Rl : float</span>
+<span class="sd">        Resistance of the resistive load :math:`R_\ell`.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        A: system matrix, representing the 3 ODEs</span>
@@ -78,14 +112,19 @@
 
 <div class="viewcode-block" id="piline.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -94,17 +133,24 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="piline.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple linear solver for (I-factor*A)u = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -113,15 +159,21 @@
 
 <div class="viewcode-block" id="piline.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to approximate the exact solution at time t by scipy</span>
+<span class="sd">        Routine to approximate the exact solution at time t by scipy as a reference.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
-<span class="sd">            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution</span>
-<span class="sd">            t_init (float): the starting time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
+<span class="sd">        u_init : pySDC.problem.Piline.dtype_u</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float</span>
+<span class="sd">            The starting time.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution (kind of)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The reference solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -189,7 +241,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
     </div>
   </body>
 </html>

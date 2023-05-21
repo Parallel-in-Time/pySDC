@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.problem_classes.Battery module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,7 +53,22 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">battery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncapacitors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V_ref</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors" title="implementations.problem_classes.Battery.battery_n_capacitors"><code class="xref py py-class docutils literal notranslate"><span class="pre">battery_n_capacitors</span></code></a></p>
-<p>Example implementing the battery drain model with one capacitor, inherits from battery_n_capacitors.</p>
+<p>Example implementing the battery drain model with <span class="math notranslate nohighlight">\(N=1\)</span> capacitor, inherits from battery_n_capacitors. The ODE system
+of this model is given by the following equations. If <span class="math notranslate nohighlight">\(v_1 &gt; V_{ref, 0}:\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{d i_L (t)}{dt} = 0,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d v_1 (t)}{dt} = -\frac{1}{CR}v_1 (t),\]</div>
+<p>where <span class="math notranslate nohighlight">\(i_L\)</span> denotes the function of the current over time <span class="math notranslate nohighlight">\(t\)</span>.
+If <span class="math notranslate nohighlight">\(v_1 \leq V_{ref, 0}:\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{d i_L(t)}{dt} = -\frac{R_s + R}{L}i_L (t) + \frac{1}{L} V_s,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d v_1(t)}{dt} = 0.\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class has the same attributes as the class it inherits from.</p>
+</div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery.dtype_f" title="Permalink to this definition">¶</a></dt>
@@ -62,16 +78,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -82,18 +98,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple linear solver for (I-factor*A)u = rhs</p>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -104,13 +120,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t</p>
+<dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact solution</p>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -124,6 +140,45 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">battery_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncapacitors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.Battery.battery" title="implementations.problem_classes.Battery.battery"><code class="xref py py-class docutils literal notranslate"><span class="pre">battery</span></code></a></p>
+<p>Example implementing the battery drain model as above. The method solve_system uses a fully-implicit computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ncapacitors</strong> (<em>int</em>) – Number of capacitors in the circuit.</p></li>
+<li><p><strong>Vs</strong> (<em>float</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C</strong> (<em>np.ndarray</em>) – Capacitances of the capacitors. Length of array must equal to number of capacitors.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – Resistance for the load.</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – Inductance of inductor.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Factor greater than zero to describe the storage of the capacitor(s).</p></li>
+<li><p><strong>V_ref</strong> (<em>float</em>) – Reference value greater than zero for the battery to switch to the voltage source.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Number of maximum iterations for the Newton solver.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for determination of the Newton solver.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.newton_itercount">
+<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.newton_itercount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counts the number of Newton iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.newton_ncalls">
+<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.newton_ncalls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counts the number of how often Newton is called in the simulation of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.dtype_f" title="Permalink to this definition">¶</a></dt>
@@ -133,16 +188,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -153,18 +208,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_implicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_implicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_implicit.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple Newton solver</p>
+<dd><p>Simple Newton solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -178,16 +233,94 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">battery_n_capacitors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncapacitors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V_ref</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_n_capacitors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the battery drain model with N capacitors, where N is an arbitrary integer greater than 0.
-.. attribute:: nswitches</p>
-<blockquote>
-<div><p>number of switches</p>
-</div></blockquote>
+<p>Example implementing the battery drain model with <span class="math notranslate nohighlight">\(N\)</span> capacitors, where <span class="math notranslate nohighlight">\(N\)</span> is an arbitrary integer greater than zero.
+First, the capacitor <span class="math notranslate nohighlight">\(C\)</span> serves as a battery and provides energy. When the voltage of the capacitor <span class="math notranslate nohighlight">\(u_{C_n}\)</span> for
+<span class="math notranslate nohighlight">\(n=1,..,N\)</span> drops below their reference value <span class="math notranslate nohighlight">\(V_{ref,n-1}', the circuit switches to the next capacitor. If all capacitors
+has dropped below their reference value, the voltage source :math:`V_s\)</span> provides further energy. The problem of simulating the
+battery draining has <span class="math notranslate nohighlight">\(N + 1\)</span> different states. Each of this state can be expressed as a nonhomogeneous linear system of
+ordinary differential equations (ODEs)</p>
+<div class="math notranslate nohighlight">
+\[\frac{d u(t)}{dt} = A_k u(t) + f_k (t)\]</div>
+<p>for <span class="math notranslate nohighlight">\(k=1,..,N+1\)</span> using an initial condition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ncapacitors</strong> (<em>int</em>) – Number of capacitors <span class="math notranslate nohighlight">\(n_{capacitors}\)</span> in the circuit.</p></li>
+<li><p><strong>Vs</strong> (<em>float</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C</strong> (<em>np.ndarray</em>) – Capacitances of the capacitors.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – Resistance for the load.</p></li>
+<li><p><strong>L</strong> (<em>float</em>) – Inductance of inductor.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Factor greater than zero to describe the storage of the capacitor(s).</p></li>
+<li><p><strong>V_ref</strong> (<em>np.ndarray</em>) – Array contains the reference values greater than zero for each capacitor to switch to the next energy source.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.A" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficients matrix of the linear system of ordinary differential equations (ODEs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.switch_A">
+<span class="sig-name descname"><span class="pre">switch_A</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.switch_A" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary that contains the coefficients for the coefficient matrix A.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.switch_f">
+<span class="sig-name descname"><span class="pre">switch_f</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.switch_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary that contains the coefficients of the right-hand side f of the ODE system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.t_switch">
+<span class="sig-name descname"><span class="pre">t_switch</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.t_switch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time point of the discrete event found by switch estimation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.nswitches">
+<span class="sig-name descname"><span class="pre">nswitches</span></span><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.nswitches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of switches found by switch estimation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The array containing the capacitances <span class="math notranslate nohighlight">\(C_n\)</span> and the array containing the reference values <span class="math notranslate nohighlight">\(V_{ref, n-1}\)</span>
+for each capacitor must be equal to the number of capacitors <span class="math notranslate nohighlight">\(n_{capacitors}\)</span>.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.count_switches">
 <span class="sig-name descname"><span class="pre">count_switches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_n_capacitors.count_switches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.count_switches" title="Permalink to this definition">¶</a></dt>
 <dd><p>Counts the number of switches. This function is called when a switch is found inside the range of tolerance
-(in switch_estimator.py)</p>
+(in pySDC/projects/PinTSimE/switch_estimator.py)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -205,31 +338,38 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_n_capacitors.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Routine to evaluate the RHS. No Switch Estimator is used: For N = 3 there are N + 1 = 4 different states of the battery:</dt><dd><ol class="arabic simple">
-<li><p>u[1] &gt; V_ref[0] and u[2] &gt; V_ref[1] and u[3] &gt; V_ref[2]    -&gt; C1 supplies energy</p></li>
-<li><p>u[1] &lt;= V_ref[0] and u[2] &gt; V_ref[1] and u[3] &gt; V_ref[2]   -&gt; C2 supplies energy</p></li>
-<li><p>u[1] &lt;= V_ref[0] and u[2] &lt;= V_ref[1] and u[3] &gt; V_ref[2]  -&gt; C3 supplies energy</p></li>
-<li><p>u[1] &lt;= V_ref[0] and u[2] &lt;= V_ref[1] and u[3] &lt;= V_ref[2] -&gt; Vs supplies energy</p></li>
-</ol>
-</dd>
-<dt>max_index is initialized to -1. List “switch” contains a True if u[k] &lt;= V_ref[k-1] is satisfied.</dt><dd><ul class="simple">
-<li><p>Is no True there (i.e. max_index = -1), we are in the first case.</p></li>
-<li><p>max_index = k &gt;= 0 means we are in the (k+1)-th case.
-So, the actual RHS has key max_index-1 in the dictionary self.switch_f.</p></li>
+<dd><p>Routine to evaluate the right-hand side of the problem. Let <span class="math notranslate nohighlight">\(v_k:=v_{C_k}\)</span> be the voltage of capacitor <span class="math notranslate nohighlight">\(C_k\)</span> for <span class="math notranslate nohighlight">\(k=1,..,N\)</span>
+with reference value <span class="math notranslate nohighlight">\(V_{ref, k-1}\)</span>. No switch estimator is used: For <span class="math notranslate nohighlight">\(N = 3\)</span> there are <span class="math notranslate nohighlight">\(N + 1 = 4\)</span> different states of the battery:</p>
+<p><span class="math notranslate nohighlight">\(C_1\)</span> supplies energy if:</p>
+<div class="math notranslate nohighlight">
+\[v_1 &gt; V_{ref,0}, v_2 &gt; V_{ref,1}, v_3 &gt; V_{ref,2},\]</div>
+<p><span class="math notranslate nohighlight">\(C_2\)</span> supplies energy if:</p>
+<div class="math notranslate nohighlight">
+\[v_1 \leq V_{ref,0}, v_2 &gt; V_{ref,1}, v_3 &gt; V_{ref,2},\]</div>
+<p><span class="math notranslate nohighlight">\(C_3\)</span> supplies energy if:</p>
+<div class="math notranslate nohighlight">
+\[v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 &gt; V_{ref,2},\]</div>
+<p><span class="math notranslate nohighlight">\(V_s\)</span> supplies energy if:</p>
+<div class="math notranslate nohighlight">
+\[v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.\]</div>
+<dl class="simple">
+<dt><span class="math notranslate nohighlight">\(max_{index}\)</span> is initialized to <span class="math notranslate nohighlight">\(-1\)</span>. List “switch” contains a True if <span class="math notranslate nohighlight">\(u_k \leq V_{ref,k-1}\)</span> is satisfied.</dt><dd><ul class="simple">
+<li><p>Is no True there (i.e., <span class="math notranslate nohighlight">\(max_{index}=-1\)</span>), we are in the first case.</p></li>
+<li><p><span class="math notranslate nohighlight">\(max_{index}=k\geq 0\)</span> means we are in the <span class="math notranslate nohighlight">\((k+1)\)</span>-th case.
+So, the actual RHS has key <span class="math notranslate nohighlight">\(max_{index}\)</span>-1 in the dictionary self.switch_f.</p></li>
 </ul>
 </dd>
 </dl>
-<p>In case of using the Switch Estimator, we count the number of switches which illustrates in which case of voltage source we are.</p>
+<p>In case of using the switch estimator, we count the number of switches which illustrates in which case of voltage source we are.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -250,17 +390,17 @@ So, the actual RHS has key max_index-1 in the dictionary self.switch_f.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Indicates if a switch is found or not
-m_guess (np.int): Index of collocation node inside one subinterval of where the discrete event was found
-vC_switch (list): Contains function values of switching condition (for interpolation)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>switch_detected (bool)</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>switch_detected</strong> (<em>bool</em>) – Indicates if a switch is found or not.</p></li>
+<li><p><strong>m_guess</strong> (<em>int</em>) – Index of collocation node inside one subinterval of where the discrete event was found.</p></li>
+<li><p><strong>vC_switch</strong> (<em>list</em>) – Contains function values of switching condition (for interpolation).</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -268,18 +408,18 @@ vC_switch (list): Contains function values of switching condition (for interpola
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_n_capacitors.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple linear solver for (I-factor*A)u = rhs</p>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -290,13 +430,13 @@ vC_switch (list): Contains function values of switching condition (for interpola
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Battery.battery_n_capacitors.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Battery.html#battery_n_capacitors.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Battery.battery_n_capacitors.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t</p>
+<dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact solution</p>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -327,12 +467,19 @@ vC_switch (list): Contains function values of switching condition (for interpola
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit"><code class="docutils literal notranslate"><span class="pre">battery_implicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors"><code class="docutils literal notranslate"><span class="pre">battery_n_capacitors</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.switch_A"><code class="docutils literal notranslate"><span class="pre">switch_A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.switch_f"><code class="docutils literal notranslate"><span class="pre">switch_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.t_switch"><code class="docutils literal notranslate"><span class="pre">t_switch</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.nswitches"><code class="docutils literal notranslate"><span class="pre">nswitches</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.count_switches"><code class="docutils literal notranslate"><span class="pre">count_switches()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Battery.battery_n_capacitors.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
@@ -402,7 +549,7 @@ vC_switch (list): Contains function values of switching condition (for interpola
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
     </div>
   </body>
 </html>

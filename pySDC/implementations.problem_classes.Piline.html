@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.problem_classes.Piline module &#8212; pySDC 5.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,13 +53,32 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Piline.piline">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">piline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rpi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lpi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Piline.html#piline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Piline.piline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the Piline model as in the description in the PinTSimE project</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.Piline.piline.A">
-<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.Piline.piline.A" title="Permalink to this definition">¶</a></dt>
-<dd><p>system matrix, representing the 3 ODEs</p>
-</dd></dl>
-
+<p>Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the
+piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:</p>
+<div class="math notranslate nohighlight">
+\[\frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_\pi} (t) + \frac{V_s}{R_s C_1},\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d v_{C_2} (t)}{dt} = -\frac{1}{R_\ell C_2}v_{C_2} (t) + \frac{1}{C_2} i_{L_\pi} (t),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d i_{L_\pi} (t)}{dt} = \frac{1}{L_\pi} v_{C_1} (t) - \frac{1}{L_\pi} v_{C_2} (t) - \frac{R_\pi}{L_\pi} i_{L_\pi} (t),\]</div>
+<p>which can be expressed as a nonhomogeneous linear system of ODEs</p>
+<div class="math notranslate nohighlight">
+\[\frac{d u(t)}{dt} = A u(t) + f(t)\]</div>
+<p>using an initial condition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Vs</strong> (<em>float</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C1</strong> (<em>float</em>) – Capacitance of the capacitor <span class="math notranslate nohighlight">\(C_1\)</span>.</p></li>
+<li><p><strong>Rpi</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_\pi\)</span>.</p></li>
+<li><p><strong>Lpi</strong> (<em>float</em>) – Inductance of the inductor <span class="math notranslate nohighlight">\(L_\pi\)</span>.</p></li>
+<li><p><strong>C2</strong> (<em>float</em>) – Capacitance of the capacitor <span class="math notranslate nohighlight">\(C_2\)</span>.</p></li>
+<li><p><strong>Rl</strong> (<em>float</em>) – Resistance of the resistive load <span class="math notranslate nohighlight">\(R_\ell\)</span>.</p></li>
+<li><p><strong>Attributes</strong> – A: system matrix, representing the 3 ODEs</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Piline.piline.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Piline.piline.dtype_f" title="Permalink to this definition">¶</a></dt>
@@ -74,16 +94,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Piline.piline.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Piline.html#piline.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Piline.piline.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -94,18 +114,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Piline.piline.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Piline.html#piline.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Piline.piline.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple linear solver for (I-factor*A)u = rhs</p>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -116,17 +136,17 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Piline.piline.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Piline.html#piline.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Piline.piline.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to approximate the exact solution at time t by scipy</p>
+<dd><p>Routine to approximate the exact solution at time t by scipy as a reference.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
-<li><p><strong>u_init</strong> (<em>pySDC.problem.Piline.dtype_u</em>) – initial conditions for getting the exact solution</p></li>
-<li><p><strong>t_init</strong> (<em>float</em>) – the starting time</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.problem.Piline.dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact solution (kind of)</p>
+<dd class="field-even"><p><strong>me</strong> – The reference solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -150,7 +170,6 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Piline module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Piline.piline"><code class="docutils literal notranslate"><span class="pre">piline</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.Piline.piline.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Piline.piline.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Piline.piline.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Piline.piline.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
@@ -217,7 +236,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
     </div>
   </body>
 </html>
