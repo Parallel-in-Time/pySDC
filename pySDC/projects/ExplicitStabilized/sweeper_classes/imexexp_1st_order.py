@@ -45,76 +45,20 @@ class imexexp_1st_order(sweeper):
 
         # get current level and problem description
         L = self.level
+        P = L.prob
 
         me = []
 
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl + L.f[1].exp))
+            # me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl + P.phi_one_f_eval(L.u[1],L.dt*self.coll.nodes[0],L.time)))
             # new instance of dtype_u, initialize values with 0
             for j in range(2, self.coll.num_nodes + 1):
                 me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl + L.f[j].exp)        
+                # me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl + P.phi_one_f_eval(L.u[j],L.dt*self.coll.nodes[j-1],L.time))        
 
         return me
-
-    # def update_nodes(self):
-    #     """
-    #     Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
-
-    #     Returns:
-    #         None
-    #     """
-
-    #     # get current level and problem description
-    #     L = self.level
-    #     P = L.prob
-
-    #     # only if the level has been touched before
-    #     assert L.status.unlocked
-
-    #     # get number of collocation nodes for easier access
-    #     M = self.coll.num_nodes
-
-    #     integral = self.integrate()
-    #     Kt = P.dtype_u(P.init,val=0.)
-    #     for m in range(M):
-    #         # subtract QIFI(u^k)_m + QEFE(u^k)_m
-    #         Kt += L.dt * self.QI[m+1,m+1]*L.f[m+1].impl 
-    #         Kt += ( P.exponential_step( L.u[m] + L.dt * self.QE[m+1,m] * L.f[m].expl, \
-    #                                     L.dt * self.QE[m+1,m], \
-    #                                     L.time + L.dt * (self.coll.nodes[m] - self.coll.delta_m[m]) )\
-    #                 -L.u[m] )                               
-    #         integral[m] -= Kt            
-    #         # add initial value
-    #         integral[m] += L.u[0]
-    #         # add tau if associated
-    #         if L.tau[m] is not None:
-    #             integral[m] += L.tau[m]
-
-    #     # do the sweep
-    #     for m in range(M):
-    #         # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)            
-            
-    #         rhs = L.u[m] + L.dt*self.QE[m+1,m]*L.f[m].expl                        
-    #         if m>=1:
-    #             rhs += integral[m] - integral[m-1]
-    #         else:
-    #             rhs += integral[m] - L.u[0]            
-
-    #         rhs = P.exponential_step(rhs, L.dt*self.QE[m+1,m], L.time + L.dt * (self.coll.nodes[m] - self.coll.delta_m[m]))            
-
-    #         # implicit solve with prefactor stemming from QI
-    #         L.u[m + 1] = P.solve_system(
-    #             rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
-    #         )
-
-    #         # update function values
-    #         L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-    #     # # indicate presence of new values at this level
-    #     L.status.updated = True
-
-    #     return None
 
     def update_nodes(self):
         """
@@ -134,23 +78,27 @@ class imexexp_1st_order(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        integral = self.integrate()
-        for m in range(M):
-            # add tau if associated
-            if L.tau[m] is not None:
-                integral[m] += L.tau[m]
-        R = []
-        R.append(P.dtype_u(integral[0]))
+        integral = [P.dtype_u(P.init,val=0.) for _ in range(M)]
+        for m in range(1,M + 1):
+            for j in range(1, M + 1):
+                integral[m - 1] += L.dt * self.coll.Smat[m, j] * (L.f[j].impl + L.f[j].expl + L.f[j].exp)      
+                # integral[m - 1] += L.dt * self.coll.Smat[m, j] * (L.f[j].impl + L.f[j].expl + P.phi_one_f_eval(L.u[j],L.dt*self.coll.nodes[j-1],L.time))        
+
+        if L.tau[0] is not None:
+            integral[0] += L.tau[0]
         for m in range(1,M):
-            R.append(P.dtype_u(integral[m]-integral[m-1]))
+            if L.tau[m] is not None:
+                integral[m] += L.tau[m]-L.tau[m-1]
 
         for m in range(M):
-            R[m] -= L.dt*self.coll.delta_m[m]*(L.f[m].expl+L.f[m+1].impl+P.phi_one_eval(L.f[m].exp,L.dt*self.coll.delta_m[m],L.time))
+            # integral[m] -= L.dt*self.coll.delta_m[m]*(L.f[m].expl+L.f[m+1].impl+P.phi_one_eval(L.f[m].exp,L.dt*self.coll.delta_m[m],L.time))
+            integral[m] -= L.dt*self.coll.delta_m[m]*(L.f[m].expl+L.f[m+1].impl+P.phi_one_f_eval(L.u[m],L.dt*self.coll.delta_m[m],L.time))
 
         # do the sweep
         for m in range(M):
 
-            rhs = L.u[m] + R[m] + L.dt*self.coll.delta_m[m]*(L.f[m].expl+P.phi_one_eval(L.f[m].exp,L.dt*self.coll.delta_m[m],L.time))
+            # rhs = L.u[m] + integral[m] + L.dt*self.coll.delta_m[m]*(L.f[m].expl+P.phi_one_eval(L.f[m].exp,L.dt*self.coll.delta_m[m],L.time))
+            rhs = L.u[m] + integral[m] + L.dt*self.coll.delta_m[m]*(L.f[m].expl+P.phi_one_f_eval(L.u[m],L.dt*self.coll.delta_m[m],L.time))
 
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(
