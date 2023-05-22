@@ -194,7 +194,7 @@ class controller_MPI(controller):
         # determine whether I am the first and/or last in line
         self.S.status.first = self.S.prev == size - 1
         self.S.status.last = self.S.next == 0
-        # intialize step with u0
+        # initialize step with u0
         self.S.init_step(u0)
         # reset some values
         self.S.status.done = False
@@ -475,7 +475,7 @@ class controller_MPI(controller):
         self.S.levels[0].sweep.predict()
 
         if self.params.use_iteration_estimator:
-            # store pervious iterate to compute difference later on
+            # store previous iterate to compute difference later on
             self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
 
         # update stage

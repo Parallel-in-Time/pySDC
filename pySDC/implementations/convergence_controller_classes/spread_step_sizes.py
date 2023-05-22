@@ -68,6 +68,10 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
         Returns:
             None
         """
+        # inactive steps don't need to participate
+        if S not in MS:
+            return None
+
         # figure out where the block is restarted
         restarts = [me.status.restart for me in MS]
         if True in restarts:
@@ -128,7 +132,7 @@ class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwise):
             restart_at = len(restarts) - 1
 
         # Compute the maximum allowed step size based on Tend.
-        dt_max = (Tend - time) / size
+        dt_max = comm.bcast((Tend - time) / size, root=restart_at)
 
         # record the step sizes to restart with from all the levels of the step
         new_steps = [None] * len(S.levels)

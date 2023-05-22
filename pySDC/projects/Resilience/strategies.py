@@ -196,6 +196,21 @@ class Strategy:
             custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-11}
         return merge_descriptions(custom_description, self.custom_description)
 
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
 
 class BaseStrategy(Strategy):
     '''
@@ -217,6 +232,27 @@ class BaseStrategy(Strategy):
     @property
     def label(self):
         return r'fixed'
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 12453
+            elif key == 'e_global_post_run' and op == max:
+                return 4.3956128381594795e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class AdaptivityStrategy(Strategy):
@@ -315,6 +351,27 @@ class AdaptivityStrategy(Strategy):
         }
         return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
 
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 3825
+            elif key == 'e_global_post_run' and op == max:
+                return 1.3370376368393444e-05
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
 
 class AdaptiveHotRodStrategy(Strategy):
     '''
@@ -353,7 +410,7 @@ class AdaptiveHotRodStrategy(Strategy):
             e_tol = 3e-7
             dt_min = 1e-3
             maxiter = 4
-            HotRod_tol = 3e-7
+            HotRod_tol = 2e-6
         else:
             raise NotImplementedError(
                 'I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
@@ -364,13 +421,34 @@ to the strategy'
 
         custom_description = {
             'convergence_controllers': {
-                Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min},
                 HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
+                Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min, 'embedded_error_flavor': 'linearized'},
             },
             'step_params': {'maxiter': maxiter},
         }
 
         return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 4466
+            elif key == 'e_global_post_run' and op == max:
+                return 2.1455229857747504e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class IterateStrategy(Strategy):
@@ -434,6 +512,27 @@ strategy'
 
         return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
 
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 8534
+            elif key == 'e_global_post_run' and op == max:
+                return 0.0005961192269257065
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
 
 class HotRodStrategy(Strategy):
     '''
@@ -495,6 +594,27 @@ class HotRodStrategy(Strategy):
         }
 
         return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 15230
+            elif key == 'e_global_post_run' and op == max:
+                return 4.3956128381594795e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class AdaptivityCollocationStrategy(Strategy):
@@ -581,11 +701,31 @@ class AdaptivityCollocationTypeStrategy(AdaptivityCollocationStrategy):
             'quad_type': ['RADAU-RIGHT', 'GAUSS'],
             'do_coll_update': [False, True],
         }
-        # self.adaptive_coll_params = {'quad_type': ['RADAU-LEFT', 'RADAU-RIGHT'], 'num_nodes': [3, 3]}
 
     @property
     def label(self):
         return 'adaptivity type'
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 2694
+            elif key == 'e_global_post_run' and op == max:
+                return 2.1707816100224875e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
@@ -603,6 +743,27 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
     def label(self):
         return 'adaptivity refinement'
 
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 1881
+            elif key == 'e_global_post_run' and op == max:
+                return 3.3428689244496823e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
 
 class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
     def __init__(self, useMPI=False, skip_residual_computation='most'):
@@ -614,6 +775,27 @@ class AdaptivityCollocationDerefinementStrategy(AdaptivityCollocationStrategy):
     @property
     def label(self):
         return 'adaptivity de-refinement'
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 3421
+            elif key == 'e_global_post_run' and op == max:
+                return 2.1130961994131336e-05
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class DIRKStrategy(AdaptivityStrategy):
@@ -651,7 +833,6 @@ class DIRKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
-        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
         from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
 
         adaptivity_description = super().get_custom_description(problem, num_procs)
@@ -669,6 +850,27 @@ class DIRKStrategy(AdaptivityStrategy):
         custom_description = merge_descriptions(adaptivity_description, rk_params)
 
         return custom_description
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 3522
+            elif key == 'e_global_post_run' and op == max:
+                return 0.00020173129027772907
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class ERKStrategy(DIRKStrategy):
@@ -700,6 +902,27 @@ class ERKStrategy(DIRKStrategy):
         desc = super().get_custom_description(problem, num_procs)
         desc['sweeper_class'] = Cash_Karp
         return desc
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 0
+            elif key == 'e_global_post_run' and op == max:
+                return 2.0606132165701396e-05
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class DoubleAdaptivityStrategy(AdaptivityStrategy):
@@ -757,6 +980,27 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
 
         return custom_description
 
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 3825
+            elif key == 'e_global_post_run' and op == max:
+                return 1.3370376368393444e-05
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
 
 class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
     """
@@ -789,6 +1033,27 @@ class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
         custom_description['convergence_controllers'][BasicRestarting.get_implementation(flavor)] = {'max_restarts': 15}
 
         return custom_description
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 2955
+            elif key == 'e_global_post_run' and op == max:
+                return 5.274015506540053e-07
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
 
 class AdaptivityInterpolationStrategy(AdaptivityStrategy):
@@ -826,3 +1091,119 @@ class AdaptivityInterpolationStrategy(AdaptivityStrategy):
         custom_description['convergence_controllers'][BasicRestarting.get_implementation(flavor)] = {'max_restarts': 15}
 
         return custom_description
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 6659
+            elif key == 'e_global_post_run' and op == max:
+                return 2.9780002756552015e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
+
+class AdaptivityExtrapolationWithinQStrategy(Strategy):
+    '''
+    Adaptivity based on extrapolation between collocation nodes as a resilience strategy
+    '''
+
+    def __init__(self, useMPI=False):
+        '''
+        Initialization routine
+        '''
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityExtrapolationWithinQ
+
+        super().__init__(useMPI=useMPI)
+        self.color = list(cmap.values())[8]
+        self.marker = '*'
+        self.name = 'adaptivity_extraQ'
+        self.bar_plot_x_label = 'adaptivity Q'
+        self.precision_parameter = 'e_tol'
+        self.adaptive_coll_params = {}
+        self.precision_parameter_loc = ['convergence_controllers', AdaptivityExtrapolationWithinQ, 'e_tol']
+        self.restol = None
+        self.maxiter = 99
+
+    def get_custom_description(self, problem, num_procs):
+        '''
+        Routine to get a custom description that adds adaptivity
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            The custom descriptions you can supply to the problem when running it
+        '''
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityExtrapolationWithinQ
+
+        custom_description = {}
+        custom_description['step_params'] = {'maxiter': self.maxiter}
+
+        dt_max = np.inf
+        dt_min = 1e-5
+
+        if problem.__name__ == "run_vdp":
+            e_tol = 2e-5
+            dt_min = 1e-3
+        # elif problem.__name__ == "run_piline":
+        #     e_tol = 1e-7
+        #     dt_min = 1e-2
+        # elif problem.__name__ == "run_Lorenz":
+        #     e_tol = 2e-5
+        #     dt_min = 1e-3
+        # elif problem.__name__ == "run_Schroedinger":
+        #     e_tol = 4e-6
+        #     dt_min = 1e-3
+        # elif problem.__name__ == "run_quench":
+        #     e_tol = 1e-5
+        #     dt_min = 1e-3
+        #     dt_max = 1e2
+        else:
+            raise NotImplementedError(
+                'I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
+ strategy'
+            )
+
+        custom_description['level_params'] = {'restol': e_tol / 10 if self.restol is None else self.restol}
+        custom_description['convergence_controllers'] = {
+            AdaptivityExtrapolationWithinQ: {
+                'e_tol': e_tol,
+                'dt_min': dt_min,
+                'dt_max': dt_max,
+            }
+        }
+        return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 2259
+            elif key == 'e_global_post_run' and op == max:
+                return 9.319882663172407e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
