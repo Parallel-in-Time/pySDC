@@ -7,49 +7,65 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 # noinspection PyUnusedLocal
 class advectiondiffusion1d_imex(ptype):
+    r"""
+    Example implementing the unforced one-dimensional advection diffusion equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = - c \frac{\partial u}{\partial x} + \nu \frac{\partial^2 u}{\partial x^2}
+
+    with periodic BC in [-L/2, L/2] in spectral space. The advection part :math:`- c \frac{\partial u}{\partial x}` is
+    treated explicitly, whereas the diffusion part :math:`\nu \frac{\partial^2 u}{\partial x^2}` will be treated numerically
+    in an implicit way. The exact solution is given by
+
+    .. math::
+        u(x, t) = \sin(\omega (x - c t)) \exp(-t \nu \omega^2)
+
+    for :math:`\omega=2 \pi k`, where :math:`k` denotes the wave number. Fast Fourier transform is used for the spatial
+    discretization.
+
+    Parameters
+    ----------
+    nvars : int
+        Number of points in spatial discretization.
+    c : float
+        Advection speed.
+    freq : int
+        Wave number :math:`k`.
+    nu : float
+        Diffusion coefficient :math:`\nu`.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+
+    Attributes
+    ----------
+    xvalues : np.1darray
+        Contains the grid points in space.
+    ddx : np.1darray
+        Spectral operator for gradient.
+    lap : np.1darray
+        Spectral operator for Laplacian.
     """
-    Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,
-    IMEX time-stepping
 
-    Attributes:
-        xvalues: grid points in space
-        ddx: spectral operator for gradient
-        lap: spectral operator for Laplacian
-        rfft_object: planned real-valued FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation, real-valued output
-    """
+    dtype_u = mesh
+    dtype_f = imex_mesh
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type with implicit and explicit component (will be passed to parent class)
-        """
-
-        if 'L' not in problem_params:
-            problem_params['L'] = 1.0
+    def __init__(self, nvars, c, freq, nu, L=1.0):
+        """Initialization routine"""
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'c', 'freq', 'nu', 'L']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars']) % 2 != 0:
-            raise ProblemError('setup requires nvars = 2^p')
+        #essential_keys = ['nvars', 'c', 'freq', 'nu']
+        #for key in essential_keys:
+        #    if key not in problem_params:
+        #        msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+        #        raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectiondiffusion1d_imex, self).__init__(
-            init=(problem_params['nvars'], None, np.dtype('float64')),
-            dtype_u=dtype_u,
-            dtype_f=dtype_f,
-            params=problem_params,
-        )
+        super().__init__(init=(nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister('nvars', 'c', 'freq', 'nu', 'L', localVars=locals(), readOnly=True)
+
+        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
+        if (self.params.nvars) % 2 != 0:
+            raise ProblemError('setup requires nvars = 2^p')
 
         self.xvalues = np.array(
             [i * self.params.L / self.params.nvars - self.params.L / 2.0 for i in range(self.params.nvars)]
