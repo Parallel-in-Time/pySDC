@@ -249,11 +249,9 @@ class BasicRestartingMPI(BasicRestarting):
 on...",
                     S,
                 )
-            elif not S.status.prev_done:
-                # receive information about restarts from earlier ranks
-                self.buffers.restart_earlier, self.buffers.max_restart_reached = self.recv(
-                    comm, source=S.status.slot - 1
-                )
+        elif not S.status.prev_done:
+            # receive information about restarts from earlier ranks
+            self.buffers.restart_earlier, self.buffers.max_restart_reached = self.recv(comm, source=S.status.slot - 1)
 
         # decide whether to restart
         S.status.restart = (S.status.restart or self.buffers.restart_earlier) and not self.buffers.max_restart_reached
