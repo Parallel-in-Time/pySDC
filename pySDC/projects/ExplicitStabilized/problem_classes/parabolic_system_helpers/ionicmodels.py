@@ -53,7 +53,9 @@ class HodgkinHuxley(IonicModel):
         self.n0 = 0.317
         self.h0 = 0.595
 
+        self.f_nonstiff_args = [0,1,2,3]
         self.f_stiff_args = [0,1]
+        self.f_expl_args = [0,1,2,3]
 
     def f(self,uh):
         V, m, n, h = uh.values.split()
@@ -152,7 +154,9 @@ class RogersMcCulloch(IonicModel):
         self.V0 = 0.
         self.w0 = 0.
 
+        self.f_nonstiff_args = [0,1]
         self.f_stiff_args = []
+        self.f_expl_args = [0,1]
     
     def f(self,uh):
         V, w = uh.values.split()

@@ -6,7 +6,7 @@ from pySDC.core.Errors import ParameterError
 from pySDC.projects.ExplicitStabilized.problem_classes.parabolic_system_helpers.ionicmodels import IonicModel
 
 def NV_Ith_S(y,k):
-    return y.values.sub(k)
+    return y.sub(k)
 
 # Non stiff with rho_max ~ 40
 class HodgkinHuxley(IonicModel):
@@ -25,7 +25,9 @@ class HodgkinHuxley(IonicModel):
         self.AC_g_Na = 120.0
         self.AC_E_L = self.AC_E_R + 10.613
 
+        self.f_nonstiff_args = [0,1,2,3]
         self.f_stiff_args = [0,1]
+        self.f_expl_args = [0,1,2,3]
 
     def f(self, y):
 
@@ -225,7 +227,9 @@ class Courtemanche1998(IonicModel):
         # 18: no, 8
         # 19: no, almost 0
         # 20: no, almost 0
+        self.f_nonstiff_args = list(range(self.size))
         self.f_stiff_args = [0,1]
+        self.f_expl_args = list(range(self.size))
 
     def f(self, y):
 
@@ -1020,8 +1024,10 @@ class TenTusscher2006_epi(IonicModel):
         # 16: no, almost 0
         # 17: no, almost 0
         # 18: no, almost 0
-
+        
+        self.f_nonstiff_args = list(range(self.size))
         self.f_stiff_args = [0,4]
+        self.f_expl_args = list(range(self.size))
 
     def f(self, y):
 

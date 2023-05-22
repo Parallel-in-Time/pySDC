@@ -10,7 +10,7 @@ class RKW1:
         paths = os.environ['PYTHONPATH'].split(os.pathsep)
         coeff = None
         for path in paths:
-            coeff_file = path + '/pySDC/projects/ExplicitStabilized/explicit_stabilized_methods/coeff_P.csv'
+            coeff_file = path + '/pySDC/projects/ExplicitStabilized/explicit_stabilized_classes/coeff_P.csv'
             if os.path.exists(coeff_file):
                 coeff = np.loadtxt(coeff_file, delimiter=",", dtype=float, skiprows=1)
 
@@ -27,8 +27,9 @@ class RKW1:
         self.s = s
         self.mu = self.muP[:s]/self.dP[s-1]
         self.nu = self.nuP[:s]+self.muP[:s]
-        self.nu[0] = 0.
         self.kappa = self.kappaP[:s]
+        self.nu[0] = s*self.mu[0]/2.
+        self.kappa[0] = s*self.mu[0]
         self.c = self.dP[:s]/self.dP[s-1]
 
     def get_s(self, z):
@@ -72,6 +73,8 @@ class RKC1:
         mu[1:] = 2.*w1*b[2:]/b[1:-1]
         nu[1:] = 2.*w0*b[2:]/b[1:-1]
         kappa[1:] = -b[2:]/b[0:-2]
+        nu[0] = s*mu[0]/2.
+        kappa[0] = s*mu[0]
 
         c = np.zeros(s+1,dtype=np.float64)
         c[0] = 0.
@@ -159,7 +162,9 @@ class RKU1:
         mu[1:] = 2.*w1*b[2:]/b[1:-1]
         nu[1:] = 2.*w0*b[2:]/b[1:-1]
         kappa[1:] = -b[2:]/b[0:-2]
-
+        self.nu[0] = s*self.mu[0]/2.
+        self.kappa[0] = s*self.mu[0]
+        
         c = np.zeros(s+1,dtype=np.float64)
         c[0] = 0.
         c[1] = mu[0]

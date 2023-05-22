@@ -43,7 +43,7 @@ class parabolic_system(ptype):
 
         FE = ufl.FiniteElement(problem_params['family'], self.domain.ufl_cell(), problem_params['order'])
         self.V = fem.FunctionSpace(self.domain, ufl.MixedElement([FE]*self.exact.size))
-        self.exact.define_domain_dependent_variables(self.domain,self.V)
+        self.exact.define_domain_dependent_variables(self.domain,self.V,self.dtype_u)
 
         self.set_solver_options(problem_params)
 
@@ -240,7 +240,7 @@ class parabolic_system(ptype):
         if self.enable_output:            
             uh.values.name = "u"         
             for i in range(self.exact.size):   
-                self.xdmf.write_function(uh.values.sub(i), t)
+                self.xdmf.write_function(uh.sub(i), t)
 
     def initial_value(self):
         u0 = self.dtype_u(self.init,val=0.)
@@ -270,7 +270,7 @@ class parabolic_system(ptype):
         norms_L2_sol = []
         rel_errors_L2 = []
         for i in range(self.exact.size):
-            errors_L2.append( np.sqrt(self.domain.comm.allreduce(fem.assemble_scalar(fem.form((uh.values.sub(i) - u_ex.values.sub(i))**2 * ufl.dx)), op=MPI.SUM)) )
+            errors_L2.append( np.sqrt(self.domain.comm.allreduce(fem.assemble_scalar(fem.form((uh.sub(i) - u_ex.values.sub(i))**2 * ufl.dx)), op=MPI.SUM)) )
             norms_L2_sol.append( np.sqrt(self.domain.comm.allreduce(fem.assemble_scalar(fem.form(u_ex.values.sub(i)**2 * ufl.dx)), op=MPI.SUM)) )
             rel_errors_L2.append(errors_L2[-1]/norms_L2_sol[-1])
         if self.domain.comm.rank == 0:
@@ -501,7 +501,7 @@ class parabolic_system_imex(parabolic_system):
 #                 self.u_exp += self.u_exp_expr[i]*v[i]*ufl.dx                                
 #                 self.u_exp_indexes[i] = True
 #             else:
-#                 self.u_exp += self.exact.uh.values.sub(i)*v[i]*ufl.dx       
+#                 self.u_exp += self.exact.uh.sub(i)*v[i]*ufl.dx       
 #         self.u_exp_form = fem.form(self.u_exp)
 
 #         self.F_expl = self.F_bnd
@@ -578,134 +578,134 @@ class parabolic_system_imex(parabolic_system):
 #         return u_sol
 
 
-class parabolic_system_multirate(parabolic_system):
+# class parabolic_system_multirate(parabolic_system):
 
-    dtype_u = fenicsx_mesh
-    dtype_f = rhs_fenicsx_mesh
+#     dtype_u = fenicsx_mesh
+#     dtype_f = rhs_fenicsx_mesh
 
-    def __init__(self, **problem_params):        
-        super(parabolic_system_multirate,self).__init__(**problem_params)                 
+#     def __init__(self, **problem_params):        
+#         super(parabolic_system_multirate,self).__init__(**problem_params)                 
 
-    def define_variational_forms(self):        
-        super().define_variational_forms()
+#     def define_variational_forms(self):        
+#         super().define_variational_forms()
 
-        v = ufl.TestFunctions(self.V)
+#         v = ufl.TestFunctions(self.V)
 
-        splitting = 'stiff_nonstiff'
-        self.u_exp_expr = self.exact.u_exp_expr[splitting]
-        self.rhs_exp_expr = self.exact.rhs_exp_expr[splitting]
-        self.rhs_stiff_expr = self.exact.rhs_stiff_expr[splitting]
-        self.rhs_nonstiff_expr = self.exact.rhs_nonstiff_expr[splitting]
-        self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
+#         splitting = 'stiff_nonstiff'
+#         self.u_exp_expr = self.exact.u_exp_expr[splitting]
+#         self.rhs_exp_expr = self.exact.rhs_exp_expr[splitting]
+#         self.rhs_stiff_expr = self.exact.rhs_stiff_expr[splitting]
+#         self.rhs_nonstiff_expr = self.exact.rhs_nonstiff_expr[splitting]
+#         self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
     
-        self.F_stiff = 0.
-        self.stiff_indexes = [False]*self.exact.size
-        self.rhs_stiff_expr_interp = [None]*self.exact.size
-        for i in range(self.exact.size):            
-            if self.rhs_stiff_expr[i] is not None:
-                self.rhs_stiff_expr_interp[i] = fem.Expression(self.rhs_stiff_expr[i],self.V.sub(i).element.interpolation_points())
-                self.F_stiff += self.rhs_stiff_expr[i]*v[i]*ufl.dx                                
-                self.stiff_indexes[i] = True
-        self.f_stiff_form = fem.form(self.F_stiff)
+#         self.F_stiff = 0.
+#         self.stiff_indexes = [False]*self.exact.size
+#         self.rhs_stiff_expr_interp = [None]*self.exact.size
+#         for i in range(self.exact.size):            
+#             if self.rhs_stiff_expr[i] is not None:
+#                 self.rhs_stiff_expr_interp[i] = fem.Expression(self.rhs_stiff_expr[i],self.V.sub(i).element.interpolation_points())
+#                 self.F_stiff += self.rhs_stiff_expr[i]*v[i]*ufl.dx                                
+#                 self.stiff_indexes[i] = True
+#         self.f_stiff_form = fem.form(self.F_stiff)
 
-        self.F_nonstiff = self.F_bnd
-        self.nonstiff_indexes = [False]*self.exact.size
-        self.rhs_nonstiff_expr_interp = [None]*self.exact.size
-        for i in range(self.exact.size):
-            if self.rhs_nonstiff_expr[i] is not None:
-                self.rhs_nonstiff_expr_interp[i] = fem.Expression(self.rhs_nonstiff_expr[i],self.V.sub(i).element.interpolation_points())   
-                self.F_nonstiff += self.rhs_nonstiff_expr[i]*v[i]*ufl.dx
-                self.nonstiff_indexes[i] = True           
-        self.f_nonstiff_form = fem.form(self.F_nonstiff)
+#         self.F_nonstiff = self.F_bnd
+#         self.nonstiff_indexes = [False]*self.exact.size
+#         self.rhs_nonstiff_expr_interp = [None]*self.exact.size
+#         for i in range(self.exact.size):
+#             if self.rhs_nonstiff_expr[i] is not None:
+#                 self.rhs_nonstiff_expr_interp[i] = fem.Expression(self.rhs_nonstiff_expr[i],self.V.sub(i).element.interpolation_points())   
+#                 self.F_nonstiff += self.rhs_nonstiff_expr[i]*v[i]*ufl.dx
+#                 self.nonstiff_indexes[i] = True           
+#         self.f_nonstiff_form = fem.form(self.F_nonstiff)
 
-    def eval_f(self, u, t, eval_impl=True, eval_expl=True, fh=None):
-        """
-        Evaluates F(u,t) = M^-1*( A*u + f(u,t) )
+#     def eval_f(self, u, t, eval_impl=True, eval_expl=True, fh=None):
+#         """
+#         Evaluates F(u,t) = M^-1*( A*u + f(u,t) )
 
-        Returns:
-            dtype_u: solution as mesh
-        """
+#         Returns:
+#             dtype_u: solution as mesh
+#         """
 
-        self.exact.update_time(t)
+#         self.exact.update_time(t)
 
-        if fh is None:
-            fh = self.dtype_f(init=self.V,val=0.)    
+#         if fh is None:
+#             fh = self.dtype_f(init=self.V,val=0.)    
 
-        # update the Dirichlet boundary conditions. Needed to apply lifting and as well to evaluate the
-        # f_form in the case where boundary conditions are applied via penalty (e.g. DG)
-        if self.family=='CG' and self.exact.bnd_cond!='N' and not self.exact.cte_Dirichlet:
-            self.get_DirBC(self.uD,t)
+#         # update the Dirichlet boundary conditions. Needed to apply lifting and as well to evaluate the
+#         # f_form in the case where boundary conditions are applied via penalty (e.g. DG)
+#         if self.family=='CG' and self.exact.bnd_cond!='N' and not self.exact.cte_Dirichlet:
+#             self.get_DirBC(self.uD,t)
         
-        # update uh, which may be needed to compute the f_form (in the case where f(u,t) depends on u)
-        if hasattr(self.exact,'uh'):
-            self.exact.uh.copy(u)
-            self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)       
+#         # update uh, which may be needed to compute the f_form (in the case where f(u,t) depends on u)
+#         if hasattr(self.exact,'uh'):
+#             self.exact.uh.copy(u)
+#             self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)       
         
-        # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
-        if eval_expl:                                                
-            fh.expl = self.eval_f_nonstiff(u,t,fh.expl) 
+#         # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
+#         if eval_expl:                                                
+#             fh.expl = self.eval_f_nonstiff(u,t,fh.expl) 
                 
-        # evaluate implicit (stiff) part M^1*A*u+M^-1*f_stiff(u,t)
-        if eval_impl:
-            fh.impl = self.eval_f_stiff(u,t,fh.impl)
+#         # evaluate implicit (stiff) part M^1*A*u+M^-1*f_stiff(u,t)
+#         if eval_impl:
+#             fh.impl = self.eval_f_stiff(u,t,fh.impl)
                             
-        return fh
+#         return fh
     
-    def eval_f_nonstiff(self,u,t,fh_nonstiff):
+#     def eval_f_nonstiff(self,u,t,fh_nonstiff):
 
-        with self.b.localForm() as loc_b:
-            loc_b.set(0)
-        if self.f_interp:
-            fem.petsc.assemble_vector(self.b, self.f_bnd_form)
-        else:
-            fem.petsc.assemble_vector(self.b, self.f_nonstiff_form)     
-        self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
-        self.invert_mass_matrix(self.b, fh_nonstiff.values.vector)
+#         with self.b.localForm() as loc_b:
+#             loc_b.set(0)
+#         if self.f_interp:
+#             fem.petsc.assemble_vector(self.b, self.f_bnd_form)
+#         else:
+#             fem.petsc.assemble_vector(self.b, self.f_nonstiff_form)     
+#         self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
+#         self.invert_mass_matrix(self.b, fh_nonstiff.values.vector)
 
-        if self.f_interp:# and any(self.nonstiff_indexes):
-            self.interp_f.zero()
-            for i in range(self.exact.size):
-                if self.nonstiff_indexes[i]:
-                    self.interp_f.values.sub(i).interpolate(self.rhs_nonstiff_expr_interp[i])             
-                # else:
-                #     self.interp_f.values.sub(i).collapse().x.array[:] = 0.
-            fh_nonstiff += self.interp_f
+#         if self.f_interp:# and any(self.nonstiff_indexes):
+#             self.interp_f.zero()
+#             for i in range(self.exact.size):
+#                 if self.nonstiff_indexes[i]:
+#                     self.interp_f.values.sub(i).interpolate(self.rhs_nonstiff_expr_interp[i])             
+#                 # else:
+#                 #     self.interp_f.values.sub(i).collapse().x.array[:] = 0.
+#             fh_nonstiff += self.interp_f
 
-        if self.family=='CG' and self.exact.bnd_cond!='N':
-            fem.petsc.set_bc(fh_nonstiff.values.vector, [self.bc], scale=0.)
+#         if self.family=='CG' and self.exact.bnd_cond!='N':
+#             fem.petsc.set_bc(fh_nonstiff.values.vector, [self.bc], scale=0.)
 
-        return fh_nonstiff
+#         return fh_nonstiff
 
-    def eval_f_stiff(self,u,t,fh_stiff):
+#     def eval_f_stiff(self,u,t,fh_stiff):
 
-        with self.b.localForm() as loc_b:
-            loc_b.set(0)
-        changed_b = False
-        if not self.f_interp and any(self.stiff_indexes):            
-            fem.petsc.assemble_vector(self.b, self.f_stiff_form)
-            changed_b = True
-        if self.family=='CG' and self.exact.bnd_cond!='N':
-            fem.petsc.apply_lifting(self.b, [self.diff_form], [[self.bc]])
-            changed_b = True
-        if changed_b:
-            self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE) 
+#         with self.b.localForm() as loc_b:
+#             loc_b.set(0)
+#         changed_b = False
+#         if not self.f_interp and any(self.stiff_indexes):            
+#             fem.petsc.assemble_vector(self.b, self.f_stiff_form)
+#             changed_b = True
+#         if self.family=='CG' and self.exact.bnd_cond!='N':
+#             fem.petsc.apply_lifting(self.b, [self.diff_form], [[self.bc]])
+#             changed_b = True
+#         if changed_b:
+#             self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE) 
         
-        self.K.multAdd(-u.values.vector,self.b,self.b)             
-        self.invert_mass_matrix(self.b, fh_stiff.values.vector)
+#         self.K.multAdd(-u.values.vector,self.b,self.b)             
+#         self.invert_mass_matrix(self.b, fh_stiff.values.vector)
         
-        if self.f_interp and any(self.stiff_indexes):
-            self.interp_f.zero()
-            for i in range(self.exact.size):
-                if self.stiff_indexes[i]:
-                    self.interp_f.values.sub(i).interpolate(self.rhs_stiff_expr_interp[i])             
-                # else:
-                #     self.interp_f.values.sub(i).collapse().x.array[:] = 0.
-            fh_stiff += self.interp_f        
+#         if self.f_interp and any(self.stiff_indexes):
+#             self.interp_f.zero()
+#             for i in range(self.exact.size):
+#                 if self.stiff_indexes[i]:
+#                     self.interp_f.values.sub(i).interpolate(self.rhs_stiff_expr_interp[i])             
+#                 # else:
+#                 #     self.interp_f.values.sub(i).collapse().x.array[:] = 0.
+#             fh_stiff += self.interp_f        
 
-        if self.family=='CG' and self.exact.bnd_cond!='N':
-            fem.petsc.set_bc(fh_stiff.values.vector, [self.bc], scale=0.)
+#         if self.family=='CG' and self.exact.bnd_cond!='N':
+#             fem.petsc.set_bc(fh_stiff.values.vector, [self.bc], scale=0.)
 
-        return fh_stiff
+#         return fh_stiff
 
 
 class parabolic_system_exp_expl_impl(parabolic_system_imex):
@@ -722,31 +722,35 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         v = ufl.TestFunctions(self.V)
 
         splitting = self.splitting
-        # self.u_exp_expr = self.exact.u_exp_expr[splitting]
-        self.phi_one_expr = self.exact.phi_one_expr[splitting]
-        self.rhs_exp_expr = self.exact.rhs_exp_expr[splitting]
+        self.lmbda_expr = self.exact.lmbda_expr[splitting]
+        self.yinf_expr = self.exact.yinf_expr[splitting]
         self.rhs_stiff_expr = self.exact.rhs_stiff_expr[splitting]
         self.rhs_nonstiff_expr = self.exact.rhs_nonstiff_expr[splitting]
-        # self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
+        self.rhs_nonstiff_args = self.exact.rhs_nonstiff_args[splitting]
+        self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
+        self.rhs_exp_args = self.exact.rhs_exp_args[splitting]
     
-        # self.u_exp = 0.
         self.phi_one = 0.  
+        self.phi_one_f = 0.  
         self.F_exp = 0.              
-        # self.u_exp_expr_interp = [None]*self.exact.size
         self.phi_one_expr_interp = [None]*self.exact.size
+        self.phi_one_f_expr_interp = [None]*self.exact.size
         self.rhs_exp_expr_interp = [None]*self.exact.size
         self.exp_indexes = [False]*self.exact.size
         for i in range(self.exact.size):            
-            if self.phi_one_expr[i] is not None:
-                # self.u_exp_expr_interp[i] = fem.Expression(self.u_exp_expr[i],self.V.sub(i).element.interpolation_points())
-                self.phi_one_expr_interp[i] = fem.Expression(self.phi_one_expr[i],self.V.sub(i).element.interpolation_points())
-                # self.u_exp += self.u_exp_expr[i]*v[i]*ufl.dx       
-                self.phi_one += self.phi_one_expr[i]*v[i]*ufl.dx           
-                self.rhs_exp_expr_interp[i] = fem.Expression(self.rhs_exp_expr[i],self.V.sub(i).element.interpolation_points())
-                self.F_exp += self.rhs_exp_expr[i]*v[i]*ufl.dx                           
+            if self.lmbda_expr[i] is not None:
+                self.phi_one_f_expr_interp[i] = fem.Expression(\
+                                                ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i]),\
+                                                self.V.sub(i).element.interpolation_points())
+                self.phi_one_f += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx    
+                self.phi_one_expr_interp[i] = fem.Expression(\
+                                                ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt))*self.exact.uh.sub(i),\
+                                                self.V.sub(i).element.interpolation_points())
+                self.phi_one += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt))*self.exact.uh.sub(i)*v[i]*ufl.dx           
+                self.rhs_exp_expr_interp[i] = fem.Expression(self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i]),self.V.sub(i).element.interpolation_points())
+                self.F_exp += self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx                                              
                 self.exp_indexes[i] = True  
-
-        # self.u_exp_form = fem.form(self.u_exp)
+        self.phi_one_f_form = fem.form(self.phi_one_f)
         self.phi_one_form = fem.form(self.phi_one)
         self.f_exp_form = fem.form(self.F_exp)
 
@@ -883,7 +887,7 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
 
         return fh_exp
     
-    # def exponential_step(self, u, factor, t, u_sol = None):
+    # def phi_one_eval(self, fu, factor, t, u_sol = None):
 
     #     self.exact.update_time(t)
     #     self.exact.update_dt(factor) # for computing the exponentials
@@ -895,28 +899,28 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
     #         self.get_DirBC(self.uD,t)
 
     #     if hasattr(self.exact,'uh'):
-    #         self.exact.uh.copy(u)
+    #         self.exact.uh.copy(fu)
     #         self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
 
     #     if self.f_interp:
     #         for i in range(self.exact.size):
     #             if self.exp_indexes[i]:
-    #                 u_sol.values.sub(i).interpolate(self.u_exp_expr_interp[i])           
+    #                 u_sol.values.sub(i).interpolate(self.phi_one_expr_interp[i])           
     #     else:
     #         with self.b.localForm() as loc_b:
     #             loc_b.set(0)
-    #         fem.petsc.assemble_vector(self.b, self.u_exp_form)   
+    #         fem.petsc.assemble_vector(self.b, self.phi_one_form)   
     #         self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
     #         self.invert_mass_matrix(self.b, u_sol.values.vector)                  
 
-    #     u_sol.copy_sub(u,[i for i in range(self.exact.size) if not self.exp_indexes[i]])
+    #     u_sol.copy_sub(fu,[i for i in range(self.exact.size) if not self.exp_indexes[i]])
         
     #     if self.family=='CG' and self.exact.bnd_cond!='N':
     #         fem.petsc.set_bc(u_sol.values.vector, bcs=self.bc, scale=1.)
 
     #     return u_sol
     
-    def phi_one_eval(self, u, factor, t, u_sol = None):
+    def phi_one_f_eval(self, u, factor, t, u_sol = None):
 
         self.exact.update_time(t)
         self.exact.update_dt(factor) # for computing the exponentials
@@ -934,15 +938,15 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         if self.f_interp:
             for i in range(self.exact.size):
                 if self.exp_indexes[i]:
-                    u_sol.values.sub(i).interpolate(self.phi_one_expr_interp[i])           
+                    u_sol.values.sub(i).interpolate(self.phi_one_f_expr_interp[i])           
         else:
             with self.b.localForm() as loc_b:
                 loc_b.set(0)
-            fem.petsc.assemble_vector(self.b, self.phi_one_form)   
+            fem.petsc.assemble_vector(self.b, self.phi_one_f_form)   
             self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
             self.invert_mass_matrix(self.b, u_sol.values.vector)                  
 
-        u_sol.copy_sub(u,[i for i in range(self.exact.size) if not self.exp_indexes[i]])
+        u_sol.zero_sub([i for i in range(self.exact.size) if not self.exp_indexes[i]])
         
         if self.family=='CG' and self.exact.bnd_cond!='N':
             fem.petsc.set_bc(u_sol.values.vector, bcs=self.bc, scale=1.)
