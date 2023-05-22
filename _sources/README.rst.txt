@@ -128,7 +128,7 @@ and is now maintained and developed by a small community of scientists intereste
 Checkout the :doc:`Changelog <./CHANGELOG>` to see pySDC's evolution since 2016.
 
 Any contribution is dearly welcome ! If you want to take part of this, please take the time to read our :doc:`Contribution Guidelines <./CONTRIBUTING>`
-(and don't forget to take a pick at our nice :doc:`Code of Conduct <./CODE_OF_CONDUCT>` |:wink:|).
+(and don't forget to take a peek at our nice :doc:`Code of Conduct <./CODE_OF_CONDUCT>` |:wink:|).
 
 Acknowledgements
 ----------------

@@ -30,7 +30,7 @@ Those tests are conducted for each commit (even for forks), but you can also run
 
 ..
 
-   |:bell:| To avoid any error about formatting (\ ``black``\ ), you can simply use this program to reformat directly your code using the command :
+   |:bell:| To avoid any error about formatting (\ ``black``\ ), you can simply use this program to reformat your code directly using the command :
 
    .. code-block:: bash
 
@@ -42,6 +42,45 @@ Some style rules that are automatically enforced :
 
 * lines should be not longer than 120 characters
 * arithmetic operators (\ ``+``\ , ``*``\ , ...) should be separated with variables by one empty space
+
+You can automate linting by running black and flakeheaven on all staged files every time you make a commit in a pre-commit hook.
+To this end, just add the following to a possibly new file in the path ``<pySDC-root-directory>/.git/hooks/pre-commit``\ :
+
+.. code-block:: bash
+
+   #!/bin/sh
+
+   export repopath=$(git rev-parse --show-toplevel)
+   export currentpath=$(pwd)
+
+   cd $repopath
+
+   export files=$(git diff --staged --name-only HEAD | grep .py)
+
+   if [[ $files != "" ]]
+   then  
+           black $files
+           git add $files
+
+           export flakeheaven_output=$(flakeheaven lint $files)
+           if [[ "$flakeheaven_output" != 0 ]]
+           then 
+               flakeheaven lint $files
+               exit 1
+           else
+               echo "No flakeheaven issues"
+               exit 0
+           fi
+   fi
+
+   cd $currentpath
+
+You may need to run ``chmod +x`` on the file to allow it to be executed.
+Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor). 
+Also, this will not allow you to commit anything that does not pass flakeheaven's linting.
+
+As a final note, make sure to regularly update linting related packages, as they constantly introduce checking of more PEP8 guidelines.
+This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.
 
 .. _docs/contrib/02_continuous_integration/code-testing:
 
