@@ -64,39 +64,42 @@ flakeheaven<span class="w"> </span>lint<span class="w"> </span>--benchmark<span 
 <li><p>lines should be not longer than 120 characters</p></li>
 <li><p>arithmetic operators (<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, …) should be separated with variables by one empty space</p></li>
 </ul>
-<p>You can automate linting by running black and flakeheaven on all staged files every time you make a commit in a pre-commit hook.
+<p>You can automate linting somewhat by using git hooks.
+In order to run black automatically, we want to do a pre-commit hook which adds the modified files to the commit after reformatting.
 To this end, just add the following to a possibly new file in the path <code class="docutils literal notranslate"><span class="pre">&lt;pySDC-root-directory&gt;/.git/hooks/pre-commit</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
 
-<span class="nb">export</span><span class="w"> </span><span class="nv">repopath</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>rev-parse<span class="w"> </span>--show-toplevel<span class="k">)</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">currentpath</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>
-
-<span class="nb">cd</span><span class="w"> </span><span class="nv">$repopath</span>
-
-<span class="nb">export</span><span class="w"> </span><span class="nv">files</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>diff<span class="w"> </span>--staged<span class="w"> </span>--name-only<span class="w"> </span>HEAD<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>.py<span class="k">)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">files</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>diff<span class="w"> </span>--staged<span class="w"> </span>--name-only<span class="w"> </span>HEAD<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s,^,</span><span class="k">$(</span>git<span class="w"> </span>rev-parse<span class="w"> </span>--show-toplevel<span class="k">)</span><span class="s2">/,&quot;</span><span class="k">)</span>
 
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$files</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="o">]]</span>
 <span class="k">then</span>
 <span class="w">        </span>black<span class="w"> </span><span class="nv">$files</span>
 <span class="w">        </span>git<span class="w"> </span>add<span class="w"> </span><span class="nv">$files</span>
-
-<span class="w">        </span><span class="nb">export</span><span class="w"> </span><span class="nv">flakeheaven_output</span><span class="o">=</span><span class="k">$(</span>flakeheaven<span class="w"> </span>lint<span class="w"> </span><span class="nv">$files</span><span class="k">)</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$flakeheaven_output</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span>
-<span class="w">        </span><span class="k">then</span>
-<span class="w">            </span>flakeheaven<span class="w"> </span>lint<span class="w"> </span><span class="nv">$files</span>
-<span class="w">            </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
-<span class="w">        </span><span class="k">else</span>
-<span class="w">            </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;No flakeheaven issues&quot;</span>
-<span class="w">            </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
-<span class="w">        </span><span class="k">fi</span>
 <span class="k">fi</span>
-
-<span class="nb">cd</span><span class="w"> </span><span class="nv">$currentpath</span>
 </pre></div>
 </div>
 <p>You may need to run <code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">+x</span></code> on the file to allow it to be executed.
-Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor).
-Also, this will not allow you to commit anything that does not pass flakeheaven’s linting.</p>
+Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor).</p>
+<p>To automate flakeheaven, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about flakeheaven only when the time comes to do a pull request.
+To obtain this functionality, add the following to <code class="docutils literal notranslate"><span class="pre">&lt;pySDC-root-directory&gt;/.git/hooks/prepare-commit-msg</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+
+<span class="nv">COMMIT_MSG_FILE</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">files</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>diff<span class="w"> </span>--staged<span class="w"> </span>--name-only<span class="w"> </span>HEAD<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s,^,</span><span class="k">$(</span>git<span class="w"> </span>rev-parse<span class="w"> </span>--show-toplevel<span class="k">)</span><span class="s2">/,&quot;</span><span class="k">)</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$files</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="o">]]</span>
+<span class="k">then</span>
+<span class="w">        </span><span class="nb">export</span><span class="w"> </span><span class="nv">flakeheaven_output</span><span class="o">=</span><span class="k">$(</span>flakeheaven<span class="w"> </span>lint<span class="w"> </span>--format<span class="w"> </span>default<span class="w"> </span><span class="nv">$files</span><span class="k">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$flakeheaven_output</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span>
+<span class="w">        </span><span class="k">then</span>
+<span class="w">                </span>git<span class="w"> </span>interpret-trailers<span class="w"> </span>--in-place<span class="w"> </span>--trailer<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$flakeheaven_output</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s/^/#/&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COMMIT_MSG_FILE</span><span class="s2">&quot;</span>
+<span class="w">                </span>git<span class="w"> </span>interpret-trailers<span class="w"> </span>--in-place<span class="w"> </span>--trailer<span class="w"> </span><span class="s2">&quot;#!!!!!!!!!! WARNING: FLAKEHEAVEN FAILED !!!!!!!!!!&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COMMIT_MSG_FILE</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="k">fi</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+<p>Don’t forget to assign execution rights.</p>
 <p>As a final note, make sure to regularly update linting related packages, as they constantly introduce checking of more PEP8 guidelines.
 This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.</p>
 </section>
