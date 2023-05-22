@@ -233,7 +233,7 @@
         <span class="c1"># determine whether I am the first and/or last in line</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">prev</span> <span class="o">==</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">next</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="c1"># intialize step with u0</span>
+        <span class="c1"># initialize step with u0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">init_step</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
         <span class="c1"># reset some values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
@@ -514,7 +514,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span><span class="p">:</span>
-            <span class="c1"># store pervious iterate to compute difference later on</span>
+            <span class="c1"># store previous iterate to compute difference later on</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uold</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
         <span class="c1"># update stage</span>
