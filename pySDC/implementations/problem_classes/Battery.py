@@ -8,8 +8,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 class battery_n_capacitors(ptype):
     r"""
     Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.
-    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`u_{C_n}` for
-    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}', the circuit switches to the next capacitor. If all capacitors
+    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`v_{C_n}` for
+    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}`, the circuit switches to the next capacitor. If all capacitors
     has dropped below their reference value, the voltage source :math:`V_s` provides further energy. The problem of simulating the
     battery draining has :math:`N + 1` different states. Each of this state can be expressed as a nonhomogeneous linear system of
     ordinary differential equations (ODEs)
@@ -101,7 +101,7 @@ class battery_n_capacitors(ptype):
         .. math::
             v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.
 
-        :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`u_k \leq V_{ref,k-1}` is satisfied.
+        :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.
             - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.
             - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.
               So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.
