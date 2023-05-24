@@ -93,8 +93,11 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
                     max([dt_max, l.params.dt_initial]),
                 ]
             )
-
-            if new_steps[i] < (l.status.dt_new if l.status.dt_new is not None else l.params.dt) and i == 0:
+            if (
+                new_steps[i] < (l.status.dt_new if l.status.dt_new is not None else l.params.dt)
+                and i == 0
+                and l.status.dt_new is not None
+            ):
                 self.log(
                     f"Overwriting stepsize control to reach Tend: {Tend:.2e}! New step size: {new_steps[i]:.2e}", S
                 )
@@ -147,7 +150,11 @@ class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwise):
                     ]
                 )
 
-                if new_steps[i] < l.status.dt_new if l.status.dt_new is not None else l.params.dt:
+                if (
+                    new_steps[i] < l.status.dt_new
+                    if l.status.dt_new is not None
+                    else l.params.dt and l.status.dt_new is not None
+                ):
                     self.log(
                         f"Overwriting stepsize control to reach Tend: {Tend:.2e}! New step size: {new_steps[i]:.2e}", S
                     )
