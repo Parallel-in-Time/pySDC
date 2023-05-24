@@ -1,6 +1,6 @@
 import pytest
 
-# @pytest.mark.
+
 def run_Lorenz(useMPI, maxiter=4, newton_maxiter=5, num_procs=1):
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
