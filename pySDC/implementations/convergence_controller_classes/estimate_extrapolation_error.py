@@ -311,7 +311,11 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
             # compute the extrapolation coefficients if needed
             if (
-                (None in self.coeff.u or self.params.use_adaptivity)
+                (
+                    None in self.coeff.u
+                    or self.params.use_adaptivity
+                    or (not self.params.no_storage and S.status.time_size > 1)
+                )
                 and None not in self.prev.t
                 and t_eval > max(self.prev.t)
             ):
