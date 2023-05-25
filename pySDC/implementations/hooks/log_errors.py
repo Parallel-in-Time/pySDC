@@ -65,6 +65,8 @@ class LogError(hooks):
 
         L.sweep.compute_end_point()
 
+        value = abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend)
+
         self.add_to_stats(
             process=step.status.slot,
             time=L.time + L.dt,
@@ -72,7 +74,19 @@ class LogError(hooks):
             iter=step.status.iter,
             sweep=L.status.sweep,
             type=f'e_local{suffix}',
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend),
+            value=value,
+        )
+
+        self.logger.debug(
+            'Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Sweep: %2i -- '
+            'local_error: %12.8e',
+            step.status.slot,
+            L.time,
+            step.status.stage,
+            L.level_index,
+            step.status.iter,
+            L.status.sweep,
+            value,
         )
 
 
@@ -80,6 +94,25 @@ class LogGlobalErrorPostStep(LogError):
     def post_step(self, step, level_number):
         super().post_step(step, level_number)
         self.log_global_error(step, level_number, '_post_step')
+
+
+class LogGlobalErrorPostIter(LogError):
+    """
+    Log the global error after each iteration
+    """
+
+    def post_iteration(self, step, level_number):
+        """
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
+        super().post_iteration(step, level_number)
+
+        self.log_global_error(step, level_number, suffix='_post_iteration')
 
 
 class LogGlobalErrorPostRun(hooks):

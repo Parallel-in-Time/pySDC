@@ -14,20 +14,6 @@ class EstimateEmbeddedError(ConvergenceController):
     you make sure your preconditioner is compatible, which you have to just try out...
     """
 
-    def __init__(self, controller, params, description, **kwargs):
-        """
-        Initialisation routine. Add the hook for recording the local error.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): Parameters for the convergence controller
-            description (dict): The description object used to instantiate the controller
-        """
-        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
-
-        super().__init__(controller, params, description, **kwargs)
-        controller.add_hook(LogEmbeddedErrorEstimate)
-
     @classmethod
     def get_implementation(cls, flavor='standard', useMPI=False):
         """
@@ -72,7 +58,8 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def dependencies(self, controller, description, **kwargs):
         """
-        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta
+        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta.
+        Add the hook for recording the error.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -83,6 +70,10 @@ class EstimateEmbeddedError(ConvergenceController):
         """
         if RungeKutta not in description["sweeper_class"].__bases__:
             controller.add_convergence_controller(StoreUOld, description=description)
+
+        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+
+        controller.add_hook(LogEmbeddedErrorEstimate)
         return None
 
     def estimate_embedded_error_serial(self, L):
@@ -301,6 +292,9 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
         controller.add_convergence_controller(
             AdaptiveCollocation, params=self.params.adaptive_coll_params, description=description
         )
+        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+
+        controller.add_hook(LogEmbeddedErrorEstimate)
 
     def post_iteration_processing(self, controller, step, **kwargs):
         """
