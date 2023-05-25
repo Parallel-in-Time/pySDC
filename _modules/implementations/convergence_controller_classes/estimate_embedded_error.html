@@ -53,20 +53,6 @@
 <span class="sd">    you make sure your preconditioner is compatible, which you have to just try out...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialisation routine. Add the hook for recording the local error.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): Parameters for the convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogEmbeddedErrorEstimate</span><span class="p">)</span>
-
 <div class="viewcode-block" id="EstimateEmbeddedError.get_implementation"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.get_implementation">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="n">useMPI</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -111,7 +97,8 @@
 
 <div class="viewcode-block" id="EstimateEmbeddedError.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta</span>
+<span class="sd">        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta.</span>
+<span class="sd">        Add the hook for recording the error.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -122,6 +109,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">RungeKutta</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;sweeper_class&quot;</span><span class="p">]</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">:</span>
             <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">StoreUOld</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
+
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogEmbeddedErrorEstimate</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EstimateEmbeddedError.estimate_embedded_error_serial"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedError.estimate_embedded_error_serial">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_embedded_error_serial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
@@ -339,7 +330,10 @@
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
             <span class="n">AdaptiveCollocation</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">adaptive_coll_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
+
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogEmbeddedErrorEstimate</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

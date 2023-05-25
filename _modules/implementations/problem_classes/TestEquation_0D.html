@@ -128,19 +128,23 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="testequation0d.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="testequation0d.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (float): current time</span>
+<span class="sd">            u_init : pySDC.problem.testequation0d.dtype_u</span>
+<span class="sd">            t_init : float</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dtype_u: exact solution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">u_init</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">u_init</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.0</span>
+        <span class="n">t_init</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">t_init</span> <span class="o">*</span> <span class="mf">1.0</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="p">))</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_init</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">t</span> <span class="o">-</span> <span class="n">t_init</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">me</span></div></div>
 </pre></div>
 
