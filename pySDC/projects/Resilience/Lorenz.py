@@ -9,6 +9,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
+from pySDC.projects.Resilience.strategies import merge_descriptions
 
 
 def run_Lorenz(
@@ -18,7 +19,6 @@ def run_Lorenz(
     hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
-    custom_problem_params=None,
     use_MPI=False,
     **kwargs,
 ):
@@ -32,7 +32,6 @@ def run_Lorenz(
         hook_class (pySDC.Hook): A hook to store data
         fault_stuff (dict): A dictionary with information on how to add faults
         custom_controller_params (dict): Overwrite presets
-        custom_problem_params (dict): Overwrite presets
         use_MPI (bool): Whether or not to use MPI
 
     Returns:
@@ -55,9 +54,6 @@ def run_Lorenz(
         'newton_tol': 1e-9,
         'newton_maxiter': 99,
     }
-
-    if custom_problem_params is not None:
-        problem_params = {**problem_params, **custom_problem_params}
 
     # initialize step parameters
     step_params = dict()
@@ -82,11 +78,7 @@ def run_Lorenz(
     description['step_params'] = step_params
 
     if custom_description is not None:
-        for k in custom_description.keys():
-            if k == 'sweeper_class':
-                description[k] = custom_description[k]
-                continue
-            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
+        description = merge_descriptions(description, custom_description)
 
     # set time parameters
     t0 = 0.0
@@ -98,18 +90,13 @@ def run_Lorenz(
 
         comm = kwargs.get('comm', MPI.COMM_WORLD)
         controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
-
-        # get initial values on finest level
         P = controller.S.levels[0].prob
-        uinit = P.u_exact(t0)
     else:
         controller = controller_nonMPI(
             num_procs=num_procs, controller_params=controller_params, description=description
         )
-
-        # get initial values on finest level
         P = controller.MS[0].levels[0].prob
-        uinit = P.u_exact(t0)
+    uinit = P.u_exact(t0)
 
     # insert faults
     if fault_stuff is not None:

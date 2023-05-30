@@ -1,6 +1,5 @@
-import numpy as np
-from pathlib import Path
 from mpi4py import MPI
+import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
 
@@ -9,6 +8,58 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 from pySDC.projects.Resilience.hook import LogData, hook_collection
+from pySDC.projects.Resilience.strategies import merge_descriptions
+
+from pySDC.core.Hooks import hooks
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+class live_plotting_with_error(hooks):  # pragma: no cover
+    def __init__(self):
+        super().__init__()
+        self.fig, self.axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(12, 7))
+
+        divider = make_axes_locatable(self.axs[1])
+        self.cax_right = divider.append_axes('right', size='5%', pad=0.05)
+        divider = make_axes_locatable(self.axs[0])
+        self.cax_left = divider.append_axes('right', size='5%', pad=0.05)
+
+    def post_step(self, step, level_number):
+        lvl = step.levels[level_number]
+        lvl.sweep.compute_end_point()
+
+        self.axs[0].cla()
+        im1 = self.axs[0].imshow(np.abs(lvl.uend), vmin=0, vmax=2.0)
+        self.fig.colorbar(im1, cax=self.cax_left)
+
+        self.axs[1].cla()
+        im = self.axs[1].imshow(np.abs(lvl.prob.u_exact(lvl.time + lvl.dt) - lvl.uend))
+        self.fig.colorbar(im, cax=self.cax_right)
+
+        self.fig.suptitle(f't={lvl.time:.2f}')
+        self.axs[0].set_title('solution')
+        self.axs[1].set_title('error')
+        plt.pause(1e-9)
+
+
+class live_plotting(hooks):  # pragma: no cover
+    def __init__(self):
+        super().__init__()
+        self.fig, self.ax = plt.subplots()
+        divider = make_axes_locatable(self.ax)
+        self.cax = divider.append_axes('right', size='5%', pad=0.05)
+
+    def post_step(self, step, level_number):
+        lvl = step.levels[level_number]
+        lvl.sweep.compute_end_point()
+
+        self.ax.cla()
+        im = self.ax.imshow(np.abs(lvl.uend), vmin=0.2, vmax=1.8)
+        self.ax.set_title(f't={lvl.time + lvl.dt:.2f}')
+        self.fig.colorbar(im, cax=self.cax)
+        plt.pause(1e-9)
 
 
 def run_Schroedinger(
@@ -18,7 +69,6 @@ def run_Schroedinger(
     hook_class=LogData,
     fault_stuff=None,
     custom_controller_params=None,
-    custom_problem_params=None,
     use_MPI=False,
     space_comm=None,
     **kwargs,
@@ -33,7 +83,6 @@ def run_Schroedinger(
         hook_class (pySDC.Hook): A hook to store data
         fault_stuff (dict): A dictionary with information on how to add faults
         custom_controller_params (dict): Overwrite presets
-        custom_problem_params (dict): Overwrite presets
         use_MPI (bool): Whether or not to use MPI
 
     Returns:
@@ -41,13 +90,14 @@ def run_Schroedinger(
         controller: The controller
         Tend: The time that was supposed to be integrated to
     """
+    from mpi4py import MPI
 
-    space_comm = MPI.COMM_WORLD if space_comm is None else space_comm
+    space_comm = MPI.COMM_SELF if space_comm is None else space_comm
     rank = space_comm.Get_rank()
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1e-08
+    level_params['restol'] = 1e-8
     level_params['dt'] = 1e-01 / 2
     level_params['nsweeps'] = 1
 
@@ -62,10 +112,8 @@ def run_Schroedinger(
     problem_params = dict()
     problem_params['nvars'] = (128, 128)
     problem_params['spectral'] = False
+    problem_params['c'] = 1.0
     problem_params['comm'] = space_comm
-
-    if custom_problem_params is not None:
-        problem_params = {**problem_params, **custom_problem_params}
 
     # initialize step parameters
     step_params = dict()
@@ -90,21 +138,26 @@ def run_Schroedinger(
     description['step_params'] = step_params
 
     if custom_description is not None:
-        for k in custom_description.keys():
-            if type(custom_description[k]) == dict:
-                description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
-            else:
-                description[k] = custom_description[k]
+        description = merge_descriptions(description, custom_description)
 
     # set time parameters
     t0 = 0.0
 
     # instantiate controller
-    assert use_MPI == False, "MPI version in time not implemented"
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+    controller_args = {
+        'controller_params': controller_params,
+        'description': description,
+    }
+    if use_MPI:
+        from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
+        comm = kwargs.get('comm', MPI.COMM_WORLD)
+        controller = controller_MPI(**controller_args, comm=comm)
+        P = controller.S.levels[0].prob
+    else:
+        controller = controller_nonMPI(**controller_args, num_procs=num_procs)
+        P = controller.MS[0].levels[0].prob
+
     uinit = P.u_exact(t0)
 
     # insert faults
@@ -124,25 +177,9 @@ def run_Schroedinger(
     return stats, controller, Tend
 
 
-def plot_solution(stats):  # pragma: no cover
-    import matplotlib.pyplot as plt
-
-    u = get_sorted(stats, type='u')
-    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
-    axs[0].imshow(np.abs(u[0][1]))
-    axs[0].set_title(f't={u[0][0]:.2f}')
-    for i in range(len(u)):
-        axs[1].cla()
-        axs[1].imshow(np.abs(u[i][1]))
-        axs[1].set_title(f't={u[i][0]:.2f}')
-        plt.pause(1e-1)
-    fig.tight_layout()
-    plt.show()
-
-
 def main():
-    stats, _, _ = run_Schroedinger(space_comm=MPI.COMM_WORLD)
-    plot_solution(stats)
+    stats, _, _ = run_Schroedinger(space_comm=MPI.COMM_WORLD, hook_class=live_plotting)
+    plt.show()
 
 
 if __name__ == "__main__":

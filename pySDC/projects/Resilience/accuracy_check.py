@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
@@ -118,12 +118,14 @@ def multiple_runs(
 
     num_procs = 1 if serial else 5
 
+    embedded_error_flavor = 'standard' if avoid_restarts else 'linearized'
+
     # perform rest of the tests
     for i in range(0, len(dt_list)):
         desc = {
             'step_params': {'maxiter': k},
             'convergence_controllers': {
-                EstimateEmbeddedErrorNonMPI: {},
+                EstimateEmbeddedError.get_implementation(flavor=embedded_error_flavor, useMPI=False): {},
                 EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
             },
         }
@@ -134,7 +136,11 @@ def multiple_runs(
         elif var == 'e_tol':
             from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
-            desc['convergence_controllers'][Adaptivity] = {'e_tol': dt_list[i], 'avoid_restarts': avoid_restarts}
+            desc['convergence_controllers'][Adaptivity] = {
+                'e_tol': dt_list[i],
+                'avoid_restarts': avoid_restarts,
+                'embedded_error_flavor': embedded_error_flavor,
+            }
 
         if custom_description is not None:
             desc = {**desc, **custom_description}
@@ -206,7 +212,7 @@ def plot(res, ax, k, var='dt'):
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
-        if all([me == 0.0 for me in res[keys[i]]]):
+        if all(me == 0.0 for me in res[keys[i]]):
             continue
         order = get_accuracy_order(res, key=keys[i], var=var)
         if keys[i] == 'e_embedded':
@@ -379,7 +385,16 @@ def check_order_with_adaptivity():
     ks = [3, 2]
     for serial in [True, False]:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-        plot_all_errors(ax, ks, serial, Tend_fixed=5e-1, var='e_tol', dt_list=[1e-5, 1e-6, 1e-7], avoid_restarts=True)
+        plot_all_errors(
+            ax,
+            ks,
+            serial,
+            Tend_fixed=5e-1,
+            var='e_tol',
+            dt_list=[1e-5, 5e-6],
+            avoid_restarts=False,
+            custom_controller_params={'logger_level': 30},
+        )
         if serial:
             fig.savefig('data/error_estimate_order_adaptivity.png', dpi=300, bbox_inches='tight')
         else:

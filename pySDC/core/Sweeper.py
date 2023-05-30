@@ -15,6 +15,7 @@ class _Pars(FrozenClass):
     def __init__(self, pars):
         self.do_coll_update = False
         self.initial_guess = 'spread'
+        self.skip_residual_computation = ()  # gain performance at the cost of correct residual output
 
         for k, v in pars.items():
             if k != 'collocation_class':
@@ -331,13 +332,22 @@ class sweeper(object):
         L.status.unlocked = True
         L.status.updated = True
 
-    def compute_residual(self):
+    def compute_residual(self, stage=None):
         """
         Computation of the residual using the collocation matrix Q
+
+        Args:
+            stage (str): The current stage of the step the level belongs to
         """
 
         # get current level and problem description
         L = self.level
+
+        # Check if we want to skip the residual computation to gain performance
+        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
+        if stage in self.params.skip_residual_computation:
+            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
+            return None
 
         # check if there are new values (e.g. from a sweep)
         # assert L.status.updated

@@ -56,6 +56,7 @@ markers = [
     'petsc: tests relying on PETSc/petsc4py',
     'benchmark: tests for benchmarking',
     'cupy: tests for cupy on GPUs',
+    'libpressio: tests using the libpressio library',
     ]
 
 [tool.flakeheaven]

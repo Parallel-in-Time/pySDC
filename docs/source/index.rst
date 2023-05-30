@@ -48,8 +48,9 @@ Projects
    projects/AllenCahn_Bayreuth.rst
    projects/performance.rst
    projects/PinTSimE.rst
-   projects/Resilience.rst
+   projects/Resilience.rst   
    projects/DAE.rst
+   projects/compression.rst
 
 
 API documentation

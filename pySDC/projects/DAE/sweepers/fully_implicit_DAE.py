@@ -169,10 +169,14 @@ class fully_implicit_DAE(sweeper):
         L.status.unlocked = True
         L.status.updated = True
 
-    def compute_residual(self):
+    def compute_residual(self, stage=None):
         """
         Overrides the base implementation
         Uses the absolute value of the implicit function ||F(u', u, t)|| as the residual
+
+        Args:
+            stage (str): The current stage of the step the level belongs to
+
         Returns:
             None
         """
@@ -180,6 +184,12 @@ class fully_implicit_DAE(sweeper):
         # get current level and problem description
         L = self.level
         P = L.prob
+
+        # Check if we want to skip the residual computation to gain performance
+        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
+        if stage in self.params.skip_residual_computation:
+            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
+            return None
 
         # check if there are new values (e.g. from a sweep)
         # assert L.status.updated

@@ -27,6 +27,7 @@ class vanderpol(ptype):
             'mu', 'newton_maxiter', 'newton_tol', 'stop_at_nan', 'crash_at_maxiter', localVars=locals()
         )
         self.work_counters['newton'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
@@ -69,6 +70,7 @@ class vanderpol(ptype):
         f = self.f_init
         f[0] = x2
         f[1] = self.mu * (1 - x1**2) * x2 - x1
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, dt, u0, t):

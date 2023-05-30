@@ -263,26 +263,7 @@ class ConvergenceController(object):
             controller (pySDC.Controller): The controller
             S (pySDC.Step): The current step
             size (int): The number of ranks
-            time (float): The current time
-            Tend (float): The final time
-
-        Returns:
-            None
-        """
-        pass
-
-    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
-        """
-        This is an extension to the function `prepare_next_block`, which is only called in the non MPI controller and
-        is needed because there is no chance to communicate backwards otherwise. While you should not do this in the
-        first place, the first step in the new block comes after the last step in the last block, such that it is still
-        in fact forwards communication, even though it looks backwards.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            MS (list): All steps of the controller
-            active_slots (list): Index list of active steps
-            time (float): The current time
+            time (float): The current time will be list in nonMPI controller implementation
             Tend (float): The final time
 
         Returns:
@@ -334,6 +315,8 @@ class ConvergenceController(object):
         # log what's happening for debug purposes
         self.logger.debug(f'Step {comm.rank} initiates send to step {dest}')
 
+        kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
         if blocking:
             req = comm.send(data, dest=dest, **kwargs)
         else:
@@ -357,6 +340,8 @@ class ConvergenceController(object):
         """
         # log what's happening for debug purposes
         self.logger.debug(f'Step {comm.rank} initiates receive from step {source}')
+
+        kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
 
         data = comm.recv(source=source, **kwargs)
 

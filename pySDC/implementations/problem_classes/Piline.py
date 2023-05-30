@@ -7,8 +7,42 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 # noinspection PyUnusedLocal
 class piline(ptype):
-    """
-    Example implementing the Piline model as in the description in the PinTSimE project
+    r"""
+    Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the
+    piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:
+
+    .. math::
+        \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_\pi} (t) + \frac{V_s}{R_s C_1},
+
+    .. math::
+        \frac{d v_{C_2} (t)}{dt} = -\frac{1}{R_\ell C_2}v_{C_2} (t) + \frac{1}{C_2} i_{L_\pi} (t),
+
+    .. math::
+        \frac{d i_{L_\pi} (t)}{dt} = \frac{1}{L_\pi} v_{C_1} (t) - \frac{1}{L_\pi} v_{C_2} (t) - \frac{R_\pi}{L_\pi} i_{L_\pi} (t),
+
+    which can be expressed as a nonhomogeneous linear system of ODEs
+
+    .. math::
+        \frac{d u(t)}{dt} = A u(t) + f(t)
+
+    using an initial condition.
+
+    Parameters
+    ----------
+    Vs : float
+        Voltage at the voltage source :math:`V_s`.
+    Rs : float
+        Resistance of the resistor :math:`R_s` at the voltage source.
+    C1 : float
+        Capacitance of the capacitor :math:`C_1`.
+    Rpi : float
+        Resistance of the resistor :math:`R_\pi`.
+    Lpi : float
+        Inductance of the inductor :math:`L_\pi`.
+    C2 : float
+        Capacitance of the capacitor :math:`C_2`.
+    Rl : float
+        Resistance of the resistive load :math:`R_\ell`.
 
     Attributes:
         A: system matrix, representing the 3 ODEs
@@ -39,14 +73,19 @@ class piline(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init, val=0.0)
@@ -55,17 +94,24 @@ class piline(ptype):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)
@@ -74,15 +120,21 @@ class piline(ptype):
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
-        Routine to approximate the exact solution at time t by scipy
+        Routine to approximate the exact solution at time t by scipy as a reference.
 
-        Args:
-            t (float): current time
-            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution
-            t_init (float): the starting time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+        u_init : pySDC.problem.Piline.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
-        Returns:
-            dtype_u: exact solution (kind of)
+        Returns
+        -------
+        me : dtype_u
+            The reference solution.
         """
 
         me = self.dtype_u(self.init)

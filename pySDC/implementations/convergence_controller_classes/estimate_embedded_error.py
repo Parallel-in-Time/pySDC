@@ -2,7 +2,6 @@ import numpy as np
 
 from pySDC.core.ConvergenceController import ConvergenceController, Pars, Status
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
-from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta
 
@@ -15,21 +14,8 @@ class EstimateEmbeddedError(ConvergenceController):
     you make sure your preconditioner is compatible, which you have to just try out...
     """
 
-    def __init__(self, controller, params, description, **kwargs):
-        """
-        Initialisation routine. Add the buffers for communication.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): Parameters for the convergence controller
-            description (dict): The description object used to instantiate the controller
-        """
-        super(EstimateEmbeddedError, self).__init__(controller, params, description, **kwargs)
-        self.buffers = Pars({'e_em_last': 0.0})
-        controller.add_hook(LogEmbeddedErrorEstimate)
-
     @classmethod
-    def get_implementation(cls, flavor):
+    def get_implementation(cls, flavor='standard', useMPI=False):
         """
         Retrieve the implementation for a specific flavor of this class.
 
@@ -39,10 +25,15 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             cls: The child class that implements the desired flavor
         """
-        if flavor == 'MPI':
-            return EstimateEmbeddedErrorMPI
-        elif flavor == 'nonMPI':
-            return EstimateEmbeddedErrorNonMPI
+        if flavor == 'standard':
+            return cls
+        elif flavor == 'linearized':
+            if useMPI:
+                return EstimateEmbeddedErrorLinearizedMPI
+            else:
+                return EstimateEmbeddedErrorLinearizedNonMPI
+        elif flavor == 'collocation':
+            return EstimateEmbeddedErrorCollocation
         else:
             raise NotImplementedError(f'Flavor {flavor} of EstimateEmbeddedError is not implemented!')
 
@@ -67,7 +58,8 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def dependencies(self, controller, description, **kwargs):
         """
-        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta
+        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta.
+        Add the hook for recording the error.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -78,6 +70,10 @@ class EstimateEmbeddedError(ConvergenceController):
         """
         if RungeKutta not in description["sweeper_class"].__bases__:
             controller.add_convergence_controller(StoreUOld, description=description)
+
+        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+
+        controller.add_hook(LogEmbeddedErrorEstimate)
         return None
 
     def estimate_embedded_error_serial(self, L):
@@ -125,8 +121,41 @@ class EstimateEmbeddedError(ConvergenceController):
     def reset_status_variables(self, controller, **kwargs):
         self.setup_status_variables(controller, **kwargs)
 
+    def post_iteration_processing(self, controller, S, **kwargs):
+        """
+        Estimate the local error here.
 
-class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
+        If you are doing MSSDC, this is the global error within the block in Gauss-Seidel mode.
+        In Jacobi mode, I haven't thought about what this is.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+
+        if S.status.iter > 0 or self.params.sweeper_type == "RK":
+            for L in S.levels:
+                L.status.error_embedded_estimate = max([self.estimate_embedded_error_serial(L), np.finfo(float).eps])
+
+        return None
+
+
+class EstimateEmbeddedErrorLinearizedNonMPI(EstimateEmbeddedError):
+    def __init__(self, controller, params, description, **kwargs):
+        """
+        Initialisation routine. Add the buffers for communication.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
+        super().__init__(controller, params, description, **kwargs)
+        self.buffers = Pars({'e_em_last': 0.0})
+
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
         Reset buffers for imitated communication.
@@ -168,7 +197,19 @@ level"
         return None
 
 
-class EstimateEmbeddedErrorMPI(EstimateEmbeddedError):
+class EstimateEmbeddedErrorLinearizedMPI(EstimateEmbeddedError):
+    def __init__(self, controller, params, description, **kwargs):
+        """
+        Initialisation routine. Add the buffers for communication.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
+        super().__init__(controller, params, description, **kwargs)
+        self.buffers = Pars({'e_em_last': 0.0})
+
     def post_iteration_processing(self, controller, S, **kwargs):
         """
         Compute embedded error estimate on the last node of each level
@@ -251,6 +292,9 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
         controller.add_convergence_controller(
             AdaptiveCollocation, params=self.params.adaptive_coll_params, description=description
         )
+        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+
+        controller.add_hook(LogEmbeddedErrorEstimate)
 
     def post_iteration_processing(self, controller, step, **kwargs):
         """

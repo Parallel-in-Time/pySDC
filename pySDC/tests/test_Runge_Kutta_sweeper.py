@@ -1,36 +1,35 @@
-import matplotlib.pyplot as plt
-import numpy as np
 import pytest
 
-from pySDC.implementations.sweeper_classes.Runge_Kutta import (
-    RK1,
-    RK4,
-    MidpointMethod,
-    CrankNicholson,
-    Cash_Karp,
-    Heun_Euler,
-    DIRK34,
-)
-from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
-from pySDC.helpers.stats_helper import get_sorted
-
-
-colors = {
-    RK1: 'blue',
-    MidpointMethod: 'red',
-    RK4: 'orange',
-    CrankNicholson: 'purple',
-    Cash_Karp: 'teal',
+COLORS = {
+    'RK1': 'blue',
+    'MidpointMethod': 'red',
+    'RK4': 'orange',
+    'CrankNicholson': 'purple',
+    'Cash_Karp': 'teal',
 }
 
 
-def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=None, implicit=True):
+def get_sweeper(sweeper_name):
+    """
+    Retrieve a sweeper from a name
+
+    Args:
+        sweeper_name (str):
+
+    Returns:
+        pySDC.Sweeper.RungeKutta: The sweeper
+    """
+    import pySDC.implementations.sweeper_classes.Runge_Kutta as RK
+
+    return eval(f'RK.{sweeper_name}')
+
+
+def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixed=None, implicit=True):
     """
     Make a plot of the order of the scheme and test if it has the correct order
 
     Args:
-        sweeper (pySDC.Sweeper.RungeKutta): The RK rule to try
+        sweeper_name (str): Name of the RK rule you want
         prob (function): Some function that runs a pySDC problem and accepts suitable parameters, see resilience project
         dt_list (list): List of step sizes to try
         description (dict): A description to use for running the problem
@@ -41,13 +40,15 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     Returns:
         None
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
     from pySDC.projects.Resilience.accuracy_check import plot_orders
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    description = dict() if description is None else description
-    description['sweeper_class'] = sweeper
+    description = {} if description is None else description
+    description['sweeper_class'] = get_sweeper(sweeper_name)
     description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
 
@@ -67,32 +68,32 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
 
     # check if we got the expected order for the local error
     orders = {
-        RK1: 2,
-        MidpointMethod: 3,
-        RK4: 5,
-        CrankNicholson: 3,
-        Cash_Karp: 6,
+        'RK1': 2,
+        'MidpointMethod': 3,
+        'RK4': 5,
+        'CrankNicholson': 3,
+        'Cash_Karp': 6,
     }
     numerical_order = float(ax.get_lines()[-1].get_label()[7:])
-    expected_order = orders.get(sweeper, numerical_order)
+    expected_order = orders.get(sweeper_name, numerical_order)
     assert np.isclose(
         numerical_order, expected_order, atol=2.6e-1
     ), f"Expected order {expected_order}, got {numerical_order}!"
 
     # decorate
-    ax.get_lines()[-1].set_color(colors.get(sweeper, 'black'))
+    ax.get_lines()[-1].set_color(COLORS.get(sweeper_name, 'black'))
 
-    label = f'{sweeper.__name__} - {ax.get_lines()[-1].get_label()[5:]}'
+    label = f'{sweeper_name} - {ax.get_lines()[-1].get_label()[5:]}'
     ax.get_lines()[-1].set_label(label)
     ax.legend(frameon=False)
 
 
-def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=None, im=None, crosshair=True):
+def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True, re=None, im=None, crosshair=True):
     """
     Plot the domain of stability for a single RK rule.
 
     Args:
-        sweeper (pySDC.Sweeper.RungeKutta)
+        sweeper_name (pySDC.Sweeper.RungeKutta)
         ax: Somewhere to plot
         description (dict): A description to use for running the problem
         implicit (bool): Whether to use implicit or explicit versions of RK rules
@@ -103,13 +104,15 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
     Returns:
         None
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
     from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    description = dict() if description is None else description
-    description['sweeper_class'] = sweeper
+    description = {} if description is None else description
+    description['sweeper_class'] = get_sweeper(sweeper_name)
     description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
 
@@ -128,16 +131,16 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
         custom_controller_params=custom_controller_params,
     )
     Astable = plot_stability(
-        stats, ax=ax, iter=[1], colors=[colors.get(sweeper, 'black')], crosshair=crosshair, fill=True
+        stats, ax=ax, iter=[1], COLORS=[COLORS.get(sweeper_name, 'black')], crosshair=crosshair, fill=True
     )
 
     # check if we think the method should be A-stable
-    Astable_methods = [RK1, CrankNicholson, MidpointMethod, DIRK34]  # only the implicit versions are A-stable
+    Astable_methods = ['RK1', 'CrankNicholson', 'MidpointMethod', 'DIRK34']  # only the implicit versions are A-stable
     assert (
-        implicit and sweeper in Astable_methods
-    ) == Astable, f"Unexpected region of stability for {sweeper.__name__} sweeper!"
+        implicit and sweeper_name in Astable_methods
+    ) == Astable, f"Unexpected region of stability for {sweeper_name} sweeper!"
 
-    ax.get_lines()[-1].set_label(sweeper.__name__)
+    ax.get_lines()[-1].set_label(sweeper_name)
     ax.legend(frameon=False)
 
 
@@ -149,10 +152,13 @@ def test_all_stability():
     Returns:
         None
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
+
     fig, axs = plt.subplots(1, 2, figsize=(11, 5))
 
     impl = [True, False]
-    sweepers = [[RK1, MidpointMethod, CrankNicholson], [RK1, MidpointMethod, RK4, Cash_Karp]]
+    sweepers = [['RK1', 'MidpointMethod', 'CrankNicholson'], ['RK1', 'MidpointMethod', 'RK4', 'Cash_Karp']]
     titles = ['implicit', 'explicit']
     re = np.linspace(-4, 4, 400)
     im = np.linspace(-4, 4, 400)
@@ -163,7 +169,7 @@ def test_all_stability():
             plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=re, im=im, crosshair=crosshair[i])
         axs[j].set_title(titles[j])
 
-    plot_stability_single(DIRK34, re=re, im=im)
+    plot_stability_single('DIRK34', re=re, im=im)
 
     fig.tight_layout()
 
@@ -182,6 +188,8 @@ def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
     Returns:
         None
     """
+    import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots(1, 1)
     for i in range(len(sweepers)):
         plot_order(sweepers[i], prob, dt_list, Tend_fixed=Tend, ax=ax, implicit=implicit)
@@ -196,10 +204,13 @@ def test_vdp():
     Returns:
         None
     """
+    import numpy as np
     from pySDC.projects.Resilience.vdp import run_vdp
 
     Tend = 7e-2
-    plot_all_orders(run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4, Cash_Karp])
+    plot_all_orders(
+        run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, ['RK1', 'MidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp']
+    )
 
 
 @pytest.mark.base
@@ -211,54 +222,52 @@ def test_advection():
         None
     """
     from pySDC.projects.Resilience.advection import run_advection
+    import numpy as np
 
     plot_all_orders(
-        run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson], implicit=True
+        run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod', 'CrankNicholson'], implicit=True
     )
-    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod], implicit=False)
+    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod'], implicit=False)
 
 
 @pytest.mark.base
-@pytest.mark.parametrize("sweeper", [Cash_Karp, Heun_Euler, DIRK34])
-def test_embedded_estimate_order(sweeper):
+@pytest.mark.parametrize('sweeper_name', ['Cash_Karp', 'Heun_Euler', 'DIRK34'])
+def test_embedded_estimate_order(sweeper_name):
     """
     Test the order of embedded Runge-Kutta schemes. They are not run with adaptivity here,
     so we can simply vary the step size and check the embedded error estimate.
 
     Args:
-        sweeper (pySDC.Sweeper.RungeKutta)
+        sweeper_name (pySDC.Sweeper.RungeKutta)
 
     Returns:
         None
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
     from pySDC.projects.Resilience.vdp import run_vdp
     from pySDC.projects.Resilience.accuracy_check import plot_all_errors
+    from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 
     fig, ax = plt.subplots(1, 1)
 
     # change only the things in the description that we need for adaptivity
-    convergence_controllers = dict()
-    convergence_controllers[EstimateEmbeddedErrorNonMPI] = {}
+    convergence_controllers = {}
+    convergence_controllers[EstimateEmbeddedError] = {}
 
-    description = dict()
+    description = {}
     description['convergence_controllers'] = convergence_controllers
-    description['sweeper_class'] = sweeper
+    description['sweeper_class'] = get_sweeper(sweeper_name)
     description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
-
-    expected_order = {
-        Cash_Karp: [5],
-        Heun_Euler: [2],
-        DIRK34: [4],
-    }
 
     Tend = 7e-2
     dt_list = Tend * 2.0 ** (-np.arange(8))
     prob = run_vdp
     plot_all_errors(
         ax,
-        expected_order.get(sweeper, None),
+        [get_sweeper(sweeper_name).get_update_order()],
         True,
         Tend_fixed=Tend,
         custom_description=description,
@@ -276,22 +285,26 @@ def test_embedded_method():
     Returns:
         None
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
     from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
+    from pySDC.helpers.stats_helper import get_sorted
 
-    sweeper = Cash_Karp
+    sweeper_name = 'Cash_Karp'
     fig, ax = plt.subplots(1, 1)
 
     # change only the things in the description that we need for adaptivity
-    adaptivity_params = dict()
+    adaptivity_params = {}
     adaptivity_params['e_tol'] = 1e-7
     adaptivity_params['update_order'] = 5
 
-    convergence_controllers = dict()
+    convergence_controllers = {}
     convergence_controllers[AdaptivityRK] = adaptivity_params
 
-    description = dict()
+    description = {}
     description['convergence_controllers'] = convergence_controllers
-    description['sweeper_class'] = sweeper
+    description['sweeper_class'] = get_sweeper(sweeper_name)
     description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
@@ -309,8 +322,8 @@ def test_embedded_method():
 
 if __name__ == '__main__':
     test_embedded_method()
-    test_embedded_estimate_order(Cash_Karp)
+    for sweep in ['Cash_Karp', 'Heun_Euler', 'DIRK34']:
+        test_embedded_estimate_order(sweep)
     test_vdp()
     test_advection()
     test_all_stability()
-    plt.show()

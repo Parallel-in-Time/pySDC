@@ -19,7 +19,7 @@ black pySDC --check --diff --color
 flakeheaven lint --benchmark pySDC
 ```
 
-> :bell: To avoid any error about formatting (`black`), you can simply use this program to reformat directly your code using the command :
+> :bell: To avoid any error about formatting (`black`), you can simply use this program to reformat your code directly using the command :
 >
 > ```bash
 > black pySDC
@@ -29,6 +29,51 @@ Some style rules that are automatically enforced :
 
 - lines should be not longer than 120 characters
 - arithmetic operators (`+`, `*`, ...) should be separated with variables by one empty space
+
+You can automate linting somewhat by using git hooks.
+In order to run black automatically, we want to do a pre-commit hook which adds the modified files to the commit after reformatting.
+To this end, just add the following to a possibly new file in the path `<pySDC-root-directory>/.git/hooks/pre-commit`:
+
+```bash
+#!/bin/sh
+
+export files=$(git diff --staged --name-only HEAD | grep .py | sed -e "s,^,$(git rev-parse --show-toplevel)/,")
+
+if [[ $files != "" ]]
+then  
+        black $files
+        git add $files
+fi
+```
+
+You may need to run `chmod +x` on the file to allow it to be executed.
+Be aware that the hook will alter files you may have opened in an editor whenever you make a commit, which may confuse you(r editor). 
+
+To automate flakeheaven, we want to write a hook that alters the commit message in case any errors are detected. This gives us the choice of aborting the commit and fixing the issues, or we can go ahead and commit them and worry about flakeheaven only when the time comes to do a pull request.
+To obtain this functionality, add the following to `<pySDC-root-directory>/.git/hooks/prepare-commit-msg`:
+
+```bash
+#!/bin/sh
+
+COMMIT_MSG_FILE=$1
+
+export files=$(git diff --staged --name-only HEAD | grep .py | sed -e "s,^,$(git rev-parse --show-toplevel)/,")
+
+if [[ $files != "" ]]
+then
+        export flakeheaven_output=$(flakeheaven lint --format default $files)
+        if [[ "$flakeheaven_output" != 0 ]]
+        then
+                git interpret-trailers --in-place --trailer "$(echo "$flakeheaven_output" | sed -e 's/^/#/')" "$COMMIT_MSG_FILE"
+                git interpret-trailers --in-place --trailer "#!!!!!!!!!! WARNING: FLAKEHEAVEN FAILED !!!!!!!!!!" "$COMMIT_MSG_FILE"
+        fi
+fi
+
+```
+Don't forget to assign execution rights.
+
+As a final note, make sure to regularly update linting related packages, as they constantly introduce checking of more PEP8 guidelines.
+This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.
 
 ## Code testing
 

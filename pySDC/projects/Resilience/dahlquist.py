@@ -11,6 +11,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from pySDC.implementations.hooks.log_solution import LogSolutionAfterIteration
 from pySDC.implementations.hooks.log_step_size import LogStepSize
+from pySDC.projects.Resilience.strategies import merge_descriptions
 
 
 class LogLambdas(hooks):
@@ -34,7 +35,6 @@ def run_dahlquist(
     hook_class=hooks,
     fault_stuff=None,
     custom_controller_params=None,
-    custom_problem_params=None,
     **kwargs,
 ):
     """
@@ -47,7 +47,6 @@ def run_dahlquist(
         hook_class (pySDC.Hook): A hook to store data
         fault_stuff (dict): A dictionary with information on how to add faults
         custom_controller_params (dict): Overwrite presets
-        custom_problem_params (dict): Overwrite presets
 
     Returns:
         dict: The stats object
@@ -78,9 +77,6 @@ def run_dahlquist(
         'u0': 1.0 + 0.0j,
     }
 
-    if custom_problem_params is not None:
-        problem_params = {**problem_params, **custom_problem_params}
-
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 5
@@ -104,11 +100,7 @@ def run_dahlquist(
     description['step_params'] = step_params
 
     if custom_description is not None:
-        for k in custom_description.keys():
-            if k == 'sweeper_class':
-                description[k] = custom_description[k]
-                continue
-            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
+        description = merge_descriptions(description, custom_description)
 
     # set time parameters
     t0 = 0.0
