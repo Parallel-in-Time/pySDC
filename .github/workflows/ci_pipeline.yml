@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: brownbaerchen/libpressio:amd64
+      image: brownbaerchen/libpressio:amd64_2
       volumes:
         - ${{ github.workspace }}:/pySDC
 
