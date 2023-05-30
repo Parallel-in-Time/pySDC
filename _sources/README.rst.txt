@@ -25,6 +25,11 @@
    :alt: fair-software.eu
 
 
+.. image:: https://img.shields.io/badge/sqaaas%20software-silver-lightgrey
+   :target: https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved"
+   :alt: SQAaaS badge shields.io
+
+
 Welcome to pySDC!
 =================
 
