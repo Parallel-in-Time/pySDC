@@ -1,5 +1,7 @@
 from pySDC.core.ConvergenceController import ConvergenceController
 import numpy as np
+
+np.bool = np.bool_
 import libpressio
 
 
