@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, num_restarts=None):
+def filter_stats(
+    stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, num_restarts=None, comm=None
+):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -13,6 +15,7 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
         iter (int): the requested iteration count
         type (str): string to describe the requested type of value
         recomputed (bool): filter recomputed values from stats if set to anything other than None
+        comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)
 
     Returns:
         dict: dictionary containing only the entries corresponding to the filter
@@ -31,17 +34,20 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
         ):
             result[k] = v
 
+    if comm is not None:
+        # gather the results across all ranks and the flatten the list
+        result = {key: value for sub_result in comm.allgather(result) for key, value in sub_result.items()}
+
     return result
 
 
-def sort_stats(stats, sortby, comm=None):
+def sort_stats(stats, sortby):
     """
     Helper function to transform stats dictionary to sorted list of tuples
 
     Args:
         stats (dict): dictionary of statistics
         sortby (str): string to specify which key to use for sorting
-        comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)
 
     Returns:
         list: list of tuples containing the sortby item and the value
@@ -52,10 +58,6 @@ def sort_stats(stats, sortby, comm=None):
         # convert string to attribute and append key + value to result as tuple
         item = getattr(k, sortby)
         result.append((item, v))
-
-    if comm is not None:
-        # gather the results across all ranks and the flatten the list
-        result = [item for sub_result in comm.allgather(result) for item in sub_result]
 
     # sort by first element of the tuple (which is the sortby key) and return
     sorted_data = sorted(result, key=lambda tup: tup[0])
@@ -108,14 +110,13 @@ def get_list_of_types(stats):
     return type_list
 
 
-def get_sorted(stats, sortby='time', comm=None, **kwargs):
+def get_sorted(stats, sortby='time', **kwargs):
     """
     Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
     Keyword arguments are passed to `filter_stats` for filtering.
 
     stats (dict): raw statistics from a controller run
     sortby (str): string to specify which key to use for sorting
-    comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)
 
     Returns:
         list: list of tuples containing the sortby item and the value
@@ -124,5 +125,4 @@ def get_sorted(stats, sortby='time', comm=None, **kwargs):
     return sort_stats(
         filter_stats(stats, **kwargs),
         sortby=sortby,
-        comm=comm,
     )
