@@ -5,6 +5,7 @@ import numpy as np
 from pySDC.core.Errors import ParameterError
 
 from pySDC.projects.ExplicitStabilized.problem_classes.ParabolicSystem_FEniCSx import parabolic_system, parabolic_system_imex, parabolic_system_exp_expl_impl
+# from pySDC.projects.ExplicitStabilized.problem_classes.ParabolicSystem_FEniCSx_vec import parabolic_system, parabolic_system_imex, parabolic_system_exp_expl_impl
 import pySDC.projects.ExplicitStabilized.problem_classes.parabolic_system_helpers.problems as problems
 from pySDC.projects.ExplicitStabilized.transfer_classes.TransferFenicsxMesh import mesh_to_mesh_fenicsx
 from pySDC.projects.ExplicitStabilized.hooks.HookClass_pde import pde_hook
@@ -14,9 +15,11 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.ExplicitStabilized.sweeper_classes.imexexp_1st_order import imexexp_1st_order
-from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_multirate_stabilized import exponential_multirate_stabilized
-from pySDC.projects.ExplicitStabilized.sweeper_classes.stabilized import stabilized
-from pySDC.projects.ExplicitStabilized.sweeper_classes.multirate_stabilized import multirate_stabilized
+from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_splitting_explicit_stabilized import exponential_splitting_explicit_stabilized
+from pySDC.projects.ExplicitStabilized.sweeper_classes.explicit_stabilized import explicit_stabilized
+from pySDC.projects.ExplicitStabilized.sweeper_classes.multirate_explicit_stabilized import multirate_explicit_stabilized
+from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
+from pySDC.projects.ExplicitStabilized.sweeper_classes.splitting_explicit_stabilized import splitting_explicit_stabilized     
 
 from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.es_methods import RKW1, RKC1, RKU1, HSRKU1, mRKC1
 
@@ -26,8 +29,10 @@ def main():
     integrators = ['IMEX']
     integrators = ['IMEXEXP']
     # integrators = ['ES']
-    # integrators = ['mES']
-    # integrators = ['exp_mES']
+    integrators = ['mES']
+    integrators = ['exp_mES']
+    # integrators = ['split_ES']
+    # integrators = ['exp_split_ES']
     
     num_procs = 1
 
@@ -36,9 +41,9 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5e-6
-    level_params['dt'] = 0.1/2**ref
-    level_params['nsweeps'] = [3]
+    level_params['restol'] = 5e-8
+    level_params['dt'] = 0.1 #0.1/2**ref
+    level_params['nsweeps'] = [1]
     level_params['residual_type'] = 'full_rel'
 
     # initialize sweeper parameters
@@ -48,18 +53,20 @@ def main():
     sweeper_params['num_nodes'] = [3]
     # specific for explicit stabilized methods
     sweeper_params['es_class'] = RKW1
-    # sweeper_params['es_class_outer'] = RKW1
-    # sweeper_params['es_class_inner'] = RKW1
+    sweeper_params['es_class_outer'] = RKW1
+    sweeper_params['es_class_inner'] = RKW1
+    # sweeper_params['es_s_outer'] = 0 # if given, or not zero, then the algorithm fixes s of the outer stabilized scheme to this value.
+    # sweeper_params['es_s_inner'] = 0
     # sweeper_params['res_comp'] = 'f_eta'
     sweeper_params['damping'] = 0.05
-    sweeper_params['safe_add'] = 1
+    sweeper_params['safe_add'] = 0
     # sweeper_params['order'] = [3]
     # sweeper_params['nodes_choice'] = 'all' # closest_radau, last, all
     sweeper_params['rho_freq'] = 100
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 1
+    step_params['maxiter'] = 100
 
     # initialize problem parameters
     problem_params = dict()
@@ -67,7 +74,7 @@ def main():
     if problem_params['family']=='CG':
         problem_params['order'] = 1
         problem_params['mass_lumping'] = True # has effect for family=CG and order=1    
-        problem_params['n_elems'] = [10*2**(ref*time_order/2.)]
+        problem_params['n_elems'] = [20] # [10*2**(ref*time_order/2.)]
     elif problem_params['family']=='DG':
         problem_params['order'] = max(time_order-1,1)
         p = ref/2. if time_order==1 else ref
@@ -83,7 +90,7 @@ def main():
     problem_params['enable_output'] = False
     problem_params['output_folder'] = './data/results/'
     problem_params['output_file_name'] = 'monodomain'
-    problem_params['exact_solution_class'] = problems.linlin_solution
+    problem_params['exact_solution_class'] = problems.Monodomain
 
 
     # base transfer parameters
@@ -113,15 +120,23 @@ def main():
             description['sweeper_class'] = imexexp_1st_order
         elif integrator == 'ES':                     
             parabolic_system_type = parabolic_system
-            description['sweeper_class'] = stabilized
+            description['sweeper_class'] = explicit_stabilized
         elif integrator == 'mES':                     
             problem_params['splitting'] = 'stiff_nonstiff'
             parabolic_system_type = parabolic_system_exp_expl_impl
-            description['sweeper_class'] = multirate_stabilized  
+            description['sweeper_class'] = multirate_explicit_stabilized
         elif integrator == 'exp_mES':                     
             problem_params['splitting'] = 'exp_stiff_nonstiff'
             parabolic_system_type = parabolic_system_exp_expl_impl
-            description['sweeper_class'] = exponential_multirate_stabilized       
+            description['sweeper_class'] = exponential_multirate_explicit_stabilized      
+        elif integrator == 'split_ES':                     
+            problem_params['splitting'] = 'stiff_nonstiff'
+            parabolic_system_type = parabolic_system_exp_expl_impl
+            description['sweeper_class'] = splitting_explicit_stabilized       
+        elif integrator == 'exp_split_ES':                     
+            problem_params['splitting'] = 'exp_stiff_nonstiff'
+            parabolic_system_type = parabolic_system_exp_expl_impl
+            description['sweeper_class'] = exponential_splitting_explicit_stabilized       
         else:
             raise ParameterError('Unknown integrator.')
         

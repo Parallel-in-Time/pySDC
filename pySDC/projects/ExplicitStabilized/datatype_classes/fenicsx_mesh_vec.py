@@ -60,6 +60,27 @@ class fenicsx_mesh_vec(object):
             l2_norm += abs(val)**2
         return np.sqrt(l2_norm/self.size)
     
+    def dot(self,other):
+        sum = 0.
+        for i in range(self.size):
+            self.val_list[i].values.vector.dotBegin(other.val_list[i].values.vector)
+            sum += self.val_list[i].values.vector.dotEnd(other.val_list[i].values.vector)
+        return sum
+    
+    def dot_sub(self,other):
+        # sum = []
+        # Nx = self.val_list[0].values.x.array.size
+        # for n in range(Nx):
+        #     sum_tmp=0.
+        #     for i in range(self.size):
+        #         sum_tmp += self.val_list[i].values.x.array[n]*other.val_list[i].values.x.array[n]
+        #     sum.append(sum_tmp)
+        sums = np.multiply(self.val_list[0].values.x.array,other.val_list[0].values.x.array)
+        for i in range(1,self.size):
+            sums += np.multiply(self.val_list[i].values.x.array,other.val_list[i].values.x.array)
+        
+        return sums
+    
     def axpy(self,a,x):
         for i in range(self.size):
             self[i].axpy(a,x[i])
@@ -122,9 +143,9 @@ class fenicsx_mesh_vec(object):
         for i in indices:
             self.val_list[i].axpy(a,x.val_list[i])
 
-    # def aypx_sub(self,a,x,indices):
-    #     for i in indices:
-    #         self.val_list[i].aypx(a,x.val_list[i])
+    def aypx_sub(self,a,x,indices):
+        for i in indices:
+            self.val_list[i].aypx(a,x.val_list[i])
 
     def copy_sub(self,other,indices):
         for i in indices:

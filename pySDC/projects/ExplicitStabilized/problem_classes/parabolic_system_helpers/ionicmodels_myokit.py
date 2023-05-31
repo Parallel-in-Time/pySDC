@@ -92,7 +92,11 @@ class HodgkinHuxley(IonicModel):
         
         AV_alpha_h = 0.07 * ufl.exp((-(NV_Ith_S(y, 0) + 75.0)) / 20.0)
         AV_beta_h = 1.0 / (ufl.exp((-(NV_Ith_S(y, 0) + 45.0)) / 10.0) + 1.0)
-        ydot[2] = AV_alpha_h * (1.0 - NV_Ith_S(y, 2)) - AV_beta_h * NV_Ith_S(y, 2)                
+        ydot[2] = AV_alpha_h * (1.0 - NV_Ith_S(y, 2)) - AV_beta_h * NV_Ith_S(y, 2)    
+
+        # AV_alpha_m = (-0.1) * (NV_Ith_S(y, 0) + 50.0) / (ufl.exp((-(NV_Ith_S(y, 0) + 50.0)) / 10.0) - 1.0)
+        # AV_beta_m = 4.0 * ufl.exp((-(NV_Ith_S(y, 0) + 75.0)) / 18.0)
+        # ydot[1] = AV_alpha_m * (1.0 - NV_Ith_S(y, 1)) - AV_beta_m * NV_Ith_S(y, 1)            
                 
         AV_i_K = self.AC_g_K * pow(NV_Ith_S(y, 3), 4.0) * (NV_Ith_S(y, 0) - self.AC_E_K)        
         AV_i_Na = self.AC_g_Na * pow(NV_Ith_S(y, 1), 3.0) * NV_Ith_S(y, 2) * (NV_Ith_S(y, 0) - self.AC_E_Na)        
@@ -104,16 +108,39 @@ class HodgkinHuxley(IonicModel):
     def f_stiff(self, y):
         ydot = [None]*self.size            
         
+        # AV_alpha_n = (-0.01) * (NV_Ith_S(y, 0) + 65.0) / (ufl.exp((-(NV_Ith_S(y, 0) + 65.0)) / 10.0) - 1.0)
+        # AV_beta_n = 0.125 * ufl.exp((NV_Ith_S(y, 0) + 75.0) / 80.0)
+        # ydot[3] = AV_alpha_n * (1.0 - NV_Ith_S(y, 3)) - AV_beta_n * NV_Ith_S(y, 3)
+        
+        # AV_alpha_h = 0.07 * ufl.exp((-(NV_Ith_S(y, 0) + 75.0)) / 20.0)
+        # AV_beta_h = 1.0 / (ufl.exp((-(NV_Ith_S(y, 0) + 45.0)) / 10.0) + 1.0)
+        # ydot[2] = AV_alpha_h * (1.0 - NV_Ith_S(y, 2)) - AV_beta_h * NV_Ith_S(y, 2)    
+
         AV_alpha_m = (-0.1) * (NV_Ith_S(y, 0) + 50.0) / (ufl.exp((-(NV_Ith_S(y, 0) + 50.0)) / 10.0) - 1.0)
         AV_beta_m = 4.0 * ufl.exp((-(NV_Ith_S(y, 0) + 75.0)) / 18.0)
         ydot[1] = AV_alpha_m * (1.0 - NV_Ith_S(y, 1)) - AV_beta_m * NV_Ith_S(y, 1)            
+                
+        # AV_i_K = self.AC_g_K * pow(NV_Ith_S(y, 3), 4.0) * (NV_Ith_S(y, 0) - self.AC_E_K)        
+        # AV_i_Na = self.AC_g_Na * pow(NV_Ith_S(y, 1), 3.0) * NV_Ith_S(y, 2) * (NV_Ith_S(y, 0) - self.AC_E_Na)        
+        # AV_i_L = self.AC_g_L * (NV_Ith_S(y, 0) - self.AC_E_L)
+        # ydot[0] = -( AV_i_Na + AV_i_K + AV_i_L)  
 
         return ydot
     
     def u_stiff_coeffs(self, y):
         yinf = [None]*self.size
         tau = [None]*self.size
+
+        # AV_alpha_n = (-0.01) * (NV_Ith_S(y, 0) + 65.0) / (ufl.exp((-(NV_Ith_S(y, 0) + 65.0)) / 10.0) - 1.0)
+        # AV_beta_n = 0.125 * ufl.exp((NV_Ith_S(y, 0) + 75.0) / 80.0)
+        # tau[3] = 1/(AV_alpha_n+AV_beta_n)
+        # yinf[3] = AV_alpha_n*tau[3]    
         
+        # AV_alpha_h = 0.07 * ufl.exp((-(NV_Ith_S(y, 0) + 75.0)) / 20.0)
+        # AV_beta_h = 1.0 / (ufl.exp((-(NV_Ith_S(y, 0) + 45.0)) / 10.0) + 1.0)
+        # tau[2] = 1/(AV_alpha_h+AV_beta_h)
+        # yinf[2] = AV_alpha_h*tau[2]    
+
         AV_alpha_m = (-0.1) * (NV_Ith_S(y, 0) + 50.0) / (ufl.exp((-(NV_Ith_S(y, 0) + 50.0)) / 10.0) - 1.0)
         AV_beta_m = 4.0 * ufl.exp((-(NV_Ith_S(y, 0) + 75.0)) / 18.0)
         tau[1] = 1/(AV_alpha_m+AV_beta_m)
@@ -1176,20 +1203,12 @@ class TenTusscher2006_epi(IonicModel):
         AV_tau_m = 1.0 * AV_alpha_m * AV_beta_m
         ydot[4] = (AV_m_inf - NV_Ith_S(y, 4)) / AV_tau_m
 
-        # /* *remaining* */
-        # AV_E_K = self.AC_R * self.AC_T / self.AC_F * ufl.ln(self.AC_K_o / NV_Ith_S(y, 18))
-        # AV_i_NaK = self.AC_P_NaK * self.AC_K_o / (self.AC_K_o + self.AC_K_mk) * NV_Ith_S(y, 17) / (NV_Ith_S(y, 17) + self.AC_K_mNa) / (1.0 + 0.1245 * ufl.exp((-0.1) * NV_Ith_S(y, 0) * self.AC_F / (self.AC_R * self.AC_T)) + 0.0353 * ufl.exp((-NV_Ith_S(y, 0)) * self.AC_F / (self.AC_R * self.AC_T)))
-        # AV_i_to = self.AC_g_to * NV_Ith_S(y, 12) * NV_Ith_S(y, 11) * (NV_Ith_S(y, 0) - AV_E_K)
-        # AV_alpha_K1 = 0.1 / (1.0 + ufl.exp(0.06 * (NV_Ith_S(y, 0) - AV_E_K - 200.0)))
-        # AV_beta_K1 = (3.0 * ufl.exp(0.0002 * (NV_Ith_S(y, 0) - AV_E_K + 100.0)) + ufl.exp(0.1 * (NV_Ith_S(y, 0) - AV_E_K - 10.0))) / (1.0 + ufl.exp((-0.5) * (NV_Ith_S(y, 0) - AV_E_K)))
-        # AV_i_p_K = self.AC_g_pK * (NV_Ith_S(y, 0) - AV_E_K) / (1.0 + ufl.exp((25.0 - NV_Ith_S(y, 0)) / 5.98))
-        # AV_i_Kr = self.AC_g_Kr * np.sqrt(self.AC_K_o / 5.4) * NV_Ith_S(y, 1) * NV_Ith_S(y, 2) * (NV_Ith_S(y, 0) - AV_E_K)
-        # AV_E_Ks = self.AC_R * self.AC_T / self.AC_F * ufl.ln((self.AC_K_o + self.AC_P_kna * self.AC_Na_o) / (NV_Ith_S(y, 18) + self.AC_P_kna * NV_Ith_S(y, 17)))
-        # AV_xK1_inf = AV_alpha_K1 / (AV_alpha_K1 + AV_beta_K1)
-        # AV_i_Ks = self.AC_g_Ks * pow(NV_Ith_S(y, 3), 2.0) * (NV_Ith_S(y, 0) - AV_E_Ks)
-        # AV_i_K1 = self.AC_g_K1 * AV_xK1_inf * np.sqrt(self.AC_K_o / 5.4) * (NV_Ith_S(y, 0) - AV_E_K)
-        # ydot[18] = (-(AV_i_K1 + AV_i_to + AV_i_Kr + AV_i_Ks + AV_i_p_K - 2.0 * AV_i_NaK)) / (self.AC_V_c * self.AC_F) * self.AC_Cm    
-        
+        # AV_alpha_j = ufl.conditional(ufl.lt(NV_Ith_S(y, 0) , (-40.0)) , ((-25428.0) * ufl.exp(0.2444 * NV_Ith_S(y, 0)) - 6.948e-06 * ufl.exp((-0.04391) * NV_Ith_S(y, 0))) * (NV_Ith_S(y, 0) + 37.78) / 1.0 / (1.0 + ufl.exp(0.311 * (NV_Ith_S(y, 0) + 79.23))) , 0.0)
+        # AV_beta_j = ufl.conditional(ufl.lt(NV_Ith_S(y, 0) , (-40.0)) , 0.02424 * ufl.exp((-0.01052) * NV_Ith_S(y, 0)) / (1.0 + ufl.exp((-0.1378) * (NV_Ith_S(y, 0) + 40.14))) , 0.6 * ufl.exp(0.057 * NV_Ith_S(y, 0)) / (1.0 + ufl.exp((-0.1) * (NV_Ith_S(y, 0) + 32.0))))
+        # AV_j_inf = 1.0 / pow(1.0 + ufl.exp((NV_Ith_S(y, 0) + 71.55) / 7.43), 2.0)
+        # AV_tau_j = 1.0 / (AV_alpha_j + AV_beta_j)
+        # ydot[6] = (AV_j_inf - NV_Ith_S(y, 6)) / AV_tau_j
+ 
         return ydot
     
     def u_stiff_coeffs(self, y):
@@ -1200,7 +1219,12 @@ class TenTusscher2006_epi(IonicModel):
         AV_alpha_m = 1.0 / (1.0 + ufl.exp(((-60.0) - NV_Ith_S(y, 0)) / 5.0))
         AV_beta_m = 0.1 / (1.0 + ufl.exp((NV_Ith_S(y, 0) + 35.0) / 5.0)) + 0.1 / (1.0 + ufl.exp((NV_Ith_S(y, 0) - 50.0) / 200.0))
         yinf[4] = 1.0 / pow(1.0 + ufl.exp(((-56.86) - NV_Ith_S(y, 0)) / 9.03), 2.0)
-        tau[4] = 1.0 * AV_alpha_m * AV_beta_m        
+        tau[4] = 1.0 * AV_alpha_m * AV_beta_m     
+
+        # AV_alpha_j = ufl.conditional(ufl.lt(NV_Ith_S(y, 0) , (-40.0)) , ((-25428.0) * ufl.exp(0.2444 * NV_Ith_S(y, 0)) - 6.948e-06 * ufl.exp((-0.04391) * NV_Ith_S(y, 0))) * (NV_Ith_S(y, 0) + 37.78) / 1.0 / (1.0 + ufl.exp(0.311 * (NV_Ith_S(y, 0) + 79.23))) , 0.0)
+        # AV_beta_j = ufl.conditional(ufl.lt(NV_Ith_S(y, 0) , (-40.0)) , 0.02424 * ufl.exp((-0.01052) * NV_Ith_S(y, 0)) / (1.0 + ufl.exp((-0.1378) * (NV_Ith_S(y, 0) + 40.14))) , 0.6 * ufl.exp(0.057 * NV_Ith_S(y, 0)) / (1.0 + ufl.exp((-0.1) * (NV_Ith_S(y, 0) + 32.0))))
+        # yinf[6] = 1.0 / pow(1.0 + ufl.exp((NV_Ith_S(y, 0) + 71.55) / 7.43), 2.0)
+        # tau[6] = 1.0 / (AV_alpha_j + AV_beta_j)
 
         return yinf,tau
     

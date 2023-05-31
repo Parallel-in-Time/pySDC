@@ -41,7 +41,10 @@ class RKW1:
         return s
 
     def stability_boundary(self,s):        
-        return 2.*self.dP[s-1]
+        if s==1:
+            return 2.
+        else:
+            return 2.*self.dP[s-1]
     
 class RKC1:
     def __init__(self,damping,safe_add):
@@ -162,8 +165,8 @@ class RKU1:
         mu[1:] = 2.*w1*b[2:]/b[1:-1]
         nu[1:] = 2.*w0*b[2:]/b[1:-1]
         kappa[1:] = -b[2:]/b[0:-2]
-        self.nu[0] = s*self.mu[0]/2.
-        self.kappa[0] = s*self.mu[0]
+        nu[0] = s*mu[0]/2.
+        kappa[0] = s*mu[0]
         
         c = np.zeros(s+1,dtype=np.float64)
         c[0] = 0.
@@ -260,11 +263,18 @@ class mRKC1:
         self.nu = self.outer_method.nu
         self.kappa = self.outer_method.kappa
         self.c = self.outer_method.c
+        self.delta_c = np.zeros_like(self.c)
+        self.delta_c[0] = self.c[0]
+        self.delta_c[1:] = self.c[1:]-self.c[:-1]
+
 
         self.alpha = self.inner_method.mu
         self.beta = self.inner_method.nu
         self.gamma = self.inner_method.kappa
         self.d = self.inner_method.c
+        self.delta_d = np.zeros_like(self.d)
+        self.delta_d[0] = self.d[0]
+        self.delta_d[1:] = self.d[1:]-self.d[:-1]
 
     def get_s(self, z):
         return self.outer_method.get_s(z)
@@ -309,6 +319,19 @@ class mRKC1:
                 m += m%2
 
         return m
+    
+    def fix_eta(self,dt,s,m):
+        ls = self.outer_method.stability_boundary(s)
+        if not self.scale_separation:
+            if isinstance(self.inner_method,RKC1):
+                self.eta = dt*6.0/ls*m**2/(m**2-1)
+            else:
+                self.inner_method.update_coefficients(m)
+                stab_fun  = stability_function(self.inner_method.mu,self.inner_method.nu,self.inner_method.kappa)
+                ddR = stab_fun.ddR(0.)
+                self.eta = 2.0*dt/ls/ddR
+        else:
+            self.eta = 2.0*dt/ls
 
 class stability_function:
     def __init__(self,mu,nu,kappa):

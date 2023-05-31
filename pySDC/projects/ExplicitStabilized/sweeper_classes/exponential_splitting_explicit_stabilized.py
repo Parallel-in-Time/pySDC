@@ -5,7 +5,7 @@ from pySDC.core.Errors import CollocationError
 from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.rho_estimator import rho_estimator
 from pySDC.core.Lagrange import LagrangeApproximation
 
-class multirate_stabilized(sweeper):
+class exponential_splitting_explicit_stabilized(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -22,7 +22,7 @@ class multirate_stabilized(sweeper):
         """
 
         # call parent's initialization routine
-        super(multirate_stabilized, self).__init__(params)
+        super(exponential_splitting_explicit_stabilized, self).__init__(params)
 
         self.damping = params['damping'] if 'damping' in params else 0.05
         self.safe_add = params['safe_add'] if 'safe_add' in params else 1
@@ -45,11 +45,12 @@ class multirate_stabilized(sweeper):
         # updates spectral radius every rho_freq steps
         self.rho_freq = params['rho_freq'] if 'rho_freq' in params else 5
         self.rho_count = 0
+        self.estimated_rho = [0,0]
 
-        self.with_node_zero = True
+        # self.with_node_zero = True
 
     def init_es(self,params):
-        return [[params['es_class'](self.damping,self.safe_add),params['es_class'](self.damping,self.safe_add)] for _ in range(self.coll.num_nodes)]
+        return [[params['es_class_outer'](self.damping,self.safe_add),params['es_class_inner'](self.damping,self.safe_add)] for _ in range(self.coll.num_nodes)]
     
     def update_stages_coefficients(self):
         
@@ -58,26 +59,31 @@ class multirate_stabilized(sweeper):
         M = self.coll.num_nodes
 
         if not hasattr(self,'rho'):
-            if hasattr(P,'rho') and callable(P.rho):
-                self.rho = P.rho
+            self.rho_estimator = rho_estimator(P)
+            if hasattr(P.exact,'rho_nonstiff') and callable(P.exact.rho_nonstiff):
+                self.rho_expl = P.exact.rho_nonstiff
             else:
-                self.rho_estimator = rho_estimator(P)
-                self.rho = self.rho_estimator.rho
-        
+                self.rho_expl = self.rho_estimator.rho_expl
+            if hasattr(P.exact,'rho_stiff') and callable(P.exact.rho_stiff):
+                self.rho_impl = P.exact.rho_stiff
+            else:
+                self.rho_impl = self.rho_estimator.rho_impl
+
         if self.rho_count % self.params.rho_freq == 0:
-            self.estimated_rho = self.rho(y=L.u[0],t=L.time,fy=L.f[0])            
+            self.estimated_rho[0] = self.rho_expl(y=L.u[0],t=L.time,fy=L.f[0]) 
+            self.estimated_rho[1] = self.rho_impl(y=L.u[0],t=L.time,fy=L.f[0])            
             self.rho_count = 0
             self.s = [[0,0] for _ in range(M)]
             for m in range(M):
                 for i in [0,1]:
-                    rho_m = self.estimated_rho.expl if i==0 else self.estimated_rho.impl
+                    rho_m = self.estimated_rho[i]
                     self.s[m][i] = self.es[m][i].get_s(L.dt*self.coll.delta_m[m]*rho_m)
                     if self.s[m][i]!=self.s_prev[m][i]:
                         self.es[m][i].update_coefficients(self.s[m][i])
                         self.sub_nodes[m][i] = self.coll.nodes[m]+(self.es[m][i].c-1.)*self.coll.delta_m[m]
                         self.interp_mat[m][i] = self.lagrange.getInterpolationMatrix(self.sub_nodes[m][i])
                         self.interp_mat0[m][i] = self.lagrange0.getInterpolationMatrix(self.sub_nodes[m][i])
-            self.s_prev[m] = self.s[m][:]
+                self.s_prev[m] = self.s[m][:]
 
         self.rho_count += 1
 
@@ -91,15 +97,18 @@ class multirate_stabilized(sweeper):
 
         # get current level and problem description
         L = self.level
+        P = L.prob
 
         me = []
 
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl+L.f[1].expl+L.f[1].exp))
+            # me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl + P.phi_one_f_eval(L.u[1],L.dt*self.coll.nodes[0],L.time)))
             # new instance of dtype_u, initialize values with 0
             for j in range(2, self.coll.num_nodes + 1):
                 me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl+L.f[j].expl+L.f[j].exp)
+                # me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl + P.phi_one_f_eval(L.u[j],L.dt*self.coll.nodes[j-1],L.time))        
 
         return me
 
@@ -138,7 +147,44 @@ class multirate_stabilized(sweeper):
         self.dj = P.dtype_u(P.init,0.)
         self.djm1 = P.dtype_u(P.init,0.)
         self.djm2 = P.dtype_u(P.init,0.)
-        
+
+        # # do the sweep
+        # for m in range(M):
+
+        #     dt = L.dt*self.coll.delta_m[m]
+        #     es = self.es[m][1]
+        #     sub_nodes = self.sub_nodes[m][1]     
+
+            
+        #     df_expl = self.f_eta(integral[m]+self.djm1,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),self.es[m][0])\
+        #                 -self.f_eta(u_old[m],dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),self.es[m][0])            
+            
+        #     f1 = P.eval_f(integral[m]+self.djm1+dt*es.nu[0]*df_expl, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=True,eval_exp=True)
+        #     f2 = P.eval_f(u_old[m], L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=True,eval_exp=True)
+        #     df_exp = P.phi_one_eval(f1.exp-f2.exp,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))
+        #     f1 = f1.impl
+        #     f2 = f2.impl
+
+        #     self.djm1.copy(self.dj)
+        #     self.dj = self.djm1 + dt*es.mu[0]*(f1-f2+df_exp) + dt*es.kappa[0]*df_expl
+        #     for j in range(2,es.s+1):
+        #         self.djm2, self.djm1, self.dj = self.djm1, self.dj, self.djm2            
+
+        #         I_int = self.interpolate(integral, m, 1, j-2)
+        #         I_u_old = self.interpolate(u_old, m, 1, j-2)
+                
+        #         f1 = P.eval_f(I_int+self.djm1, L.time + L.dt * sub_nodes[j-2],eval_impl=True,eval_expl=False,eval_exp=True)
+        #         f2 = P.eval_f(I_u_old, L.time + L.dt * sub_nodes[j-2],eval_impl=True,eval_expl=False,eval_exp=True)
+        #         df_exp = P.phi_one_eval(f1.exp-f2.exp,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))
+        #         f1 = f1.impl
+        #         f2 = f2.impl
+        #         self.dj = f1-f2+df_exp
+        #         self.dj *= dt*es.mu[j-1]
+        #         self.dj += es.nu[j-1]*self.djm1+es.kappa[j-1]*self.djm2
+
+        #     L.u[m+1] = self.dj+integral[m+1]
+        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+
         # do the sweep
         for m in range(M):
 
@@ -146,14 +192,19 @@ class multirate_stabilized(sweeper):
             es = self.es[m][1]
             sub_nodes = self.sub_nodes[m][1]     
 
-            self.djm1.copy(self.dj)
-            f1 = P.eval_f(integral[m]+self.djm1, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=True,eval_exp=False)
-            f2 = P.eval_f(u_old[m], L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=True,eval_exp=False)
-            df_expl = self.f_eta(integral[m]+self.djm1,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),self.es[m][0])\
-                        -self.f_eta(u_old[m],dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),self.es[m][0])
+            
+            df_expl =  self.f_eta(integral[m]+self.djm1, dt, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]), self.es[m][0])\
+                     - self.f_eta(u_old[m]             , dt, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]), self.es[m][0])            
+            
+            f1 = P.eval_f(integral[m]+self.djm1, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=False,eval_exp=False)
+            f2 = P.eval_f(u_old[m]             , L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=False,eval_exp=False)
+            df_exp =   P.phi_one_f_eval(integral[m]+self.djm1, dt, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))\
+                     - P.phi_one_f_eval(u_old[m]             , dt, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))
             f1 = f1.impl
             f2 = f2.impl
-            self.dj = self.djm1 + dt*es.mu[0]*(f1-f2+df_expl)
+
+            self.djm1.copy(self.dj)
+            self.dj = self.djm1 + dt*es.mu[0]*(f1-f2+df_expl+df_exp)
             for j in range(2,es.s+1):
                 self.djm2, self.djm1, self.dj = self.djm1, self.dj, self.djm2            
 
@@ -162,17 +213,16 @@ class multirate_stabilized(sweeper):
                 
                 f1 = P.eval_f(I_int+self.djm1, L.time + L.dt * sub_nodes[j-2],eval_impl=True,eval_expl=False,eval_exp=False)
                 f2 = P.eval_f(I_u_old, L.time + L.dt * sub_nodes[j-2],eval_impl=True,eval_expl=False,eval_exp=False)
+                df_exp = P.phi_one_f_eval(I_int+self.djm1,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))\
+                            - P.phi_one_f_eval(I_u_old,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))
                 f1 = f1.impl
                 f2 = f2.impl
-                self.dj = f1-f2+df_expl
+                self.dj = f1-f2+df_expl+df_exp
                 self.dj *= dt*es.mu[j-1]
                 self.dj += es.nu[j-1]*self.djm1+es.kappa[j-1]*self.djm2
 
             L.u[m+1] = self.dj+integral[m+1]
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-        # # indicate presence of new values at this level
-        L.status.updated = True
 
         return None
     

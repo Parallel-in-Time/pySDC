@@ -173,6 +173,8 @@ class parabolic_system_problem():
         self.rhs_exp_args = dict()
         self.lmbda = dict()
         self.yinf = dict()
+        self.diagonal_stiff = dict()
+        self.diagonal_nonstiff = dict()
 
         # here we consider only a stiff and a nonstiff part
         self.rhs_nonstiff['stiff_nonstiff'] = [self.rhs[0], self.rhs[1]] #this is random splitting (i.e. not really in stiff-nonstiff) just for debugging
@@ -182,6 +184,8 @@ class parabolic_system_problem():
         self.rhs_nonstiff_args['stiff_nonstiff'] = [0,1] 
         self.rhs_stiff_args['stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
         self.rhs_exp_args['stiff_nonstiff'] = [] 
+        self.diagonal_nonstiff['stiff_nonstiff'] = True
+        self.diagonal_stiff['stiff_nonstiff'] = False
         
         # here we add (artificially) an exponential term and remove the stiff term
         self.rhs_nonstiff['exp_nonstiff'] = [self.rhs[0], self.rhs[1] + self.sol[1]]
@@ -191,6 +195,8 @@ class parabolic_system_problem():
         self.rhs_nonstiff_args['exp_nonstiff'] = [0,1] 
         self.rhs_stiff_args['exp_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
         self.rhs_exp_args['exp_nonstiff'] = [1] 
+        self.diagonal_nonstiff['exp_nonstiff'] = True
+        self.diagonal_stiff['exp_nonstiff'] = False
 
         # here we consider the three terms
         self.rhs_nonstiff['exp_stiff_nonstiff'] = [self.rhs[0], self.sol[1]]
@@ -200,6 +206,8 @@ class parabolic_system_problem():
         self.rhs_nonstiff_args['exp_stiff_nonstiff'] = [0,1] 
         self.rhs_stiff_args['exp_stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
         self.rhs_exp_args['exp_stiff_nonstiff'] = [1] 
+        self.diagonal_nonstiff['exp_stiff_nonstiff'] = True
+        self.diagonal_stiff['exp_stiff_nonstiff'] = False
 
 
 class linlin_solution(parabolic_system_problem):
@@ -410,7 +418,7 @@ class coscoscos(parabolic_system_problem):
         self.ft = 1.
         self.t0 = 0.
         self.Tend = 1.
-        self.diff = [0.1,0.1]
+        self.diff = [0.5,0.5]
 
         self.know_exact = True
         self.cte_Dirichlet = False # indicates if the Dirichlet boundary condition is constant in time
@@ -512,7 +520,7 @@ class brusselator(parabolic_system_problem):
         self.zero = fem.Constant(self.domain,0.)
         self.g = [self.zero]*self.size        
         self.u0 = [22.*self.x[1]*ufl.elem_pow(1.-self.x[1],1.5),27.*self.x[0]*ufl.elem_pow(1.-self.x[0],1.5)]        
-        self.rhs = [1.0+self.uh.values.sub(0)**2*self.uh.values.sub(1)-4.4*self.uh.values.sub(0)+5.*ufl.exp(-((self.x[0]-0.3)**2+(self.x[1]-0.6)**2)/0.005), 3.4*self.uh.values.sub(0)-self.uh.values.sub(0)**2*self.uh.values.sub(1)]
+        self.rhs = [1.0+self.uh.sub(0)**2*self.uh.sub(1)-4.4*self.uh.sub(0)+5.*ufl.exp(-((self.x[0]-0.3)**2+(self.x[1]-0.6)**2)/0.005), 3.4*self.uh.sub(0)-self.uh.sub(0)**2*self.uh.sub(1)]
         self.define_splittings()
 
     def define_splittings(self):
@@ -525,6 +533,8 @@ class brusselator(parabolic_system_problem):
         self.rhs_nonstiff_args = dict()
         self.rhs_stiff_args = dict()
         self.rhs_exp_args = dict()
+        self.diagonal_stiff = dict()
+        self.diagonal_nonstiff = dict()
 
         # here we consider only a stiff and a nonstiff part
         self.rhs_nonstiff['stiff_nonstiff'] = self.rhs
@@ -535,23 +545,29 @@ class brusselator(parabolic_system_problem):
         self.rhs_nonstiff_args['stiff_nonstiff'] = [0,1] 
         self.rhs_stiff_args['stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
         self.rhs_exp_args['stiff_nonstiff'] = [] 
-        
-        self.rhs_nonstiff['exp_nonstiff'] = [1.0+self.uh.values.sub(0)**2*self.uh.values.sub(1)+5.*ufl.exp(-((self.x[0]-0.3)**2+(self.x[1]-0.6)**2)/0.005), 3.4*self.uh.values.sub(0)-self.uh.values.sub(0)**2*self.uh.values.sub(1)]
+        self.diagonal_nonstiff['stiff_nonstiff'] = False
+        self.diagonal_stiff['stiff_nonstiff'] = False
+
+        self.rhs_nonstiff['exp_nonstiff'] = [1.0+self.uh.sub(0)**2*self.uh.sub(1)+5.*ufl.exp(-((self.x[0]-0.3)**2+(self.x[1]-0.6)**2)/0.005), 3.4*self.uh.sub(0)-self.uh.sub(0)**2*self.uh.sub(1)]
         self.rhs_stiff['exp_nonstiff'] = [None,None]      
         self.lmbda['exp_nonstiff'] = [-4.4,None]  
         self.yinf['exp_nonstiff'] = [0.,None]
         self.rhs_nonstiff_args['exp_nonstiff'] = [0,1] 
         self.rhs_stiff_args['exp_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
         self.rhs_exp_args['exp_nonstiff'] = [0] 
+        self.diagonal_nonstiff['exp_nonstiff'] = False
+        self.diagonal_stiff['exp_nonstiff'] = False
 
         # here we consider the three terms
-        self.rhs_nonstiff['exp_stiff_nonstiff'] = [1.0+self.uh.values.sub(0)**2*self.uh.values.sub(1)+5.*ufl.exp(-((self.x[0]-0.3)**2+(self.x[1]-0.6)**2)/0.005), 3.4*self.uh.values.sub(0)-self.uh.values.sub(0)**2*self.uh.values.sub(1)]
+        self.rhs_nonstiff['exp_stiff_nonstiff'] = [1.0+self.uh.sub(0)**2*self.uh.sub(1)+5.*ufl.exp(-((self.x[0]-0.3)**2+(self.x[1]-0.6)**2)/0.005), 3.4*self.uh.sub(0)-self.uh.sub(0)**2*self.uh.sub(1)]
         self.rhs_stiff['exp_stiff_nonstiff'] = [None,None]      
         self.lmbda['exp_stiff_nonstiff'] = [-4.4,None]  
         self.yinf['exp_stiff_nonstiff'] = [0.,None]
         self.rhs_nonstiff_args['exp_stiff_nonstiff'] = [0,1] 
         self.rhs_stiff_args['exp_stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
         self.rhs_exp_args['exp_stiff_nonstiff'] = [0] 
+        self.diagonal_nonstiff['exp_stiff_nonstiff'] = False
+        self.diagonal_stiff['exp_stiff_nonstiff'] = False
 
     @property
     def u0_expr(self):        
@@ -568,13 +584,13 @@ class Monodomain(parabolic_system_problem):
         self.bnd_cond = 'N' 
 
         # self.ionic_model = ionicmodels.HodgkinHuxley() # Available: HodgkinHuxley, RogersMcCulloch
-        self.ionic_model = ionicmodels_myokit.TenTusscher2006_epi() # Available: HodgkinHuxley, Courtemanche1998, Fox2002, TenTusscher2006_epi
+        self.ionic_model = ionicmodels_myokit.HodgkinHuxley() # Available: HodgkinHuxley, Courtemanche1998, Fox2002, TenTusscher2006_epi
         self.size = self.ionic_model.size
         self.sp_ind = [0]
         self.diff = [0] # defined later
 
         self.t0 = 0.
-        self.Tend = 5. # ms
+        self.Tend = 3. # ms
 
         n_pts = 10
         # a = np.reshape(np.array(dom_size[0]),(1,3))
@@ -642,6 +658,8 @@ class Monodomain(parabolic_system_problem):
         self.rhs_nonstiff_args = dict()
         self.rhs_stiff_args = dict()
         self.rhs_exp_args = dict()
+        self.diagonal_stiff = dict()
+        self.diagonal_nonstiff = dict()
 
         # this is a splitting to be used in multirate explicit stabilized methods
         self.rhs_nonstiff['stiff_nonstiff'] = self.ionic_model.f_nonstiff(self.uh)
@@ -654,6 +672,7 @@ class Monodomain(parabolic_system_problem):
         self.rhs_nonstiff_args['stiff_nonstiff'] = self.ionic_model.f_nonstiff_args 
         if 0 not in self.rhs_nonstiff_args['stiff_nonstiff']:
             self.rhs_nonstiff_args['stiff_nonstiff'] = [0]+self.rhs_nonstiff_args['stiff_nonstiff']
+        self.diagonal_nonstiff['stiff_nonstiff'] = True # f_nonstiff acts element wise, hence Jacobian is block diagonal
 
         self.rhs_stiff['stiff_nonstiff'] = self.ionic_model.f_stiff(self.uh)    
         if self.rhs_stiff['stiff_nonstiff'][0] is not None and abs(self.scale_Iion/self.Cm-1.)>1e-10:    
@@ -661,6 +680,7 @@ class Monodomain(parabolic_system_problem):
         self.rhs_stiff_args['stiff_nonstiff'] = self.ionic_model.f_stiff_args
         if 0 not in self.rhs_stiff_args['stiff_nonstiff']:
             self.rhs_stiff_args['stiff_nonstiff'] = [0]+self.rhs_stiff_args['stiff_nonstiff']
+        self.diagonal_stiff['stiff_nonstiff'] = False # Laplacian is not element-wise operator
         self.lmbda['stiff_nonstiff'] = [None]*self.size
         self.yinf['stiff_nonstiff'] = [None]*self.size
         self.rhs_exp_args['stiff_nonstiff'] = []
@@ -676,9 +696,11 @@ class Monodomain(parabolic_system_problem):
         self.rhs_nonstiff_args['exp_nonstiff'] = self.ionic_model.f_expl_args 
         if 0 not in self.rhs_nonstiff_args['exp_nonstiff']:
             self.rhs_nonstiff_args['exp_nonstiff'] = [0]+self.rhs_nonstiff_args['exp_nonstiff']
+        self.diagonal_nonstiff['exp_nonstiff'] = True
 
         self.rhs_stiff['exp_nonstiff'] = [None]*self.size
         self.rhs_stiff_args['exp_nonstiff'] = [0]
+        self.diagonal_stiff['exp_nonstiff'] = False
         self.lmbda['exp_nonstiff'] = [None]*self.size
         self.yinf['exp_nonstiff'] = [None]*self.size
         self.rhs_exp_args['exp_nonstiff'] = []
@@ -695,8 +717,10 @@ class Monodomain(parabolic_system_problem):
         # still integrated via explicit stabilized methods. 
         self.rhs_nonstiff['exp_stiff_nonstiff'] = self.rhs_nonstiff['stiff_nonstiff']
         self.rhs_nonstiff_args['exp_stiff_nonstiff'] = self.rhs_nonstiff_args['stiff_nonstiff']
+        self.diagonal_nonstiff['exp_stiff_nonstiff'] = True
         self.rhs_stiff['exp_stiff_nonstiff'] = [None]*self.size
         self.rhs_stiff_args['exp_stiff_nonstiff'] = [0]
+        self.diagonal_stiff['exp_stiff_nonstiff'] = False
         self.lmbda['exp_stiff_nonstiff'] = [None]*self.size
         self.yinf['exp_stiff_nonstiff'] = [None]*self.size
         self.rhs_exp_args['exp_stiff_nonstiff'] = []
@@ -709,7 +733,7 @@ class Monodomain(parabolic_system_problem):
 
         self.u0 = [fem.Constant(self.domain,y0) for y0 in self.ionic_model.initial_values()]        
         V0_bnd = -1.5
-        V0 = 64
+        V0 = 27
         if self.dim ==1:
             V0_expr = ufl.conditional(ufl.le(self.x[0], V0_bnd), V0, self.u0[0])
         elif self.dim==2:    
@@ -723,10 +747,24 @@ class Monodomain(parabolic_system_problem):
         return self.u0
 
     def Istim(self):        
+        stim_bnd = 1.5
         if self.dim ==1:
-            return ufl.conditional(ufl.And(ufl.lt(self.t,self.stim_dur),ufl.le(self.x[0], 1.5)), self.stim_intensity, self.zero_fun)
+            return ufl.conditional(ufl.And(ufl.lt(self.t,self.stim_dur),ufl.le(self.x[0], stim_bnd)), self.stim_intensity, self.zero_fun)
         elif self.dim==2:    
-            return ufl.conditional(ufl.And(ufl.lt(self.t,self.stim_dur),ufl.And(ufl.le(self.x[0], 1.5),ufl.le(self.x[1], 1.5))), self.stim_intensity, self.zero_fun)
+            return ufl.conditional(ufl.And(ufl.lt(self.t,self.stim_dur),ufl.And(ufl.le(self.x[0], stim_bnd),ufl.le(self.x[1], stim_bnd))), self.stim_intensity, self.zero_fun)
         else:
-            return ufl.conditional(ufl.And(ufl.lt(self.t,self.stim_dur),ufl.And(ufl.And(ufl.le(self.x[0], 1.5),ufl.le(self.x[1], 1.5)),ufl.le(self.x[2], 1.5))), self.stim_intensity, self.zero_fun)
+            return ufl.conditional(ufl.And(ufl.lt(self.t,self.stim_dur),ufl.And(ufl.And(ufl.le(self.x[0], stim_bnd),ufl.le(self.x[1], stim_bnd)),ufl.le(self.x[2], stim_bnd))), self.stim_intensity, self.zero_fun)
         
+    def rho_nonstiff(self,y,t,fy=None):
+        if isinstance(self.ionic_model,ionicmodels_myokit.TenTusscher2006_epi):
+            return 6.5
+        elif isinstance(self.ionic_model,ionicmodels_myokit.Courtemanche1998):
+            return 7.5
+        elif isinstance(self.ionic_model,ionicmodels_myokit.HodgkinHuxley):
+            return 40.
+        # elif isinstance(self.ionic_model,ionicmodels.HodgkinHuxley):
+        #     return 40.
+        # elif isinstance(self.ionic_model,ionicmodels.RogersMcCulloch):
+        #     return
+        else:
+            raise Exception('rho_nonstiff not implemented for this ionic model.')
