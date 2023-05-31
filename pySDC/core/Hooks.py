@@ -2,6 +2,9 @@ import logging
 from collections import namedtuple
 
 
+Entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'sweep', 'type', 'num_restarts'])
+
+
 # noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames
 class hooks(object):
     """
@@ -28,7 +31,7 @@ class hooks(object):
 
         # create statistics and entry elements
         self.__stats = {}
-        self.__entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'sweep', 'type', 'num_restarts'])
+        self.__entry = Entry
 
     def add_to_stats(self, process, time, level, iter, sweep, type, value):
         """
