@@ -48,6 +48,54 @@
   <section id="module-core.Hooks">
 <span id="core-hooks-module"></span><h1>core.Hooks module<a class="headerlink" href="#module-core.Hooks" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="core.Hooks.Entry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.Hooks.Entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><a class="headerlink" href="#core.Hooks.Entry.iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.level">
+<span class="sig-name descname"><span class="pre">level</span></span><a class="headerlink" href="#core.Hooks.Entry.level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.num_restarts">
+<span class="sig-name descname"><span class="pre">num_restarts</span></span><a class="headerlink" href="#core.Hooks.Entry.num_restarts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.process">
+<span class="sig-name descname"><span class="pre">process</span></span><a class="headerlink" href="#core.Hooks.Entry.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.sweep">
+<span class="sig-name descname"><span class="pre">sweep</span></span><a class="headerlink" href="#core.Hooks.Entry.sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.Hooks.Entry.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#core.Hooks.Entry.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="core.Hooks.hooks">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hooks</span></span><a class="reference internal" href="../_modules/core/Hooks.html#hooks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -366,6 +414,16 @@ initialize if applicable and to value otherwise</p>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">core.Hooks module</a><ul>
+<li><a class="reference internal" href="#core.Hooks.Entry"><code class="docutils literal notranslate"><span class="pre">Entry</span></code></a><ul>
+<li><a class="reference internal" href="#core.Hooks.Entry.iter"><code class="docutils literal notranslate"><span class="pre">iter</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.level"><code class="docutils literal notranslate"><span class="pre">level</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.num_restarts"><code class="docutils literal notranslate"><span class="pre">num_restarts</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.process"><code class="docutils literal notranslate"><span class="pre">process</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.sweep"><code class="docutils literal notranslate"><span class="pre">sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.time"><code class="docutils literal notranslate"><span class="pre">time</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.type"><code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#core.Hooks.hooks"><code class="docutils literal notranslate"><span class="pre">hooks</span></code></a><ul>
 <li><a class="reference internal" href="#core.Hooks.hooks.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.__num_restarts"><code class="docutils literal notranslate"><span class="pre">__num_restarts</span></code></a></li>

@@ -41,6 +41,9 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
 
+<span class="n">Entry</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Entry&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;process&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="s1">&#39;iter&#39;</span><span class="p">,</span> <span class="s1">&#39;sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;num_restarts&#39;</span><span class="p">])</span>
+
+
 <span class="c1"># noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames</span>
 <div class="viewcode-block" id="hooks"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks">[docs]</a><span class="k">class</span> <span class="nc">hooks</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -67,7 +70,7 @@
 
         <span class="c1"># create statistics and entry elements</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__entry</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Entry&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;process&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="s1">&#39;iter&#39;</span><span class="p">,</span> <span class="s1">&#39;sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;num_restarts&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entry</span> <span class="o">=</span> <span class="n">Entry</span>
 
 <div class="viewcode-block" id="hooks.add_to_stats"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.add_to_stats">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
