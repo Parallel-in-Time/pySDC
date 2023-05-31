@@ -192,6 +192,11 @@ class fenicsx_mesh(object):
         # norm_L2 = self.values.x.norm()/np.sqrt(self.values.x.array.size)
 
         return norm_L2
+    
+    def dot(self,other):
+        self.values.vector.dotBegin(other.values.vector)
+        res = self.values.vector.dotEnd(other.values.vector)
+        return res
 
     def axpy(self, a, x):
         """

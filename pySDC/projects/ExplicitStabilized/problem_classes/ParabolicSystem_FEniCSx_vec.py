@@ -547,6 +547,8 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         self.rhs_nonstiff_args = self.exact.rhs_nonstiff_args[splitting]
         self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
         self.rhs_exp_args = self.exact.rhs_exp_args[splitting]
+        self.diagonal_impl = self.exact.diagonal_stiff[splitting]
+        self.diagonal_expl = self.exact.diagonal_nonstiff[splitting]
 
         self.phi_one_f = [None]*self.exact.size
         self.phi_one_f_form = [None]*self.exact.size
@@ -738,3 +740,5 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
                     self.invert_mass_matrix(self.b, u_sol[i].values.vector)
                 if self.family=='CG' and self.exact.bnd_cond!='N':
                     fem.petsc.set_bc(u_sol[i].values.vector, [self.bc[sp0]], scale=0.)
+
+        return u_sol
