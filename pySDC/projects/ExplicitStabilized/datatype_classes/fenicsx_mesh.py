@@ -3,6 +3,7 @@ import numpy as np
 import ufl
 from mpi4py import MPI
 from petsc4py import PETSc
+from dolfinx import fem
 
 from pySDC.core.Errors import DataError
 
@@ -150,6 +151,11 @@ class fenicsx_mesh(object):
             me = fenicsx_mesh(self)
             me.values.vector.scale(other)            
             return me
+        elif isinstance(other,fenicsx_mesh):
+            mult = fenicsx_mesh(init=self.values.function_space,val=0.)    
+            for i in range(self.size):
+                mult.values.sub(i).interpolate(fem.Expression(self.values.sub(i)*other.values.sub(i),self.values.function_space.sub(i).element.interpolation_points()))     
+            return mult
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
         

@@ -1,6 +1,7 @@
 from pySDC.projects.ExplicitStabilized.datatype_classes.fenicsx_mesh import fenicsx_mesh
 import numpy as np
 from pySDC.core.Errors import DataError
+from dolfinx import fem
 
 class fenicsx_mesh_vec(object):
     """
@@ -35,9 +36,18 @@ class fenicsx_mesh_vec(object):
         return me
     
     def __rmul__(self, other):
-        me = fenicsx_mesh_vec(self)
-        me *= other
-        return me
+        if isinstance(other,float):
+            me = fenicsx_mesh_vec(self)
+            me *= other
+            return me
+        elif isinstance(other,fenicsx_mesh_vec):
+            V = self.val_list[0].values.function_space
+            mult = fenicsx_mesh_vec(init=V,val=0.,size=self.size)    
+            for i in range(self.size):
+                mult.val_list[i].values.interpolate(fem.Expression(self.val_list[i].values*other.val_list[i].values,V.element.interpolation_points()))                 
+            return mult
+        else:
+            raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))        
     
     def __iadd__(self, other):
         for i in range(self.size):

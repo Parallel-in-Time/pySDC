@@ -487,12 +487,26 @@ class coscoscos_pdeode(parabolic_system_problem):
         
         self.define_standard_splittings()
 
+    def f(self,u):
+        return ufl.cos(u)
+    
+    def define_standard_splittings(self):
+        super().define_standard_splittings()
+
         self.rhs_stiff_args['stiff_nonstiff'] = [0]
         self.rhs_stiff_args['exp_nonstiff'] = [0]
         self.rhs_stiff_args['exp_stiff_nonstiff'] = [0,1]
-            
-    def f(self,u):
-        return ufl.cos(u)
+
+        # here we consider the three terms
+        self.rhs_nonstiff['exp_nonstiff_dir_sum'] = [self.rhs[0], None]
+        self.rhs_stiff['exp_nonstiff_dir_sum'] = [None, None]      
+        self.lmbda['exp_nonstiff_dir_sum'] = [None, fem.Constant(self.domain,-1.)]
+        self.yinf['exp_nonstiff_dir_sum'] = [None, self.rhs[1]+self.sol[1]]
+        self.rhs_nonstiff_args['exp_nonstiff_dir_sum'] = [0] 
+        self.rhs_stiff_args['exp_nonstiff_dir_sum'] = [0]
+        self.rhs_exp_args['exp_nonstiff_dir_sum'] = [1] 
+        self.diagonal_nonstiff['exp_nonstiff_dir_sum'] = True
+        self.diagonal_stiff['exp_nonstiff_dir_sum'] = False
 
 class brusselator(parabolic_system_problem):
     def __init__(self,dim,n_elems):
@@ -584,7 +598,7 @@ class Monodomain(parabolic_system_problem):
         self.bnd_cond = 'N' 
 
         # self.ionic_model = ionicmodels.HodgkinHuxley() # Available: HodgkinHuxley, RogersMcCulloch
-        self.ionic_model = ionicmodels_myokit.HodgkinHuxley() # Available: HodgkinHuxley, Courtemanche1998, Fox2002, TenTusscher2006_epi
+        self.ionic_model = ionicmodels_myokit.TenTusscher2006_epi() # Available: HodgkinHuxley, Courtemanche1998, Fox2002, TenTusscher2006_epi
         self.size = self.ionic_model.size
         self.sp_ind = [0]
         self.diff = [0] # defined later
@@ -710,6 +724,17 @@ class Monodomain(parabolic_system_problem):
                 self.lmbda['exp_nonstiff'][i] = -1./tau[i]
                 self.yinf['exp_nonstiff'][i] = yinf[i]
                 self.rhs_exp_args['exp_nonstiff'].append(i)
+
+        # this splitting is the same as above, but is used for methods with exponential Runge-Kutta as underlying collocation method
+        self.rhs_nonstiff['exp_nonstiff_dir_sum'] = self.rhs_nonstiff['exp_nonstiff']
+        self.rhs_nonstiff_args['exp_nonstiff_dir_sum'] = self.rhs_nonstiff_args['exp_nonstiff']
+        self.diagonal_nonstiff['exp_nonstiff_dir_sum'] = self.diagonal_nonstiff['exp_nonstiff']
+        self.rhs_stiff['exp_nonstiff_dir_sum'] = self.rhs_stiff['exp_nonstiff']
+        self.rhs_stiff_args['exp_nonstiff_dir_sum'] = self.rhs_stiff_args['exp_nonstiff']
+        self.diagonal_stiff['exp_nonstiff_dir_sum'] = self.diagonal_stiff['exp_nonstiff']
+        self.lmbda['exp_nonstiff_dir_sum'] = self.lmbda['exp_nonstiff']
+        self.yinf['exp_nonstiff_dir_sum'] = self.yinf['exp_nonstiff']
+        self.rhs_exp_args['exp_nonstiff_dir_sum'] = self.rhs_exp_args['exp_nonstiff']
 
         # This is a splitting similar to the one for stabilized methods but where the rhs_stiff variables are
         # integrated exponentially. The difference with respect to Rush-Larsen is that only truly stiff 
