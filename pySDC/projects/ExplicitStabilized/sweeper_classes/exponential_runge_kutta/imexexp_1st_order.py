@@ -49,6 +49,16 @@ class imexexp_1st_order(sweeper):
 
         me = []
 
+        M = self.coll.num_nodes
+        assert M==1
+
+        lmbda = P.lmbda_eval(L.u[0],L.time)
+        phi_one = P.phi_one_eval(L.u[0],L.dt,L.time)        
+        me.append( L.dt*( L.f[1].impl + L.f[1].expl +  phi_one.__rmul__(L.f[1].exp+lmbda.__rmul__(L.u[0]-L.u[1]))) )
+        # me.append( L.dt*( L.f[1].impl + L.f[0].expl +  P.phi_one_f_eval(L.u[0],L.dt,L.time) ) )
+
+        return me
+    
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl + L.f[1].exp))
@@ -78,11 +88,11 @@ class imexexp_1st_order(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        integral = [P.dtype_u(P.init,val=0.) for _ in range(M)]
-        for m in range(1,M + 1):
-            for j in range(1, M + 1):
-                integral[m - 1] += L.dt * self.coll.Smat[m, j] * (L.f[j].impl + L.f[j].expl + L.f[j].exp)      
-                # integral[m - 1] += L.dt * self.coll.Smat[m, j] * (L.f[j].impl + L.f[j].expl + P.phi_one_f_eval(L.u[j],L.dt*self.coll.nodes[j-1],L.time))        
+        assert M==1
+
+        integral = self.integrate()
+        for i in range(1,M):
+            integral[M-i] -= integral[M-i-1]
 
         if L.tau[0] is not None:
             integral[0] += L.tau[0]
@@ -90,13 +100,19 @@ class imexexp_1st_order(sweeper):
             if L.tau[m] is not None:
                 integral[m] += L.tau[m]-L.tau[m-1]
 
-        for m in range(M):
-            integral[m] -= L.dt*self.coll.delta_m[m]*(L.f[m].expl+L.f[m+1].impl+P.phi_one_f_eval(L.u[m],L.dt*self.coll.delta_m[m],L.time))
+        lmbda = P.lmbda_eval(L.u[0],L.time)
+        phi_one = P.phi_one_eval(L.u[0],L.dt,L.time)
 
+        # for m in range(M):
+        #     integral[m] -= L.dt*self.coll.delta_m[m]*(L.f[m].expl+L.f[m+1].impl+P.phi_one_f_eval(L.u[m],L.dt*self.coll.delta_m[m],L.time))
+        integral[0] -= L.dt*(L.f[1].impl+L.f[0].expl+phi_one.__rmul__(L.f[0].exp))
+        # integral[0] -= L.dt*(L.f[1].impl+L.f[0].expl+P.phi_one_f_eval(L.u[0],L.dt,L.time))
+        
         # do the sweep
         for m in range(M):
 
-            rhs = L.u[m] + integral[m] + L.dt*self.coll.delta_m[m]*(L.f[m].expl+P.phi_one_f_eval(L.u[m],L.dt*self.coll.delta_m[m],L.time))
+            rhs = L.u[m] + integral[m] + L.dt*self.coll.delta_m[m]*(L.f[m].expl+phi_one.__rmul__(L.f[m].exp))
+            # rhs = L.u[m] + integral[m] + L.dt*self.coll.delta_m[m]*(L.f[m].expl+P.phi_one_f_eval(L.u[m],L.dt*self.coll.delta_m[m],L.time))
 
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(

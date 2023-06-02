@@ -148,43 +148,6 @@ class exponential_splitting_explicit_stabilized(sweeper):
         self.djm1 = P.dtype_u(P.init,0.)
         self.djm2 = P.dtype_u(P.init,0.)
 
-        # # do the sweep
-        # for m in range(M):
-
-        #     dt = L.dt*self.coll.delta_m[m]
-        #     es = self.es[m][1]
-        #     sub_nodes = self.sub_nodes[m][1]     
-
-            
-        #     df_expl = self.f_eta(integral[m]+self.djm1,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),self.es[m][0])\
-        #                 -self.f_eta(u_old[m],dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),self.es[m][0])            
-            
-        #     f1 = P.eval_f(integral[m]+self.djm1+dt*es.nu[0]*df_expl, L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=True,eval_exp=True)
-        #     f2 = P.eval_f(u_old[m], L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]),eval_impl=True,eval_expl=True,eval_exp=True)
-        #     df_exp = P.phi_one_eval(f1.exp-f2.exp,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))
-        #     f1 = f1.impl
-        #     f2 = f2.impl
-
-        #     self.djm1.copy(self.dj)
-        #     self.dj = self.djm1 + dt*es.mu[0]*(f1-f2+df_exp) + dt*es.kappa[0]*df_expl
-        #     for j in range(2,es.s+1):
-        #         self.djm2, self.djm1, self.dj = self.djm1, self.dj, self.djm2            
-
-        #         I_int = self.interpolate(integral, m, 1, j-2)
-        #         I_u_old = self.interpolate(u_old, m, 1, j-2)
-                
-        #         f1 = P.eval_f(I_int+self.djm1, L.time + L.dt * sub_nodes[j-2],eval_impl=True,eval_expl=False,eval_exp=True)
-        #         f2 = P.eval_f(I_u_old, L.time + L.dt * sub_nodes[j-2],eval_impl=True,eval_expl=False,eval_exp=True)
-        #         df_exp = P.phi_one_eval(f1.exp-f2.exp,dt,L.time + L.dt * (self.coll.nodes[m]-self.coll.delta_m[m]))
-        #         f1 = f1.impl
-        #         f2 = f2.impl
-        #         self.dj = f1-f2+df_exp
-        #         self.dj *= dt*es.mu[j-1]
-        #         self.dj += es.nu[j-1]*self.djm1+es.kappa[j-1]*self.djm2
-
-        #     L.u[m+1] = self.dj+integral[m+1]
-        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
         # do the sweep
         for m in range(M):
 

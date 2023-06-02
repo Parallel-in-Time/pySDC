@@ -730,6 +730,7 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
         self.rhs_exp_args = self.exact.rhs_exp_args[splitting]
     
+        self.lmbda_expr_interp = [None]*self.exact.size
         self.phi_one = 0.  
         self.phi_one_f = 0.  
         self.F_exp = 0.              
@@ -744,9 +745,10 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
                                                 self.V.sub(i).element.interpolation_points())
                 self.phi_one_f += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx    
                 self.phi_one_expr_interp[i] = fem.Expression(\
-                                                ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt))*self.exact.uh.sub(i),\
+                                                ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt)),\
                                                 self.V.sub(i).element.interpolation_points())
-                self.phi_one += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt))*self.exact.uh.sub(i)*v[i]*ufl.dx           
+                self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i], self.V.sub(i).element.interpolation_points())
+                self.phi_one += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt))*v[i]*ufl.dx                     
                 self.rhs_exp_expr_interp[i] = fem.Expression(self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i]),self.V.sub(i).element.interpolation_points())
                 self.F_exp += self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx                                              
                 self.exp_indexes[i] = True  
@@ -774,6 +776,9 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
                 self.nonstiff_indexes[i] = True           
         self.f_nonstiff_form = fem.form(self.F_nonstiff)
 
+        self.one = self.dtype_u(init=self.V,val=0.)    
+        for i in range(self.exact.size):
+            self.one.values.sub(i).interpolate(fem.Expression(fem.Constant(self.domain,1.),self.V.sub(i).element.interpolation_points()))     
 
     def eval_f(self, u, t, eval_impl=True, eval_expl=True, eval_exp=True, fh=None):
         """
@@ -887,38 +892,65 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
 
         return fh_exp
     
-    # def phi_one_eval(self, fu, factor, t, u_sol = None):
+    def phi_one_eval(self, u, factor, t, u_sol = None):
 
-    #     self.exact.update_time(t)
-    #     self.exact.update_dt(factor) # for computing the exponentials
+        self.exact.update_time(t)
+        self.exact.update_dt(factor) # for computing the exponentials
 
-    #     if u_sol is None:
-    #         u_sol = self.dtype_u(init=self.V,val=0.)    
+        if u_sol is None:
+            u_sol = self.dtype_u(init=self.V,val=0.)    
 
-    #     if self.family=='CG' and self.exact.bnd_cond!='N' and not self.exact.cte_Dirichlet:
-    #         self.get_DirBC(self.uD,t)
+        if self.family=='CG' and self.exact.bnd_cond!='N' and not self.exact.cte_Dirichlet:
+            self.get_DirBC(self.uD,t)
 
-    #     if hasattr(self.exact,'uh'):
-    #         self.exact.uh.copy(fu)
-    #         self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
+        if hasattr(self.exact,'uh'):
+            self.exact.uh.copy(u)
+            self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
 
-    #     if self.f_interp:
-    #         for i in range(self.exact.size):
-    #             if self.exp_indexes[i]:
-    #                 u_sol.values.sub(i).interpolate(self.phi_one_expr_interp[i])           
-    #     else:
-    #         with self.b.localForm() as loc_b:
-    #             loc_b.set(0)
-    #         fem.petsc.assemble_vector(self.b, self.phi_one_form)   
-    #         self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
-    #         self.invert_mass_matrix(self.b, u_sol.values.vector)                  
+        if self.f_interp:
+            for i in range(self.exact.size):
+                if self.exp_indexes[i]:
+                    u_sol.values.sub(i).interpolate(self.phi_one_expr_interp[i])           
+        else:
+            with self.b.localForm() as loc_b:
+                loc_b.set(0)
+            fem.petsc.assemble_vector(self.b, self.phi_one_form)   
+            self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
+            self.invert_mass_matrix(self.b, u_sol.values.vector)                  
 
-    #     u_sol.copy_sub(fu,[i for i in range(self.exact.size) if not self.exp_indexes[i]])
+        u_sol.copy_sub(self.one,[i for i in range(self.exact.size) if not self.exp_indexes[i]])
         
-    #     if self.family=='CG' and self.exact.bnd_cond!='N':
-    #         fem.petsc.set_bc(u_sol.values.vector, bcs=self.bc, scale=1.)
+        if self.family=='CG' and self.exact.bnd_cond!='N':
+            fem.petsc.set_bc(u_sol.values.vector, bcs=self.bc, scale=1.)
 
-    #     return u_sol
+        return u_sol
+    
+    def lmbda_eval(self, u, t, u_sol = None):
+
+        self.exact.update_time(t)
+        # self.exact.update_dt(factor) # for computing the exponentials
+
+        if u_sol is None:
+            u_sol = self.dtype_u(init=self.V,val=0.)        
+
+        self.exact.uh.copy(u)
+        self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
+
+        if self.f_interp:
+            for i in range(self.exact.size):
+                if self.exp_indexes[i]:
+                    u_sol.values.sub(i).interpolate(self.lmbda_expr_interp[i])           
+        else:
+            raise Exception('not implemented')
+            # with self.b.localForm() as loc_b:
+            #     loc_b.set(0)
+            # fem.petsc.assemble_vector(self.b, self.phi_one_form)   
+            # self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
+            # self.invert_mass_matrix(self.b, u_sol.values.vector)                  
+
+        u_sol.zero_sub([i for i in range(self.exact.size) if not self.exp_indexes[i]])
+
+        return u_sol
     
     def phi_one_f_eval(self, u, factor, t, u_sol = None):
 

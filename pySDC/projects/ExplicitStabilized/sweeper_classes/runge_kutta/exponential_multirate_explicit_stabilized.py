@@ -58,7 +58,7 @@ class exponential_multirate_explicit_stabilized(sweeper):
         P = L.prob
         M = self.coll.num_nodes
 
-        if not hasattr(self,'rho'):
+        if not hasattr(self,'rho_expl'):
             self.rho_estimator = rho_estimator(P)
             self.estimated_rho = [0,0]
             if hasattr(P.exact,'rho_nonstiff') and callable(P.exact.rho_nonstiff):
@@ -146,7 +146,7 @@ class exponential_multirate_explicit_stabilized(sweeper):
 
         integral.insert(0,L.u[0])
 
-        # print(f's = {[es.s for es in self.es]}, m = {[es.m for es in self.es]}')
+        print(f's = {[es.s for es in self.es]}, m = {[es.m for es in self.es]}, rho = {self.estimated_rho}')
 
         self.dj = P.dtype_u(P.init,0.)
         self.djm1 = P.dtype_u(P.init,0.)
