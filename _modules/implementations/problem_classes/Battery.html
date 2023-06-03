@@ -48,7 +48,7 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.</span>
 <span class="sd">    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`u_{C_n}` for</span>
-<span class="sd">    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}&#39;, the circuit switches to the next capacitor. If all capacitors</span>
+<span class="sd">    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}`, the circuit switches to the next capacitor. If all capacitors</span>
 <span class="sd">    has dropped below their reference value, the voltage source :math:`V_s` provides further energy. The problem of simulating the</span>
 <span class="sd">    battery draining has :math:`N + 1` different states. Each of this state can be expressed as a nonhomogeneous linear system of</span>
 <span class="sd">    ordinary differential equations (ODEs)</span>
@@ -99,10 +99,16 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncapacitors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">Vs</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">Rs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">V_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">ncapacitors</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">C</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">V_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">V_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
@@ -455,7 +461,25 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ncapacitors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">Vs</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">Rs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">C</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">R</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+        <span class="n">V_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">C</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">V_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">V_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
