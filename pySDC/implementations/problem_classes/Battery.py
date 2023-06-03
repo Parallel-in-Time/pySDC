@@ -60,10 +60,18 @@ class battery_n_capacitors(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, ncapacitors=2, Vs=5.0, Rs=0.5, C=np.array([1.0, 1.0]), R=1.0, L=1.0, alpha=1.2, V_ref=np.array([1.0, 1.0])):
+    def __init__(
+        self, ncapacitors=2, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None
+    ):
         """Initialization routine"""
         n = ncapacitors
         nvars = n + 1
+
+        if C is None:
+            C = np.array([1.0, 1.0])
+
+        if V_ref is None:
+            V_ref = np.array([1.0, 1.0])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -421,14 +429,21 @@ class battery_implicit(battery):
         ncapacitors=1,
         Vs=5.0,
         Rs=0.5,
-        C=np.array([1.0]),
+        C=None,
         R=1.0,
         L=1.0,
         alpha=1.2,
-        V_ref=np.array([1.0]),
+        V_ref=None,
         newton_maxiter=200,
-        newton_tol=1e-8
+        newton_tol=1e-8,
     ):
+
+        if C is None:
+            C = np.array([1.0])
+
+        if V_ref is None:
+            V_ref = np.array([1.0])
+
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
