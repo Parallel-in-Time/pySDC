@@ -100,15 +100,8 @@ def generate_description(
 
     # initialize problem parameters
     problem_params = dict()
-    if problem == battery_implicit:
-        problem_params['newton_maxiter'] = 200
-        problem_params['newton_tol'] = 1e-08
     problem_params['ncapacitors'] = ncapacitors  # number of capacitors
-    problem_params['Vs'] = 5.0
-    problem_params['Rs'] = 0.5
     problem_params['C'] = C
-    problem_params['R'] = 1.0
-    problem_params['L'] = 1.0
     problem_params['alpha'] = alpha
     problem_params['V_ref'] = V_ref
 

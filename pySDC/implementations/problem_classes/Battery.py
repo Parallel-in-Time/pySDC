@@ -60,7 +60,7 @@ class battery_n_capacitors(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, ncapacitors, Vs, Rs, C, R, L, alpha, V_ref):
+    def __init__(self, ncapacitors=2, Vs=5.0, Rs=0.5, C=np.array([1.0, 1.0]), R=1.0, L=1.0, alpha=1.2, V_ref=np.array([1.0, 1.0])):
         """Initialization routine"""
         n = ncapacitors
         nvars = n + 1
@@ -416,7 +416,19 @@ class battery_implicit(battery):
     """
     dtype_f = mesh
 
-    def __init__(self, ncapacitors, Vs, Rs, C, R, L, alpha, V_ref, newton_maxiter, newton_tol):
+    def __init__(
+        self,
+        ncapacitors=1,
+        Vs=5.0,
+        Rs=0.5,
+        C=np.array([1.0]),
+        R=1.0,
+        L=1.0,
+        alpha=1.2,
+        V_ref=np.array([1.0]),
+        newton_maxiter=200,
+        newton_tol=1e-8
+    ):
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
