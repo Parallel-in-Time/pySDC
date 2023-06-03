@@ -60,9 +60,7 @@ class battery_n_capacitors(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(
-        self, ncapacitors=2, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None
-    ):
+    def __init__(self, ncapacitors=2, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None):
         """Initialization routine"""
         n = ncapacitors
         nvars = n + 1
