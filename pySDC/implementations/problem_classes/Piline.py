@@ -51,7 +51,7 @@ class piline(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, Vs, Rs, C1, Rpi, Lpi, C2, Rl):
+    def __init__(self, Vs=100.0, Rs=1.0, C1=1.0, Rpi=0.2, Lpi=1.0, C2=1.0, Rl=5.0):
         """Initialization routine"""
 
         nvars = 3

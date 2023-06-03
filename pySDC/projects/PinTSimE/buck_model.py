@@ -32,13 +32,6 @@ def main():
     problem_params = dict()
     problem_params['duty'] = 0.5  # duty cycle
     problem_params['fsw'] = 1e3  # switching freqency
-    problem_params['Vs'] = 10.0
-    problem_params['Rs'] = 0.5
-    problem_params['C1'] = 1e-3
-    problem_params['Rp'] = 0.01
-    problem_params['L1'] = 1e-3
-    problem_params['C2'] = 1e-3
-    problem_params['Rl'] = 10
 
     # initialize step parameters
     step_params = dict()
@@ -46,7 +39,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
 
     # fill description dictionary for easy step instantiation
