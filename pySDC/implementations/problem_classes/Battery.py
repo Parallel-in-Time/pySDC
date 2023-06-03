@@ -435,7 +435,6 @@ class battery_implicit(battery):
         newton_maxiter=200,
         newton_tol=1e-8,
     ):
-
         if C is None:
             C = np.array([1.0])
 
