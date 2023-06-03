@@ -9,7 +9,7 @@ class battery_n_capacitors(ptype):
     r"""
     Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.
     First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`u_{C_n}` for
-    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}', the circuit switches to the next capacitor. If all capacitors
+    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}`, the circuit switches to the next capacitor. If all capacitors
     has dropped below their reference value, the voltage source :math:`V_s` provides further energy. The problem of simulating the
     battery draining has :math:`N + 1` different states. Each of this state can be expressed as a nonhomogeneous linear system of
     ordinary differential equations (ODEs)
