@@ -134,6 +134,18 @@ class fenicsx_mesh(object):
             return self
         else:
             raise DataError("Type error: cannot isub %s to %s" % (type(other), type(self)))
+
+    def __mul__(self,other):
+
+        if isinstance(other,fenicsx_mesh):
+            mult = fenicsx_mesh(init=self.values.function_space,val=0.)    
+            # for i in range(self.size):
+            #     mult.values.sub(i).interpolate(fem.Expression(self.values.sub(i)*other.values.sub(i),self.values.function_space.sub(i).element.interpolation_points()))     
+            mult.values.x.array[:] = self.values.x.array*other.values.x.array
+            return mult
+
+        else:
+            raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
         
     def __rmul__(self, other):
         """
@@ -151,11 +163,6 @@ class fenicsx_mesh(object):
             me = fenicsx_mesh(self)
             me.values.vector.scale(other)            
             return me
-        elif isinstance(other,fenicsx_mesh):
-            mult = fenicsx_mesh(init=self.values.function_space,val=0.)    
-            for i in range(self.size):
-                mult.values.sub(i).interpolate(fem.Expression(self.values.sub(i)*other.values.sub(i),self.values.function_space.sub(i).element.interpolation_points()))     
-            return mult
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
         

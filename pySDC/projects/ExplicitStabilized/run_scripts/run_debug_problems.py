@@ -4,12 +4,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError
 
-# from pySDC.projects.ExplicitStabilized.problem_classes.ParabolicSystem_FEniCSx import parabolic_system, parabolic_system_imex, parabolic_system_exp_expl_impl
-# from pySDC.projects.ExplicitStabilized.transfer_classes.TransferFenicsxMesh import mesh_to_mesh_fenicsx
-from pySDC.projects.ExplicitStabilized.problem_classes.ParabolicSystem_FEniCSx_vec import parabolic_system, parabolic_system_imex, parabolic_system_exp_expl_impl
-from pySDC.projects.ExplicitStabilized.transfer_classes.TransferFenicsxMeshVec import mesh_to_mesh_fenicsx
-import pySDC.projects.ExplicitStabilized.problem_classes.parabolic_system_helpers.problems as problems
-from pySDC.projects.ExplicitStabilized.hooks.HookClass_pde import pde_hook
+from pySDC.projects.ExplicitStabilized.problem_classes.debug_problems import debug_exp_runge_kutta_1,debug_exp_runge_kutta_2
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -17,7 +12,6 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
-from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.exponential_splitting_explicit_stabilized import exponential_splitting_explicit_stabilized
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
@@ -32,7 +26,6 @@ def main():
     integrators = ['IMEX']
     integrators = ['IMEXEXP']
     integrators = ['IMEXEXP_EXPRK']
-    integrators = ['exp_mES_EXPRK']
     # integrators = ['ES']
     # integrators = ['mES']
     # integrators = ['exp_mES']
@@ -41,8 +34,7 @@ def main():
     
     num_procs = 1
 
-    ref = 1
-    time_order = 3
+    ref = 0
 
     # initialize level parameters
     level_params = dict()
@@ -64,7 +56,7 @@ def main():
     # sweeper_params['es_s_inner'] = 0
     # sweeper_params['res_comp'] = 'f_eta'
     sweeper_params['damping'] = 0.05
-    sweeper_params['safe_add'] = 4
+    sweeper_params['safe_add'] = 0
     # sweeper_params['order'] = [3]
     # sweeper_params['nodes_choice'] = 'all' # closest_radau, last, all
     sweeper_params['rho_freq'] = 100
@@ -75,28 +67,6 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['family'] = 'CG'    
-    if problem_params['family']=='CG':
-        problem_params['order'] = 1
-        problem_params['mass_lumping'] = True # has effect for family=CG and order=1    
-        problem_params['n_elems'] = [20] #[10*2**(ref*time_order/2.)]
-    elif problem_params['family']=='DG':
-        problem_params['order'] = max(time_order-1,1)
-        p = ref/2. if time_order==1 else ref
-        problem_params['n_elems'] = [10*2**p]        
-        problem_params['mass_lumping'] = False
-    problem_params['refinements'] = [0]
-    problem_params['dim'] = 2
-    problem_params['f_interp'] = True
-    # problem_params['solver_ksp'] = 'cg' # comment these two lines to use default solver (cholesky for dim<=2 and cg+hypre for dim=3)
-    # problem_params['solver_pc'] = 'hypre' # work in parallel with cg: hypre, hmg, gamg, jacobi,
-    # problem_params['solver_ksp'] = 'preonly' # comment these two lines to use default solver (cholesky for dim<=2 and cg+hypre for dim=3)
-    # problem_params['solver_pc'] = 'cholesky'
-    problem_params['enable_output'] = False
-    problem_params['output_folder'] = './data/results/'
-    problem_params['output_file_name'] = 'monodomain'
-    problem_params['exact_solution_class'] = problems.Monodomain
-
 
     # base transfer parameters
     base_transfer_params = dict()
@@ -109,7 +79,6 @@ def main():
     controller_params['fname'] = 'data/ExplicitStabilized_HeatEquation'
     controller_params['logger_level'] = 20
     controller_params['dump_setup'] = False
-    controller_params['hook_class'] = pde_hook
 
     Path("data").mkdir(parents=True, exist_ok=True)
 
@@ -117,49 +86,30 @@ def main():
         
         description = dict()          
         if integrator == 'IMEX':
-            parabolic_system_type = parabolic_system_imex
             description['sweeper_class'] = imex_1st_order        
         elif integrator == 'IMEXEXP':
-            problem_params['splitting'] = 'exp_nonstiff'
-            parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = imexexp_1st_order
         elif integrator == 'IMEXEXP_EXPRK':
-            problem_params['splitting'] = 'exp_nonstiff_dir_sum'
-            parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = imexexp_1st_order_ExpRK
         elif integrator == 'ES':                     
-            parabolic_system_type = parabolic_system
             description['sweeper_class'] = explicit_stabilized
         elif integrator == 'mES':                     
-            problem_params['splitting'] = 'stiff_nonstiff'
-            parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = multirate_explicit_stabilized
         elif integrator == 'exp_mES':                     
-            problem_params['splitting'] = 'exp_stiff_nonstiff'
-            parabolic_system_type = parabolic_system_exp_expl_impl
-            description['sweeper_class'] = exponential_multirate_explicit_stabilized   
-        elif integrator == 'exp_mES_EXPRK':                     
-            problem_params['splitting'] = 'exp_stiff_nonstiff_dir_sum'
-            parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = exponential_multirate_explicit_stabilized      
         elif integrator == 'split_ES':                     
-            problem_params['splitting'] = 'stiff_nonstiff'
-            parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = splitting_explicit_stabilized       
         elif integrator == 'exp_split_ES':                     
-            problem_params['splitting'] = 'exp_stiff_nonstiff'
-            parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = exponential_splitting_explicit_stabilized       
         else:
             raise ParameterError('Unknown integrator.')
         
-        description['problem_class'] = parabolic_system_type
+        description['problem_class'] = debug_exp_runge_kutta_2
         description['problem_params'] = problem_params
         description['sweeper_params'] = sweeper_params
         description['level_params'] = level_params
         description['step_params'] = step_params
         description['base_transfer_params'] = base_transfer_params
-        description['space_transfer_class'] = mesh_to_mesh_fenicsx
 
         # instantiate the controller
         controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
@@ -172,14 +122,7 @@ def main():
         uinit = P.initial_value()
 
         prob_size = P.get_size()
-        if P.domain.comm.rank == 0:
-            print(f'Problem size: {prob_size}')
-
-        data = (uinit.n_loc_dofs+uinit.n_ghost_dofs,uinit.n_loc_dofs,uinit.n_ghost_dofs,uinit.n_ghost_dofs/(uinit.n_loc_dofs+uinit.n_loc_dofs))
-        data = P.domain.comm.gather(data, root=0)
-        if P.domain.comm.rank == 0:
-            for i,d in enumerate(data):
-                print(f'Processor {i}: tot_dofs = {d[0]:.2e}, n_loc_dofs = {d[1]:.2e}, n_ghost_dofs = {d[2]:.2e}, %ghost = {100*d[3]:.2f}')        
+        print(f'Problem size: {prob_size}')
 
         # call main function to get things done...
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
