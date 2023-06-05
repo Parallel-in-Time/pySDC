@@ -190,7 +190,7 @@ class parabolic_system_problem():
         # here we add (artificially) an exponential term and remove the stiff term
         self.rhs_nonstiff['exp_nonstiff'] = [self.rhs[0], self.rhs[1] + self.sol[1]]
         self.rhs_stiff['exp_nonstiff'] = [None, None]      
-        self.lmbda['exp_nonstiff'] = [None, -1.]
+        self.lmbda['exp_nonstiff'] = [None, fem.Constant(self.domain,-1.)]
         self.yinf['exp_nonstiff'] = [None, 0.]
         self.rhs_nonstiff_args['exp_nonstiff'] = [0,1] 
         self.rhs_stiff_args['exp_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
@@ -201,7 +201,7 @@ class parabolic_system_problem():
         # here we consider the three terms
         self.rhs_nonstiff['exp_stiff_nonstiff'] = [self.rhs[0], self.sol[1]]
         self.rhs_stiff['exp_stiff_nonstiff'] = [None, self.rhs[1]]      
-        self.lmbda['exp_stiff_nonstiff'] = [None, -1.]
+        self.lmbda['exp_stiff_nonstiff'] = [None, fem.Constant(self.domain,-1.)]
         self.yinf['exp_stiff_nonstiff'] = [None, 0.]
         self.rhs_nonstiff_args['exp_stiff_nonstiff'] = [0,1] 
         self.rhs_stiff_args['exp_stiff_nonstiff'] = [0,1]  # do not forget the laplacian!! it acts on both variables
@@ -508,6 +508,17 @@ class coscoscos_pdeode(parabolic_system_problem):
         self.diagonal_nonstiff['exp_nonstiff_dir_sum'] = True
         self.diagonal_stiff['exp_nonstiff_dir_sum'] = False
 
+        # here we consider the three terms
+        self.rhs_nonstiff['exp_stiff_nonstiff_dir_sum'] = [self.rhs[0], None]
+        self.rhs_stiff['exp_stiff_nonstiff_dir_sum'] = [None, None]      
+        self.lmbda['exp_stiff_nonstiff_dir_sum'] = [None, fem.Constant(self.domain,-1.)]
+        self.yinf['exp_stiff_nonstiff_dir_sum'] = [None, self.rhs[1]+self.sol[1]]
+        self.rhs_nonstiff_args['exp_stiff_nonstiff_dir_sum'] = [0] 
+        self.rhs_stiff_args['exp_stiff_nonstiff_dir_sum'] = [0]
+        self.rhs_exp_args['exp_stiff_nonstiff_dir_sum'] = [1] 
+        self.diagonal_nonstiff['exp_stiff_nonstiff_dir_sum'] = True
+        self.diagonal_stiff['exp_stiff_nonstiff_dir_sum'] = False
+
 class brusselator(parabolic_system_problem):
     def __init__(self,dim,n_elems):
         dom_size=[[0.,0.,0.],[1.,1.,1.]]
@@ -589,7 +600,7 @@ class brusselator(parabolic_system_problem):
     
 class Monodomain(parabolic_system_problem):
     def __init__(self,dim,n_elems):
-        dom_size=[[0.,0.,0.],[2.,2.,3.]]
+        dom_size=[[0.,0.,0.],[20.,7.,3.]]
         super(Monodomain,self).__init__(dim,n_elems,dom_size)
 
         self.know_exact = False
@@ -604,7 +615,7 @@ class Monodomain(parabolic_system_problem):
         self.diff = [0] # defined later
 
         self.t0 = 0.
-        self.Tend = 3. # ms
+        self.Tend = 60. # ms
 
         n_pts = 10
         # a = np.reshape(np.array(dom_size[0]),(1,3))
@@ -755,6 +766,17 @@ class Monodomain(parabolic_system_problem):
                 self.lmbda['exp_stiff_nonstiff'][i] = -1./tau[i]
                 self.yinf['exp_stiff_nonstiff'][i] = yinf[i]
                 self.rhs_exp_args['exp_stiff_nonstiff'].append(i)
+
+        # this splitting is the same as above, but is used for methods with exponential Runge-Kutta as underlying collocation method
+        self.rhs_nonstiff['exp_stiff_nonstiff_dir_sum'] = self.rhs_nonstiff['exp_stiff_nonstiff']
+        self.rhs_nonstiff_args['exp_stiff_nonstiff_dir_sum'] = self.rhs_nonstiff_args['exp_stiff_nonstiff']
+        self.diagonal_nonstiff['exp_stiff_nonstiff_dir_sum'] = self.diagonal_nonstiff['exp_stiff_nonstiff']
+        self.rhs_stiff['exp_stiff_nonstiff_dir_sum'] = self.rhs_stiff['exp_stiff_nonstiff']
+        self.rhs_stiff_args['exp_stiff_nonstiff_dir_sum'] = self.rhs_stiff_args['exp_stiff_nonstiff']
+        self.diagonal_stiff['exp_stiff_nonstiff_dir_sum'] = self.diagonal_stiff['exp_stiff_nonstiff']
+        self.lmbda['exp_stiff_nonstiff_dir_sum'] = self.lmbda['exp_stiff_nonstiff']
+        self.yinf['exp_stiff_nonstiff_dir_sum'] = self.yinf['exp_stiff_nonstiff']
+        self.rhs_exp_args['exp_stiff_nonstiff_dir_sum'] = self.rhs_exp_args['exp_stiff_nonstiff']
 
         self.u0 = [fem.Constant(self.domain,y0) for y0 in self.ionic_model.initial_values()]        
         V0_bnd = -1.5

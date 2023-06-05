@@ -547,13 +547,12 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         self.rhs_nonstiff_args = self.exact.rhs_nonstiff_args[splitting]
         self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
         self.rhs_exp_args = self.exact.rhs_exp_args[splitting]
-        self.diagonal_impl = self.exact.diagonal_stiff[splitting]
-        self.diagonal_expl = self.exact.diagonal_nonstiff[splitting]
 
+        self.phi_max = 5
         self.lmbda_expr_interp = [None]*self.exact.size
-        self.phi_one = [None]*self.exact.size
-        self.phi_one_form = [None]*self.exact.size
-        self.phi_one_expr_interp = [None]*self.exact.size
+        self.phi = [None]*self.exact.size
+        self.phi_form = [None]*self.exact.size
+        self.phi_expr_interp = [None]*self.exact.size
         self.phi_one_f = [None]*self.exact.size
         self.phi_one_f_form = [None]*self.exact.size
         self.phi_one_f_expr_interp = [None]*self.exact.size
@@ -564,11 +563,22 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         for i in range(self.exact.size):            
             if self.lmbda_expr[i] is not None:
                 self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i],self.V.element.interpolation_points())
-                self.phi_one_expr_interp[i] = fem.Expression(\
-                                                ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt*self.lmbda_expr[i])),\
-                                                self.V.element.interpolation_points())
-                self.phi_one[i] = ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt*self.lmbda_expr[i]))*v*ufl.dx    
-                self.phi_one_form[i] = fem.form(self.phi_one[i])
+
+                self.phi_expr_interp[i] = [None]*(self.phi_max+1)
+                self.phi[i] = [None]*(self.phi_max+1)
+                self.phi_form[i] = [None]*(self.phi_max+1)
+                phi_k = ufl.exp(self.lmbda_expr[i]*self.exact.dt)                
+                self.phi_expr_interp[i][0] = fem.Expression(phi_k,self.V.element.interpolation_points())
+                self.phi[i][0] = phi_k*v*ufl.dx
+                self.phi_form[i][0] = fem.form(self.phi[i][0])
+                k_fac = 1. # 0!
+                for k in range(1,self.phi_max+1):                    
+                    phi_k = (phi_k-1./k_fac)/(self.lmbda_expr[i]*self.exact.dt)                    
+                    self.phi_expr_interp[i][k] = fem.Expression(phi_k,self.V.element.interpolation_points())
+                    self.phi[i][k] = phi_k*v*ufl.dx
+                    self.phi_form[i][k] = fem.form(self.phi[i][k])                    
+                    k_fac = k_fac*k
+
                 self.phi_one_f_expr_interp[i] = fem.Expression(\
                                                 ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i]),\
                                                 self.V.element.interpolation_points())
@@ -726,7 +736,7 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
 
         return fh_exp
     
-    def phi_one_eval(self, u, factor, t, u_sol = None):
+    def phi_eval(self, u, factor, t, k, u_sol = None):
         
         self.exact.update_time(t)
         self.exact.update_dt(factor) # for computing the exponentials
@@ -742,11 +752,11 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         for i in range(self.exact.size):
             if self.exp_indexes[i]:
                 if self.f_interp:                    
-                    u_sol.val_list[i].values.interpolate(self.phi_one_expr_interp[i])                    
+                    u_sol.val_list[i].values.interpolate(self.phi_expr_interp[i][k])                    
                 else:                              
                     with self.b.localForm() as loc_b:
                         loc_b.set(0)                
-                    fem.petsc.assemble_vector(self.b, self.phi_one_form[i])
+                    fem.petsc.assemble_vector(self.b, self.phi_form[i][k])
                     self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                          
                     self.invert_mass_matrix(self.b, u_sol[i].values.vector)
                 if self.family=='CG' and self.exact.bnd_cond!='N':

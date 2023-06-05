@@ -730,11 +730,11 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         self.rhs_stiff_args = self.exact.rhs_stiff_args[splitting]
         self.rhs_exp_args = self.exact.rhs_exp_args[splitting]
     
+        self.phi_max = 5
+        self.phi_expr_interp = [None]*self.exact.size
         self.lmbda_expr_interp = [None]*self.exact.size
-        self.phi_one = 0.  
         self.phi_one_f = 0.  
         self.F_exp = 0.              
-        self.phi_one_expr_interp = [None]*self.exact.size
         self.phi_one_f_expr_interp = [None]*self.exact.size
         self.rhs_exp_expr_interp = [None]*self.exact.size
         self.exp_indexes = [False]*self.exact.size
@@ -744,16 +744,21 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
                                                 ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i]),\
                                                 self.V.sub(i).element.interpolation_points())
                 self.phi_one_f += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx    
-                self.phi_one_expr_interp[i] = fem.Expression(\
-                                                ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt)),\
-                                                self.V.sub(i).element.interpolation_points())
-                self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i], self.V.sub(i).element.interpolation_points())
-                self.phi_one += ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.lmbda_expr[i]*self.exact.dt))*v[i]*ufl.dx                     
+
+                self.phi_expr_interp[i] = []
+                phi_k = ufl.exp(self.lmbda_expr[i]*self.exact.dt) # phi_0
+                k_fac = 1. # 0!
+                self.phi_expr_interp[i].append(fem.Expression(phi_k,self.V.sub(i).element.interpolation_points()))
+                for k in range(1,self.phi_max+1):                    
+                    phi_k = (phi_k-1./k_fac)/(self.lmbda_expr[i]*self.exact.dt)
+                    self.phi_expr_interp[i].append(fem.Expression(phi_k,self.V.sub(i).element.interpolation_points()))
+                    k_fac = k_fac*k
+    
+                self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i], self.V.sub(i).element.interpolation_points())                                
                 self.rhs_exp_expr_interp[i] = fem.Expression(self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i]),self.V.sub(i).element.interpolation_points())
                 self.F_exp += self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx                                              
                 self.exp_indexes[i] = True  
         self.phi_one_f_form = fem.form(self.phi_one_f)
-        self.phi_one_form = fem.form(self.phi_one)
         self.f_exp_form = fem.form(self.F_exp)
 
         self.F_stiff = 0.
@@ -892,26 +897,23 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
 
         return fh_exp
     
-    def phi_one_eval(self, u, factor, t, u_sol = None):
+    def phi_eval(self, u, factor, t, k, u_sol = None):
 
         self.exact.update_time(t)
         self.exact.update_dt(factor) # for computing the exponentials
 
         if u_sol is None:
-            u_sol = self.dtype_u(init=self.V,val=0.)    
+            u_sol = self.dtype_u(init=self.V,val=0.)            
 
-        if self.family=='CG' and self.exact.bnd_cond!='N' and not self.exact.cte_Dirichlet:
-            self.get_DirBC(self.uD,t)
-
-        if hasattr(self.exact,'uh'):
-            self.exact.uh.copy(u)
-            self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
+        self.exact.uh.copy(u)
+        self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
 
         if self.f_interp:
             for i in range(self.exact.size):
                 if self.exp_indexes[i]:
-                    u_sol.values.sub(i).interpolate(self.phi_one_expr_interp[i])           
+                    u_sol.values.sub(i).interpolate(self.phi_expr_interp[i][k])           
         else:
+            raise Exception('Not implemented')
             with self.b.localForm() as loc_b:
                 loc_b.set(0)
             fem.petsc.assemble_vector(self.b, self.phi_one_form)   
@@ -924,6 +926,39 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
             fem.petsc.set_bc(u_sol.values.vector, bcs=self.bc, scale=1.)
 
         return u_sol
+    
+    # def phi_one_eval(self, u, factor, t, u_sol = None):
+
+    #     self.exact.update_time(t)
+    #     self.exact.update_dt(factor) # for computing the exponentials
+
+    #     if u_sol is None:
+    #         u_sol = self.dtype_u(init=self.V,val=0.)    
+
+    #     if self.family=='CG' and self.exact.bnd_cond!='N' and not self.exact.cte_Dirichlet:
+    #         self.get_DirBC(self.uD,t)
+
+    #     if hasattr(self.exact,'uh'):
+    #         self.exact.uh.copy(u)
+    #         self.exact.uh.ghostUpdate(addv=PETSc.InsertMode.INSERT, mode=PETSc.ScatterMode.FORWARD)    
+
+    #     if self.f_interp:
+    #         for i in range(self.exact.size):
+    #             if self.exp_indexes[i]:
+    #                 u_sol.values.sub(i).interpolate(self.phi_one_expr_interp[i])           
+    #     else:
+    #         with self.b.localForm() as loc_b:
+    #             loc_b.set(0)
+    #         fem.petsc.assemble_vector(self.b, self.phi_one_form)   
+    #         self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)                
+    #         self.invert_mass_matrix(self.b, u_sol.values.vector)                  
+
+    #     u_sol.copy_sub(self.one,[i for i in range(self.exact.size) if not self.exp_indexes[i]])
+        
+    #     if self.family=='CG' and self.exact.bnd_cond!='N':
+    #         fem.petsc.set_bc(u_sol.values.vector, bcs=self.bc, scale=1.)
+
+    #     return u_sol
     
     def lmbda_eval(self, u, t, u_sol = None):
 

@@ -35,17 +35,26 @@ class fenicsx_mesh_vec(object):
         me -= other
         return me
     
+    def __mul__(self, other):
+        if isinstance(other,fenicsx_mesh_vec):
+            V = self.val_list[0].values.function_space
+            # mult = fenicsx_mesh_vec(init=V,val=0.,size=self.size)    
+            # for i in range(self.size):
+            #     mult.val_list[i].values.interpolate(fem.Expression(self.val_list[i].values*other.val_list[i].values,V.element.interpolation_points()))   
+      
+            mult = fenicsx_mesh_vec(init=V,val=0.,size=self.size)    
+            for i in range(self.size):
+                mult.val_list[i].values.x.array[:] = self.val_list[i].values.x.array[:]*other.val_list[i].values.x.array[:]
+            
+            return mult                        
+        else:
+            raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))        
+        
     def __rmul__(self, other):
         if isinstance(other,float):
             me = fenicsx_mesh_vec(self)
             me *= other
             return me
-        elif isinstance(other,fenicsx_mesh_vec):
-            V = self.val_list[0].values.function_space
-            mult = fenicsx_mesh_vec(init=V,val=0.,size=self.size)    
-            for i in range(self.size):
-                mult.val_list[i].values.interpolate(fem.Expression(self.val_list[i].values*other.val_list[i].values,V.element.interpolation_points()))                 
-            return mult
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))        
     
@@ -141,9 +150,23 @@ class fenicsx_mesh_vec(object):
         for i in indices:
             self.val_list[i] -= other.val_list[i]
 
-    def imul_sub(self,other,indices):
+    def mul_sub(self, other,indices):        
+        V = self.val_list[0].values.function_space
+        mult = fenicsx_mesh_vec(init=V,val=0.,size=self.size)    
         for i in indices:
-            self.val_list[i] *= other
+            mult.val_list[i].values.x.array[:] = self.val_list[i].values.x.array[:]*other.val_list[i].values.x.array[:]
+        
+        return mult                        
+
+    def imul_sub(self,other,indices):
+        if isinstance(other,float):
+            for i in indices:
+                self.val_list[i] *= other
+        elif isinstance(other,fenicsx_mesh_vec):
+            for i in indices:
+                self.val_list[i].values.x.array[:] *= other.val_list[i].values.x.array[:]
+        else:
+            raise DataError("Type error: cannot multiply %s with %s" % (type(other), type(self)))
 
     def axpby_sub(self,a,b,x,indices):
         for i in indices:

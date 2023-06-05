@@ -5,6 +5,7 @@ from pySDC.core.Errors import CollocationError
 from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.rho_estimator import rho_estimator
 from pySDC.core.Lagrange import LagrangeApproximation
 from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.es_methods import mRKC1
+import numdifftools.fornberg as fornberg
 
 class exponential_multirate_explicit_stabilized(sweeper):
     """
@@ -106,15 +107,48 @@ class exponential_multirate_explicit_stabilized(sweeper):
 
         # get current level and problem description
         L = self.level
+        P = L.prob
 
         me = []
 
+        M = self.coll.num_nodes
+        
+        # this works for M==1
+        # lmbda = P.lmbda_eval(L.u[0],L.time)
+        # phi_one = P.phi_eval(L.u[0],L.dt,L.time,1)        
+        # me.append( L.dt*( L.f[1].impl + L.f[1].expl +  phi_one.__rmul__(L.f[1].exp+lmbda.__rmul__(L.u[0]-L.u[1]))) )        
+        # return me
+    
+        # compute phi[k][i] = phi_{k}(dt*c_i*lmbda), i=0,...,M-1, k=0,...,M
+        phi = []
+        c = self.coll.nodes
+        for k in range(M+1):
+            phi.append([])
+            for i in range(M):
+                phi[k].append(P.phi_eval(L.u[0],L.dt*c[i],L.time,k))
+
+        # compute polynomial. remember that L.u[k+1] corresponds to c[k]
+        lmbda = P.lmbda_eval(L.u[0],L.time)
+        Q = []
+        for k in range(M):
+            Q.append(L.f[k+1].exp+lmbda*(L.u[0]-L.u[k+1]))
+
+        # compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
+        w = fornberg.fd_weights_all(c,0.,M-1)
+
+        # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
+        Qmat_exp = [[P.dtype_u(P.init,val=0.) for j in range(M)] for i in range(M)]
+        for i in range(M):            
+            for j in range(M):
+                for k in range(M):
+                    Qmat_exp[i][j] += (w[k,j]*c[i]**(k+1))*phi[k+1][i]
+
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
-            me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl+L.f[1].expl+L.f[1].exp))
+            me.append(L.dt * (self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl) + Qmat_exp[m-1][0]*(Q[0])))
             # new instance of dtype_u, initialize values with 0
             for j in range(2, self.coll.num_nodes + 1):
-                me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl+L.f[j].expl+L.f[j].exp)
+                me[m - 1] += L.dt * (self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl) + Qmat_exp[m-1][j-1]*(Q[j-1]))
 
         return me
 
@@ -201,11 +235,13 @@ class exponential_multirate_explicit_stabilized(sweeper):
 
         I_int = self.interpolate(integral,m,j,0)
         I_u = self.interpolate(u,m,j,0)
-        f1 = P.eval_f(I_int+d,t,eval_impl=True,eval_expl=True,eval_exp=False)
-        f2 = P.eval_f(I_u,t,eval_impl=True,eval_expl=True,eval_exp=False)        
+        f1 = P.eval_f(I_int+d,t,eval_impl=True,eval_expl=True,eval_exp=True)
+        f2 = P.eval_f(I_u,t,eval_impl=True,eval_expl=True,eval_exp=True)        
         df_expl = f1.expl-f2.expl
         df_impl = f1.impl-f2.impl
-        df_exp = P.phi_one_f_eval(I_int+d, es.eta*es.alpha[0], t)-P.phi_one_f_eval(I_u, es.eta*es.alpha[0], t)
+        lmbda = P.lmbda_eval(L.u[0],L.time)        
+        df_exp = P.phi_eval(L.u[0],es.eta*es.alpha[0],t,1)*(f1.exp-f2.exp+lmbda*(I_u-(I_int+d)))
+        # df_exp = P.phi_eval(L.u[0],es.eta,t,1)*(f1.exp-f2.exp+lmbda*(I_u-(I_int+d)))
         
         djm1 = P.dtype_u(d)
         dj = djm1 + es.eta*es.alpha[0]*(df_impl+df_expl+df_exp)
@@ -215,10 +251,10 @@ class exponential_multirate_explicit_stabilized(sweeper):
 
             I_int = self.interpolate(integral,m,j,k-1)
             I_u = self.interpolate(u,m,j,k-1)
-            f1 = P.eval_f(I_int+djm1,t+es.eta*es.d[k-2],eval_impl=True,eval_expl=False,eval_exp=False)
-            f2 = P.eval_f(I_u,t+es.eta*es.d[k-2],eval_impl=True,eval_expl=False,eval_exp=False)
-            df_impl = f1.impl-f2.impl
-            df_exp = P.phi_one_f_eval(I_int+djm1, es.eta*es.alpha[k-1], t+es.eta*es.d[k-2])-P.phi_one_f_eval(I_u, es.eta*es.alpha[k-1], t+es.eta*es.d[k-2])
+            f1 = P.eval_f(I_int+djm1,t+es.eta*es.d[k-2],eval_impl=True,eval_expl=False,eval_exp=True)
+            f2 = P.eval_f(I_u,t+es.eta*es.d[k-2],eval_impl=True,eval_expl=False,eval_exp=True)
+            df_impl = f1.impl-f2.impl            
+            df_exp = P.phi_eval(L.u[0],es.eta*es.alpha[0],t,1)*(f1.exp-f2.exp+lmbda*(I_u-(I_int+djm1)))            
 
             dj = es.beta[k-1]*djm1 + es.gamma[k-1]*djm2 + es.eta*es.alpha[k-1]*(df_expl+df_impl+df_exp)
 
