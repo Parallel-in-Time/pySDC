@@ -243,12 +243,10 @@ class fully_implicit_DAE(sweeper):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
-            print('Right is node')
         else:
             # start with u0 and add integral over the full interval (using coll.weights)
             L.uend = P.dtype_u(L.u[0])
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt * self.coll.weights[m] * L.f[m + 1]
-            print('Right is not node')
 
         return None
