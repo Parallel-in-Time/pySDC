@@ -41,7 +41,7 @@ class particles_output(hooks):
         #     self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
         part = L.u[0]
-        N = L.prob.params.nparts
+        N = L.prob.nparts
         w = np.array([1, 1, -2])
 
         # compute (slowly..) the potential at u0
@@ -49,13 +49,13 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             fpot[i] -= (
-                L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
+                L.prob.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
             )
 
         # add up kinetic and potntial contributions to total energy
@@ -92,7 +92,7 @@ class particles_output(hooks):
 
         L.sweep.compute_end_point()
         part = L.uend
-        N = L.prob.params.nparts
+        N = L.prob.nparts
         w = np.array([1, 1, -2])
 
         # compute (slowly..) the potential at uend
@@ -100,13 +100,13 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             fpot[i] -= (
-                L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
+                L.prob.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
             )
 
         # add up kinetic and potntial contributions to total energy
@@ -131,7 +131,7 @@ class particles_output(hooks):
         self.sframe = self.ax.scatter(L.uend.pos[0::3], L.uend.pos[1::3], L.uend.pos[2::3])
         # Remove old line collection before drawing
         if oldcol is not None:
-            self.ax.collections.remove(oldcol)
+            oldcol.remove()
         plt.pause(0.001)
 
         return None
@@ -182,7 +182,7 @@ class convergence_data(hooks):
         self.storage["position_exact"][L.time] = L.prob.u_exact(L.time + L.dt).pos
         self.storage["velocity_exact"][L.time] = L.prob.u_exact(L.time + L.dt).vel
 
-        if L.time + L.dt >= L.prob.params.Tend:
+        if L.time + L.dt >= L.prob.Tend:
             self.add_to_stats(
                 process=step.status.slot,
                 time=L.dt,
