@@ -79,7 +79,7 @@ class buck_converter(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, duty, fsw, Vs, Rs, C1, Rp, L1, C2, Rl):
+    def __init__(self, duty=0.5, fsw=1e3, Vs=10.0, Rs=0.5, C1=1e-3, Rp=0.01, L1=1e-3, C2=1e-3, Rl=10):
         """Initialization routine"""
 
         # invoke super init, passing number of dofs

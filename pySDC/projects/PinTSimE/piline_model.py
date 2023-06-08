@@ -70,29 +70,19 @@ def main():
     sweeper_params['num_nodes'] = 5
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['Vs'] = 100.0
-    problem_params['Rs'] = 1.0
-    problem_params['C1'] = 1.0
-    problem_params['Rpi'] = 0.2
-    problem_params['C2'] = 1.0
-    problem_params['Lpi'] = 1.0
-    problem_params['Rl'] = 5.0
-
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 20
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
 
     # fill description dictionary for easy step instantiation
+    # keep in mind: default params are used for the problem, but can be changed
     description = dict()
     description['problem_class'] = piline  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
