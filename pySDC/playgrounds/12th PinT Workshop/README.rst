@@ -70,3 +70,9 @@ Then, if you want to run stuff in parallel (but locally), start an ``ipcluster``
 
     ipcluster start --engines=MPI -n 4
 
+Fire up a new shell, remember to augment the `PYTHONPATH` as before and start a jupyter notebook via
+
+.. code-block:: bash
+
+    jupyter notebook
+
