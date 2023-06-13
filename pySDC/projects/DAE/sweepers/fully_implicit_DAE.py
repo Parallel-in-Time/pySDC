@@ -32,9 +32,7 @@ class fully_implicit_DAE(sweeper):
         super(fully_implicit_DAE, self).__init__(params)
 
         msg = f"Quadrature type {self.params.quad_type} is not implemented yet. Use 'RADAU-RIGHT' instead!"
-        if not self.coll.right_is_node:
-            raise ParameterError(msg)
-        elif self.coll.right_is_node and self.coll.left_is_node:
+        if self.coll.left_is_node:
             raise ParameterError(msg)
 
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
