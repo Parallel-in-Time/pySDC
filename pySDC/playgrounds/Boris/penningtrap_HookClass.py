@@ -182,7 +182,7 @@ class convergence_data(hooks):
         self.storage["position_exact"][L.time] = L.prob.u_exact(L.time + L.dt).pos
         self.storage["velocity_exact"][L.time] = L.prob.u_exact(L.time + L.dt).vel
 
-        if L.time + L.dt >= L.prob.Tend:
+        if L.time + L.dt >= self.Tend:
             self.add_to_stats(
                 process=step.status.slot,
                 time=L.dt,
