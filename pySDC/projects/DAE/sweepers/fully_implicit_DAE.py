@@ -31,6 +31,10 @@ class fully_implicit_DAE(sweeper):
         # call parent's initialization routine
         super(fully_implicit_DAE, self).__init__(params)
 
+        msg = f"Quadrature type {self.params.quad_type} is not implemented yet. Use 'RADAU-RIGHT' instead!"
+        if self.coll.left_is_node:
+            raise ParameterError(msg)
+
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
 
     # TODO: hijacking this function to return solution from its gradient i.e. fundamental theorem of calculus.
