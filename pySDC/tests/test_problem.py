@@ -44,23 +44,29 @@ def test_scipy_reference(init):
 
 @pytest.mark.base
 class TestBasics:
-    PROBLEMS = {}
+    @staticmethod
+    def importClass(className):
+        if className == 'logistics_equation':
+            from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
 
-    def __init__(self):
-        from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
+            return logistics_equation
+        else:
+            raise ValueError(f'cannot import {className} problem class')
 
-        self.PROBLEMS[logistics_equation] = {
+    PROBLEMS = {
+        'logistics_equation': {
             'probParams': dict(u0=2.0, newton_maxiter=100, newton_tol=1e-6, direct=True, lam=0.5, stop_at_nan=True),
             'testParams': {'tBeg': 0, 'tEnd': 1.0, 'nSteps': 1000, 'tol': 1e-3},
         }
+    }
 
     @pytest.mark.base
-    @pytest.mark.parametrize('probType', PROBLEMS.keys())
-    def test_uExact_accuracy(self, probType):
-        params = self.PROBLEMS[probType]['probParams']
-        prob = probType(**params)
+    @pytest.mark.parametrize('className', PROBLEMS.keys())
+    def test_uExact_accuracy(self, className):
+        params = self.PROBLEMS[className]['probParams']
+        prob = self.importClass(className)(**params)
 
-        testParams = self.PROBLEMS[probType]['testParams']
+        testParams = self.PROBLEMS[className]['testParams']
         tBeg = testParams['tBeg']
         tEnd = testParams['tEnd']
         nSteps = testParams['nSteps']
@@ -75,7 +81,5 @@ class TestBasics:
 if __name__ == '__main__':
     test_scipy_reference([(2, 3)])
 
-    from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
-
     prob = TestBasics()
-    prob.test_uExact_accuracy(logistics_equation)
+    prob.test_uExact_accuracy('logistics_equation')
