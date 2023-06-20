@@ -44,15 +44,15 @@ def test_scipy_reference(init):
 
 @pytest.mark.base
 class TestBasics:
-    PROBLEMS = {}
-
-    def __init__(self):
-        from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
-
-        self.PROBLEMS[logistics_equation] = {
+    
+    from pySDC.implementations.problem_classes.LogisticEquation import logistics_equation
+    
+    PROBLEMS = {
+        logistics_equation: {
             'probParams': dict(u0=2.0, newton_maxiter=100, newton_tol=1e-6, direct=True, lam=0.5, stop_at_nan=True),
             'testParams': {'tBeg': 0, 'tEnd': 1.0, 'nSteps': 1000, 'tol': 1e-3},
         }
+    }
 
     @pytest.mark.base
     @pytest.mark.parametrize('probType', PROBLEMS.keys())
