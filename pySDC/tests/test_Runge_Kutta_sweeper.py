@@ -8,6 +8,10 @@ COLORS = {
     'Cash_Karp': 'teal',
 }
 
+EXPLICIT_METHODS = ['RK1', 'MidpointMethod', 'CrankNicholson']
+IMPLICIT_METHODS = ['RK1', 'MidpointMethod', 'RK4', 'Cash_Karp']
+EMBEDDED_METHODS = ['Cash_Karp', 'Heun_Euler', 'DIRK34']
+
 
 def get_sweeper(sweeper_name):
     """
@@ -144,8 +148,7 @@ def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True
     ax.legend(frameon=False)
 
 
-@pytest.mark.base
-def test_all_stability():
+def plot_all_stability():
     """
     Make a figure showing domains of stability for a range of RK rules, both implicit and explicit.
 
@@ -174,6 +177,18 @@ def test_all_stability():
     fig.tight_layout()
 
 
+@pytest.mark.base
+@pytest.mark.parametrize("sweeper_name", EXPLICIT_METHODS)
+def test_stability_implicit_methods(sweeper_name):
+    plot_stability_single(sweeper_name, implicit=True)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize("sweeper_name", IMPLICIT_METHODS)
+def test_stability_explicit_methods(sweeper_name):
+    plot_stability_single(sweeper_name, implicit=False)
+
+
 def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
     """
     Make a plot with various sweepers and check their order.
@@ -196,7 +211,8 @@ def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
 
 
 @pytest.mark.base
-def test_vdp():
+@pytest.mark.parametrize("sweeper_name", ['RK1', 'MidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp'])
+def test_vdp(sweeper_name):
     """
     Here, we check the order in time for various implicit RK rules with the van der Pol problem.
     This is interesting, because van der Pol is non-linear.
@@ -208,15 +224,14 @@ def test_vdp():
     from pySDC.projects.Resilience.vdp import run_vdp
 
     Tend = 7e-2
-    plot_all_orders(
-        run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, ['RK1', 'MidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp']
-    )
+    plot_order(sweeper_name, prob=run_vdp, dt_list=Tend * 2.0 ** (-np.arange(8)), implicit=True, Tend_fixed=Tend)
 
 
 @pytest.mark.base
-def test_advection():
+@pytest.mark.parametrize("sweeper_name", ['RK1', 'MidpointMethod'])
+def test_advection(sweeper_name):
     """
-    Here, we check the order in time for various implicit and explicit RK rules with an advection problem.
+    Test the order for some explicit RK rules
 
     Returns:
         None
@@ -224,14 +239,17 @@ def test_advection():
     from pySDC.projects.Resilience.advection import run_advection
     import numpy as np
 
-    plot_all_orders(
-        run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod', 'CrankNicholson'], implicit=True
+    plot_order(
+        sweeper_name=sweeper_name,
+        prob=run_advection,
+        dt_list=1.0e-3 * 2.0 ** (-np.arange(8)),
+        implicit=False,
+        Tend_fixed=None,
     )
-    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod'], implicit=False)
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('sweeper_name', ['Cash_Karp', 'Heun_Euler', 'DIRK34'])
+@pytest.mark.parametrize('sweeper_name', EMBEDDED_METHODS)
 def test_embedded_estimate_order(sweeper_name):
     """
     Test the order of embedded Runge-Kutta schemes. They are not run with adaptivity here,
@@ -321,9 +339,24 @@ def test_embedded_method():
 
 
 if __name__ == '__main__':
+    # make plots
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from pySDC.projects.Resilience.vdp import run_vdp
+    from pySDC.projects.Resilience.advection import run_advection
+
+    plot_all_orders(
+        run_vdp, 7e-2 * 2.0 ** (-np.arange(8)), 7e-2, ['RK1', 'MidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp']
+    )
+
+    plot_all_orders(
+        run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod', 'CrankNicholson'], implicit=True
+    )
+    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod'], implicit=False)
+
     test_embedded_method()
-    for sweep in ['Cash_Karp', 'Heun_Euler', 'DIRK34']:
+    for sweep in EMBEDDED_METHODS:
         test_embedded_estimate_order(sweep)
-    test_vdp()
-    test_advection()
-    test_all_stability()
+    plot_all_stability()
+
+    plt.show()
