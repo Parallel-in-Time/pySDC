@@ -55,8 +55,9 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
     description['sweeper_class'] = get_sweeper(sweeper_name)
     description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
+    description['level_params'] = {'restol': +1}
 
-    custom_controller_params = {'logger_level': 40}
+    custom_controller_params = {'logger_level': 30}
 
     # determine the order
     plot_orders(
@@ -68,6 +69,7 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
         dt_list=dt_list,
         prob=prob,
         custom_controller_params=custom_controller_params,
+        embedded_error_flavor='standard',
     )
 
     # check if we got the expected order for the local error
@@ -120,7 +122,7 @@ def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True
     description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
 
-    custom_controller_params = {'logger_level': 40}
+    custom_controller_params = {'logger_level': 30}
 
     re = np.linspace(-30, 30, 400) if re is None else re
     im = np.linspace(-50, 50, 400) if im is None else im
@@ -271,14 +273,14 @@ def test_embedded_estimate_order(sweeper_name):
 
     # change only the things in the description that we need for adaptivity
     convergence_controllers = {}
-    convergence_controllers[EstimateEmbeddedError] = {}
+    convergence_controllers[EstimateEmbeddedError.get_implementation('standard')] = {}
 
     description = {}
     description['convergence_controllers'] = convergence_controllers
     description['sweeper_class'] = get_sweeper(sweeper_name)
     description['step_params'] = {'maxiter': 1}
 
-    custom_controller_params = {'logger_level': 40}
+    custom_controller_params = {'logger_level': 30}
 
     Tend = 7e-2
     dt_list = Tend * 2.0 ** (-np.arange(8))
@@ -292,6 +294,8 @@ def test_embedded_estimate_order(sweeper_name):
         dt_list=dt_list,
         prob=prob,
         custom_controller_params=custom_controller_params,
+        embedded_error_flavor='standard',
+        keys=['e', 'e_embedded'],
     )
 
 

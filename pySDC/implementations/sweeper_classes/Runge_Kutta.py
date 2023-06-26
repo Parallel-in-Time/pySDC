@@ -3,6 +3,7 @@ import logging
 
 from pySDC.core.Sweeper import sweeper, _Pars
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Level import level
 from pySDC.implementations.datatype_classes.mesh import imex_mesh, mesh
 
 
@@ -143,7 +144,7 @@ class RungeKutta(sweeper):
 
     All of these variables are either determined by the RK rule, or are not part of an RK scheme.
 
-    Attribues:
+    Attributes:
         butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want
     """
 
@@ -283,6 +284,33 @@ class RungeKutta(sweeper):
         In this Runge-Kutta implementation, the solution to the step is always stored in the last node
         """
         self.level.uend = self.level.u[-1]
+
+    @property
+    def level(self):
+        """
+        Returns the current level
+
+        Returns:
+            pySDC.Level.level: Current level
+        """
+        return self.__level
+
+    @level.setter
+    def level(self, lvl):
+        """
+        Sets a reference to the current level (done in the initialization of the level)
+
+        Args:
+            lvl (pySDC.Level.level): Current level
+        """
+        assert isinstance(lvl, level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
+        if lvl.params.restol > 0:
+            lvl.params.restol = -1
+            self.logger.warning(
+                'Overwriting residual tolerance with -1 because RK methods are direct and hence may not compute a residual at all!'
+            )
+
+        self.__level = lvl
 
 
 class RK1(RungeKutta):
