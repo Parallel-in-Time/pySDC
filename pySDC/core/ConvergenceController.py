@@ -63,6 +63,20 @@ class ConvergenceController(object):
         self.logger.log(level, f'Process {S.status.slot:2d} on time {S.time:.6f} - {msg}')
         return None
 
+    def debug(self, msg, S, **kwargs):
+        """
+        Shortcut to pass messages at debug level to the logger.
+
+        Args:
+            msg (str): Message you want to log
+            S (pySDC.step): The current step
+
+        Returns:
+            None
+        """
+        self.log(msg=msg, S=S, level=10, **kwargs)
+        return None
+
     def setup(self, controller, params, description, **kwargs):
         """
         Setup various variables that only need to be set once in the beginning.
@@ -312,10 +326,10 @@ class ConvergenceController(object):
         Returns:
             request handle of the communication
         """
-        # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} initiates send to step {dest}')
-
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates send to step {dest} with tag {kwargs["tag"]}')
 
         if blocking:
             req = comm.send(data, dest=dest, **kwargs)
@@ -323,7 +337,7 @@ class ConvergenceController(object):
             req = comm.isend(data, dest=dest, **kwargs)
 
         # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} leaves send to step {dest}')
+        self.logger.debug(f'Step {comm.rank} leaves send to step {dest} with tag {kwargs["tag"]}')
 
         return req
 
@@ -338,15 +352,66 @@ class ConvergenceController(object):
         Returns:
             whatever has been received
         """
-        # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} initiates receive from step {source}')
-
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates receive from step {source} with tag {kwargs["tag"]}')
 
         data = comm.recv(source=source, **kwargs)
 
         # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} leaves receive from step {source}')
+        self.logger.debug(f'Step {comm.rank} leaves receive from step {source} with tag {kwargs["tag"]}')
+
+        return data
+
+    def Send(self, comm, dest, buffer, blocking=False, **kwargs):
+        """
+        Send data to a different rank
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            dest (int): The target rank
+            buffer: Buffer for the data
+            blocking (bool): Whether the communication is blocking or not
+
+        Returns:
+            request handle of the communication
+        """
+        kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates Send to step {dest} with tag {kwargs["tag"]}')
+
+        if blocking:
+            req = comm.Send(buffer, dest=dest, **kwargs)
+        else:
+            req = comm.Isend(buffer, dest=dest, **kwargs)
+
+        # log what's, buffer] happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} leaves Send to step {dest} with tag {kwargs["tag"]}')
+
+        return req
+
+    def Recv(self, comm, source, buffer, **kwargs):
+        """
+        Receive some data
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            source (int): Where to look for receiving
+
+        Returns:
+            whatever has been received
+        """
+        kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} initiates Receive from step {source} with tag {kwargs["tag"]}')
+
+        data = comm.Recv(buffer, source=source, **kwargs)
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} leaves Receive from step {source} with tag {kwargs["tag"]}')
 
         return data
 

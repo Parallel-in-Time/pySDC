@@ -80,7 +80,7 @@ def run(cwd='./'):
                     restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None))
                     restarts = restarts_dict[dt_item][:, 1]
                     restarts_all.append(np.sum(restarts))
-                    print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
+                    print(f"Restarts for dt: {dt_item:.2e} -- {np.sum(restarts):.0f}")
 
     V_ref = description['problem_params']['V_ref']
 
@@ -123,9 +123,7 @@ def run(cwd='./'):
         diff_true_all1.append(
             [diff_true1[m] for m in range(len(t_true)) if np.isclose(t_true[m], t_switch[0], atol=1e-15)]
         )
-        diff_true_all2.append(
-            [diff_true2[m] for m in range(len(t_true)) if np.isclose(t_true[m], t_switch[1], atol=1e-15)]
-        )
+        diff_true_all2.append([diff_true2[np.argmin([abs(me - t_switch[1]) for me in t_true])]])
 
         diff_false_all_before1.append(
             [diff_false1[m - 1] for m in range(1, len(t_false)) if t_false[m - 1] < t_switch[0] < t_false[m]]

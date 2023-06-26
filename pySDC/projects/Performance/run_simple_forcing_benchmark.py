@@ -139,6 +139,9 @@ def run_simulation(name=None, nprocs_space=None):
         out = f'Mean number of iterations: {np.mean(niters):.4f}'
         print(out)
 
+    space_comm.Free()
+    time_comm.Free()
+
 
 if __name__ == "__main__":
     # Add parser to get number of processors in space and setup (have to do this here to enable automatic testing)
