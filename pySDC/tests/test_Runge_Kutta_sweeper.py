@@ -1,12 +1,18 @@
 import pytest
 
 COLORS = {
-    'RK1': 'blue',
-    'MidpointMethod': 'red',
+    'ForwardEuler': 'blue',
+    'BackwardEuler': 'blue',
+    'ExplicitMidpointMethod': 'red',
+    'ImplicitMidpointMethod': 'red',
     'RK4': 'orange',
     'CrankNicholson': 'purple',
     'Cash_Karp': 'teal',
 }
+
+EXPLICIT_METHODS = ['ForwardEuler', 'ExplicitMidpointMethod', 'CrankNicholson']
+IMPLICIT_METHODS = ['BackwardEuler', 'ImplicitMidpointMethod', 'RK4', 'Cash_Karp']
+EMBEDDED_METHODS = ['Cash_Karp', 'Heun_Euler', 'DIRK34']
 
 
 def get_sweeper(sweeper_name):
@@ -24,7 +30,7 @@ def get_sweeper(sweeper_name):
     return eval(f'RK.{sweeper_name}')
 
 
-def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixed=None, implicit=True):
+def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixed=None):
     """
     Make a plot of the order of the scheme and test if it has the correct order
 
@@ -35,7 +41,6 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
         description (dict): A description to use for running the problem
         ax: Somewhere to plot
         Tend_fixed (float): Time to integrate to with each step size
-        implicit (bool): Whether to use implicit or explicit versions of RK rules
 
     Returns:
         None
@@ -49,10 +54,10 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
 
     description = {} if description is None else description
     description['sweeper_class'] = get_sweeper(sweeper_name)
-    description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
+    description['level_params'] = {'restol': +1}
 
-    custom_controller_params = {'logger_level': 40}
+    custom_controller_params = {'logger_level': 30}
 
     # determine the order
     plot_orders(
@@ -64,12 +69,15 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
         dt_list=dt_list,
         prob=prob,
         custom_controller_params=custom_controller_params,
+        embedded_error_flavor='standard',
     )
 
     # check if we got the expected order for the local error
     orders = {
-        'RK1': 2,
-        'MidpointMethod': 3,
+        'ForwardEuler': 2,
+        'BackwardEuler': 2,
+        'ExplicitMidpointMethod': 3,
+        'ImplicitMidpointMethod': 3,
         'RK4': 5,
         'CrankNicholson': 3,
         'Cash_Karp': 6,
@@ -88,7 +96,7 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
     ax.legend(frameon=False)
 
 
-def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True, re=None, im=None, crosshair=True):
+def plot_stability_single(sweeper_name, ax=None, description=None, re=None, im=None, crosshair=True):
     """
     Plot the domain of stability for a single RK rule.
 
@@ -96,7 +104,6 @@ def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True
         sweeper_name (pySDC.Sweeper.RungeKutta)
         ax: Somewhere to plot
         description (dict): A description to use for running the problem
-        implicit (bool): Whether to use implicit or explicit versions of RK rules
         re (numpy.ndarray): A range of values for the real axis
         im (numpy.ndarray): A range of values for the imaginary axis
         crosshair (bool): Whether to emphasize the axes
@@ -113,10 +120,9 @@ def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True
 
     description = {} if description is None else description
     description['sweeper_class'] = get_sweeper(sweeper_name)
-    description['sweeper_params'] = {'implicit': implicit}
     description['step_params'] = {'maxiter': 1}
 
-    custom_controller_params = {'logger_level': 40}
+    custom_controller_params = {'logger_level': 30}
 
     re = np.linspace(-30, 30, 400) if re is None else re
     im = np.linspace(-50, 50, 400) if im is None else im
@@ -135,17 +141,14 @@ def plot_stability_single(sweeper_name, ax=None, description=None, implicit=True
     )
 
     # check if we think the method should be A-stable
-    Astable_methods = ['RK1', 'CrankNicholson', 'MidpointMethod', 'DIRK34']  # only the implicit versions are A-stable
-    assert (
-        implicit and sweeper_name in Astable_methods
-    ) == Astable, f"Unexpected region of stability for {sweeper_name} sweeper!"
+    Astable_methods = ['BackwardEuler', 'CrankNicholson', 'ImplicitMidpointMethod', 'DIRK34']
+    assert (sweeper_name in Astable_methods) == Astable, f"Unexpected region of stability for {sweeper_name} sweeper!"
 
     ax.get_lines()[-1].set_label(sweeper_name)
     ax.legend(frameon=False)
 
 
-@pytest.mark.base
-def test_all_stability():
+def plot_all_stability():
     """
     Make a figure showing domains of stability for a range of RK rules, both implicit and explicit.
 
@@ -157,16 +160,18 @@ def test_all_stability():
 
     fig, axs = plt.subplots(1, 2, figsize=(11, 5))
 
-    impl = [True, False]
-    sweepers = [['RK1', 'MidpointMethod', 'CrankNicholson'], ['RK1', 'MidpointMethod', 'RK4', 'Cash_Karp']]
+    sweepers = [
+        ['BackwardEuler', 'ImplicitMidpointMethod', 'CrankNicholson'],
+        ['ForwardEuler', 'ExplicitMidpointMethod', 'RK4', 'Cash_Karp'],
+    ]
     titles = ['implicit', 'explicit']
     re = np.linspace(-4, 4, 400)
     im = np.linspace(-4, 4, 400)
     crosshair = [True, False, False, False]
 
-    for j in range(len(impl)):
+    for j in range(2):
         for i in range(len(sweepers[j])):
-            plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=re, im=im, crosshair=crosshair[i])
+            plot_stability_single(sweepers[j][i], ax=axs[j], re=re, im=im, crosshair=crosshair[i])
         axs[j].set_title(titles[j])
 
     plot_stability_single('DIRK34', re=re, im=im)
@@ -174,7 +179,13 @@ def test_all_stability():
     fig.tight_layout()
 
 
-def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
+@pytest.mark.base
+@pytest.mark.parametrize("sweeper_name", EXPLICIT_METHODS + IMPLICIT_METHODS)
+def test_stability(sweeper_name):
+    plot_stability_single(sweeper_name)
+
+
+def plot_all_orders(prob, dt_list, Tend, sweepers):
     """
     Make a plot with various sweepers and check their order.
 
@@ -183,7 +194,6 @@ def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
         dt_list (list): List of step sizes to try
         Tend (float): Time to solve to with each step size
         sweepers (list): List of RK rules to try
-        implicit (bool): Whether to use implicit or explicit versions of RK rules
 
     Returns:
         None
@@ -192,11 +202,14 @@ def plot_all_orders(prob, dt_list, Tend, sweepers, implicit=True):
 
     fig, ax = plt.subplots(1, 1)
     for i in range(len(sweepers)):
-        plot_order(sweepers[i], prob, dt_list, Tend_fixed=Tend, ax=ax, implicit=implicit)
+        plot_order(sweepers[i], prob, dt_list, Tend_fixed=Tend, ax=ax)
 
 
 @pytest.mark.base
-def test_vdp():
+@pytest.mark.parametrize(
+    "sweeper_name", ['BackwardEuler', 'ImplicitMidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp']
+)
+def test_vdp(sweeper_name):
     """
     Here, we check the order in time for various implicit RK rules with the van der Pol problem.
     This is interesting, because van der Pol is non-linear.
@@ -208,15 +221,14 @@ def test_vdp():
     from pySDC.projects.Resilience.vdp import run_vdp
 
     Tend = 7e-2
-    plot_all_orders(
-        run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, ['RK1', 'MidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp']
-    )
+    plot_order(sweeper_name, prob=run_vdp, dt_list=Tend * 2.0 ** (-np.arange(8)), Tend_fixed=Tend)
 
 
 @pytest.mark.base
-def test_advection():
+@pytest.mark.parametrize("sweeper_name", ['ForwardEuler', 'ExplicitMidpointMethod'])
+def test_advection(sweeper_name):
     """
-    Here, we check the order in time for various implicit and explicit RK rules with an advection problem.
+    Test the order for some explicit RK rules
 
     Returns:
         None
@@ -224,14 +236,16 @@ def test_advection():
     from pySDC.projects.Resilience.advection import run_advection
     import numpy as np
 
-    plot_all_orders(
-        run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod', 'CrankNicholson'], implicit=True
+    plot_order(
+        sweeper_name=sweeper_name,
+        prob=run_advection,
+        dt_list=1.0e-3 * 2.0 ** (-np.arange(8)),
+        Tend_fixed=None,
     )
-    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['RK1', 'MidpointMethod'], implicit=False)
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('sweeper_name', ['Cash_Karp', 'Heun_Euler', 'DIRK34'])
+@pytest.mark.parametrize('sweeper_name', EMBEDDED_METHODS)
 def test_embedded_estimate_order(sweeper_name):
     """
     Test the order of embedded Runge-Kutta schemes. They are not run with adaptivity here,
@@ -253,14 +267,14 @@ def test_embedded_estimate_order(sweeper_name):
 
     # change only the things in the description that we need for adaptivity
     convergence_controllers = {}
-    convergence_controllers[EstimateEmbeddedError] = {}
+    convergence_controllers[EstimateEmbeddedError.get_implementation('standard')] = {}
 
     description = {}
     description['convergence_controllers'] = convergence_controllers
     description['sweeper_class'] = get_sweeper(sweeper_name)
     description['step_params'] = {'maxiter': 1}
 
-    custom_controller_params = {'logger_level': 40}
+    custom_controller_params = {'logger_level': 30}
 
     Tend = 7e-2
     dt_list = Tend * 2.0 ** (-np.arange(8))
@@ -274,6 +288,8 @@ def test_embedded_estimate_order(sweeper_name):
         dt_list=dt_list,
         prob=prob,
         custom_controller_params=custom_controller_params,
+        embedded_error_flavor='standard',
+        keys=['e', 'e_embedded'],
     )
 
 
@@ -321,9 +337,30 @@ def test_embedded_method():
 
 
 if __name__ == '__main__':
+    # make plots
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from pySDC.projects.Resilience.vdp import run_vdp
+    from pySDC.projects.Resilience.advection import run_advection
+
+    plot_all_orders(
+        run_vdp,
+        7e-2 * 2.0 ** (-np.arange(8)),
+        7e-2,
+        ['BackwardEuler', 'ImplicitMidpointMethod', 'CrankNicholson', 'RK4', 'Cash_Karp'],
+    )
+
+    plot_all_orders(
+        run_advection,
+        1.0e-3 * 2.0 ** (-np.arange(8)),
+        None,
+        ['ForwardEuler', 'ImplicitMidpointMethod', 'CrankNicholson'],
+    )
+    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, ['ForwardEuler', 'ExplicitMidpointMethod'])
+
     test_embedded_method()
-    for sweep in ['Cash_Karp', 'Heun_Euler', 'DIRK34']:
+    for sweep in EMBEDDED_METHODS:
         test_embedded_estimate_order(sweep)
-    test_vdp()
-    test_advection()
-    test_all_stability()
+    plot_all_stability()
+
+    plt.show()

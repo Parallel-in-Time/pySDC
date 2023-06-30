@@ -3,6 +3,7 @@ import logging
 
 from pySDC.core.Sweeper import sweeper, _Pars
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Level import level
 from pySDC.implementations.datatype_classes.mesh import imex_mesh, mesh
 
 
@@ -143,7 +144,7 @@ class RungeKutta(sweeper):
 
     All of these variables are either determined by the RK rule, or are not part of an RK scheme.
 
-    Attribues:
+    Attributes:
         butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want
     """
 
@@ -284,31 +285,75 @@ class RungeKutta(sweeper):
         """
         self.level.uend = self.level.u[-1]
 
+    @property
+    def level(self):
+        """
+        Returns the current level
 
-class RK1(RungeKutta):
+        Returns:
+            pySDC.Level.level: Current level
+        """
+        return self.__level
+
+    @level.setter
+    def level(self, lvl):
+        """
+        Sets a reference to the current level (done in the initialization of the level)
+
+        Args:
+            lvl (pySDC.Level.level): Current level
+        """
+        assert isinstance(lvl, level), f"You tried to set the sweeper's level with an instance of {type(lvl)}!"
+        if lvl.params.restol > 0:
+            lvl.params.restol = -1
+            self.logger.warning(
+                'Overwriting residual tolerance with -1 because RK methods are direct and hence may not compute a residual at all!'
+            )
+
+        self.__level = lvl
+
+
+class ForwardEuler(RungeKutta):
+    """
+    Forward Euler. Still a classic.
+
+    Not very stable first order method.
+    """
+
     def __init__(self, params):
-        implicit = params.get('implicit', False)
         nodes = np.array([0.0])
         weights = np.array([1.0])
-        if implicit:
-            matrix = np.array(
-                [
-                    [1.0],
-                ]
-            )
-        else:
-            matrix = np.array(
-                [
-                    [0.0],
-                ]
-            )
+        matrix = np.array(
+            [
+                [0.0],
+            ]
+        )
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super(RK1, self).__init__(params)
+        super().__init__(params)
+
+
+class BackwardEuler(RungeKutta):
+    """
+    Backward Euler. A favorite among true connoisseurs of the heat equation.
+
+    A-stable first order method.
+    """
+
+    def __init__(self, params):
+        nodes = np.array([0.0])
+        weights = np.array([1.0])
+        matrix = np.array(
+            [
+                [1.0],
+            ]
+        )
+        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
+        super().__init__(params)
 
 
 class CrankNicholson(RungeKutta):
     """
-    Implicit Runge-Kutta method of second order
+    Implicit Runge-Kutta method of second order, A-stable.
     """
 
     def __init__(self, params):
@@ -318,28 +363,35 @@ class CrankNicholson(RungeKutta):
         matrix[1, 0] = 0.5
         matrix[1, 1] = 0.5
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super(CrankNicholson, self).__init__(params)
+        super().__init__(params)
 
 
-class MidpointMethod(RungeKutta):
+class ExplicitMidpointMethod(RungeKutta):
     """
-    Runge-Kutta method of second order
+    Explicit Runge-Kutta method of second order.
     """
 
     def __init__(self, params):
-        implicit = params.get('implicit', False)
-        if implicit:
-            nodes = np.array([0.5])
-            weights = np.array([1])
-            matrix = np.zeros((1, 1))
-            matrix[0, 0] = 1.0 / 2.0
-        else:
-            nodes = np.array([0, 0.5])
-            weights = np.array([0, 1])
-            matrix = np.zeros((2, 2))
-            matrix[1, 0] = 0.5
+        nodes = np.array([0, 0.5])
+        weights = np.array([0, 1])
+        matrix = np.zeros((2, 2))
+        matrix[1, 0] = 0.5
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super(MidpointMethod, self).__init__(params)
+        super().__init__(params)
+
+
+class ImplicitMidpointMethod(RungeKutta):
+    """
+    Implicit Runge-Kutta method of second order.
+    """
+
+    def __init__(self, params):
+        nodes = np.array([0.5])
+        weights = np.array([1])
+        matrix = np.zeros((1, 1))
+        matrix[0, 0] = 1.0 / 2.0
+        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
+        super().__init__(params)
 
 
 class RK4(RungeKutta):
@@ -355,12 +407,12 @@ class RK4(RungeKutta):
         matrix[2, 1] = 0.5
         matrix[3, 2] = 1.0
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super(RK4, self).__init__(params)
+        super().__init__(params)
 
 
 class Heun_Euler(RungeKutta):
     """
-    Second order explicit embedded Runge-Kutta
+    Second order explicit embedded Runge-Kutta method.
     """
 
     def __init__(self, params):
@@ -369,7 +421,7 @@ class Heun_Euler(RungeKutta):
         matrix = np.zeros((2, 2))
         matrix[1, 0] = 1
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
-        super(Heun_Euler, self).__init__(params)
+        super().__init__(params)
 
     @classmethod
     def get_update_order(cls):
@@ -396,7 +448,7 @@ class Cash_Karp(RungeKutta):
         matrix[4, :4] = [-11.0 / 54.0, 5.0 / 2.0, -70.0 / 27.0, 35.0 / 27.0]
         matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
-        super(Cash_Karp, self).__init__(params)
+        super().__init__(params)
 
     @classmethod
     def get_update_order(cls):
