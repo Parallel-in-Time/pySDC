@@ -379,7 +379,7 @@ def test_rhs_evaluations(sweeper_name):
 
     assert all(
         me == num_nodes for me in rhs_evaluations
-    ), f'Did not perform one RHS evaluation per step in {sweeper_name} method! Expected {num_nodes}, but got {rhs_evaluations}.'
+    ), f'Did not perform one RHS evaluation per step and stage in {sweeper_name} method! Expected {num_nodes}, but got {rhs_evaluations}.'
 
 
 if __name__ == '__main__':

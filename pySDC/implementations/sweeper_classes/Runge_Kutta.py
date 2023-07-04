@@ -224,7 +224,7 @@ class RungeKutta(sweeper):
             list of dtype_u: containing the integral as values
         """
 
-        # get current level and problem description
+        # get current level and problem
         lvl = self.level
         prob = lvl.prob
 
@@ -247,7 +247,7 @@ class RungeKutta(sweeper):
             None
         """
 
-        # get current level and problem description
+        # get current level and problem
         lvl = self.level
         prob = lvl.prob
 
@@ -317,7 +317,7 @@ class RungeKutta(sweeper):
         Predictor to fill values at nodes before first sweep
         """
 
-        # get current level and problem description
+        # get current level and problem
         lvl = self.level
         prob = lvl.prob
 
