@@ -225,17 +225,17 @@ class RungeKutta(sweeper):
         """
 
         # get current level and problem description
-        L = self.level
-        P = L.prob
+        lvl = self.level
+        prob = lvl.prob
 
         me = []
 
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             # new instance of dtype_u, initialize values with 0
-            me.append(P.dtype_u(P.init, val=0.0))
+            me.append(prob.dtype_u(prob.init, val=0.0))
             for j in range(1, self.coll.num_nodes + 1):
-                me[-1] += L.dt * self.coll.Qmat[m, j] * self.get_full_f(L.f[j])
+                me[-1] += lvl.dt * self.coll.Qmat[m, j] * self.get_full_f(lvl.f[j])
 
         return me
 
@@ -248,34 +248,34 @@ class RungeKutta(sweeper):
         """
 
         # get current level and problem description
-        L = self.level
-        P = L.prob
+        lvl = self.level
+        prob = lvl.prob
 
         # only if the level has been touched before
-        assert L.status.unlocked
-        assert L.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
+        assert lvl.status.unlocked
+        assert lvl.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = L.u[0]
+            rhs = lvl.u[0]
             for j in range(1, m + 1):
-                rhs += L.dt * self.QI[m + 1, j] * self.get_full_f(L.f[j])
+                rhs += lvl.dt * self.QI[m + 1, j] * self.get_full_f(lvl.f[j])
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
-                L.u[m + 1] = P.solve_system(
-                    rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
+                lvl.u[m + 1] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m]
                 )
             else:
-                L.u[m + 1] = rhs
+                lvl.u[m + 1] = rhs
             # update function values
-            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+            lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
-        L.status.updated = True
+        lvl.status.updated = True
 
         return None
 
@@ -311,6 +311,22 @@ class RungeKutta(sweeper):
             )
 
         self.__level = lvl
+
+    def predict(self):
+        """
+        Predictor to fill values at nodes before first sweep
+        """
+
+        # get current level and problem description
+        lvl = self.level
+        prob = lvl.prob
+
+        for m in range(1, self.coll.num_nodes + 1):
+            lvl.u[m] = prob.dtype_u(lvl.u[0])
+
+        # indicate that this level is now ready for sweeps
+        lvl.status.unlocked = True
+        lvl.status.updated = True
 
 
 class ForwardEuler(RungeKutta):

@@ -336,12 +336,60 @@ def test_embedded_method():
     assert restarts == 17, "Cash-Karp has restarted a different number of times than before"
 
 
+@pytest.mark.base
+@pytest.mark.parametrize("sweeper_name", EXPLICIT_METHODS + IMPLICIT_METHODS + EMBEDDED_METHODS)
+def test_rhs_evaluations(sweeper_name):
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.hooks.log_work import LogWork
+    from pySDC.helpers.stats_helper import get_sorted
+
+    level_params = {'dt': 1.0}
+
+    step_params = {'maxiter': 1}
+
+    problem_params = {
+        'lambdas': [[1.0e-1 + 0j]],
+        'u0': 1.0 + 0.0j,
+    }
+
+    description = {
+        'level_params': level_params,
+        'step_params': step_params,
+        'sweeper_class': get_sweeper(sweeper_name),
+        'problem_class': testequation0d,
+        'sweeper_params': {},
+        'problem_params': problem_params,
+    }
+
+    controller_params = {
+        'logger_level': 30,
+        'hook_class': LogWork,
+    }
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    prob = controller.MS[0].levels[0].prob
+    u_end, stats = controller.run(prob.u_exact(0), 0.0, 2.0)
+
+    sweep = controller.MS[0].levels[0].sweep
+    num_nodes = sweep.coll.num_nodes
+
+    rhs_evaluations = [me[1] for me in get_sorted(stats, type='work_rhs')]
+
+    assert all(
+        me == num_nodes for me in rhs_evaluations
+    ), f'Did not perform one RHS evaluation per step in {sweeper_name} method! Expected {num_nodes}, but got {rhs_evaluations}.'
+
+
 if __name__ == '__main__':
     # make plots
     import matplotlib.pyplot as plt
     import numpy as np
     from pySDC.projects.Resilience.vdp import run_vdp
     from pySDC.projects.Resilience.advection import run_advection
+
+    test_rhs_evaluations('CrankNicholson')
 
     plot_all_orders(
         run_vdp,
