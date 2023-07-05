@@ -38,7 +38,8 @@ class ButcherTableau(object):
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
         # Set number of nodes, left and right interval boundaries
-        self.num_nodes = matrix.shape[0] + 1
+        self.num_solution_stages = 1
+        self.num_nodes = matrix.shape[0] + self.num_solution_stages
         self.tleft = 0.0
         self.tright = 1.0
 
@@ -59,7 +60,7 @@ class ButcherTableau(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 1))
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
 
 
 class ButcherTableauEmbedded(object):
@@ -95,7 +96,8 @@ class ButcherTableauEmbedded(object):
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
         # Set number of nodes, left and right interval boundaries
-        self.num_nodes = matrix.shape[0] + 2
+        self.num_solution_stages = 2
+        self.num_nodes = matrix.shape[0] + self.num_solution_stages
         self.tleft = 0.0
         self.tright = 1.0
 
@@ -117,7 +119,7 @@ class ButcherTableauEmbedded(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 2))
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
 
 
 class RungeKutta(sweeper):
@@ -180,6 +182,9 @@ class RungeKutta(sweeper):
             'skip_residual_computation', ('IT_CHECK', 'IT_FINE', 'IT_COARSE', 'IT_UP', 'IT_DOWN')
         )
 
+        # check if we can skip some usually unnecessary right hand side evaluations
+        params['eval_rhs_at_right_boundary'] = params.get('eval_rhs_at_right_boundary', False)
+
         self.params = _Pars(params)
 
         self.coll = params['butcher_tableau']
@@ -213,6 +218,9 @@ class RungeKutta(sweeper):
             return f
         elif type(f) == imex_mesh:
             return f.impl + f.expl
+        elif f is None:
+            prob = self.level.prob
+            return prob.dtype_f(prob.init, val=0)
         else:
             raise NotImplementedError(f'Type \"{type(f)}\" not implemented in Runge-Kutta sweeper')
 
@@ -271,8 +279,10 @@ class RungeKutta(sweeper):
                 )
             else:
                 lvl.u[m + 1] = rhs
-            # update function values
-            lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
+
+            # update function values (we don't usually need to evaluate the RHS at the solution of the step)
+            if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
         lvl.status.updated = True
@@ -322,7 +332,7 @@ class RungeKutta(sweeper):
         prob = lvl.prob
 
         for m in range(1, self.coll.num_nodes + 1):
-            lvl.u[m] = prob.dtype_u(lvl.u[0])
+            lvl.u[m] = prob.dtype_u(init=prob.init, val=0.0)
 
         # indicate that this level is now ready for sweeps
         lvl.status.unlocked = True

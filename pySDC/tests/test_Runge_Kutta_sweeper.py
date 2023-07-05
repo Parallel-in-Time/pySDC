@@ -56,6 +56,7 @@ def plot_order(sweeper_name, prob, dt_list, description=None, ax=None, Tend_fixe
     description['sweeper_class'] = get_sweeper(sweeper_name)
     description['step_params'] = {'maxiter': 1}
     description['level_params'] = {'restol': +1}
+    description['sweeper_params'] = {'eval_rhs_at_right_boundary': True}
 
     custom_controller_params = {'logger_level': 30}
 
@@ -273,6 +274,7 @@ def test_embedded_estimate_order(sweeper_name):
     description['convergence_controllers'] = convergence_controllers
     description['sweeper_class'] = get_sweeper(sweeper_name)
     description['step_params'] = {'maxiter': 1}
+    description['sweeper_params'] = {'eval_rhs_at_right_boundary': True}
 
     custom_controller_params = {'logger_level': 30}
 
@@ -373,13 +375,13 @@ def test_rhs_evaluations(sweeper_name):
     u_end, stats = controller.run(prob.u_exact(0), 0.0, 2.0)
 
     sweep = controller.MS[0].levels[0].sweep
-    num_nodes = sweep.coll.num_nodes
+    num_stages = sweep.coll.num_nodes - sweep.coll.num_solution_stages
 
     rhs_evaluations = [me[1] for me in get_sorted(stats, type='work_rhs')]
 
     assert all(
-        me == num_nodes for me in rhs_evaluations
-    ), f'Did not perform one RHS evaluation per step and stage in {sweeper_name} method! Expected {num_nodes}, but got {rhs_evaluations}.'
+        me == num_stages for me in rhs_evaluations
+    ), f'Did not perform one RHS evaluation per step and stage in {sweeper_name} method! Expected {num_stages}, but got {rhs_evaluations}.'
 
 
 if __name__ == '__main__':
@@ -389,7 +391,7 @@ if __name__ == '__main__':
     from pySDC.projects.Resilience.vdp import run_vdp
     from pySDC.projects.Resilience.advection import run_advection
 
-    test_rhs_evaluations('CrankNicholson')
+    test_rhs_evaluations('BackwardEuler')
 
     plot_all_orders(
         run_vdp,
