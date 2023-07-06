@@ -51,8 +51,18 @@ To this end, just add the following to a possibly new file in the path ``<pySDC-
 
    #!/bin/sh
 
+   # get files that have been staged
    export files=$(git diff --staged --name-only HEAD | grep .py | sed -e "s,^,$(git rev-parse --show-toplevel)/,")
 
+   # remove any deleted files because black will otherwise fail
+   for file in $files
+   do
+           if [ ! -f "$file" ]; then
+               files=( ${files[@]/$file} )
+           fi
+   done
+
+   # apply black and stage the changes that black made
    if [[ $files != "" ]]
    then  
            black $files

@@ -69,8 +69,18 @@ In order to run black automatically, we want to do a pre-commit hook which adds 
 To this end, just add the following to a possibly new file in the path <code class="docutils literal notranslate"><span class="pre">&lt;pySDC-root-directory&gt;/.git/hooks/pre-commit</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
 
+<span class="c1"># get files that have been staged</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">files</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>diff<span class="w"> </span>--staged<span class="w"> </span>--name-only<span class="w"> </span>HEAD<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s,^,</span><span class="k">$(</span>git<span class="w"> </span>rev-parse<span class="w"> </span>--show-toplevel<span class="k">)</span><span class="s2">/,&quot;</span><span class="k">)</span>
 
+<span class="c1"># remove any deleted files because black will otherwise fail</span>
+<span class="k">for</span><span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nv">$files</span>
+<span class="k">do</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="nv">files</span><span class="o">=(</span><span class="w"> </span><span class="si">${</span><span class="nv">files</span><span class="p">[@]/</span><span class="nv">$file</span><span class="si">}</span><span class="w"> </span><span class="o">)</span>
+<span class="w">        </span><span class="k">fi</span>
+<span class="k">done</span>
+
+<span class="c1"># apply black and stage the changes that black made</span>
 <span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$files</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="o">]]</span>
 <span class="k">then</span>
 <span class="w">        </span>black<span class="w"> </span><span class="nv">$files</span>
