@@ -49,6 +49,14 @@
   <section id="module-implementations.sweeper_classes.Runge_Kutta">
 <span id="implementations-sweeper-classes-runge-kutta-module"></span><h1>implementations.sweeper_classes.Runge_Kutta module<a class="headerlink" href="#module-implementations.sweeper_classes.Runge_Kutta" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.BackwardEuler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BackwardEuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#BackwardEuler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Backward Euler. A favorite among true connoisseurs of the heat equation.</p>
+<p>A-stable first order method.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ButcherTableau">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ButcherTableau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ButcherTableau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -77,7 +85,7 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.CrankNicholson">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CrankNicholson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#CrankNicholson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Implicit Runge-Kutta method of second order</p>
+<p>Implicit Runge-Kutta method of second order, A-stable.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -95,10 +103,25 @@
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ExplicitMidpointMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ExplicitMidpointMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Explicit Runge-Kutta method of second order.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ForwardEuler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ForwardEuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ForwardEuler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Forward Euler. Still a classic.</p>
+<p>Not very stable first order method.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Heun_Euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Second order explicit embedded Runge-Kutta</p>
+<p>Second order explicit embedded Runge-Kutta method.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order" title="Permalink to this definition">¶</a></dt>
@@ -108,16 +131,10 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.MidpointMethod">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MidpointMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#MidpointMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ImplicitMidpointMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ImplicitMidpointMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Runge-Kutta method of second order</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RK1">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RK1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RK1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RK1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Implicit Runge-Kutta method of second order.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -151,10 +168,17 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </div></blockquote>
 <p>All of these variables are either determined by the RK rule, or are not part of an RK scheme.</p>
-<dl class="simple">
-<dt>Attribues:</dt><dd><p>butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.butcher_tableau">
+<span class="sig-name descname"><span class="pre">butcher_tableau</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.butcher_tableau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Butcher tableau for the Runge-Kutta scheme that you want</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau">ButcherTableau</a></p>
 </dd>
 </dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">
 <span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point" title="Permalink to this definition">¶</a></dt>
@@ -198,6 +222,26 @@ method, which does not require us to solve a system of equations to compute the 
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.level">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">level</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Current level</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pySDC.Level.level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictor to fill values at nodes before first sweep</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes" title="Permalink to this definition">¶</a></dt>
@@ -224,6 +268,7 @@ method, which does not require us to solve a system of equations to compute the 
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">implementations.sweeper_classes.Runge_Kutta module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a><ul>
@@ -235,18 +280,22 @@ method, which does not require us to solve a system of equations to compute the 
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ExplicitMidpointMethod</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ForwardEuler"><code class="docutils literal notranslate"><span class="pre">ForwardEuler</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod"><code class="docutils literal notranslate"><span class="pre">MidpointMethod</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK1"><code class="docutils literal notranslate"><span class="pre">RK1</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ImplicitMidpointMethod</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="docutils literal notranslate"><span class="pre">RungeKutta</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.butcher_tableau"><code class="docutils literal notranslate"><span class="pre">butcher_tableau</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f"><code class="docutils literal notranslate"><span class="pre">get_full_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.level"><code class="docutils literal notranslate"><span class="pre">level</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
 </ul>
 </li>

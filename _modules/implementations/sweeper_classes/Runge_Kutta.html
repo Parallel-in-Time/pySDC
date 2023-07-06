@@ -42,6 +42,7 @@
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Sweeper</span> <span class="kn">import</span> <span class="n">sweeper</span><span class="p">,</span> <span class="n">_Pars</span>
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Level</span> <span class="kn">import</span> <span class="n">level</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">imex_mesh</span><span class="p">,</span> <span class="n">mesh</span>
 
 
@@ -76,7 +77,8 @@
             <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of nodes! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="c1"># Set number of nodes, left and right interval boundaries</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tright</span> <span class="o">=</span> <span class="mf">1.0</span>
 
@@ -97,7 +99,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span>
 
         <span class="c1"># check if the RK scheme is implicit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="ButcherTableauEmbedded"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded">[docs]</a><span class="k">class</span> <span class="nc">ButcherTableauEmbedded</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -133,7 +135,8 @@
             <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Incompatible number of nodes! Need </span><span class="si">{</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="c1"># Set number of nodes, left and right interval boundaries</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tright</span> <span class="o">=</span> <span class="mf">1.0</span>
 
@@ -155,7 +158,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span>
 
         <span class="c1"># check if the RK scheme is implicit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">2</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="RungeKutta"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
@@ -182,7 +185,7 @@
 
 <span class="sd">    All of these variables are either determined by the RK rule, or are not part of an RK scheme.</span>
 
-<span class="sd">    Attribues:</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">        butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -218,6 +221,9 @@
             <span class="s1">&#39;skip_residual_computation&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;IT_CHECK&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_FINE&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_COARSE&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_UP&#39;</span><span class="p">,</span> <span class="s1">&#39;IT_DOWN&#39;</span><span class="p">)</span>
         <span class="p">)</span>
 
+        <span class="c1"># check if we can skip some usually unnecessary right hand side evaluations</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;eval_rhs_at_right_boundary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eval_rhs_at_right_boundary&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span>
@@ -251,6 +257,9 @@
             <span class="k">return</span> <span class="n">f</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">imex_mesh</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span>
+        <span class="k">elif</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span>
+            <span class="k">return</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Type </span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented in Runge-Kutta sweeper&#39;</span><span class="p">)</span></div>
 
@@ -262,18 +271,18 @@
 <span class="sd">            list of dtype_u: containing the integral as values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># integrate RHS over all collocation nodes</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
             <span class="c1"># new instance of dtype_u, initialize values with 0</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">))</span>
+            <span class="n">me</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
 
@@ -285,35 +294,37 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
 
         <span class="c1"># only if the level has been touched before</span>
-        <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
-        <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;RK schemes are direct solvers. Please perform only 1 iteration!&quot;</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;RK schemes are direct solvers. Please perform only 1 iteration!&quot;</span>
 
         <span class="c1"># get number of collocation nodes for easier access</span>
         <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
             <span class="c1"># build rhs, consisting of the known values from above and new values from previous nodes (at k+1)</span>
-            <span class="n">rhs</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">rhs</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="n">rhs</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="n">rhs</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
             <span class="c1"># implicit solve with prefactor stemming from the diagonal of Qd</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">implicit</span><span class="p">:</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span>
-                    <span class="n">rhs</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span>
+                    <span class="n">rhs</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span>
-            <span class="c1"># update function values</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span>
+
+            <span class="c1"># update function values (we don&#39;t usually need to evaluate the RHS at the solution of the step)</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="n">M</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_solution_stages</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">eval_rhs_at_right_boundary</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
 
         <span class="c1"># indicate presence of new values at this level</span>
-        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -321,33 +332,93 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In this Runge-Kutta implementation, the solution to the step is always stored in the last node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current level</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.Level.level: Current level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__level</span>
+
+    <span class="nd">@level</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lvl</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets a reference to the current level (done in the initialization of the level)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lvl (pySDC.Level.level): Current level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="n">level</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;You tried to set the sweeper&#39;s level with an instance of </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span><span class="si">}</span><span class="s2">!&quot;</span>
+        <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Overwriting residual tolerance with -1 because RK methods are direct and hence may not compute a residual at all!&#39;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">lvl</span>
+
+<div class="viewcode-block" id="RungeKutta.predict"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predictor to fill values at nodes before first sweep</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># indicate that this level is now ready for sweeps</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div></div>
 
 
-<div class="viewcode-block" id="RK1"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK1">[docs]</a><span class="k">class</span> <span class="nc">RK1</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<div class="viewcode-block" id="ForwardEuler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler">[docs]</a><span class="k">class</span> <span class="nc">ForwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Forward Euler. Still a classic.</span>
+
+<span class="sd">    Not very stable first order method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">implicit</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;implicit&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">implicit</span><span class="p">:</span>
-            <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RK1</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BackwardEuler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler">[docs]</a><span class="k">class</span> <span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Backward Euler. A favorite among true connoisseurs of the heat equation.</span>
+
+<span class="sd">    A-stable first order method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CrankNicholson"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson">[docs]</a><span class="k">class</span> <span class="nc">CrankNicholson</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implicit Runge-Kutta method of second order</span>
+<span class="sd">    Implicit Runge-Kutta method of second order, A-stable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
@@ -357,28 +428,35 @@
         <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CrankNicholson</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.MidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">MidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<div class="viewcode-block" id="ExplicitMidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">ExplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Runge-Kutta method of second order</span>
+<span class="sd">    Explicit Runge-Kutta method of second order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">implicit</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;implicit&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">implicit</span><span class="p">:</span>
-            <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">])</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-            <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-            <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MidpointMethod</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImplicitMidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">ImplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit Runge-Kutta method of second order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">])</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RK4"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4">[docs]</a><span class="k">class</span> <span class="nc">RK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -394,12 +472,12 @@
         <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RK4</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Heun_Euler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">[docs]</a><span class="k">class</span> <span class="nc">Heun_Euler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Second order explicit embedded Runge-Kutta</span>
+<span class="sd">    Second order explicit embedded Runge-Kutta method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
@@ -408,7 +486,7 @@
         <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Heun_Euler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Heun_Euler.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -435,7 +513,7 @@
         <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">11.0</span> <span class="o">/</span> <span class="mf">54.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">35.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">]</span>
         <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1631.0</span> <span class="o">/</span> <span class="mf">55296.0</span><span class="p">,</span> <span class="mf">175.0</span> <span class="o">/</span> <span class="mf">512.0</span><span class="p">,</span> <span class="mf">575.0</span> <span class="o">/</span> <span class="mf">13824.0</span><span class="p">,</span> <span class="mf">44275.0</span> <span class="o">/</span> <span class="mf">110592.0</span><span class="p">,</span> <span class="mf">253.0</span> <span class="o">/</span> <span class="mf">4096.0</span><span class="p">]</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Cash_Karp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cash_Karp.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
