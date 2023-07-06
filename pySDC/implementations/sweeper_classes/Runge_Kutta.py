@@ -38,7 +38,8 @@ class ButcherTableau(object):
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
         # Set number of nodes, left and right interval boundaries
-        self.num_nodes = matrix.shape[0] + 1
+        self.num_solution_stages = 1
+        self.num_nodes = matrix.shape[0] + self.num_solution_stages
         self.tleft = 0.0
         self.tright = 1.0
 
@@ -59,7 +60,7 @@ class ButcherTableau(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 1))
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
 
 
 class ButcherTableauEmbedded(object):
@@ -95,7 +96,8 @@ class ButcherTableauEmbedded(object):
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
         # Set number of nodes, left and right interval boundaries
-        self.num_nodes = matrix.shape[0] + 2
+        self.num_solution_stages = 2
+        self.num_nodes = matrix.shape[0] + self.num_solution_stages
         self.tleft = 0.0
         self.tright = 1.0
 
@@ -117,7 +119,7 @@ class ButcherTableauEmbedded(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - 2))
+        self.implicit = any(matrix[i, i] != 0 for i in range(self.num_nodes - self.num_solution_stages))
 
 
 class RungeKutta(sweeper):
@@ -180,6 +182,9 @@ class RungeKutta(sweeper):
             'skip_residual_computation', ('IT_CHECK', 'IT_FINE', 'IT_COARSE', 'IT_UP', 'IT_DOWN')
         )
 
+        # check if we can skip some usually unnecessary right hand side evaluations
+        params['eval_rhs_at_right_boundary'] = params.get('eval_rhs_at_right_boundary', False)
+
         self.params = _Pars(params)
 
         self.coll = params['butcher_tableau']
@@ -213,6 +218,9 @@ class RungeKutta(sweeper):
             return f
         elif type(f) == imex_mesh:
             return f.impl + f.expl
+        elif f is None:
+            prob = self.level.prob
+            return prob.dtype_f(prob.init, val=0)
         else:
             raise NotImplementedError(f'Type \"{type(f)}\" not implemented in Runge-Kutta sweeper')
 
@@ -224,18 +232,18 @@ class RungeKutta(sweeper):
             list of dtype_u: containing the integral as values
         """
 
-        # get current level and problem description
-        L = self.level
-        P = L.prob
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
 
         me = []
 
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             # new instance of dtype_u, initialize values with 0
-            me.append(P.dtype_u(P.init, val=0.0))
+            me.append(prob.dtype_u(prob.init, val=0.0))
             for j in range(1, self.coll.num_nodes + 1):
-                me[-1] += L.dt * self.coll.Qmat[m, j] * self.get_full_f(L.f[j])
+                me[-1] += lvl.dt * self.coll.Qmat[m, j] * self.get_full_f(lvl.f[j])
 
         return me
 
@@ -247,35 +255,37 @@ class RungeKutta(sweeper):
             None
         """
 
-        # get current level and problem description
-        L = self.level
-        P = L.prob
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
 
         # only if the level has been touched before
-        assert L.status.unlocked
-        assert L.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
+        assert lvl.status.unlocked
+        assert lvl.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = L.u[0]
+            rhs = lvl.u[0]
             for j in range(1, m + 1):
-                rhs += L.dt * self.QI[m + 1, j] * self.get_full_f(L.f[j])
+                rhs += lvl.dt * self.QI[m + 1, j] * self.get_full_f(lvl.f[j])
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
-                L.u[m + 1] = P.solve_system(
-                    rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
+                lvl.u[m + 1] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m]
                 )
             else:
-                L.u[m + 1] = rhs
-            # update function values
-            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+                lvl.u[m + 1] = rhs
+
+            # update function values (we don't usually need to evaluate the RHS at the solution of the step)
+            if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
-        L.status.updated = True
+        lvl.status.updated = True
 
         return None
 
@@ -311,6 +321,22 @@ class RungeKutta(sweeper):
             )
 
         self.__level = lvl
+
+    def predict(self):
+        """
+        Predictor to fill values at nodes before first sweep
+        """
+
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
+
+        for m in range(1, self.coll.num_nodes + 1):
+            lvl.u[m] = prob.dtype_u(init=prob.init, val=0.0)
+
+        # indicate that this level is now ready for sweeps
+        lvl.status.unlocked = True
+        lvl.status.updated = True
 
 
 class ForwardEuler(RungeKutta):

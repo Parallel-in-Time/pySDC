@@ -3,7 +3,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 
 from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -38,6 +38,7 @@ class testequation0d(ptype):
 
         self.A = self.__get_A(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
+        self.work_counters['rhs'] = WorkCounter()
 
     @staticmethod
     def __get_A(lambdas):
@@ -68,6 +69,7 @@ class testequation0d(ptype):
 
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(u)
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
