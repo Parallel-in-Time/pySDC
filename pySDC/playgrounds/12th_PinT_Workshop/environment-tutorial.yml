@@ -9,8 +9,10 @@ dependencies:
   - dill>=0.2.6
   - mpich
   - mpi4py>=3.0.0
+  - mpi4py-fft>=2.0.2
   - pytest
   - pytest-cov
   - jupyter
   - ipyparallel
   - pip
+  - ipython
