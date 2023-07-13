@@ -136,7 +136,6 @@ class MultiStep(sweeper):
             self.generate_starting_values()
 
         else:
-
             # build the right hand side from the previous solutions
             rhs = prob.dtype_u(prob.init)
             dts = [self.cache.t[i + 1] - self.cache.t[i] for i in range(self.steps - 1)] + [
