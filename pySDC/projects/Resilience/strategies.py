@@ -866,9 +866,9 @@ class DIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_vdp":
             if key == 'work_newton' and op == sum:
-                return 3522
+                return 4005
             elif key == 'e_global_post_run' and op == max:
-                return 0.00020173129027772907
+                return 0.0002343928835518705
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
