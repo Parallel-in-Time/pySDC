@@ -323,10 +323,10 @@ class Quench(ptype):
                 }
 
                 if self.reference_sol_type == 'DIRK':
-                    from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
+                    from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK43
                     from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
 
-                    description['sweeper_class'] = DIRK34
+                    description['sweeper_class'] = DIRK43
                     description['sweeper_params'] = {}
                     description['step_params'] = {'maxiter': 1}
                     description['level_params'] = {'dt': 1e-4}

@@ -833,7 +833,7 @@ class DIRKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
-        from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK43
 
         adaptivity_description = super().get_custom_description(problem, num_procs)
 
@@ -843,7 +843,7 @@ class DIRKStrategy(AdaptivityStrategy):
 
         rk_params = {
             'step_params': {'maxiter': 1},
-            'sweeper_class': DIRK34,
+            'sweeper_class': DIRK43,
             'convergence_controllers': {AdaptivityRK: {'e_tol': e_tol}},
         }
 
