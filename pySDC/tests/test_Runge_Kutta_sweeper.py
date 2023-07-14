@@ -114,12 +114,6 @@ def test_order(sweeper_name):
         'DIRK43': 4,
     }
 
-    expected_embedded_order = {
-        'DIRK43': 4,
-        'Cash_Karp': 5,
-        'ESDIRK53': 4,
-    }
-
     dt_max = {
         'Cash_Karp': 1e0,
         'ESDIRK53': 1e0,
@@ -131,7 +125,7 @@ def test_order(sweeper_name):
     e_embedded = {}
     dts = [dt_max.get(sweeper_name, 1e-1) / 2**i for i in range(5)]
     for dt in dts:
-        stats, _, _ = single_run(sweeper_name, dt, 2 * max(dts), lambdas)
+        stats, _, controller = single_run(sweeper_name, dt, 2 * max(dts), lambdas)
         e[dt] = get_sorted(stats, type='e_global_post_run')[-1][1]
         e_em = get_sorted(stats, type='error_embedded_estimate')
         if len(e_em):
@@ -154,9 +148,15 @@ def test_order(sweeper_name):
         np.mean(order), expected_order[sweeper_name], atol=0.2
     ), f"Got unexpected order {np.mean(order):.2f} for {sweeper_name} method! ({order})"
 
-    if sweeper_name in expected_embedded_order.keys():
+    try:
+        update_order = controller.MS[0].levels[0].sweep.get_update_order()
+    except NotImplementedError:
+        update_order = None
+
+    if update_order:
+    # if sweeper_name in expected_embedded_order.keys():
         assert np.isclose(
-            np.mean(order_embedded), expected_embedded_order[sweeper_name], atol=0.2
+            np.mean(order_embedded), update_order, atol=0.2
         ), f"Got unexpected order of embedded error estimate {np.mean(order_embedded):.2f} for {sweeper_name} method! ({order_embedded})"
 
 

@@ -274,11 +274,11 @@ class RungeKutta(sweeper):
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
-                lvl.u[m + 1] = prob.solve_system(
-                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m]
+                lvl.u[m + 1][:] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[0], lvl.time + lvl.dt * self.coll.nodes[m]
                 )
             else:
-                lvl.u[m + 1] = rhs
+                lvl.u[m + 1][:] = rhs[:]
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
@@ -491,7 +491,7 @@ class DIRK43(RungeKutta):
     def __init__(self, params):
         nodes = np.array([5.0 / 6.0, 10.0 / 39.0, 0, 1.0 / 6.0])
         weights = np.array(
-            [[61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0], [32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0]]
+            [[61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0], [32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0.]]
         )
         matrix = np.zeros((4, 4))
         matrix[0, 0] = 5.0 / 6.0
