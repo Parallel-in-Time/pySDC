@@ -4,6 +4,7 @@ from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_os
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Stability_implementation
 
+
 def dampedharmonic_oscillator_params():
     """
     Runtine to compute modulues of the stability function
@@ -25,9 +26,8 @@ def dampedharmonic_oscillator_params():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol']=1e-16
+    level_params['restol'] = 1e-16
     level_params["dt"] = 1.0
-
 
     # initialize problem parameters for the Damped harmonic oscillator problem
     problem_params = dict()
@@ -43,9 +43,8 @@ def dampedharmonic_oscillator_params():
     sweeper_params["picard_mats_sweep"] = True
 
     # initialize step parameters
-    step_params=dict()
-    step_params['maxiter']=50
-
+    step_params = dict()
+    step_params['maxiter'] = 50
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -58,18 +57,19 @@ def dampedharmonic_oscillator_params():
 
     return description
 
-if __name__=='__main__':
-    """
-     Damped harmonic oscillatro as test problem for the stability plot:
-         x'=v
-         v'=-kappa*x-mu*v
-         kappa: spring constant
-         mu: friction
 
-         https://beltoforion.de/en/harmonic_oscillator/
+if __name__ == '__main__':
     """
-    description=dampedharmonic_oscillator_params()
-    Stability=Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=[200, 200])
+    Damped harmonic oscillatro as test problem for the stability plot:
+        x'=v
+        v'=-kappa*x-mu*v
+        kappa: spring constant
+        mu: friction
+
+        https://beltoforion.de/en/harmonic_oscillator/
+    """
+    description = dampedharmonic_oscillator_params()
+    Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=[200, 200])
     Stability.run_SDC_stability
     Stability.run_Picard_stability
     Stability.run_RKN_stability

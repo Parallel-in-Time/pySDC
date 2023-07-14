@@ -8,6 +8,3 @@ if not os.path.isdir(folder_name):
     os.makedirs(folder_name)
 else:
     pass
-
-
-

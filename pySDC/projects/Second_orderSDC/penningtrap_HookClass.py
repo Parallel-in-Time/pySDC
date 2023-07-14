@@ -54,9 +54,7 @@ class particles_output(hooks):
             for j in range(i + 1, N):
                 dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= (
-                L.prob.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
-            )
+            fpot[i] -= L.prob.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -105,9 +103,7 @@ class particles_output(hooks):
             for j in range(i + 1, N):
                 dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= (
-                L.prob.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
-            )
+            fpot[i] -= L.prob.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -139,7 +135,6 @@ class particles_output(hooks):
 
 class convergence_data(hooks):
     def __init__(self):
-
         super(convergence_data, self).__init__()
 
         self.storage = dict()
@@ -156,7 +151,6 @@ class convergence_data(hooks):
         ]
 
         for ii, jj in enumerate(self.values):
-
             self.storage[jj] = dict()
 
     def post_step(self, step, level_number):
