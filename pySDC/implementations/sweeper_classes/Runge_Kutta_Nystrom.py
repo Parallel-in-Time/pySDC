@@ -162,6 +162,7 @@ class RungeKuttaNystrom(RungeKutta):
                 Boris solver for the implicit part
 
                 """
+
                 if self.coll.implicit:
                     ck = rhs.vel * 0.0
                     L.f[3] = P.eval_f(rhs, L.time + L.dt)
@@ -177,7 +178,7 @@ class RungeKuttaNystrom(RungeKutta):
             if self.coll.implicit:
                 L.f[0] = P.eval_f(L.u[0], L.time)
                 # L.f[1]=deepcopy(L.f[0])
-                L.f[m] = deepcopy(L.f[0])
+                L.f[m + 1] = deepcopy(L.f[0])
             else:
                 if m != 4:
                     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])

@@ -837,7 +837,7 @@ class Work_precision(Convergence):
 
         # Controller for plot
         if self.time_iter == 3:
-            cont = 16
+            cont = 1
         else:
             tt = np.abs(3 - self.time_iter)
             cont = 8**tt + 8
