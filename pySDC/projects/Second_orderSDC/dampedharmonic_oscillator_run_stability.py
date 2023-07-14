@@ -71,7 +71,7 @@ if __name__ == '__main__':
         https://beltoforion.de/en/harmonic_oscillator/
     """
     description = dampedharmonic_oscillator_params()
-    Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=[200, 200])
+    Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
     Stability.run_SDC_stability
     Stability.run_Picard_stability
     Stability.run_RKN_stability

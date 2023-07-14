@@ -21,7 +21,7 @@ class Convergence(object):
     Implementation of convergence plot for the Second order SDC
     """
 
-    def __init__(self, controller_params, description, time_iter=3, K_iter=[1, 2, 3], Tend=2, axes=[1], cwd=''):
+    def __init__(self, controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd=''):
         self.controller_params = controller_params
         self.description = description
         self.time_iter = time_iter
@@ -292,7 +292,7 @@ class Convergence(object):
                 sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
                 sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
                 # sort values and compute error
-                for mm, nn in enumerate(values):
+                for _, nn in enumerate(values):
                     data = sortedlist_stats[0][1][nn].values()
                     u_val[nn] = np.array(list(data))
                     u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
@@ -494,7 +494,16 @@ class Work_precision(Convergence):
     """
 
     def __init__(
-        self, controller_params, description, time_iter=3, K_iter=[1, 2, 3], Tend=2, axes=[0], RKN=True, VV=True, cwd=''
+        self,
+        controller_params,
+        description,
+        time_iter=3,
+        K_iter=(1, 2, 3),
+        Tend=2,
+        axes=(0,),
+        RKN=True,
+        VV=True,
+        cwd='',
     ):
         self.RKN = RKN
         self.VV = VV
@@ -581,7 +590,7 @@ class Work_precision(Convergence):
                 sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
                 sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
                 # sort values and compute error
-                for mm, nn in enumerate(values):
+                for _, nn in enumerate(values):
                     data = sortedlist_stats[0][1][nn].values()
                     u_val[nn] = np.array(list(data))
                     u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
@@ -682,7 +691,7 @@ class Work_precision(Convergence):
                 sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
                 sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
                 # sort values and compute error
-                for mm, nn in enumerate(values):
+                for _, nn in enumerate(values):
                     data = sortedlist_stats[0][1][nn].values()
                     u_val[nn] = np.array(list(data))
                     u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
@@ -778,7 +787,7 @@ class Work_precision(Convergence):
             sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
 
             # sort values and compute error
-            for mm, nn in enumerate(values):
+            for _, nn in enumerate(values):
                 data = sortedlist_stats[0][1][nn].values()
                 u_val[nn] = np.array(list(data))
                 u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
@@ -874,7 +883,7 @@ class Work_precision(Convergence):
             sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
 
             # sort values and compute error
-            for mm, nn in enumerate(values):
+            for _, nn in enumerate(values):
                 data = sortedlist_stats[0][1][nn].values()
                 u_val[nn] = np.array(list(data))
                 u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
@@ -1086,7 +1095,7 @@ class Stability_implementation(object):
     Get necessary values for the computation of stability function and store them.
     """
 
-    def __init__(self, description, kappa_max=20, mu_max=20, Num_iter=[400, 400], cwd=''):
+    def __init__(self, description, kappa_max=20, mu_max=20, Num_iter=(400, 400), cwd=''):
         self.description = description
         self.kappa_max = kappa_max
         self.mu_max = mu_max

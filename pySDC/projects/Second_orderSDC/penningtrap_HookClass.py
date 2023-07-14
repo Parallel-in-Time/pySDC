@@ -150,7 +150,7 @@ class convergence_data(hooks):
             "vel_nodes_ex",
         ]
 
-        for ii, jj in enumerate(self.values):
+        for _, jj in enumerate(self.values):
             self.storage[jj] = dict()
 
     def post_step(self, step, level_number):

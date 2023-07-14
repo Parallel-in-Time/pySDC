@@ -115,17 +115,17 @@ class RungeKuttaNystrom(RungeKutta):
         """
 
         # get current level and problem description
-        L = self.level
-        P = L.prob
+        # L = self.level
+        # P = L.prob
 
-        p = []
+        # p = []
 
         # integrate RHS over all collocation nodes
-        for m in range(1, self.coll.num_nodes + 1):
-            # new instance of dtype_u, initialize values with 0
-            p.append(P.dtype_u(P.init, val=0.0))
+        # for m in range(1, self.coll.num_nodes + 1):
+        #     # new instance of dtype_u, initialize values with 0
+        #     p.append(P.dtype_u(P.init, val=0.0))
 
-        return p
+        return None
 
     def update_nodes(self):
         """

@@ -57,6 +57,6 @@ if __name__ == '__main__':
     Tend = 128 * 0.015625
     controller_params, description = penningtrap_param()
     work_pre = Work_precision(
-        controller_params, description, time_iter=3, Tend=Tend, K_iter=[2, 4, 6], RKN=True, VV=False, axes=[0]
+        controller_params, description, time_iter=3, Tend=Tend, K_iter=(2, 4, 6), RKN=True, VV=False, axes=(0,)
     )
     work_pre.run_work_precision
