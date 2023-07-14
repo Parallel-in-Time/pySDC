@@ -20,9 +20,8 @@ class penningtrap(ptype):
         super().__init__(((3, nparts), None, np.dtype('float64')))
         self._makeAttributeAndRegister('nparts', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('omega_B', 'omega_E', 'u0', 'sig', localVars=locals())
-        self.work_counters['Boris_solver']=WorkCounter()
-        self.work_counters['rhs']=WorkCounter()
-
+        self.work_counters['Boris_solver'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
 
     @staticmethod
     @jit(nopython=True, nogil=True)
@@ -241,7 +240,6 @@ class penningtrap(ptype):
         Emean = 0.5 * (old_fields.elec + new_fields.elec)
         for n in range(N):
             a = old_parts.q[n] / old_parts.m[n]
-
 
             c[:, n] += dt / 2 * a * np.cross(old_parts.vel[:, n], old_fields.magn[:, n] - new_fields.magn[:, n])
 

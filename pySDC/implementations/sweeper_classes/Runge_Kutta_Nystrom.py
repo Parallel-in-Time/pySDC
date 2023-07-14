@@ -8,6 +8,7 @@ from pySDC.implementations.sweeper_classes.Runge_Kutta import ButcherTableau
 from copy import deepcopy
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta
 
+
 class RungeKuttaNystrom(RungeKutta):
     """
     Runge-Kutta scheme that fits the interface of a sweeper.
@@ -68,11 +69,10 @@ class RungeKuttaNystrom(RungeKutta):
             'skip_residual_computation', ('IT_CHECK', 'IT_FINE', 'IT_COARSE', 'IT_UP', 'IT_DOWN')
         )
 
-
         self.params = _Pars(params)
 
         self.coll = params['butcher_tableau']
-        self.coll_bar=params['butcher_tableau_bar']
+        self.coll_bar = params['butcher_tableau_bar']
 
         # This will be set as soon as the sweeper is instantiated at the level
         self.__level = None
@@ -80,8 +80,6 @@ class RungeKuttaNystrom(RungeKutta):
         self.parallelizable = False
         self.QI = self.coll.Qmat
         self.Qx = self.coll_bar.Qmat
-
-
 
     @classmethod
     def get_update_order(cls):
@@ -151,10 +149,9 @@ class RungeKuttaNystrom(RungeKutta):
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = deepcopy(L.u[0])
-            rhs.pos += L.dt*self.coll.nodes[m+1]* L.u[0].vel
+            rhs.pos += L.dt * self.coll.nodes[m + 1] * L.u[0].vel
 
             for j in range(1, m + 1):
-
                 # build RHS from f-terms (containing the E field) and the B field
 
                 f = P.build_f(L.f[j], L.u[j], L.time + L.dt * self.coll.nodes[j])
@@ -166,27 +163,24 @@ class RungeKuttaNystrom(RungeKutta):
 
                 """
                 if self.coll.implicit:
-
-                    ck=rhs.vel * 0.0
-                    L.f[3]=P.eval_f(rhs, L.time+L.dt)
+                    ck = rhs.vel * 0.0
+                    L.f[3] = P.eval_f(rhs, L.time + L.dt)
                     rhs.vel = P.boris_solver(ck, L.dt, L.f[0], L.f[3], L.u[0])
 
                 else:
                     rhs.vel += L.dt * self.QI[m + 1, j] * self.get_full_f(f)
-
 
             # implicit solve with prefactor stemming from the diagonal of Qd
 
             L.u[m + 1] = rhs
             # update function values
             if self.coll.implicit:
-                L.f[0]=P.eval_f(L.u[0], L.time)
+                L.f[0] = P.eval_f(L.u[0], L.time)
                 # L.f[1]=deepcopy(L.f[0])
-                L.f[m]=deepcopy(L.f[0])
+                L.f[m] = deepcopy(L.f[0])
             else:
-                if m!=4:
+                if m != 4:
                     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
 
         # indicate presence of new values at this level
 
@@ -200,6 +194,7 @@ class RungeKuttaNystrom(RungeKutta):
         """
         self.level.uend = self.level.u[-1]
 
+
 class RKN(RungeKuttaNystrom):
     """
     Runge-Kutta-Nystrom method
@@ -207,39 +202,41 @@ class RKN(RungeKuttaNystrom):
     page: 284
     Chapter: II.14 Numerical methods for Second order differential equations
     """
-    def __init__(self, params):
 
-        nodes=np.array([0.0, 0.5, 0.5, 1])
-        weights=np.array([1.0, 2.0, 2.0, 1.0])/6.0
-        matrix=np.zeros([4, 4])
+    def __init__(self, params):
+        nodes = np.array([0.0, 0.5, 0.5, 1])
+        weights = np.array([1.0, 2.0, 2.0, 1.0]) / 6.0
+        matrix = np.zeros([4, 4])
         matrix[1, 0] = 0.5
         matrix[2, 1] = 0.5
         matrix[3, 2] = 1.0
 
-        weights_bar=np.array([1.0, 1.0, 1.0, 0])/6.0
-        matrix_bar=np.zeros([4,4])
-        matrix_bar[1,0]=1/8
-        matrix_bar[2,0]=1/8
-        matrix_bar[3, 2]=1/2
-        params['butcher_tableau']=ButcherTableau(weights, nodes, matrix)
-        params['butcher_tableau_bar']=ButcherTableau(weights_bar, nodes, matrix_bar)
+        weights_bar = np.array([1.0, 1.0, 1.0, 0]) / 6.0
+        matrix_bar = np.zeros([4, 4])
+        matrix_bar[1, 0] = 1 / 8
+        matrix_bar[2, 0] = 1 / 8
+        matrix_bar[3, 2] = 1 / 2
+        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
+        params['butcher_tableau_bar'] = ButcherTableau(weights_bar, nodes, matrix_bar)
 
         super(RKN, self).__init__(params)
+
 
 class Velocity_Verlet(RungeKuttaNystrom):
     """
     Velocity-Verlet scheme
     https://de.wikipedia.org/wiki/Verlet-Algorithmus
     """
+
     def __init__(self, params):
-        nodes=np.array([1.0, 1.0])
-        weights=np.array([1/2, 0])
-        matrix=np.zeros([2, 2])
-        matrix[1,1]=1
-        weights_bar=np.array([1/2, 0])
-        matrix_bar=np.zeros([2, 2])
-        params['butcher_tableau']=ButcherTableau(weights, nodes, matrix)
-        params['butcher_tableau_bar']=ButcherTableau(weights_bar, nodes, matrix_bar)
-        params['Velocity_verlet']=True
+        nodes = np.array([1.0, 1.0])
+        weights = np.array([1 / 2, 0])
+        matrix = np.zeros([2, 2])
+        matrix[1, 1] = 1
+        weights_bar = np.array([1 / 2, 0])
+        matrix_bar = np.zeros([2, 2])
+        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
+        params['butcher_tableau_bar'] = ButcherTableau(weights_bar, nodes, matrix_bar)
+        params['Velocity_verlet'] = True
 
         super(Velocity_Verlet, self).__init__(params)
