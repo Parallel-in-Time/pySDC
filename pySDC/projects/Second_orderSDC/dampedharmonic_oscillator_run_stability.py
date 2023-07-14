@@ -1,3 +1,5 @@
+exec(open("check_data_folder.py").read())
+
 import numpy as np
 
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator

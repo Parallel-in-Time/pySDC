@@ -3,7 +3,6 @@
 # matplotlib.use('Agg')
 # import os
 
-exec(open("check_data_folder.py").read())
 
 import matplotlib.pyplot as plt
 import numpy as np
