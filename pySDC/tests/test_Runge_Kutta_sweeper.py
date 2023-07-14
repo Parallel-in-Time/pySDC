@@ -10,6 +10,7 @@ SWEEPER_NAMES = [
     'Cash_Karp',
     'ESDIRK53',
     'DIRK43',
+    'Heun_Euler',
 ]
 
 
@@ -112,6 +113,7 @@ def test_order(sweeper_name):
         'Cash_Karp': 5,
         'ESDIRK53': 5,
         'DIRK43': 4,
+        'Heun_Euler': 2,
     }
 
     dt_max = {
@@ -181,6 +183,7 @@ def test_stability(sweeper_name):
         'Cash_Karp': False,
         'ESDIRK53': True,
         'DIRK43': True,
+        'Heun_Euler': False,
     }
 
     re = -np.logspace(-3, 6, 50)
