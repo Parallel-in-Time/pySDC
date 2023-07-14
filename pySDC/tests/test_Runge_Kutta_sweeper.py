@@ -154,7 +154,6 @@ def test_order(sweeper_name):
         update_order = None
 
     if update_order:
-    # if sweeper_name in expected_embedded_order.keys():
         assert np.isclose(
             np.mean(order_embedded), update_order, atol=0.2
         ), f"Got unexpected order of embedded error estimate {np.mean(order_embedded):.2f} for {sweeper_name} method! ({order_embedded})"
