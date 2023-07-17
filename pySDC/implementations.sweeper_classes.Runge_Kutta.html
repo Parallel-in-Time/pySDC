@@ -89,14 +89,28 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK34">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DIRK34</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK34"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DIRK43</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK43"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
 <p>Embedded A-stable diagonally implicit RK pair of order 3 and 4.</p>
 <p>Taken from [here](<a class="reference external" href="https://doi.org/10.1007/BF01934920">https://doi.org/10.1007/BF01934920</a>).</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK34.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK43.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK53">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ESDIRK53</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ESDIRK53"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>A-stable embedded RK pair of orders 5 and 3.
+Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/citations/20160005923">https://ntrs.nasa.gov/citations/20160005923</a>)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ESDIRK53.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
 </dd></dl>
 
@@ -276,8 +290,12 @@ method, which does not require us to solve a system of equations to compute the 
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a></li>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34"><code class="docutils literal notranslate"><span class="pre">DIRK34</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK34.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43"><code class="docutils literal notranslate"><span class="pre">DIRK43</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53"><code class="docutils literal notranslate"><span class="pre">ESDIRK53</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order"><code class="docutils literal notranslate"><span class="pre">get_update_order()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod"><code class="docutils literal notranslate"><span class="pre">ExplicitMidpointMethod</span></code></a></li>

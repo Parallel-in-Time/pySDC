@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_sweepers_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-06 07:48 +0000
+            created at 2023-07-17 08:56 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -915,7 +915,7 @@
     <p class="pln"><span class="n"><a id="t833" href="#t833">833</a></span><span class="t"><span class="str">            The custom descriptions you can supply to the problem when running it</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t834" href="#t834">834</a></span><span class="t"><span class="str">        '''</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t835" href="#t835">835</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">convergence_controller_classes</span><span class="op">.</span><span class="nam">adaptivity</span> <span class="key">import</span> <span class="nam">AdaptivityRK</span><span class="op">,</span> <span class="nam">Adaptivity</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t836" href="#t836">836</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">Runge_Kutta</span> <span class="key">import</span> <span class="nam">DIRK34</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t836" href="#t836">836</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">sweeper_classes</span><span class="op">.</span><span class="nam">Runge_Kutta</span> <span class="key">import</span> <span class="nam">DIRK43</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t837" href="#t837">837</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t838" href="#t838">838</a></span><span class="t">        <span class="nam">adaptivity_description</span> <span class="op">=</span> <span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">get_custom_description</span><span class="op">(</span><span class="nam">problem</span><span class="op">,</span> <span class="nam">num_procs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t839" href="#t839">839</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -925,7 +925,7 @@
     <p class="pln"><span class="n"><a id="t843" href="#t843">843</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t844" href="#t844">844</a></span><span class="t">        <span class="nam">rk_params</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t845" href="#t845">845</a></span><span class="t">            <span class="str">'step_params'</span><span class="op">:</span> <span class="op">{</span><span class="str">'maxiter'</span><span class="op">:</span> <span class="num">1</span><span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t846" href="#t846">846</a></span><span class="t">            <span class="str">'sweeper_class'</span><span class="op">:</span> <span class="nam">DIRK34</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t846" href="#t846">846</a></span><span class="t">            <span class="str">'sweeper_class'</span><span class="op">:</span> <span class="nam">DIRK43</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t847" href="#t847">847</a></span><span class="t">            <span class="str">'convergence_controllers'</span><span class="op">:</span> <span class="op">{</span><span class="nam">AdaptivityRK</span><span class="op">:</span> <span class="op">{</span><span class="str">'e_tol'</span><span class="op">:</span> <span class="nam">e_tol</span><span class="op">}</span><span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t848" href="#t848">848</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t849" href="#t849">849</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -948,9 +948,9 @@
     <p class="pln"><span class="n"><a id="t866" href="#t866">866</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t867" href="#t867">867</a></span><span class="t">        <span class="key">if</span> <span class="nam">problem</span><span class="op">.</span><span class="nam">__name__</span> <span class="op">==</span> <span class="str">"run_vdp"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t868" href="#t868">868</a></span><span class="t">            <span class="key">if</span> <span class="nam">key</span> <span class="op">==</span> <span class="str">'work_newton'</span> <span class="key">and</span> <span class="nam">op</span> <span class="op">==</span> <span class="nam">sum</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t869" href="#t869">869</a></span><span class="t">                <span class="key">return</span> <span class="num">3522</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t869" href="#t869">869</a></span><span class="t">                <span class="key">return</span> <span class="num">2168</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t870" href="#t870">870</a></span><span class="t">            <span class="key">elif</span> <span class="nam">key</span> <span class="op">==</span> <span class="str">'e_global_post_run'</span> <span class="key">and</span> <span class="nam">op</span> <span class="op">==</span> <span class="nam">max</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t871" href="#t871">871</a></span><span class="t">                <span class="key">return</span> <span class="num">0.00020173129027772907</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t871" href="#t871">871</a></span><span class="t">                <span class="key">return</span> <span class="num">0.00024166437265116247</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t872" href="#t872">872</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t873" href="#t873">873</a></span><span class="t">        <span class="key">raise</span> <span class="nam">NotImplementedError</span><span class="op">(</span><span class="str">'The reference value you are looking for is not implemented for this strategy!'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t874" href="#t874">874</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -1298,7 +1298,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_sweepers_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-06 07:48 +0000
+            created at 2023-07-17 08:56 +0000
         </p>
     </div>
 </footer>

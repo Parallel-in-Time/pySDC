@@ -362,10 +362,10 @@
                 <span class="p">}</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sol_type</span> <span class="o">==</span> <span class="s1">&#39;DIRK&#39;</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span> <span class="kn">import</span> <span class="n">DIRK34</span>
+                    <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span> <span class="kn">import</span> <span class="n">DIRK43</span>
                     <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.adaptivity</span> <span class="kn">import</span> <span class="n">AdaptivityRK</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DIRK34</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DIRK43</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">}</span>

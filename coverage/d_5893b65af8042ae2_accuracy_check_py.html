@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/Resilience/accuracy_check.py: 82%</title>
+    <title>Coverage for pySDC/projects/Resilience/accuracy_check.py: 73%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/projects/Resilience/accuracy_check.py</b>:
-            <span class="pc_cov">82%</span>
+            <span class="pc_cov">73%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">142 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">117<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">25<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">104<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">38<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">7<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_advection_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-06 07:48 +0000
+            created at 2023-07-17 08:56 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -230,7 +230,7 @@
     <p class="pln"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">            <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">        <span class="key">if</span> <span class="nam">custom_description</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">            <span class="nam">desc</span> <span class="op">=</span> <span class="nam">merge_descriptions</span><span class="op">(</span><span class="nam">desc</span><span class="op">,</span> <span class="nam">custom_description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">            <span class="nam">desc</span> <span class="op">=</span> <span class="nam">merge_descriptions</span><span class="op">(</span><span class="nam">desc</span><span class="op">,</span> <span class="nam">custom_description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t">        <span class="nam">Tend</span> <span class="op">=</span> <span class="nam">Tend_fixed</span> <span class="key">if</span> <span class="nam">Tend_fixed</span> <span class="key">else</span> <span class="num">30</span> <span class="op">*</span> <span class="nam">dt_list</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">        <span class="nam">stats</span><span class="op">,</span> <span class="nam">controller</span><span class="op">,</span> <span class="nam">_</span> <span class="op">=</span> <span class="nam">prob</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">            <span class="nam">custom_description</span><span class="op">=</span><span class="nam">desc</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -270,15 +270,15 @@
     <p class="pln"><span class="n"><a id="t188" href="#t188">188</a></span><span class="t"><span class="str">    Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t189" href="#t189">189</a></span><span class="t"><span class="str">        None</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t190" href="#t190">190</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t191" href="#t191">191</a></span><span class="t">    <span class="nam">color</span> <span class="op">=</span> <span class="nam">plt</span><span class="op">.</span><span class="nam">rcParams</span><span class="op">[</span><span class="str">'axes.prop_cycle'</span><span class="op">]</span><span class="op">.</span><span class="nam">by_key</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="str">'color'</span><span class="op">]</span><span class="op">[</span><span class="nam">k</span> <span class="op">-</span> <span class="num">2</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t191" href="#t191">191</a></span><span class="t">    <span class="nam">color</span> <span class="op">=</span> <span class="nam">plt</span><span class="op">.</span><span class="nam">rcParams</span><span class="op">[</span><span class="str">'axes.prop_cycle'</span><span class="op">]</span><span class="op">.</span><span class="nam">by_key</span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="str">'color'</span><span class="op">]</span><span class="op">[</span><span class="nam">k</span> <span class="op">-</span> <span class="num">2</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t192" href="#t192">192</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t193" href="#t193">193</a></span><span class="t">    <span class="nam">key</span> <span class="op">=</span> <span class="str">'e_local'</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t194" href="#t194">194</a></span><span class="t">    <span class="nam">order</span> <span class="op">=</span> <span class="nam">get_accuracy_order</span><span class="op">(</span><span class="nam">res</span><span class="op">,</span> <span class="nam">key</span><span class="op">=</span><span class="nam">key</span><span class="op">,</span> <span class="nam">thresh</span><span class="op">=</span><span class="num">1e-11</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t195" href="#t195">195</a></span><span class="t">    <span class="nam">label</span> <span class="op">=</span> <span class="str">f'k={k}, p={np.mean(order):.2f}'</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t196" href="#t196">196</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">loglog</span><span class="op">(</span><span class="nam">res</span><span class="op">[</span><span class="str">'dt'</span><span class="op">]</span><span class="op">,</span> <span class="nam">res</span><span class="op">[</span><span class="nam">key</span><span class="op">]</span><span class="op">,</span> <span class="nam">color</span><span class="op">=</span><span class="nam">color</span><span class="op">,</span> <span class="nam">ls</span><span class="op">=</span><span class="str">'-'</span><span class="op">,</span> <span class="nam">label</span><span class="op">=</span><span class="nam">label</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t197" href="#t197">197</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">set_xlabel</span><span class="op">(</span><span class="str">r'$\Delta t$'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t198" href="#t198">198</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">set_ylabel</span><span class="op">(</span><span class="str">r'$\epsilon$'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t199" href="#t199">199</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">legend</span><span class="op">(</span><span class="nam">frameon</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">loc</span><span class="op">=</span><span class="str">'lower right'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t193" href="#t193">193</a></span><span class="t">    <span class="nam">key</span> <span class="op">=</span> <span class="str">'e_local'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t194" href="#t194">194</a></span><span class="t">    <span class="nam">order</span> <span class="op">=</span> <span class="nam">get_accuracy_order</span><span class="op">(</span><span class="nam">res</span><span class="op">,</span> <span class="nam">key</span><span class="op">=</span><span class="nam">key</span><span class="op">,</span> <span class="nam">thresh</span><span class="op">=</span><span class="num">1e-11</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t195" href="#t195">195</a></span><span class="t">    <span class="nam">label</span> <span class="op">=</span> <span class="str">f'k={k}, p={np.mean(order):.2f}'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t196" href="#t196">196</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">loglog</span><span class="op">(</span><span class="nam">res</span><span class="op">[</span><span class="str">'dt'</span><span class="op">]</span><span class="op">,</span> <span class="nam">res</span><span class="op">[</span><span class="nam">key</span><span class="op">]</span><span class="op">,</span> <span class="nam">color</span><span class="op">=</span><span class="nam">color</span><span class="op">,</span> <span class="nam">ls</span><span class="op">=</span><span class="str">'-'</span><span class="op">,</span> <span class="nam">label</span><span class="op">=</span><span class="nam">label</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t197" href="#t197">197</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">set_xlabel</span><span class="op">(</span><span class="str">r'$\Delta t$'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t198" href="#t198">198</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">set_ylabel</span><span class="op">(</span><span class="str">r'$\epsilon$'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t199" href="#t199">199</a></span><span class="t">    <span class="nam">ax</span><span class="op">.</span><span class="nam">legend</span><span class="op">(</span><span class="nam">frameon</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">loc</span><span class="op">=</span><span class="str">'lower right'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t200" href="#t200">200</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t201" href="#t201">201</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t202" href="#t202">202</a></span><span class="t"><span class="key">def</span> <span class="nam">plot</span><span class="op">(</span><span class="nam">res</span><span class="op">,</span> <span class="nam">ax</span><span class="op">,</span> <span class="nam">k</span><span class="op">,</span> <span class="nam">var</span><span class="op">=</span><span class="str">'dt'</span><span class="op">,</span> <span class="nam">keys</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -391,9 +391,9 @@
     <p class="pln"><span class="n"><a id="t309" href="#t309">309</a></span><span class="t"><span class="str">    Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t310" href="#t310">310</a></span><span class="t"><span class="str">        None</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t311" href="#t311">311</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t312" href="#t312">312</a></span><span class="t">    <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">ks</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t313" href="#t313">313</a></span><span class="t">        <span class="nam">k</span> <span class="op">=</span> <span class="nam">ks</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t314" href="#t314">314</a></span><span class="t">        <span class="nam">res</span> <span class="op">=</span> <span class="nam">multiple_runs</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t312" href="#t312">312</a></span><span class="t">    <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">ks</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t313" href="#t313">313</a></span><span class="t">        <span class="nam">k</span> <span class="op">=</span> <span class="nam">ks</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t314" href="#t314">314</a></span><span class="t">        <span class="nam">res</span> <span class="op">=</span> <span class="nam">multiple_runs</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t315" href="#t315">315</a></span><span class="t">            <span class="nam">k</span><span class="op">=</span><span class="nam">k</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t316" href="#t316">316</a></span><span class="t">            <span class="nam">serial</span><span class="op">=</span><span class="nam">serial</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t317" href="#t317">317</a></span><span class="t">            <span class="nam">Tend_fixed</span><span class="op">=</span><span class="nam">Tend_fixed</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -404,7 +404,7 @@
     <p class="pln"><span class="n"><a id="t322" href="#t322">322</a></span><span class="t">            <span class="nam">custom_controller_params</span><span class="op">=</span><span class="nam">custom_controller_params</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t323" href="#t323">323</a></span><span class="t">            <span class="nam">embedded_error_flavor</span><span class="op">=</span><span class="nam">embedded_error_flavor</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t324" href="#t324">324</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">        <span class="nam">plot_order</span><span class="op">(</span><span class="nam">res</span><span class="op">,</span> <span class="nam">ax</span><span class="op">,</span> <span class="nam">k</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">        <span class="nam">plot_order</span><span class="op">(</span><span class="nam">res</span><span class="op">,</span> <span class="nam">ax</span><span class="op">,</span> <span class="nam">k</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t"><span class="key">def</span> <span class="nam">plot_all_errors</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
@@ -532,7 +532,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_advection_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-06 07:48 +0000
+            created at 2023-07-17 08:56 +0000
         </p>
     </div>
 </footer>
