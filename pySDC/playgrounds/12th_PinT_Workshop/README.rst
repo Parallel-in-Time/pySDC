@@ -45,12 +45,13 @@ Only installations made with ``micromamba`` or ``pip`` are affected by changing 
 Use `branches <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches>`_ to isolate development work.
 **Please make sure to perform all the following steps inside the virtual environment!**
 
-Finally, install `pySDC` via ``pip`` in editable mode using:
+Finally, you can install `pySDC` via ``pip`` in editable mode using:
 
 .. code-block:: bash
 
     pip install -e <pySDC-root-dir>
 
+You don't need to do this, but it can make life easier when it comes to setting path variables etc.
 
 Testing
 -------
@@ -62,7 +63,9 @@ Change to `pySDC`'s root directory and run
     pytest pySDC/tests -m "mpi4py and not slow"
 
 This will check if "all" went well with the installation you just created.
-If it does, you are now ready to play with `pySDC`.
+Note that at the time of creating this tutorial we had to remove `mpi4py_fft` from the dependencies.
+Therefore, 7 out of the 39 selected test cases may fail!
+Anyway, you are now ready to play with `pySDC`.
 
 Jupyter
 -------
@@ -90,7 +93,7 @@ Then, if you want to run stuff in parallel (but locally), start an ``ipcluster``
 
 This is only required for the third step of the tutorial, but you can do this already now.
 
-Fire up a new shell and start a jupyter notebook via
+Fire up a new shell, activate the virtual Python environment as before, and start a jupyter notebook via
 
 .. code-block:: bash
 
