@@ -54,11 +54,18 @@ class Cache(object):
 class MultiStep(sweeper):
     def __init__(self, params, alpha, beta):
         """
-        Initialization routine for the base sweeper
+        Initialization routine for the base sweeper.
+
+        Multistep methods work by constructing Euleresque steps with the right hand side composed of a weighted sum of solutions and right hand side evaluations at previous steps.
+        The coefficients in the weighted sum for the solutions are called alpha and the ones for the right hand sides are called beta in this implementation.
+        So for an N step method, there need to be N alpha values and N + 1 beta values, where the last one is on the left hand side for implicit methods.
+        The first element in the coefficients belongs to the value furthest in the past and vice versa. Values from previous time steps are stored in a `Cache` object.
+        Be careful with the sign of the alpha values. You can look at the implementations of the Euler methods for guidance.
 
         Args:
             params (dict): parameter object
-
+            alpha (list): Coefficients for the solutions of previous steps
+            beta (list): Coefficients for the right hand side evaluations
         """
         import logging
         from pySDC.core.Collocation import CollBase
@@ -66,20 +73,20 @@ class MultiStep(sweeper):
         # set up logger
         self.logger = logging.getLogger('sweeper')
 
-        if 'collocation_class' not in params:
-            params['collocation_class'] = CollBase
-
         self.params = _Pars(params)
 
+        # check if some parameters are set which only apply to actual sweepers
+        for key in ['initial_guess', 'collocation_class', 'num_nodes', 'quad_type']:
+            if key in params:
+                self.logger.warning(f'"{key}" will be ignored by multistep sweeper')
+
         # we need a dummy collocation object to instantiate the levels.
-        self.coll = params['collocation_class'](**params)
+        self.coll = CollBase(num_nodes=1, quad_type='RADAU-RIGHT')
 
         # This will be set as soon as the sweeper is instantiated at the level
         self.__level = None
 
         self.parallelizable = False
-
-        super().__init__(params)
 
         # proprietary variables for the multistep methods
         self.steps = len(alpha)
