@@ -220,7 +220,7 @@ class RungeKutta(sweeper):
             return f.impl + f.expl
         elif f is None:
             prob = self.level.prob
-            return prob.dtype_f(prob.init, val=0)
+            return self.get_full_f(prob.dtype_f(prob.init, val=0))
         else:
             raise NotImplementedError(f'Type \"{type(f)}\" not implemented in Runge-Kutta sweeper')
 
@@ -274,11 +274,11 @@ class RungeKutta(sweeper):
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
-                lvl.u[m + 1] = prob.solve_system(
-                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m]
+                lvl.u[m + 1][:] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[0], lvl.time + lvl.dt * self.coll.nodes[m]
                 )
             else:
-                lvl.u[m + 1] = rhs
+                lvl.u[m + 1][:] = rhs[:]
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
@@ -481,7 +481,7 @@ class Cash_Karp(RungeKutta):
         return 5
 
 
-class DIRK34(RungeKutta):
+class DIRK43(RungeKutta):
     """
     Embedded A-stable diagonally implicit RK pair of order 3 and 4.
 
@@ -491,13 +491,81 @@ class DIRK34(RungeKutta):
     def __init__(self, params):
         nodes = np.array([5.0 / 6.0, 10.0 / 39.0, 0, 1.0 / 6.0])
         weights = np.array(
-            [[32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0], [61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0]]
+            [[61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0], [32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0.0]]
         )
         matrix = np.zeros((4, 4))
         matrix[0, 0] = 5.0 / 6.0
         matrix[1, :2] = [-15.0 / 26.0, 5.0 / 6.0]
         matrix[2, :3] = [215.0 / 54.0, -130.0 / 27.0, 5.0 / 6.0]
         matrix[3, :] = [4007.0 / 6075.0, -31031.0 / 24300.0, -133.0 / 2700.0, 5.0 / 6.0]
+        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
+        super().__init__(params)
+
+    @classmethod
+    def get_update_order(cls):
+        return 4
+
+
+class ESDIRK53(RungeKutta):
+    """
+    A-stable embedded RK pair of orders 5 and 3.
+    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
+    """
+
+    def __init__(self, params):
+        nodes = np.array(
+            [0, 4024571134387.0 / 7237035672548.0, 14228244952610.0 / 13832614967709.0, 1.0 / 10.0, 3.0 / 50.0, 1.0]
+        )
+        matrix = np.zeros((6, 6))
+        matrix[1, :2] = [3282482714977.0 / 11805205429139.0, 3282482714977.0 / 11805205429139.0]
+        matrix[2, :3] = [
+            606638434273.0 / 1934588254988,
+            2719561380667.0 / 6223645057524,
+            3282482714977.0 / 11805205429139.0,
+        ]
+        matrix[3, :4] = [
+            -651839358321.0 / 6893317340882,
+            -1510159624805.0 / 11312503783159,
+            235043282255.0 / 4700683032009.0,
+            3282482714977.0 / 11805205429139.0,
+        ]
+        matrix[4, :5] = [
+            -5266892529762.0 / 23715740857879,
+            -1007523679375.0 / 10375683364751,
+            521543607658.0 / 16698046240053.0,
+            514935039541.0 / 7366641897523.0,
+            3282482714977.0 / 11805205429139.0,
+        ]
+        matrix[5, :] = [
+            -6225479754948.0 / 6925873918471,
+            6894665360202.0 / 11185215031699,
+            -2508324082331.0 / 20512393166649,
+            -7289596211309.0 / 4653106810017.0,
+            39811658682819.0 / 14781729060964.0,
+            3282482714977.0 / 11805205429139,
+        ]
+
+        weights = np.array(
+            [
+                [
+                    -6225479754948.0 / 6925873918471,
+                    6894665360202.0 / 11185215031699.0,
+                    -2508324082331.0 / 20512393166649,
+                    -7289596211309.0 / 4653106810017,
+                    39811658682819.0 / 14781729060964.0,
+                    3282482714977.0 / 11805205429139,
+                ],
+                [
+                    -2512930284403.0 / 5616797563683,
+                    5849584892053.0 / 8244045029872,
+                    -718651703996.0 / 6000050726475.0,
+                    -18982822128277.0 / 13735826808854.0,
+                    23127941173280.0 / 11608435116569.0,
+                    2847520232427.0 / 11515777524847.0,
+                ],
+            ]
+        )
+
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
         super().__init__(params)
 

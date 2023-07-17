@@ -498,7 +498,7 @@ def check_order(reference_sol_type='scipy'):
 
     fig, ax = plt.subplots()
 
-    from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
+    from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK43
 
     colors = ['black', 'teal', 'magenta', 'orange', 'red']
     for j in range(len(maxiter_list)):
@@ -518,7 +518,7 @@ def check_order(reference_sol_type='scipy'):
             description['convergence_controllers'] = {EstimateEmbeddedError: {}}
 
             # if maxiter_list[j] == 5:
-            #    description['sweeper_class'] = DIRK34
+            #    description['sweeper_class'] = DIRK43
             #    description['sweeper_params'] = {'maxiter': 1}
 
             stats, controller, _ = run_quench(
