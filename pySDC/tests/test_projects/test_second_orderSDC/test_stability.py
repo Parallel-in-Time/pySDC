@@ -1,13 +1,11 @@
-exec(open("check_data_folder.py").read())
-
-import numpy as np
-
-from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
-from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Stability_implementation
+import pytest
 
 
 def dampedharmonic_oscillator_params():
+    import numpy as np
+    from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
+    from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
+
     """
     Runtine to compute modulues of the stability function
 
@@ -46,7 +44,7 @@ def dampedharmonic_oscillator_params():
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 100
+    step_params['maxiter'] = 50
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -60,20 +58,27 @@ def dampedharmonic_oscillator_params():
     return description
 
 
-if __name__ == '__main__':
+def test_stability():
     """
-    Damped harmonic oscillatro as test problem for the stability plot:
-        x'=v
-        v'=-kappa*x-mu*v
-        kappa: spring constant
-        mu: friction
+    Stability domain test
+    only the values of mu=[6, 20] and kappa=[3, 20]
+    It is stable at mu=6, kappa=3 otherwise it is instable
+    """
+    import numpy as np
+    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Stability_implementation
 
-        https://beltoforion.de/en/harmonic_oscillator/
-    """
     description = dampedharmonic_oscillator_params()
-    Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
-    Stability.run_SDC_stability
-    Stability.run_Picard_stability
-    Stability.run_RKN_stability
-    Stability.run_Ksdc
-    # Stability.run_Kpicard
+    Stability = Stability_implementation(description, kappa_max=14, mu_max=14, Num_iter=(2, 2))
+    Stability.lambda_kappa = np.array([6, 20])
+    Stability.lambda_mu = np.array([3, 20])
+    SDC, KSDC, *_ = Stability.stability_data()
+    assert (
+        SDC[0, 0] <= 1
+    ), f'The SDC method is instable at mu={Stability.lambda_mu[0]} and kappa={Stability.lambda_kappa[0]}'
+    assert (
+        SDC[-1, -1] > 1
+    ), f'The SDC method is stable at mu={Stability.lambda_mu[-1]} and kappa={Stability.lambda_kappa[-1]}'
+
+
+if __name__ == '__main__':
+    pass

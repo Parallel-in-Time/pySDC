@@ -58,8 +58,8 @@ if __name__ == '__main__':
     # Set final time
     Tend = 128 * 0.015625
     controller_params, description = penningtrap_param()
-    conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=Tend, axes=(0,))
+    conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2), Tend=Tend, axes=(2,))
     # Run local convergence order
-    conv.run_local_error
+    # conv.run_local_error
     # Run global convergence order
-    # conv.run_global_error
+    conv.run_global_error

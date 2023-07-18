@@ -1255,9 +1255,7 @@ class Stability_implementation(object):
         plt.figure()
         levels = np.array([0.25, 0.5, 0.75, 0.9, 1.0, 1.1])
 
-        CS1 = plt.contour(
-            self.lambda_kappa, self.lambda_mu, np.absolute(region.T), levels, colors='k', linestyles="dashed"
-        )
+        CS1 = plt.contour(self.lambda_kappa, self.lambda_mu, region.T, levels, colors='k', linestyles="dashed")
         # CS2 = plt.contour(self.lambda_k, self.lambda_mu, np.absolute(region.T), [1.0], colors='k')
 
         plt.clabel(CS1, inline=True, fmt="%3.2f", fontsize=fs - 2)

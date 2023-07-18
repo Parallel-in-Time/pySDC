@@ -81,18 +81,9 @@ class RungeKuttaNystrom(RungeKutta):
         self.QI = self.coll.Qmat
         self.Qx = self.coll_bar.Qmat
 
-    @classmethod
-    def get_update_order(cls):
-        """
-        Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.
-        """
-        raise NotImplementedError(
-            f"There is not an update order for RK scheme \"{cls.__name__}\" implemented. Maybe it is not an embedded scheme?"
-        )
-
     def get_full_f(self, f):
         """
-        Get the full right hand side as a `mesh` from the right hand side
+        Test the right hand side funtion is the correct type
 
         Args:
             f (dtype_f): Right hand side at a single node
@@ -104,28 +95,7 @@ class RungeKuttaNystrom(RungeKutta):
         if type(f) in [particles, fields, acceleration]:
             return f
         else:
-            raise NotImplementedError(f'Type \"{type(f)}\" not implemented in Runge-Kutta sweeper')
-
-    def integrate(self):
-        """
-        Integrates the right-hand side
-
-        Returns:
-            list of dtype_u: containing the integral as values
-        """
-
-        # get current level and problem description
-        # L = self.level
-        # P = L.prob
-
-        # p = []
-
-        # integrate RHS over all collocation nodes
-        # for m in range(1, self.coll.num_nodes + 1):
-        #     # new instance of dtype_u, initialize values with 0
-        #     p.append(P.dtype_u(P.init, val=0.0))
-
-        return None
+            raise NotImplementedError(f'Type \"{type(f)}\" not implemented')
 
     def update_nodes(self):
         """
@@ -172,15 +142,14 @@ class RungeKuttaNystrom(RungeKutta):
                     rhs.vel += L.dt * self.QI[m + 1, j] * self.get_full_f(f)
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-
             L.u[m + 1] = rhs
             # update function values
             if self.coll.implicit:
+                # That is why it only works for the Velocity-Verlet scheme
                 L.f[0] = P.eval_f(L.u[0], L.time)
-                # L.f[1]=deepcopy(L.f[0])
                 L.f[m + 1] = deepcopy(L.f[0])
             else:
-                if m != 4:
+                if m != self.coll.num_nodes-1:
                     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
