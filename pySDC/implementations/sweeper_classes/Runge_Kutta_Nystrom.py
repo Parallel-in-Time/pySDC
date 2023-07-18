@@ -149,7 +149,7 @@ class RungeKuttaNystrom(RungeKutta):
                 L.f[0] = P.eval_f(L.u[0], L.time)
                 L.f[m + 1] = deepcopy(L.f[0])
             else:
-                if m != self.coll.num_nodes-1:
+                if m != self.coll.num_nodes - 1:
                     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
