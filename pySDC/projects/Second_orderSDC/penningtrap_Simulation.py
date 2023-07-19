@@ -31,11 +31,11 @@ class Convergence(object):
         self.cwd = cwd
         self.quad_type = self.description['sweeper_params']['quad_type']
         self.num_nodes = self.description['sweeper_params']['num_nodes']
+        self.error_type = 'Local'
 
     # run local convergence rate and plot the graph
     @property
     def run_local_error(self):
-        self.error_type = 'Local'
         self.compute_local_error_data()
         self.find_approximate_order()
         self.plot_convergence()
@@ -52,7 +52,7 @@ class Convergence(object):
     Plot convergence order plots for the position and velocity
     """
 
-    def plot_convergence(self):
+    def plot_convergence(self):  # pragma: no cover
         fs = 16
         [N, time_data, error_data, order_data, convline] = self.organize_data(
             filename='data/{}-conv-data.txt'.format(self.error_type)
@@ -96,11 +96,11 @@ class Convergence(object):
                 )
 
             if self.error_type == 'Local':
-                ax1.set_ylabel('$\Delta x^{\mathrm{(abs)}}_{%d}$' % (value + 1), fontsize=fs + 5)
+                ax1.set_ylabel(r'$\Delta x^{\mathrm{(abs)}}_{%d}$' % (value + 1), fontsize=fs + 5)
             else:
-                ax1.set_ylabel('$\Delta x^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 5)
+                ax1.set_ylabel(r'$\Delta x^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 5)
         ax1.set_title('{} order of convergence, $M={}$'.format(self.error_type, self.num_nodes), fontsize=fs + 5)
-        ax1.set_xlabel('$\omega_{B} \cdot \Delta t$', fontsize=fs + 5)
+        ax1.set_xlabel(r'$\omega_{B} \cdot \Delta t$', fontsize=fs + 5)
 
         ax1.legend(loc='best')
         fig1.tight_layout()
@@ -134,11 +134,11 @@ class Convergence(object):
                 )
 
             if self.error_type == 'Local':
-                ax2.set_ylabel('$\Delta v^{\mathrm{(abs)}}_{%d}$' % (value + 1), fontsize=fs + 5)
+                ax2.set_ylabel(r'$\Delta v^{\mathrm{(abs)}}_{%d}$' % (value + 1), fontsize=fs + 5)
             else:
-                ax2.set_ylabel('$\Delta v^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 5)
-        ax2.set_title('{} order of convergence, $M={}$'.format(self.error_type, self.num_nodes), fontsize=fs + 5)
-        ax2.set_xlabel('$\omega_{B} \cdot \Delta t$', fontsize=fs + 5)
+                ax2.set_ylabel(r'$\Delta v^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 5)
+        ax2.set_title(r'{} order of convergence, $M={}$'.format(self.error_type, self.num_nodes), fontsize=fs + 5)
+        ax2.set_xlabel(r'$\omega_{B} \cdot \Delta t$', fontsize=fs + 5)
         if self.error_type == 'Global':
             ax2.set_ylim(1e-14, 1e1)
             ax1.set_ylim(1e-14, 1e1)
@@ -368,7 +368,7 @@ class Convergence(object):
         return np.linalg.norm(np.abs((u_ex - u)), np.inf, 0) / np.linalg.norm(u_ex, np.inf, 0)
 
     # convert string saved data into numpy array
-    def string_to_array(self, string):
+    def string_to_array(self, string):  # pragma: no cover
         numbers = string.strip('[]').split()
         array = [float(num) for num in numbers]
         return np.array(array)
@@ -379,7 +379,7 @@ class Convergence(object):
 
     """
 
-    def organize_data(self, filename='data/Local-conv-data.txt', time_iter=None):
+    def organize_data(self, filename='data/Local-conv-data.txt', time_iter=None):  # pragma: no cover
         """
         Organize data according to plot
         Args:
@@ -450,9 +450,9 @@ class Convergence(object):
 
         for jj in range(0, 3):
             if jj == 0:
-                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format('Local'), 'w')
+                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format(self.error_type), 'w')
             else:
-                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format('Local'), 'a')
+                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format(self.error_type), 'a')
 
             for ii in range(0, N):
                 approx_order['pos'][0, ii] = np.polyfit(
@@ -910,7 +910,7 @@ class Work_precision(Convergence):
             )
         file.close()
 
-    def format_number(self, data_value, indx):
+    def format_number(self, data_value, indx):  # pragma: no cover
         if data_value >= 1_000_000:
             formatter = "{:1.1f}M".format(data_value * 0.000_001)
         else:
@@ -921,7 +921,7 @@ class Work_precision(Convergence):
     Plot work precision from the saved datas
     """
 
-    def plot_work_precision(self):
+    def plot_work_precision(self):  # pragma: no cover
         fs = 16
         [N, func_eval_SDC, error_SDC, *_] = self.organize_data(
             filename=self.cwd + 'data/func_eval_vs_error_SDC{}{}.txt'.format(self.time_iter, self.num_nodes),
@@ -1059,7 +1059,7 @@ class Work_precision(Convergence):
 
         ax1.set_title("$M={}$".format(self.num_nodes), fontsize=fs - 2)
         ax1.set_xlabel("Number of RHS evaluations", fontsize=fs + 4)
-        ax1.set_ylabel('$\Delta x^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 5)
+        ax1.set_ylabel(r'$\Delta x^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 5)
         ax1.loglog([], [], color="black", ls="--", label="Picard iteration")
         ax1.loglog([], [], color="black", ls="solid", label="Boris-SDC iteration")
 
@@ -1076,7 +1076,7 @@ class Work_precision(Convergence):
         ax2.xaxis.set_major_formatter(self.format_number)
         ax2.set_title("$M={}$".format(self.num_nodes), fontsize=fs - 2)
         ax2.set_xlabel("Number of RHS evaluations", fontsize=fs + 3)
-        ax2.set_ylabel('$\Delta v^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 3)
+        ax2.set_ylabel(r'$\Delta v^{\mathrm{(rel)}}_{%d}$' % (value + 1), fontsize=fs + 3)
         ax2.loglog([], [], color="black", ls="--", label="Picard iteration")
         ax2.loglog([], [], color="black", ls="solid", label="Boris-SDC iteration")
         ax2.set_xticks(xx)
@@ -1234,7 +1234,7 @@ class Stability_implementation(object):
 
         return stab_RKN
 
-    def plot_stability(self, region, title=""):
+    def plot_stability(self, region, title=""):  # pragma: no cover
         """
         Plotting runtine for moduli
 
@@ -1271,11 +1271,11 @@ class Stability_implementation(object):
         if self.RKN:
             plt.title(f"{title}", fontsize=fs)
         else:
-            plt.title("{}  $M={},\  K={}$".format(title, self.num_nodes, self.K_iter), fontsize=fs)
+            plt.title(r"{}  $M={},\  K={}$".format(title, self.num_nodes, self.K_iter), fontsize=fs)
         plt.tight_layout()
         plt.savefig(self.cwd + "data/M={}_K={}_redion_{}.pdf".format(self.num_nodes, self.K_iter, title))
 
-    def plot_spec_radius(self, region, title=""):
+    def plot_spec_radius(self, region, title=""):  # pragma: no cover
         """
         Plotting runtine for moduli
 

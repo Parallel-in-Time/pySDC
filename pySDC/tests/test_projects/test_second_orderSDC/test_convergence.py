@@ -58,14 +58,31 @@ def penningtrap_params(sweeper_name):
     return description, controller_params
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('axis', [0, 2])
+def test_global_convergence(axis):
+    import numpy as np
+
+    expected_order, num_order = BorisSDC_global_convergence()
+
+    assert np.isclose(
+        num_order['position'][axis, :], expected_order['position'][axis, :], atol=2.6e-1
+    ).all(), 'Expected order in {} {}, got {}!'.format(
+        'position', expected_order['position'][axis, :], num_order['position'][axis, :]
+    )
+
+
 def BorisSDC_global_convergence():
     from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Convergence
     from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
     description, controller_params = penningtrap_params(boris_2nd_order)
-    conv = Convergence(controller_params, description, time_iter=3)
+    description['level_params']['dt'] = 0.015625 * 2
+    conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2, 3))
+    conv.error_type = 'Global'
     conv.compute_global_error_data()
-    conv.find_approximate_order()
+
+    conv.find_approximate_order(filename='data/Global-conv-data.txt')
 
     expected_order, num_order = sort_order(filename='data/Global_order_vs_approxorder.txt')
 
@@ -199,4 +216,4 @@ def test_RKN_VV(sweeper_name, cwd=''):
 
 
 if __name__ == '__main__':
-    pass
+    BorisSDC_global_convergence()

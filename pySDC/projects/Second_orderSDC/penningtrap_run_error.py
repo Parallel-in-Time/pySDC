@@ -12,7 +12,7 @@ def penningtrap_param():
     level_params = dict()
     level_params['restol'] = 1e-16
     # for the first axis
-    level_params['dt'] = 0.015625
+    level_params['dt'] = 0.015625 * 2
     # for the third axis
     # level_params['dt']=0.015625*4
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     # Set final time
     Tend = 128 * 0.015625
     controller_params, description = penningtrap_param()
-    conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2), Tend=Tend, axes=(2,))
+    conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=Tend, axes=(2,))
     # Run local convergence order
     # conv.run_local_error
     # Run global convergence order
