@@ -63,9 +63,9 @@ class sweeper(object):
 
         self.params = _Pars(params)
 
-        coll = params['collocation_class'](**params)
+        self.coll = params['collocation_class'](**params)
 
-        if not coll.right_is_node and not self.params.do_coll_update:
+        if not self.coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning(
                 'we need to do a collocation update here, since the right end point is not a node. Changing this!'
             )
@@ -73,9 +73,6 @@ class sweeper(object):
 
         # This will be set as soon as the sweeper is instantiated at the level
         self.__level = None
-
-        # collocation object
-        self.coll = coll
 
         self.parallelizable = False
 
