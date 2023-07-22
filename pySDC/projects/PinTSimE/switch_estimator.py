@@ -3,6 +3,7 @@ import scipy as sp
 
 from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController, Status
+from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
 
 class SwitchEstimator(ConvergenceController):
@@ -82,29 +83,34 @@ class SwitchEstimator(ConvergenceController):
 
         L = S.levels[0]
 
-        if S.status.iter == S.params.maxiter:
+        if CheckConvergence.check_convergence(S):
             self.status.switch_detected, m_guess, state_function = L.prob.get_switching_info(L.u, L.time)
-
+            print([L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))], state_function)
             if self.status.switch_detected:
                 t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
+                t_interp, state_function = self.adapt_interpolation_info(
+                    L.time, L.sweep.coll.left_is_node, t_interp, state_function
+                )
+                print(t_interp, state_function)
 
-                # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
-                if state_function[0] * state_function[-1] < 0:
-                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess)
+                # when the state function is already close to zero the event is already resolved well
+                #if all(np.isclose(state_function, np.zeros(len(t_interp)), atol=1e-10)):
+                if abs(state_function[0]) <= self.params.tol or abs(state_function[-1]) <= self.params.tol:
+                    print('Is already close enough to one of the end point!')
+                    #self.status.is_zero = True
 
-                    if L.time <= self.status.t_switch <= L.time + L.dt:
+                # intermediate value theorem states that a root is contained in current step
+                if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
+                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess, self.params.counter)
+                    self.params.counter += 1
+                    if L.time < self.status.t_switch < L.time + L.dt:
                         dt_switch = self.status.t_switch - L.time
-                        if not np.isclose(self.status.t_switch - L.time, L.dt, atol=self.params.tol):
-                            self.log(
-                                f"Located Switch at time {self.status.t_switch:.6f} is outside the range of tol={self.params.tol:.4e}",
-                                S,
-                            )
 
-                        else:
-                            self.log(
-                                f"Switch located at time {self.status.t_switch:.6f} inside tol={self.params.tol:.4e}", S
-                            )
-
+                        if (
+                            abs(self.status.t_switch - L.time) <= self.params.tol
+                            or abs((L.time + L.dt) - self.status.t_switch) <= self.params.tol
+                        ):
+                            self.log(f"Switch located at time {self.status.t_switch:.12f}", S)
                             L.prob.t_switch = self.status.t_switch
                             controller.hooks[0].add_to_stats(
                                 process=S.status.slot,
@@ -118,19 +124,32 @@ class SwitchEstimator(ConvergenceController):
 
                             L.prob.count_switches()
 
-                        dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
+                        else:
+                            self.log(f"Located Switch at time {self.status.t_switch:.12f} is outside the range", S)
 
-                        # when a switch is found, time step to match with switch should be preferred
+                        # when an event is found, step size matching with this event should be preferred
+                        dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
                         if self.status.switch_detected:
                             L.status.dt_new = dt_switch
-
                         else:
                             L.status.dt_new = min([dt_planned, dt_switch])
-
+                        print('dt_new', L.status.dt_new)
                     else:
+                        # event occurs on L.time or L.time + L.dt; no restart necessary
+                        boundary = 'left boundary' if self.status.t_switch == L.time else 'right boundary'
+                        self.log(f"Estimated switch {self.status.t_switch:.12f} occurs at {boundary}", S)
+                        controller.hooks[0].add_to_stats(
+                            process=S.status.slot,
+                            time=L.time,
+                            level=L.level_index,
+                            iter=0,
+                            sweep=L.status.sweep,
+                            type='switch',
+                            value=self.status.t_switch,
+                        )
                         self.status.switch_detected = False
 
-                else:
+                else:  # intermediate value theorem is not satisfied
                     self.status.switch_detected = False
 
     def determine_restart(self, controller, S, **kwargs):
@@ -191,15 +210,117 @@ class SwitchEstimator(ConvergenceController):
            Time point of the founded switch.
         """
 
-        p = sp.interpolate.interp1d(t_interp, state_function, 'cubic', bounds_error=False)
+        Interpolator = sp.interpolate.BarycentricInterpolator(t_interp, state_function)
 
-        SwitchResults = sp.optimize.root_scalar(
-            p,
-            method='brentq',
-            bracket=[t_interp[0], t_interp[m_guess]],
-            x0=t_interp[m_guess],
-            xtol=1e-10,
-        )
-        t_switch = SwitchResults.root
+        def p(t):
+            """
+            Simplifies the call of the interpolant.
+
+            Parameters
+            ----------
+            t : float
+                Time t at which the interpolant is called.
+
+            Returns
+            -------
+            p(t) : float
+                The value of the interpolated function at time t.
+            """
+            return Interpolator.__call__(t)
+
+        def fprime(t):
+            """
+            Computes the derivative of the scalar interpolant using finite differences.
+
+            Parameters
+            ----------
+            t : float
+                Time where the derivatives is computed.
+
+            Returns
+            -------
+            dp : float
+                Derivative of interpolation p at time t.
+            """
+            dt = 1e-15
+            dp = (p(t + dt) - p(t)) / dt
+            return dp
+
+        newton_tol, newton_maxiter = 1e-14, 200
+        t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
 
         return t_switch
+
+    @staticmethod
+    def adapt_interpolation_info(t, left_is_node, t_interp, state_function):
+        """
+        Adapts the x- and y-axis for interpolation. For SDC, it is proven whether the left boundary is a
+        collocation node or not. In case it is, the first entry of the state function has to be removed,
+        because it would otherwise contain double values on starting time and the first node. Otherwise,
+        starting time L.time has to be added to t_interp to also take this value in the interpolation
+        into account.
+
+        Parameters
+        ----------
+        t : float
+            Starting time of the step.
+        left_is_node : bool
+            Indicates whether the left boundary is a collocation node or not.
+        t_interp : list
+            x-values for interpolation containing collocation nodes.
+        state_function : list
+            y-values for interpolation containing values of state function.
+
+        Returns
+        -------
+        t_interp : list
+            Adapted x-values for interpolation containing collocation nodes.
+        state_function : list
+            Adapted y-values for interpolation containing values of state function.
+        """
+
+        if not left_is_node:
+            t_interp.insert(0, t)
+        else:
+            del state_function[0]  # state_function[1:] ?
+
+        return t_interp, state_function
+
+def newton(x0, p, fprime, newton_tol, newton_maxiter):
+    """
+    Newton's method fo find the root of interpolant p.
+
+    Parameters
+    ----------
+    x0 : float
+        Initial guess.
+    p : callable
+        Interpolated function where Newton's method is applied at.
+    fprime : callable
+        Approximated erivative of p using finite differences.
+    newton_tol : float
+        Tolerance for termination.
+    newton_maxiter : int
+        Maximum of iterations the method should execute.
+
+    Returns
+    -------
+    root : float
+        Root of function p.
+    """
+
+    n = 0
+    while n < newton_maxiter:
+        print('Iteration: ', n, '-- Root: ', x0, '-- Distance to 0: ', abs(p(x0)))
+        if abs(p(x0)) < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)):
+            break
+
+        x0 -= 1.0 / fprime(x0) * p(x0)
+
+        n += 1
+
+    root = x0
+    msg = "Newton's method took {} iterations".format(n)
+    print(msg)
+
+    return root
