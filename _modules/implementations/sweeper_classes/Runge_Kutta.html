@@ -162,6 +162,11 @@
 
 
 <div class="viewcode-block" id="RungeKutta"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableau</span>
+
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runge-Kutta scheme that fits the interface of a sweeper.</span>
 <span class="sd">    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions</span>
@@ -185,8 +190,7 @@
 
 <span class="sd">    All of these variables are either determined by the RK rule, or are not part of an RK scheme.</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</span>
+<span class="sd">    The entries of the Butcher tableau are stored as class attributes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
@@ -199,22 +203,16 @@
         <span class="c1"># set up logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;sweeper&#39;</span><span class="p">)</span>
 
-        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate step, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
         <span class="c1"># check if some parameters are set which only apply to actual sweepers</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">,</span> <span class="s1">&#39;collocation_class&#39;</span><span class="p">,</span> <span class="s1">&#39;num_nodes&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot; will be ignored by Runge-Kutta sweeper&#39;</span><span class="p">)</span>
 
         <span class="c1"># set parameters to their actual values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau</span><span class="p">()</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;zero&#39;</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">])</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
         <span class="c1"># disable residual computation by default</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;skip_residual_computation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -226,13 +224,19 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span>
-
         <span class="c1"># This will be set as soon as the sweeper is instantiated at the level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span>
+
+<div class="viewcode-block" id="RungeKutta.get_Q_matrix"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_Q_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_Butcher_tableau</span><span class="p">()</span><span class="o">.</span><span class="n">Qmat</span></div>
+
+<div class="viewcode-block" id="RungeKutta.get_Butcher_tableau"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_Butcher_tableau</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RungeKutta.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -385,16 +389,13 @@
 <span class="sd">    Not very stable first order method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BackwardEuler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler">[docs]</a><span class="k">class</span> <span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -404,16 +405,13 @@
 <span class="sd">    A-stable first order method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CrankNicholson"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson">[docs]</a><span class="k">class</span> <span class="nc">CrankNicholson</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -421,14 +419,11 @@
 <span class="sd">    Implicit Runge-Kutta method of second order, A-stable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span></div>
 
 
 <div class="viewcode-block" id="ExplicitMidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">ExplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -436,13 +431,10 @@
 <span class="sd">    Explicit Runge-Kutta method of second order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span></div>
 
 
 <div class="viewcode-block" id="ImplicitMidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">ImplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -450,13 +442,10 @@
 <span class="sd">    Implicit Runge-Kutta method of second order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span></div>
 
 
 <div class="viewcode-block" id="RK4"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4">[docs]</a><span class="k">class</span> <span class="nc">RK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -464,15 +453,12 @@
 <span class="sd">    Explicit Runge-Kutta of fourth order: Everybody&#39;s darling.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">6.0</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableau</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">6.0</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
 
 
 <div class="viewcode-block" id="Heun_Euler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">[docs]</a><span class="k">class</span> <span class="nc">Heun_Euler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -480,13 +466,11 @@
 <span class="sd">    Second order explicit embedded Runge-Kutta method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
 <div class="viewcode-block" id="Heun_Euler.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -498,22 +482,20 @@
 <span class="sd">    Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">7.0</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="p">[</span><span class="mf">37.0</span> <span class="o">/</span> <span class="mf">378.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">250.0</span> <span class="o">/</span> <span class="mf">621.0</span><span class="p">,</span> <span class="mf">125.0</span> <span class="o">/</span> <span class="mf">594.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">512.0</span> <span class="o">/</span> <span class="mf">1771.0</span><span class="p">],</span>
-                <span class="p">[</span><span class="mf">2825.0</span> <span class="o">/</span> <span class="mf">27648.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">18575.0</span> <span class="o">/</span> <span class="mf">48384.0</span><span class="p">,</span> <span class="mf">13525.0</span> <span class="o">/</span> <span class="mf">55296.0</span><span class="p">,</span> <span class="mf">277.0</span> <span class="o">/</span> <span class="mf">14336.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">],</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">9.0</span> <span class="o">/</span> <span class="mf">40.0</span><span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">11.0</span> <span class="o">/</span> <span class="mf">54.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">35.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1631.0</span> <span class="o">/</span> <span class="mf">55296.0</span><span class="p">,</span> <span class="mf">175.0</span> <span class="o">/</span> <span class="mf">512.0</span><span class="p">,</span> <span class="mf">575.0</span> <span class="o">/</span> <span class="mf">13824.0</span><span class="p">,</span> <span class="mf">44275.0</span> <span class="o">/</span> <span class="mf">110592.0</span><span class="p">,</span> <span class="mf">253.0</span> <span class="o">/</span> <span class="mf">4096.0</span><span class="p">]</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">7.0</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mf">37.0</span> <span class="o">/</span> <span class="mf">378.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">250.0</span> <span class="o">/</span> <span class="mf">621.0</span><span class="p">,</span> <span class="mf">125.0</span> <span class="o">/</span> <span class="mf">594.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">512.0</span> <span class="o">/</span> <span class="mf">1771.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">2825.0</span> <span class="o">/</span> <span class="mf">27648.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">18575.0</span> <span class="o">/</span> <span class="mf">48384.0</span><span class="p">,</span> <span class="mf">13525.0</span> <span class="o">/</span> <span class="mf">55296.0</span><span class="p">,</span> <span class="mf">277.0</span> <span class="o">/</span> <span class="mf">14336.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">9.0</span> <span class="o">/</span> <span class="mf">40.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">11.0</span> <span class="o">/</span> <span class="mf">54.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">70.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">35.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1631.0</span> <span class="o">/</span> <span class="mf">55296.0</span><span class="p">,</span> <span class="mf">175.0</span> <span class="o">/</span> <span class="mf">512.0</span><span class="p">,</span> <span class="mf">575.0</span> <span class="o">/</span> <span class="mf">13824.0</span><span class="p">,</span> <span class="mf">44275.0</span> <span class="o">/</span> <span class="mf">110592.0</span><span class="p">,</span> <span class="mf">253.0</span> <span class="o">/</span> <span class="mf">4096.0</span><span class="p">]</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
 <div class="viewcode-block" id="Cash_Karp.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -527,18 +509,16 @@
 <span class="sd">    Taken from [here](https://doi.org/10.1007/BF01934920).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">10.0</span> <span class="o">/</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">])</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[[</span><span class="mf">61.0</span> <span class="o">/</span> <span class="mf">150.0</span><span class="p">,</span> <span class="mf">2197.0</span> <span class="o">/</span> <span class="mf">2100.0</span><span class="p">,</span> <span class="mf">19.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.0</span> <span class="o">/</span> <span class="mf">14.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">32.0</span> <span class="o">/</span> <span class="mf">75.0</span><span class="p">,</span> <span class="mf">169.0</span> <span class="o">/</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]</span>
-        <span class="p">)</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">15.0</span> <span class="o">/</span> <span class="mf">26.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">215.0</span> <span class="o">/</span> <span class="mf">54.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">130.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4007.0</span> <span class="o">/</span> <span class="mf">6075.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">31031.0</span> <span class="o">/</span> <span class="mf">24300.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">133.0</span> <span class="o">/</span> <span class="mf">2700.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">10.0</span> <span class="o">/</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">])</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="mf">61.0</span> <span class="o">/</span> <span class="mf">150.0</span><span class="p">,</span> <span class="mf">2197.0</span> <span class="o">/</span> <span class="mf">2100.0</span><span class="p">,</span> <span class="mf">19.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.0</span> <span class="o">/</span> <span class="mf">14.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">32.0</span> <span class="o">/</span> <span class="mf">75.0</span><span class="p">,</span> <span class="mf">169.0</span> <span class="o">/</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]]</span>
+    <span class="p">)</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">15.0</span> <span class="o">/</span> <span class="mf">26.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">215.0</span> <span class="o">/</span> <span class="mf">54.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">130.0</span> <span class="o">/</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4007.0</span> <span class="o">/</span> <span class="mf">6075.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">31031.0</span> <span class="o">/</span> <span class="mf">24300.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">133.0</span> <span class="o">/</span> <span class="mf">2700.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
 <div class="viewcode-block" id="DIRK43.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -551,62 +531,59 @@
 <span class="sd">    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">4024571134387.0</span> <span class="o">/</span> <span class="mf">7237035672548.0</span><span class="p">,</span> <span class="mf">14228244952610.0</span> <span class="o">/</span> <span class="mf">13832614967709.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span> <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="mf">606638434273.0</span> <span class="o">/</span> <span class="mi">1934588254988</span><span class="p">,</span>
-            <span class="mf">2719561380667.0</span> <span class="o">/</span> <span class="mi">6223645057524</span><span class="p">,</span>
-            <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="o">-</span><span class="mf">651839358321.0</span> <span class="o">/</span> <span class="mi">6893317340882</span><span class="p">,</span>
-            <span class="o">-</span><span class="mf">1510159624805.0</span> <span class="o">/</span> <span class="mi">11312503783159</span><span class="p">,</span>
-            <span class="mf">235043282255.0</span> <span class="o">/</span> <span class="mf">4700683032009.0</span><span class="p">,</span>
-            <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="o">-</span><span class="mf">5266892529762.0</span> <span class="o">/</span> <span class="mi">23715740857879</span><span class="p">,</span>
-            <span class="o">-</span><span class="mf">1007523679375.0</span> <span class="o">/</span> <span class="mi">10375683364751</span><span class="p">,</span>
-            <span class="mf">521543607658.0</span> <span class="o">/</span> <span class="mf">16698046240053.0</span><span class="p">,</span>
-            <span class="mf">514935039541.0</span> <span class="o">/</span> <span class="mf">7366641897523.0</span><span class="p">,</span>
-            <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="o">-</span><span class="mf">6225479754948.0</span> <span class="o">/</span> <span class="mi">6925873918471</span><span class="p">,</span>
-            <span class="mf">6894665360202.0</span> <span class="o">/</span> <span class="mi">11185215031699</span><span class="p">,</span>
-            <span class="o">-</span><span class="mf">2508324082331.0</span> <span class="o">/</span> <span class="mi">20512393166649</span><span class="p">,</span>
-            <span class="o">-</span><span class="mf">7289596211309.0</span> <span class="o">/</span> <span class="mf">4653106810017.0</span><span class="p">,</span>
-            <span class="mf">39811658682819.0</span> <span class="o">/</span> <span class="mf">14781729060964.0</span><span class="p">,</span>
-            <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mi">11805205429139</span><span class="p">,</span>
-        <span class="p">]</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">4024571134387.0</span> <span class="o">/</span> <span class="mf">7237035672548.0</span><span class="p">,</span> <span class="mf">14228244952610.0</span> <span class="o">/</span> <span class="mf">13832614967709.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span> <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">606638434273.0</span> <span class="o">/</span> <span class="mi">1934588254988</span><span class="p">,</span>
+        <span class="mf">2719561380667.0</span> <span class="o">/</span> <span class="mi">6223645057524</span><span class="p">,</span>
+        <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">-</span><span class="mf">651839358321.0</span> <span class="o">/</span> <span class="mi">6893317340882</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1510159624805.0</span> <span class="o">/</span> <span class="mi">11312503783159</span><span class="p">,</span>
+        <span class="mf">235043282255.0</span> <span class="o">/</span> <span class="mf">4700683032009.0</span><span class="p">,</span>
+        <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">-</span><span class="mf">5266892529762.0</span> <span class="o">/</span> <span class="mi">23715740857879</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1007523679375.0</span> <span class="o">/</span> <span class="mi">10375683364751</span><span class="p">,</span>
+        <span class="mf">521543607658.0</span> <span class="o">/</span> <span class="mf">16698046240053.0</span><span class="p">,</span>
+        <span class="mf">514935039541.0</span> <span class="o">/</span> <span class="mf">7366641897523.0</span><span class="p">,</span>
+        <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mf">11805205429139.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">-</span><span class="mf">6225479754948.0</span> <span class="o">/</span> <span class="mi">6925873918471</span><span class="p">,</span>
+        <span class="mf">6894665360202.0</span> <span class="o">/</span> <span class="mi">11185215031699</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">2508324082331.0</span> <span class="o">/</span> <span class="mi">20512393166649</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">7289596211309.0</span> <span class="o">/</span> <span class="mf">4653106810017.0</span><span class="p">,</span>
+        <span class="mf">39811658682819.0</span> <span class="o">/</span> <span class="mf">14781729060964.0</span><span class="p">,</span>
+        <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mi">11805205429139</span><span class="p">,</span>
+    <span class="p">]</span>
 
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
             <span class="p">[</span>
-                <span class="p">[</span>
-                    <span class="o">-</span><span class="mf">6225479754948.0</span> <span class="o">/</span> <span class="mi">6925873918471</span><span class="p">,</span>
-                    <span class="mf">6894665360202.0</span> <span class="o">/</span> <span class="mf">11185215031699.0</span><span class="p">,</span>
-                    <span class="o">-</span><span class="mf">2508324082331.0</span> <span class="o">/</span> <span class="mi">20512393166649</span><span class="p">,</span>
-                    <span class="o">-</span><span class="mf">7289596211309.0</span> <span class="o">/</span> <span class="mi">4653106810017</span><span class="p">,</span>
-                    <span class="mf">39811658682819.0</span> <span class="o">/</span> <span class="mf">14781729060964.0</span><span class="p">,</span>
-                    <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mi">11805205429139</span><span class="p">,</span>
-                <span class="p">],</span>
-                <span class="p">[</span>
-                    <span class="o">-</span><span class="mf">2512930284403.0</span> <span class="o">/</span> <span class="mi">5616797563683</span><span class="p">,</span>
-                    <span class="mf">5849584892053.0</span> <span class="o">/</span> <span class="mi">8244045029872</span><span class="p">,</span>
-                    <span class="o">-</span><span class="mf">718651703996.0</span> <span class="o">/</span> <span class="mf">6000050726475.0</span><span class="p">,</span>
-                    <span class="o">-</span><span class="mf">18982822128277.0</span> <span class="o">/</span> <span class="mf">13735826808854.0</span><span class="p">,</span>
-                    <span class="mf">23127941173280.0</span> <span class="o">/</span> <span class="mf">11608435116569.0</span><span class="p">,</span>
-                    <span class="mf">2847520232427.0</span> <span class="o">/</span> <span class="mf">11515777524847.0</span><span class="p">,</span>
-                <span class="p">],</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;butcher_tableau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+                <span class="o">-</span><span class="mf">6225479754948.0</span> <span class="o">/</span> <span class="mi">6925873918471</span><span class="p">,</span>
+                <span class="mf">6894665360202.0</span> <span class="o">/</span> <span class="mf">11185215031699.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">2508324082331.0</span> <span class="o">/</span> <span class="mi">20512393166649</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">7289596211309.0</span> <span class="o">/</span> <span class="mi">4653106810017</span><span class="p">,</span>
+                <span class="mf">39811658682819.0</span> <span class="o">/</span> <span class="mf">14781729060964.0</span><span class="p">,</span>
+                <span class="mf">3282482714977.0</span> <span class="o">/</span> <span class="mi">11805205429139</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+                <span class="o">-</span><span class="mf">2512930284403.0</span> <span class="o">/</span> <span class="mi">5616797563683</span><span class="p">,</span>
+                <span class="mf">5849584892053.0</span> <span class="o">/</span> <span class="mi">8244045029872</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">718651703996.0</span> <span class="o">/</span> <span class="mf">6000050726475.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">18982822128277.0</span> <span class="o">/</span> <span class="mf">13735826808854.0</span><span class="p">,</span>
+                <span class="mf">23127941173280.0</span> <span class="o">/</span> <span class="mf">11608435116569.0</span><span class="p">,</span>
+                <span class="mf">2847520232427.0</span> <span class="o">/</span> <span class="mf">11515777524847.0</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
 <div class="viewcode-block" id="ESDIRK53.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>

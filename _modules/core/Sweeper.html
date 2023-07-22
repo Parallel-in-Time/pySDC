@@ -102,9 +102,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
-        <span class="n">coll</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s1">&#39;we need to do a collocation update here, since the right end point is not a node. Changing this!&#39;</span>
             <span class="p">)</span>
@@ -112,9 +112,6 @@
 
         <span class="c1"># This will be set as soon as the sweeper is instantiated at the level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># collocation object</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">coll</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
 

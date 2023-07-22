@@ -266,10 +266,20 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.build_f">build_f() (penningtrap method)</a>
 </li>
-      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.butcher_tableau">butcher_tableau (RungeKutta attribute)</a>
-</li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau">ButcherTableau (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.ButcherTableauClass">ButcherTableauClass (Cash_Karp attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.ButcherTableauClass">(DIRK43 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.ButcherTableauClass">(ESDIRK53 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.ButcherTableauClass">(Heun_Euler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass">(RungeKutta attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded">ButcherTableauEmbedded (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
   </ul></td>
@@ -1177,6 +1187,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix">get2DUpwindMatrix() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
 </li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau">get_Butcher_tableau() (RungeKutta class method)</a>
+</li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.get_convergence_controllers_as_table">get_convergence_controllers_as_table() (controller method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">get_extrapolated_error() (EstimateExtrapolationErrorNonMPI method)</a>
@@ -1239,6 +1251,8 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.get_problem_dict">get_problem_dict() (battery_n_capacitors method)</a>
 </li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">get_Q_matrix() (RungeKutta class method)</a>
+</li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.get_Qdelta_explicit">get_Qdelta_explicit() (sweeper method)</a>
 </li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.get_Qdelta_implicit">get_Qdelta_implicit() (sweeper method)</a>
@@ -1247,10 +1261,10 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">get_scalar_problems_manysweep_mats() (boris_2nd_order method)</a>
 </li>
-      <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">get_scalar_problems_picardsweep_mats() (boris_2nd_order method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">get_scalar_problems_picardsweep_mats() (boris_2nd_order method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">get_scalar_problems_sweeper_mats() (boris_2nd_order method)</a>
 
       <ul>
@@ -2334,6 +2348,30 @@
       </ul></li>
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.fields.magn">magn (fields attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.matrix">matrix (BackwardEuler attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.matrix">(Cash_Karp attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.matrix">(CrankNicholson attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.matrix">(DIRK43 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.matrix">(ESDIRK53 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.matrix">(ExplicitMidpointMethod attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.matrix">(ForwardEuler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.matrix">(Heun_Euler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.matrix">(ImplicitMidpointMethod attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4.matrix">(RK4 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.matrix">(RungeKutta attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.mesh">mesh (acoustic_1d_imex attribute)</a>
 
       <ul>
@@ -2627,12 +2665,36 @@
 </li>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors_periodic">next_neighbors_periodic() (in module helpers.transfer_helper)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Nodes.html#core.Nodes.NodesGenerator.node_type">node_type (NodesGenerator attribute)</a>
 </li>
-      <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.nodes">nodes (CollBase attribute)</a>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.nodes">nodes (BackwardEuler attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.nodes">(Cash_Karp attribute)</a>
 </li>
+        <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.nodes">(CollBase attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.nodes">(CrankNicholson attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.nodes">(DIRK43 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.nodes">(ESDIRK53 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.nodes">(ExplicitMidpointMethod attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.nodes">(ForwardEuler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.nodes">(Heun_Euler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.nodes">(ImplicitMidpointMethod attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4.nodes">(RK4 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.nodes">(RungeKutta attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Nodes.html#core.Nodes.NodesError">NodesError</a>
 </li>
       <li><a href="pySDC/core.Nodes.html#core.Nodes.NodesGenerator">NodesGenerator (class in core.Nodes)</a>
@@ -3571,16 +3633,38 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2">w2 (fenics_grayscott attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt">wait_with_interrupt() (controller_MPI method)</a>
 </li>
-      <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.weights">weights (CollBase attribute)</a>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler.weights">weights (BackwardEuler attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.weights">(Cash_Karp attribute)</a>
+</li>
+        <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.weights">(CollBase attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson.weights">(CrankNicholson attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.weights">(DIRK43 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.weights">(ESDIRK53 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod.weights">(ExplicitMidpointMethod attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler.weights">(ForwardEuler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.weights">(Heun_Euler attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod.weights">(ImplicitMidpointMethod attribute)</a>
+</li>
         <li><a href="pySDC/core.Lagrange.html#core.Lagrange.LagrangeApproximation.weights">(LagrangeApproximation attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4.weights">(RK4 attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.weights">(RungeKutta attribute)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.welcome_message">welcome_message() (controller method)</a>
 </li>
       <li><a href="pySDC/core.Problem.html#core.Problem.WorkCounter">WorkCounter (class in core.Problem)</a>
