@@ -222,8 +222,8 @@ class battery_n_capacitors(ptype):
             Indicates if a switch is found or not.
         m_guess : int
             Index of collocation node inside one subinterval of where the discrete event was found.
-        vC_switch : list
-            Contains function values of switching condition (for interpolation).
+        state_function : list
+            Contains values of the state function (for interpolation).
         """
 
         switch_detected = False
@@ -242,9 +242,9 @@ class battery_n_capacitors(ptype):
             if break_flag:
                 break
 
-        vC_switch = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
+        state_function = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
 
-        return switch_detected, m_guess, vC_switch
+        return switch_detected, m_guess, state_function
 
     def count_switches(self):
         """
@@ -273,8 +273,12 @@ class battery_n_capacitors(ptype):
 
 class battery(battery_n_capacitors):
     r"""
-    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. The ODE system
-    of this model is given by the following equations. If :math:`v_1 > V_{ref, 0}:`
+    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. This model is an example
+    of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has
+    a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by
+    the following equations:
+
+    If :math:`h(v_1) := v_1 - V_{ref, 0} > 0:`
 
     .. math::
         \frac{d i_L (t)}{dt} = 0,
@@ -282,14 +286,15 @@ class battery(battery_n_capacitors):
     .. math::
         \frac{d v_1 (t)}{dt} = -\frac{1}{CR}v_1 (t),
 
-    where :math:`i_L` denotes the function of the current over time :math:`t`.
-    If :math:`v_1 \leq V_{ref, 0}:`
+    else:
 
     .. math::
         \frac{d i_L(t)}{dt} = -\frac{R_s + R}{L}i_L (t) + \frac{1}{L} V_s,
 
     .. math::
-        \frac{d v_1(t)}{dt} = 0.
+        \frac{d v_1(t)}{dt} = 0,
+
+    where :math:`i_L` denotes the function of the current over time :math:`t`.
 
     Note
     ----
@@ -320,7 +325,7 @@ class battery(battery_n_capacitors):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if u[1] <= self.V_ref[0] or t >= t_switch:
+        if u[1] - self.V_ref[0] <= 0 or t >= t_switch:
             f.expl[0] = self.Vs / self.L
 
         else:
@@ -352,7 +357,7 @@ class battery(battery_n_capacitors):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if rhs[1] <= self.V_ref[0] or t >= t_switch:
+        if rhs[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
 
         else:
@@ -469,7 +474,7 @@ class battery_implicit(battery):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if u[1] <= self.V_ref[0] or t >= t_switch:
+        if u[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
             non_f[0] = self.Vs
 
@@ -507,7 +512,7 @@ class battery_implicit(battery):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if rhs[1] <= self.V_ref[0] or t >= t_switch:
+        if rhs[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
             non_f[0] = self.Vs
 
