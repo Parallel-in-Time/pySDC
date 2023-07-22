@@ -1,7 +1,6 @@
 Parallel-in-time simulation for multi-modal energy systems
 ==========================================================
 
-#In this project, we want to model energy systems as systems of ordinary differential equations to simulate them in parallel in time. Here, the focus lies on a simulation faster than real-time. Our first energy system that we consider is the DC microgrid, which consists of a Pi-model transmission line, buck (step-down) converters and a battery drain model. In the last two components there occur discrete events due to switching processes and we are interested in how SDC and PFASST can handle with it.
 This project deals with the parallel-in-time simulation of energy systems. Components of, for example, an DC-DC microgrid are:
 
     - the pi-line, and
