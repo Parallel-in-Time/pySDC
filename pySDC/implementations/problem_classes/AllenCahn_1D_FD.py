@@ -649,7 +649,6 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
             The solution as mesh.
         """
 
-
         me = self.dtype_u(u0)
         me[:] = spsolve(sp.eye(self.nvars, format='csc') - factor * self.A, rhs)
         return me
