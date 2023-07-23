@@ -11,11 +11,11 @@ class advectiondiffusion1d_imex(ptype):
     Example implementing the unforced one-dimensional advection diffusion equation
 
     .. math::
-        \frac{\partial u}{\partial t} = - c \frac{\partial u}{\partial x} + \nu \frac{\partial^2 u}{\partial x^2}
+        \frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}
 
     with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. The advection part
-    :math:`- c \frac{\partial u}{\partial x}` is treated explicitly, whereas the diffusion part
-    :math:`\nu \frac{\partial^2 u}{\partial x^2}` will be treated numerically in an implicit way. The exact solution is
+    :math:`- c \frac{\partial u(x,t)}{\partial x}` is treated explicitly, whereas the diffusion part
+    :math:`\nu \frac{\partial^2 u(x,t)}{\partial x^2}` will be treated numerically in an implicit way. The exact solution is
     given by
 
     .. math::
@@ -165,7 +165,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     Example implementing the unforced one-dimensional advection diffusion equation
 
     .. math::
-        \frac{\partial u}{\partial t} = - c \frac{\partial u}{\partial x} + \nu \frac{\partial^2 u}{\partial x^2}
+        \frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}
 
     with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. This class implements the problem solving it
     with fully-implicit time-stepping. The exact solution is
