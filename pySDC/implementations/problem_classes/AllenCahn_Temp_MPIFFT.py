@@ -14,12 +14,41 @@ class allencahn_temp_imex(ptype):
 
     mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
 
-    Attributes:
-        fft: fft object
-        X: grid coordinates in real space
-        K2: Laplace operator in spectral space
-        dx: mesh width in x direction
-        dy: mesh width in y direction
+    Attributes
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    spectral : bool
+        Indicates if spectral initial condition is used.
+    TM : float
+        Problem parameter.
+    D : float
+        Problem parameter.
+    dw : float
+        Problem parameter.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str, optional
+        Initialises type of initial state.
+    comm : bool, optional
+        Communicator.
+
+    Attributes
+    ----------
+    fft :
+        fft object.
+    X : np.ogrid
+        Grid coordinates in real space.
+    K2 : np.ndarray
+        Laplace operator in spectral space
+    dx : float
+        Mesh width in x direction
+    dy : float
+        Mesh width in y direction
     """
 
     dtype_u = mesh
@@ -29,10 +58,14 @@ class allencahn_temp_imex(ptype):
         """
         Initialization routine
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: fft data type (will be passed to parent class)
-            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
+        Parameters
+        ----------
+        problem_params : dict
+            Custom parameters for the example.
+        dtype_u :
+            fft data type (will be passed to parent class).
+        dtype_f :
+            fft data type wuth implicit and explicit parts (will be passed to parent class).
         """
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')

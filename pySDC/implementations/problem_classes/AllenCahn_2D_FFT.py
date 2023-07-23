@@ -10,12 +10,33 @@ class allencahn2d_imex(ptype):
     """
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
 
-    Attributes:
-        xvalues: grid points in space
-        dx: mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str
+        Indicates which type of initial condition is used.
+
+    Attributes
+    ----------
+    xvalues : np.ndarray
+        Grid points in space.
+    dx : float
+        Mesh width.
+    lap : np.ndarray
+        Spectral operator for Laplacian.
+    rfft_object :
+        Planned real FFT for forward transformation.
+    irfft_object :
+        Planned IFFT for backward transformation.
     """
 
     dtype_u = mesh
@@ -25,10 +46,14 @@ class allencahn2d_imex(ptype):
         """
         Initialization routine
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
+        Parameters
+        ----------
+        problem_params : dict
+            Custom parameters for the example
+        dtype_u :
+            mesh data type (will be passed to parent class)
+        dtype_f :
+            mesh data type with implicit and explicit parts (will be passed to parent class)
         """
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
@@ -161,12 +186,33 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
     stabilized splitting
 
-    Attributes:
-        xvalues: grid points in space
-        dx: mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str
+        Indicates which type of initial condition is used.
+
+    Attributes
+    ----------
+    xvalues : np.ndarray
+        Grid points in space.
+    dx : float
+        Mesh width.
+    lap : np.ndarray
+        Spectral operator for Laplacian.
+    rfft_object :
+        Planned real FFT for forward transformation.
+    irfft_object :
+        Planned IFFT for backward transformation.
     """
 
     def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):

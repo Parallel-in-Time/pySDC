@@ -11,11 +11,31 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 class allencahn_front_fullyimplicit(ptype):
     """
     Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-    with driving force, 0-1 formulation (Bayreuth example)
+    with driving force, 0-1 formulation (Bayreuth example).
 
-    Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    dw : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for Newton's method.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    interval : list
+        Interval of spatial domain.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if nan values arise.
+
+    Attributes
+    ----------
+    A : scipy.diags
+        Second-order FD discretization of the 1D laplace operator.
+    dx : float
+        Distance between two spatial nodes.
     """
 
     dtype_u = mesh
@@ -204,9 +224,12 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
     Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
     with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping
 
-    Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+    Attributes
+    ----------
+    A : scipy.diags
+        Second-order FD discretization of the 1D laplace operator.
+    dx : float
+        Distance between two spatial nodes.
     """
 
     dtype_f = imex_mesh
@@ -391,9 +414,31 @@ class allencahn_periodic_fullyimplicit(ptype):
     Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
     with driving force, 0-1 formulation (Bayreuth example)
 
-    Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    dw : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for Newton's method.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    interval : list
+        Interval of spatial domain.
+    radius : float
+        Radius of the circles.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if nan values arise.
+
+    Attributes
+    ----------
+    A : scipy.diags
+        Second-order FD discretization of the 1D laplace operator.
+    dx : float
+        Distance between two spatial nodes.
     """
 
     dtype_u = mesh
@@ -559,6 +604,25 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
     with driving force, 0-1 formulation (Bayreuth example)
+
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    dw : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for Newton's method.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    interval : list
+        Interval of spatial domain.
+    radius : float
+        Radius of the circles.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if nan values arise.
     """
 
     dtype_f = imex_mesh
@@ -620,6 +684,25 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
     with driving force, 0-1 formulation (Bayreuth example)
+
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    dw : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for Newton's method.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    interval : list
+        Interval of spatial domain.
+    radius : float
+        Radius of the circles.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if nan values arise.
     """
 
     dtype_f = comp2_mesh

@@ -14,9 +14,31 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
 
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for the Newton solver.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    lin_tol : float
+        Tolerance for linear solver to terminate.
+    lin_maxiter : int
+        Maximum number of iterations for the linear solver.
+    radius : float
+        Radius of the circles.
+
+    Attributes
+    ----------
+    A : scipy.spdiags
+        Second-order FD discretization of the 2D laplace operator.
+    dx : float
+        Distance between two spatial nodes (same for both directions).
     """
 
     dtype_u = cupy_mesh
@@ -26,10 +48,14 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
         """
         Initialization routine
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: cupy_mesh data type (will be passed parent class)
-            dtype_f: cupy_mesh data type (will be passed parent class)
+        Parameters
+        ----------
+        problem_params : dict
+            Custom parameters for the example.
+        dtype_u : cupy_mesh data type
+            (will be passed parent class)
+        dtype_f : cupy_mesh data type
+            (will be passed parent class)
         """
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:

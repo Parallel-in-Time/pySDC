@@ -18,9 +18,33 @@ class allencahn_fullyimplicit(ptype):
 
     TODO : doku
 
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for the Newton solver.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    lin_tol : float
+        Tolerance for linear solver to terminate.
+    lin_maxiter : int
+        Maximum number of iterations for the linear solver.
+    radius : float
+        Radius of the circles.
+    order : int
+        Order of the finite difference matrix.
+
+    Attributes
+    ----------
+    A : scipy.spdiags
+        Second-order FD discretization of the 2D laplace operator.
+    dx : float
+        Distance between two spatial nodes (same for both directions).
     """
 
     dtype_u = mesh

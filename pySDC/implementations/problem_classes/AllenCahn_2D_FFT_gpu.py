@@ -10,12 +10,33 @@ class allencahn2d_imex(ptype):  # pragma: no cover
     """
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
 
-    Attributes:
-        xvalues: grid points in space
-        dx: cupy_mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str
+        Indicates which type of initial condition is used.
+
+    Attributes
+    ----------
+    xvalues : cp.ndarray
+        Grid points in space.
+    dx : float
+        Cupy mesh width.
+    lap : cp.ndarray
+        Spectral operator for Laplacian.
+    rfft_object :
+        Planned real FFT for forward transformation.
+    irfft_object :
+        Planned IFFT for backward transformation.
     """
 
     dtype_u = cupy_mesh
@@ -141,12 +162,33 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
     stabilized splitting
 
-    Attributes:
-        xvalues: grid points in space
-        dx: mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str
+        Indicates which type of initial condition is used.
+
+    Attributes
+    ----------
+    xvalues : cp.ndarray
+        Grid points in space.
+    dx : float
+        Cupy mesh width.
+    lap : cp.ndarray
+        Spectral operator for Laplacian.
+    rfft_object :
+        Planned real FFT for forward transformation.
+    irfft_object :
+        Planned IFFT for backward transformation.
     """
 
     def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
