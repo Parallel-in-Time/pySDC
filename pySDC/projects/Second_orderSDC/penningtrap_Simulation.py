@@ -438,14 +438,14 @@ class compute_error(plotmanager):
 
     # run local convergence rate and plot the graph
 
-    def run_local_error(self):
+    def run_local_error(self):  # pragma: no cover
         self.compute_local_error_data()
         self.find_approximate_order()
         self.plot_convergence()
 
     # run global convergence rate and plot the graph
 
-    def run_global_error(self):
+    def run_global_error(self):  # pragma: no cover
         self.error_type = 'global'
         self.compute_global_error_data()
         self.find_approximate_order(filename='data/dt_vs_global_errorSDC.txt')
@@ -453,7 +453,7 @@ class compute_error(plotmanager):
 
     # def run_work_precision(self):
 
-    def run_work_precision(self, RKN=True, VV=False):
+    def run_work_precision(self, RKN=True, VV=False):  # pragma: no cover
         self.RKN = RKN
         self.VV = VV
         self.compute_global_error_data(work_counter=True)
@@ -1037,25 +1037,25 @@ class Stability_implementation(object):
         plt.savefig(self.cwd + "data/M={}_redion_{}.pdf".format(self.num_nodes, title))
 
     @property
-    def run_SDC_stability(self):
+    def run_SDC_stability(self):  # pragma: no cover
         self.RKN = False
         self.plot_stability(self.SDC, title="SDC stability region")
 
     @property
-    def run_Picard_stability(self):
+    def run_Picard_stability(self):  # pragma: no cover
         self.RKN = False
         self.plot_stability(self.picard, title="Picard stability region")
 
     @property
-    def run_Ksdc(self):
+    def run_Ksdc(self):  # pragma: no cover
         self.plot_spec_radius(self.Ksdc, title="$K_{sdc}$ spectral radius")
 
     @property
-    def run_Kpicard(self):
+    def run_Kpicard(self):  # pragma: no cover
         self.plot_spec_radius(self.Kpicard, title="$K_{picard}$ spectral radius")
 
     @property
-    def run_RKN_stability(self):
+    def run_RKN_stability(self):  # pragma: no cover
         self.RKN = True
         region_RKN = self.stability_data_RKN()
         self.plot_stability(region_RKN.T, title='RKN-4 stability region')
