@@ -19,36 +19,35 @@ def get_sweeper(sweeper_name):
     return eval(f'RK.{sweeper_name}')
 
 
-# @pytest.mark.base
-# @pytest.mark.parametrize('axis', [0, 2])
-# def test_global_convergence(axis):
-#     import numpy as np
+@pytest.mark.base
+@pytest.mark.parametrize('axis', [0, 2])
+def test_global_convergence(axis):
+    import numpy as np
 
-#     expected_order, num_order = BorisSDC_global_convergence()
+    expected_order, num_order = BorisSDC_global_convergence()
 
-#     assert np.isclose(
-#         num_order['position'][axis, :], expected_order['position'][axis, :], atol=2.6e-1
-#     ).all(), 'Expected order in {} {}, got {}!'.format(
-#         'position', expected_order['position'][axis, :], num_order['position'][axis, :]
-#     )
-
-
-# def BorisSDC_global_convergence():
-#     from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
-#     from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Convergence
+    assert np.isclose(
+        num_order['position'][axis, :], expected_order['position'][axis, :], atol=2.6e-1
+    ).all(), 'Expected order in {} {}, got {}!'.format(
+        'position', expected_order['position'][axis, :], num_order['position'][axis, :]
+    )
 
 
-#     controller_params, description = penningtrap_param()
-#     description['level_params']['dt'] = 0.015625 * 2
-#     conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2, 3))
-#     conv.error_type = 'Global'
-#     conv.compute_global_error_data()
+def BorisSDC_global_convergence():
+    from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+    from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
 
-#     conv.find_approximate_order(filename='data/Global-conv-data.txt')
+    controller_params, description = penningtrap_param()
+    description['level_params']['dt'] = 0.015625 * 2
+    conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3))
+    conv.error_type = 'global'
+    conv.compute_global_error_data()
 
-#     expected_order, num_order = sort_order(filename='data/Global_order_vs_approxorder.txt')
+    conv.find_approximate_order(filename='data/dt_vs_global_errorSDC.txt')
 
-#     return expected_order, num_order
+    expected_order, num_order = sort_order(filename='data/global_order_vs_approxorder.txt')
+
+    return expected_order, num_order
 
 
 def string_to_array(string):
