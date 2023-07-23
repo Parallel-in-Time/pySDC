@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.mark.base
 def test_stability():
     """
@@ -22,6 +23,7 @@ def test_stability():
     assert (
         SDC[-1, -1] > 1
     ), f'The SDC method is stable at mu={Stability.lambda_mu[-1]} and kappa={Stability.lambda_kappa[-1]}'
+
 
 @pytest.mark.base
 def test_RKN_stability():
