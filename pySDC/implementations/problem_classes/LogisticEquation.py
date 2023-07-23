@@ -18,11 +18,25 @@ class logistics_equation(ptype):
     .. math::
         u(t) = u(0) \frac{e^{\lambda t}}{1-u(0)+u(0)e^{\lambda t}}
 
+    Parameters
+    ----------
+    u0 : float, optional
+        Initial condition.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate.
+    direct : bool, optional
+        Indicates if the problem should be solved directly or not. If False, it will be approximated by Newton.
+    lam : float, optional
+        Problem parameter :math:`\lambda`.
+    stop_at_nan : bool, optional
+        Indicates if the Newton solver stops when nan values arise.
     """
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, u0, newton_maxiter, newton_tol, direct, lam=1, stop_at_nan=True):
+    def __init__(self, u0=0.5, newton_maxiter=100, newton_tol=1e-12, direct=True, lam=1, stop_at_nan=True):
         nvars = 1
 
         super().__init__((nvars, None, np.dtype('float64')))
@@ -40,12 +54,17 @@ class logistics_equation(ptype):
 
     def u_exact(self, t):
         """
-        Exact solution
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: mesh type containing the values
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         me = self.dtype_u(self.init)
@@ -54,13 +73,19 @@ class logistics_equation(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS
+        Routine to compute the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): the current values
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS, 1 component
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem (contains one component).
         """
 
         f = self.dtype_f(self.init)
@@ -69,16 +94,23 @@ class logistics_equation(ptype):
 
     def solve_system(self, rhs, dt, u0, t):
         """
-        Simple Newton solver for the nonlinear equation
+        Simple Newton solver for the nonlinear equation.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f)
+            Right-hand side for the nonlinear system.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
