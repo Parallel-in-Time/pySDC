@@ -1,5 +1,3 @@
-exec(open("check_data_folder.py").read())
-
 import numpy as np
 
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
@@ -70,6 +68,7 @@ if __name__ == '__main__':
 
         https://beltoforion.de/en/harmonic_oscillator/
     """
+    # exec(open("check_data_folder.py").read())
     description = dampedharmonic_oscillator_params()
     Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
     Stability.run_SDC_stability

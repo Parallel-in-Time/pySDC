@@ -16,11 +16,7 @@ from pySDC.core.Errors import ProblemError
 from pySDC.core.Step import step
 
 
-class Convergence(object):
-    """
-    Implementation of convergence plot for the Second order SDC
-    """
-
+class plotmanager(object):  # pragma: no cover
     def __init__(self, controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd=''):
         self.controller_params = controller_params
         self.description = description
@@ -31,22 +27,7 @@ class Convergence(object):
         self.cwd = cwd
         self.quad_type = self.description['sweeper_params']['quad_type']
         self.num_nodes = self.description['sweeper_params']['num_nodes']
-        self.error_type = 'Local'
-
-    # run local convergence rate and plot the graph
-    @property
-    def run_local_error(self):
-        self.compute_local_error_data()
-        self.find_approximate_order()
-        self.plot_convergence()
-
-    # run global convergence rate and plot the graph
-    @property
-    def run_global_error(self):
-        self.error_type = 'Global'
-        self.compute_global_error_data()
-        self.find_approximate_order(filename='data/Global-conv-data.txt')
-        self.plot_convergence()
+        self.error_type = 'local'
 
     """
     Plot convergence order plots for the position and velocity
@@ -55,7 +36,7 @@ class Convergence(object):
     def plot_convergence(self):  # pragma: no cover
         fs = 16
         [N, time_data, error_data, order_data, convline] = self.organize_data(
-            filename='data/{}-conv-data.txt'.format(self.error_type)
+            filename='data/dt_vs_{}_errorSDC.txt'.format(self.error_type)
         )
 
         color = ['r', 'brown', 'g', 'blue']
@@ -150,766 +131,6 @@ class Convergence(object):
         fig2.savefig(self.cwd + 'data/{}_conv_plot_vel{}.pdf'.format(self.error_type, value + 1))
         plt.show()
 
-    """
-    Compute local convergece data and save it
-    """
-
-    def compute_local_error_data(self):
-        step_params = dict()
-        dt_val = self.description['level_params']['dt']
-
-        # Error storage. It is only for the test
-        error_test = dict()
-        error_test['pos'] = dict()
-        error_test['vel'] = dict()
-        error_test['time'] = dict()
-        error = dict()
-        for order in self.K_iter:
-            # define storage for the local error
-            # error={'pos': np.zeros([1,3]), 'vel': np.zeros([1,3])}
-            error['pos'] = np.zeros([3, self.time_iter])
-            error['vel'] = np.zeros([3, self.time_iter])
-
-            step_params['maxiter'] = order
-            self.description['step_params'] = step_params
-
-            if order == self.K_iter[0]:
-                file = open(self.cwd + 'data/Local-conv-data.txt', 'w')
-            else:
-                file = open(self.cwd + 'data/Local-conv-data.txt', 'a')
-
-            for ii in range(0, self.time_iter):
-                dt = dt_val / 2**ii
-
-                self.description['level_params']['dt'] = dt
-                self.description['level_params'] = self.description['level_params']
-
-                # instantiate the controller (no controller parameters used here)
-                controller = controller_nonMPI(
-                    num_procs=1, controller_params=self.controller_params, description=self.description
-                )
-
-                # set time parameters
-                t0 = 0.0
-                Tend = dt
-
-                # get initial values on finest level
-                P = controller.MS[0].levels[0].prob
-                uinit = P.u_init()
-
-                # call main function to get things done...
-                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-                # compute exact solution and compare
-                uex = P.u_exact(Tend)
-
-                # find order of quadrature rule
-                coll_order = controller.MS[0].levels[0].sweep.coll.order
-
-                # find order of convergence for the postion and velocity
-                order_pos = self.local_order_pos(order, coll_order)
-                order_vel = self.local_order_vel(order, coll_order)
-                # evaluate error
-                error['pos'][:, ii] = np.abs((uex - uend).pos).T
-                error['vel'][:, ii] = np.abs((uex - uend).vel).T
-                if order == self.K_iter[0]:
-                    error_test['pos'][dt] = error['pos']
-                    error_test['vel'][dt] = error['vel']
-                dt_omega = dt * self.description['problem_params']['omega_B']
-                file.write(
-                    str(dt_omega)
-                    + " * "
-                    + str(order_pos)
-                    + " * "
-                    + str(error['pos'][:, ii])
-                    + " * "
-                    + str(order_vel)
-                    + " * "
-                    + str(error['vel'][:, ii])
-                    + '\n'
-                )
-
-            file.close()
-
-    """
-
-    Compute global convergence data and save it data folder
-
-    """
-
-    def compute_global_error_data(self):
-        convergence_data.Tend = self.Tend
-        self.controller_params['hook_class'] = convergence_data
-        step_params = dict()
-        dt_val = self.description['level_params']['dt']
-
-        values = ['position', 'velocity']
-
-        error = dict()
-
-        for order in self.K_iter:
-            # define storage for the global error
-            error['position'] = np.zeros([3, self.time_iter])
-            error['velocity'] = np.zeros([3, self.time_iter])
-            u_val = dict()
-            uex_val = dict()
-
-            step_params['maxiter'] = order
-            self.description['step_params'] = step_params
-
-            if order == self.K_iter[0]:
-                file = open(self.cwd + 'data/Global-conv-data.txt', 'w')
-            else:
-                file = open(self.cwd + 'data/Global-conv-data.txt', 'a')
-
-            for ii in range(0, self.time_iter):
-                dt = dt_val / 2**ii
-
-                self.description['level_params']['dt'] = dt
-                self.description['level_params'] = self.description['level_params']
-
-                # instantiate the controller (no controller parameters used here)
-                controller = controller_nonMPI(
-                    num_procs=1, controller_params=self.controller_params, description=self.description
-                )
-
-                # set time parameters
-                t0 = 0.0
-                # Tend = dt
-                Tend = self.Tend
-
-                # get initial values on finest level
-                P = controller.MS[0].levels[0].prob
-                uinit = P.u_init()
-
-                # call main function to get things done...
-                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-                # extract values from stats
-                extract_stats = filter_stats(stats, type="error")
-                sortedlist_stats = sort_stats(extract_stats, sortby="time")
-
-                sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
-                sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
-                # sort values and compute error
-                for _, nn in enumerate(values):
-                    data = sortedlist_stats[0][1][nn].values()
-                    u_val[nn] = np.array(list(data))
-                    u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
-
-                    data = sortedlist_stats[0][1][nn + "_exact"].values()
-                    uex_val[nn] = np.array(list(data))
-                    uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
-
-                    error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
-                coll_order = controller.MS[0].levels[0].sweep.coll.order
-                global_order = self.global_order(order, coll_order)
-                dt_omega = dt * self.description['problem_params']['omega_B']
-
-                file.write(
-                    str(dt_omega)
-                    + " * "
-                    + str(global_order)
-                    + " * "
-                    + str(error['position'][:, ii])
-                    + " * "
-                    + str(global_order)
-                    + " * "
-                    + str(error['velocity'][:, ii])
-                    + '\n'
-                )
-            file.close()
-
-    # find expected local convergence order for position
-    def local_order_pos(self, order_K, order_quad):
-        if self.description['sweeper_params']['initial_guess'] == 'spread':
-            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
-                return np.array([np.min([order_K + 2 + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
-            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
-                return np.array([np.min([order_K + 2 + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
-            else:
-                raise NotImplementedError('order of convergence explicitly not implemented ')
-        else:
-            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
-                return np.array([np.min([order_K + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
-            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
-                return np.array([np.min([order_K + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
-            else:
-                raise NotImplementedError('order of convergence explicitly not implemented ')
-
-    # find expected local convergence order for velocity
-    def local_order_vel(self, order_K, order_quad):
-        if self.description['sweeper_params']['initial_guess'] == 'spread':
-            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
-                return np.array([np.min([order_K + 1 + 2, order_quad]), np.min([2 * order_K + 2, order_quad])])
-            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
-                return np.array([np.min([order_K + 1 + 2, order_quad]), np.min([2 * order_K + 2, order_quad])])
-            else:
-                raise NotImplementedError('order of convergence explicitly not implemented ')
-        else:
-            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
-                return np.array([np.min([order_K + 1, order_quad]), np.min([2 * order_K + 2, order_quad])])
-            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
-                return np.array([np.min([order_K + 1, order_quad]), np.min([2 * order_K + 2, order_quad])])
-            else:
-                raise NotImplementedError('order of convergence explicitly not implemented ')
-
-    # find expected global convergence order
-    def global_order(self, order_K, order_quad):
-        if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
-            return np.array([np.min([order_K, order_quad]), np.min([2 * order_K, order_quad])])
-        elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
-            return np.array([np.min([order_K, order_quad]), np.min([2 * order_K, order_quad])]) + 2
-        else:
-            raise NotImplementedError('order of convergence explicitly not implemented ')
-
-    # compute relative error
-    def relative_error(self, u_ex, u):
-        return np.linalg.norm(np.abs((u_ex - u)), np.inf, 0) / np.linalg.norm(u_ex, np.inf, 0)
-
-    # convert string saved data into numpy array
-    def string_to_array(self, string):  # pragma: no cover
-        numbers = string.strip('[]').split()
-        array = [float(num) for num in numbers]
-        return np.array(array)
-
-    """
-
-    Seperate data to plot for the graph
-
-    """
-
-    def organize_data(self, filename='data/Local-conv-data.txt', time_iter=None):  # pragma: no cover
-        """
-        Organize data according to plot
-        Args:
-            filename (string): data to find approximate order
-        """
-        if time_iter == None:
-            time_iter = self.time_iter
-
-        time = np.array([])
-        order = {'pos': np.array([]).reshape([0, 2]), 'vel': np.array([]).reshape([0, 2])}
-        error = {'pos': np.array([]).reshape([0, 3]), 'vel': np.array([]).reshape([0, 3])}
-
-        file = open(self.cwd + filename, 'r')
-
-        while True:
-            line = file.readline()
-            if not line:
-                break
-
-            items = str.split(line, " * ", 5)
-            time = np.append(time, float(items[0]))
-
-            order['pos'] = np.vstack((order['pos'], self.string_to_array(items[1])))
-            order['vel'] = np.vstack((order['vel'], self.string_to_array(items[3])))
-            error['pos'] = np.vstack((error['pos'], self.string_to_array(items[2])))
-            error['vel'] = np.vstack((error['vel'], self.string_to_array(items[4][:-1])))
-
-        N = int(np.size(time) / time_iter)
-
-        error_data = {'pos': np.zeros([3, N, time_iter]), 'vel': np.zeros([3, N, time_iter])}
-        order_data = {'pos': np.zeros([N, time_iter, 2]), 'vel': np.zeros([N, time_iter, 2])}
-        time_data = np.zeros([N, time_iter])
-        convline = {'pos': np.zeros([3, N, time_iter]), 'vel': np.zeros([3, N, time_iter])}
-
-        time_data = time.reshape([N, time_iter])
-
-        order_data['pos'][:, :, 0] = order['pos'][:, 0].reshape([N, time_iter])
-        order_data['pos'][:, :, 1] = order['pos'][:, 1].reshape([N, time_iter])
-        order_data['vel'][:, :, 0] = order['vel'][:, 0].reshape([N, time_iter])
-        order_data['vel'][:, :, 1] = order['vel'][:, 1].reshape([N, time_iter])
-
-        for ii in range(0, 3):
-            error_data['pos'][ii, :, :] = error['pos'][:, ii].reshape([N, time_iter])
-            error_data['vel'][ii, :, :] = error['vel'][:, ii].reshape([N, time_iter])
-
-        for jj in range(0, 3):
-            if jj == 2:
-                convline['pos'][jj, :, :] = (
-                    (time_data / time_data[0, 0]).T ** order_data['pos'][:, jj, 1]
-                ).T * error_data['pos'][jj, :, 0][:, None]
-                convline['vel'][jj, :, :] = (
-                    (time_data / time_data[0, 0]).T ** order_data['vel'][:, jj, 1]
-                ).T * error_data['vel'][jj, :, 0][:, None]
-            else:
-                convline['pos'][jj, :, :] = (
-                    (time_data / time_data[0, 0]).T ** order_data['pos'][:, jj, 0]
-                ).T * error_data['pos'][jj, :, 0][:, None]
-                convline['vel'][jj, :, :] = (
-                    (time_data / time_data[0, 0]).T ** order_data['vel'][:, jj, 0]
-                ).T * error_data['vel'][jj, :, 0][:, None]
-
-        return [N, time_data, error_data, order_data, convline]
-
-    # find approximate order
-    def find_approximate_order(self, filename='data/Local-conv-data.txt'):
-        [N, time_data, error_data, order_data, convline] = self.organize_data(self.cwd + filename)
-        approx_order = {'pos': np.zeros([1, N]), 'vel': np.zeros([1, N])}
-
-        for jj in range(0, 3):
-            if jj == 0:
-                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format(self.error_type), 'w')
-            else:
-                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format(self.error_type), 'a')
-
-            for ii in range(0, N):
-                approx_order['pos'][0, ii] = np.polyfit(
-                    np.log(time_data[ii, :]), np.log(error_data['pos'][jj, ii, :]), 1
-                )[0].real
-                approx_order['vel'][0, ii] = np.polyfit(
-                    np.log(time_data[ii, :]), np.log(error_data['vel'][jj, ii, :]), 1
-                )[0].real
-            if jj == 2:
-                file.write(
-                    str(order_data['pos'][:, jj, 1])
-                    + ' * '
-                    + str(approx_order['pos'][0])
-                    + ' * '
-                    + str(order_data['vel'][:, jj, 1])
-                    + ' * '
-                    + str(approx_order['vel'][0])
-                    + '\n'
-                )
-            else:
-                file.write(
-                    str(order_data['pos'][:, jj, 0])
-                    + ' * '
-                    + str(approx_order['pos'][0])
-                    + ' * '
-                    + str(order_data['vel'][:, jj, 0])
-                    + ' * '
-                    + str(approx_order['vel'][0])
-                    + '\n'
-                )
-        file.close()
-
-
-class Work_precision(Convergence):
-
-    """
-    Implementation Work precision.
-
-    """
-
-    def __init__(
-        self,
-        controller_params,
-        description,
-        time_iter=3,
-        K_iter=(1, 2, 3),
-        Tend=2,
-        axes=(0,),
-        RKN=True,
-        VV=True,
-        cwd='',
-    ):
-        self.RKN = RKN
-        self.VV = VV
-
-        super().__init__(
-            controller_params, description, time_iter=time_iter, K_iter=K_iter, Tend=Tend, axes=axes, cwd=cwd
-        )
-
-    """
-    All of the implementations can be controlled in here
-    """
-
-    @property
-    def run_work_precision(self):
-        self.func_eval_SDC()
-        self.func_eval_Picard()
-        if self.RKN:
-            self.func_eval_RKN()
-        if self.VV:
-            self.func_eval_Velocity_Verlet()
-        self.plot_work_precision()
-
-    """
-    Compute RHS evalutations for the second order SDC method and save into data folder
-    """
-
-    def func_eval_SDC(self):
-        convergence_data.Tend = self.Tend
-        self.controller_params['hook_class'] = convergence_data
-        step_params = dict()
-        dt_val = self.description['level_params']['dt']
-
-        values = ['position', 'velocity']
-        time_iter = self.time_iter
-        error = dict()
-
-        for order in self.K_iter:
-            # define storage for the global error
-            error['position'] = np.zeros([3, time_iter])
-            error['velocity'] = np.zeros([3, time_iter])
-            u_val = dict()
-            uex_val = dict()
-
-            step_params['maxiter'] = order
-            self.description['step_params'] = step_params
-
-            if order == self.K_iter[0]:
-                file = open(
-                    self.cwd + 'data/func_eval_vs_error_SDC{}{}.txt'.format(self.time_iter, self.num_nodes), 'w'
-                )
-            else:
-                file = open(
-                    self.cwd + 'data/func_eval_vs_error_SDC{}{}.txt'.format(self.time_iter, self.num_nodes), 'a'
-                )
-
-            for ii in range(0, time_iter):
-                dt = (dt_val) / 2**ii
-
-                self.description['level_params']['dt'] = dt
-                self.description['level_params'] = self.description['level_params']
-
-                # instantiate the controller (no controller parameters used here)
-                controller = controller_nonMPI(
-                    num_procs=1, controller_params=self.controller_params, description=self.description
-                )
-
-                # set time parameters
-                t0 = 0.0
-                # Tend = dt
-                Tend = self.Tend
-
-                # get initial values on finest level
-                P = controller.MS[0].levels[0].prob
-                uinit = P.u_init()
-
-                # call main function to get things done...
-                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-                func_eval = P.work_counters['Boris_solver'].niter + P.work_counters['rhs'].niter
-                # extract values from stats
-                extract_stats = filter_stats(stats, type="error")
-                sortedlist_stats = sort_stats(extract_stats, sortby="time")
-
-                sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
-                sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
-                # sort values and compute error
-                for _, nn in enumerate(values):
-                    data = sortedlist_stats[0][1][nn].values()
-                    u_val[nn] = np.array(list(data))
-                    u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
-
-                    data = sortedlist_stats[0][1][nn + "_exact"].values()
-                    uex_val[nn] = np.array(list(data))
-                    uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
-
-                    error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
-                coll_order = controller.MS[0].levels[0].sweep.coll.order
-                global_order = self.global_order(order, coll_order)
-                # dt_omega=dt*self.description['problem_params']['omega_B']
-
-                file.write(
-                    str(func_eval)
-                    + " * "
-                    + str(global_order)
-                    + " * "
-                    + str(error['position'][:, ii])
-                    + " * "
-                    + str(global_order)
-                    + " * "
-                    + str(error['velocity'][:, ii])
-                    + '\n'
-                )
-            file.close()
-
-    """
-    Compute RHS evalutations for the Picard iteration and save into data folder
-    """
-
-    def func_eval_Picard(self):
-        convergence_data.Tend = self.Tend
-        description = self.description
-        description['sweeper_params']['QI'] = 'PIC'
-        description['sweeper_params']['QE'] = 'PIC'
-        self.controller_params['hook_class'] = convergence_data
-        step_params = dict()
-        dt_val = description['level_params']['dt']
-
-        values = ['position', 'velocity']
-
-        error = dict()
-
-        for order in self.K_iter:
-            # define storage for the global error
-            error['position'] = np.zeros([3, self.time_iter])
-            error['velocity'] = np.zeros([3, self.time_iter])
-            u_val = dict()
-            uex_val = dict()
-
-            step_params['maxiter'] = order
-            description['step_params'] = step_params
-
-            if order == self.K_iter[0]:
-                file = open(
-                    self.cwd + 'data/func_eval_vs_error_picard{}{}.txt'.format(self.time_iter, self.num_nodes), 'w'
-                )
-            else:
-                file = open(
-                    self.cwd + 'data/func_eval_vs_error_picard{}{}.txt'.format(self.time_iter, self.num_nodes), 'a'
-                )
-
-            # Controller for plot
-            if self.time_iter == 3:
-                cont = 2
-            else:
-                tt = np.abs(3 - self.time_iter)
-                cont = 2**tt + 2
-
-            for ii in range(0, self.time_iter):
-                dt = (dt_val * cont) / 2**ii
-
-                description['level_params']['dt'] = dt
-                description['level_params'] = self.description['level_params']
-
-                # instantiate the controller (no controller parameters used here)
-                controller = controller_nonMPI(
-                    num_procs=1, controller_params=self.controller_params, description=description
-                )
-
-                # set time parameters
-                t0 = 0.0
-                # Tend = dt
-                Tend = self.Tend
-
-                # get initial values on finest level
-                P = controller.MS[0].levels[0].prob
-                uinit = P.u_init()
-
-                # call main function to get things done...
-                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-                func_eval = P.work_counters['rhs'].niter
-                # extract values from stats
-                extract_stats = filter_stats(stats, type="error")
-                sortedlist_stats = sort_stats(extract_stats, sortby="time")
-
-                sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
-                sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
-                # sort values and compute error
-                for _, nn in enumerate(values):
-                    data = sortedlist_stats[0][1][nn].values()
-                    u_val[nn] = np.array(list(data))
-                    u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
-
-                    data = sortedlist_stats[0][1][nn + "_exact"].values()
-                    uex_val[nn] = np.array(list(data))
-                    uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
-
-                    error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
-                coll_order = controller.MS[0].levels[0].sweep.coll.order
-                global_order = self.global_order(order, coll_order)
-                # dt_omega=dt*self.description['problem_params']['omega_B']
-
-                file.write(
-                    str(func_eval)
-                    + " * "
-                    + str(global_order)
-                    + " * "
-                    + str(error['position'][:, ii])
-                    + " * "
-                    + str(global_order)
-                    + " * "
-                    + str(error['velocity'][:, ii])
-                    + '\n'
-                )
-            file.close()
-
-    """
-    Compute RHS evalutations for the Runge-Kutta-Nystrom method and save into data folder
-    """
-
-    def func_eval_RKN(self):
-        convergence_data.Tend = self.Tend
-        description = self.description
-        self.controller_params['hook_class'] = convergence_data
-        step_params = dict()
-        dt_val = description['level_params']['dt']
-        # description['level_params'].pop('restol')
-
-        values = ['position', 'velocity']
-
-        error = dict()
-
-        # define storage for the global error
-        error['position'] = np.zeros([3, self.time_iter])
-        error['velocity'] = np.zeros([3, self.time_iter])
-        u_val = dict()
-        uex_val = dict()
-        order = 1
-        step_params['maxiter'] = order
-        description['step_params'] = step_params
-        description['sweeper_class'] = RKN
-
-        file = open(self.cwd + 'data/func_eval_vs_error_RKN{}{}.txt'.format(self.time_iter, self.num_nodes), 'w')
-
-        # Controller for plot
-        if self.time_iter == 3:
-            cont = 1
-        else:
-            tt = np.abs(3 - self.time_iter)
-            cont = (1 / 4) ** tt
-
-        for ii in range(0, self.time_iter):
-            dt = (dt_val * cont) / 2**ii
-
-            description['level_params']['dt'] = dt
-            description['level_params'] = self.description['level_params']
-
-            # instantiate the controller (no controller parameters used here)
-            controller = controller_nonMPI(
-                num_procs=1, controller_params=self.controller_params, description=description
-            )
-
-            # set time parameters
-            t0 = 0.0
-            # Tend = dt
-            Tend = self.Tend
-
-            # get initial values on finest level
-            P = controller.MS[0].levels[0].prob
-            uinit = P.u_init()
-
-            # call main function to get things done...
-            uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-            func_eval = P.work_counters['rhs'].niter
-
-            # extract values from stats
-            extract_stats = filter_stats(stats, type="error")
-            sortedlist_stats = sort_stats(extract_stats, sortby="time")
-
-            sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
-            sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
-
-            # sort values and compute error
-            for _, nn in enumerate(values):
-                data = sortedlist_stats[0][1][nn].values()
-                u_val[nn] = np.array(list(data))
-                u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
-
-                data = sortedlist_stats[0][1][nn + "_exact"].values()
-                uex_val[nn] = np.array(list(data))
-                uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
-
-                error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
-
-            global_order = np.array([4, 4])
-            # dt_omega=dt*self.description['problem_params']['omega_B']
-
-            file.write(
-                str(func_eval)
-                + " * "
-                + str(global_order)
-                + " * "
-                + str(error['position'][:, ii])
-                + " * "
-                + str(global_order)
-                + " * "
-                + str(error['velocity'][:, ii])
-                + '\n'
-            )
-        file.close()
-
-    """
-    Compute RHS evalutations for the Velocity-Verlet scheme method and save into data folder
-    """
-
-    def func_eval_Velocity_Verlet(self):
-        convergence_data.Tend = self.Tend
-        description = self.description
-        self.controller_params['hook_class'] = convergence_data
-        step_params = dict()
-        dt_val = description['level_params']['dt']
-        # description['level_params'].pop('restol')
-
-        values = ['position', 'velocity']
-
-        error = dict()
-
-        # define storage for the global error
-        error['position'] = np.zeros([3, self.time_iter])
-        error['velocity'] = np.zeros([3, self.time_iter])
-        u_val = dict()
-        uex_val = dict()
-
-        step_params['maxiter'] = 1
-        description['step_params'] = step_params
-        description['sweeper_class'] = Velocity_Verlet
-
-        # if order ==self.K_iter[0]:
-        file = open(self.cwd + 'data/func_eval_vs_error_VV{}{}.txt'.format(self.time_iter, self.num_nodes), 'w')
-
-        # Controller for plot
-        if self.time_iter == 3:
-            cont = 1
-        else:
-            tt = np.abs(3 - self.time_iter)
-            cont = 8**tt + 8
-
-        for ii in range(0, self.time_iter):
-            dt = (dt_val * cont) / 2**ii
-
-            description['level_params']['dt'] = dt
-            description['level_params'] = self.description['level_params']
-
-            # instantiate the controller (no controller parameters used here)
-            controller = controller_nonMPI(
-                num_procs=1, controller_params=self.controller_params, description=description
-            )
-
-            # set time parameters
-            t0 = 0.0
-            # Tend = dt
-            Tend = self.Tend
-
-            # get initial values on finest level
-            P = controller.MS[0].levels[0].prob
-            uinit = P.u_init()
-
-            # call main function to get things done...
-            uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-            func_eval = P.work_counters['rhs'].niter
-            # extract values from stats
-            extract_stats = filter_stats(stats, type="error")
-            sortedlist_stats = sort_stats(extract_stats, sortby="time")
-
-            sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
-            sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
-
-            # sort values and compute error
-            for _, nn in enumerate(values):
-                data = sortedlist_stats[0][1][nn].values()
-                u_val[nn] = np.array(list(data))
-                u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
-
-                data = sortedlist_stats[0][1][nn + "_exact"].values()
-                uex_val[nn] = np.array(list(data))
-                uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
-
-                error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
-
-            global_order = np.array([2, 2])
-
-            file.write(
-                str(func_eval)
-                + " * "
-                + str(global_order)
-                + " * "
-                + str(error['position'][:, ii])
-                + " * "
-                + str(global_order)
-                + " * "
-                + str(error['velocity'][:, ii])
-                + '\n'
-            )
-        file.close()
-
     def format_number(self, data_value, indx):  # pragma: no cover
         if data_value >= 1_000_000:
             formatter = "{:1.1f}M".format(data_value * 0.000_001)
@@ -924,12 +145,12 @@ class Work_precision(Convergence):
     def plot_work_precision(self):  # pragma: no cover
         fs = 16
         [N, func_eval_SDC, error_SDC, *_] = self.organize_data(
-            filename=self.cwd + 'data/func_eval_vs_error_SDC{}{}.txt'.format(self.time_iter, self.num_nodes),
+            filename=self.cwd + 'data/rhs_eval_vs_global_errorSDC.txt',
             time_iter=self.time_iter,
         )
 
         [N, func_eval_picard, error_picard, *_] = self.organize_data(
-            filename=self.cwd + 'data/func_eval_vs_error_picard{}{}.txt'.format(self.time_iter, self.num_nodes),
+            filename=self.cwd + 'data/rhs_eval_vs_global_errorPicard.txt',
             time_iter=self.time_iter,
         )
 
@@ -947,13 +168,13 @@ class Work_precision(Convergence):
 
         if self.RKN:
             [N, func_eval_RKN, error_RKN, *_] = self.organize_data(
-                filename=self.cwd + 'data/func_eval_vs_error_RKN{}{}.txt'.format(self.time_iter, self.num_nodes),
+                filename=self.cwd + 'data/rhs_eval_vs_global_errorRKN.txt',
                 time_iter=self.time_iter,
             )
 
             ax1.loglog(
-                func_eval_RKN[0][1:],
-                error_RKN['pos'][value,][0][:][1:],
+                func_eval_RKN[0],
+                error_RKN['pos'][value,][0][:],
                 ls='dashdot',
                 color='purple',
                 marker='p',
@@ -961,8 +182,8 @@ class Work_precision(Convergence):
                 markersize=fs - 3,
             )
             ax2.loglog(
-                func_eval_RKN[0][1:],
-                error_RKN['vel'][value,][0][:][1:],
+                func_eval_RKN[0],
+                error_RKN['vel'][value,][0][:],
                 ls='dashdot',
                 color='purple',
                 marker='p',
@@ -971,7 +192,7 @@ class Work_precision(Convergence):
             )
         if self.VV:
             [N, func_eval_VV, error_VV, *_] = self.organize_data(
-                filename=self.cwd + 'data/func_eval_vs_error_VV{}{}.txt'.format(self.time_iter, self.num_nodes),
+                filename=self.cwd + 'data/rhs_eval_vs_global_errorVV.txt',
                 time_iter=self.time_iter,
             )
 
@@ -1088,6 +309,507 @@ class Work_precision(Convergence):
         fig2.savefig(self.cwd + "data/f_eval_vel_{}_M={}.pdf".format(value, self.num_nodes))
 
         plt.show()
+
+    def string_to_array(self, string):  # pragma: no cover
+        numbers = string.strip('[]').split()
+        array = [float(num) for num in numbers]
+        return np.array(array)
+
+    """
+
+    Seperate data to plot for the graph
+
+    """
+
+    def organize_data(self, filename='data/dt_vs_local_errorSDC.txt', time_iter=None):  # pragma: no cover
+        """
+        Organize data according to plot
+        Args:
+            filename (string): data to find approximate order
+        """
+        if time_iter == None:
+            time_iter = self.time_iter
+
+        time = np.array([])
+        order = {'pos': np.array([]).reshape([0, 2]), 'vel': np.array([]).reshape([0, 2])}
+        error = {'pos': np.array([]).reshape([0, 3]), 'vel': np.array([]).reshape([0, 3])}
+
+        file = open(self.cwd + filename, 'r')
+
+        while True:
+            line = file.readline()
+            if not line:
+                break
+
+            items = str.split(line, " * ", 5)
+            time = np.append(time, float(items[0]))
+
+            order['pos'] = np.vstack((order['pos'], self.string_to_array(items[1])))
+            order['vel'] = np.vstack((order['vel'], self.string_to_array(items[3])))
+            error['pos'] = np.vstack((error['pos'], self.string_to_array(items[2])))
+            error['vel'] = np.vstack((error['vel'], self.string_to_array(items[4][:-1])))
+
+        N = int(np.size(time) / time_iter)
+
+        error_data = {'pos': np.zeros([3, N, time_iter]), 'vel': np.zeros([3, N, time_iter])}
+        order_data = {'pos': np.zeros([N, time_iter, 2]), 'vel': np.zeros([N, time_iter, 2])}
+        time_data = np.zeros([N, time_iter])
+        convline = {'pos': np.zeros([3, N, time_iter]), 'vel': np.zeros([3, N, time_iter])}
+
+        time_data = time.reshape([N, time_iter])
+
+        order_data['pos'][:, :, 0] = order['pos'][:, 0].reshape([N, time_iter])
+        order_data['pos'][:, :, 1] = order['pos'][:, 1].reshape([N, time_iter])
+        order_data['vel'][:, :, 0] = order['vel'][:, 0].reshape([N, time_iter])
+        order_data['vel'][:, :, 1] = order['vel'][:, 1].reshape([N, time_iter])
+
+        for ii in range(0, 3):
+            error_data['pos'][ii, :, :] = error['pos'][:, ii].reshape([N, time_iter])
+            error_data['vel'][ii, :, :] = error['vel'][:, ii].reshape([N, time_iter])
+
+        for jj in range(0, 3):
+            if jj == 2:
+                convline['pos'][jj, :, :] = (
+                    (time_data / time_data[0, 0]).T ** order_data['pos'][:, jj, 1]
+                ).T * error_data['pos'][jj, :, 0][:, None]
+                convline['vel'][jj, :, :] = (
+                    (time_data / time_data[0, 0]).T ** order_data['vel'][:, jj, 1]
+                ).T * error_data['vel'][jj, :, 0][:, None]
+            else:
+                convline['pos'][jj, :, :] = (
+                    (time_data / time_data[0, 0]).T ** order_data['pos'][:, jj, 0]
+                ).T * error_data['pos'][jj, :, 0][:, None]
+                convline['vel'][jj, :, :] = (
+                    (time_data / time_data[0, 0]).T ** order_data['vel'][:, jj, 0]
+                ).T * error_data['vel'][jj, :, 0][:, None]
+
+        return [N, time_data, error_data, order_data, convline]
+
+    # find approximate order
+    def find_approximate_order(self, filename='data/dt_vs_local_errorSDC.txt'):
+        [N, time_data, error_data, order_data, convline] = self.organize_data(self.cwd + filename)
+        approx_order = {'pos': np.zeros([1, N]), 'vel': np.zeros([1, N])}
+
+        for jj in range(0, 3):
+            if jj == 0:
+                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format(self.error_type), 'w')
+            else:
+                file = open(self.cwd + 'data/{}_order_vs_approxorder.txt'.format(self.error_type), 'a')
+
+            for ii in range(0, N):
+                approx_order['pos'][0, ii] = np.polyfit(
+                    np.log(time_data[ii, :]), np.log(error_data['pos'][jj, ii, :]), 1
+                )[0].real
+                approx_order['vel'][0, ii] = np.polyfit(
+                    np.log(time_data[ii, :]), np.log(error_data['vel'][jj, ii, :]), 1
+                )[0].real
+            if jj == 2:
+                file.write(
+                    str(order_data['pos'][:, jj, 1])
+                    + ' * '
+                    + str(approx_order['pos'][0])
+                    + ' * '
+                    + str(order_data['vel'][:, jj, 1])
+                    + ' * '
+                    + str(approx_order['vel'][0])
+                    + '\n'
+                )
+            else:
+                file.write(
+                    str(order_data['pos'][:, jj, 0])
+                    + ' * '
+                    + str(approx_order['pos'][0])
+                    + ' * '
+                    + str(order_data['vel'][:, jj, 0])
+                    + ' * '
+                    + str(approx_order['vel'][0])
+                    + '\n'
+                )
+        file.close()
+
+
+class compute_error(plotmanager):
+    """
+    Implementation of convergence plot for the Second order SDC
+    """
+
+    def __init__(self, controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd=''):
+        super().__init__(controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd='')
+
+    # run local convergence rate and plot the graph
+
+    def run_local_error(self):
+        self.compute_local_error_data()
+        self.find_approximate_order()
+        self.plot_convergence()
+
+    # run global convergence rate and plot the graph
+
+    def run_global_error(self):
+        self.error_type = 'global'
+        self.compute_global_error_data()
+        self.find_approximate_order(filename='data/dt_vs_global_errorSDC.txt')
+        self.plot_convergence()
+
+    # def run_work_precision(self):
+
+    def run_work_precision(self, RKN=True, VV=False):
+        self.RKN = RKN
+        self.VV = VV
+        self.compute_global_error_data(work_counter=True)
+        self.compute_global_error_data(Picard=True, work_counter=True)
+        if self.RKN:
+            self.compute_error_RKN_VV(work_counter=True)
+        if self.VV:
+            self.func_eval_Velocity_Verlet(VV=True, work_counter=True)
+        self.plot_work_precision()
+
+    """
+    Compute local convergece data and save it
+    """
+
+    def compute_local_error_data(self):
+        step_params = dict()
+        dt_val = self.description['level_params']['dt']
+
+        # Error storage. It is only for the test
+        error_test = dict()
+        error_test['pos'] = dict()
+        error_test['vel'] = dict()
+        error_test['time'] = dict()
+        error = dict()
+        for order in self.K_iter:
+            # define storage for the local error
+            # error={'pos': np.zeros([1,3]), 'vel': np.zeros([1,3])}
+            error['pos'] = np.zeros([3, self.time_iter])
+            error['vel'] = np.zeros([3, self.time_iter])
+
+            step_params['maxiter'] = order
+            self.description['step_params'] = step_params
+
+            if order == self.K_iter[0]:
+                file = open(self.cwd + 'data/dt_vs_local_errorSDC.txt', 'w')
+            else:
+                file = open(self.cwd + 'data/dt_vs_local_errorSDC.txt', 'a')
+
+            for ii in range(0, self.time_iter):
+                dt = dt_val / 2**ii
+
+                self.description['level_params']['dt'] = dt
+                self.description['level_params'] = self.description['level_params']
+
+                # instantiate the controller (no controller parameters used here)
+                controller = controller_nonMPI(
+                    num_procs=1, controller_params=self.controller_params, description=self.description
+                )
+
+                # set time parameters
+                t0 = 0.0
+                Tend = dt
+
+                # get initial values on finest level
+                P = controller.MS[0].levels[0].prob
+                uinit = P.u_init()
+
+                # call main function to get things done...
+                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+                # compute exact solution and compare
+                uex = P.u_exact(Tend)
+
+                # find order of quadrature rule
+                coll_order = controller.MS[0].levels[0].sweep.coll.order
+
+                # find order of convergence for the postion and velocity
+                order_pos = self.local_order_pos(order, coll_order)
+                order_vel = self.local_order_vel(order, coll_order)
+                # evaluate error
+                error['pos'][:, ii] = np.abs((uex - uend).pos).T
+                error['vel'][:, ii] = np.abs((uex - uend).vel).T
+                if order == self.K_iter[0]:
+                    error_test['pos'][dt] = error['pos']
+                    error_test['vel'][dt] = error['vel']
+                dt_omega = dt * self.description['problem_params']['omega_B']
+                file.write(
+                    str(dt_omega)
+                    + " * "
+                    + str(order_pos)
+                    + " * "
+                    + str(error['pos'][:, ii])
+                    + " * "
+                    + str(order_vel)
+                    + " * "
+                    + str(error['vel'][:, ii])
+                    + '\n'
+                )
+
+            file.close()
+
+    """
+
+    Compute global convergence data and save it data folder
+
+    """
+
+    def compute_global_error_data(self, Picard=False, work_counter=False, dt_cont=1):
+        convergence_data.Tend = self.Tend
+
+        if Picard:
+            name = 'Picard'
+            description = self.description
+            description['sweeper_params']['QI'] = 'PIC'
+            description['sweeper_params']['QE'] = 'PIC'
+        else:
+            name = 'SDC'
+            description = self.description
+        self.controller_params['hook_class'] = convergence_data
+        step_params = dict()
+        dt_val = self.description['level_params']['dt']
+
+        values = ['position', 'velocity']
+
+        error = dict()
+
+        if work_counter:
+            filename = 'data/rhs_eval_vs_global_error{}.txt'.format(name)
+        else:
+            filename = 'data/dt_vs_global_error{}.txt'.format(name)
+
+        for order in self.K_iter:
+            # define storage for the global error
+            error['position'] = np.zeros([3, self.time_iter])
+            error['velocity'] = np.zeros([3, self.time_iter])
+            u_val = dict()
+            uex_val = dict()
+
+            step_params['maxiter'] = order
+            description['step_params'] = step_params
+
+            if order == self.K_iter[0]:
+                file = open(self.cwd + filename, 'w')
+            else:
+                file = open(self.cwd + filename, 'a')
+
+            # Controller for plot
+            if Picard:
+                if self.time_iter == 3:
+                    cont = 2
+                else:
+                    tt = np.abs(3 - self.time_iter)
+                    cont = 2**tt + 2
+            else:
+                cont = dt_cont
+
+            for ii in range(0, self.time_iter):
+                dt = (dt_val * cont) / 2**ii
+
+                description['level_params']['dt'] = dt
+                description['level_params'] = self.description['level_params']
+
+                # instantiate the controller (no controller parameters used here)
+                controller = controller_nonMPI(
+                    num_procs=1, controller_params=self.controller_params, description=description
+                )
+
+                # set time parameters
+                t0 = 0.0
+                # Tend = dt
+                Tend = self.Tend
+
+                # get initial values on finest level
+                P = controller.MS[0].levels[0].prob
+                uinit = P.u_init()
+
+                # call main function to get things done...
+                uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+                # rhs function evaluation
+                func_eval = P.work_counters['Boris_solver'].niter + P.work_counters['rhs'].niter
+                # extract values from stats
+                extract_stats = filter_stats(stats, type="error")
+                sortedlist_stats = sort_stats(extract_stats, sortby="time")
+
+                sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
+                sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
+                # sort values and compute error
+                for _, nn in enumerate(values):
+                    data = sortedlist_stats[0][1][nn].values()
+                    u_val[nn] = np.array(list(data))
+                    u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
+
+                    data = sortedlist_stats[0][1][nn + "_exact"].values()
+                    uex_val[nn] = np.array(list(data))
+                    uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
+
+                    error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
+                coll_order = controller.MS[0].levels[0].sweep.coll.order
+                global_order = self.global_order(order, coll_order)
+                dt_omega = dt * self.description['problem_params']['omega_B']
+                if work_counter:
+                    save = func_eval
+                else:
+                    save = dt_omega
+                file.write(
+                    str(save)
+                    + " * "
+                    + str(global_order)
+                    + " * "
+                    + str(error['position'][:, ii])
+                    + " * "
+                    + str(global_order)
+                    + " * "
+                    + str(error['velocity'][:, ii])
+                    + '\n'
+                )
+            file.close()
+
+    """
+    Compute RHS evalutations for the Runge-Kutta-Nystrom method and save into data folder
+    """
+
+    def compute_error_RKN_VV(self, VV=False, work_counter=True, dt_cont=1):
+        convergence_data.Tend = self.Tend
+        description = self.description
+        self.controller_params['hook_class'] = convergence_data
+        step_params = dict()
+        dt_val = description['level_params']['dt']
+        # description['level_params'].pop('restol')
+
+        values = ['position', 'velocity']
+
+        error = dict()
+
+        # define storage for the global error
+        error['position'] = np.zeros([3, self.time_iter])
+        error['velocity'] = np.zeros([3, self.time_iter])
+        u_val = dict()
+        uex_val = dict()
+        order = 1
+        step_params['maxiter'] = order
+        description['step_params'] = step_params
+        if VV:
+            name = 'VV'
+            description['sweeper_class'] = Velocity_Verlet
+        else:
+            name = 'RKN'
+            description['sweeper_class'] = RKN
+
+        if work_counter:
+            filename = 'data/rhs_eval_vs_global_error{}.txt'.format(name)
+        else:
+            filename = 'data/dt_vs_global_error{}.txt'.format(name)
+
+        file = open(self.cwd + filename, 'w')
+
+        for ii in range(0, self.time_iter):
+            dt = (dt_val * dt_cont) / 2**ii
+
+            description['level_params']['dt'] = dt
+            description['level_params'] = self.description['level_params']
+
+            # instantiate the controller (no controller parameters used here)
+            controller = controller_nonMPI(
+                num_procs=1, controller_params=self.controller_params, description=description
+            )
+
+            # set time parameters
+            t0 = 0.0
+            # Tend = dt
+            Tend = self.Tend
+
+            # get initial values on finest level
+            P = controller.MS[0].levels[0].prob
+            uinit = P.u_init()
+
+            # call main function to get things done...
+            uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+            func_eval = P.work_counters['rhs'].niter
+
+            # extract values from stats
+            extract_stats = filter_stats(stats, type="error")
+            sortedlist_stats = sort_stats(extract_stats, sortby="time")
+
+            sortedlist_stats[0][1]["position_ex"] = P.u_exact(Tend).pos
+            sortedlist_stats[0][1]["velocity_ex"] = P.u_exact(Tend).vel
+
+            # sort values and compute error
+            for _, nn in enumerate(values):
+                data = sortedlist_stats[0][1][nn].values()
+                u_val[nn] = np.array(list(data))
+                u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
+
+                data = sortedlist_stats[0][1][nn + "_exact"].values()
+                uex_val[nn] = np.array(list(data))
+                uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
+
+                error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
+
+            global_order = np.array([4, 4])
+            dt_omega = dt * self.description['problem_params']['omega_B']
+            if work_counter:
+                save = func_eval
+            else:
+                save = dt_omega
+            file.write(
+                str(save)
+                + " * "
+                + str(global_order)
+                + " * "
+                + str(error['position'][:, ii])
+                + " * "
+                + str(global_order)
+                + " * "
+                + str(error['velocity'][:, ii])
+                + '\n'
+            )
+        file.close()
+
+    # find expected local convergence order for position
+    def local_order_pos(self, order_K, order_quad):
+        if self.description['sweeper_params']['initial_guess'] == 'spread':
+            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
+                return np.array([np.min([order_K + 2 + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
+            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
+                return np.array([np.min([order_K + 2 + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
+            else:
+                raise NotImplementedError('order of convergence explicitly not implemented ')
+        else:
+            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
+                return np.array([np.min([order_K + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
+            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
+                return np.array([np.min([order_K + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
+            else:
+                raise NotImplementedError('order of convergence explicitly not implemented ')
+
+    # find expected local convergence order for velocity
+    def local_order_vel(self, order_K, order_quad):
+        if self.description['sweeper_params']['initial_guess'] == 'spread':
+            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
+                return np.array([np.min([order_K + 1 + 2, order_quad]), np.min([2 * order_K + 2, order_quad])])
+            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
+                return np.array([np.min([order_K + 1 + 2, order_quad]), np.min([2 * order_K + 2, order_quad])])
+            else:
+                raise NotImplementedError('order of convergence explicitly not implemented ')
+        else:
+            if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
+                return np.array([np.min([order_K + 1, order_quad]), np.min([2 * order_K + 2, order_quad])])
+            elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
+                return np.array([np.min([order_K + 1, order_quad]), np.min([2 * order_K + 2, order_quad])])
+            else:
+                raise NotImplementedError('order of convergence explicitly not implemented ')
+
+    # find expected global convergence order
+    def global_order(self, order_K, order_quad):
+        if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
+            return np.array([np.min([order_K, order_quad]), np.min([2 * order_K, order_quad])])
+        elif self.quad_type == 'LOBATTO' or self.quad_type == 'RADAU-LEFT':
+            return np.array([np.min([order_K, order_quad]), np.min([2 * order_K, order_quad])]) + 2
+        else:
+            raise NotImplementedError('order of convergence explicitly not implemented ')
+
+    # compute relative error
+    def relative_error(self, u_ex, u):
+        return np.linalg.norm(np.abs((u_ex - u)), np.inf, 0) / np.linalg.norm(u_ex, np.inf, 0)
 
 
 class Stability_implementation(object):

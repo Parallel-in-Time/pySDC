@@ -1,10 +1,10 @@
-exec(open("check_data_folder.py").read())
+# exec(open("check_data_folder.py").read())
 
 import numpy as np
 
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Convergence
+from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
 
 
 def penningtrap_param():
@@ -54,12 +54,12 @@ if __name__ == '__main__':
         time_iter: the number of time slices in the time/2**time_iter
         axes: Axis to show the plot
     """
-
+    exec(open("check_data_folder.py").read())
     # Set final time
     Tend = 128 * 0.015625
     controller_params, description = penningtrap_param()
-    conv = Convergence(controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=Tend, axes=(2,))
+    conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=Tend, axes=(1,))
     # Run local convergence order
-    # conv.run_local_error
+    # conv.run_local_error()
     # Run global convergence order
-    conv.run_global_error
+    conv.run_global_error()
