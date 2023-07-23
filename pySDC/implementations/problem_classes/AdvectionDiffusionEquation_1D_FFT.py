@@ -50,15 +50,8 @@ class advectiondiffusion1d_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, c, freq, nu, L=1.0):
+    def __init__(self, nvars=256, c=1.0, freq=-1, nu=0.02, L=1.0):
         """Initialization routine"""
-
-        # these parameters will be used later, so assert their existence
-        #essential_keys = ['nvars', 'c', 'freq', 'nu']
-        #for key in essential_keys:
-        #    if key not in problem_params:
-        #        msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-        #        raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
