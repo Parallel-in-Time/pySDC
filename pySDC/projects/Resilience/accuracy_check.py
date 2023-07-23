@@ -9,6 +9,7 @@ from pySDC.implementations.convergence_controller_classes.estimate_extrapolation
 )
 from pySDC.core.Hooks import hooks
 from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
+from pySDC.projects.Resilience.strategies import merge_descriptions
 
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.projects.Resilience.piline import run_piline
@@ -87,6 +88,7 @@ def multiple_runs(
     custom_controller_params=None,
     var='dt',
     avoid_restarts=False,
+    embedded_error_flavor=None,
 ):
     """
     A simple test program to compute the order of accuracy.
@@ -103,6 +105,7 @@ def multiple_runs(
         custom_controller_params (dict): Custom parameters to pass to the problem
         var (str): The variable to check the order against
         avoid_restarts (bool): Mode of running adaptivity if applicable
+        embedded_error_flavor (str): Flavor for the estimation of embedded error
 
     Returns:
         dict: The errors for different values of var
@@ -118,7 +121,9 @@ def multiple_runs(
 
     num_procs = 1 if serial else 5
 
-    embedded_error_flavor = 'standard' if avoid_restarts else 'linearized'
+    embedded_error_flavor = (
+        embedded_error_flavor if embedded_error_flavor else 'standard' if avoid_restarts else 'linearized'
+    )
 
     # perform rest of the tests
     for i in range(0, len(dt_list)):
@@ -143,7 +148,7 @@ def multiple_runs(
             }
 
         if custom_description is not None:
-            desc = {**desc, **custom_description}
+            desc = merge_descriptions(desc, custom_description)
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
         stats, controller, _ = prob(
             custom_description=desc,
@@ -194,7 +199,7 @@ def plot_order(res, ax, k):
     ax.legend(frameon=False, loc='lower right')
 
 
-def plot(res, ax, k, var='dt'):
+def plot(res, ax, k, var='dt', keys=None):
     """
     Plot the order of various errors using the results from `multiple_runs`.
 
@@ -203,11 +208,12 @@ def plot(res, ax, k, var='dt'):
         ax: Somewhere to plot
         k (int): Number of SDC sweeps
         var (str): The variable to compute the order against
+        keys (list): List of keys to plot from the results
 
     Returns:
         None
     """
-    keys = ['e_embedded', 'e_extrapolated', 'e']
+    keys = keys if keys else ['e_embedded', 'e_extrapolated', 'e']
     ls = ['-', ':', '-.']
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
@@ -267,9 +273,8 @@ def get_accuracy_order(results, key='e_embedded', thresh=1e-14, var='dt'):
     for i in range(1, len(dt_list)):
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
         try:
-            tmp = np.log(results[key][i] / results[key][i - 1]) / np.log(dt_list[i] / dt_list[i - 1])
             if results[key][i] > thresh and results[key][i - 1] > thresh:
-                order.append(tmp)
+                order.append(np.log(results[key][i] / results[key][i - 1]) / np.log(dt_list[i] / dt_list[i - 1]))
         except TypeError:
             print('Type Warning', results[key])
 
@@ -285,6 +290,7 @@ def plot_orders(
     prob=run_piline,
     dt_list=None,
     custom_controller_params=None,
+    embedded_error_flavor=None,
 ):
     """
     Plot only the local error.
@@ -298,6 +304,7 @@ def plot_orders(
         prob (function): A function that can accept suitable arguments and run a problem (see the Resilience project)
         dt_list (list): A list of values to check the order with
         custom_controller_params (dict): Custom parameters to pass to the problem
+        embedded_error_flavor (str): Flavor for the estimation of embedded error
 
     Returns:
         None
@@ -313,6 +320,7 @@ def plot_orders(
             dt_list=dt_list,
             hook_class=DoNothing,
             custom_controller_params=custom_controller_params,
+            embedded_error_flavor=embedded_error_flavor,
         )
         plot_order(res, ax, k)
 
@@ -328,6 +336,8 @@ def plot_all_errors(
     custom_controller_params=None,
     var='dt',
     avoid_restarts=False,
+    embedded_error_flavor=None,
+    keys=None,
 ):
     """
     Make tests for plotting the error and plot a bunch of error estimates
@@ -343,6 +353,8 @@ def plot_all_errors(
         custom_controller_params (dict): Custom parameters to pass to the problem
         var (str): The variable to compute the order against
         avoid_restarts (bool): Mode of running adaptivity if applicable
+        embedded_error_flavor (str): Flavor for the estimation of embedded error
+        keys (list): List of keys to plot from the results
 
     Returns:
         None
@@ -359,10 +371,11 @@ def plot_all_errors(
             custom_controller_params=custom_controller_params,
             var=var,
             avoid_restarts=avoid_restarts,
+            embedded_error_flavor=embedded_error_flavor,
         )
 
         # visualize results
-        plot(res, ax, k, var=var)
+        plot(res, ax, k, var=var, keys=keys)
 
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')

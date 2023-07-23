@@ -3,7 +3,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 
 from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -38,6 +38,7 @@ class testequation0d(ptype):
 
         self.A = self.__get_A(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
+        self.work_counters['rhs'] = WorkCounter()
 
     @staticmethod
     def __get_A(lambdas):
@@ -68,6 +69,7 @@ class testequation0d(ptype):
 
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(u)
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -89,17 +91,21 @@ class testequation0d(ptype):
         me[:] = L.solve(rhs)
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
         Routine to compute the exact solution at time t
 
         Args:
             t (float): current time
+            u_init : pySDC.problem.testequation0d.dtype_u
+            t_init : float
 
         Returns:
             dtype_u: exact solution
         """
+        u_init = (self.u0 if u_init is None else u_init) * 1.0
+        t_init = 0.0 if t_init is None else t_init * 1.0
 
         me = self.dtype_u(self.init)
-        me[:] = self.u0 * np.exp(t * np.array(self.lambdas))
+        me[:] = u_init * np.exp((t - t_init) * np.array(self.lambdas))
         return me

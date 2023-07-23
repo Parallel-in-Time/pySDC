@@ -13,9 +13,10 @@ class advectiondiffusion1d_imex(ptype):
     .. math::
         \frac{\partial u}{\partial t} = - c \frac{\partial u}{\partial x} + \nu \frac{\partial^2 u}{\partial x^2}
 
-    with periodic BC in [-L/2, L/2] in spectral space. The advection part :math:`- c \frac{\partial u}{\partial x}` is
-    treated explicitly, whereas the diffusion part :math:`\nu \frac{\partial^2 u}{\partial x^2}` will be treated numerically
-    in an implicit way. The exact solution is given by
+    with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. The advection part
+    :math:`- c \frac{\partial u}{\partial x}` is treated explicitly, whereas the diffusion part
+    :math:`\nu \frac{\partial^2 u}{\partial x^2}` will be treated numerically in an implicit way. The exact solution is
+    given by
 
     .. math::
         u(x, t) = \sin(\omega (x - c t)) \exp(-t \nu \omega^2)
@@ -80,14 +81,19 @@ class advectiondiffusion1d_imex(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -101,16 +107,23 @@ class advectiondiffusion1d_imex(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part
+        Simple FFT solver for the diffusion part.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)
@@ -121,13 +134,17 @@ class advectiondiffusion1d_imex(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         me = self.dtype_u(self.init, val=0.0)
@@ -151,36 +168,42 @@ class advectiondiffusion1d_imex(ptype):
 
 
 class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
+    r"""
+    Example implementing the unforced one-dimensional advection diffusion equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = - c \frac{\partial u}{\partial x} + \nu \frac{\partial^2 u}{\partial x^2}
+
+    with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. This class implements the problem solving it
+    with fully-implicit time-stepping. The exact solution is
+    given by
+
+    .. math::
+        u(x, t) = \sin(\omega (x - c t)) \exp(-t \nu \omega^2)
+
+    for :math:`\omega=2 \pi k`, where :math:`k` denotes the wave number. Fast Fourier transform is used for the spatial
+    discretization.
+
+    Note
+    ----
+    This class has the same attributes as the class it inherits from.
     """
-    Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,
-    fully-implicit time-stepping
-    """
-
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type (will be passed to parent class)
-        """
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectiondiffusion1d_implicit, self).__init__(
-            problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f
-        )
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -192,16 +215,23 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion and advection part (both are linear!)
+        Simple FFT solver for the diffusion and advection part (both are linear!).
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)

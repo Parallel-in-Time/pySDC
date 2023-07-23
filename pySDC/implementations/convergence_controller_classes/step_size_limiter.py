@@ -78,8 +78,7 @@ class StepSizeLimiter(ConvergenceController):
                     L.status.dt_new = self.params.dt_min
                 elif L.status.dt_new > self.params.dt_max:
                     self.log(
-                        f"Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to \
-{self.params.dt_max:.2e}",
+                        f"Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to {self.params.dt_max:.2e}",
                         S,
                     )
                     L.status.dt_new = self.params.dt_max
@@ -107,7 +106,7 @@ class StepSizeSlopeLimiter(ConvergenceController):
             (dict): The updated params dictionary
         """
         defaults = {
-            "control_order": +91,
+            "control_order": 91,
             "dt_slope_min": 0,
             "dt_slope_max": np.inf,
         }

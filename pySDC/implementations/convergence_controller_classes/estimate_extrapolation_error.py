@@ -311,7 +311,11 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
             # compute the extrapolation coefficients if needed
             if (
-                (None in self.coeff.u or self.params.use_adaptivity)
+                (
+                    None in self.coeff.u
+                    or self.params.use_adaptivity
+                    or (not self.params.no_storage and S.status.time_size > 1)
+                )
                 and None not in self.prev.t
                 and t_eval > max(self.prev.t)
             ):
@@ -443,7 +447,6 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         num_nodes = description['sweeper_params']['num_nodes']
 
         default_params = {
-            "control_order": 400,
             'Taylor_order': 2 * num_nodes,
             'n': num_nodes,
         }
@@ -461,7 +464,9 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         Returns:
             None
         """
-        if not S.status.done:
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+
+        if not CheckConvergence.check_convergence(S):
             return None
 
         lvl = S.levels[0]

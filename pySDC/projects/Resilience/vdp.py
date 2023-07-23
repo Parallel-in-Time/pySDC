@@ -268,8 +268,6 @@ def mpi_vs_nonMPI(MPI_ready, comm):
     custom_description = {'convergence_controllers': {}}
     custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': False}
 
-    custom_controller_params = {'logger_level': 30}
-
     data = [{}, {}]
 
     for i in range(2):
@@ -278,7 +276,6 @@ def mpi_vs_nonMPI(MPI_ready, comm):
                 custom_description=custom_description,
                 num_procs=size,
                 use_MPI=use_MPI[i],
-                custom_controller_params=custom_controller_params,
                 Tend=1.0,
                 comm=comm,
             )
@@ -309,7 +306,7 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
     """
     fig, ax = plt.subplots()
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
-    custom_controller_params = {'logger_level': 30, 'all_to_done': False}
+    custom_controller_params = {'all_to_done': False}
     results = {'e': {}, 'sweeps': {}, 'restarts': {}}
     size = comm.size if comm is not None else size
 
@@ -384,7 +381,6 @@ def check_step_size_limiter(size=4, comm=None):
     from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
 
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
-    custom_controller_params = {'logger_level': 30}
     expect = {}
     params = {'e_tol': 1e-6}
 
@@ -405,7 +401,6 @@ def check_step_size_limiter(size=4, comm=None):
             custom_description=custom_description,
             num_procs=size,
             use_MPI=comm is not None,
-            custom_controller_params=custom_controller_params,
             Tend=5.0e0,
             comm=comm,
         )
@@ -496,10 +491,8 @@ def interpolation_stuff():  # pragma: no cover
             'sweeper_params': sweeper_params,
         }
 
-        custom_controller_params = {'logger_level': 30}
         stats, controller, _ = run_vdp(
             custom_description=custom_description,
-            custom_controller_params=custom_controller_params,
             hook_class=[LogLocalErrorPostStep, LogData, LogWork] + hook_collection,
         )
 
@@ -529,6 +522,8 @@ def interpolation_stuff():  # pragma: no cover
 
 
 if __name__ == "__main__":
+    import sys
+
     try:
         from mpi4py import MPI
 
@@ -540,8 +535,18 @@ if __name__ == "__main__":
         comm = None
         size = 1
 
-    mpi_vs_nonMPI(MPI_ready, comm)
-    check_step_size_limiter(size, comm)
+    if len(sys.argv) == 1:
+        mpi_vs_nonMPI(MPI_ready, comm)
+        check_step_size_limiter(size, comm)
 
-    if size == 1:
+        if size == 1:
+            check_adaptivity_with_avoid_restarts(comm=None, size=1)
+
+    elif 'mpi_vs_nonMPI' in sys.argv:
+        mpi_vs_nonMPI(MPI_ready, comm)
+    elif 'check_step_size_limiter' in sys.argv:
+        check_step_size_limiter(MPI_ready, comm)
+    elif 'check_adaptivity_with_avoid_restarts' and size == 1:
         check_adaptivity_with_avoid_restarts(comm=None, size=1)
+    else:
+        raise NotImplementedError('Your test is not implemented!')

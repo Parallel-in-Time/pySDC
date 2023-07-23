@@ -79,13 +79,14 @@ class InterpolateBetweenRestarts(ConvergenceController):
                 nodes_new = level.sweep.coll.nodes.copy() * level.status.dt_new / level.params.dt
 
                 interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
-                self.status.u_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ level.u[:])[:]]
-                self.status.f_inter += [(interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ level.f[:])[:]]
-
+                interpolation_matrix = interpolator.getInterpolationMatrix(np.append(0, nodes_new))
+                self.status.u_inter += [(interpolation_matrix @ level.u[:])[:]]
+                self.status.f_inter += [(interpolation_matrix @ level.f[:])[:]]
                 self.status.perform_interpolation = True
 
                 self.log(
                     f'Interpolating before restart from dt={level.params.dt:.2e} to dt={level.status.dt_new:.2e}', step
                 )
+
         else:
             self.status.perform_interpolation = False

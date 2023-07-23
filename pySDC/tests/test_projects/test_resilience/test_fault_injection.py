@@ -219,10 +219,6 @@ def generate_stats(load=False):
         AdaptivityStrategy,
         IterateStrategy,
         HotRodStrategy,
-        AdaptivityCollocationRefinementStrategy,
-        DoubleAdaptivityStrategy,
-        AdaptivityAvoidRestartsStrategy,
-        AdaptivityInterpolationStrategy,
     )
     from pySDC.projects.Resilience.fault_stats import (
         FaultStats,
@@ -243,10 +239,6 @@ def generate_stats(load=False):
             AdaptivityStrategy(),
             IterateStrategy(),
             HotRodStrategy(),
-            AdaptivityCollocationRefinementStrategy(),
-            DoubleAdaptivityStrategy(),
-            AdaptivityAvoidRestartsStrategy(),
-            AdaptivityInterpolationStrategy(),
         ],
         stats_path='data',
     )
