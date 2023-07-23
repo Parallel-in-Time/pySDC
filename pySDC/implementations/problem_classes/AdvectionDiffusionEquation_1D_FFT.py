@@ -26,15 +26,15 @@ class advectiondiffusion1d_imex(ptype):
 
     Parameters
     ----------
-    nvars : int
+    nvars : int, optional
         Number of points in spatial discretization.
-    c : float
+    c : float, optional
         Advection speed.
-    freq : int
+    freq : int, optional
         Wave number :math:`k`.
-    nu : float
+    nu : float, optional
         Diffusion coefficient :math:`\nu`.
-    L : int
+    L : int, optional
         Denotes the period of the function to be approximated for the Fourier transform.
 
     Attributes
