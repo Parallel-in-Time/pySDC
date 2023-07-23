@@ -7,33 +7,51 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 # noinspection PyUnusedLocal
 class auzinger(ptype):
     """
-    Example implementing the Auzinger initial value problem
+    This class implements the Auzinger equation as initial value problem. It can be found in doi.org/10.2140/camcos.2015.10.1.
+    The system of two ordinary differential equations (ODEs) is given by
+
+    .. math::
+        \frac{d y_1 (t)}{dt} = -y_2 (t) + y_1 (t) (1 - y^2_1 (t) - y^2_2 (t)),
+
+    .. math::
+        \frac{d y_2 (t)}{dt} = y_1 (t) + 3 y_2 (t) (1 - y^2_1 (t) - y^2_2 (t))
+
+    with initial condition :math:`y(t) = (1, 0)^T` for :math:`t \in [0, 10]`. The exact solution of this problem is
+
+    .. math::
+        y (t) = (\cos(t), \sin(t))^T.
+
+    Attributes
+    ----------
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate.
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, newton_maxiter, newton_tol):
-        """
-        Initialization routine
+    def __init__(self, newton_maxiter=1e-12, newton_tol=100):
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type (will be passed to parent class)
-        """
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
         super().__init__((2, None, np.dtype('float64')))
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
     def u_exact(self, t):
         """
-        Routine for the exact solution
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: mesh type containing the exact solution
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         me = self.dtype_u(self.init)
@@ -43,13 +61,19 @@ class auzinger(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS for both components simultaneously
+        Routine to compute the right-hand side of the problem for both components simultaneously.
 
-        Args:
-            u (dtype_u): the current values
-            t (float): current time (not used here)
-        Returns:
-            RHS, 2 components
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem (contains two components).
         """
 
         x1 = u[0]
@@ -61,16 +85,23 @@ class auzinger(ptype):
 
     def solve_system(self, rhs, dt, u0, t):
         """
-        Simple Newton solver for the nonlinear system
+        Simple Newton solver for the nonlinear system.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs.)
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
 
         # create new mesh object from u0 and set initial values for iteration
