@@ -487,7 +487,7 @@ class battery_implicit(battery):
         Parameters
         ----------
         rhs : dtype_f
-            Right-hand side for the linear system.
+            Right-hand side for the nonlinear system.
         factor : float
             Abbrev. for the local stepsize (or any other factor required).
         u0 : dtype_u
