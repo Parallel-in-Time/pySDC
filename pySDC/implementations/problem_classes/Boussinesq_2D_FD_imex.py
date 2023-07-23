@@ -78,17 +78,24 @@ class boussinesq_2d_imex(ptype):
         self.gmres_logger = logging()
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-dtA)u = rhs using GMRES
+        r"""
+        Simple linear solver for :math:`(I - factor A) \vec{u} = \vec{rhs}` using GMRES.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         b = rhs.flatten()
@@ -114,14 +121,19 @@ class boussinesq_2d_imex(ptype):
 
     def __eval_fexpl(self, u, t):
         """
-        Helper routine to evaluate the explicit part of the RHS
+        Helper routine to evaluate the explicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values (not used here)
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed (not used here).
 
-        Returns:
-            explicit part of RHS
+        Returns
+        -------
+        fexpl : dtype_u
+            Explicit part of right-hand side.
         """
 
         # Evaluate right hand side
@@ -134,14 +146,19 @@ class boussinesq_2d_imex(ptype):
 
     def __eval_fimpl(self, u, t):
         """
-        Helper routine to evaluate the implicit part of the RHS
+        Helper routine to evaluate the implicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time (not used here)
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed (not used here).
 
-        Returns:
-            implicit part of RHS
+        Returns
+        -------
+        fexpl : dtype_u
+            Implicit part of right-hand side.
         """
 
         temp = u.flatten()
@@ -170,13 +187,17 @@ class boussinesq_2d_imex(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 

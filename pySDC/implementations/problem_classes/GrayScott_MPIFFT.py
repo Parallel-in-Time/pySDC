@@ -88,14 +88,19 @@ class grayscott_imex_diffusion(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -126,16 +131,23 @@ class grayscott_imex_diffusion(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part
+        Simple FFT solver for the diffusion part.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)
@@ -157,11 +169,15 @@ class grayscott_imex_diffusion(ptype):
         """
         Routine to compute the exact solution at time t=0, see https://www.chebfun.org/examples/pde/GrayScott.html
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
         assert t == 0.0, 'Exact solution only valid as initial condition'
         assert self.ndim == 2, 'The initial conditions are 2D for now..'
@@ -195,14 +211,19 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -242,14 +263,19 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -280,16 +306,23 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
-        Solver for the first component, can just call the super function
+        Solver for the first component, can just call the super function.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = super(grayscott_mi_diffusion, self).solve_system(rhs, factor, u0, t)
@@ -297,16 +330,23 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     def solve_system_2(self, rhs, factor, u0, t):
         """
-        Newton-Solver for the second component
+        Newton-Solver for the second component.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
         u = self.dtype_u(u0)
 
@@ -397,14 +437,19 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -435,16 +480,23 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
-        Solver for the first component, can just call the super function
+        Solver for the first component, can just call the super function.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = super(grayscott_mi_linear, self).solve_system(rhs, factor, u0, t)
@@ -452,16 +504,23 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
     def solve_system_2(self, rhs, factor, u0, t):
         """
-        Newton-Solver for the second component
+        Newton-Solver for the second component.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
         u = self.dtype_u(u0)
 

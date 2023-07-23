@@ -93,14 +93,18 @@ class fenics_grayscott(ptype):
         self.M = M1 + M2
 
     def __invert_mass_matrix(self, u):
-        """
-        Helper routine to invert mass matrix
+        r"""
+        Helper routine to invert mass matrix.
 
-        Args:
-            u (dtype_u): current values
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            dtype_u: inv(M)*u
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M^{-1} \vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -113,17 +117,24 @@ class fenics_grayscott(ptype):
         return me
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Dolfin's linear solver for (M-factor*A)u = rhs
+        r"""
+        Dolfin's linear solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         sol = self.dtype_u(self.V)
@@ -157,14 +168,19 @@ class fenics_grayscott(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.V)
@@ -178,13 +194,17 @@ class fenics_grayscott(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         class InitialConditions(df.Expression):
