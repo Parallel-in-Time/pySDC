@@ -11,7 +11,7 @@ class swfw_scalar(ptype):
     This class implements the fast-wave-slow-wave scalar problem fully investigated in _[1]. It is defined by
 
     .. math::
-        \frac{d u(t)}{dt} = i \lambda_f u(t) + i \lambda_s u(t),
+        \frac{d u(t)}{dt} = \lambda_f u(t) + \lambda_s u(t),
 
     where :math:`\lambda_f` denotes the part of the fast wave, and :math:`\lambda_s` is the part of the slow wave with
     :math:`\lambda_f \gg \lambda_s`. Let :math:`u_0` be the initial condition to the problem, then the exact solution
