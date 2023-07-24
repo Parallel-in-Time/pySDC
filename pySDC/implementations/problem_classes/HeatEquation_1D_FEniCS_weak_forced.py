@@ -87,14 +87,18 @@ class fenics_heat_weak_fullyimplicit(ptype):
         self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
     def __invert_mass_matrix(self, u):
-        """
-        Helper routine to invert mass matrix
+        r"""
+        Helper routine to invert mass matrix.
 
-        Args:
-            u (dtype_u): current values
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            dtype_u: inv(M)*u
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M^{-1} \vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -109,17 +113,24 @@ class fenics_heat_weak_fullyimplicit(ptype):
         return me
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Dolfin's weak solver for (M-dtA)u = rhs
+        r"""
+        Dolfin's weak solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)
-            t (float): current time
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        sol : dtype_u
+            The solution as mesh.
         """
 
         sol = self.dtype_u(self.V)
@@ -152,14 +163,19 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         self.g.t = t
@@ -175,13 +191,17 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
@@ -266,14 +286,18 @@ class fenics_heat_weak_imex(ptype):
         self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
     def __invert_mass_matrix(self, u):
-        """
-        Helper routine to invert mass matrix
+        r"""
+        Helper routine to invert mass matrix.
 
-        Args:
-            u (dtype_u): current values
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            dtype_u: inv(M)*u
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M^{-1} \vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -287,17 +311,24 @@ class fenics_heat_weak_imex(ptype):
         return me
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Dolfin's weak solver for (M-dtA)u = rhs
+        r"""
+        Dolfin's weak solver for :math:`(M - factor A)\vec{u} = \vec{u}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)
-            t (float): current time
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        sol : dtype_u
+            The solution as mesh.
         """
 
         sol = self.dtype_u(u0)
@@ -308,14 +339,19 @@ class fenics_heat_weak_imex(ptype):
 
     def __eval_fexpl(self, u, t):
         """
-        Helper routine to evaluate the explicit part of the RHS
+        Helper routine to evaluate the explicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values (not used here)
-            t (fliat): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution (not used here).
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            explicit part of RHS
+        Returns
+        -------
+        fexpl : dtype_u
+            Explicit part of the right-hand side.
         """
 
         self.g.t = t
@@ -325,14 +361,19 @@ class fenics_heat_weak_imex(ptype):
 
     def __eval_fimpl(self, u, t):
         """
-        Helper routine to evaluate the implicit part of the RHS
+        Helper routine to evaluate the implicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time (not used here)
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed (not used here).
 
-        Returns:
-            implicit part of RHS
+        Returns
+        -------
+        fimpl : dtype_u
+            Implicit part of the right-hand side.
         """
 
         tmp = self.dtype_u(self.V)
@@ -343,14 +384,19 @@ class fenics_heat_weak_imex(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.V)
@@ -360,13 +406,17 @@ class fenics_heat_weak_imex(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)

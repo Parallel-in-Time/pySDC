@@ -17,21 +17,26 @@ class acoustic_1d_imex(ptype):
 
     TODO : doku
 
-    Attributes:
-        mesh (numpy.ndarray): 1d mesh
-        dx (float): mesh size
-        Dx: matrix for the advection operator
-        Id: sparse identity matrix
-        A: matrix for the wave operator
+    Attributes
+    ----------
+    mesh : np.ndarray
+        1d mesh.
+    dx : float
+        Mesh size.
+    Dx : scipy.csc_matrix
+        Matrix for the advection operator.
+    Id : scipy.csc_matrix
+        Sparse identity matrix.
+    A : scipy.csc_matrix
+        Matrix for the wave operator.
     """
 
     dtype_u = mesh
     dtype_f = imex_mesh
 
     def __init__(self, nvars, cs, cadv, order_adv, waveno):
-        """
-        Initialization routine
-        """
+        """Initialization routine"""
+
         # invoke super init, passing number of dofs
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'cs', 'cadv', 'order_adv', 'waveno', localVars=locals(), readOnly=True)
@@ -44,17 +49,24 @@ class acoustic_1d_imex(ptype):
         self.A = -self.cs * A
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-dtA)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         M = self.Id - factor * self.A
@@ -70,14 +82,19 @@ class acoustic_1d_imex(ptype):
 
     def __eval_fexpl(self, u, t):
         """
-        Helper routine to evaluate the explicit part of the RHS
+        Helper routine to evaluate the explicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values (not used here)
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            explicit part of RHS
+        Returns
+        -------
+        fexpl : dtype_f
+            Explicit part of the right-hand side.
         """
 
         b = np.concatenate((u[0, :], u[1, :]))
@@ -90,14 +107,19 @@ class acoustic_1d_imex(ptype):
 
     def __eval_fimpl(self, u, t):
         """
-        Helper routine to evaluate the implicit part of the RHS
+        Helper routine to evaluate the implicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time (not used here)
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            implicit part of RHS
+        Returns
+        -------
+        fimpl : dtype_f
+            Implicit part of the right-hand side.
         """
 
         b = np.concatenate((u[:][0, :], u[:][1, :]))
@@ -110,14 +132,19 @@ class acoustic_1d_imex(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.init)
@@ -127,13 +154,17 @@ class acoustic_1d_imex(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         def u_initial(x, k):

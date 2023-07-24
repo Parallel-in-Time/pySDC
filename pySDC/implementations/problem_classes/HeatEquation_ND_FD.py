@@ -26,13 +26,17 @@ class heatNd_unforced(GenericNDimFinDiff):
 
     def u_exact(self, t, **kwargs):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        sol : dtype_u
+            The exact solution.
         """
         ndim, freq, nu, sigma, dx, sol = self.ndim, self.freq, self.nu, self.sigma, self.dx, self.u_init
 
@@ -80,14 +84,19 @@ class heatNd_forced(heatNd_unforced):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.f_init
@@ -119,13 +128,17 @@ class heatNd_forced(heatNd_unforced):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        sol : dtype_u
+            The exact solution.
         """
         ndim, freq, sol = self.ndim, self.freq, self.u_init
         if ndim == 1:

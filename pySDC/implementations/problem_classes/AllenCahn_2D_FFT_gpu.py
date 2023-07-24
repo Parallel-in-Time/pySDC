@@ -10,12 +10,33 @@ class allencahn2d_imex(ptype):  # pragma: no cover
     """
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
 
-    Attributes:
-        xvalues: grid points in space
-        dx: cupy_mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str
+        Indicates which type of initial condition is used.
+
+    Attributes
+    ----------
+    xvalues : cp.ndarray
+        Grid points in space.
+    dx : float
+        Cupy mesh width.
+    lap : cp.ndarray
+        Spectral operator for Laplacian.
+    rfft_object :
+        Planned real FFT for forward transformation.
+    irfft_object :
+        Planned IFFT for backward transformation.
     """
 
     dtype_u = cupy_mesh
@@ -55,14 +76,19 @@ class allencahn2d_imex(ptype):  # pragma: no cover
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -75,16 +101,23 @@ class allencahn2d_imex(ptype):  # pragma: no cover
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part
+        Simple FFT solver for the diffusion part.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Parameters
+        ----------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)
@@ -95,13 +128,17 @@ class allencahn2d_imex(ptype):  # pragma: no cover
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
@@ -125,12 +162,33 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
     stabilized splitting
 
-    Attributes:
-        xvalues: grid points in space
-        dx: mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str
+        Indicates which type of initial condition is used.
+
+    Attributes
+    ----------
+    xvalues : cp.ndarray
+        Grid points in space.
+    dx : float
+        Cupy mesh width.
+    lap : cp.ndarray
+        Spectral operator for Laplacian.
+    rfft_object :
+        Planned real FFT for forward transformation.
+    irfft_object :
+        Planned IFFT for backward transformation.
     """
 
     def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
@@ -139,14 +197,19 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -159,16 +222,23 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part
+        Simple FFT solver for the diffusion part.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)

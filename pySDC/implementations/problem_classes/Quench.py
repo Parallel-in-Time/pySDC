@@ -115,14 +115,19 @@ class Quench(ptype):
 
     def eval_f_non_linear(self, u, t):
         """
-        Get the non-linear part of f
+        Get the non-linear part of f.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution:
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_u: the non-linear part of the RHS
+        Returns
+        -------
+        me : dtype_u
+            The non-linear part of the right-hand side.
         """
         u_thresh = self.u_thresh
         u_max = self.u_max
@@ -152,14 +157,19 @@ class Quench(ptype):
 
     def eval_f(self, u, t):
         """
-        Evaluate the full right hand side.
+        Evaluate the full right-hand side.
 
-        Args:
-            u (dtype_u): Current solution
-            t (float): Current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: The right hand side
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.eval_f_non_linear(u, t)
@@ -168,13 +178,17 @@ class Quench(ptype):
 
     def get_non_linear_Jacobian(self, u):
         """
-        Evaluate the non-linear part of the Jacobian only
+        Evaluate the non-linear part of the Jacobian only.
 
-        Args:
-            u (dtype_u): Current solution
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+        Returns
+        -------
+        scipy.sparse.csc
+            The derivative of the non-linear part of the solution w.r.t. to the solution.
         """
         u_thresh = self.u_thresh
         u_max = self.u_max
@@ -203,17 +217,24 @@ class Quench(ptype):
         return sp.diags(me, format='csc')
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple Newton solver for (I-factor*f)(u) = rhs
+        r"""
+        Simple Newton solver for :math:`(I - factor f)(\vec{u}) = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
         u = self.dtype_u(u0)
         res = np.inf
@@ -266,13 +287,17 @@ class Quench(ptype):
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         me = self.dtype_u(self.init, val=0.0)
@@ -368,14 +393,19 @@ class QuenchIMEX(Quench):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -386,17 +416,24 @@ class QuenchIMEX(Quench):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*f_expl)(u) = rhs
+        r"""
+        Simple linear solver for :math:`(I - factor f_{expl})(\vec{u}) = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+             The solution as mesh.
         """
 
         me = self.dtype_u(self.init)
@@ -405,13 +442,17 @@ class QuenchIMEX(Quench):
 
     def u_exact(self, t, u_init=None, t_init=None):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
         me = self.dtype_u(self.init, val=0.0)
 
@@ -422,26 +463,37 @@ class QuenchIMEX(Quench):
 
             def jac(t, u):
                 """
-                Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`
-                Args:
-                    t (float): The current time
-                    u (dtype_u): Current solution
+                Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`.
 
-                Returns:
-                    scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                Parameters
+                ----------
+                t : float
+                    Current time.
+                u : dtype_u
+                    Current solution.
+
+                Returns
+                -------
+                scipy.sparse.csc
+                    The derivative of the non-linear part of the solution w.r.t. to the solution.
                 """
                 return self.A
 
             def eval_rhs(t, u):
                 """
-                Function to pass to `scipy.solve_ivp` to evaluate the full RHS
+                Function to pass to `scipy.solve_ivp` to evaluate the full right-hand side.
 
-                Args:
-                    t (float): Current time
-                    u (numpy.1darray): Current solution
+                Parameters
+                ----------
+                t : float
+                    Current time
+                u : numpy.1darray
+                    Current solution
 
-                Returns:
-                    (numpy.1darray): RHS
+                Returns
+                -------
+                numpy.1darray
+                    The right-hand side.
                 """
                 f = self.eval_f(u.reshape(self.init[0]), t)
                 return (f.impl + f.expl).flatten()
