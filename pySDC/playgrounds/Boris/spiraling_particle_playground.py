@@ -25,7 +25,7 @@ def main(dt, Tend):
     problem_params = dict()
     problem_params['delta'] = 1
     problem_params['a0'] = 0.07
-    problem_params['u0'] = np.array([[0, -1, 0], [0.05, 0.01, 0], [1], [1]])
+    problem_params['u0'] = np.array([[0, -1, 0], [0.05, 0.01, 0], [1], [1]], dtype=object)
 
     # initialize step parameters
     step_params = dict()

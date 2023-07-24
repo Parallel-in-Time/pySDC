@@ -426,6 +426,13 @@ class plotmanager(object):  # pragma: no cover
                     + '\n'
                 )
         file.close()
+    def plot_hamiltonian(self, ham_SDC, ham_RKN):
+        tn=np.max(np.shape(ham_RKN))
+        time=np.linspace(0, self.Tend, tn)
+        import pdb
+        pdb.set_trace()
+        plt.semilogy(time, ham_RKN[:,1])
+
 
 
 class compute_error(plotmanager):
@@ -464,6 +471,12 @@ class compute_error(plotmanager):
             self.func_eval_Velocity_Verlet(VV=True, work_counter=True)
         self.plot_work_precision()
 
+    def run_hamiltonian_error(self):
+        Hamiltonian_SDC=self.compute_global_error_data()
+        Hamiltonia_RKN=self.compute_error_RKN_VV()
+        self.plot_hamiltonian(Hamiltonian_SDC, Hamiltonia_RKN)
+
+
     """
     Compute local convergece data and save it
     """
@@ -472,11 +485,7 @@ class compute_error(plotmanager):
         step_params = dict()
         dt_val = self.description['level_params']['dt']
 
-        # Error storage. It is only for the test
-        error_test = dict()
-        error_test['pos'] = dict()
-        error_test['vel'] = dict()
-        error_test['time'] = dict()
+
         error = dict()
         for order in self.K_iter:
             # define storage for the local error
@@ -526,9 +535,6 @@ class compute_error(plotmanager):
                 # evaluate error
                 error['pos'][:, ii] = np.abs((uex - uend).pos).T
                 error['vel'][:, ii] = np.abs((uex - uend).vel).T
-                if order == self.K_iter[0]:
-                    error_test['pos'][dt] = error['pos']
-                    error_test['vel'][dt] = error['vel']
                 dt_omega = dt * self.description['problem_params']['omega_B']
                 file.write(
                     str(dt_omega)
@@ -569,7 +575,7 @@ class compute_error(plotmanager):
         values = ['position', 'velocity']
 
         error = dict()
-
+        Hamiltonian=dict()
         if work_counter:
             filename = 'data/rhs_eval_vs_global_error{}.txt'.format(name)
         else:
@@ -641,6 +647,12 @@ class compute_error(plotmanager):
                     uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
 
                     error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
+
+                if ii==0:
+                    Hamiltonian[order]=self.Hamiltonian_error(u_val, uinit)
+
+
+
                 coll_order = controller.MS[0].levels[0].sweep.coll.order
                 global_order = self.global_order(order, coll_order)
                 dt_omega = dt * self.description['problem_params']['omega_B']
@@ -661,6 +673,7 @@ class compute_error(plotmanager):
                     + '\n'
                 )
             file.close()
+        return Hamiltonian
 
     """
     Compute RHS evalutations for the Runge-Kutta-Nystrom method and save into data folder
@@ -677,7 +690,7 @@ class compute_error(plotmanager):
         values = ['position', 'velocity']
 
         error = dict()
-
+        Hamiltonia_RKN=dict()
         # define storage for the global error
         error['position'] = np.zeros([3, self.time_iter])
         error['velocity'] = np.zeros([3, self.time_iter])
@@ -743,7 +756,8 @@ class compute_error(plotmanager):
                 uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
 
                 error[nn][:, ii] = self.relative_error(uex_val[nn], u_val[nn])
-
+            if ii==0:
+                Hamiltonia_RKN=self.Hamiltonian_error(u_val, uinit)
             global_order = np.array([4, 4])
             dt_omega = dt * self.description['problem_params']['omega_B']
             if work_counter:
@@ -763,6 +777,8 @@ class compute_error(plotmanager):
                 + '\n'
             )
         file.close()
+
+        return Hamiltonia_RKN
 
     # find expected local convergence order for position
     def local_order_pos(self, order_K, order_quad):
@@ -810,6 +826,20 @@ class compute_error(plotmanager):
     # compute relative error
     def relative_error(self, u_ex, u):
         return np.linalg.norm(np.abs((u_ex - u)), np.inf, 0) / np.linalg.norm(u_ex, np.inf, 0)
+
+    def Hamiltonian_error(self, u, u0):
+        shape=np.shape(u['position'])
+
+        Hn=0.5*(u['position']**2+u['velocity']**2)
+
+        u0pos=u0.pos.T*np.ones(shape)
+        u0vel=u0.vel.T*np.ones(shape)
+        H0=0.5*(u0pos**2+u0vel**2)
+
+        H=np.abs(Hn-H0)/np.abs(H0)
+
+        return H
+
 
 
 class Stability_implementation(object):
