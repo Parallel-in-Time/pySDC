@@ -11,17 +11,17 @@ class Cache(object):
         - t (list): Contains time of previous steps
     """
 
-    def __init__(self, num_entries):
+    def __init__(self, num_steps):
         """
         Initialization routing
 
         Args:
-            num_entries (int): Number of entries for the cache
+            num_steps (int): Number of entries for the cache
         """
-        self.num_entries = num_entries
-        self.u = [None] * num_entries
-        self.f = [None] * num_entries
-        self.t = [None] * num_entries
+        self.num_steps = num_steps
+        self.u = [None] * num_steps
+        self.f = [None] * num_steps
+        self.t = [None] * num_steps
 
     def update(self, t, u, f):
         """
@@ -45,14 +45,17 @@ class Cache(object):
         Print the contents of the cache for debugging purposes.
         """
         string = ''
-        for i in range(self.num_entries):
+        for i in range(self.num_steps):
             string = f'{string} t={self.t[i]}: u={self.u[i]}, f={self.f[i]}'
 
         return string
 
 
 class MultiStep(sweeper):
-    def __init__(self, params, alpha, beta):
+    alpha = None
+    beta = None
+
+    def __init__(self, params):
         """
         Initialization routine for the base sweeper.
 
@@ -62,10 +65,12 @@ class MultiStep(sweeper):
         The first element in the coefficients belongs to the value furthest in the past and vice versa. Values from previous time steps are stored in a `Cache` object.
         Be careful with the sign of the alpha values. You can look at the implementations of the Euler methods for guidance.
 
-        Args:
-            params (dict): parameter object
+        Class attributes:
             alpha (list): Coefficients for the solutions of previous steps
             beta (list): Coefficients for the right hand side evaluations
+
+        Args:
+            params (dict): parameter object
         """
         import logging
         from pySDC.core.Collocation import CollBase
@@ -89,10 +94,8 @@ class MultiStep(sweeper):
         self.parallelizable = False
 
         # proprietary variables for the multistep methods
-        self.steps = len(alpha)
+        self.steps = len(self.alpha)
         self.cache = Cache(self.steps)
-        self.alpha = alpha
-        self.beta = beta
 
     def predict(self):
         """
@@ -173,21 +176,17 @@ class AdamsBashforthExplicit1Step(MultiStep):
     This is just forward Euler.
     """
 
-    def __init__(self, params):
-        alpha = [-1.0]
-        beta = [1.0, 0.0]
-        super().__init__(params, alpha, beta)
+    alpha = [-1.0]
+    beta = [1.0, 0.0]
 
 
 class BackwardEuler(MultiStep):
     """
-    Do you like mess? Me neither! Let me lure you in!
+    Almost as old, impressive and beloved as Koelner Dom.
     """
 
-    def __init__(self, params):
-        alpha = [-1.0]
-        beta = [0.0, 1.0]
-        super().__init__(params, alpha, beta)
+    alpha = [-1.0]
+    beta = [0.0, 1.0]
 
 
 class AdamsMoultonImplicit1Step(MultiStep):
@@ -195,11 +194,8 @@ class AdamsMoultonImplicit1Step(MultiStep):
     Trapezoidal method dressed up as a multistep method.
     """
 
-    def __init__(self, params):
-        alpha = [-1.0]
-        beta = [0.5, 0.5]
-
-        super().__init__(params, alpha, beta)
+    alpha = [-1.0]
+    beta = [0.5, 0.5]
 
 
 class AdamsMoultonImplicit2Step(MultiStep):
@@ -207,10 +203,8 @@ class AdamsMoultonImplicit2Step(MultiStep):
     Third order implicit scheme
     """
 
-    def __init__(self, params):
-        alpha = [0.0, -1.0]
-        beta = [-1.0 / 12.0, 8.0 / 12.0, 5.0 / 12.0]
-        super().__init__(params, alpha, beta)
+    alpha = [0.0, -1.0]
+    beta = [-1.0 / 12.0, 8.0 / 12.0, 5.0 / 12.0]
 
     def generate_starting_values(self):
         """
