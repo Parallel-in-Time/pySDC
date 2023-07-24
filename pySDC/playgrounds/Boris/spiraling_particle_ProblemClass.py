@@ -8,8 +8,10 @@ class planewave_single(ptype):
     """
     Example implementing a single particle spiraling in a trap
     """
+    dtype_u = particles
+    dtype_f = fields
 
-    def __init__(self, cparams, dtype_u=particles, dtype_f=fields):
+    def __init__(self, u0, a0, delta):
         """
         Initialization routine
 
@@ -18,20 +20,13 @@ class planewave_single(ptype):
             dtype_u: particle data type (will be passed parent class)
             dtype_f: fields data type (will be passed parent class)
         """
-
-        # these parameters will be used later, so assert their existence
-        assert 'delta' in cparams  # polarization
-        assert 'a0' in cparams  # normalized amplitude
-        assert 'u0' in cparams  # initial position and velocity
-
-        # add parameters as attributes for further reference
-        for k, v in cparams.items():
-            setattr(self, k, v)
-
         # set nparts to one (lonely particle, you know)
-        self.nparts = 1
-        # invoke super init, passing nparts, dtype_u and dtype_f
-        super(planewave_single, self).__init__((self.nparts, None, np.dtype('float64')), dtype_u, dtype_f, cparams)
+        nparts = 1
+        # TODO : delta is not used later in the Problem class or Hook class !
+
+        super().__init__(((3, nparts), None, np.dtype('float64')))
+        self._makeAttributeAndRegister('nparts', 'a0', 'delta', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('u0', localVars=locals())
 
     def eval_f(self, part, t):
         """
@@ -47,8 +42,8 @@ class planewave_single(ptype):
         f = self.dtype_f(((3, self.nparts), self.init[1], self.init[2]))
 
         R = np.linalg.norm(part.pos[:, 0], 2)
-        f.elec[0, 0] = self.params.a0 / (R**3) * part.pos[0, 0]
-        f.elec[1, 0] = self.params.a0 / (R**3) * part.pos[1, 0]
+        f.elec[0, 0] = self.a0 / (R**3) * part.pos[0, 0]
+        f.elec[1, 0] = self.a0 / (R**3) * part.pos[1, 0]
         f.elec[2, 0] = 0
 
         f.magn[0, 0] = 0
@@ -65,7 +60,7 @@ class planewave_single(ptype):
             particle type
         """
 
-        u0 = self.params.u0
+        u0 = self.u0
         # some abbreviations
         u = self.dtype_u(((3, 1), self.init[1], self.init[2]))
 
