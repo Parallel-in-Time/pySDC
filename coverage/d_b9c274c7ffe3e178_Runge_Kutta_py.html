@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/sweeper_classes/Runge_Kutta.py: 94%</title>
+    <title>Coverage for pySDC/implementations/sweeper_classes/Runge_Kutta.py: 95%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/sweeper_classes/Runge_Kutta.py</b>:
-            <span class="pc_cov">94%</span>
+            <span class="pc_cov">95%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,17 +55,17 @@
         </aside>
         <h2>
             <span class="text">219 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">206<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">13<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">208<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">11<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">18<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
             <a id="prevFileLink" class="nav" href="d_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_boris_2nd_order_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_Runge_Kutta_Nystrom_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-24 07:30 +0000
+            created at 2023-07-24 07:32 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -401,8 +401,8 @@
     <p class="pln"><span class="n"><a id="t319" href="#t319">319</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t320" href="#t320">320</a></span><span class="t">        <span class="key">assert</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">lvl</span><span class="op">,</span> <span class="nam">level</span><span class="op">)</span><span class="op">,</span> <span class="str">f"You tried to set the sweeper's level with an instance of {type(lvl)}!"</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t321" href="#t321">321</a></span><span class="t">        <span class="key">if</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">restol</span> <span class="op">></span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t322" href="#t322">322</a></span><span class="t">            <span class="nam">lvl</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">restol</span> <span class="op">=</span> <span class="op">-</span><span class="num">1</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t323" href="#t323">323</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">logger</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t322" href="#t322">322</a></span><span class="t">            <span class="nam">lvl</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">restol</span> <span class="op">=</span> <span class="op">-</span><span class="num">1</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t323" href="#t323">323</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">logger</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t324" href="#t324">324</a></span><span class="t">                <span class="str">'Overwriting residual tolerance with -1 because RK methods are direct and hence may not compute a residual at all!'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -637,10 +637,10 @@
         <p>
             <a id="prevFileLink" class="nav" href="d_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_boris_2nd_order_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_Runge_Kutta_Nystrom_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-24 07:30 +0000
+            created at 2023-07-24 07:32 +0000
         </p>
     </div>
 </footer>

@@ -8,6 +8,7 @@ Submodules
    :maxdepth: 2
 
    implementations.sweeper_classes.Runge_Kutta
+   implementations.sweeper_classes.Runge_Kutta_Nystrom
    implementations.sweeper_classes.boris_2nd_order
    implementations.sweeper_classes.explicit
    implementations.sweeper_classes.generic_LU

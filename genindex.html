@@ -385,15 +385,17 @@
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">(RungeKutta method)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point">(RungeKuttaNystrom method)</a>
+</li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.compute_end_point">(sweeper method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.compute_end_point">(verlet method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size">compute_optimal_step_size() (AdaptivityBase method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size">compute_optimal_step_size() (AdaptivityBase method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">compute_residual() (imex_1st_order_mass method)</a>
 
       <ul>
@@ -1214,7 +1216,11 @@
       <li><a href="pySDC/helpers.problem_helper.html#helpers.problem_helper.get_finite_difference_stencil">get_finite_difference_stencil() (in module helpers.problem_helper)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">get_full_f() (RungeKutta method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">(RungeKuttaNystrom method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestarting.get_implementation">get_implementation() (BasicRestarting class method)</a>
 
       <ul>
@@ -1271,10 +1277,10 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat">get_scalar_problems_manysweep_mat() (imex_1st_order method)</a>
 </li>
-      <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">get_scalar_problems_manysweep_mats() (boris_2nd_order method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">get_scalar_problems_manysweep_mats() (boris_2nd_order method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">get_scalar_problems_picardsweep_mats() (boris_2nd_order method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">get_scalar_problems_sweeper_mats() (boris_2nd_order method)</a>
@@ -2090,6 +2096,13 @@
 </li>
       </ul></li>
       <li>
+    implementations.sweeper_classes.Runge_Kutta_Nystrom
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#module-implementations.sweeper_classes.Runge_Kutta_Nystrom">module</a>
+</li>
+      </ul></li>
+      <li>
     implementations.sweeper_classes.verlet
 
       <ul>
@@ -2624,6 +2637,8 @@
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#module-implementations.sweeper_classes.Runge_Kutta">implementations.sweeper_classes.Runge_Kutta</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#module-implementations.sweeper_classes.Runge_Kutta_Nystrom">implementations.sweeper_classes.Runge_Kutta_Nystrom</a>
+</li>
         <li><a href="pySDC/implementations.sweeper_classes.verlet.html#module-implementations.sweeper_classes.verlet">implementations.sweeper_classes.verlet</a>
 </li>
         <li><a href="pySDC/implementations.transfer_classes.html#module-implementations.transfer_classes">implementations.transfer_classes</a>
@@ -3111,6 +3126,8 @@
         <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex">(class in implementations.problem_classes.boussinesq_helpers.standard_integrators)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">RKN (class in implementations.sweeper_classes.Runge_Kutta_Nystrom)</a>
+</li>
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.Rspace">Rspace (mesh_to_mesh attribute)</a>, <a href="pySDC/implementations.transfer_classes.TransferMesh_NoCoarse.html#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.Rspace">[1]</a>
 
       <ul>
@@ -3126,6 +3143,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">RungeKutta (class in implementations.sweeper_classes.Runge_Kutta)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">RungeKuttaNystrom (class in implementations.sweeper_classes.Runge_Kutta_Nystrom)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -3600,6 +3619,8 @@
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">(RungeKutta method)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes">(RungeKuttaNystrom method)</a>
+</li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.update_nodes">(sweeper method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.update_nodes">(verlet method)</a>
@@ -3630,6 +3651,8 @@
       <li><a href="pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol">vanderpol (class in implementations.problem_classes.Van_der_Pol_implicit)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.particles.vel">vel (particles attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">Velocity_Verlet (class in implementations.sweeper_classes.Runge_Kutta_Nystrom)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet">verlet (class in implementations.sweeper_classes.verlet)</a>
 </li>

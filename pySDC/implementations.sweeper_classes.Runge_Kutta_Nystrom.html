@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes.Runge_Kutta_Nystrom module &#8212; pySDC 5.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.boris_2nd_order module" href="implementations.sweeper_classes.boris_2nd_order.html" />
+    <link rel="prev" title="implementations.sweeper_classes.Runge_Kutta module" href="implementations.sweeper_classes.Runge_Kutta.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.boris_2nd_order.html" title="implementations.sweeper_classes.boris_2nd_order module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Runge_Kutta_Nystrom module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.sweeper_classes.Runge_Kutta_Nystrom">
+<span id="implementations-sweeper-classes-runge-kutta-nystrom-module"></span><h1>implementations.sweeper_classes.Runge_Kutta_Nystrom module<a class="headerlink" href="#module-implementations.sweeper_classes.Runge_Kutta_Nystrom" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
+<p>Runge-Kutta-Nystrom method
+<a class="reference external" href="https://link.springer.com/book/10.1007/978-3-540-78862-1">https://link.springer.com/book/10.1007/978-3-540-78862-1</a>
+page: 284
+Chapter: II.14 Numerical methods for Second order differential equations</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></p>
+<p>Runge-Kutta scheme that fits the interface of a sweeper.
+Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
+at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</p>
+<p>We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = &lt;Butcher tableau&gt;, but in this
+implementation, that would lead to a lot of wasted FLOPS from integrating with Q and then with Q_Delta and
+subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.</p>
+<p>This class only supports lower triangular Butcher tableaux such that the system can be solved with forward
+substitution. In this way, we don’t get the maximum order that we could for the number of stages, but computing the
+stages is much cheaper. In particular, if the Butcher tableaux is strictly lower triangular, we get an explicit
+method, which does not require us to solve a system of equations to compute the stages.</p>
+<p>Please be aware that all fundamental parameters of the Sweeper are ignored. These include</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>num_nodes</p></li>
+<li><p>collocation_class</p></li>
+<li><p>initial_guess</p></li>
+<li><p>QI</p></li>
+</ul>
+</div></blockquote>
+<p>All of these variables are either determined by the RK rule, or are not part of an RK scheme.</p>
+<dl class="simple">
+<dt>Attribues:</dt><dd><p>butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point">
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>In this Runge-Kutta implementation, the solution to the step is always stored in the last node</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">
+<span class="sig-name descname"><span class="pre">get_full_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_full_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test the right hand side funtion is the correct type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>dtype_f</em>) – Right hand side at a single node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Full right hand side as a mesh</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes">
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the u- and f-values at the collocation nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
+<p>Velocity-Verlet scheme
+<a class="reference external" href="https://de.wikipedia.org/wiki/Verlet-Algorithmus">https://de.wikipedia.org/wiki/Verlet-Algorithmus</a></p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.Runge_Kutta_Nystrom module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN"><code class="docutils literal notranslate"><span class="pre">RKN</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f"><code class="docutils literal notranslate"><span class="pre">get_full_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet"><code class="docutils literal notranslate"><span class="pre">Velocity_Verlet</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.Runge_Kutta.html"
+                          title="previous chapter">implementations.sweeper_classes.Runge_Kutta module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.boris_2nd_order.html"
+                          title="next chapter">implementations.sweeper_classes.boris_2nd_order module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.boris_2nd_order.html" title="implementations.sweeper_classes.boris_2nd_order module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Runge_Kutta_Nystrom module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>
