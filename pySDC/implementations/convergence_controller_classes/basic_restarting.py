@@ -3,6 +3,7 @@ from pySDC.implementations.convergence_controller_classes.spread_step_sizes impo
     SpreadStepSizesBlockwise,
 )
 from pySDC.core.Errors import ConvergenceError
+import numpy as np
 
 
 class BasicRestarting(ConvergenceController):
@@ -15,22 +16,20 @@ class BasicRestarting(ConvergenceController):
     """
 
     @classmethod
-    def get_implementation(cls, flavor):
+    def get_implementation(cls, useMPI):
         """
         Retrieve the implementation for a specific flavor of this class.
 
         Args:
-            flavor (str): The implementation that you want
+            useMPI (bool): Whether or not the controller uses MPI
 
         Returns:
             cls: The child class that implements the desired flavor
         """
-        if flavor == 'MPI':
+        if useMPI:
             return BasicRestartingMPI
-        elif flavor == 'nonMPI':
-            return BasicRestartingNonMPI
         else:
-            raise NotImplementedError(f'Flavor {flavor} of BasicRestarting is not implemented!')
+            return BasicRestartingNonMPI
 
     def __init__(self, controller, params, description, **kwargs):
         """
@@ -67,6 +66,7 @@ class BasicRestarting(ConvergenceController):
             "control_order": 95,
             "max_restarts": 10,
             "crash_after_max_restarts": True,
+            "restart_from_first_step": True,
             "step_size_spreader": SpreadStepSizesBlockwise.get_implementation(useMPI=params['useMPI']),
         }
 
@@ -118,7 +118,12 @@ class BasicRestarting(ConvergenceController):
         Returns:
             None
         """
-        controller.add_convergence_controller(self.params.step_size_spreader, description=description)
+        spread_step_sizes_params = {
+            'spread_from_first_restarted': not self.params.restart_from_first_step,
+        }
+        controller.add_convergence_controller(
+            self.params.step_size_spreader, description=description, params=spread_step_sizes_params
+        )
         return None
 
     def determine_restart(self, controller, S, **kwargs):
@@ -134,24 +139,6 @@ class BasicRestarting(ConvergenceController):
             None
         """
         raise NotImplementedError("Please implement a function to determine if we need a restart here!")
-
-    def prepare_next_block(self, controller, S, size, time, Tend, **kwargs):
-        """
-        Update restarts in a row for all steps.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            S (pySDC.Step): The current step
-            size (int): The number of ranks
-            time (list): List containing the time of all the steps
-            Tend (float): Final time of the simulation
-
-        Returns:
-            None
-        """
-        S.status.restarts_in_a_row = S.status.restarts_in_a_row + 1 if S.status.restart else 0
-
-        return None
 
 
 class BasicRestartingNonMPI(BasicRestarting):
@@ -174,7 +161,7 @@ class BasicRestartingNonMPI(BasicRestarting):
 
         return None
 
-    def determine_restart(self, controller, S, **kwargs):
+    def determine_restart(self, controller, S, MS, **kwargs):
         """
         Restart all steps after the first one which wants to be restarted as well, but also check if we lost patience
         with the restarts and want to move on anyways.
@@ -182,6 +169,7 @@ class BasicRestartingNonMPI(BasicRestarting):
         Args:
             controller (pySDC.Controller): The controller
             S (pySDC.Step): The current step
+            MS (list): List of active steps
 
         Returns:
             None
@@ -189,6 +177,7 @@ class BasicRestartingNonMPI(BasicRestarting):
         # check if we performed too many restarts
         if S.status.first:
             self.buffers.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
+
             if self.buffers.max_restart_reached and S.status.restart:
                 if self.params.crash_after_max_restarts:
                     raise ConvergenceError(f"Restarted {S.status.restarts_in_a_row} time(s) already, surrendering now.")
@@ -200,6 +189,38 @@ on...",
 
         self.buffers.restart = S.status.restart or self.buffers.restart
         S.status.restart = (S.status.restart or self.buffers.restart) and not self.buffers.max_restart_reached
+
+        if S.status.last and self.params.restart_from_first_step and not self.buffers.max_restart_reached:
+            for step in MS:
+                step.status.restart = self.buffers.restart
+
+        return None
+
+    def prepare_next_block(self, controller, S, size, time, Tend, MS, **kwargs):
+        """
+        Update restarts in a row for all steps.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+            size (int): The number of ranks
+            time (list): List containing the time of all the steps
+            Tend (float): Final time of the simulation
+            MS (list): List of active steps
+
+        Returns:
+            None
+        """
+        if S not in MS:
+            return None
+
+        restart_from = min([me.status.slot for me in MS if me.status.restart] + [size - 1])
+
+        if S.status.slot < restart_from:
+            MS[restart_from - S.status.slot].status.restarts_in_a_row = 0
+        else:
+            step = MS[S.status.slot - restart_from]
+            step.status.restarts_in_a_row = S.status.restarts_in_a_row + 1 if S.status.restart else 0
 
         return None
 
@@ -218,6 +239,11 @@ class BasicRestartingMPI(BasicRestarting):
             params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         """
+        from mpi4py import MPI
+
+        self.OR = MPI.LOR
+        self.INT = MPI.INT
+
         super().__init__(controller, params, description)
         self.buffers = Pars({"restart": False, "max_restart_reached": False, 'restart_earlier': False})
 
@@ -249,7 +275,7 @@ class BasicRestartingMPI(BasicRestarting):
 on...",
                     S,
                 )
-        elif not S.status.prev_done:
+        elif not S.status.prev_done and not self.params.restart_from_first_step:
             # receive information about restarts from earlier ranks
             self.buffers.restart_earlier, self.buffers.max_restart_reached = self.recv(comm, source=S.status.slot - 1)
 
@@ -257,7 +283,50 @@ on...",
         S.status.restart = (S.status.restart or self.buffers.restart_earlier) and not self.buffers.max_restart_reached
 
         # send information about restarts forward
-        if not S.status.last:
+        if not S.status.last and not self.params.restart_from_first_step:
             self.send(comm, dest=S.status.slot + 1, data=(S.status.restart, self.buffers.max_restart_reached))
+
+        if self.params.restart_from_first_step:
+            max_restart_reached = comm.bcast(S.status.restarts_in_a_row > self.params.max_restarts, root=0)
+            S.status.restart = comm.allreduce(S.status.restart, op=self.OR) and not max_restart_reached
+
+        return None
+
+    def prepare_next_block(self, controller, S, size, time, Tend, comm, **kwargs):
+        """
+        Update restarts in a row for all steps.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+            size (int): The number of ranks
+            time (list): List containing the time of all the steps
+            Tend (float): Final time of the simulation
+            comm (mpi4py.MPI.Intracomm): Communicator
+
+        Returns:
+            None
+        """
+
+        restart_from = min(comm.allgather(S.status.slot if S.status.restart else S.status.time_size - 1))
+
+        # send "backward" the number of restarts in a row
+        if S.status.slot >= restart_from:
+            buff = np.empty(1, dtype=int)
+            buff[0] = int(S.status.restarts_in_a_row + 1 if S.status.restart else 0)
+            self.Send(
+                comm,
+                dest=S.status.slot - restart_from,
+                buffer=[buff, self.INT],
+                blocking=False,
+            )
+
+        # receive new number of restarts in a row
+        if S.status.slot + restart_from < size:
+            buff = np.empty(1, dtype=int)
+            self.Recv(comm, source=(S.status.slot + restart_from), buffer=[buff, self.INT])
+            S.status.restarts_in_a_row = buff[0]
+        else:
+            S.status.restarts_in_a_row = 0
 
         return None

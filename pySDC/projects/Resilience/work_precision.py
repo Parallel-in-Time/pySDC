@@ -48,7 +48,7 @@ def single_run(problem, strategy, data, custom_description, num_procs=1, comm_wo
     Returns:
         None
     """
-    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRunMPI
+    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.projects.Resilience.hook import LogData
 
@@ -65,7 +65,7 @@ def single_run(problem, strategy, data, custom_description, num_procs=1, comm_wo
     stats, controller, _ = problem(
         custom_description=description,
         Tend=strategy.get_Tend(problem, num_procs),
-        hook_class=[LogData, LogWork, LogGlobalErrorPostRunMPI],
+        hook_class=[LogData, LogWork, LogGlobalErrorPostRun],
         custom_controller_params=controller_params,
         use_MPI=True,
         comm=comm,
@@ -79,6 +79,8 @@ def single_run(problem, strategy, data, custom_description, num_procs=1, comm_wo
             data[key] += [np.nan]
         else:
             data[key] += [mapping[1]([you[1] for you in me])]
+
+    comm.Free()
     return None
 
 

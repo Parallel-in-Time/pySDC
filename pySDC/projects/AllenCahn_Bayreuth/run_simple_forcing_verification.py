@@ -195,6 +195,8 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         assert niters == exp_iters, f'Got deviating iteration counts of {niters} instead of {exp_iters}'
         assert err_test < exp_err, f'Got deviating errors of {err_test} instead of {exp_err}'
 
+    space_comm.Free()
+
 
 def visualize_radii():
     """

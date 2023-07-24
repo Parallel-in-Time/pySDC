@@ -122,10 +122,7 @@ class LogGlobalErrorPostRun(hooks):
     The issue is that the convergence controllers can change the step size after the final iteration but before the
     `post_run` functions of the hooks are called, which results in a mismatch of `L.time + L.dt` as corresponding to
     when the solution is computed and when the error is computed. The issue is resolved by recording the time at which
-    the solution is computed in a private attribute of this class.
-
-    There is another issue: The MPI controller instantiates a step after the run is completed, meaning the final
-    solution is not accessed by computing the end point, but by using the initial value on the finest level.
+    the solution is computed in an attribute of this class.
     Additionally, the number of restarts is reset, which we need to filter recomputed values in post processing.
     For this reason, we need to mess with the private `__num_restarts` of the core Hooks class.
     """
@@ -172,7 +169,7 @@ class LogGlobalErrorPostRun(hooks):
         if level_number == 0 and step.status.last:
             L = step.levels[level_number]
 
-            u_num = self.get_final_solution(L)
+            u_num = L.uend
             u_ref = L.prob.u_exact(t=self.t_last_solution)
 
             self.logger.info(f'Finished with a global error of e={abs(u_num-u_ref):.2e}')
@@ -195,35 +192,6 @@ class LogGlobalErrorPostRun(hooks):
                 type='e_global_rel_post_run',
                 value=abs((u_num - u_ref) / u_ref),
             )
-
-    def get_final_solution(self, lvl):
-        """
-        Get the final solution from the level
-
-        Args:
-            lvl (pySDC.Level.level): The level
-        """
-        return lvl.uend
-
-
-class LogGlobalErrorPostRunMPI(LogGlobalErrorPostRun):
-    """
-    The MPI controller shows slightly different behaviour which is why the final solution is stored in a different place
-    than in the nonMPI controller.
-    """
-
-    def post_step(self, step, level_number):
-        super().post_step(step, level_number)
-        self.num_restarts = self._hooks__num_restarts
-
-    def get_final_solution(self, lvl):
-        """
-        Get the final solution from the level
-
-        Args:
-            lvl (pySDC.Level.level): The level
-        """
-        return lvl.u[0]
 
 
 class LogLocalErrorPostStep(LogError):

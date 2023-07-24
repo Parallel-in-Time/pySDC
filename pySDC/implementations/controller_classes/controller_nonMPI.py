@@ -38,13 +38,13 @@ class controller_nonMPI(controller):
         try:
             for _ in range(num_procs - 1):
                 self.MS.append(dill.copy(self.MS[0]))
-        # if this fails (e.g. due to un-picklable data in the steps), initialize seperately
+        # if this fails (e.g. due to un-picklable data in the steps), initialize separately
         except (dill.PicklingError, TypeError):
             self.logger.warning('Need to initialize steps separately due to pickling error')
             for _ in range(num_procs - 1):
                 self.MS.append(stepclass.step(description))
 
-        self.base_convergence_controllers += [BasicRestarting.get_implementation("nonMPI")]
+        self.base_convergence_controllers += [BasicRestarting.get_implementation(useMPI=False)]
         for convergence_controller in self.base_convergence_controllers:
             self.add_convergence_controller(convergence_controller, description)
 
@@ -150,7 +150,7 @@ class controller_nonMPI(controller):
 
             for S in MS_active[:restart_at]:
                 for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                    C.post_step_processing(self, S)
+                    C.post_step_processing(self, S, MS=MS_active)
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in self.MS]
