@@ -24,8 +24,8 @@ class particles_output(hooks):
         super(particles_output, self).pre_run(step, level_number)
         L = step.levels[0]
 
-        # if hasattr(L.prob.params, 'Tend'):
-        #     self.bar_run = progressbar.ProgressBar(max_value=L.prob.params.Tend)
+        # if hasattr(L.prob, 'Tend'):
+        #     self.bar_run = progressbar.ProgressBar(max_value=L.prob.Tend)
         # else:
         #     self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
@@ -46,7 +46,7 @@ class particles_output(hooks):
         # self.bar_run.update(L.time)
 
         R = np.linalg.norm(u.pos)
-        H = 1 / 2 * np.dot(u.vel[:, 0], u.vel[:, 0]) + L.prob.params.a0 / R
+        H = 1 / 2 * np.dot(u.vel[:, 0], u.vel[:, 0]) + L.prob.a0 / R
 
         self.add_to_stats(
             process=step.status.slot,
