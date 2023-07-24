@@ -67,13 +67,19 @@
 
 <div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the RHS</span>
+<span class="sd">        Routine to compute the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): the particles</span>
-<span class="sd">            t (float): current time (not used here)</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: RHS</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
@@ -92,12 +98,17 @@
 
 <div class="viewcode-block" id="fermi_pasta_ulam_tsingou.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact/initial trajectory at time t</span>
+<span class="sd">        Routine to compute the exact/initial trajectory at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact/initial position and velocity</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact/initial position and velocity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;error, u_exact only works for the initial time t0=0&#39;</span>
 
@@ -110,12 +121,17 @@
 
 <div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the Hamiltonian</span>
+<span class="sd">        Routine to compute the Hamiltonian.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): the particles</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            float: hamiltonian</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            The particles.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ham : float</span>
+<span class="sd">            The Hamiltonian.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ham</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
@@ -132,10 +148,15 @@
 <span class="sd">        Routine to compute the energy following</span>
 <span class="sd">        http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): the particles</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            dict: energies</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            The particles.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        energy : dict</span>
+<span class="sd">            The energies.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">energy</span> <span class="o">=</span> <span class="p">{}</span>

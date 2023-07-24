@@ -47,7 +47,7 @@
 <div class="viewcode-block" id="battery_n_capacitors"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors">[docs]</a><span class="k">class</span> <span class="nc">battery_n_capacitors</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the battery drain model with :math:`N` capacitors, where :math:`N` is an arbitrary integer greater than zero.</span>
-<span class="sd">    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`u_{C_n}` for</span>
+<span class="sd">    First, the capacitor :math:`C` serves as a battery and provides energy. When the voltage of the capacitor :math:`v_{C_n}` for</span>
 <span class="sd">    :math:`n=1,..,N` drops below their reference value :math:`V_{ref,n-1}`, the circuit switches to the next capacitor. If all capacitors</span>
 <span class="sd">    has dropped below their reference value, the voltage source :math:`V_s` provides further energy. The problem of simulating the</span>
 <span class="sd">    battery draining has :math:`N + 1` different states. Each of this state can be expressed as a nonhomogeneous linear system of</span>
@@ -146,7 +146,7 @@
 <span class="sd">        .. math::</span>
 <span class="sd">            v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.</span>
 
-<span class="sd">        :math:`max_{index}` is initialized to :math:`-1`. List &quot;switch&quot; contains a True if :math:`u_k \leq V_{ref,k-1}` is satisfied.</span>
+<span class="sd">        :math:`max_{index}` is initialized to :math:`-1`. List &quot;switch&quot; contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.</span>
 <span class="sd">            - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.</span>
 <span class="sd">            - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.</span>
 <span class="sd">              So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.</span>
@@ -526,7 +526,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rhs : dtype_f</span>
-<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">            Right-hand side for the nonlinear system.</span>
 <span class="sd">        factor : float</span>
 <span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
 <span class="sd">        u0 : dtype_u</span>

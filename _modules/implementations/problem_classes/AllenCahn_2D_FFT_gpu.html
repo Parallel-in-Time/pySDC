@@ -49,12 +49,33 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        xvalues: grid points in space</span>
-<span class="sd">        dx: cupy_mesh width</span>
-<span class="sd">        lap: spectral operator for Laplacian</span>
-<span class="sd">        rfft_object: planned real FFT for forward transformation</span>
-<span class="sd">        irfft_object: planned IFFT for backward transformation</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns in the problem.</span>
+<span class="sd">    nu : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the circles.</span>
+<span class="sd">    L : int</span>
+<span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
+<span class="sd">    init_type : str</span>
+<span class="sd">        Indicates which type of initial condition is used.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xvalues : cp.ndarray</span>
+<span class="sd">        Grid points in space.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Cupy mesh width.</span>
+<span class="sd">    lap : cp.ndarray</span>
+<span class="sd">        Spectral operator for Laplacian.</span>
+<span class="sd">    rfft_object :</span>
+<span class="sd">        Planned real FFT for forward transformation.</span>
+<span class="sd">    irfft_object :</span>
+<span class="sd">        Planned IFFT for backward transformation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
@@ -94,14 +115,19 @@
 
 <div class="viewcode-block" id="allencahn2d_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -114,16 +140,23 @@
 
 <div class="viewcode-block" id="allencahn2d_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple FFT solver for the diffusion part</span>
+<span class="sd">        Simple FFT solver for the diffusion part.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver (not used here so far).</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -134,13 +167,17 @@
 
 <div class="viewcode-block" id="allencahn2d_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
@@ -164,12 +201,33 @@
 <span class="sd">    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with</span>
 <span class="sd">    stabilized splitting</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        xvalues: grid points in space</span>
-<span class="sd">        dx: mesh width</span>
-<span class="sd">        lap: spectral operator for Laplacian</span>
-<span class="sd">        rfft_object: planned real FFT for forward transformation</span>
-<span class="sd">        irfft_object: planned IFFT for backward transformation</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns in the problem.</span>
+<span class="sd">    nu : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the circles.</span>
+<span class="sd">    L : int</span>
+<span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
+<span class="sd">    init_type : str</span>
+<span class="sd">        Indicates which type of initial condition is used.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xvalues : cp.ndarray</span>
+<span class="sd">        Grid points in space.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Cupy mesh width.</span>
+<span class="sd">    lap : cp.ndarray</span>
+<span class="sd">        Spectral operator for Laplacian.</span>
+<span class="sd">    rfft_object :</span>
+<span class="sd">        Planned real FFT for forward transformation.</span>
+<span class="sd">    irfft_object :</span>
+<span class="sd">        Planned IFFT for backward transformation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">init_type</span><span class="o">=</span><span class="s1">&#39;circle&#39;</span><span class="p">):</span>
@@ -178,14 +236,19 @@
 
 <div class="viewcode-block" id="allencahn2d_imex_stab.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -198,16 +261,23 @@
 
 <div class="viewcode-block" id="allencahn2d_imex_stab.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple FFT solver for the diffusion part</span>
+<span class="sd">        Simple FFT solver for the diffusion part.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver (not used here so far).</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>

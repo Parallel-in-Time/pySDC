@@ -68,16 +68,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HenonHeiles.henon_heiles.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the RHS</p>
+<dd><p>Routine to compute the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the particles.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the particles is computed (not used here).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>RHS</p>
+<dd class="field-even"><p><strong>me</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -88,13 +88,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian">
 <span class="sig-name descname"><span class="pre">eval_hamiltonian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles.eval_hamiltonian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the Hamiltonian</p>
+<dd><p>Routine to compute the Hamiltonian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – Current values of The particles.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>hamiltonian</p>
+<dd class="field-even"><p><strong>ham</strong> – The Hamiltonian.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -105,13 +105,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HenonHeiles.henon_heiles.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact/initial trajectory at time t</p>
+<dd><p>Routine to compute the exact/initial trajectory at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact/initial trajectory.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact/initial position and velocity</p>
+<dd class="field-even"><p><strong>me</strong> – Exact/initial position and velocity.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>

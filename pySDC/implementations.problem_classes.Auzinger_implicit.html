@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,9 +51,31 @@
 <span id="implementations-problem-classes-auzinger-implicit-module"></span><h1>implementations.problem_classes.Auzinger_implicit module<a class="headerlink" href="#module-implementations.problem_classes.Auzinger_implicit" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">auzinger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">auzinger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the Auzinger initial value problem</p>
+<blockquote>
+<div><p>This class implements the Auzinger equation as initial value problem. It can be found in doi.org/10.2140/camcos.2015.10.1.
+The system of two ordinary differential equations (ODEs) is given by</p>
+<div class="math notranslate nohighlight">
+\[\]</div>
+</div></blockquote>
+<p>rac{d y_1 (t)}{dt} = -y_2 (t) + y_1 (t) (1 - y^2_1 (t) - y^2_2 (t)),</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\]</div>
+</div></blockquote>
+<p>rac{d y_2 (t)}{dt} = y_1 (t) + 3 y_2 (t) (1 - y^2_1 (t) - y^2_2 (t))</p>
+<blockquote>
+<div><p>with initial condition <span class="math notranslate nohighlight">\(y(t) = (1, 0)^T\)</span> for <span class="math notranslate nohighlight">\(t \in [0, 10]\)</span>. The exact solution of this problem is</p>
+<div class="math notranslate nohighlight">
+\[y (t) = (\cos(t), \sin(t))^T.\]</div>
+<dl class="simple">
+<dt>newton_maxiter<span class="classifier">int, optional</span></dt><dd><p>Maximum number of iterations for Newton’s method.</p>
+</dd>
+<dt>newton_tol<span class="classifier">float, optional</span></dt><dd><p>Tolerance for Newton’s method to terminate.</p>
+</dd>
+</dl>
+</div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.dtype_f" title="Permalink to this definition">¶</a></dt>
@@ -68,16 +91,19 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the RHS for both components simultaneously</p>
+<dd><p>Routine to compute the right-hand side of the problem for both components simultaneously.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – the current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed (not used here).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>RHS, 2 components</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem (contains two components).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
 </dd>
 </dl>
 </dd></dl>
@@ -85,18 +111,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple Newton solver for the nonlinear system</p>
+<dd><p>Simple Newton solver for the nonlinear system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
-<li><p><strong>dt</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs.)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution u</p>
+<dd class="field-even"><p><strong>u</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -107,13 +133,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for the exact solution</p>
+<dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>mesh type containing the exact solution</p>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>

@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -69,16 +70,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the RHS for both components simultaneously</p>
+<dd><p>Routine to compute the right-hand side for both components simultaneously.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – the current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time at which the numerical solution is computed (not used here).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>RHS, 2 components</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side (contains 2 components).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -89,18 +90,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple Newton solver for the nonlinear system</p>
+<dd><p>Simple Newton solver for the nonlinear system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
-<li><p><strong>dt</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the nonlinear system.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution u</p>
+<dd class="field-even"><p><strong>u</strong> – The solution u.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -111,17 +112,17 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to approximate the exact solution at time t by scipy or give initial conditions when called at t=0</p>
+<dd><p>Routine to approximate the exact solution at time t by scipy or give initial conditions when called at <span class="math notranslate nohighlight">\(t=0\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
-<li><p><strong>u_init</strong> (<em>pySDC.problem.vanderpol.dtype_u</em>) – initial conditions for getting the exact solution</p></li>
-<li><p><strong>t_init</strong> (<em>float</em>) – the starting time</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.problem.vanderpol.dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>approximate exact solution</p>
+<dd class="field-even"><p><strong>me</strong> – Approximate exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>

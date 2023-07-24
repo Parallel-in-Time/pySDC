@@ -60,12 +60,17 @@
 
 <div class="viewcode-block" id="full_solar_system.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FullSolarSystem.html#implementations.problem_classes.FullSolarSystem.full_solar_system.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact/initial trajectory at time t</span>
+<span class="sd">        Routine to compute the exact/initial trajectory at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact/initial position and velocity</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact/initial trajectory.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Exact/initial position and velocity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;error, u_exact only works for the initial time t0=0&#39;</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>

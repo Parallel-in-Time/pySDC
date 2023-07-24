@@ -46,28 +46,53 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple script to run a Lorenz attractor problem.</span>
 
-<span class="sd">    The Lorenz attractor is a system of three ordinary differential equations that exhibits some chaotic behaviour.</span>
-<span class="sd">    It is well known for the &quot;Butterfly Effect&quot;, because the solution looks like a butterfly (solve to Tend = 100 or</span>
-<span class="sd">    so to see this with these initial conditions) and because of the chaotic nature.</span>
+<span class="sd">    The Lorenz attractor is a system of three ordinary differential equations (ODEs) that exhibits some chaotic behaviour.</span>
+<span class="sd">    It is well known for the &quot;Butterfly Effect&quot;, because the solution looks like a butterfly (solve to :math:`T_{end} = 100`</span>
+<span class="sd">    or so to see this with these initial conditions) and because of the chaotic nature.</span>
 
 <span class="sd">    Since the problem is non-linear, we need to use a Newton solver.</span>
 
-<span class="sd">    Problem and initial conditions do not originate from,</span>
-<span class="sd">    but were taken from doi.org/10.2140/camcos.2015.10.1</span>
+<span class="sd">    Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1</span>
 
-<span class="sd">    TODO : add equations with parameters</span>
+<span class="sd">    The system of ODEs is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d y_1(t)}{dt} = \sigma (y_2 (t) - y_1 (t)),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d y_2(t)}{dt} = \rho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)</span>
+
+<span class="sd">    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem are</span>
+<span class="sd">    :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sigma : float, optional</span>
+<span class="sd">        Parameter :math:`\sigma` of the problem.</span>
+<span class="sd">    rho : float, optional</span>
+<span class="sd">        Parameter :math:`\rho` of the problem.</span>
+<span class="sd">    beta : float, optional</span>
+<span class="sd">        Parameter :math:`\beta` of the problem.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Tolerance for Newton for termination.</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    work_counter : dict</span>
+<span class="sd">        Counts the iterations/nfev (here for Newton&#39;s method and the nfev for the right-hand side).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">28.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">8.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
@@ -80,14 +105,19 @@
 
 <div class="viewcode-block" id="LorenzAttractor.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># abbreviations</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
@@ -107,14 +137,21 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear system.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            dt (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the nonlinear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># abbreviations</span>
@@ -180,13 +217,19 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to return initial conditions or to approximate exact solution using scipy.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
-<span class="sd">            u_init (pySDC.implementations.problem_classes.Lorenz.dtype_u): initial conditions for getting the exact solution</span>
-<span class="sd">            t_init (float): the starting time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time at which the approximated exact solution is computed.</span>
+<span class="sd">        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float</span>
+<span class="sd">            The starting time.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The approximated exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 

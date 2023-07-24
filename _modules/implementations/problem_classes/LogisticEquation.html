@@ -57,11 +57,25 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u(t) = u(0) \frac{e^{\lambda t}}{1-u(0)+u(0)e^{\lambda t}}</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    u0 : float, optional</span>
+<span class="sd">        Initial condition.</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
+<span class="sd">    direct : bool, optional</span>
+<span class="sd">        Indicates if the problem should be solved directly or not. If False, it will be approximated by Newton.</span>
+<span class="sd">    lam : float, optional</span>
+<span class="sd">        Problem parameter :math:`\lambda`.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates if the Newton solver stops when nan values arise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">,</span> <span class="n">direct</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">direct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
@@ -79,12 +93,17 @@
 
 <div class="viewcode-block" id="logistics_equation.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Exact solution</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: mesh type containing the values</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -93,13 +112,19 @@
 
 <div class="viewcode-block" id="logistics_equation.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the RHS</span>
+<span class="sd">        Routine to compute the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): the current values</span>
-<span class="sd">            t (float): current time (not used here)</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: RHS, 1 component</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem (contains one component).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -108,16 +133,23 @@
 
 <div class="viewcode-block" id="logistics_equation.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple Newton solver for the nonlinear equation</span>
+<span class="sd">        Simple Newton solver for the nonlinear equation.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the nonlinear system</span>
-<span class="sd">            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f)</span>
+<span class="sd">            Right-hand side for the nonlinear system.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution u</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># create new mesh object from u0 and set initial values for iteration</span>
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>

@@ -53,12 +53,41 @@
 
 <span class="sd">    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        fft: fft object</span>
-<span class="sd">        X: grid coordinates in real space</span>
-<span class="sd">        K2: Laplace operator in spectral space</span>
-<span class="sd">        dx: mesh width in x direction</span>
-<span class="sd">        dy: mesh width in y direction</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int</span>
+<span class="sd">        Number of unknowns in the problem.</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the circles.</span>
+<span class="sd">    spectral : bool</span>
+<span class="sd">        Indicates if spectral initial condition is used.</span>
+<span class="sd">    TM : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    D : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    dw : float</span>
+<span class="sd">        Problem parameter.</span>
+<span class="sd">    L : int</span>
+<span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
+<span class="sd">    init_type : str, optional</span>
+<span class="sd">        Initialises type of initial state.</span>
+<span class="sd">    comm : bool, optional</span>
+<span class="sd">        Communicator.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fft :</span>
+<span class="sd">        fft object.</span>
+<span class="sd">    X : np.ogrid</span>
+<span class="sd">        Grid coordinates in real space.</span>
+<span class="sd">    K2 : np.ndarray</span>
+<span class="sd">        Laplace operator in spectral space</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Mesh width in x direction</span>
+<span class="sd">    dy : float</span>
+<span class="sd">        Mesh width in y direction</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -68,10 +97,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: fft data type (will be passed to parent class)</span>
-<span class="sd">            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        problem_params : dict</span>
+<span class="sd">            Custom parameters for the example.</span>
+<span class="sd">        dtype_u :</span>
+<span class="sd">            fft data type (will be passed to parent class).</span>
+<span class="sd">        dtype_f :</span>
+<span class="sd">            fft data type wuth implicit and explicit parts (will be passed to parent class).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Need at least two dimensions&#39;</span><span class="p">)</span>
@@ -134,14 +167,19 @@
 
 <div class="viewcode-block" id="allencahn_temp_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -180,16 +218,23 @@
 
 <div class="viewcode-block" id="allencahn_temp_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple FFT solver for the diffusion part</span>
+<span class="sd">        Simple FFT solver for the diffusion part.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver (not used here so far).</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
@@ -210,13 +255,17 @@
 
 <div class="viewcode-block" id="allencahn_temp_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">circle</span><span class="p">():</span>

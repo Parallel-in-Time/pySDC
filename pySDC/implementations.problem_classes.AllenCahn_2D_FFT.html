@@ -53,34 +53,61 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
+<li><p><strong>nu</strong> (<em>float</em>) – Problem parameter.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – Radius of the circles.</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
+<li><p><strong>init_type</strong> (<em>str</em>) – Indicates which type of initial condition is used.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.xvalues">
 <span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.xvalues" title="Permalink to this definition">¶</a></dt>
-<dd><p>grid points in space</p>
+<dd><p>Grid points in space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.dx" title="Permalink to this definition">¶</a></dt>
-<dd><p>mesh width</p>
+<dd><p>Mesh width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.lap">
 <span class="sig-name descname"><span class="pre">lap</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.lap" title="Permalink to this definition">¶</a></dt>
-<dd><p>spectral operator for Laplacian</p>
+<dd><p>Spectral operator for Laplacian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.rfft_object">
 <span class="sig-name descname"><span class="pre">rfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.rfft_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>planned real FFT for forward transformation</p>
+<dd><p>Planned real FFT for forward transformation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.irfft_object">
 <span class="sig-name descname"><span class="pre">irfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.irfft_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>planned IFFT for backward transformation</p>
+<dd><p>Planned IFFT for backward transformation.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -98,16 +125,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -118,18 +145,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple FFT solver for the diffusion part</p>
+<dd><p>Simple FFT solver for the diffusion part.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver (not used here so far).</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -140,17 +167,17 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t</p>
+<dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
-<li><p><strong>u_init</strong> (<em>pySDC.implementations.problem_classes.allencahn2d_imex.dtype_u</em>) – initial conditions for getting the exact solution</p></li>
-<li><p><strong>t_init</strong> (<em>float</em>) – the starting time</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.implementations.problem_classes.allencahn2d_imex.dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact solution</p>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -166,49 +193,76 @@
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex" title="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn2d_imex</span></code></a></p>
 <p>Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
 stabilized splitting</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
+<li><p><strong>nu</strong> (<em>float</em>) – Problem parameter.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – Radius of the circles.</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
+<li><p><strong>init_type</strong> (<em>str</em>) – Indicates which type of initial condition is used.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.xvalues">
 <span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.xvalues" title="Permalink to this definition">¶</a></dt>
-<dd><p>grid points in space</p>
+<dd><p>Grid points in space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.dx" title="Permalink to this definition">¶</a></dt>
-<dd><p>mesh width</p>
+<dd><p>Mesh width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.lap">
 <span class="sig-name descname"><span class="pre">lap</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.lap" title="Permalink to this definition">¶</a></dt>
-<dd><p>spectral operator for Laplacian</p>
+<dd><p>Spectral operator for Laplacian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.rfft_object">
 <span class="sig-name descname"><span class="pre">rfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.rfft_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>planned real FFT for forward transformation</p>
+<dd><p>Planned real FFT for forward transformation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.irfft_object">
 <span class="sig-name descname"><span class="pre">irfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.irfft_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>planned IFFT for backward transformation</p>
+<dd><p>Planned IFFT for backward transformation.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex_stab.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -219,18 +273,18 @@ stabilized splitting</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex_stab.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple FFT solver for the diffusion part</p>
+<dd><p>Simple FFT solver for the diffusion part.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver (not used here so far).</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
