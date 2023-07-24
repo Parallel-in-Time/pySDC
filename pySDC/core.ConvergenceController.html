@@ -54,6 +54,42 @@
 <p>Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
 count and time step size.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.Recv">
+<span class="sig-name descname"><span class="pre">Recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.Recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.Recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive some data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>source</strong> (<em>int</em>) – Where to look for receiving</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whatever has been received</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.Send">
+<span class="sig-name descname"><span class="pre">Send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.Send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.Send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send data to a different rank</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>dest</strong> (<em>int</em>) – The target rank</p></li>
+<li><p><strong>buffer</strong> – Buffer for the data</p></li>
+<li><p><strong>blocking</strong> (<em>bool</em>) – Whether the communication is blocking or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>request handle of the communication</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.add_variable">
 <span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.add_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.add_variable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a variable to a frozen class.</p>
@@ -135,6 +171,23 @@ This is called in <cite>it_check</cite> in the controller after every iteration 
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to pass messages at debug level to the logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>str</em>) – Message you want to log</p></li>
+<li><p><strong>S</strong> (<em>pySDC.step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -475,10 +528,13 @@ relevant information about the controller are known.</p>
     <ul>
 <li><a class="reference internal" href="#">core.ConvergenceController module</a><ul>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController"><code class="docutils literal notranslate"><span class="pre">ConvergenceController</span></code></a><ul>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.Recv"><code class="docutils literal notranslate"><span class="pre">Recv()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.Send"><code class="docutils literal notranslate"><span class="pre">Send()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.add_variable"><code class="docutils literal notranslate"><span class="pre">add_variable()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">check_iteration_status()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.convergence_control"><code class="docutils literal notranslate"><span class="pre">convergence_control()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.debug"><code class="docutils literal notranslate"><span class="pre">debug()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>

@@ -75,6 +75,28 @@ step otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_step_from_which_to_spread">
+<span class="sig-name descname"><span class="pre">get_step_from_which_to_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">restarts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwise.get_step_from_which_to_spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_step_from_which_to_spread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index of the step from which to spread the step size to all steps in the next block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>restarts</strong> (<em>list</em>) – List of booleans for each step, showing if it wants to be restarted</p></li>
+<li><p><strong>new_steps</strong> (<em>list</em>) – List of the new step sizes on the finest level of each step</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – Size of the time communicator</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the step from which we want to spread the step size</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwise.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define parameters here</p>
@@ -101,6 +123,27 @@ step otherwise.</p>
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpreadStepSizesBlockwiseMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwiseMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise" title="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpreadStepSizesBlockwise</span></code></a></p>
+<p>MPI version</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread">
+<span class="sig-name descname"><span class="pre">get_step_from_which_to_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index of the step from which to spread the step size to all steps in the next block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the step from which we want to spread the step size</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">
 <span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwiseMPI.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block" title="Permalink to this definition">¶</a></dt>
@@ -112,7 +155,7 @@ on Tend</p>
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
 <li><p><strong>S</strong> (<em>pySDC.step</em>) – The current step</p></li>
 <li><p><strong>size</strong> (<em>int</em>) – The number of ranks</p></li>
-<li><p><strong>time</strong> (<em>list</em>) – List containing the time of all the steps handled by the controller (or float in MPI implementation)</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – Time of the first step</p></li>
 <li><p><strong>Tend</strong> (<em>float</em>) – Final time of the simulation</p></li>
 <li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
 </ul>
@@ -130,6 +173,26 @@ on Tend</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpreadStepSizesBlockwiseNonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwiseNonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise" title="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpreadStepSizesBlockwise</span></code></a></p>
 <p>Non-MPI version</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread">
+<span class="sig-name descname"><span class="pre">get_step_from_which_to_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index of the step from which to spread the step size to all steps in the next block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>MS</strong> (<em>list</em>) – Active steps</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the step from which we want to spread the step size</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block">
 <span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/spread_step_sizes.html#SpreadStepSizesBlockwiseNonMPI.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block" title="Permalink to this definition">¶</a></dt>
@@ -169,14 +232,17 @@ on Tend</p>
 <li><a class="reference internal" href="#">implementations.convergence_controller_classes.spread_step_sizes module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise"><code class="docutils literal notranslate"><span class="pre">SpreadStepSizesBlockwise</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_implementation"><code class="docutils literal notranslate"><span class="pre">get_implementation()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_step_from_which_to_spread"><code class="docutils literal notranslate"><span class="pre">get_step_from_which_to_spread()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI"><code class="docutils literal notranslate"><span class="pre">SpreadStepSizesBlockwiseMPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread"><code class="docutils literal notranslate"><span class="pre">get_step_from_which_to_spread()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">prepare_next_block()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI"><code class="docutils literal notranslate"><span class="pre">SpreadStepSizesBlockwiseNonMPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread"><code class="docutils literal notranslate"><span class="pre">get_step_from_which_to_spread()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">prepare_next_block()</span></code></a></li>
 </ul>
 </li>

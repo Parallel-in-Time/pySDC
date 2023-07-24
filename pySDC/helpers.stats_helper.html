@@ -48,26 +48,9 @@
   <section id="module-helpers.stats_helper">
 <span id="helpers-stats-helper-module"></span><h1>helpers.stats_helper module<a class="headerlink" href="#module-helpers.stats_helper" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="helpers.stats_helper.filter_recomputed">
-<span class="sig-name descname"><span class="pre">filter_recomputed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_recomputed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_recomputed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter recomputed values from the stats and remove them.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>stats</strong> (<em>dict</em>) – Raw statistics from a controller run</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The filtered stats dict</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.filter_stats">
 <span class="sig-name descname"><span class="pre">filter_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to extract data from the dictrionary of statistics</p>
+<dd><p>Helper function to extract data from the dictionary of statistics</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -110,7 +93,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.get_sorted">
 <span class="sig-name descname"><span class="pre">get_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_sorted" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.
+<dd><p>Utility for filtering and sorting stats in a single call. Pass a communicator if using MPI.
 Keyword arguments are passed to <cite>filter_stats</cite> for filtering.</p>
 <p>stats (dict): raw statistics from a controller run
 sortby (str): string to specify which key to use for sorting</p>
@@ -157,7 +140,6 @@ sortby (str): string to specify which key to use for sorting</p>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">helpers.stats_helper module</a><ul>
-<li><a class="reference internal" href="#helpers.stats_helper.filter_recomputed"><code class="docutils literal notranslate"><span class="pre">filter_recomputed()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.stats_helper.filter_stats"><code class="docutils literal notranslate"><span class="pre">filter_stats()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.stats_helper.get_list_of_types"><code class="docutils literal notranslate"><span class="pre">get_list_of_types()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.stats_helper.get_sorted"><code class="docutils literal notranslate"><span class="pre">get_sorted()</span></code></a></li>

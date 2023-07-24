@@ -44,7 +44,7 @@
     <span class="n">stats</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_restarts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper function to extract data from the dictrionary of statistics</span>
+<span class="sd">    Helper function to extract data from the dictionary of statistics</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stats (dict): raw statistics from a controller run</span>
@@ -61,7 +61,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">recomputed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">filter_recomputed</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="c1"># get data if key matches the filter (if specified)</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="n">time</span> <span class="ow">or</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
@@ -74,8 +74,29 @@
             <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
     <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># gather the results across all ranks and the flatten the list</span>
+        <span class="c1"># gather the results across all ranks</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">sub_result</span> <span class="ow">in</span> <span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sub_result</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">if</span> <span class="n">recomputed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># delete values that have been recorded and superseded by similar, but not identical keys</span>
+        <span class="n">times_restarted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">me</span><span class="o">.</span><span class="n">time</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">me</span><span class="o">.</span><span class="n">num_restarts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_restarted</span><span class="p">:</span>
+            <span class="n">restarts</span> <span class="o">=</span> <span class="p">[(</span><span class="n">me</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">num_restarts</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="p">[</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">you</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">you</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num_restarts</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">restarts</span>
+            <span class="p">]</span>
+
+        <span class="c1"># delete values that were recorded at times that shouldn&#39;t be recorded because we performed a different step after the restart</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">!=</span> <span class="s1">&#39;_recomputed&#39;</span><span class="p">:</span>
+            <span class="n">other_restarted_steps</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;_recomputed&#39;</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">other_restarted_steps</span><span class="p">:</span>
+                <span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
 
     <span class="k">return</span> <span class="n">result</span></div>
 
@@ -104,32 +125,6 @@
     <span class="k">return</span> <span class="n">sorted_data</span></div>
 
 
-<div class="viewcode-block" id="filter_recomputed"><a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.filter_recomputed">[docs]</a><span class="k">def</span> <span class="nf">filter_recomputed</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter recomputed values from the stats and remove them.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        stats (dict): Raw statistics from a controller run</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dict: The filtered stats dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># delete values that have been recorded and superseded by similar, but not identical keys</span>
-    <span class="n">times_restarted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">me</span><span class="o">.</span><span class="n">time</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">me</span><span class="o">.</span><span class="n">num_restarts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_restarted</span><span class="p">:</span>
-        <span class="n">restarts</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">me</span><span class="o">.</span><span class="n">num_restarts</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;_recomputed&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">restarts</span><span class="p">):</span>
-            <span class="p">[</span><span class="n">stats</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">num_restarts</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-
-    <span class="c1"># delete values that were recorded at times that shouldn&#39;t be recorded because we performed a different step after the restart</span>
-    <span class="n">other_restarted_steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;_recomputed&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">stats</span><span class="p">[</span><span class="n">me</span><span class="p">]]</span>
-    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">other_restarted_steps</span><span class="p">:</span>
-        <span class="p">[</span><span class="n">stats</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-
-    <span class="k">return</span> <span class="n">stats</span></div>
-
-
 <div class="viewcode-block" id="get_list_of_types"><a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.get_list_of_types">[docs]</a><span class="k">def</span> <span class="nf">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function to get list of types registered in stats</span>
@@ -151,7 +146,7 @@
 
 <div class="viewcode-block" id="get_sorted"><a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.get_sorted">[docs]</a><span class="k">def</span> <span class="nf">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Utility for filtering and sorting stats in a single call. Pass a communicatior if using MPI.</span>
+<span class="sd">    Utility for filtering and sorting stats in a single call. Pass a communicator if using MPI.</span>
 <span class="sd">    Keyword arguments are passed to `filter_stats` for filtering.</span>
 
 <span class="sd">    stats (dict): raw statistics from a controller run</span>

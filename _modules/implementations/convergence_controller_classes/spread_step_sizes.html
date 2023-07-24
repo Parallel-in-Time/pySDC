@@ -65,6 +65,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">+</span><span class="mi">100</span><span class="p">,</span>
+            <span class="s2">&quot;spread_from_first_restarted&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;overwrite_to_reach_Tend&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
@@ -83,13 +85,56 @@
         <span class="k">if</span> <span class="n">useMPI</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SpreadStepSizesBlockwiseMPI</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">SpreadStepSizesBlockwiseNonMPI</span></div></div>
+            <span class="k">return</span> <span class="n">SpreadStepSizesBlockwiseNonMPI</span></div>
+
+<div class="viewcode-block" id="SpreadStepSizesBlockwise.get_step_from_which_to_spread"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_step_from_which_to_spread">[docs]</a>    <span class="k">def</span> <span class="nf">get_step_from_which_to_spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restarts</span><span class="p">,</span> <span class="n">new_steps</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the index of the step from which to spread the step size to all steps in the next block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            restarts (list): List of booleans for each step, showing if it wants to be restarted</span>
+<span class="sd">            new_steps (list): List of the new step sizes on the finest level of each step</span>
+<span class="sd">            size (int): Size of the time communicator</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The index of the step from which we want to spread the step size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span><span class="p">:</span>
+            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spread_from_first_restarted</span><span class="p">:</span>
+                <span class="n">spread_from_step</span> <span class="o">=</span> <span class="n">restart_at</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># we want to spread the smallest step size out of the steps that want to be restarted</span>
+                <span class="n">spread_from_step</span> <span class="o">=</span> <span class="n">restart_at</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">new_steps</span><span class="p">[</span><span class="n">restart_at</span><span class="p">:])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detected restart from step </span><span class="si">{</span><span class="n">restart_at</span><span class="si">}</span><span class="s1">. Spreading step size from step </span><span class="si">{</span><span class="n">spread_from_step</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">spread_from_step</span> <span class="o">=</span> <span class="n">restart_at</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Spreading step size from last step.&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">spread_from_step</span><span class="p">,</span> <span class="n">restart_at</span></div></div>
 
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseNonMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwise</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Non-MPI version</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread">[docs]</a>    <span class="k">def</span> <span class="nf">get_step_from_which_to_spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the index of the step from which to spread the step size to all steps in the next block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            MS (list): Active steps</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The index of the step from which we want to spread the step size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">restarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">]</span>
+        <span class="n">new_steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">if</span> <span class="n">me</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">else</span> <span class="mf">1e9</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_from_which_to_spread</span><span class="p">(</span><span class="n">restarts</span><span class="p">,</span> <span class="n">new_steps</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">),</span> <span class="n">S</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -111,20 +156,18 @@
         <span class="k">if</span> <span class="n">S</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="c1"># figure out where the block is restarted</span>
-        <span class="n">restarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">]</span>
-        <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span><span class="p">:</span>
-            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">restart_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">restarts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">spread_from_step</span><span class="p">,</span> <span class="n">restart_at</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step_from_which_to_spread</span><span class="p">(</span><span class="n">MS</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
         <span class="c1"># Compute the maximum allowed step size based on Tend.</span>
-        <span class="n">dt_max</span> <span class="o">=</span> <span class="p">(</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">size</span>
+        <span class="n">dt_all</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">dt</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">MS</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">me</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">]</span>
+        <span class="n">dt_max</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt_all</span><span class="p">[</span><span class="n">restart_at</span><span class="p">])</span> <span class="o">/</span> <span class="n">size</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">overwrite_to_reach_Tend</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="p">)</span>
 
         <span class="c1"># record the step sizes to restart with from all the levels of the step</span>
         <span class="n">new_steps</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
-            <span class="n">l</span> <span class="o">=</span> <span class="n">MS</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">[</span><span class="n">spread_from_step</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">MS</span><span class="p">[</span><span class="n">spread_from_step</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="c1"># overrule the step size control to reach Tend if needed</span>
             <span class="n">new_steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                 <span class="p">[</span>
@@ -149,6 +192,26 @@
 
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">[docs]</a><span class="k">class</span> <span class="nc">SpreadStepSizesBlockwiseMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwise</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MPI version</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread">[docs]</a>    <span class="k">def</span> <span class="nf">get_step_from_which_to_spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the index of the step from which to spread the step size to all steps in the next block.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The index of the step from which we want to spread the step size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">restarts</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">)</span>
+        <span class="n">new_steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">if</span> <span class="n">me</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">1e9</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_from_which_to_spread</span><span class="p">(</span><span class="n">restarts</span><span class="p">,</span> <span class="n">new_steps</span><span class="p">,</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI.prepare_next_block"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based</span>
@@ -158,27 +221,21 @@
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            S (pySDC.step): The current step</span>
 <span class="sd">            size (int): The number of ranks</span>
-<span class="sd">            time (list): List containing the time of all the steps handled by the controller (or float in MPI implementation)</span>
+<span class="sd">            time (float): Time of the first step</span>
 <span class="sd">            Tend (float): Final time of the simulation</span>
 <span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># figure out where the block is restarted</span>
-        <span class="n">restarts</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allgather</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">)</span>
-        <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span><span class="p">:</span>
-            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">restart_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">restarts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">spread_from_step</span><span class="p">,</span> <span class="n">restart_at</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step_from_which_to_spread</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
         <span class="c1"># Compute the maximum allowed step size based on Tend.</span>
-        <span class="n">dt_max</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">((</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">time</span><span class="p">)</span> <span class="o">/</span> <span class="n">size</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">restart_at</span><span class="p">)</span>
+        <span class="n">dt_max</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">((</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">time</span><span class="p">)</span> <span class="o">/</span> <span class="n">size</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">restart_at</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">overwrite_to_reach_Tend</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
 
         <span class="c1"># record the step sizes to restart with from all the levels of the step</span>
         <span class="n">new_steps</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">==</span> <span class="n">restart_at</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">==</span> <span class="n">spread_from_step</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
                 <span class="n">l</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="c1"># overrule the step size control to reach Tend if needed</span>
@@ -197,7 +254,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Overwriting stepsize control to reach Tend: </span><span class="si">{</span><span class="n">Tend</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">! New step size: </span><span class="si">{</span><span class="n">new_steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">S</span>
                     <span class="p">)</span>
-        <span class="n">new_steps</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">new_steps</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">restart_at</span><span class="p">)</span>
+        <span class="n">new_steps</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">new_steps</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">spread_from_step</span><span class="p">)</span>
 
         <span class="c1"># spread the step sizes to all levels</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
