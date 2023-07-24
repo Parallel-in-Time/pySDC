@@ -21,12 +21,17 @@ class full_solar_system(outer_solar_system):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact/initial trajectory at time t
+        Routine to compute the exact/initial trajectory at time t.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact/initial position and velocity
+        Parameters
+        ----------
+        t : float
+            Time of the exact/initial trajectory.
+
+        Returns
+        -------
+        me : dtype_u
+            Exact/initial position and velocity.
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
         me = self.dtype_u(self.init)

@@ -24,13 +24,18 @@ class outer_solar_system(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS
+        Routine to compute the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): the particles
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS
+        Parameters
+        ----------
+        u : dtype_u
+            The particles.
+        t (float): Current time at which the particles are computed (not used here).
+
+        Returns
+        -------
+        me : dtype_f
+            The right-hand side of the problem.
         """
         me = self.dtype_f(self.init, val=0.0)
 
@@ -57,12 +62,17 @@ class outer_solar_system(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact/initial trajectory at time t
+        Routine to compute the exact/initial trajectory at time t.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact/initial position and velocity
+        Parameters
+        ----------
+        t : float
+            Time of the exact/initial trajectory.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact/initial position and velocity.
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
         me = self.dtype_u(self.init)
@@ -92,12 +102,17 @@ class outer_solar_system(ptype):
 
     def eval_hamiltonian(self, u):
         """
-        Routine to compute the Hamiltonian
+        Routine to compute the Hamiltonian.
 
-        Args:
-            u (dtype_u): the particles
-        Returns:
-            float: hamiltonian
+        Parameters
+        ----------
+        u : dtype_u
+            The particles.
+
+        Returns
+        -------
+        ham : float
+            The Hamiltonian.
         """
 
         ham = 0

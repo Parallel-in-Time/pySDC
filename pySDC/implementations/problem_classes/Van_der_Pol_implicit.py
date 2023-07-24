@@ -30,16 +30,22 @@ class vanderpol(ptype):
         self.work_counters['rhs'] = WorkCounter()
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at t=0
+        r"""
+        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at :math:`t=0`.
 
-        Args:
-            t (float): current time
-            u_init (pySDC.problem.vanderpol.dtype_u): initial conditions for getting the exact solution
-            t_init (float): the starting time
+        Parameters
+        ----------
+        t : float
+            Current time.
+        u_init : pySDC.problem.vanderpol.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
-        Returns:
-            dtype_u: approximate exact solution
+        Returns
+        -------
+        me : dtype_u
+            Approximate exact solution.
         """
 
         me = self.dtype_u(self.init)
@@ -56,13 +62,19 @@ class vanderpol(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS for both components simultaneously
+        Routine to compute the right-hand side for both components simultaneously.
 
-        Args:
-            u (dtype_u): the current values
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS, 2 components
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed (not used here).
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side (contains 2 components).
         """
 
         x1 = u[0]
@@ -75,16 +87,23 @@ class vanderpol(ptype):
 
     def solve_system(self, rhs, dt, u0, t):
         """
-        Simple Newton solver for the nonlinear system
+        Simple Newton solver for the nonlinear system.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution u.
         """
 
         mu = self.mu

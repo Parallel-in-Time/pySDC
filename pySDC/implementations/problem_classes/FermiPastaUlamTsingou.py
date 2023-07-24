@@ -28,13 +28,19 @@ class fermi_pasta_ulam_tsingou(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS
+        Routine to compute the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): the particles
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         me = self.dtype_f(self.init, val=0.0)
 
@@ -53,12 +59,17 @@ class fermi_pasta_ulam_tsingou(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact/initial trajectory at time t
+        Routine to compute the exact/initial trajectory at time t.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact/initial position and velocity
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact/initial position and velocity.
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
 
@@ -71,12 +82,17 @@ class fermi_pasta_ulam_tsingou(ptype):
 
     def eval_hamiltonian(self, u):
         """
-        Routine to compute the Hamiltonian
+        Routine to compute the Hamiltonian.
 
-        Args:
-            u (dtype_u): the particles
-        Returns:
-            float: hamiltonian
+        Parameters
+        ----------
+        u : dtype_u
+            The particles.
+
+        Returns
+        -------
+        ham : float
+            The Hamiltonian.
         """
 
         ham = sum(
@@ -93,10 +109,15 @@ class fermi_pasta_ulam_tsingou(ptype):
         Routine to compute the energy following
         http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
 
-        Args:
-            u (dtype_u): the particles
-        Returns:
-            dict: energies
+        Parameters
+        ----------
+        u : dtype_u
+            The particles.
+
+        Returns
+        -------
+        energy : dict
+            The energies.
         """
 
         energy = {}
