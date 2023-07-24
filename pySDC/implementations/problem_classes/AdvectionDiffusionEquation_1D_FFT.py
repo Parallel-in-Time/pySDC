@@ -58,16 +58,14 @@ class advectiondiffusion1d_imex(ptype):
         self._makeAttributeAndRegister('nvars', 'c', 'freq', 'nu', 'L', localVars=locals(), readOnly=True)
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (self.params.nvars) % 2 != 0:
+        if (self.nvars) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p')
 
-        self.xvalues = np.array(
-            [i * self.params.L / self.params.nvars - self.params.L / 2.0 for i in range(self.params.nvars)]
-        )
+        self.xvalues = np.array([i * self.L / self.nvars - self.L / 2.0 for i in range(self.nvars)])
 
         kx = np.zeros(self.init[0] // 2 + 1)
         for i in range(0, len(kx)):
-            kx[i] = 2 * np.pi / self.params.L * i
+            kx[i] = 2 * np.pi / self.L * i
 
         self.ddx = kx * 1j
         self.lap = -(kx**2)
@@ -91,8 +89,8 @@ class advectiondiffusion1d_imex(ptype):
 
         f = self.dtype_f(self.init)
         tmp_u = np.fft.rfft(u)
-        tmp_impl = self.params.nu * self.lap * tmp_u
-        tmp_expl = -self.params.c * self.ddx * tmp_u
+        tmp_impl = self.nu * self.lap * tmp_u
+        tmp_expl = -self.c * self.ddx * tmp_u
         f.impl[:] = np.fft.irfft(tmp_impl)
         f.expl[:] = np.fft.irfft(tmp_expl)
 
@@ -120,7 +118,7 @@ class advectiondiffusion1d_imex(ptype):
         """
 
         me = self.dtype_u(self.init)
-        tmp = np.fft.rfft(rhs) / (1.0 - self.params.nu * factor * self.lap)
+        tmp = np.fft.rfft(rhs) / (1.0 - self.nu * factor * self.lap)
         me[:] = np.fft.irfft(tmp)
 
         return me
@@ -141,22 +139,20 @@ class advectiondiffusion1d_imex(ptype):
         """
 
         me = self.dtype_u(self.init, val=0.0)
-        if self.params.freq > 0:
-            omega = 2.0 * np.pi * self.params.freq
-            me[:] = np.sin(omega * (self.xvalues - self.params.c * t)) * np.exp(-t * self.params.nu * omega**2)
-        elif self.params.freq == 0:
+        if self.freq > 0:
+            omega = 2.0 * np.pi * self.freq
+            me[:] = np.sin(omega * (self.xvalues - self.c * t)) * np.exp(-t * self.nu * omega**2)
+        elif self.freq == 0:
             np.random.seed(1)
-            me[:] = np.random.rand(self.params.nvars)
+            me[:] = np.random.rand(self.nvars)
         else:
             t00 = 0.08
-            if self.params.nu > 0:
-                nbox = int(np.ceil(np.sqrt(4.0 * self.params.nu * (t00 + t) * 37.0 / (self.params.L**2))))
+            if self.nu > 0:
+                nbox = int(np.ceil(np.sqrt(4.0 * self.nu * (t00 + t) * 37.0 / (self.L**2))))
                 for k in range(-nbox, nbox + 1):
                     for i in range(self.init[0]):
-                        x = self.xvalues[i] - self.params.c * t + k * self.params.L
-                        me[i] += (
-                            np.sqrt(t00) / np.sqrt(t00 + t) * np.exp(-(x**2) / (4.0 * self.params.nu * (t00 + t)))
-                        )
+                        x = self.xvalues[i] - self.c * t + k * self.L
+                        me[i] += np.sqrt(t00) / np.sqrt(t00 + t) * np.exp(-(x**2) / (4.0 * self.nu * (t00 + t)))
         return me
 
 
@@ -201,7 +197,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
 
         f = self.dtype_f(self.init)
         tmp_u = np.fft.rfft(u)
-        tmp = self.params.nu * self.lap * tmp_u - self.params.c * self.ddx * tmp_u
+        tmp = self.nu * self.lap * tmp_u - self.c * self.ddx * tmp_u
         f[:] = np.fft.irfft(tmp)
 
         return f
@@ -228,7 +224,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         """
 
         me = self.dtype_u(self.init)
-        tmp = np.fft.rfft(rhs) / (1.0 - factor * (self.params.nu * self.lap - self.params.c * self.ddx))
+        tmp = np.fft.rfft(rhs) / (1.0 - factor * (self.nu * self.lap - self.c * self.ddx))
         me[:] = np.fft.irfft(tmp)
 
         return me
