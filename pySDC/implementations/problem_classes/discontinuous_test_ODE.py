@@ -1,5 +1,6 @@
 import numpy as np
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -44,6 +45,9 @@ class DiscontinuousTestODE(ptype):
 
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
+
+        if self.nvars != 1:
+            raise ParameterError('nvars has to be equal to 1!')
 
         self.t_switch_exact = np.log(5)
         self.t_switch = None
