@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = 'pySDC'
-version = '5.2.0'
+version = '5.3.0'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
@@ -13,6 +13,7 @@ authors=[
     {name='Thibaut Lunet', email='thibaut.lunet@tuhh.de'},
     {name='Thomas Baumann', email='t.baumann@fz-juelich.de'},
     {name='Lisa Wimmer', email='wimmer@uni-wuppertal.de'},
+    {name='Ikrom Akramov', email='ikrom.akramov@tuhh.de'},
     ]
 homepage = "http://www.parallel-in-time.org/pySDC/"
 repository = "https://github.com/Parallel-in-Time/pySDC/"
