@@ -606,7 +606,9 @@ def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False)
             get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed)
         )[:, 1]
     if use_switch_estimator:
-        data['state_function'] = np.array(get_sorted(stats, type='state_function', sortby='time', recomputed=recomputed))[:, 1]
+        data['state_function'] = np.array(
+            get_sorted(stats, type='state_function', sortby='time', recomputed=recomputed)
+        )[:, 1]
     if use_adaptivity or use_switch_estimator:
         data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
     data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
