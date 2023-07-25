@@ -45,8 +45,10 @@
 Besides the usual bugfixing and polishing, <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> now comes with linear multistep methods, classical Runge Kutta methods, DAE sweepers, and more/improved projects.
 We have second-order SDC on board, the brand-new switch estimator, a testing ground for compression with <a class="reference external" href="https://github.com/robertu94/libpressio">libpressio</a>, and more.</p></li>
 <li><p>March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their
-parameters explicitly with the constructor, and not with a dictionary (backward compatible, thanks &#64;tlunet). The resilience project
-now comes with the quench problem, resulting a collaboration between &#64;brownbaerchen and &#64;eschnaubelt during the
+parameters explicitly with the constructor, and not with a dictionary. <code class="docutils literal notranslate"><span class="pre">params</span></code> is now a property of the problem class, that returns the problem parameters into a dictionary,
+and parameters are also automatically stored as problem attribute using the <code class="docutils literal notranslate"><span class="pre">_makeAttributeAndRegister</span></code> method, allowing to define readonly paramters
+(warning: <strong>not backward compatible</strong>).
+The resilience project now comes with the quench problem, resulting a collaboration between &#64;brownbaerchen and &#64;eschnaubelt during the
 TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> for Version 6.</p></li>
 <li><p>January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website.
 We revived the <a class="reference external" href="https://app.codecov.io/gh/Parallel-in-Time/pySDC">codecov</a> connection and started the
