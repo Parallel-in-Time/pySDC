@@ -28,7 +28,7 @@ class grayscott_imex_diffusion(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(self, nvars=127, Du=1.0, Dv=0.01, A=0.09, B=0.086, spectral=None, L=2.0, comm=MPI.COMM_WORLD):
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
@@ -204,7 +204,7 @@ class grayscott_imex_diffusion(ptype):
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
-    def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(self, nvars=127, Du=1.0, Dv=0.01, A=0.09, B=0.086, spectral=None, L=2.0, comm=MPI.COMM_WORLD):
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         self.Ku -= self.A
         self.Kv -= self.B
@@ -256,7 +256,19 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
     dtype_f = comp2_mesh
 
-    def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(
+        self,
+        nvars=127,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        spectral=None,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        L=2.0,
+        comm=MPI.COMM_WORLD,
+    ):
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         # This may not run in parallel yet..
         assert self.comm.Get_size() == 1
@@ -430,7 +442,19 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 class grayscott_mi_linear(grayscott_imex_linear):
     dtype_f = comp2_mesh
 
-    def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(
+        self,
+        nvars=127,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        spectral=None,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        L=2.0,
+        comm=MPI.COMM_WORLD,
+    ):
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         # This may not run in parallel yet..
         assert self.comm.Get_size() == 1

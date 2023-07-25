@@ -50,7 +50,18 @@ class allencahn_fullyimplicit(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars, nu, eps, newton_maxiter, newton_tol, lin_tol, lin_maxiter, radius, order=2):
+    def __init__(
+        self,
+        nvars=(128, 128),
+        nu=2,
+        eps=0.04,
+        newton_maxiter=200,
+        newton_tol=1e-12,
+        lin_tol=1e-8,
+        lin_maxiter=100,
+        radius=0.25,
+        order=2,
+    ):
         """
         Initialization routine
         """
