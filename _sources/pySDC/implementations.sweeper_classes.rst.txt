@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
+   implementations.sweeper_classes.Multistep
    implementations.sweeper_classes.Runge_Kutta
    implementations.sweeper_classes.Runge_Kutta_Nystrom
    implementations.sweeper_classes.boris_2nd_order

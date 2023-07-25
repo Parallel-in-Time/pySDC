@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic &#8212; pySDC 5.2.0 documentation</title>
+    <title>implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic</a></li> 
       </ul>
@@ -58,7 +58,10 @@
 <span class="sd">        K: stiffness matrix incl. diffusion coefficient (and correct sign)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">fenics_mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">rhs_fenics_mesh</span><span class="p">):</span>
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine</span>
 
@@ -67,6 +70,12 @@
 <span class="sd">            dtype_u: FEniCS mesh data type (will be passed to parent class)</span>
 <span class="sd">            dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">c_nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">c_nvars</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">refinements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">refinements</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Sub domain for Periodic boundary condition</span>
         <span class="k">class</span> <span class="nc">PeriodicBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
@@ -90,13 +99,6 @@
                     <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span>
 
-        <span class="c1"># these parameters will be used later, so assert their existence</span>
-        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c_nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;family&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;refinements&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;delta&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate problem, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
         <span class="c1"># set logger level for FFC and dolfin</span>
         <span class="n">df</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;FFC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
@@ -106,21 +108,22 @@
         <span class="n">df</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;form_compiler&quot;</span><span class="p">][</span><span class="s2">&quot;cpp_optimize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># set mesh and refinement (for multilevel)</span>
-        <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">UnitSquareMesh</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c_nvars&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c_nvars&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;refinements&#39;</span><span class="p">]):</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">UnitSquareMesh</span><span class="p">(</span><span class="n">c_nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c_nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">refinements</span><span class="p">):</span>
             <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">refine</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
 
         <span class="c1"># define function space for future reference</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span>
-            <span class="n">mesh</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;family&#39;</span><span class="p">],</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">],</span> <span class="n">constrained_domain</span><span class="o">=</span><span class="n">PeriodicBoundary</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">family</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">constrained_domain</span><span class="o">=</span><span class="n">PeriodicBoundary</span><span class="p">())</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;DoFs on this level:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]))</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">fenics_vortex_2d</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">fenics_vortex_2d</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;c_nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;family&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;refinements&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;delta&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
         <span class="n">w</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
@@ -210,7 +213,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-        <span class="n">tmp</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="n">tmp</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
         <span class="n">fimpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__invert_mass_matrix</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">fimpl</span>
@@ -307,10 +310,10 @@
 <span class="s1">                           r*(1-pow(tanh(r*((0.75+3) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25+3))),2)) - </span><span class="se">\</span>
 <span class="s1">                           r*(1-pow(tanh(r*((0.75+4) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25+4))),2)) - </span><span class="se">\</span>
 <span class="s1">                           d*2*a*cos(2*a*(x[0]+0.25))&#39;</span><span class="p">,</span>
-            <span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span>
+            <span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+            <span class="n">r</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span>
             <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
-            <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
@@ -352,7 +355,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic</a></li> 
       </ul>

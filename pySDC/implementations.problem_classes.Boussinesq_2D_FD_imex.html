@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.problem_classes.Boussinesq_2D_FD_imex module &#8212; pySDC 5.2.0 documentation</title>
+    <title>implementations.problem_classes.Boussinesq_2D_FD_imex module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.Battery.html" title="implementations.problem_classes.Battery module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Boussinesq_2D_FD_imex module</a></li> 
@@ -51,9 +51,160 @@
 <span id="implementations-problem-classes-boussinesq-2d-fd-imex-module"></span><h1>implementations.problem_classes.Boussinesq_2D_FD_imex module<a class="headerlink" href="#module-implementations.problem_classes.Boussinesq_2D_FD_imex" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boussinesq_2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boussinesq_2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_adv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nfreq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_upw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_tol_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the 2D Boussinesq equation for different boundary conditions</p>
+<p>This class implements the two-dimensional Boussinesq equations for different boundary conditions with</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + \frac{\partial p}{\partial x} = 0,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial w}{\partial t} + U \frac{\partial w}{\partial x} + \frac{\partial p}{\partial z} = 0,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial b}{\partial t} + U \frac{\partial b}{\partial x} + N^2 w = 0,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial p}{\partial t} + U \frac{\partial p}{\partial x} + c^2 (\frac{\partial u}{\partial x} + \frac{\partial w}{\partial z}) = 0.\]</div>
+<p>They can be derived from the linearized Euler equations by a transformation of variables <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>list</em><em>, </em><em>optional</em>) – List of number of unknowns nvars.</p></li>
+<li><p><strong>c_s</strong> (<em>float</em><em>, </em><em>optional</em>) – Acoustic velocity <span class="math notranslate nohighlight">\(c_s\)</span>.</p></li>
+<li><p><strong>u_adv</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed <span class="math notranslate nohighlight">\(U\)</span>.</p></li>
+<li><p><strong>Nfreq</strong> (<em>float</em><em>, </em><em>optional</em>) – Stability frequency.</p></li>
+<li><p><strong>x_bounds</strong> (<em>list</em><em>, </em><em>optional</em>) – Domain in x-direction.</p></li>
+<li><p><strong>z_bounds</strong> (<em>list</em><em>, </em><em>optional</em>) – Domain in z-direction.</p></li>
+<li><p><strong>order_upwind</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of upwind scheme for discretization.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order for discretization.</p></li>
+<li><p><strong>gmres_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for GMRES solver.</p></li>
+<li><p><strong>gmres_restart</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of iterations between restarts in GMRES solver.</p></li>
+<li><p><strong>gmres_tol_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for GMRES solver to terminate.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N">
+<span class="sig-name descname"><span class="pre">N</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of number of unknowns nvars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_hor">
+<span class="sig-name descname"><span class="pre">bc_hor</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_hor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains type of boundary conditions for both boundaries for both dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver">
+<span class="sig-name descname"><span class="pre">bc_ver</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains type of boundary conditions for both boundaries for both dimemsions, e.g. ‘neumann’ or ‘dirichlet’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx">
+<span class="sig-name descname"><span class="pre">xx</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of np.ndarrays for mesh in x-direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.zz">
+<span class="sig-name descname"><span class="pre">zz</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.zz" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of np.ndarrays for mesh in z-direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.h">
+<span class="sig-name descname"><span class="pre">h</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mesh size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id">
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identity matrix for the equation of appropriate size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sp.sparse.eye</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.M">
+<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boussinesq 2D Matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.D_upwind">
+<span class="sig-name descname"><span class="pre">D_upwind</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.D_upwind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boussinesq 2D Upwind matrix for discretization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sp.csc_matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger">
+<span class="sig-name descname"><span class="pre">gmres_logger</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logger for GMRES solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>D. R. Durran. Numerical Methods for Fluid Dynamics. Texts Appl. Math. 32. Springer-Verlag, New York (2010)
+<a class="reference external" href="http://dx.doi.org/10.1007/978-1-4419-6412-0">http://dx.doi.org/10.1007/978-1-4419-6412-0</a>.</p>
+</aside>
+</aside>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f" title="Permalink to this definition">¶</a></dt>
@@ -129,6 +280,18 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Boussinesq_2D_FD_imex module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex"><code class="docutils literal notranslate"><span class="pre">boussinesq_2d_imex</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N"><code class="docutils literal notranslate"><span class="pre">N</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_hor"><code class="docutils literal notranslate"><span class="pre">bc_hor</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver"><code class="docutils literal notranslate"><span class="pre">bc_ver</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx"><code class="docutils literal notranslate"><span class="pre">xx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.zz"><code class="docutils literal notranslate"><span class="pre">zz</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.h"><code class="docutils literal notranslate"><span class="pre">h</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id"><code class="docutils literal notranslate"><span class="pre">Id</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.M"><code class="docutils literal notranslate"><span class="pre">M</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.D_upwind"><code class="docutils literal notranslate"><span class="pre">D_upwind</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger"><code class="docutils literal notranslate"><span class="pre">gmres_logger</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -185,7 +348,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.Battery.html" title="implementations.problem_classes.Battery module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Boussinesq_2D_FD_imex module</a></li> 

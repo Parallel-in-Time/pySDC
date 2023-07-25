@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes.Multistep module &#8212; pySDC 5.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.Runge_Kutta module" href="implementations.sweeper_classes.Runge_Kutta.html" />
+    <link rel="prev" title="implementations.sweeper_classes package" href="implementations.sweeper_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Multistep module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.sweeper_classes.Multistep">
+<span id="implementations-sweeper-classes-multistep-module"></span><h1>implementations.sweeper_classes.Multistep module<a class="headerlink" href="#module-implementations.sweeper_classes.Multistep" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdamsBashforthExplicit1Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#AdamsBashforthExplicit1Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
+<p>This is just forward Euler.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-1.0]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[1.0,</span> <span class="pre">0.0]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdamsMoultonImplicit1Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#AdamsMoultonImplicit1Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
+<p>Trapezoidal method dressed up as a multistep method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-1.0]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step.alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.5,</span> <span class="pre">0.5]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step.beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdamsMoultonImplicit2Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#AdamsMoultonImplicit2Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
+<p>Third order implicit scheme</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.0,</span> <span class="pre">-1.0]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-0.08333333333333333,</span> <span class="pre">0.6666666666666666,</span> <span class="pre">0.4166666666666667]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.generate_starting_values">
+<span class="sig-name descname"><span class="pre">generate_starting_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#AdamsMoultonImplicit2Step.generate_starting_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.generate_starting_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate starting value by trapezoidal rule.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.BackwardEuler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BackwardEuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#BackwardEuler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.BackwardEuler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
+<p>Almost as old, impressive and beloved as Koelner Dom.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.BackwardEuler.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-1.0]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.BackwardEuler.alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.BackwardEuler.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.0,</span> <span class="pre">1.0]</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.BackwardEuler.beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.Cache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#Cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.Cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for managing solutions and right hand side evaluations of previous steps for the MultiStep “sweeper”.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">u</span></span></dt>
+<dd><p>Contains solution from previous steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">f</span></span></dt>
+<dd><p>Contains right hand side evaluations from previous steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">t</span></span></dt>
+<dd><p>Contains time of previous steps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.Cache.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#Cache.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.Cache.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new value to the cache and remove the oldest one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time of new step</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Solution of new step</p></li>
+<li><p><strong>f</strong> (<em>dtype_f</em>) – Right hand side evaluation at new step</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiStep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.alpha" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.compute_end_point">
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.compute_end_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>The solution is stored in the single node that we have.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.compute_residual">
+<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.compute_residual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do nothing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The current stage of the step the level belongs to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.generate_starting_values">
+<span class="sig-name descname"><span class="pre">generate_starting_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep.generate_starting_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.generate_starting_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute solutions to the steps when not enough previous values are available for the multistep method.
+The initial conditions are added in <cite>predict</cite> since this is not bespoke behaviour to any method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial conditions to the cache if needed.</p>
+<p>Default prediction for the sweepers, only copies the values to all collocation nodes
+and evaluates the RHS of the ODE there</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.update_nodes">
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.update_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the solution to the current step. If the cache is not filled, we compute a provisional solution with a different method.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.Multistep module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step"><code class="docutils literal notranslate"><span class="pre">AdamsBashforthExplicit1Step</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.alpha"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.beta"><code class="docutils literal notranslate"><span class="pre">beta</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step"><code class="docutils literal notranslate"><span class="pre">AdamsMoultonImplicit1Step</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step.alpha"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step.beta"><code class="docutils literal notranslate"><span class="pre">beta</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step"><code class="docutils literal notranslate"><span class="pre">AdamsMoultonImplicit2Step</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.alpha"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.beta"><code class="docutils literal notranslate"><span class="pre">beta</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.generate_starting_values"><code class="docutils literal notranslate"><span class="pre">generate_starting_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.BackwardEuler.alpha"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.BackwardEuler.beta"><code class="docutils literal notranslate"><span class="pre">beta</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.Cache"><code class="docutils literal notranslate"><span class="pre">Cache</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.Cache.update"><code class="docutils literal notranslate"><span class="pre">update()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep"><code class="docutils literal notranslate"><span class="pre">MultiStep</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.alpha"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.beta"><code class="docutils literal notranslate"><span class="pre">beta</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.generate_starting_values"><code class="docutils literal notranslate"><span class="pre">generate_starting_values()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.html"
+                          title="previous chapter">implementations.sweeper_classes package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.Runge_Kutta.html"
+                          title="next chapter">implementations.sweeper_classes.Runge_Kutta module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.Multistep.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.Multistep module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.problem_classes.GrayScott_1D_FEniCS_implicit module &#8212; pySDC 5.2.0 documentation</title>
+    <title>implementations.problem_classes.GrayScott_1D_FEniCS_implicit module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.GeneralizedFisher_1D_PETSc.html" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GrayScott_1D_FEniCS_implicit module</a></li> 
@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-grayscott-1d-fenics-implicit-module"></span><h1>implementations.problem_classes.GrayScott_1D_FEniCS_implicit module<a class="headerlink" href="#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fenics_grayscott</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fenics_grayscott</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CG'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refinements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Du</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.086</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</p>
 <dl class="py attribute">
@@ -100,6 +100,18 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M">
 <span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M" title="Permalink to this definition">¶</a></dt>
 <dd><p>full mass matrix for both parts</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">fenics_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">fenics_mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -185,6 +197,8 @@
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F2"><code class="docutils literal notranslate"><span class="pre">F2</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F"><code class="docutils literal notranslate"><span class="pre">F</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M"><code class="docutils literal notranslate"><span class="pre">M</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
@@ -241,7 +255,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.GeneralizedFisher_1D_PETSc.html" title="implementations.problem_classes.GeneralizedFisher_1D_PETSc module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GrayScott_1D_FEniCS_implicit module</a></li> 

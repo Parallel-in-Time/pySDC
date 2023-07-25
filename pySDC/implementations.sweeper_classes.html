@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.sweeper_classes package &#8212; pySDC 5.2.0 documentation</title>
+    <title>implementations.sweeper_classes package &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -16,7 +16,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="implementations.sweeper_classes.Runge_Kutta module" href="implementations.sweeper_classes.Runge_Kutta.html" />
+    <link rel="next" title="implementations.sweeper_classes.Multistep module" href="implementations.sweeper_classes.Multistep.html" />
     <link rel="prev" title="implementations.problem_classes.nonlinear_ODE_1 module" href="implementations.problem_classes.nonlinear_ODE_1.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -29,12 +29,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+          <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes package</a></li> 
       </ul>
@@ -51,6 +51,15 @@
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html">implementations.sweeper_classes.Multistep module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step"><code class="docutils literal notranslate"><span class="pre">AdamsBashforthExplicit1Step</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit1Step"><code class="docutils literal notranslate"><span class="pre">AdamsMoultonImplicit1Step</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step"><code class="docutils literal notranslate"><span class="pre">AdamsMoultonImplicit2Step</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.Cache"><code class="docutils literal notranslate"><span class="pre">Cache</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep"><code class="docutils literal notranslate"><span class="pre">MultiStep</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html">implementations.sweeper_classes.Runge_Kutta module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler"><code class="docutils literal notranslate"><span class="pre">BackwardEuler</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
@@ -138,8 +147,8 @@
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="implementations.sweeper_classes.Runge_Kutta.html"
-                          title="next chapter">implementations.sweeper_classes.Runge_Kutta module</a></p>
+    <p class="topless"><a href="implementations.sweeper_classes.Multistep.html"
+                          title="next chapter">implementations.sweeper_classes.Multistep module</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -172,12 +181,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.sweeper_classes.Runge_Kutta.html" title="implementations.sweeper_classes.Runge_Kutta module"
+          <a href="implementations.sweeper_classes.Multistep.html" title="implementations.sweeper_classes.Multistep module"
              >next</a> |</li>
         <li class="right" >
           <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes package</a></li> 
       </ul>

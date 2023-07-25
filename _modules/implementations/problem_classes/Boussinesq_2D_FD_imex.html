@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.Boussinesq_2D_FD_imex &#8212; pySDC 5.2.0 documentation</title>
+    <title>implementations.problem_classes.Boussinesq_2D_FD_imex &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Boussinesq_2D_FD_imex</a></li> 
       </ul>
@@ -52,22 +52,108 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="boussinesq_2d_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex">[docs]</a><span class="k">class</span> <span class="nc">boussinesq_2d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the 2D Boussinesq equation for different boundary conditions</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the two-dimensional Boussinesq equations for different boundary conditions with</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + \frac{\partial p}{\partial x} = 0,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial w}{\partial t} + U \frac{\partial w}{\partial x} + \frac{\partial p}{\partial z} = 0,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial b}{\partial t} + U \frac{\partial b}{\partial x} + N^2 w = 0,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial p}{\partial t} + U \frac{\partial p}{\partial x} + c^2 (\frac{\partial u}{\partial x} + \frac{\partial w}{\partial z}) = 0.</span>
+
+<span class="sd">    They can be derived from the linearized Euler equations by a transformation of variables [1]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : list, optional</span>
+<span class="sd">        List of number of unknowns nvars.</span>
+<span class="sd">    c_s : float, optional</span>
+<span class="sd">        Acoustic velocity :math:`c_s`.</span>
+<span class="sd">    u_adv : float, optional</span>
+<span class="sd">        Advection speed :math:`U`.</span>
+<span class="sd">    Nfreq : float, optional</span>
+<span class="sd">        Stability frequency.</span>
+<span class="sd">    x_bounds : list, optional</span>
+<span class="sd">        Domain in x-direction.</span>
+<span class="sd">    z_bounds : list, optional</span>
+<span class="sd">        Domain in z-direction.</span>
+<span class="sd">    order_upwind : int, optional</span>
+<span class="sd">        Order of upwind scheme for discretization.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Order for discretization.</span>
+<span class="sd">    gmres_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for GMRES solver.</span>
+<span class="sd">    gmres_restart : int, optional</span>
+<span class="sd">        Number of iterations between restarts in GMRES solver.</span>
+<span class="sd">    gmres_tol_limit : float, optional</span>
+<span class="sd">        Tolerance for GMRES solver to terminate.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    N : list</span>
+<span class="sd">        List of number of unknowns nvars.</span>
+<span class="sd">    bc_hor : list</span>
+<span class="sd">        Contains type of boundary conditions for both boundaries for both dimensions.</span>
+<span class="sd">    bc_ver :</span>
+<span class="sd">        Contains type of boundary conditions for both boundaries for both dimemsions, e.g. &#39;neumann&#39; or &#39;dirichlet&#39;.</span>
+<span class="sd">    xx : np.ndarray</span>
+<span class="sd">        List of np.ndarrays for mesh in x-direction.</span>
+<span class="sd">    zz : np.ndarray</span>
+<span class="sd">        List of np.ndarrays for mesh in z-direction.</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Mesh size.</span>
+<span class="sd">    Id : sp.sparse.eye</span>
+<span class="sd">        Identity matrix for the equation of appropriate size.</span>
+<span class="sd">    M : np.ndarray</span>
+<span class="sd">        Boussinesq 2D Matrix.</span>
+<span class="sd">    D_upwind : sp.csc_matrix</span>
+<span class="sd">        Boussinesq 2D Upwind matrix for discretization.</span>
+<span class="sd">    gmres_logger : object</span>
+<span class="sd">        Logger for GMRES solver.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] D. R. Durran. Numerical Methods for Fluid Dynamics. Texts Appl. Math. 32. Springer-Verlag, New York (2010)</span>
+<span class="sd">        http://dx.doi.org/10.1007/978-1-4419-6412-0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: mesh data type (will be passed to parent class)</span>
-<span class="sd">            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">c_s</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">u_adv</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+        <span class="n">Nfreq</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">x_bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">z_bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">order_upw</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">gmres_maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">gmres_restart</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">gmres_tol_limit</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
-        <span class="c1"># these parameters will be used later, so assert their existence</span>
-        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nvars</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">30</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">x_bounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x_bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="mf">150.0</span><span class="p">,</span> <span class="mf">150.0</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">z_bounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">z_bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)]</span>
+
+        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
             <span class="s1">&#39;nvars&#39;</span><span class="p">,</span>
             <span class="s1">&#39;c_s&#39;</span><span class="p">,</span>
             <span class="s1">&#39;u_adv&#39;</span><span class="p">,</span>
@@ -79,18 +165,11 @@
             <span class="s1">&#39;gmres_maxiter&#39;</span><span class="p">,</span>
             <span class="s1">&#39;gmres_restart&#39;</span><span class="p">,</span>
             <span class="s1">&#39;gmres_tol_limit&#39;</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate problem, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
-        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">boussinesq_2d_imex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span>
@@ -105,14 +184,12 @@
             <span class="p">[</span><span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">],</span>
         <span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">get2DMesh</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">x_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">z_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">get2DMesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">Id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">getBoussinesq2DMatrix</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">c_s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Nfreq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nfreq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">D_upwind</span> <span class="o">=</span> <span class="n">getBoussinesq2DUpwindMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_adv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order_upw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D_upwind</span> <span class="o">=</span> <span class="n">getBoussinesq2DUpwindMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_adv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_upw</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">gmres_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="p">()</span>
 
@@ -144,9 +221,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span>
             <span class="n">b</span><span class="p">,</span>
             <span class="n">x0</span><span class="o">=</span><span class="n">u0</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
-            <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_tol_limit</span><span class="p">,</span>
-            <span class="n">restart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_restart</span><span class="p">,</span>
-            <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_maxiter</span><span class="p">,</span>
+            <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gmres_tol_limit</span><span class="p">,</span>
+            <span class="n">restart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gmres_restart</span><span class="p">,</span>
+            <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gmres_maxiter</span><span class="p">,</span>
             <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">,</span>
         <span class="p">)</span>
@@ -285,7 +362,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Boussinesq_2D_FD_imex</a></li> 
       </ul>
