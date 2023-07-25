@@ -14,7 +14,8 @@ from pySDC.projects.PinTSimE.battery_model import (
     check_solution,
     generate_description,
     get_recomputed,
-    log_data,
+    LogEvent,
+    LogData,
     proof_assertions_description,
 )
 import pySDC.helpers.plot_helper as plt_helper
@@ -28,21 +29,34 @@ def run(cwd='./'):
     """
     Routine to check the differences between using a switch estimator or not
 
-    Args:
-        cwd (str): current working directory
+    Parameters
+    ----------
+    cwd : str
+        Current working directory.
     """
 
-    dt_list = [4e-2, 4e-3]
+    dt_list = [1e-2, 1e-3]
     t0 = 0.0
     Tend = 0.3
 
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
+    num_nodes = 4
+    restol = -1
+    maxiter = 12
 
     ncapacitors = 1
     alpha = 1.2
     V_ref = np.array([1.0])
     C = np.array([1.0])
+
+    problem_params = dict()
+    problem_params['ncapacitors'] = ncapacitors
+    problem_params['C'] = C
+    problem_params['alpha'] = alpha
+    problem_params['V_ref'] = V_ref
+
+    hook_class = [LogData, LogEvent]
 
     max_restarts = 1
     use_switch_estimator = [True, False]
@@ -55,18 +69,20 @@ def run(cwd='./'):
         for dt_item in dt_list:
             for use_SE in use_switch_estimator:
                 for use_A in use_adaptivity:
+                    tol_event = 1e-10
                     description, controller_params = generate_description(
                         dt_item,
                         problem,
                         sweeper,
-                        log_data,
+                        num_nodes,
+                        hook_class,
                         use_A,
                         use_SE,
-                        ncapacitors,
-                        alpha,
-                        V_ref,
-                        C,
+                        problem_params,
+                        restol,
+                        maxiter,
                         max_restarts,
+                        tol_event,
                     )
 
                     # Assertions
@@ -76,11 +92,6 @@ def run(cwd='./'):
 
                     if use_A or use_SE:
                         check_solution(stats, dt_item, problem.__name__, use_A, use_SE)
-
-                    if use_SE:
-                        assert (
-                            len(get_recomputed(stats, type='switch', sortby='time')) >= 1
-                        ), 'No switches found for dt={}!'.format(dt_item)
 
                     fname = 'data/battery_dt{}_USE{}_USA{}_{}.dat'.format(dt_item, use_SE, use_A, sweeper.__name__)
                     f = open(fname, 'wb')
@@ -121,14 +132,20 @@ def run(cwd='./'):
 
 def accuracy_check(dt_list, problem, sweeper, V_ref, cwd='./'):
     """
-    Routine to check accuracy for different step sizes in case of using adaptivity
+    Routine to check accuracy for different step sizes in case of using adaptivity.
 
-    Args:
-        dt_list (list): list of considered (initial) step sizes
-        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
-        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
-        V_ref (np.float): reference value for the switch
-        cwd (str): current working directory
+    Parameters
+    ----------
+    dt_list : list
+        List of considered (initial) step sizes.
+    problem : pySDC.core.Problem.ptype
+        Problem class used to consider (the class name).
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper used to solve (the class name).
+    V_ref : float
+        Reference value for the switch.
+    cwd : str
+        Current working directory.
     """
 
     if len(dt_list) > 1:
@@ -236,17 +253,27 @@ def differences_around_switch(
     dt_list, problem, restarts_SE, restarts_adapt, restarts_SE_adapt, sweeper, V_ref, cwd='./'
 ):
     """
-    Routine to plot the differences before, at, and after the switch. Produces the diffs_estimation_<sweeper_class>.png file
+    Routine to plot the differences before, at, and after the switch. Produces the
+    diffs_estimation_<sweeper_class>.png file
 
-    Args:
-        dt_list (list): list of considered (initial) step sizes
-        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
-        restarts_SE (list): Restarts for the solve only using the switch estimator
-        restarts_adapt (list): Restarts for the solve of only using adaptivity
-        restarts_SE_adapt (list): Restarts for the solve of using both, switch estimator and adaptivity
-        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
-        V_ref (np.float): reference value for the switch
-        cwd (str): current working directory
+    Parameters
+    ----------
+    dt_list : list
+        List of considered (initial) step sizes.
+    problem : pySDC.core.Problem.ptype
+        Problem class used to consider (the class name).
+    restarts_SE : list
+        Restarts for the solve only using the switch estimator.
+    restarts_adapt : list
+        Restarts for the solve of only using adaptivity.
+    restarts_SE_adapt : list
+        Restarts for the solve of using both, switch estimator and adaptivity.
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper used to solve (the class name).
+    V_ref float
+        Reference value for the switch.
+    cwd : str
+        Current working directory.
     """
 
     diffs_true_at = []
@@ -297,9 +324,7 @@ def differences_around_switch(
         times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
         times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
 
-        diffs_true_at.append(
-            [diff_SE[m] for m in range(len(times_SE)) if np.isclose(times_SE[m], t_switch, atol=1e-15)][0]
-        )
+        diffs_true_at.append([diff_SE[m] for m in range(len(times_SE)) if abs(times_SE[m] - t_switch) <= 1e-17][0])
 
         diffs_false_before.append(
             [diff[m - 1] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]][0]
@@ -307,7 +332,7 @@ def differences_around_switch(
         diffs_false_after.append([diff[m] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]][0])
 
         for m in range(len(times_SE_adapt)):
-            if np.isclose(times_SE_adapt[m], t_switch_SE_adapt, atol=1e-10):
+            if abs(times_SE_adapt[m] - t_switch_SE_adapt) <= 1e-16:
                 diffs_true_at_adapt.append(diff_SE_adapt[m])
                 diffs_true_before_adapt.append(diff_SE_adapt[m - 1])
                 diffs_true_after_adapt.append(diff_SE_adapt[m + 1])
@@ -387,14 +412,21 @@ def differences_around_switch(
 
 def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
     """
-    Routine to plot the differences in time using the switch estimator or not. Produces the difference_estimation_<sweeper_class>.png file
+    Routine to plot the differences in time using the switch estimator or not. Produces the
+    difference_estimation_<sweeper_class>.png file.
 
-    Args:
-        dt_list (list): list of considered (initial) step sizes
-        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
-        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
-        V_ref (np.float): reference value for the switch
-        cwd (str): current working directory
+    Parameters
+    ----------
+    dt_list : list
+        List of considered (initial) step sizes.
+    problem : pySDC.core.Problem.ptype
+        Problem class used to consider (the class name).
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper used to solve (the class name).
+    V_ref : float
+        Reference value for the switch.
+    cwd : str
+        Current working directory.
     """
 
     if len(dt_list) > 1:
@@ -535,14 +567,21 @@ def differences_over_time(dt_list, problem, sweeper, V_ref, cwd='./'):
 
 def iterations_over_time(dt_list, maxiter, problem, sweeper, cwd='./'):
     """
-    Routine  to plot the number of iterations over time using switch estimator or not. Produces the iters_<sweeper_class>.png file
+    Routine  to plot the number of iterations over time using switch estimator or not. Produces the
+    iters_<sweeper_class>.png file.
 
-    Args:
-        dt_list (list): list of considered (initial) step sizes
-        maxiter (np.int): maximum number of iterations
-        problem (pySDC.core.Problem.ptype): Problem class used to consider (the class name)
-        sweeper (pySDC.core.Sweeper.sweeper): Sweeper used to solve (the class name)
-        cwd (str): current working directory
+    Parameters
+    ----------
+    dt_list : list
+        List of considered (initial) step sizes.
+    maxiter : int
+        Maximum number of iterations.
+    problem : pySDC.core.Problem.ptype
+        Problem class used to consider (the class name).
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper used to solve (the class name).
+    cwd : str
+        Current working directory.
     """
 
     iters_time_SE = []

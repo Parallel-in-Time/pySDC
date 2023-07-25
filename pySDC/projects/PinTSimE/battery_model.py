@@ -16,9 +16,14 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
-class log_data(hooks):
+class LogData(hooks):
+    """
+    Logs the data such as the numerical solution, the adapted step sizes by Adaptivity and the
+    embedded error estimate.
+    """
+
     def post_step(self, step, level_number):
-        super(log_data, self).post_step(step, level_number)
+        super(LogData, self).post_step(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
@@ -54,60 +59,101 @@ class log_data(hooks):
         )
 
 
+class LogEvent(hooks):
+    """
+    Logs the problem dependent state function of the battery drain model.
+    """
+
+    def post_step(self, step, level_number):
+        super(LogEvent, self).post_step(step, level_number)
+
+        L = step.levels[level_number]
+        P = L.prob
+
+        L.sweep.compute_end_point()
+
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='state_function',
+            value=L.uend[1] - P.V_ref[0],
+        )
+
+
 def generate_description(
     dt,
     problem,
     sweeper,
+    num_nodes,
     hook_class,
     use_adaptivity,
     use_switch_estimator,
-    ncapacitors,
-    alpha,
-    V_ref,
-    C,
+    problem_params,
+    restol,
+    maxiter,
     max_restarts=None,
+    tol_event=1e-10,
 ):
     """
     Generate a description for the battery models for a controller run.
-    Args:
-        dt (float): time step for computation
-        problem (pySDC.core.Problem.ptype): problem class that wants to be simulated
-        sweeper (pySDC.core.Sweeper.sweeper): sweeper class for solving the problem class numerically
-        hook_class (pySDC.core.Hooks): logged data for a problem
-        use_adaptivity (bool): flag if the adaptivity wants to be used or not
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-        ncapacitors (np.int): number of capacitors used for the battery_model
-        alpha (np.float): Multiple used for the initial conditions (problem_parameter)
-        V_ref (np.ndarray): Reference values for the capacitors (problem_parameter)
-        C (np.ndarray): Capacitances (problem_parameter
 
-    Returns:
-        description (dict): contains all information for a controller run
-        controller_params (dict): Parameters needed for a controller run
+    Parameters
+    ----------
+    dt : float
+        Time step for computation.
+    problem : pySDC.core.Problem.ptype
+        Problem class that wants to be simulated.
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper class for solving the problem class numerically.
+    num_nodes : int
+        Number of collocation nodes.
+    hook_class : pySDC.core.Hooks
+        Logged data for a problem.
+    use_adaptivity : bool
+        Flag if the adaptivity wants to be used or not.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
+    ncapacitors : int
+        Number of capacitors used for the battery_model.
+    alpha : float
+        Multiple used for the initial conditions (problem_parameter).
+    problem_params : dict
+        Dictionary containing the problem parameters.
+    restol : float
+        Residual tolerance to terminate.
+    maxiter : int
+        Maximum number of iterations to be done.
+    max_restarts : int, optional
+        Maximum number of restarts per step.
+    tol_event : float, optional
+        Tolerance for switch estimation to terminate.
+
+    Returns
+    -------
+    description : dict
+        Contains all information for a controller run.
+    controller_params : dict
+        Parameters needed for a controller run.
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = -1
+    level_params['restol'] = -1 if use_adaptivity else restol
     level_params['dt'] = dt
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 5
+    sweeper_params['num_nodes'] = num_nodes
     sweeper_params['QI'] = 'IE'
     sweeper_params['initial_guess'] = 'spread'
 
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['ncapacitors'] = ncapacitors  # number of capacitors
-    problem_params['C'] = C
-    problem_params['alpha'] = alpha
-    problem_params['V_ref'] = V_ref
-
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 4
+    step_params['maxiter'] = maxiter
 
     # initialize controller parameters
     controller_params = dict()
@@ -119,6 +165,7 @@ def generate_description(
     convergence_controllers = dict()
     if use_switch_estimator:
         switch_estimator_params = {}
+        switch_estimator_params['tol'] = tol_event
         convergence_controllers.update({SwitchEstimator: switch_estimator_params})
 
     if use_adaptivity:
@@ -147,16 +194,23 @@ def generate_description(
 
 def controller_run(description, controller_params, use_adaptivity, use_switch_estimator, t0, Tend):
     """
-    Executes a controller run for a problem defined in the description
+    Executes a controller run for a problem defined in the description.
 
-    Args:
-        description (dict): contains all information for a controller run
-        controller_params (dict): Parameters needed for a controller run
-        use_adaptivity (bool): flag if the adaptivity wants to be used or not
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+    Parameters
+    ----------
+    description : dict
+        Contains all information for a controller run.
+    controller_params : dict
+        Parameters needed for a controller run.
+    use_adaptivity : bool
+        Flag if the adaptivity wants to be used or not.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
 
-    Returns:
-        stats (dict): Raw statistics from a controller run
+    Returns
+    -------
+    stats : dict
+        Raw statistics from a controller run.
     """
 
     # instantiate controller
@@ -195,22 +249,46 @@ def run():
 
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
+    num_nodes = 4
+    restol = 1e-14
+    maxiter = 12
 
     ncapacitors = 1
     alpha = 1.2
     V_ref = np.array([1.0])
     C = np.array([1.0])
 
+    problem_params = dict()
+    problem_params['ncapacitors'] = ncapacitors
+    problem_params['C'] = C
+    problem_params['alpha'] = alpha
+    problem_params['V_ref'] = V_ref
+
     max_restarts = 1
     recomputed = False
-    use_switch_estimator = [True]
+    use_switch_estimator = [False]
     use_adaptivity = [True]
+
+    hook_class = [LogData, LogEvent]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
             for use_A in use_adaptivity:
+                tol_event = 1e-10 if problem.__name__ == 'generic_implicit' else 1e-17
+
                 description, controller_params = generate_description(
-                    dt, problem, sweeper, log_data, use_A, use_SE, ncapacitors, alpha, V_ref, C, max_restarts
+                    dt,
+                    problem,
+                    sweeper,
+                    num_nodes,
+                    hook_class,
+                    use_A,
+                    use_SE,
+                    problem_params,
+                    restol,
+                    maxiter,
+                    max_restarts,
+                    tol_event,
                 )
 
                 # Assertions
@@ -227,16 +305,24 @@ def run():
 
 def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimator, use_adaptivity, cwd='./'):
     """
-    Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model.
 
-    Args:
-        description(dict): contains all information for a controller run
-        problem (pySDC.core.Problem.ptype): problem class that wants to be simulated
-        sweeper (pySDC.core.Sweeper.sweeper): sweeper class for solving the problem class numerically
-        recomputed (bool): flag if the values after a restart are used or before
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-        use_adaptivity (bool): flag if adaptivity wants to be used or not
-        cwd (str): current working directory
+    Parameters
+    ----------
+    description : dict
+        Contains all information for a controller run.
+    problem : pySDC.core.Problem.ptype
+        Problem class that wants to be simulated.
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper class for solving the problem class numerically.
+    recomputed : bool
+        Flag if the values after a restart are used or before.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
+    use_adaptivity : bool
+        Flag if adaptivity wants to be used or not.
+    cwd : str
+        Current working directory.
     """
 
     f = open(cwd + 'data/{}_{}_USE{}_USA{}.dat'.format(problem, sweeper, use_switch_estimator, use_adaptivity), 'rb')
@@ -284,14 +370,21 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 
 def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
     """
-    Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
+    Function that checks the solution based on a hardcoded reference solution.
+    Based on check_solution function from @brownbaerchen.
 
-    Args:
-        stats (dict): Raw statistics from a controller run
-        dt (float): initial time step
-        problem (problem_class.__name__): the problem_class that is numerically solved
-        use_switch_estimator (bool):
-        use_adaptivity (bool):
+    Parameters
+    ----------
+    stats : dict
+        Raw statistics from a controller run.
+    dt : float
+        Initial time step.
+    problem : problem_class.__name__
+        The problem_class that is numerically solved
+    use_switch_estimator : bool
+        Indicates if switch detection is used or not.
+    use_adaptivity : bool
+        Indicate if adaptivity is used or not.
     """
 
     data = get_data_dict(stats, use_adaptivity, use_switch_estimator)
@@ -301,33 +394,23 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator and adaptivity for battery for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5474500710994862,
-                    'vC': 1.0019332967173764,
-                    'dt': 0.011761752270047832,
-                    'e_em': 8.001793672107738e-10,
-                    'switches': 0.18232155791181945,
-                    'restarts': 3.0,
-                    'sum_niters': 44.0,
+                    'cL': 0.5393867578762905,
+                    'vC': 1.0000000000128175,
+                    'dt': 0.09016888395614442,
+                    'e_em': 2.220446049250313e-16,
+                    'state_function': 1.2817524819297432e-11,
+                    'restarts': 14.0,
+                    'sum_niters': 528.0,
                 }
-            elif dt == 4e-2:
+            elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5525783945667581,
-                    'vC': 1.00001743462299,
-                    'dt': 0.03550610373897258,
-                    'e_em': 6.21240694442804e-08,
-                    'switches': 0.18231603298272345,
-                    'restarts': 4.0,
-                    'sum_niters': 56.0,
-                }
-            elif dt == 4e-3:
-                expected = {
-                    'cL': 0.5395601429161445,
-                    'vC': 1.0000413761942089,
-                    'dt': 0.028281271825675414,
-                    'e_em': 2.5628611677319668e-08,
-                    'switches': 0.18230920573953438,
-                    'restarts': 3.0,
-                    'sum_niters': 48.0,
+                    'cL': 0.5393867578404922,
+                    'vC': 1.0000000000097553,
+                    'dt': 0.01852918796343711,
+                    'e_em': 2.220446049250313e-16,
+                    'state_function': 9.755307672776325e-12,
+                    'restarts': 14.0,
+                    'sum_niters': 564.0,
                 }
 
             got = {
@@ -335,7 +418,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'vC': data['vC'][-1],
                 'dt': data['dt'][-1],
                 'e_em': data['e_em'][-1],
-                'switches': data['switches'][-1],
+                'state_function': data['state_function'][-1],
                 'restarts': data['restarts'],
                 'sum_niters': data['sum_niters'],
             }
@@ -343,33 +426,25 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator for battery for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5495834172613568,
-                    'vC': 1.000118710428906,
-                    'switches': 0.1823188001399631,
-                    'restarts': 1.0,
-                    'sum_niters': 128.0,
+                    'cL': 0.5491221336263004,
+                    'vC': 0.9999999999999998,
+                    'state_function': -2.220446049250313e-16,
+                    'restarts': 4.0,
+                    'sum_niters': 444.0,
                 }
-            elif dt == 4e-2:
+            elif dt == 1e-3:
                 expected = {
-                    'cL': 0.553775247309617,
-                    'vC': 1.0010140038721593,
-                    'switches': 0.1824302065533169,
-                    'restarts': 1.0,
-                    'sum_niters': 36.0,
-                }
-            elif dt == 4e-3:
-                expected = {
-                    'cL': 0.5495840499078819,
-                    'vC': 1.0001158309787614,
-                    'switches': 0.18232183080236553,
-                    'restarts': 1.0,
-                    'sum_niters': 308.0,
+                    'cL': 0.5407340515900249,
+                    'vC': 0.9999999999999998,
+                    'state_function': -2.220446049250313e-16,
+                    'restarts': 3.0,
+                    'sum_niters': 3660.0,
                 }
 
             got = {
                 'cL': data['cL'][-1],
                 'vC': data['vC'][-1],
-                'switches': data['switches'][-1],
+                'state_function': data['state_function'][-1],
                 'restarts': data['restarts'],
                 'sum_niters': data['sum_niters'],
             }
@@ -378,30 +453,21 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using adaptivity for battery for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5401449976237487,
-                    'vC': 0.9944656165121677,
-                    'dt': 0.013143356036619536,
-                    'e_em': 1.2462494369813726e-09,
-                    'restarts': 3.0,
-                    'sum_niters': 52.0,
+                    'cL': 0.6212002265916728,
+                    'vC': 0.9227219154001182,
+                    'dt': 0.018387805115298306,
+                    'e_em': 2.220446049250313e-16,
+                    'restarts': 0.0,
+                    'sum_niters': 48.0,
                 }
-            elif dt == 4e-2:
+            elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5966289599915113,
-                    'vC': 0.9923148791604984,
-                    'dt': 0.03564958366355817,
-                    'e_em': 6.210964231812e-08,
-                    'restarts': 1.0,
-                    'sum_niters': 36.0,
-                }
-            elif dt == 4e-3:
-                expected = {
-                    'cL': 0.5431613774808756,
-                    'vC': 0.9934307674636834,
-                    'dt': 0.022880524075396924,
-                    'e_em': 1.1130212751453428e-08,
-                    'restarts': 3.0,
-                    'sum_niters': 52.0,
+                    'cL': 0.6916091953888337,
+                    'vC': 0.9657300508434754,
+                    'dt': 0.1656405031934166,
+                    'e_em': 1.0658141036401503e-14,
+                    'restarts': 0.0,
+                    'sum_niters': 60.0,
                 }
 
             got = {
@@ -418,33 +484,23 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator and adaptivity for battery_implicit for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5395401085152521,
-                    'vC': 1.00003663985255,
-                    'dt': 0.011465727118881608,
+                    'cL': 0.53938675787623,
+                    'vC': 1.0000000000128175,
+                    'dt': 0.09016886276237707,
                     'e_em': 2.220446049250313e-16,
-                    'switches': 0.18231044486762837,
-                    'restarts': 4.0,
-                    'sum_niters': 44.0,
+                    'state_function': 1.2817524819297432e-11,
+                    'restarts': 14.0,
+                    'sum_niters': 528.0,
                 }
-            elif dt == 4e-2:
+            elif dt == 1e-3:
                 expected = {
-                    'cL': 0.6717104472882885,
-                    'vC': 1.0071670698947914,
-                    'dt': 0.035896059229296486,
-                    'e_em': 6.208836400567463e-08,
-                    'switches': 0.18232158833761175,
-                    'restarts': 3.0,
-                    'sum_niters': 36.0,
-                }
-            elif dt == 4e-3:
-                expected = {
-                    'cL': 0.5396216192241711,
-                    'vC': 1.0000561014463172,
-                    'dt': 0.009904645972832471,
+                    'cL': 0.5393867578404211,
+                    'vC': 1.0000000000097553,
+                    'dt': 0.01852918796342412,
                     'e_em': 2.220446049250313e-16,
-                    'switches': 0.18230549652342606,
-                    'restarts': 4.0,
-                    'sum_niters': 44.0,
+                    'state_function': 9.755307672776325e-12,
+                    'restarts': 14.0,
+                    'sum_niters': 564.0,
                 }
 
             got = {
@@ -452,7 +508,7 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'vC': data['vC'][-1],
                 'dt': data['dt'][-1],
                 'e_em': data['e_em'][-1],
-                'switches': data['switches'][-1],
+                'state_function': data['state_function'][-1],
                 'restarts': data['restarts'],
                 'sum_niters': data['sum_niters'],
             }
@@ -460,33 +516,25 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator for battery_implicit for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5495834122430945,
-                    'vC': 1.000118715162845,
-                    'switches': 0.18231880065636324,
-                    'restarts': 1.0,
-                    'sum_niters': 128.0,
+                    'cL': 0.549099295295675,
+                    'vC': 0.999999999999999,
+                    'state_function': -9.992007221626409e-16,
+                    'restarts': 5.0,
+                    'sum_niters': 468.0,
                 }
-            elif dt == 4e-2:
+            elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5537752525450169,
-                    'vC': 1.0010140112484431,
-                    'switches': 0.18243023230469263,
-                    'restarts': 1.0,
-                    'sum_niters': 36.0,
-                }
-            elif dt == 4e-3:
-                expected = {
-                    'cL': 0.5495840604357269,
-                    'vC': 1.0001158454740509,
-                    'switches': 0.1823218812753008,
-                    'restarts': 1.0,
-                    'sum_niters': 308.0,
+                    'cL': 0.5407340515900175,
+                    'vC': 1.0000000000000022,
+                    'state_function': 2.220446049250313e-15,
+                    'restarts': 3.0,
+                    'sum_niters': 3660.0,
                 }
 
             got = {
                 'cL': data['cL'][-1],
                 'vC': data['vC'][-1],
-                'switches': data['switches'][-1],
+                'state_function': data['state_function'][-1],
                 'restarts': data['restarts'],
                 'sum_niters': data['sum_niters'],
             }
@@ -495,30 +543,21 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using adaptivity for battery_implicit for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5569818284195267,
-                    'vC': 0.9846733115433628,
-                    'dt': 0.01,
+                    'cL': 0.6601456662045085,
+                    'vC': 0.9227219154001187,
+                    'dt': 0.018387805115298306,
                     'e_em': 2.220446049250313e-16,
-                    'restarts': 9.0,
-                    'sum_niters': 88.0,
+                    'restarts': 0.0,
+                    'sum_niters': 48.0,
                 }
-            elif dt == 4e-2:
+            elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5556563012729733,
-                    'vC': 0.9930947318467772,
-                    'dt': 0.035507110551631804,
-                    'e_em': 6.2098696185231e-08,
-                    'restarts': 6.0,
-                    'sum_niters': 64.0,
-                }
-            elif dt == 4e-3:
-                expected = {
-                    'cL': 0.5401117929618637,
-                    'vC': 0.9933888475391347,
-                    'dt': 0.03176025170463925,
-                    'e_em': 4.0386798239033794e-08,
-                    'restarts': 8.0,
-                    'sum_niters': 80.0,
+                    'cL': 0.6998265072942349,
+                    'vC': 0.9657300508434863,
+                    'dt': 0.1656405031934166,
+                    'e_em': 1.0690337504115632e-12,
+                    'restarts': 0.0,
+                    'sum_niters': 60.0,
                 }
 
             got = {
@@ -541,18 +580,24 @@ def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False)
     Converts the statistics in a useful data dictionary so that it can be easily checked in the check_solution function.
     Based on @brownbaerchen's get_data function.
 
-    Args:
-        stats (dict): Raw statistics from a controller run
-        use_adaptivity (bool): flag if adaptivity wants to be used or not
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-        recomputed (bool): flag if the values after a restart are used or before
+    Parameters
+    ----------
+    stats : dict
+        Raw statistics from a controller run.
+    use_adaptivity : bool
+        Flag if adaptivity wants to be used or not.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
+    recomputed : bool
+        Flag if the values after a restart are used or before.
 
-    Return:
-        data (dict): contains all information as the statistics dict
+    Returns
+    -------
+    data : dict
+        Contains all information as the statistics dict.
     """
 
     data = dict()
-
     data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed, sortby='time')])
     data['vC'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed, sortby='time')])
     if use_adaptivity:
@@ -561,7 +606,7 @@ def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False)
             get_sorted(stats, type='error_embedded_estimate', recomputed=recomputed, sortby='time')
         )[:, 1]
     if use_switch_estimator:
-        data['switches'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[:, 1]
+        data['state_function'] = np.array(get_sorted(stats, type='state_function', sortby='time'))[:, 1]
     if use_adaptivity or use_switch_estimator:
         data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
     data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
@@ -574,13 +619,19 @@ def get_recomputed(stats, type, sortby):
     Function that filters statistics after a recomputation. It stores all value of a type before restart. If there are multiple values
     with same time point, it only stores the elements with unique times.
 
-    Args:
-        stats (dict): Raw statistics from a controller run
-        type (str): the type the be filtered
-        sortby (str): string to specify which key to use for sorting
+    Parameters
+    ----------
+    stats : dict
+        Raw statistics from a controller run.
+    type : str
+        The type the be filtered.
+    sortby : str
+        String to specify which key to use for sorting.
 
-    Returns:
-        sorted_list (list): list of filtered statistics
+    Returns
+    -------
+    sorted_list : list
+        List of filtered statistics.
     """
 
     sorted_nested_list = []
@@ -604,10 +655,14 @@ def proof_assertions_description(description, use_adaptivity, use_switch_estimat
     """
     Function to proof the assertions in the description.
 
-    Args:
-        description(dict): contains all information for a controller run
-        use_adaptivity (bool): flag if adaptivity wants to be used or not
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+    Parameters
+    ----------
+    description : dict
+        Contains all information for a controller run.
+    use_adaptivity : bool
+        Flag if adaptivity wants to be used or not.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
     """
 
     n = description['problem_params']['ncapacitors']
@@ -631,19 +686,24 @@ def proof_assertions_description(description, use_adaptivity, use_switch_estimat
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
     assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
 
-    if use_switch_estimator or use_adaptivity:
+    if use_adaptivity:
         assert description['level_params']['restol'] == -1, "Please set restol to -1 or omit it"
 
 
 def proof_assertions_time(dt, Tend, V_ref, alpha):
     """
-    Function to proof the assertions regarding the time domain (in combination with the specific problem):
+    Function to proof the assertions regarding the time domain (in combination with the specific problem).
 
-    Args:
-        dt (float): time step for computation
-        Tend (float): end time
-        V_ref (np.ndarray): Reference values (problem parameter)
-        alpha (np.float): Multiple used for initial conditions (problem_parameter)
+    Parameters
+    ----------
+    dt : float
+        Time step for computation.
+    Tend : float
+        End time.
+    V_ref : np.ndarray
+        Reference values (problem parameter).
+    alpha : float
+        Multiple used for initial conditions (problem_parameter).
     """
 
     assert dt < Tend, "Time step is too large for the time domain!"

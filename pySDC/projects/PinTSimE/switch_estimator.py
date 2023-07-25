@@ -40,7 +40,6 @@ class SwitchEstimator(ConvergenceController):
 
         defaults = {
             'control_order': 100,
-            'tol': description['level_params']['dt'],
             'nodes': coll.nodes,
         }
         return {**defaults, **params}
@@ -55,7 +54,7 @@ class SwitchEstimator(ConvergenceController):
             The controller doing all the stuff in a computation.
         """
 
-        self.status = Status(['switch_detected', 't_switch'])
+        self.status = Status(['is_zero', 'switch_detected', 't_switch'])
 
     def reset_status_variables(self, controller, **kwargs):
         """
@@ -85,24 +84,25 @@ class SwitchEstimator(ConvergenceController):
 
         if CheckConvergence.check_convergence(S):
             self.status.switch_detected, m_guess, state_function = L.prob.get_switching_info(L.u, L.time)
-            print([L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))], state_function)
+
             if self.status.switch_detected:
                 t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
                 t_interp, state_function = self.adapt_interpolation_info(
                     L.time, L.sweep.coll.left_is_node, t_interp, state_function
                 )
-                print(t_interp, state_function)
 
                 # when the state function is already close to zero the event is already resolved well
-                #if all(np.isclose(state_function, np.zeros(len(t_interp)), atol=1e-10)):
-                if abs(state_function[0]) <= self.params.tol or abs(state_function[-1]) <= self.params.tol:
-                    print('Is already close enough to one of the end point!')
-                    #self.status.is_zero = True
+                if abs(state_function[-1]) <= self.params.tol:
+                    self.log("Is already close enough to one of the end point!", S)
+                    self.log_event_time(
+                        controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_interp[-1]
+                    )
+                    self.status.is_zero = True
 
                 # intermediate value theorem states that a root is contained in current step
                 if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess, self.params.counter)
-                    self.params.counter += 1
+                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess)
+
                     if L.time < self.status.t_switch < L.time + L.dt:
                         dt_switch = self.status.t_switch - L.time
 
@@ -112,14 +112,13 @@ class SwitchEstimator(ConvergenceController):
                         ):
                             self.log(f"Switch located at time {self.status.t_switch:.12f}", S)
                             L.prob.t_switch = self.status.t_switch
-                            controller.hooks[0].add_to_stats(
-                                process=S.status.slot,
-                                time=L.time,
-                                level=L.level_index,
-                                iter=0,
-                                sweep=L.status.sweep,
-                                type='switch',
-                                value=self.status.t_switch,
+                            self.log_event_time(
+                                controller.hooks[0],
+                                S.status.slot,
+                                L.time,
+                                L.level_index,
+                                L.status.sweep,
+                                self.status.t_switch,
                             )
 
                             L.prob.count_switches()
@@ -133,19 +132,19 @@ class SwitchEstimator(ConvergenceController):
                             L.status.dt_new = dt_switch
                         else:
                             L.status.dt_new = min([dt_planned, dt_switch])
-                        print('dt_new', L.status.dt_new)
+
                     else:
                         # event occurs on L.time or L.time + L.dt; no restart necessary
                         boundary = 'left boundary' if self.status.t_switch == L.time else 'right boundary'
                         self.log(f"Estimated switch {self.status.t_switch:.12f} occurs at {boundary}", S)
-                        controller.hooks[0].add_to_stats(
-                            process=S.status.slot,
-                            time=L.time,
-                            level=L.level_index,
-                            iter=0,
-                            sweep=L.status.sweep,
-                            type='switch',
-                            value=self.status.t_switch,
+
+                        self.log_event_time(
+                            controller.hooks[0],
+                            S.status.slot,
+                            L.time,
+                            L.level_index,
+                            L.status.sweep,
+                            self.status.t_switch,
                         )
                         self.status.switch_detected = False
 
@@ -189,6 +188,38 @@ class SwitchEstimator(ConvergenceController):
             L.status.dt_new = L.status.dt_new if L.status.dt_new is not None else L.params.dt_initial
 
         super().post_step_processing(controller, S, **kwargs)
+
+    @staticmethod
+    def log_event_time(controller_hooks, process, time, level, sweep, t_switch):
+        """
+        Logs the event time of an event satisfying an appropriate criterion, e.g., event is already resolved well,
+        event time satisfies tolerance.
+
+        Parameters
+        ----------
+        controller_hooks : pySDC.Controller.hooks
+            Controller with access to the hooks.
+        process : int
+            Process for logging.
+        time : float
+            Time at which the event time is logged (denotes the current step).
+        level : int
+            Level at which event is found.
+        sweep : int
+            Denotes the number of sweep.
+        t_switch : float
+            Event time founded by switch estimation.
+        """
+
+        controller_hooks.add_to_stats(
+            process=process,
+            time=time,
+            level=level,
+            iter=0,
+            sweep=sweep,
+            type='switch',
+            value=t_switch,
+        )
 
     @staticmethod
     def get_switch(t_interp, state_function, m_guess):
@@ -282,9 +313,10 @@ class SwitchEstimator(ConvergenceController):
         if not left_is_node:
             t_interp.insert(0, t)
         else:
-            del state_function[0]  # state_function[1:] ?
+            del state_function[0]
 
         return t_interp, state_function
+
 
 def newton(x0, p, fprime, newton_tol, newton_maxiter):
     """

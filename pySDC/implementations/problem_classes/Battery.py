@@ -229,10 +229,11 @@ class battery_n_capacitors(ptype):
         switch_detected = False
         m_guess = -100
         break_flag = False
-
         for m in range(1, len(u)):
             for k in range(1, self.nvars):
-                if u[m][k] - self.V_ref[k - 1] <= 0:
+                h_prev_node = u[m - 1][k] - self.V_ref[k - 1]
+                h_curr_node = u[m][k] - self.V_ref[k - 1]
+                if h_prev_node > 0 and h_curr_node <= 0:
                     switch_detected = True
                     m_guess = m - 1
                     k_detected = k
@@ -242,7 +243,9 @@ class battery_n_capacitors(ptype):
             if break_flag:
                 break
 
-        state_function = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
+        state_function = (
+            [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(len(u))] if switch_detected else []
+        )
 
         return switch_detected, m_guess, state_function
 
@@ -262,7 +265,6 @@ class battery_n_capacitors(ptype):
         n = self.ncapacitors
         v = np.zeros(n + 1)
         v[0] = 1
-
         A, f = dict(), dict()
         A = {k: np.diag(-1 / (self.C[k] * self.R) * np.roll(v, k + 1)) for k in range(n)}
         A.update({n: np.diag(-(self.Rs + self.R) / self.L * v)})
@@ -438,7 +440,7 @@ class battery_implicit(battery):
         alpha=1.2,
         V_ref=None,
         newton_maxiter=200,
-        newton_tol=1e-8,
+        newton_tol=1e-14,
     ):
         if C is None:
             C = np.array([1.0])

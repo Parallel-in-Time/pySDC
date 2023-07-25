@@ -11,7 +11,7 @@ from pySDC.projects.PinTSimE.battery_model import (
     controller_run,
     generate_description,
     get_recomputed,
-    log_data,
+    LogData,
     proof_assertions_description,
 )
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
@@ -21,31 +21,86 @@ from pySDC.core.Hooks import hooks
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
+class LogEvent(hooks):
+    """
+    Logs the problem dependent state function of the battery drain model.
+    """
+
+    def post_step(self, step, level_number):
+        super(LogEvent, self).post_step(step, level_number)
+
+        L = step.levels[level_number]
+        P = L.prob
+
+        L.sweep.compute_end_point()
+
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='state_function_1',
+            value=L.uend[1] - P.V_ref[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='state_function_2',
+            value=L.uend[2] - P.V_ref[1],
+        )
+
+
 def run():
     """
     Executes the simulation for the battery model using the IMEX sweeper and plot the results
     as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    dt = 1e-2
+    dt = 4e-3
     t0 = 0.0
     Tend = 3.5
 
     problem_classes = [battery_n_capacitors]
     sweeper_classes = [imex_1st_order]
+    num_nodes = 4
+    restol = -1
+    maxiter = 12
 
     ncapacitors = 2
     alpha = 5.0
     V_ref = np.array([1.0, 1.0])
     C = np.array([1.0, 1.0])
 
+    problem_params = dict()
+    problem_params['ncapacitors'] = ncapacitors
+    problem_params['C'] = C
+    problem_params['alpha'] = alpha
+    problem_params['V_ref'] = V_ref
+
     recomputed = False
     use_switch_estimator = [True]
+
+    hook_class = [LogData, LogEvent]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
             description, controller_params = generate_description(
-                dt, problem, sweeper, log_data, False, use_SE, ncapacitors, alpha, V_ref, C
+                dt,
+                problem,
+                sweeper,
+                num_nodes,
+                hook_class,
+                False,
+                use_SE,
+                problem_params,
+                restol,
+                maxiter,
+                1,
+                1e-10,
             )
 
             # Assertions
@@ -62,16 +117,24 @@ def run():
 
 def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimator, use_adaptivity, cwd='./'):
     """
-    Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model.
 
-    Args:
-        description(dict): contains all information for a controller run
-        problem (pySDC.core.Problem.ptype): problem class that wants to be simulated
-        sweeper (pySDC.core.Sweeper.sweeper): sweeper class for solving the problem class numerically
-        recomputed (bool): flag if the values after a restart are used or before
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-        use_adaptivity (bool): flag if adaptivity wants to be used or not
-        cwd (str): current working directory
+    Parameters
+    ----------
+    description : dict
+        Contains all information for a controller run.
+    problem : pySDC.core.Problem.ptype
+        Problem class that wants to be simulated.
+    sweeper : pySDC.core.Sweeper.sweeper
+        Sweeper class for solving the problem class numerically.
+    recomputed : bool
+        Flag if the values after a restart are used or before.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
+    use_adaptivity : bool
+        Flag if adaptivity wants to be used or not.
+    cwd : str
+        Current working directory.
     """
 
     f = open(cwd + 'data/{}_{}_USE{}_USA{}.dat'.format(problem, sweeper, use_switch_estimator, use_adaptivity), 'rb')
@@ -111,12 +174,17 @@ def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimato
 
 def check_solution(stats, dt, use_switch_estimator):
     """
-    Function that checks the solution based on a hardcoded reference solution. Based on check_solution function from @brownbaerchen.
+    Function that checks the solution based on a hardcoded reference solution.
+    Based on check_solution function from @brownbaerchen.
 
-    Args:
-        stats (dict): Raw statistics from a controller run
-        dt (float): initial time step
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
+    Parameters
+    ----------
+    stats : dict
+        Raw statistics from a controller run.
+    dt : float
+        Initial time step.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
     """
 
     data = get_data_dict(stats, use_switch_estimator)
@@ -125,51 +193,51 @@ def check_solution(stats, dt, use_switch_estimator):
         msg = f'Error when using the switch estimator for battery_2capacitors for dt={dt:.1e}:'
         if dt == 1e-2:
             expected = {
-                'cL': 1.207906161238752,
-                'vC1': 1.0094825899806945,
-                'vC2': 1.00000000000412,
-                'switch1': 1.6094379124373626,
-                'switch2': 3.209437912437337,
-                'restarts': 1.0,
-                'sum_niters': 1412.0,
+                'cL': 1.1783297877614238,
+                'vC1': 0.999999999996731,
+                'vC2': 0.9999999999967274,
+                'state_function_1': -3.2690516960087734e-12,
+                'state_function_2': -3.272604409687574e-12,
+                'restarts': 2.0,
+                'sum_niters': 4236.0,
             }
         elif dt == 4e-1:
             expected = {
-                'cL': 1.5090409300896785,
-                'vC1': 1.0094891393319418,
-                'vC2': 1.0018593331860708,
-                'switch1': 1.6075867934844466,
-                'switch2': 3.2094445842818007,
-                'restarts': 2.0,
-                'sum_niters': 52.0,
+                'cL': 1.504055256840796,
+                'vC1': 0.9999999999999989,
+                'vC2': 0.999999999999998,
+                'state_function_1': -1.1102230246251565e-15,
+                'state_function_2': -1.9984014443252818e-15,
+                'restarts': 8.0,
+                'sum_niters': 252.0,
             }
         elif dt == 4e-2:
             expected = {
-                'cL': 1.2708164018400792,
-                'vC1': 1.0094825917376264,
-                'vC2': 1.000030506091851,
-                'switch1': 1.6094074085553605,
-                'switch2': 3.209437914186951,
-                'restarts': 2.0,
-                'sum_niters': 368.0,
+                'cL': 1.270787780316536,
+                'vC1': 0.9999999999999913,
+                'vC2': 0.9999999999999984,
+                'state_function_1': -8.659739592076221e-15,
+                'state_function_2': -1.5543122344752192e-15,
+                'restarts': 8.0,
+                'sum_niters': 1224.0,
             }
         elif dt == 4e-3:
             expected = {
-                'cL': 1.1564912472685411,
-                'vC1': 1.001438946726028,
-                'vC2': 1.0000650435224532,
-                'switch1': 1.6093728710270467,
-                'switch2': 3.217437912434931,
-                'restarts': 2.0,
-                'sum_niters': 3516.0,
+                'cL': 1.1551903323589119,
+                'vC1': 0.9999999999999931,
+                'vC2': 0.9996666666666729,
+                'state_function_1': -6.8833827526759706e-15,
+                'state_function_2': -0.0003333333333270794,
+                'restarts': 6.0,
+                'sum_niters': 10620.0,
             }
 
     got = {
         'cL': data['cL'][-1],
         'vC1': data['vC1'][-1],
         'vC2': data['vC2'][-1],
-        'switch1': data['switch1'],
-        'switch2': data['switch2'],
+        'state_function_1': data['state_function_1'][-1],
+        'state_function_2': data['state_function_2'][-1],
         'restarts': data['restarts'],
         'sum_niters': data['sum_niters'],
     }
@@ -185,21 +253,31 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     Converts the statistics in a useful data dictionary so that it can be easily checked in the check_solution function.
     Based on @brownbaerchen's get_data function.
 
-    Args:
-        stats (dict): Raw statistics from a controller run
-        use_switch_estimator (bool): flag if the switch estimator wants to be used or not
-        recomputed (bool): flag if the values after a restart are used or before
+    Parameters
+    ----------
+    stats : dict
+        Raw statistics from a controller run.
+    use_switch_estimator : bool
+        Flag if the switch estimator wants to be used or not.
+    recomputed : bool
+        Flag if the values after a restart are used or before.
 
-    Return:
-        data (dict): contains all information as the statistics dict
+    Returns
+    -------
+    data : dict
+        Contains all information as the statistics dict.
     """
 
     data = dict()
     data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['vC1'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['vC2'] = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
-    data['switch1'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[0, 1]
-    data['switch2'] = np.array(get_recomputed(stats, type='switch', sortby='time'))[-1, 1]
+    data['state_function_1'] = np.array(get_sorted(stats, type='state_function_1', sortby='time', recomputed=False))[
+        :, 1
+    ]
+    data['state_function_2'] = np.array(get_sorted(stats, type='state_function_2', sortby='time', recomputed=False))[
+        :, 1
+    ]
     data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
     data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
 
@@ -208,13 +286,18 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
 
 def proof_assertions_time(dt, Tend, V_ref, alpha):
     """
-    Function to proof the assertions regarding the time domain (in combination with the specific problem):
+    Function to proof the assertions regarding the time domain (in combination with the specific problem).
 
-    Args:
-        dt (float): time step for computation
-        Tend (float): end time
-        V_ref (np.ndarray): Reference values (problem parameter)
-        alpha (np.float): Multiple used for initial conditions (problem_parameter)
+    Parameters
+    ----------
+    dt : float
+        Time step for computation.
+    Tend : float
+        End time.
+    V_ref : np.ndarray
+        Reference values (problem parameter).
+    alpha : np.float
+        Multiple used for initial conditions (problem_parameter).
     """
 
     assert (
