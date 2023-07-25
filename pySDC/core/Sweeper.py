@@ -1,6 +1,7 @@
 import logging
 
 import numpy as np
+import scipy as sp
 import scipy.linalg
 import scipy.optimize as opt
 
@@ -116,9 +117,10 @@ class sweeper(object):
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
             self.parallelizable = True
-        elif qd_type == 'MIN_GT':
+        elif qd_type in ['MIN_GT', 'MIN-SR-NS']:
             m = QDmat.shape[0] - 1
             QDmat[1:, 1:] = np.diag(coll.nodes) / m
+            self.parallelizable = True
         elif qd_type == 'MIN3':
             m = QDmat.shape[0] - 1
             x = None
@@ -266,6 +268,33 @@ class sweeper(object):
                 )
             QDmat[1:, 1:] = np.diag(x)
             self.parallelizable = True
+
+        elif qd_type == "MIN-SR-S":
+            M = QDmat.shape[0] - 1
+            Q = coll.Qmat[1:, 1:]
+            nodes = coll.nodes
+
+            nCoeffs = M
+            if coll.quad_type in ['LOBATTO', 'RADAU-LEFT']:
+                nCoeffs -= 1
+                Q = Q[1:, 1:]
+                nodes = nodes[1:]
+
+            def func(coeffs):
+                coeffs = np.asarray(coeffs)
+                kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ Q for z in nodes]
+                vals = [np.linalg.det(K) - 1 for K in kMats]
+                return np.array(vals)
+
+            coeffs = sp.optimize.fsolve(func, nodes / M, xtol=1e-13)
+
+            if coll.quad_type in ['LOBATTO', 'RADAU-LEFT']:
+                coeffs = [0] + list(coeffs)
+
+            QDmat[1:, 1:] = np.diag(coeffs)
+
+            self.parallelizable = True
+
         else:
             raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
         # check if we got not more than a lower triangular matrix
