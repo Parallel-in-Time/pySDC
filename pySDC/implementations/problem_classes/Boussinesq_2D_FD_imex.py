@@ -13,22 +13,108 @@ from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import u
 
 # noinspection PyUnusedLocal
 class boussinesq_2d_imex(ptype):
+    r"""
+    This class implements the two-dimensional Boussinesq equations for different boundary conditions with
+
+    .. math::
+        \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + \frac{\partial p}{\partial x} = 0,
+
+    .. math::
+        \frac{\partial w}{\partial t} + U \frac{\partial w}{\partial x} + \frac{\partial p}{\partial z} = 0,
+
+    .. math::
+        \frac{\partial b}{\partial t} + U \frac{\partial b}{\partial x} + N^2 w = 0,
+
+    .. math::
+        \frac{\partial p}{\partial t} + U \frac{\partial p}{\partial x} + c^2 (\frac{\partial u}{\partial x} + \frac{\partial w}{\partial z}) = 0.
+
+    They can be derived from the linearized Euler equations by a transformation of variables [1]_.
+
+    Parameters
+    ----------
+    nvars : list, optional
+        List of number of unknowns nvars.
+    c_s : float, optional
+        Acoustic velocity :math:`c_s`.
+    u_adv : float, optional
+        Advection speed :math:`U`.
+    Nfreq : float, optional
+        Stability frequency.
+    x_bounds : list, optional
+        Domain in x-direction.
+    z_bounds : list, optional
+        Domain in z-direction.
+    order_upwind : int, optional
+        Order of upwind scheme for discretization.
+    order : int, optional
+        Order for discretization.
+    gmres_maxiter : int, optional
+        Maximum number of iterations for GMRES solver.
+    gmres_restart : int, optional
+        Number of iterations between restarts in GMRES solver.
+    gmres_tol_limit : float, optional
+        Tolerance for GMRES solver to terminate.
+
+    Attributes
+    ----------
+    N : list
+        List of number of unknowns nvars.
+    bc_hor : list
+        Contains type of boundary conditions for both boundaries for both dimensions.
+    bc_ver :
+        Contains type of boundary conditions for both boundaries for both dimemsions, e.g. 'neumann' or 'dirichlet'.
+    xx : np.ndarray
+        List of np.ndarrays for mesh in x-direction.
+    zz : np.ndarray
+        List of np.ndarrays for mesh in z-direction.
+    h : float
+        Mesh size.
+    Id : sp.sparse.eye
+        Identity matrix for the equation of appropriate size.
+    M : np.ndarray
+        Boussinesq 2D Matrix.
+    D_upwind : sp.csc_matrix
+        Boussinesq 2D Upwind matrix for discretization.
+    gmres_logger : object
+        Logger for GMRES solver.
+
+    References
+    ----------
+    .. [1] D. R. Durran. Numerical Methods for Fluid Dynamics. Texts Appl. Math. 32. Springer-Verlag, New York (2010)
+        http://dx.doi.org/10.1007/978-1-4419-6412-0.
     """
-    Example implementing the 2D Boussinesq equation for different boundary conditions
-    """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
-        """
-        Initialization routine
+    dtype_u = mesh
+    dtype_f = imex_mesh
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
-        """
+    def __init__(
+        self,
+        nvars=None,
+        c_s=0.3,
+        u_adv=0.02,
+        Nfreq=0.01,
+        x_bounds=None,
+        z_bounds=None,
+        order_upw=5,
+        order=4,
+        gmres_maxiter=500,
+        gmres_restart=10,
+        gmres_tol_limit=1e-5,
+    ):
+        """Initialization routine"""
 
-        # these parameters will be used later, so assert their existence
-        essential_keys = [
+        if nvars is None:
+            nvars = [(4, 300, 30)]
+
+        if x_bounds is None:
+            x_bounds = [(-150.0, 150.0)]
+
+        if z_bounds is None:
+            z_bounds = [(0.0, 10.0)]
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super().__init__(init=(nvars, None, np.dtype('float64')))
+        self._makeAttributeAndRegister(
             'nvars',
             'c_s',
             'u_adv',
@@ -40,18 +126,11 @@ class boussinesq_2d_imex(ptype):
             'gmres_maxiter',
             'gmres_restart',
             'gmres_tol_limit',
-        ]
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(boussinesq_2d_imex, self).__init__(
-            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+            localVars=locals(),
+            readOnly=True,
         )
 
-        self.N = [self.params.nvars[1], self.params.nvars[2]]
+        self.N = [self.nvars[1], self.nvars[2]]
 
         self.bc_hor = [
             ['periodic', 'periodic'],
@@ -66,14 +145,12 @@ class boussinesq_2d_imex(ptype):
             ['neumann', 'neumann'],
         ]
 
-        self.xx, self.zz, self.h = get2DMesh(
-            self.N, self.params.x_bounds, self.params.z_bounds, self.bc_hor[0], self.bc_ver[0]
-        )
+        self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
 
         self.Id, self.M = getBoussinesq2DMatrix(
-            self.N, self.h, self.bc_hor, self.bc_ver, self.params.c_s, self.params.Nfreq, self.params.order
+            self.N, self.h, self.bc_hor, self.bc_ver, self.c_s, self.Nfreq, self.order
         )
-        self.D_upwind = getBoussinesq2DUpwindMatrix(self.N, self.h[0], self.params.u_adv, self.params.order_upw)
+        self.D_upwind = getBoussinesq2DUpwindMatrix(self.N, self.h[0], self.u_adv, self.order_upw)
 
         self.gmres_logger = logging()
 
@@ -105,9 +182,9 @@ class boussinesq_2d_imex(ptype):
             self.Id - factor * self.M,
             b,
             x0=u0.flatten(),
-            tol=self.params.gmres_tol_limit,
-            restart=self.params.gmres_restart,
-            maxiter=self.params.gmres_maxiter,
+            tol=self.gmres_tol_limit,
+            restart=self.gmres_restart,
+            maxiter=self.gmres_maxiter,
             atol=0,
             callback=cb,
         )

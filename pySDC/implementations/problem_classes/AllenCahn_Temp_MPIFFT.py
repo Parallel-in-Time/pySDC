@@ -54,7 +54,19 @@ class allencahn_temp_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, eps, radius, spectral, TM, D, dw=0.0, L=1.0, init_type='circle', comm=None):
+    def __init__(
+        self,
+        nvars=None,
+        eps=0.04,
+        radius=0.25,
+        spectral=None,
+        TM=1.0,
+        D=10.0,
+        dw=0.0,
+        L=1.0,
+        init_type='circle',
+        comm=None,
+    ):
         """
         Initialization routine
 
@@ -67,6 +79,10 @@ class allencahn_temp_imex(ptype):
         dtype_f :
             fft data type wuth implicit and explicit parts (will be passed to parent class).
         """
+
+        if nvars is None:
+            nvars = [(128, 128)]
+
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 

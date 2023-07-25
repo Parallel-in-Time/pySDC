@@ -20,7 +20,7 @@ class testequation0d(ptype):
     dtype_f = mesh
 
     # TODO : add default values
-    def __init__(self, lambdas, u0):
+    def __init__(self, lambdas=1, u0=0.0):
         """
         Initialization routine
 

@@ -34,8 +34,11 @@ class acoustic_1d_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, cs, cadv, order_adv, waveno):
+    def __init__(self, nvars=None, cs=0.5, cadv=0.1, order_adv=5, waveno=5):
         """Initialization routine"""
+
+        if nvars is None:
+            nvars = [(2, 300)]
 
         # invoke super init, passing number of dofs
         super().__init__((nvars, None, np.dtype('float64')))

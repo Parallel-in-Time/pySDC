@@ -51,15 +51,22 @@ class allencahn_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, eps, radius, spectral, dw=0.0, L=1.0, init_type='circle', comm=None):
-        """
-        Initialization routine
+    def __init__(
+        self,
+        nvars=None,
+        eps=0.04,
+        radius=0.25,
+        spectral=None,
+        dw=0.0,
+        L=1.0,
+        init_type='circle',
+        comm=None,
+    ):
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: fft data type (will be passed to parent class)
-            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
-        """
+        if nvars is None:
+            nvars = [(128, 128), (32, 32)]
+
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 

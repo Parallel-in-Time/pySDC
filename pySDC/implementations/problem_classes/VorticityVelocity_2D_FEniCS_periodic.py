@@ -19,7 +19,10 @@ class fenics_vortex_2d(ptype):
         K: stiffness matrix incl. diffusion coefficient (and correct sign)
     """
 
-    def __init__(self, problem_params, dtype_u=fenics_mesh, dtype_f=rhs_fenics_mesh):
+    dtype_u = fenics_mesh
+    dtype_f = rhs_fenics_mesh
+
+    def __init__(self, c_nvars=None, family='CG', order=4, refinements=None, nu=0.01, rho=50, delta=0.05):
         """
         Initialization routine
 
@@ -28,6 +31,12 @@ class fenics_vortex_2d(ptype):
             dtype_u: FEniCS mesh data type (will be passed to parent class)
             dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)
         """
+
+        if c_nvars is None:
+            c_nvars = [(32, 32)]
+
+        if refinements is None:
+            refinements = [1, 0]
 
         # Sub domain for Periodic boundary condition
         class PeriodicBoundary(df.SubDomain):
@@ -51,13 +60,6 @@ class fenics_vortex_2d(ptype):
                     y[0] = x[0]
                     y[1] = x[1] - 1.0
 
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['c_nvars', 'family', 'order', 'refinements', 'nu', 'rho', 'delta']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
-
         # set logger level for FFC and dolfin
         df.set_log_level(df.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
@@ -67,21 +69,22 @@ class fenics_vortex_2d(ptype):
         df.parameters["form_compiler"]["cpp_optimize"] = True
 
         # set mesh and refinement (for multilevel)
-        mesh = df.UnitSquareMesh(problem_params['c_nvars'][0], problem_params['c_nvars'][1])
-        for _ in range(problem_params['refinements']):
+        mesh = df.UnitSquareMesh(c_nvars[0], c_nvars[1])
+        for _ in range(refinements):
             mesh = df.refine(mesh)
 
         self.mesh = df.Mesh(mesh)
 
         # define function space for future reference
-        self.V = df.FunctionSpace(
-            mesh, problem_params['family'], problem_params['order'], constrained_domain=PeriodicBoundary()
-        )
+        self.V = df.FunctionSpace(mesh, family, order, constrained_domain=PeriodicBoundary())
         tmp = df.Function(self.V)
         print('DoFs on this level:', len(tmp.vector().vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_vortex_2d, self).__init__(self.V, dtype_u, dtype_f, problem_params)
+        super(fenics_vortex_2d, self).__init__(self.V)
+        self._makeAttributeAndRegister(
+            'c_nvars', 'family', 'order', 'refinements', 'nu', 'rho', 'delta', localVars=locals(), readOnly=True
+        )
 
         w = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
@@ -171,7 +174,7 @@ class fenics_vortex_2d(ptype):
         """
 
         tmp = self.dtype_u(self.V)
-        tmp.values = df.Function(self.V, -1.0 * self.params.nu * self.K * u.values.vector())
+        tmp.values = df.Function(self.V, -1.0 * self.nu * self.K * u.values.vector())
         fimpl = self.__invert_mass_matrix(tmp)
 
         return fimpl
@@ -268,10 +271,10 @@ class fenics_vortex_2d(ptype):
                            r*(1-pow(tanh(r*((0.75+3) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25+3))),2)) - \
                            r*(1-pow(tanh(r*((0.75+4) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25+4))),2)) - \
                            d*2*a*cos(2*a*(x[0]+0.25))',
-            d=self.params.delta,
-            r=self.params.rho,
+            d=self.delta,
+            r=self.rho,
             a=np.pi,
-            degree=self.params.order,
+            degree=self.order,
         )
 
         me = self.dtype_u(self.V)

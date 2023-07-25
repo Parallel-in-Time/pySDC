@@ -42,19 +42,11 @@ class allencahn2d_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
-        """
-        Initialization routine
+    def __init__(self, nvars=None, nu=2, eps=0.04, radius=0.25, L=1.0, init_type='circle'):
+        """Initialization routine"""
 
-        Parameters
-        ----------
-        problem_params : dict
-            Custom parameters for the example
-        dtype_u :
-            mesh data type (will be passed to parent class)
-        dtype_f :
-            mesh data type with implicit and explicit parts (will be passed to parent class)
-        """
+        if nvars is None:
+            nvars = [(256, 256), (64, 64)]
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
@@ -215,7 +207,12 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         Planned IFFT for backward transformation.
     """
 
-    def __init__(self, nvars, nu, eps, radius, L=1.0, init_type='circle'):
+    def __init__(self, nvars=None, nu=2, eps=0.04, radius=0.25, L=1.0, init_type='circle'):
+        """Initialization routine"""
+
+        if nvars is None:
+            nvars = [(256, 256), (64, 64)]
+
         super().__init__(nvars, nu, eps, radius, L, init_type)
         self.lap -= 2.0 / self.eps**2
 
