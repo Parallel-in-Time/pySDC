@@ -598,15 +598,15 @@ def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False)
     """
 
     data = dict()
-    data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed, sortby='time')])
-    data['vC'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed, sortby='time')])
+    data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', sortby='time', recomputed=recomputed)])
+    data['vC'] = np.array([me[1][1] for me in get_sorted(stats, type='u', sortby='time', recomputed=recomputed)])
     if use_adaptivity:
-        data['dt'] = np.array(get_sorted(stats, type='dt', recomputed=recomputed, sortby='time'))[:, 1]
+        data['dt'] = np.array(get_sorted(stats, type='dt', sortby='time', recomputed=recomputed))[:, 1]
         data['e_em'] = np.array(
-            get_sorted(stats, type='error_embedded_estimate', recomputed=recomputed, sortby='time')
+            get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed)
         )[:, 1]
     if use_switch_estimator:
-        data['state_function'] = np.array(get_sorted(stats, type='state_function', sortby='time'))[:, 1]
+        data['state_function'] = np.array(get_sorted(stats, type='state_function', sortby='time', recomputed=recomputed))[:, 1]
     if use_adaptivity or use_switch_estimator:
         data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
     data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])

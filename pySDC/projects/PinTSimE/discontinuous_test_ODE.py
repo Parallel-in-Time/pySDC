@@ -93,7 +93,6 @@ def main():
     hookclass = [LogEvent, LogSolution, LogError]
 
     problem_class = DiscontinuousTestODE
-    nvars = 1
 
     sweeper = generic_implicit
     nnodes = [2, 3, 4]
@@ -101,7 +100,6 @@ def main():
     newton_tol = 1e-11
 
     problem_params = dict()
-    problem_params['nvars'] = nvars
     problem_params['newton_maxiter'] = 200
     problem_params['newton_tol'] = newton_tol
 
@@ -319,9 +317,6 @@ def proof_assertions(description, t0, Tend, recomputed, use_detection):
     use_detection : bool
         Indicates whether switch estimation is used.
     """
-
-    nvars = description['problem_params']['nvars']
-    assert nvars == 1, 'Number of unknowns is only one!'
 
     newton_tol = description['problem_params']['newton_tol']
     msg = 'Newton tolerance should be set as small as possible to get best possible resolution of solution'
