@@ -67,7 +67,7 @@ def run():
     problem_classes = [battery_n_capacitors]
     sweeper_classes = [imex_1st_order]
     num_nodes = 4
-    restol = -1
+    restol = 1e-8
     maxiter = 12
 
     ncapacitors = 2

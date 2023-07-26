@@ -77,8 +77,9 @@ class battery_n_capacitors(ptype):
             'nvars', 'ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref', localVars=locals(), readOnly=True
         )
 
-        self.A = np.zeros((n + 1, n + 1))
         self.switch_A, self.switch_f = self.get_problem_dict()
+        self.A = self.switch_A[0]
+
         self.t_switch = None
         self.nswitches = 0
 
