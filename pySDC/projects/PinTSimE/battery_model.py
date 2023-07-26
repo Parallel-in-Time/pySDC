@@ -555,7 +555,6 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'sum_niters': data['sum_niters'],
             }
 
-
     for key in expected.keys():
         err_msg = f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
         if key == 'cL':
