@@ -275,11 +275,11 @@ class SwitchEstimator(ConvergenceController):
             dp : float
                 Derivative of interpolation p at time t.
             """
-            dt = 1e-15
+            dt = 1e-8
             dp = (p(t + dt) - p(t)) / dt
             return dp
 
-        newton_tol, newton_maxiter = 1e-14, 200
+        newton_tol, newton_maxiter = 1e-8, 50
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
 
         return t_switch

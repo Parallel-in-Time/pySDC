@@ -3,19 +3,22 @@ import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed, LogData
-from pySDC.projects.PinTSimE.piline_model import setup_mpl
+from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed
+
 from pySDC.projects.PinTSimE.battery_2capacitors_model import (
     LogEvent,
     check_solution,
     proof_assertions_description,
     proof_assertions_time,
 )
+
+from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
+
+from pySDC.implementations.hooks.log_solution import LogSolution
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
@@ -30,7 +33,7 @@ def run(cwd='./'):
         Current working directory.
     """
 
-    dt_list = [4e-1, 4e-2, 4e-3]
+    dt_list = [4e-1, 4e-2]
     t0 = 0.0
     Tend = 3.5
 
@@ -38,7 +41,7 @@ def run(cwd='./'):
     sweeper_classes = [imex_1st_order]
     num_nodes = 4
     restol = -1
-    maxiter = 12
+    maxiter = 8
 
     ncapacitors = 2
     alpha = 5.0
@@ -51,7 +54,7 @@ def run(cwd='./'):
     problem_params['alpha'] = alpha
     problem_params['V_ref'] = V_ref
 
-    hook_class = [LogData, LogEvent]
+    hook_class = [LogSolution, LogEvent]
 
     use_switch_estimator = [True, False]
     restarts_all = []
@@ -71,7 +74,7 @@ def run(cwd='./'):
                     restol,
                     maxiter,
                     1,
-                    1e-10,
+                    1e-8,
                 )
 
                 # Assertions

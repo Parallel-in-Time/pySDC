@@ -40,7 +40,7 @@ class DiscontinuousTestODE(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, newton_maxiter=200, newton_tol=1e-8):
+    def __init__(self, newton_maxiter=100, newton_tol=1e-8):
         """Initialization routine"""
         nvars = 1
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -150,7 +150,7 @@ class DiscontinuousTestODE(ptype):
 
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
         Routine to compute the exact solution at time t.
 
@@ -158,6 +158,10 @@ class DiscontinuousTestODE(ptype):
         ----------
         t : float
             Time of the exact solution.
+        u_init : pySDC.problem.DiscontinuousTestODE.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
         Returns
         -------

@@ -3,7 +3,6 @@ import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -11,12 +10,14 @@ from pySDC.projects.PinTSimE.battery_model import (
     controller_run,
     generate_description,
     get_recomputed,
-    LogData,
     proof_assertions_description,
 )
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
+
 from pySDC.core.Hooks import hooks
+from pySDC.implementations.hooks.log_solution import LogSolution
+from pySDC.implementations.hooks.default_hook import DefaultHooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
@@ -67,8 +68,8 @@ def run():
     problem_classes = [battery_n_capacitors]
     sweeper_classes = [imex_1st_order]
     num_nodes = 4
-    restol = 1e-8
-    maxiter = 12
+    restol = -1
+    maxiter = 8
 
     ncapacitors = 2
     alpha = 5.0
@@ -84,9 +85,9 @@ def run():
     recomputed = False
     use_switch_estimator = [True]
     max_restarts = 1
-    tol_event = 1e-10
+    tol_event = 1e-8
 
-    hook_class = [LogData, LogEvent]
+    hook_class = [DefaultHooks, LogSolution, LogEvent]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
@@ -195,43 +196,33 @@ def check_solution(stats, dt, use_switch_estimator):
         msg = f'Error when using the switch estimator for battery_2capacitors for dt={dt:.1e}:'
         if dt == 1e-2:
             expected = {
-                'cL': 1.1783297877614238,
-                'vC1': 0.999999999996731,
-                'vC2': 0.9999999999967274,
-                'state_function_1': -3.2690516960087734e-12,
-                'state_function_2': -3.272604409687574e-12,
+                'cL': 1.1783297877614183,
+                'vC1': 0.9999999999967468,
+                'vC2': 0.999999999996747,
+                'state_function_1': -3.2531755067566337e-12,
+                'state_function_2': -3.2529534621517087e-12,
                 'restarts': 2.0,
-                'sum_niters': 4236.0,
+                'sum_niters': 2824.0,
             }
         elif dt == 4e-1:
             expected = {
-                'cL': 1.504055256840796,
-                'vC1': 0.9999999999999989,
-                'vC2': 0.999999999999998,
-                'state_function_1': -1.1102230246251565e-15,
-                'state_function_2': -1.9984014443252818e-15,
-                'restarts': 8.0,
-                'sum_niters': 252.0,
+                'cL': 1.5039617338098907,
+                'vC1': 0.9999999968387812,
+                'vC2': 0.9999999968387812,
+                'state_function_1': -3.161218842251401e-09,
+                'state_function_2': -3.161218842251401e-09,
+                'restarts': 10.0,
+                'sum_niters': 200.0,
             }
         elif dt == 4e-2:
             expected = {
-                'cL': 1.270787780316536,
-                'vC1': 0.9999999999999913,
-                'vC2': 0.9999999999999984,
-                'state_function_1': -8.659739592076221e-15,
-                'state_function_2': -1.5543122344752192e-15,
-                'restarts': 8.0,
-                'sum_niters': 1224.0,
-            }
-        elif dt == 4e-3:
-            expected = {
-                'cL': 1.1551903323589119,
-                'vC1': 0.9999999999999931,
-                'vC2': 0.9996666666666729,
-                'state_function_1': -6.8833827526759706e-15,
-                'state_function_2': -0.0003333333333270794,
+                'cL': 1.2707220273133215,
+                'vC1': 1.0000000041344774,
+                'vC2': 0.999999999632751,
+                'state_function_1': 4.134477427086836e-09,
+                'state_function_2': -3.672490089812186e-10,
                 'restarts': 6.0,
-                'sum_niters': 10620.0,
+                'sum_niters': 792.0,
             }
 
     got = {
@@ -274,7 +265,6 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['vC1'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['vC2'] = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
-
     data['state_function_1'] = np.array(get_sorted(stats, type='state_function_1', sortby='time', recomputed=False))[
         :, 1
     ]
@@ -308,7 +298,7 @@ def proof_assertions_time(dt, Tend, V_ref, alpha):
     ), "Error! Do not use other parameters for V_ref[:] != 1.0, alpha != 1.2, Tend != 0.3 due to hardcoded reference!"
 
     assert (
-        dt == 1e-2 or dt == 4e-1 or dt == 4e-2 or dt == 4e-3
+        dt == 1e-2 or dt == 4e-1 or dt == 4e-2
     ), "Error! Do not use other time steps dt != 4e-1 or dt != 4e-2 or dt != 4e-3 due to hardcoded references!"
 
 

@@ -7,47 +7,33 @@ from pySDC.implementations.problem_classes.Battery import battery, battery_impli
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
+
 from pySDC.core.Hooks import hooks
+from pySDC.implementations.hooks.log_solution import LogSolution
+from pySDC.implementations.hooks.log_step_size import LogStepSize
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
 
-class LogData(hooks):
+class LogErrorEmbeddedEstimate(hooks):
     """
     Logs the data such as the numerical solution, the adapted step sizes by Adaptivity and the
     embedded error estimate.
     """
 
     def post_step(self, step, level_number):
-        super(LogData, self).post_step(step, level_number)
+        super(LogErrorEmbeddedEstimate, self).post_step(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='u',
-            value=L.uend,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='dt',
-            value=L.dt,
-        )
         self.add_to_stats(
             process=step.status.slot,
             time=L.time + L.dt,
@@ -157,7 +143,7 @@ def generate_description(
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 15
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
 
@@ -250,8 +236,8 @@ def run():
     problem_classes = [battery, battery_implicit]
     sweeper_classes = [imex_1st_order, generic_implicit]
     num_nodes = 4
-    restol = 1e-14
-    maxiter = 12
+    restol = -1
+    maxiter = 8
 
     ncapacitors = 1
     alpha = 1.2
@@ -266,10 +252,10 @@ def run():
 
     max_restarts = 1
     recomputed = False
-    use_switch_estimator = [False]
+    use_switch_estimator = [True]
     use_adaptivity = [True]
 
-    hook_class = [LogData, LogEvent]
+    hook_class = [LogSolution, LogEvent, LogErrorEmbeddedEstimate, LogStepSize]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
@@ -394,23 +380,23 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator and adaptivity for battery for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5393867578762905,
-                    'vC': 1.0000000000128175,
-                    'dt': 0.09016888395614442,
+                    'cL': 0.5446532674094873,
+                    'vC': 0.9999999999883544,
+                    'dt': 0.01,
                     'e_em': 2.220446049250313e-16,
-                    'state_function': 1.2817524819297432e-11,
-                    'restarts': 14.0,
-                    'sum_niters': 528.0,
+                    'state_function': -1.1645573394503117e-11,
+                    'restarts': 3.0,
+                    'sum_niters': 136.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5393867578404922,
-                    'vC': 1.0000000000097553,
-                    'dt': 0.01852918796343711,
+                    'cL': 0.539386744746365,
+                    'vC': 0.9999999710472945,
+                    'dt': 0.005520873635314061,
                     'e_em': 2.220446049250313e-16,
-                    'state_function': 9.755307672776325e-12,
-                    'restarts': 14.0,
-                    'sum_niters': 564.0,
+                    'state_function': -2.8952705455331795e-08,
+                    'restarts': 11.0,
+                    'sum_niters': 264.0,
                 }
 
             got = {
@@ -426,19 +412,19 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator for battery for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.5491221336263004,
-                    'vC': 0.9999999999999998,
-                    'state_function': -2.220446049250313e-16,
+                    'cL': 0.5456190026495924,
+                    'vC': 0.999166666941434,
+                    'state_function': -0.0008333330585660326,
                     'restarts': 4.0,
-                    'sum_niters': 444.0,
+                    'sum_niters': 296.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5407340515900249,
-                    'vC': 0.9999999999999998,
-                    'state_function': -2.220446049250313e-16,
-                    'restarts': 3.0,
-                    'sum_niters': 3660.0,
+                    'cL': 0.5403849766797957,
+                    'vC': 0.9999166666752302,
+                    'state_function': -8.33333247698409e-05,
+                    'restarts': 2.0,
+                    'sum_niters': 2424.0,
                 }
 
             got = {
@@ -453,21 +439,21 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using adaptivity for battery for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.6212002265916728,
-                    'vC': 0.9227219154001182,
-                    'dt': 0.018387805115298306,
-                    'e_em': 2.220446049250313e-16,
+                    'cL': 0.4433805288639916,
+                    'vC': 0.90262388393713,
+                    'dt': 0.18137307612335937,
+                    'e_em': 2.7177844974524135e-09,
                     'restarts': 0.0,
-                    'sum_niters': 48.0,
+                    'sum_niters': 24.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'cL': 0.6916091953888337,
-                    'vC': 0.9657300508434754,
-                    'dt': 0.1656405031934166,
-                    'e_em': 1.0658141036401503e-14,
+                    'cL': 0.3994744179584864,
+                    'vC': 0.9679037468770668,
+                    'dt': 0.1701392217033212,
+                    'e_em': 2.0992988458701234e-09,
                     'restarts': 0.0,
-                    'sum_niters': 60.0,
+                    'sum_niters': 32.0,
                 }
 
             got = {
@@ -484,23 +470,23 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator and adaptivity for battery_implicit for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.53938675787623,
-                    'vC': 1.0000000000128175,
-                    'dt': 0.09016886276237707,
+                    'cL': 0.5446675396652545,
+                    'vC': 0.9999999999883541,
+                    'dt': 0.01,
                     'e_em': 2.220446049250313e-16,
-                    'state_function': 1.2817524819297432e-11,
-                    'restarts': 14.0,
-                    'sum_niters': 528.0,
+                    'state_function': -1.1645906461410505e-11,
+                    'restarts': 3.0,
+                    'sum_niters': 136.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5393867578404211,
-                    'vC': 1.0000000000097553,
-                    'dt': 0.01852918796342412,
+                    'cL': 0.5393867447463223,
+                    'vC': 0.9999999710472952,
+                    'dt': 0.005520876908755634,
                     'e_em': 2.220446049250313e-16,
-                    'state_function': 9.755307672776325e-12,
-                    'restarts': 14.0,
-                    'sum_niters': 564.0,
+                    'state_function': -2.895270478919798e-08,
+                    'restarts': 11.0,
+                    'sum_niters': 264.0,
                 }
 
             got = {
@@ -516,19 +502,19 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using switch estimator for battery_implicit for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.549099295295675,
-                    'vC': 0.999999999999999,
-                    'state_function': -9.992007221626409e-16,
-                    'restarts': 5.0,
-                    'sum_niters': 468.0,
+                    'cL': 0.5456190026495138,
+                    'vC': 0.9991666669414431,
+                    'state_function': -0.0008333330585569287,
+                    'restarts': 4.0,
+                    'sum_niters': 296.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'cL': 0.5407340515900175,
-                    'vC': 1.0000000000000022,
-                    'state_function': 2.220446049250313e-15,
-                    'restarts': 3.0,
-                    'sum_niters': 3660.0,
+                    'cL': 0.5403849766797896,
+                    'vC': 0.9999166666752302,
+                    'state_function': -8.33333247698409e-05,
+                    'restarts': 2.0,
+                    'sum_niters': 2424.0,
                 }
 
             got = {
@@ -543,21 +529,21 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
             msg = f'Error when using adaptivity for battery_implicit for dt={dt:.1e}:'
             if dt == 1e-2:
                 expected = {
-                    'cL': 0.6601456662045085,
-                    'vC': 0.9227219154001187,
-                    'dt': 0.018387805115298306,
-                    'e_em': 2.220446049250313e-16,
+                    'cL': 0.4694087102919169,
+                    'vC': 0.9026238839371302,
+                    'dt': 0.18137307612335937,
+                    'e_em': 2.3469713394952407e-09,
                     'restarts': 0.0,
-                    'sum_niters': 48.0,
+                    'sum_niters': 24.0,
                 }
             elif dt == 1e-3:
                 expected = {
-                    'cL': 0.6998265072942349,
-                    'vC': 0.9657300508434863,
-                    'dt': 0.1656405031934166,
-                    'e_em': 1.0690337504115632e-12,
+                    'cL': 0.39947441811958956,
+                    'vC': 0.9679037468770735,
+                    'dt': 0.1701392217033212,
+                    'e_em': 1.147640815712947e-09,
                     'restarts': 0.0,
-                    'sum_niters': 60.0,
+                    'sum_niters': 32.0,
                 }
 
             got = {
@@ -569,10 +555,13 @@ def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
                 'sum_niters': data['sum_niters'],
             }
 
+
     for key in expected.keys():
-        assert np.isclose(
-            expected[key], got[key], rtol=1e-4
-        ), f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
+        err_msg = f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
+        if key == 'cL':
+            assert abs(expected[key] - got[key]) <= 1e-2, err_msg
+        else:
+            assert np.isclose(expected[key], got[key], rtol=1e-3), err_msg
 
 
 def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False):

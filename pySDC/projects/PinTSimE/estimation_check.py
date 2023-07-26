@@ -3,23 +3,26 @@ import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import (
     controller_run,
     check_solution,
     generate_description,
     get_recomputed,
     LogEvent,
-    LogData,
+    LogErrorEmbeddedEstimate,
     proof_assertions_description,
 )
+
+from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
+
 from pySDC.core.Hooks import hooks
+from pySDC.implementations.hooks.log_solution import LogSolution
+from pySDC.implementations.hooks.log_step_size import LogStepSize
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -43,7 +46,7 @@ def run(cwd='./'):
     sweeper_classes = [imex_1st_order, generic_implicit]
     num_nodes = 4
     restol = -1
-    maxiter = 12
+    maxiter = 8
 
     ncapacitors = 1
     alpha = 1.2
@@ -56,7 +59,7 @@ def run(cwd='./'):
     problem_params['alpha'] = alpha
     problem_params['V_ref'] = V_ref
 
-    hook_class = [LogData, LogEvent]
+    hook_class = [LogSolution, LogEvent, LogStepSize, LogErrorEmbeddedEstimate]
 
     max_restarts = 1
     use_switch_estimator = [True, False]
@@ -69,7 +72,7 @@ def run(cwd='./'):
         for dt_item in dt_list:
             for use_SE in use_switch_estimator:
                 for use_A in use_adaptivity:
-                    tol_event = 1e-10
+                    tol_event = 1e-10 if problem.__name__ == 'generic_implicit' else 1e-17
                     description, controller_params = generate_description(
                         dt_item,
                         problem,
@@ -323,8 +326,8 @@ def differences_around_switch(
         diff_adapt, diff_SE_adapt = vC_adapt - V_ref[0], vC_SE_adapt - V_ref[0]
         times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
         times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
-
-        diffs_true_at.append([diff_SE[m] for m in range(len(times_SE)) if abs(times_SE[m] - t_switch) <= 1e-17][0])
+        print(times_SE, t_switch)
+        diffs_true_at.append([diff_SE[m] for m in range(len(times_SE)) if abs(times_SE[m] - t_switch) <= 1e-7][0])
 
         diffs_false_before.append(
             [diff[m - 1] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]][0]
@@ -332,7 +335,7 @@ def differences_around_switch(
         diffs_false_after.append([diff[m] for m in range(1, len(times)) if times[m - 1] <= t_switch <= times[m]][0])
 
         for m in range(len(times_SE_adapt)):
-            if abs(times_SE_adapt[m] - t_switch_SE_adapt) <= 1e-16:
+            if abs(times_SE_adapt[m] - t_switch_SE_adapt) <= 1e-10:
                 diffs_true_at_adapt.append(diff_SE_adapt[m])
                 diffs_true_before_adapt.append(diff_SE_adapt[m - 1])
                 diffs_true_after_adapt.append(diff_SE_adapt[m + 1])
