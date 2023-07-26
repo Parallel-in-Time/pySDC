@@ -6,7 +6,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 # noinspection PyUnusedLocal
 class auzinger(ptype):
-    """
+    r"""
     This class implements the Auzinger equation as initial value problem. It can be found in doi.org/10.2140/camcos.2015.10.1.
     The system of two ordinary differential equations (ODEs) is given by
 
