@@ -21,7 +21,9 @@ class generalized_fisher(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars, nu, lambda0, newton_maxiter, newton_tol, interval, stop_at_nan=True):
+    def __init__(
+        self, nvars=127, nu=1.0, lambda0=2.0, newton_maxiter=100, newton_tol=1e-12, interval=(-5, 5), stop_at_nan=True
+    ):
         """Initialization routine"""
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on

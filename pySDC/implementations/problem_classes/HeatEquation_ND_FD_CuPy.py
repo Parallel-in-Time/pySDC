@@ -23,7 +23,16 @@ class heatNd_forced(ptype):  # pragma: no cover
     dtype_f = imex_cupy_mesh
 
     def __init__(
-        self, nvars, nu, freq, bc, order=2, stencil_type='center', lintol=1e-12, liniter=10000, solver_type='direct'
+        self,
+        nvars=512,
+        nu=0.1,
+        freq=2,
+        bc='periodic',
+        order=2,
+        stencil_type='center',
+        lintol=1e-12,
+        liniter=10000,
+        solver_type='direct',
     ):
         """Initialization routine"""
 

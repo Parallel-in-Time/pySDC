@@ -2,9 +2,15 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   July 25, 2023: For Version 5.3 a lot of pull requests got merged, thanks to [\@brownbaerchen](https://github.com/brownbaerchen),
+    [\@tlunet](https://github.com/tlunet), [\@lisawim](https://github.com/lisawim), [\@ikrom96git](https://github.com/ikrom96git) for all the contributions.
+    Besides the usual bugfixing and polishing, `pySDC` now comes with linear multistep methods, classical Runge Kutta methods, DAE sweepers, and more/improved projects.
+    We have second-order SDC on board, the brand-new switch estimator, a testing ground for compression with [libpressio](https://github.com/robertu94/libpressio), and more.
 -   March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their 
-    parameters explicitly with the constructor, and not with a dictionary (backward compatible, thanks @tlunet). The resilience project
-    now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the 
+    parameters explicitly with the constructor, and not with a dictionary. `params` is now a property of the problem class, that returns the problem parameters into a dictionary,
+    and parameters are also automatically stored as problem attribute using the `_makeAttributeAndRegister` method, allowing to define readonly paramters
+    (warning: **not backward compatible**).
+    The resilience project now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the 
     TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare `pySDC` for Version 6.
 -   January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website. 
     We revived the [codecov](https://app.codecov.io/gh/Parallel-in-Time/pySDC) connection and started the 

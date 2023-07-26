@@ -16,11 +16,13 @@ class vanderpol(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, u0, mu, newton_maxiter, newton_tol, stop_at_nan=True, crash_at_maxiter=True):
-        """
-        Initialization routine
-        """
+    def __init__(self, u0=None, mu=5.0, newton_maxiter=100, newton_tol=1e-9, stop_at_nan=True, crash_at_maxiter=True):
+        """Initialization routine"""
         nvars = 2
+
+        if u0 is None:
+            u0 = [2.0, 0.0]
+
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'u0', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(

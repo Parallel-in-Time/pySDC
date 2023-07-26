@@ -25,15 +25,12 @@ class nonlinearschroedinger_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, spectral, L=2 * np.pi, c=1.0, comm=MPI.COMM_WORLD):
-        """
-        Initialization routine
+    def __init__(self, nvars=None, spectral=None, L=2 * np.pi, c=1.0, comm=MPI.COMM_WORLD):
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: fft data type (will be passed to parent class)
-            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
-        """
+        if nvars is None:
+            nvars = [(128, 128)]
+
         if not L == 2.0 * np.pi:
             raise ProblemError(f'Setup not implemented, L has to be 2pi, got {L}')
 

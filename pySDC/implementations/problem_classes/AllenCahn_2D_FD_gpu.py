@@ -44,7 +44,17 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     dtype_u = cupy_mesh
     dtype_f = cupy_mesh
 
-    def __init__(self, nvars, nu, eps, newton_maxiter, newton_tol, lin_tol, lin_maxiter, radius):
+    def __init__(
+        self,
+        nvars=(128, 128),
+        nu=2,
+        eps=0.04,
+        newton_maxiter=1e-12,
+        newton_tol=100,
+        lin_tol=1e-8,
+        lin_maxiter=100,
+        radius=0.25,
+    ):
         """
         Initialization routine
 

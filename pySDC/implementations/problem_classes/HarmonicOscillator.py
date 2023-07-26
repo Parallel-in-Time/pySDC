@@ -14,7 +14,7 @@ class harmonic_oscillator(ptype):
     dtype_u = particles
     dtype_f = acceleration
 
-    def __init__(self, k, mu=0.0, u0=(1, 0), phase=1.0, amp=0.0):
+    def __init__(self, k=0, mu=0.0, u0=(1, 0), phase=1.0, amp=0.0):
         """Initialization routine"""
         # invoke super init, passing nparts, dtype_u and dtype_f
         u0 = np.asarray(u0)

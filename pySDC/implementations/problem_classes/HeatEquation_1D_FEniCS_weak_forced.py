@@ -24,7 +24,7 @@ class fenics_heat_weak_fullyimplicit(ptype):
     dtype_u = fenics_mesh
     dtype_f = fenics_mesh
 
-    def __init__(self, c_nvars, t0, family, order, refinements, nu):
+    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
         """
         Initialization routine
 
@@ -227,7 +227,7 @@ class fenics_heat_weak_imex(ptype):
     dtype_u = fenics_mesh
     dtype_f = rhs_fenics_mesh
 
-    def __init__(self, c_nvars, t0, family, order, refinements, nu):
+    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
         """
         Initialization routine
 

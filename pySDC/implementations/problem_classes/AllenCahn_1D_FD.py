@@ -41,7 +41,16 @@ class allencahn_front_fullyimplicit(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, stop_at_nan=True):
+    def __init__(
+        self,
+        nvars=127,
+        dw=-0.04,
+        eps=0.04,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        interval=(-0.5, 0.5),
+        stop_at_nan=True,
+    ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars + 1) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p - 1')
@@ -444,7 +453,17 @@ class allencahn_periodic_fullyimplicit(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
+    def __init__(
+        self,
+        nvars=128,
+        dw=-0.04,
+        eps=0.04,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        interval=(-0.5, 0.5),
+        radius=0.25,
+        stop_at_nan=True,
+    ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p')
@@ -627,7 +646,17 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
 
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
+    def __init__(
+        self,
+        nvars=128,
+        dw=-0.04,
+        eps=0.04,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        interval=(-0.5, 0.5),
+        radius=0.25,
+        stop_at_nan=True,
+    ):
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
         self.A -= sp.eye(self.init) * 0.0 / self.eps**2
 
@@ -707,7 +736,17 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
 
     dtype_f = comp2_mesh
 
-    def __init__(self, nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan=True):
+    def __init__(
+        self,
+        nvars=128,
+        dw=-0.04,
+        eps=0.04,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        interval=(-0.5, 0.5),
+        radius=0.25,
+        stop_at_nan=True,
+    ):
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
         self.A -= sp.eye(self.init) * 0.0 / self.eps**2
 

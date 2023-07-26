@@ -16,8 +16,12 @@ class fermi_pasta_ulam_tsingou(ptype):
     dtype_u = particles
     dtype_f = acceleration
 
-    def __init__(self, npart, alpha, k, energy_modes):
+    def __init__(self, npart=2048, alpha=0.25, k=1.0, energy_modes=None):
         """Initialization routine"""
+
+        if energy_modes is None:
+            energy_modes = [1, 2, 3, 4]
+
         # invoke super init, passing nparts
         super().__init__((npart, None, np.dtype('float64')))
         self._makeAttributeAndRegister('npart', 'alpha', 'k', 'energy_modes', localVars=locals(), readOnly=True)
