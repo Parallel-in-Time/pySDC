@@ -97,6 +97,7 @@ class SwitchEstimator(ConvergenceController):
                     self.log_event_time(
                         controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_interp[-1]
                     )
+                    L.prob.count_switches()
                     self.status.is_zero = True
 
                 # intermediate value theorem states that a root is contained in current step
@@ -146,6 +147,7 @@ class SwitchEstimator(ConvergenceController):
                             L.status.sweep,
                             self.status.t_switch,
                         )
+                        L.prob.count_switches()
                         self.status.switch_detected = False
 
                 else:  # intermediate value theorem is not satisfied
@@ -343,7 +345,6 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
 
     n = 0
     while n < newton_maxiter:
-        print('Iteration: ', n, '-- Root: ', x0, '-- Distance to 0: ', abs(p(x0)))
         if abs(p(x0)) < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)):
             break
 

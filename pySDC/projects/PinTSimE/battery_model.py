@@ -157,7 +157,7 @@ def generate_description(
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 15
     controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
 

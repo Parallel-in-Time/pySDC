@@ -60,7 +60,7 @@ def run():
     as <problem_class>_model_solution_<sweeper_class>.png
     """
 
-    dt = 4e-3
+    dt = 1e-2
     t0 = 0.0
     Tend = 3.5
 
@@ -83,6 +83,8 @@ def run():
 
     recomputed = False
     use_switch_estimator = [True]
+    max_restarts = 1
+    tol_event = 1e-10
 
     hook_class = [LogData, LogEvent]
 
@@ -99,8 +101,8 @@ def run():
                 problem_params,
                 restol,
                 maxiter,
-                1,
-                1e-10,
+                max_restarts,
+                tol_event,
             )
 
             # Assertions
@@ -272,6 +274,7 @@ def get_data_dict(stats, use_switch_estimator, recomputed=False):
     data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['vC1'] = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
     data['vC2'] = np.array([me[1][2] for me in get_sorted(stats, type='u', recomputed=False, sortby='time')])
+
     data['state_function_1'] = np.array(get_sorted(stats, type='state_function_1', sortby='time', recomputed=False))[
         :, 1
     ]
