@@ -97,6 +97,11 @@ class advectionNd(GenericNDimFinDiff):
         sol : dtype_u
             The exact solution.
         """
+        if 'u_init' in kwargs.keys() or 't_init' in kwargs.keys():
+            self.logger.warn(
+                f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
+            )
+
         # Initialize pointers and variables
         ndim, freq, c, sigma, sol = self.ndim, self.freq, self.c, self.sigma, self.u_init
 
