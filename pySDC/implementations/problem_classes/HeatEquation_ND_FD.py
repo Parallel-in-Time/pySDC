@@ -38,6 +38,11 @@ class heatNd_unforced(GenericNDimFinDiff):
         sol : dtype_u
             The exact solution.
         """
+        if 'u_init' in kwargs.keys() or 't_init' in kwargs.keys():
+            self.logger.warn(
+                f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
+            )
+
         ndim, freq, nu, sigma, dx, sol = self.ndim, self.freq, self.nu, self.sigma, self.dx, self.u_init
 
         if ndim == 1:

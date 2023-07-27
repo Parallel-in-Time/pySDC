@@ -161,6 +161,10 @@ class nonlinearschroedinger_imex(ptype):
         u : dtype_u
             The exact solution.
         """
+        if 'u_init' in kwargs.keys() or 't_init' in kwargs.keys():
+            self.logger.warn(
+                f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
+            )
 
         def nls_exact_1D(t, x, c):
             ae = 1.0 / np.sqrt(2.0) * np.exp(1j * t)
