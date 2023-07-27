@@ -17,10 +17,10 @@ class acoustic_1d_imex(ptype):
     fully investigated in -[1]. The equations are given by
 
     .. math::
-        \frac{\partial u}{\partial t} = c_s \frac{\partial p}{\partial x} + U \frac{\partial u}{\partial x},
+        \frac{\partial u}{\partial t} + c_s \frac{\partial p}{\partial x} + U \frac{\partial u}{\partial x} = 0,
 
     .. math::
-        \frac{\partial p}{\partial t} = c_s \frac{\partial u}{\partial x} + U \frac{\partial p}{\partial x}.
+        \frac{\partial p}{\partial t} + c_s \frac{\partial u}{\partial x} + U \frac{\partial p}{\partial x} = 0.
 
     For initial data :math:`u(x, 0) \equiv 0` and :math:`p(x, 0) = p_0 (x)` the analytical solution is
 
