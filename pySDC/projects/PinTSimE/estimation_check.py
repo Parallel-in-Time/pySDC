@@ -13,7 +13,6 @@ from pySDC.projects.PinTSimE.battery_model import (
     generate_description,
     get_recomputed,
     LogEvent,
-    LogErrorEmbeddedEstimate,
     proof_assertions_description,
 )
 
@@ -23,6 +22,7 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 from pySDC.implementations.hooks.log_solution import LogSolution
 from pySDC.implementations.hooks.log_step_size import LogStepSize
+from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
@@ -59,7 +59,7 @@ def run(cwd='./'):
     problem_params['alpha'] = alpha
     problem_params['V_ref'] = V_ref
 
-    hook_class = [LogSolution, LogEvent, LogStepSize, LogErrorEmbeddedEstimate]
+    hook_class = [LogSolution, LogEvent, LogStepSize, LogEmbeddedErrorEstimate]
 
     max_restarts = 1
     use_switch_estimator = [True, False]
@@ -72,7 +72,7 @@ def run(cwd='./'):
         for dt_item in dt_list:
             for use_SE in use_switch_estimator:
                 for use_A in use_adaptivity:
-                    tol_event = 1e-10 if problem.__name__ == 'generic_implicit' else 1e-17
+                    tol_event = 1e-10 if sweeper.__name__ == 'generic_implicit' else 1e-17
                     description, controller_params = generate_description(
                         dt_item,
                         problem,
@@ -326,7 +326,7 @@ def differences_around_switch(
         diff_adapt, diff_SE_adapt = vC_adapt - V_ref[0], vC_SE_adapt - V_ref[0]
         times_adapt = [me[0] for me in get_sorted(stats_adapt, type='u', recomputed=False)]
         times_SE_adapt = [me[0] for me in get_sorted(stats_SE_adapt, type='u', recomputed=False)]
-        print(times_SE, t_switch)
+
         diffs_true_at.append([diff_SE[m] for m in range(len(times_SE)) if abs(times_SE[m] - t_switch) <= 1e-7][0])
 
         diffs_false_before.append(

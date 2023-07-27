@@ -14,35 +14,11 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 from pySDC.implementations.hooks.log_solution import LogSolution
 from pySDC.implementations.hooks.log_step_size import LogStepSize
+from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-
-
-class LogErrorEmbeddedEstimate(hooks):
-    """
-    Logs the data such as the numerical solution, the adapted step sizes by Adaptivity and the
-    embedded error estimate.
-    """
-
-    def post_step(self, step, level_number):
-        super(LogErrorEmbeddedEstimate, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.get('error_embedded_estimate'),
-        )
 
 
 class LogEvent(hooks):
@@ -255,12 +231,12 @@ def run():
     use_switch_estimator = [True]
     use_adaptivity = [True]
 
-    hook_class = [LogSolution, LogEvent, LogErrorEmbeddedEstimate, LogStepSize]
+    hook_class = [LogSolution, LogEvent, LogEmbeddedErrorEstimate, LogStepSize]
 
     for problem, sweeper in zip(problem_classes, sweeper_classes):
         for use_SE in use_switch_estimator:
             for use_A in use_adaptivity:
-                tol_event = 1e-10 if problem.__name__ == 'generic_implicit' else 1e-17
+                tol_event = 1e-10 if sweeper.__name__ == 'generic_implicit' else 1e-17
 
                 description, controller_params = generate_description(
                     dt,
