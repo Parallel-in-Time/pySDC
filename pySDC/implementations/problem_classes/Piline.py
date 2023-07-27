@@ -137,6 +137,9 @@ class piline(ptype):
             The reference solution.
         """
 
+        if t_init is not None and u_init is not None:
+            self.logger.warning('Setting t_init and u_init leads to computation of global error!')
+
         me = self.dtype_u(self.init)
 
         # fill initial conditions
