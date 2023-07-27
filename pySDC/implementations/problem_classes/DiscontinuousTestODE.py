@@ -170,7 +170,9 @@ class DiscontinuousTestODE(ptype):
         """
 
         if t_init is not None and u_init is not None:
-            self.logger.warning('Setting t_init and u_init leads to computation of global error!')
+            self.logger.warning(
+                f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
+            )
 
         me = self.dtype_u(self.init)
         if t <= self.t_switch_exact:

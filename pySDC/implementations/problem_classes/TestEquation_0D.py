@@ -126,9 +126,6 @@ class testequation0d(ptype):
             The exact solution.
         """
 
-        if t_init is not None and u_init is not None:
-            self.logger.warning('Setting t_init and u_init leads to computation of global error!')
-
         u_init = (self.u0 if u_init is None else u_init) * 1.0
         t_init = 0.0 if t_init is None else t_init * 1.0
 
