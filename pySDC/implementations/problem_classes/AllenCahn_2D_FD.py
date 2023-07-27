@@ -13,10 +13,29 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
 
-    TODO : doku
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space finite differences are used, the order of the finite difference formula
+    can be chosen by setting the attribute `order`. For time-stepping the problem class is implemented
+    to provide a discretization in a fully-implicit way.
 
     Parameters
     ----------
@@ -62,9 +81,7 @@ class allencahn_fullyimplicit(ptype):
         radius=0.25,
         order=2,
     ):
-        """
-        Initialization routine
-        """
+        """Initialization routine"""
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % nvars)
@@ -254,8 +271,29 @@ class allencahn_fullyimplicit(ptype):
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space finite differences are used, the order of the finite difference formula
+    can be chosen by setting the attribute `order`. A semi-implicit discretization is used for the time
+    discretization.
     """
 
     dtype_f = imex_mesh
@@ -333,8 +371,28 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space finite differences are used, the order of the finite difference formula
+    can be chosen by setting the attribute `order`. An AC splitting is used for time discretization here.
     """
 
     dtype_f = imex_mesh
@@ -428,8 +486,29 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space finite differences are used, the order of the finite difference formula
+    can be chosen by setting the attribute `order`. For time-stepping the problem class is implemented
+    to provide a discretization in a multi-implicit way.
     """
 
     dtype_f = comp2_mesh
@@ -569,8 +648,28 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space finite differences are used, the order of the finite difference formula
+    can be chosen by setting the attribute `order`. For time-stepping an AC splitting is used.
     """
 
     dtype_f = comp2_mesh

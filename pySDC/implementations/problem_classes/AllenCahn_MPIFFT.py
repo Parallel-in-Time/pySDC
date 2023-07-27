@@ -10,10 +10,28 @@ from mpi4py_fft import newDistArray
 
 
 class allencahn_imex(ptype):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping
+    r"""
+    This class implements the two-dimensional (also three-dimensional) Allen-Cahn equation
 
-    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space mpi4py-fft is used for solving linear parts [1]_, and a semi-implicit discretization
+    is chosen for discretization in time.
 
     Parameters
     ----------
@@ -46,6 +64,10 @@ class allencahn_imex(ptype):
         Mesh width in x direction
     dy : float
         Mesh width in y direction
+
+    References
+    ----------
+    .. [1] mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
     """
 
     dtype_u = mesh
@@ -235,9 +257,33 @@ class allencahn_imex(ptype):
 
 
 class allencahn_imex_timeforcing(allencahn_imex):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping,
-    time-dependent forcing
+    r"""
+    This class implements the two-dimensional (also three-dimensional) Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space mpi4py-fft is used for solving linear parts [1]_, and a semi-implicit discretization
+    with time-dependent forcing is chosen for discretization in time.
+    time-dependent forcing.
+
+    References
+    ----------
+    .. [1] mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
     """
 
     def eval_f(self, u, t):

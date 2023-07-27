@@ -7,8 +7,28 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 # noinspection PyUnusedLocal
 class allencahn2d_imex(ptype):
-    """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space Fast Fourier Transformations (FFTs) are used for solving the linear parts.
+    The time-stepping is chosen to be semi-implicit.
 
     Parameters
     ----------
@@ -174,9 +194,28 @@ class allencahn2d_imex(ptype):
 
 
 class allencahn2d_imex_stab(allencahn2d_imex):
-    """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
-    stabilized splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u),
+
+    .. math::
+        u(x, 0) = \sum_{i=1}^L \sum_{j=1}^L u_{i,j}(x)
+
+    with periodic boundary conditions and a scaling parameter :math:`\varepsilon > 0`. The domain in space
+    :math:`[-L/2, L/2]` for :math:`L \in \mathbb{N}` consists of :math:`L^2` patches. In each patch the
+    simulation is started with a circle
+
+    .. math::
+        u_{i,j} (x) = \frac{1}{2} (1 + \tanh( \frac{R_{i,j} - |x|}{\sqrt{2} \varepsilon} ))
+
+    of initial radius :math:`R_{i,j} > 0` which is chosen randomly between :math:`0.5 \varepsilon` and
+    :math:`3 \varepsilon` for each patch. For :math:`L = 1` this is precisely the well-known shrinking
+    circle.
+
+    For discretization in space  FFTs are used for solving the linear parts, the time-stepping uses an
+    semi-implicit formulation with stabilized splitting.
 
     Parameters
     ----------
