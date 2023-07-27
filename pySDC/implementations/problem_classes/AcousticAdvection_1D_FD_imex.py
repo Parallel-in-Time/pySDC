@@ -12,10 +12,38 @@ from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix im
 
 # noinspection PyUnusedLocal
 class acoustic_1d_imex(ptype):
-    """
-    Example implementing the one-dimensional IMEX acoustic-advection
+    r"""
+    This class implements the one-dimensional acoustics advection equation on a periodic domain :math:`[0, 1]`
+    fully investigated in -[1]. The equations are given by
 
-    TODO : doku
+    .. math::
+        \frac{\partial u}{\partial t} = c_s \frac{\partial p}{\partial x} + U \frac{\partial u}{\partial x},
+
+    .. math::
+        \frac{\partial p}{\partial t} = c_s \frac{\partial u}{\partial x} + U \frac{\partial p}{\partial x}.
+
+    For initial data :math:`u(x, 0) \equiv 0` and :math:`p(x, 0) = p_0 (x)` the analytical solution is
+
+    .. math::
+        u(x, t) = \frac{1}{2} p_0 (x - (U + c_s) t) - \frac{1}{2} p_0 (x - (U - c_s) t),
+
+    .. math::
+        p(x, t) = \frac{1}{2} p_0 (x - (U + c_s) t) + \frac{1}{2} p_0 (x - (U - c_s) t).
+
+    The problem is implemented in the way that is used for IMEX time-stepping.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Number of degrees of freedom.
+    cs : float, optional
+        Sound velocity :math:`c_s`.
+    cadv : float, optional
+        Advection speed :math:`U`.
+    order_adv : knt, optional
+        Order of which the advective derivative is discretized.
+    waveno : int, optional
+        The wave number.
 
     Attributes
     ----------
@@ -29,6 +57,11 @@ class acoustic_1d_imex(ptype):
         Sparse identity matrix.
     A : scipy.csc_matrix
         Matrix for the wave operator.
+
+    References
+    ----------
+    .. [1] D. Ruprecht, R. Speck. Spectral deferred corrections with fast-wave slow-wave splitting.
+        SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).
     """
 
     dtype_u = mesh

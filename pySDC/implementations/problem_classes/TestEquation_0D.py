@@ -9,26 +9,33 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 # noinspection PyUnusedLocal
 class testequation0d(ptype):
-    """
-    Example implementing a bundle of test equations at once (via diagonal matrix)
+    r"""
+    This class implements the simple test equation of the form
 
-    Attributes:
-        A: digonal matrix containing the parameters
+    .. math::
+        \frac{d u(t)}{dt} = A u(t)
+
+    for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.
+
+    Parameters
+    ----------
+    lambdas : sequence of array_like
+        List of lambda parameters.
+    u0 : sequence of array_like
+        Initial condition.
+
+    Attributes
+    ----------
+    A : scipy.sparse.csc_matrix
+        Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
-    # TODO : add default values
     def __init__(self, lambdas=1, u0=0.0):
-        """
-        Initialization routine
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type for solution
-            dtype_f: mesh data type for RHS
-        """
         assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
         nvars = len(lambdas)
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
@@ -47,7 +54,7 @@ class testequation0d(ptype):
 
         Parameters
         ----------
-        lambdas : list
+        lambdas : sequence of array_like
             List of lambda parameters.
 
         Returns
