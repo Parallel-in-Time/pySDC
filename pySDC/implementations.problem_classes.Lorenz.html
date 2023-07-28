@@ -53,8 +53,7 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Lorenz.LorenzAttractor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LorenzAttractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">28.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.6666666666666665</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Lorenz.html#LorenzAttractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Lorenz.LorenzAttractor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<blockquote>
-<div><p>Simple script to run a Lorenz attractor problem.</p>
+<p>Simple script to run a Lorenz attractor problem.</p>
 <p>The Lorenz attractor is a system of three ordinary differential equations (ODEs) that exhibits some chaotic behaviour.
 It is well known for the “Butterfly Effect”, because the solution looks like a butterfly (solve to <span class="math notranslate nohighlight">\(T_{end} = 100\)</span>
 or so to see this with these initial conditions) and because of the chaotic nature.</p>
@@ -62,48 +61,35 @@ or so to see this with these initial conditions) and because of the chaotic natu
 <p>Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1</p>
 <p>The system of ODEs is given by</p>
 <div class="math notranslate nohighlight">
-\[\]</div>
-</div></blockquote>
-<p>rac{d y_1(t)}{dt} = sigma (y_2 (t) - y_1 (t)),</p>
-<blockquote>
-<div><div class="math notranslate nohighlight">
-\[\]</div>
-</div></blockquote>
-<p>rac{d y_2(t)}{dt} =
-ho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),</p>
-<blockquote>
-<div><div class="math notranslate nohighlight">
-\[\]</div>
-</div></blockquote>
-<p>rac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - eta y_3 (t)</p>
-<blockquote>
-<div><p>with initial condition <span class="math notranslate nohighlight">\(y(0) = (1, 1, 1)^{T}\)</span> for <span class="math notranslate nohighlight">\(t \in [0, 1]\)</span>. The problem parameters for this problem are
-<span class="math notranslate nohighlight">\(\sigma = 10\)</span>, :math:<a href="#id1"><span class="problematic" id="id2">`</span></a></p>
-</div></blockquote>
-<p>ho = 28` and <span class="math notranslate nohighlight">\(eta = 8/3\)</span>.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>sigma<span class="classifier">float, optional</span></dt><dd><p>Parameter <span class="math notranslate nohighlight">\(\sigma\)</span> of the problem.</p>
-</dd>
-<dt>rho<span class="classifier">float, optional</span></dt><dd><p>Parameter :math:<a href="#id3"><span class="problematic" id="id4">`</span></a></p>
+\[\frac{d y_1(t)}{dt} = \sigma (y_2 (t) - y_1 (t)),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d y_2(t)}{dt} = \rho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)\]</div>
+<p>with initial condition <span class="math notranslate nohighlight">\(y(0) = (1, 1, 1)^{T}\)</span> for <span class="math notranslate nohighlight">\(t \in [0, 1]\)</span>. The problem parameters for this problem are
+<span class="math notranslate nohighlight">\(\sigma = 10\)</span>, <span class="math notranslate nohighlight">\(\rho = 28\)</span> and <span class="math notranslate nohighlight">\(\beta = 8/3\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Parameter <span class="math notranslate nohighlight">\(\sigma\)</span> of the problem.</p></li>
+<li><p><strong>rho</strong> (<em>float</em><em>, </em><em>optional</em>) – Parameter <span class="math notranslate nohighlight">\(\rho\)</span> of the problem.</p></li>
+<li><p><strong>beta</strong> (<em>float</em><em>, </em><em>optional</em>) – Parameter <span class="math notranslate nohighlight">\(\beta\)</span> of the problem.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton for termination.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method.</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
-<dl>
-<dt>ho` of the problem.</dt><dd><dl class="simple">
-<dt>beta<span class="classifier">float, optional</span></dt><dd><p>Parameter <span class="math notranslate nohighlight">\(eta\)</span> of the problem.</p>
-</dd>
-<dt>newton_tol<span class="classifier">float, optional</span></dt><dd><p>Tolerance for Newton for termination.</p>
-</dd>
-<dt>newton_maxiter<span class="classifier">int, optional</span></dt><dd><p>Maximum number of iterations for Newton’s method.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>work_counter<span class="classifier">dict</span></dt><dd><p>Counts the iterations/nfev (here for Newton’s method and the nfev for the right-hand side).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Lorenz.LorenzAttractor.work_counter">
+<span class="sig-name descname"><span class="pre">work_counter</span></span><a class="headerlink" href="#implementations.problem_classes.Lorenz.LorenzAttractor.work_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counts the iterations/nfev (here for Newton’s method and the nfev for the right-hand side).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
-</dd>
-</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Lorenz.LorenzAttractor.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Lorenz.LorenzAttractor.dtype_f" title="Permalink to this definition">¶</a></dt>
@@ -195,6 +181,7 @@ ho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Lorenz module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor"><code class="docutils literal notranslate"><span class="pre">LorenzAttractor</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor.work_counter"><code class="docutils literal notranslate"><span class="pre">work_counter</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

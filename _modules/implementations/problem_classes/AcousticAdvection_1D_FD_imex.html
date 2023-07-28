@@ -51,10 +51,38 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="acoustic_1d_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex">[docs]</a><span class="k">class</span> <span class="nc">acoustic_1d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the one-dimensional IMEX acoustic-advection</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional acoustics advection equation on a periodic domain :math:`[0, 1]`</span>
+<span class="sd">    fully investigated in [1]_. The equations are given by</span>
 
-<span class="sd">    TODO : doku</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} + c_s \frac{\partial p}{\partial x} + U \frac{\partial u}{\partial x} = 0,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial p}{\partial t} + c_s \frac{\partial u}{\partial x} + U \frac{\partial p}{\partial x} = 0.</span>
+
+<span class="sd">    For initial data :math:`u(x, 0) \equiv 0` and :math:`p(x, 0) = p_0 (x)` the analytical solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = \frac{1}{2} p_0 (x - (U + c_s) t) - \frac{1}{2} p_0 (x - (U - c_s) t),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        p(x, t) = \frac{1}{2} p_0 (x - (U + c_s) t) + \frac{1}{2} p_0 (x - (U - c_s) t).</span>
+
+<span class="sd">    The problem is implemented in the way that is used for IMEX time-stepping.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int, optional</span>
+<span class="sd">        Number of degrees of freedom.</span>
+<span class="sd">    cs : float, optional</span>
+<span class="sd">        Sound velocity :math:`c_s`.</span>
+<span class="sd">    cadv : float, optional</span>
+<span class="sd">        Advection speed :math:`U`.</span>
+<span class="sd">    order_adv : knt, optional</span>
+<span class="sd">        Order of which the advective derivative is discretized.</span>
+<span class="sd">    waveno : int, optional</span>
+<span class="sd">        The wave number.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -68,6 +96,11 @@
 <span class="sd">        Sparse identity matrix.</span>
 <span class="sd">    A : scipy.csc_matrix</span>
 <span class="sd">        Matrix for the wave operator.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] D. Ruprecht, R. Speck. Spectral deferred corrections with fast-wave slow-wave splitting.</span>
+<span class="sd">        SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>

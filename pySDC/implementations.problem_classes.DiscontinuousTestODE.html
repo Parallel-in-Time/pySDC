@@ -58,7 +58,7 @@ the solution changes when the state function <span class="math notranslate nohig
 <p>if <span class="math notranslate nohighlight">\(u - 5 &lt; 0:\)</span></p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\fra{d u}{dt} = u\]</div>
+\[\frac{d u}{dt} = u\]</div>
 </div></blockquote>
 <p>else:</p>
 <blockquote>
@@ -66,7 +66,7 @@ the solution changes when the state function <span class="math notranslate nohig
 \[\frac{d u}{dt} = \frac{4}{t^*},\]</div>
 </div></blockquote>
 <p>where <span class="math notranslate nohighlight">\(t^* = \log(5) \approx 1.6094379\)</span>. For <span class="math notranslate nohighlight">\(h(u) &lt; 0\)</span>, i.e., <span class="math notranslate nohighlight">\(t \leq t^*\)</span> the exact solution is
-<span class="math notranslate nohighlight">\(u(t) = exp(t)\)</span>; for <span class="math notranslate nohighlight">\(h(u) \geq 0\)</span>, i.e., <span class="math notranslate nohighlight">\(t \geq t^*\)</span> the exact solution is <span class="math notranslate nohighlight">\(u(t) = \frac{4 t}{t^*} + 1\)</span>.</p>
+<span class="math notranslate nohighlight">\(u(t) = \exp(t)\)</span>; for <span class="math notranslate nohighlight">\(h(u) \geq 0\)</span>, i.e., <span class="math notranslate nohighlight">\(t \geq t^*\)</span> the exact solution is <span class="math notranslate nohighlight">\(u(t) = \frac{4 t}{t^*} + 1\)</span>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact">
 <span class="sig-name descname"><span class="pre">t_switch_exact</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact" title="Permalink to this definition">¶</a></dt>
@@ -215,7 +215,7 @@ step.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
-<li><p><strong>u_init</strong> (<em>pySDC.problem.DiscontinuousTestODE.dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<em>dtype_u</em>) – Initial conditions for getting the exact solution.</p></li>
 <li><p><strong>t_init</strong> (<em>float</em>) – The starting time.</p></li>
 </ul>
 </dd>

@@ -46,10 +46,33 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="vanderpol"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol">[docs]</a><span class="k">class</span> <span class="nc">vanderpol</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the van der pol oscillator</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the stiff Van der Pol oscillator given by the equation</span>
 
-<span class="sd">    TODO : doku</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    u0 : sequence of array_like, optional</span>
+<span class="sd">        Initial condition.</span>
+<span class="sd">    mu : float, optional</span>
+<span class="sd">        Stiff parameter :math:`\mu`.</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton&#39;s method to terminate.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Tolerance for Newton to terminate.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicate whether Newton&#39;s method should stop if nan values arise.</span>
+<span class="sd">    crash_at_maxiter = bool, optional</span>
+<span class="sd">        Indicates whether Newton&#39;s method should stop if maximum number of iterations</span>
+<span class="sd">        `newton_maxiter` is reached.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    work_counters : WorkCounter</span>
+<span class="sd">        Counts different things, here: Number of evaluations of the right-hand side in `eval_f`</span>
+<span class="sd">        and number of Newton calls in each Newton iterations are counted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>

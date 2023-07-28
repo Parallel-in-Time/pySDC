@@ -53,32 +53,24 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nonlinear_ODE_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<blockquote>
-<div><p>This class implements a simple nonlinear ODE with a singularity in the derivative, taken from
+<p>This class implements a simple nonlinear ODE with a singularity in the derivative, taken from
 <a class="reference external" href="https://www.osti.gov/servlets/purl/6111421">https://www.osti.gov/servlets/purl/6111421</a> (Problem E-4). For <span class="math notranslate nohighlight">\(0 \leq t \leq 5\)</span>, the problem is
 given by</p>
 <div class="math notranslate nohighlight">
-\[\]</div>
-</div></blockquote>
-<p>rac{du(t)}{dt} = sqrt(1 - u(t))</p>
-<blockquote>
-<div><p>with initial condition <span class="math notranslate nohighlight">\(u(0) = 0\)</span>. The exact solution is</p>
+\[\frac{du(t)}{dt} = \sqrt(1 - u(t))\]</div>
+<p>with initial condition <span class="math notranslate nohighlight">\(u(0) = 0\)</span>. The exact solution is</p>
 <div class="math notranslate nohighlight">
-\[u(t) = t -\]</div>
-</div></blockquote>
-<p>rac{t^2}{4}.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>u0<span class="classifier">float, optional</span></dt><dd><p>Initial condition.</p>
-</dd>
-<dt>newton_maxiter<span class="classifier">float, optional</span></dt><dd><p>Maximum number of iterations for Newton’s method.</p>
-</dd>
-<dt>newton_tol<span class="classifier">float, optional</span></dt><dd><p>Tolerance for Newton’s method to terminate.</p>
-</dd>
-<dt>stop_at_nan<span class="classifier">bool, optional</span></dt><dd><p>Indicates that Newton solver has to stop if nan values arise.</p>
+\[u(t) = t - \frac{t^2}{4}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u0</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial condition.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton’s method to terminate.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that Newton solver has to stop if nan values arise.</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f" title="Permalink to this definition">¶</a></dt>

@@ -53,11 +53,27 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">testequation0d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing a bundle of test equations at once (via diagonal matrix)</p>
+<p>This class implements the simple test equation of the form</p>
+<div class="math notranslate nohighlight">
+\[\frac{d u(t)}{dt} = A u(t)\]</div>
+<p>for <span class="math notranslate nohighlight">\(A = diag(\lambda_1, .. ,\lambda_n)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lambdas</strong> (<em>sequence</em><em> of </em><em>array_like</em>) – List of lambda parameters.</p></li>
+<li><p><strong>u0</strong> (<em>sequence</em><em> of </em><em>array_like</em>) – Initial condition.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d.A">
 <span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d.A" title="Permalink to this definition">¶</a></dt>
-<dd><p>digonal matrix containing the parameters</p>
+<dd><p>Diagonal matrix containing <span class="math notranslate nohighlight">\(\lambda_1,..,\lambda_n\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.sparse.csc_matrix</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">

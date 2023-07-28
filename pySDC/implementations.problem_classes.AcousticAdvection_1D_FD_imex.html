@@ -53,8 +53,29 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acoustic_1d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_adv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waveno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AcousticAdvection_1D_FD_imex.html#acoustic_1d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the one-dimensional IMEX acoustic-advection</p>
-<p>TODO : doku</p>
+<p>This class implements the one-dimensional acoustics advection equation on a periodic domain <span class="math notranslate nohighlight">\([0, 1]\)</span>
+fully investigated in <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The equations are given by</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} + c_s \frac{\partial p}{\partial x} + U \frac{\partial u}{\partial x} = 0,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial p}{\partial t} + c_s \frac{\partial u}{\partial x} + U \frac{\partial p}{\partial x} = 0.\]</div>
+<p>For initial data <span class="math notranslate nohighlight">\(u(x, 0) \equiv 0\)</span> and <span class="math notranslate nohighlight">\(p(x, 0) = p_0 (x)\)</span> the analytical solution is</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = \frac{1}{2} p_0 (x - (U + c_s) t) - \frac{1}{2} p_0 (x - (U - c_s) t),\]</div>
+<div class="math notranslate nohighlight">
+\[p(x, t) = \frac{1}{2} p_0 (x - (U + c_s) t) + \frac{1}{2} p_0 (x - (U - c_s) t).\]</div>
+<p>The problem is implemented in the way that is used for IMEX time-stepping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of degrees of freedom.</p></li>
+<li><p><strong>cs</strong> (<em>float</em><em>, </em><em>optional</em>) – Sound velocity <span class="math notranslate nohighlight">\(c_s\)</span>.</p></li>
+<li><p><strong>cadv</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed <span class="math notranslate nohighlight">\(U\)</span>.</p></li>
+<li><p><strong>order_adv</strong> (<em>knt</em><em>, </em><em>optional</em>) – Order of which the advective derivative is discretized.</p></li>
+<li><p><strong>waveno</strong> (<em>int</em><em>, </em><em>optional</em>) – The wave number.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.mesh">
 <span class="sig-name descname"><span class="pre">mesh</span></span><a class="headerlink" href="#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.mesh" title="Permalink to this definition">¶</a></dt>
@@ -110,6 +131,14 @@
 </dl>
 </dd></dl>
 
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>D. Ruprecht, R. Speck. Spectral deferred corrections with fast-wave slow-wave splitting.
+SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.dtype_f" title="Permalink to this definition">¶</a></dt>

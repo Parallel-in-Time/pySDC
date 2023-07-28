@@ -52,7 +52,7 @@
 <span class="sd">    if :math:`u - 5 &lt; 0:`</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            \fra{d u}{dt} = u</span>
+<span class="sd">            \frac{d u}{dt} = u</span>
 
 <span class="sd">    else:</span>
 
@@ -60,7 +60,7 @@
 <span class="sd">            \frac{d u}{dt} = \frac{4}{t^*},</span>
 
 <span class="sd">    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) &lt; 0`, i.e., :math:`t \leq t^*` the exact solution is</span>
-<span class="sd">    :math:`u(t) = exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.</span>
+<span class="sd">    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -197,7 +197,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
-<span class="sd">        u_init : pySDC.problem.DiscontinuousTestODE.dtype_u</span>
+<span class="sd">        u_init : dtype_u</span>
 <span class="sd">            Initial conditions for getting the exact solution.</span>
 <span class="sd">        t_init : float</span>
 <span class="sd">            The starting time.</span>

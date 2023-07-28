@@ -53,8 +53,36 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vanderpol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crash_at_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the van der pol oscillator</p>
-<p>TODO : doku</p>
+<p>This class implements the stiff Van der Pol oscillator given by the equation</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u0</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – Initial condition.</p></li>
+<li><p><strong>mu</strong> (<em>float</em><em>, </em><em>optional</em>) – Stiff parameter <span class="math notranslate nohighlight">\(\mu\)</span>.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method to terminate.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton to terminate.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicate whether Newton’s method should stop if nan values arise.</p></li>
+<li><p><strong>bool</strong> (<em>crash_at_maxiter =</em>) – Indicates whether Newton’s method should stop if maximum number of iterations
+<cite>newton_maxiter</cite> is reached.</p></li>
+<li><p><strong>optional</strong> – Indicates whether Newton’s method should stop if maximum number of iterations
+<cite>newton_maxiter</cite> is reached.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.work_counters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counts different things, here: Number of evaluations of the right-hand side in <cite>eval_f</cite>
+and number of Newton calls in each Newton iterations are counted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.Problem.html#core.Problem.WorkCounter" title="core.Problem.WorkCounter">WorkCounter</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_f" title="Permalink to this definition">¶</a></dt>
@@ -146,6 +174,7 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Van_der_Pol_implicit module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol"><code class="docutils literal notranslate"><span class="pre">vanderpol</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

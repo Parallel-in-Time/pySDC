@@ -48,26 +48,32 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="testequation0d"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d">[docs]</a><span class="k">class</span> <span class="nc">testequation0d</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing a bundle of test equations at once (via diagonal matrix)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the simple test equation of the form</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        A: digonal matrix containing the parameters</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u(t)}{dt} = A u(t)</span>
+
+<span class="sd">    for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lambdas : sequence of array_like</span>
+<span class="sd">        List of lambda parameters.</span>
+<span class="sd">    u0 : sequence of array_like</span>
+<span class="sd">        Initial condition.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : scipy.sparse.csc_matrix</span>
+<span class="sd">        Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
-    <span class="c1"># TODO : add default values</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: mesh data type for solution</span>
-<span class="sd">            dtype_f: mesh data type for RHS</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lambdas</span><span class="p">),</span> <span class="s1">&#39;ERROR: expect flat list here, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">lambdas</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">nvars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: expect at least one lambda parameter here&#39;</span>
@@ -86,7 +92,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        lambdas : list</span>
+<span class="sd">        lambdas : sequence of array_like</span>
 <span class="sd">            List of lambda parameters.</span>
 
 <span class="sd">        Returns</span>
