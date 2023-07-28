@@ -13,9 +13,9 @@ class buck_converter(ptype):
         \frac{d u(t)}{dt} = A_k u(t) + f_k (t)
 
     for :math:`k=1,2`. The two states are the following. Define :math:`T_{sw}:=\frac{1}{f_{sw}}` as the switching period with
-    switching frequency :math:`f_{sw}`. The duty cycle :math:`duty`defines the period of how long the switches are in one state
-    until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage. A duty cycle of one means
-    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} mod 1 \leq duty`:
+    switching frequency :math:`f_{sw}`. The duty cycle :math:`duty` defines the period of how long the switches are in one state
+    until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage [1]_. A duty cycle of one means
+    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} mod 1 \leq duty` [2]_:
 
     .. math::
         \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_1} (t) + \frac{V_s}{R_s C_1},
