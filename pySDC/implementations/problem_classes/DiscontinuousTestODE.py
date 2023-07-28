@@ -13,7 +13,7 @@ class DiscontinuousTestODE(ptype):
     if :math:`u - 5 < 0:`
 
         .. math::
-            \fra{d u}{dt} = u
+            \frac{d u}{dt} = u
 
     else:
 
@@ -21,7 +21,7 @@ class DiscontinuousTestODE(ptype):
             \frac{d u}{dt} = \frac{4}{t^*},
 
     where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) < 0`, i.e., :math:`t \leq t^*` the exact solution is
-    :math:`u(t) = exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
+    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
 
     Attributes
     ----------
@@ -158,7 +158,7 @@ class DiscontinuousTestODE(ptype):
         ----------
         t : float
             Time of the exact solution.
-        u_init : pySDC.problem.DiscontinuousTestODE.dtype_u
+        u_init : dtype_u
             Initial conditions for getting the exact solution.
         t_init : float
             The starting time.
