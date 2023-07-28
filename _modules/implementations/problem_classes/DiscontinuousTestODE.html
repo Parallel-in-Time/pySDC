@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.problem_classes.DiscontinuousTestODE &#8212; pySDC 5.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.DiscontinuousTestODE</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.DiscontinuousTestODE</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">ProblemError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+
+
+<div class="viewcode-block" id="DiscontinuousTestODE"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">[docs]</a><span class="k">class</span> <span class="nc">DiscontinuousTestODE</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements a very simple test case of a ordinary differential equation consisting of one discrete event. The dynamics of</span>
+<span class="sd">    the solution changes when the state function :math:`h(u) := u - 5` changes the sign. The problem is defined by:</span>
+
+<span class="sd">    if :math:`u - 5 &lt; 0:`</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \fra{d u}{dt} = u</span>
+
+<span class="sd">    else:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \frac{d u}{dt} = \frac{4}{t^*},</span>
+
+<span class="sd">    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) &lt; 0`, i.e., :math:`t \leq t^*` the exact solution is</span>
+<span class="sd">    :math:`u(t) = exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t_switch_exact : float</span>
+<span class="sd">        Exact event time with :math:`t^* = \log(5)`.</span>
+<span class="sd">    t_switch: float</span>
+<span class="sd">        Time point of the discrete event found by switch estimation.</span>
+<span class="sd">    nswitches: int</span>
+<span class="sd">        Number of switches found by switch estimation.</span>
+<span class="sd">    newton_itercount: int</span>
+<span class="sd">        Counts the number of Newton iterations.</span>
+<span class="sd">    newton_ncalls: int</span>
+<span class="sd">        Counts the number of how often Newton is called in the simulation of the problem.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;nvars has to be equal to 1!&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_itercount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span>
+        <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple Newton solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># form function g with g(u) = 0</span>
+            <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="n">rhs</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+                <span class="n">dg</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">dt</span>
+
+            <span class="c1"># newton update</span>
+            <span class="n">u</span> <span class="o">-=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dg</span> <span class="o">*</span> <span class="n">g</span>
+
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_itercount</span> <span class="o">+=</span> <span class="n">n</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
+<span class="sd">        u_init : pySDC.problem.DiscontinuousTestODE.dtype_u</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float</span>
+<span class="sd">            The starting time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact solution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.get_switching_info"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_switching_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides information about the state function of the problem. When the state function changes its sign,</span>
+<span class="sd">        typically an event occurs. So the check for an event should be done in the way that the state function</span>
+<span class="sd">        is checked for a sign change. If this is the case, the intermediate value theorem states a root in this</span>
+<span class="sd">        step.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution at time t.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        switch_detected : bool</span>
+<span class="sd">            Indicates whether a discrete event is found or not.</span>
+<span class="sd">        m_guess : int</span>
+<span class="sd">            The index before the sign changes.</span>
+<span class="sd">        state_function : list</span>
+<span class="sd">            Defines the values of the state function at collocation nodes where it changes the sign.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">switch_detected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">m_guess</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)):</span>
+            <span class="n">h_prev_node</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span>
+            <span class="n">h_curr_node</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span>
+            <span class="k">if</span> <span class="n">h_prev_node</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">h_curr_node</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">switch_detected</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">m_guess</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">break</span>
+
+        <span class="n">state_function</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">))]</span> <span class="k">if</span> <span class="n">switch_detected</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">switch_detected</span><span class="p">,</span> <span class="n">m_guess</span><span class="p">,</span> <span class="n">state_function</span></div>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.count_switches"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches">[docs]</a>    <span class="k">def</span> <span class="nf">count_switches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter to update the number of switches if one is found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.DiscontinuousTestODE</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>

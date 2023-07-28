@@ -30,6 +30,7 @@ Submodules
    implementations.problem_classes.Battery
    implementations.problem_classes.Boussinesq_2D_FD_imex
    implementations.problem_classes.BuckConverter
+   implementations.problem_classes.DiscontinuousTestODE
    implementations.problem_classes.FastWaveSlowWave_0D
    implementations.problem_classes.FermiPastaUlamTsingou
    implementations.problem_classes.FullSolarSystem

@@ -116,8 +116,9 @@
             <span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;ncapacitors&#39;</span><span class="p">,</span> <span class="s1">&#39;Vs&#39;</span><span class="p">,</span> <span class="s1">&#39;Rs&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;V_ref&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">switch_A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">switch_f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_problem_dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">switch_A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -261,17 +262,18 @@
 <span class="sd">            Indicates if a switch is found or not.</span>
 <span class="sd">        m_guess : int</span>
 <span class="sd">            Index of collocation node inside one subinterval of where the discrete event was found.</span>
-<span class="sd">        vC_switch : list</span>
-<span class="sd">            Contains function values of switching condition (for interpolation).</span>
+<span class="sd">        state_function : list</span>
+<span class="sd">            Contains values of the state function (for interpolation).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">switch_detected</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">m_guess</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
         <span class="n">break_flag</span> <span class="o">=</span> <span class="kc">False</span>
-
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">h_prev_node</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">h_curr_node</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">h_prev_node</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">h_curr_node</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">switch_detected</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="n">m_guess</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span>
                     <span class="n">k_detected</span> <span class="o">=</span> <span class="n">k</span>
@@ -281,9 +283,11 @@
             <span class="k">if</span> <span class="n">break_flag</span><span class="p">:</span>
                 <span class="k">break</span>
 
-        <span class="n">vC_switch</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">k_detected</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k_detected</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">))]</span> <span class="k">if</span> <span class="n">switch_detected</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">state_function</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">k_detected</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k_detected</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">))]</span> <span class="k">if</span> <span class="n">switch_detected</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">switch_detected</span><span class="p">,</span> <span class="n">m_guess</span><span class="p">,</span> <span class="n">vC_switch</span></div>
+        <span class="k">return</span> <span class="n">switch_detected</span><span class="p">,</span> <span class="n">m_guess</span><span class="p">,</span> <span class="n">state_function</span></div>
 
 <div class="viewcode-block" id="battery_n_capacitors.count_switches"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.count_switches">[docs]</a>    <span class="k">def</span> <span class="nf">count_switches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -301,7 +305,6 @@
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncapacitors</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-
         <span class="n">A</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">A</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)}</span>
         <span class="n">A</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="n">v</span><span class="p">)})</span>
@@ -312,8 +315,12 @@
 
 <div class="viewcode-block" id="battery"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery">[docs]</a><span class="k">class</span> <span class="nc">battery</span><span class="p">(</span><span class="n">battery_n_capacitors</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. The ODE system</span>
-<span class="sd">    of this model is given by the following equations. If :math:`v_1 &gt; V_{ref, 0}:`</span>
+<span class="sd">    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. This model is an example</span>
+<span class="sd">    of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has</span>
+<span class="sd">    a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by</span>
+<span class="sd">    the following equations:</span>
+
+<span class="sd">    If :math:`h(v_1) := v_1 - V_{ref, 0} &gt; 0:`</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d i_L (t)}{dt} = 0,</span>
@@ -321,14 +328,15 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d v_1 (t)}{dt} = -\frac{1}{CR}v_1 (t),</span>
 
-<span class="sd">    where :math:`i_L` denotes the function of the current over time :math:`t`.</span>
-<span class="sd">    If :math:`v_1 \leq V_{ref, 0}:`</span>
+<span class="sd">    else:</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d i_L(t)}{dt} = -\frac{R_s + R}{L}i_L (t) + \frac{1}{L} V_s,</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{d v_1(t)}{dt} = 0.</span>
+<span class="sd">        \frac{d v_1(t)}{dt} = 0,</span>
+
+<span class="sd">    where :math:`i_L` denotes the function of the current over time :math:`t`.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -359,7 +367,7 @@
 
         <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
 
-        <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -391,7 +399,7 @@
 
         <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
 
-        <span class="k">if</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -471,8 +479,8 @@
         <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">alpha</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
         <span class="n">V_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-11</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">C</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
@@ -508,7 +516,7 @@
 
         <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
 
-        <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
             <span class="n">non_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span>
 
@@ -546,7 +554,7 @@
 
         <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
 
-        <span class="k">if</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
             <span class="n">non_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span>
 
