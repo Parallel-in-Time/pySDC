@@ -11,5 +11,7 @@ dependencies:
   - dill>=0.2.6
   - pytest
   - pytest-benchmark
+  - pytest-timeout
+  - pytest-order
   - coverage[toml]
   - sphinx

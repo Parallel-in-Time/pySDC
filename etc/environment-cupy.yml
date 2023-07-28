@@ -9,4 +9,5 @@ dependencies:
   - dill>=0.2.6
   - pytest
   - pytest-cov
+  - pytest-timeout
   - cupy

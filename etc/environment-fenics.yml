@@ -10,3 +10,4 @@ dependencies:
   - fenics>=2019.1.0
   - pytest
   - pytest-cov
+  - pytest-timeout
