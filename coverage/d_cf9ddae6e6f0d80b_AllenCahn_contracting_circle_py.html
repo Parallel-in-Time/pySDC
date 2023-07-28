@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/projects/TOMS/AllenCahn_contracting_circle.py: 100%</title>
+    <title>Coverage for pySDC/projects/TOMS/AllenCahn_contracting_circle.py: 95%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/projects/TOMS/AllenCahn_contracting_circle.py</b>:
-            <span class="pc_cov">100%</span>
+            <span class="pc_cov">95%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">184 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">184<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">174<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">10<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">9<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_cf9ddae6e6f0d80b_AllenCahn_monitor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-28 12:53 +0000
+            created at 2023-07-28 15:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -395,20 +395,20 @@
     <p class="pln"><span class="n"><a id="t313" href="#t313">313</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t314" href="#t314">314</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t315" href="#t315">315</a></span><span class="t">    <span class="com"># Loop over variants, exact and inexact solves</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t316" href="#t316">316</a></span><span class="t">    <span class="nam">results</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t317" href="#t317">317</a></span><span class="t">    <span class="key">for</span> <span class="nam">variant</span> <span class="key">in</span> <span class="op">[</span><span class="str">'multi-implicit'</span><span class="op">,</span> <span class="str">'semi-implicit'</span><span class="op">,</span> <span class="str">'fully-implicit'</span><span class="op">,</span> <span class="str">'semi-implicit_v2'</span><span class="op">,</span> <span class="str">'multi-implicit_v2'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t318" href="#t318">318</a></span><span class="t">        <span class="nam">results</span><span class="op">[</span><span class="op">(</span><span class="nam">variant</span><span class="op">,</span> <span class="str">'exact'</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="nam">run_SDC_variant</span><span class="op">(</span><span class="nam">variant</span><span class="op">=</span><span class="nam">variant</span><span class="op">,</span> <span class="nam">inexact</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t319" href="#t319">319</a></span><span class="t">        <span class="nam">results</span><span class="op">[</span><span class="op">(</span><span class="nam">variant</span><span class="op">,</span> <span class="str">'inexact'</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="nam">run_SDC_variant</span><span class="op">(</span><span class="nam">variant</span><span class="op">=</span><span class="nam">variant</span><span class="op">,</span> <span class="nam">inexact</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t316" href="#t316">316</a></span><span class="t">    <span class="nam">results</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t317" href="#t317">317</a></span><span class="t">    <span class="key">for</span> <span class="nam">variant</span> <span class="key">in</span> <span class="op">[</span><span class="str">'multi-implicit'</span><span class="op">,</span> <span class="str">'semi-implicit'</span><span class="op">,</span> <span class="str">'fully-implicit'</span><span class="op">,</span> <span class="str">'semi-implicit_v2'</span><span class="op">,</span> <span class="str">'multi-implicit_v2'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t318" href="#t318">318</a></span><span class="t">        <span class="nam">results</span><span class="op">[</span><span class="op">(</span><span class="nam">variant</span><span class="op">,</span> <span class="str">'exact'</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="nam">run_SDC_variant</span><span class="op">(</span><span class="nam">variant</span><span class="op">=</span><span class="nam">variant</span><span class="op">,</span> <span class="nam">inexact</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t319" href="#t319">319</a></span><span class="t">        <span class="nam">results</span><span class="op">[</span><span class="op">(</span><span class="nam">variant</span><span class="op">,</span> <span class="str">'inexact'</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="nam">run_SDC_variant</span><span class="op">(</span><span class="nam">variant</span><span class="op">=</span><span class="nam">variant</span><span class="op">,</span> <span class="nam">inexact</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t320" href="#t320">320</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t321" href="#t321">321</a></span><span class="t">    <span class="com"># dump result</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t322" href="#t322">322</a></span><span class="t">    <span class="nam">fname</span> <span class="op">=</span> <span class="str">'data/results_SDC_variants_AllenCahn_1E-03'</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t323" href="#t323">323</a></span><span class="t">    <span class="nam">file</span> <span class="op">=</span> <span class="nam">open</span><span class="op">(</span><span class="nam">cwd</span> <span class="op">+</span> <span class="nam">fname</span> <span class="op">+</span> <span class="str">'.pkl'</span><span class="op">,</span> <span class="str">'wb'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t324" href="#t324">324</a></span><span class="t">    <span class="nam">dill</span><span class="op">.</span><span class="nam">dump</span><span class="op">(</span><span class="nam">results</span><span class="op">,</span> <span class="nam">file</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">    <span class="nam">file</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">    <span class="key">assert</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">isfile</span><span class="op">(</span><span class="nam">cwd</span> <span class="op">+</span> <span class="nam">fname</span> <span class="op">+</span> <span class="str">'.pkl'</span><span class="op">)</span><span class="op">,</span> <span class="str">'ERROR: dill did not create file'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t322" href="#t322">322</a></span><span class="t">    <span class="nam">fname</span> <span class="op">=</span> <span class="str">'data/results_SDC_variants_AllenCahn_1E-03'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t323" href="#t323">323</a></span><span class="t">    <span class="nam">file</span> <span class="op">=</span> <span class="nam">open</span><span class="op">(</span><span class="nam">cwd</span> <span class="op">+</span> <span class="nam">fname</span> <span class="op">+</span> <span class="str">'.pkl'</span><span class="op">,</span> <span class="str">'wb'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t324" href="#t324">324</a></span><span class="t">    <span class="nam">dill</span><span class="op">.</span><span class="nam">dump</span><span class="op">(</span><span class="nam">results</span><span class="op">,</span> <span class="nam">file</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t325" href="#t325">325</a></span><span class="t">    <span class="nam">file</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t326" href="#t326">326</a></span><span class="t">    <span class="key">assert</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">isfile</span><span class="op">(</span><span class="nam">cwd</span> <span class="op">+</span> <span class="nam">fname</span> <span class="op">+</span> <span class="str">'.pkl'</span><span class="op">)</span><span class="op">,</span> <span class="str">'ERROR: dill did not create file'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t">    <span class="com"># visualize</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">    <span class="nam">show_results</span><span class="op">(</span><span class="nam">fname</span><span class="op">,</span> <span class="nam">cwd</span><span class="op">=</span><span class="nam">cwd</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">    <span class="nam">show_results</span><span class="op">(</span><span class="nam">fname</span><span class="op">,</span> <span class="nam">cwd</span><span class="op">=</span><span class="nam">cwd</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t330" href="#t330">330</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t331" href="#t331">331</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t332" href="#t332">332</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">"__main__"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -422,7 +422,7 @@
             <a id="nextFileLink" class="nav" href="d_cf9ddae6e6f0d80b_AllenCahn_monitor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-28 12:53 +0000
+            created at 2023-07-28 15:27 +0000
         </p>
     </div>
 </footer>
