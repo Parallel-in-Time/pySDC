@@ -8,7 +8,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class swfw_scalar(ptype):
     r"""
-    This class implements the fast-wave-slow-wave scalar problem fully investigated in _[1]. It is defined by
+    This class implements the fast-wave-slow-wave scalar problem fully investigated in [1]_. It is defined by
 
     .. math::
         \frac{d u(t)}{dt} = \lambda_f u(t) + \lambda_s u(t),
@@ -31,7 +31,8 @@ class swfw_scalar(ptype):
 
     References
     ----------
-    .. [1] D. Ruprecht, R. Speck. Spectral deferred corrections with fast-wave slow-wave splitting. SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).
+    .. [1] D. Ruprecht, R. Speck. Spectral deferred corrections with fast-wave slow-wave splitting.
+       SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).
     """
 
     dtype_u = mesh
