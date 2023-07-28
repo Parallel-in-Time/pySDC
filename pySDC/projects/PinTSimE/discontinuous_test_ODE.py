@@ -11,7 +11,7 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.projects.PinTSimE.battery_model import get_recomputed, generate_description
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
-from pySDC.implementations.hooks.log_errors import LogLocalErrorPostStep
+from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
 from pySDC.implementations.hooks.log_solution import LogSolution
 
 
@@ -45,7 +45,7 @@ def main():
 
     Path("data").mkdir(parents=True, exist_ok=True)
 
-    hookclass = [LogEvent, LogSolution, LogLocalErrorPostStep]
+    hookclass = [LogEvent, LogSolution, LogGlobalErrorPostStep]
 
     problem_class = DiscontinuousTestODE
 
@@ -200,7 +200,7 @@ def test_error(stats, dt, num_nodes, use_SE, recomputed):
         Indicates whether the values after a restart will be used.
     """
 
-    err = get_sorted(stats, type='e_local_post_step', sortby='time', recomputed=recomputed)
+    err = get_sorted(stats, type='e_global_post_step', sortby='time', recomputed=recomputed)
     err_norm = max([me[1] for me in err])
 
     u_err = {
