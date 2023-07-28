@@ -125,6 +125,7 @@ class testequation0d(ptype):
         me : dtype_u
             The exact solution.
         """
+
         u_init = (self.u0 if u_init is None else u_init) * 1.0
         t_init = 0.0 if t_init is None else t_init * 1.0
 

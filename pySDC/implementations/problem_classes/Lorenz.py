@@ -192,6 +192,7 @@ class LorenzAttractor(ptype):
         me : dtype_u
             The approximated exact solution.
         """
+
         me = self.dtype_u(self.init)
 
         if t > 0:

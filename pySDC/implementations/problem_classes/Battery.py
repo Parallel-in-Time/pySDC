@@ -77,8 +77,9 @@ class battery_n_capacitors(ptype):
             'nvars', 'ncapacitors', 'Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref', localVars=locals(), readOnly=True
         )
 
-        self.A = np.zeros((n + 1, n + 1))
         self.switch_A, self.switch_f = self.get_problem_dict()
+        self.A = self.switch_A[0]
+
         self.t_switch = None
         self.nswitches = 0
 
@@ -222,17 +223,18 @@ class battery_n_capacitors(ptype):
             Indicates if a switch is found or not.
         m_guess : int
             Index of collocation node inside one subinterval of where the discrete event was found.
-        vC_switch : list
-            Contains function values of switching condition (for interpolation).
+        state_function : list
+            Contains values of the state function (for interpolation).
         """
 
         switch_detected = False
         m_guess = -100
         break_flag = False
-
         for m in range(1, len(u)):
             for k in range(1, self.nvars):
-                if u[m][k] - self.V_ref[k - 1] <= 0:
+                h_prev_node = u[m - 1][k] - self.V_ref[k - 1]
+                h_curr_node = u[m][k] - self.V_ref[k - 1]
+                if h_prev_node > 0 and h_curr_node <= 0:
                     switch_detected = True
                     m_guess = m - 1
                     k_detected = k
@@ -242,9 +244,11 @@ class battery_n_capacitors(ptype):
             if break_flag:
                 break
 
-        vC_switch = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(1, len(u))] if switch_detected else []
+        state_function = (
+            [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(len(u))] if switch_detected else []
+        )
 
-        return switch_detected, m_guess, vC_switch
+        return switch_detected, m_guess, state_function
 
     def count_switches(self):
         """
@@ -262,7 +266,6 @@ class battery_n_capacitors(ptype):
         n = self.ncapacitors
         v = np.zeros(n + 1)
         v[0] = 1
-
         A, f = dict(), dict()
         A = {k: np.diag(-1 / (self.C[k] * self.R) * np.roll(v, k + 1)) for k in range(n)}
         A.update({n: np.diag(-(self.Rs + self.R) / self.L * v)})
@@ -273,8 +276,12 @@ class battery_n_capacitors(ptype):
 
 class battery(battery_n_capacitors):
     r"""
-    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. The ODE system
-    of this model is given by the following equations. If :math:`v_1 > V_{ref, 0}:`
+    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. This model is an example
+    of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has
+    a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by
+    the following equations:
+
+    If :math:`h(v_1) := v_1 - V_{ref, 0} > 0:`
 
     .. math::
         \frac{d i_L (t)}{dt} = 0,
@@ -282,14 +289,15 @@ class battery(battery_n_capacitors):
     .. math::
         \frac{d v_1 (t)}{dt} = -\frac{1}{CR}v_1 (t),
 
-    where :math:`i_L` denotes the function of the current over time :math:`t`.
-    If :math:`v_1 \leq V_{ref, 0}:`
+    else:
 
     .. math::
         \frac{d i_L(t)}{dt} = -\frac{R_s + R}{L}i_L (t) + \frac{1}{L} V_s,
 
     .. math::
-        \frac{d v_1(t)}{dt} = 0.
+        \frac{d v_1(t)}{dt} = 0,
+
+    where :math:`i_L` denotes the function of the current over time :math:`t`.
 
     Note
     ----
@@ -320,7 +328,7 @@ class battery(battery_n_capacitors):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if u[1] <= self.V_ref[0] or t >= t_switch:
+        if u[1] - self.V_ref[0] <= 0 or t >= t_switch:
             f.expl[0] = self.Vs / self.L
 
         else:
@@ -352,7 +360,7 @@ class battery(battery_n_capacitors):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if rhs[1] <= self.V_ref[0] or t >= t_switch:
+        if rhs[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
 
         else:
@@ -432,8 +440,8 @@ class battery_implicit(battery):
         L=1.0,
         alpha=1.2,
         V_ref=None,
-        newton_maxiter=200,
-        newton_tol=1e-8,
+        newton_maxiter=100,
+        newton_tol=1e-11,
     ):
         if C is None:
             C = np.array([1.0])
@@ -469,7 +477,7 @@ class battery_implicit(battery):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if u[1] <= self.V_ref[0] or t >= t_switch:
+        if u[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
             non_f[0] = self.Vs
 
@@ -507,7 +515,7 @@ class battery_implicit(battery):
 
         t_switch = np.inf if self.t_switch is None else self.t_switch
 
-        if rhs[1] <= self.V_ref[0] or t >= t_switch:
+        if rhs[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
             non_f[0] = self.Vs
 
