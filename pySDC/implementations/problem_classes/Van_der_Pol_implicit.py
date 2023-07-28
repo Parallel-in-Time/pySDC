@@ -7,10 +7,33 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 # noinspection PyUnusedLocal
 class vanderpol(ptype):
-    """
-    Example implementing the van der pol oscillator
+    r"""
+    This class implements the stiff Van der Pol oscillator given by the equation
 
-    TODO : doku
+    .. math::
+        \frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.
+
+    Parameters
+    ----------
+    u0 : sequence of array_like, optional
+        Initial condition.
+    mu : float, optional
+        Stiff parameter :math:`\mu`.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method to terminate.
+    newton_tol : float, optional
+        Tolerance for Newton to terminate.
+    stop_at_nan : bool, optional
+        Indicate whether Newton's method should stop if nan values arise.
+    crash_at_maxiter = bool, optional
+        Indicates whether Newton's method should stop if maximum number of iterations
+        `newton_maxiter` is reached.
+
+    Attributes
+    ----------
+    work_counters : WorkCounter
+        Counts different things, here: Number of evaluations of the right-hand side in `eval_f`
+        and number of Newton calls in each Newton iterations are counted.
     """
 
     dtype_u = mesh
