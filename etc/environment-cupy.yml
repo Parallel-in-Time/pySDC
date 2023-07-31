@@ -10,4 +10,5 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-timeout
+  - pytest-order
   - cupy

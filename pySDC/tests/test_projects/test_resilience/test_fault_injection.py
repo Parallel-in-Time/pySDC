@@ -12,15 +12,18 @@ def get_random_float():
     Returns:
         float: Random float
     """
-    return np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
+    rand = 0.0
+    while np.isclose(rand, 0.0, atol=1E-12):
+        rand = np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
+    return rand
 
 
 @pytest.mark.base
 def test_float_conversion():
-    '''
+    """
     Method to test the float conversion by converting to bytes and back and by flipping bits where we know what the
     impact is. We try with 1000 random numbers, so we don't know how many times we get nan beforehand.
-    '''
+    """
     from pySDC.projects.Resilience.fault_injection import FaultInjector
 
     # Try the conversion between floats and bytes

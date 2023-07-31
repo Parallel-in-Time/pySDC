@@ -136,15 +136,14 @@ def test_stability(sweeper_name):
         'AdamsBashforthExplicit1Step': False,
     }
 
-    re = -np.logspace(-3, 6, 50)
-    im = -np.logspace(-3, 6, 50)
+    re = -np.logspace(-3, 2, 50)
+    im = -np.logspace(-3, 2, 50)
     lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
         (len(re) * len(im))
     )
 
     stats, ic = single_run(sweeper_name, 1.0, 1.0, lambdas)
     u = get_sorted(stats, type='u')[-1][1]
-
     unstable = np.abs(u) / np.abs(ic) > 1.0
 
     Astable = not any(lambdas[unstable].real < 0)

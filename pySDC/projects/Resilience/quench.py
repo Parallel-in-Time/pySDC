@@ -334,7 +334,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
         Adaptivity: {'e_tol': 1e-6, 'dt_max': 50},
     }
 
-    custom_controller_params = {'logger_level': 30}
+    custom_controller_params = {'logger_level': 10}
     for imex in [False, True]:
         stats, controller, _ = run_quench(
             custom_description=custom_description,

@@ -185,6 +185,7 @@ class GenericNDimFinDiff(ptype):
                 maxiter=liniter,
                 atol=0,
                 callback=self.work_counters[solver_type],
+                callback_type = 'legacy',
             )[0].reshape(nvars)
         elif solver_type == 'CG':
             sol[:] = cg(

@@ -162,7 +162,7 @@ class nonlinearschroedinger_imex(ptype):
             The exact solution.
         """
         if 'u_init' in kwargs.keys() or 't_init' in kwargs.keys():
-            self.logger.warn(
+            self.logger.warning(
                 f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
             )
 

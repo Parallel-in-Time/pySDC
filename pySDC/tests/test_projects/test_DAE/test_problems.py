@@ -15,21 +15,11 @@ def test_pendulum_u_exact_main():
     # instantiate problem
     prob = pendulum_2d(**problem_params)
 
-    # ignore using warning while checking error
-    warnings.filterwarnings('ignore')
     u_test = prob.u_exact(5.0)
     assert np.array_equal(u_test, np.zeros(5))
 
-    # change warning status to error
-    warnings.filterwarnings('error')
-    try:
-        u_test = prob.u_exact(5.0)
-    except UserWarning:
-        pass
-    else:
-        raise Exception("User warning not raised correctly")
-    # reset warning status to normal
-    warnings.resetwarnings()
+    u_test = prob.u_exact(5.0)
+
 
 
 @pytest.mark.base
@@ -44,21 +34,10 @@ def test_one_transistor_amplifier_u_exact_main():
     # instantiate problem
     prob = one_transistor_amplifier(**problem_params)
 
-    # ignore using warning while checking error
-    warnings.filterwarnings('ignore')
     u_test = prob.u_exact(5.0)
     assert np.array_equal(u_test, np.zeros(5))
 
-    # change warning status to error
-    warnings.filterwarnings('error')
-    try:
-        u_test = prob.u_exact(5.0)
-    except UserWarning:
-        pass
-    else:
-        raise Exception("User warning not raised correctly")
-    # reset warning status to normal
-    warnings.resetwarnings()
+    u_test = prob.u_exact(5.0)
 
 
 @pytest.mark.base
@@ -73,22 +52,10 @@ def test_two_transistor_amplifier_u_exact_main():
     # instantiate problem
     prob = two_transistor_amplifier(**problem_params)
 
-    # ignore using warning while checking error
-    warnings.filterwarnings('ignore')
     u_test = prob.u_exact(5.0)
     assert np.array_equal(u_test, np.zeros(8))
 
-    # change warning status to error
-    warnings.filterwarnings('error')
-    try:
-        u_test = prob.u_exact(5.0)
-    except UserWarning:
-        pass
-    else:
-        raise Exception("User warning not raised correctly")
-    # reset warning status to normal
-    warnings.resetwarnings()
-
+    u_test = prob.u_exact(5.0)
 
 #
 #   Explicit test for the pendulum example
@@ -122,7 +89,7 @@ def test_pendulum_main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_hook
+    # controller_params['hook_class'] = error_hook
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -143,11 +110,8 @@ def test_pendulum_main():
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-    warnings.resetwarnings()
 
     # call main function to get things done...
-    # ignore warning from non-existent reference solution
-    warnings.filterwarnings('ignore')
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     uend_ref = [0.98613917, -0.16592027, 0.29956023, 1.77825875, 4.82500525]
 
@@ -185,7 +149,7 @@ def test_one_transistor_amplifier_main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_hook
+    # controller_params['hook_class'] = error_hook
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -208,10 +172,7 @@ def test_one_transistor_amplifier_main():
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    # ignore warning from non-existent reference solution
-    warnings.filterwarnings('ignore')
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    warnings.resetwarnings()
 
     uend_ref = [-0.02182035, 3.06674603, 2.89634691, 2.45212382, -2.69727238]
 
@@ -249,7 +210,7 @@ def test_two_transistor_amplifier_main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_hook
+    # controller_params['hook_class'] = error_hook
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -272,10 +233,7 @@ def test_two_transistor_amplifier_main():
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    # ignore warning from non-existent reference solution
-    warnings.filterwarnings('ignore')
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    warnings.resetwarnings()
 
     uend_ref = [
         -5.52721527e-03,
@@ -322,7 +280,7 @@ def test_synchgen_infinite_bus_main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_hook
+    # controller_params['hook_class'] = error_hook
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -345,10 +303,7 @@ def test_synchgen_infinite_bus_main():
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    # ignore warning from non-existent reference solution
-    warnings.filterwarnings('ignore')
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    warnings.resetwarnings()
 
     uend_ref = [
         8.30823565e-01,

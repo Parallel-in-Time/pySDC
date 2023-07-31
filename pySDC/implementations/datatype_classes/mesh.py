@@ -79,6 +79,7 @@ class mesh(np.ndarray):
                 comm = input_.comm
             else:
                 args.append(input_)
+
         results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(mesh)
         if not method == 'reduce':
             results._comm = comm
