@@ -21,7 +21,6 @@ def test_pendulum_u_exact_main():
     u_test = prob.u_exact(5.0)
 
 
-
 @pytest.mark.base
 def test_one_transistor_amplifier_u_exact_main():
     from pySDC.projects.DAE.problems.transistor_amplifier import one_transistor_amplifier
@@ -56,6 +55,7 @@ def test_two_transistor_amplifier_u_exact_main():
     assert np.array_equal(u_test, np.zeros(8))
 
     u_test = prob.u_exact(5.0)
+
 
 #
 #   Explicit test for the pendulum example

@@ -13,7 +13,7 @@ def get_random_float():
         float: Random float
     """
     rand = 0.0
-    while np.isclose(rand, 0.0, atol=1E-12):
+    while np.isclose(rand, 0.0, atol=1e-12):
         rand = np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
     return rand
 
