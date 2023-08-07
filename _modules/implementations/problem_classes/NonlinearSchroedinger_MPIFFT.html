@@ -38,6 +38,9 @@
             
   <h1>Source code for implementations.problem_classes.NonlinearSchroedinger_MPIFFT</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">newton_krylov</span><span class="p">,</span> <span class="n">root</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize.nonlin</span> <span class="kn">import</span> <span class="n">NoConvergence</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span>
 
@@ -68,7 +71,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">nvars</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)]</span>
+            <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">L</span> <span class="o">==</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setup not implemented, L has to be 2pi, got </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -223,6 +226,99 @@
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">nls_exact_1D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">me</span></div></div>
+
+
+<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit">[docs]</a><span class="k">class</span> <span class="nc">nonlinearschroedinger_fully_implicit</span><span class="p">(</span><span class="n">nonlinearschroedinger_imex</span><span class="p">):</span>
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lintol</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">liniter</span><span class="o">=</span><span class="mi">99</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;liniter&#39;</span><span class="p">,</span> <span class="s1">&#39;lintol&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+
+<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time at which the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+            <span class="n">tmpf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="mi">2</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tmp</span>
+            <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">u</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpf</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="mi">2</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the nonlinear system `(1 - factor * f)(u) = rhs` using a scipy Newton-Krylov solver.</span>
+<span class="sd">        See this page for details on the solver: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver (not used here so far).</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution as mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="c1"># assemble the nonlinear function F for the solver</span>
+        <span class="k">def</span> <span class="nf">F</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Nonlinear function for the scipy solver.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                x : dtype_u</span>
+<span class="sd">                    Current solution</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decrement</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sol</span> <span class="o">=</span> <span class="n">newton_krylov</span><span class="p">(</span>
+                <span class="n">F</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                <span class="n">xin</span><span class="o">=</span><span class="n">u0</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">liniter</span><span class="p">,</span>
+                <span class="n">x_tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lintol</span><span class="p">,</span>
+                <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">],</span>
+                <span class="n">method</span><span class="o">=</span><span class="s1">&#39;gmres&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">NoConvergence</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">sol</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">sol</span>
+        <span class="k">return</span> <span class="n">me</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -261,7 +357,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

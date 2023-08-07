@@ -69,7 +69,10 @@
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># *args and **kwargs are necessary for gmres</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="WorkCounter.decrement"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.WorkCounter.decrement">[docs]</a>    <span class="k">def</span> <span class="nf">decrement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">-=</span> <span class="mi">1</span></div></div>
 
 
 <div class="viewcode-block" id="ptype"><a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype">[docs]</a><span class="k">class</span> <span class="nc">ptype</span><span class="p">(</span><span class="n">RegisterParams</span><span class="p">):</span>
@@ -200,7 +203,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>
