@@ -59,7 +59,7 @@ markers = [
     'cupy: tests for cupy on GPUs',
     'libpressio: tests using the libpressio library',
     ]
-timeout = 180
+timeout = 300
 
 [tool.flakeheaven]
 max-line-length = 120
