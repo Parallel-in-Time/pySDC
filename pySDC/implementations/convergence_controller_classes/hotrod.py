@@ -1,9 +1,6 @@
 import numpy as np
 
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
-    EstimateExtrapolationErrorNonMPI,
-)
 
 
 class HotRod(ConvergenceController):
@@ -55,8 +52,18 @@ class HotRod(ConvergenceController):
             description=description,
         )
         if not self.params.useMPI:
+            from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
+                EstimateExtrapolationErrorNonMPI,
+            )
+            from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+
             controller.add_convergence_controller(
                 EstimateExtrapolationErrorNonMPI, description=description, params={'no_storage': self.params.no_storage}
+            )
+            controller.add_convergence_controller(
+                BasicRestartingNonMPI,
+                description=description,
+                params={'restart_from_first_step': True},
             )
         else:
             raise NotImplementedError("Don't know how to estimate extrapolated error with MPI")
@@ -95,13 +102,14 @@ smaller than 0!",
 
         return True, ""
 
-    def determine_restart(self, controller, S, **kwargs):
+    def determine_restart(self, controller, S, MS, **kwargs):
         """
         Check if the difference between the error estimates exceeds the allowed tolerance
 
         Args:
             controller (pySDC.Controller): The controller
             S (pySDC.Step): The current step
+            MS (list): List of steps
 
         Returns:
             None
@@ -119,7 +127,12 @@ smaller than 0!",
                 if diff > self.params.HotRod_tol:
                     S.status.restart = True
                     self.log(
-                        f"Triggering restart: delta={diff:.2e}, tol={self.params.HotRod_tol:.2e}",
+                        f"Triggering restart: e_em={L.status.error_embedded_estimate:.2e}, e_ex={L.status.error_extrapolation_estimate:.2e} -> delta={diff:.2e}, tol={self.params.HotRod_tol:.2e}",
+                        S,
+                    )
+                else:
+                    self.debug(
+                        f"Not triggering restart: e_em={L.status.error_embedded_estimate:.2e}, e_ex={L.status.error_extrapolation_estimate:.2e} -> delta={diff:.2e}, tol={self.params.HotRod_tol:.2e}",
                         S,
                     )
 
