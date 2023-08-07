@@ -183,8 +183,9 @@ def run_Schroedinger(
         nvars = [me / 2 for me in problem_params['nvars']]
         nvars[0] += 1
 
-        rnd_args = {'problem_pos': nvars}
-        prepare_controller_for_faults(controller, fault_stuff, rnd_args)
+        rnd_args = {'iteration': 5, 'problem_pos': nvars, 'min_node': 1}
+        args = {'time': 0.3, 'target': 0}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
