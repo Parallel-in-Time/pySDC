@@ -32,6 +32,9 @@ class WorkCounter(object):
         # *args and **kwargs are necessary for gmres
         self.niter += 1
 
+    def decrement(self):
+        self.niter -= 1
+
 
 class ptype(RegisterParams):
     """

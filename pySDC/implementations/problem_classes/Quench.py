@@ -249,9 +249,7 @@ class Quench(ptype):
             G = u - factor * self.eval_f(u, t) - rhs
             self.work_counters[
                 'rhs'
-            ].niter -= (
-                1  # Work regarding construction of the Jacobian etc. should count into the Newton iterations only
-            )
+            ].decrement()  # Work regarding construction of the Jacobian etc. should count into the Newton iterations only
 
             res = np.linalg.norm(G, np.inf)
             if res <= self.newton_tol and n > 0:  # we want to make at least one Newton iteration

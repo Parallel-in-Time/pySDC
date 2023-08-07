@@ -5,7 +5,11 @@ from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import (
+    nonlinearschroedinger_imex,
+    nonlinearschroedinger_fully_implicit,
+)
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.strategies import merge_descriptions
@@ -71,6 +75,7 @@ def run_Schroedinger(
     custom_controller_params=None,
     use_MPI=False,
     space_comm=None,
+    imex=True,
     **kwargs,
 ):
     """
@@ -84,12 +89,20 @@ def run_Schroedinger(
         fault_stuff (dict): A dictionary with information on how to add faults
         custom_controller_params (dict): Overwrite presets
         use_MPI (bool): Whether or not to use MPI
+        space_comm (mpi4py.Intracomm): Space communicator
+        imex (bool): Whether to use IMEX implementation or the fully implicit one
 
     Returns:
         dict: The stats object
         controller: The controller
         Tend: The time that was supposed to be integrated to
     """
+    if custom_description is not None:
+        problem_params = custom_description.get('problem_params', {})
+        if 'imex' in problem_params.keys():
+            imex = problem_params['imex']
+            problem_params.pop('imex', None)
+
     from mpi4py import MPI
 
     space_comm = MPI.COMM_SELF if space_comm is None else space_comm
@@ -114,6 +127,9 @@ def run_Schroedinger(
     problem_params['spectral'] = False
     problem_params['c'] = 1.0
     problem_params['comm'] = space_comm
+    if not imex:
+        problem_params['liniter'] = 99
+        problem_params['lintol'] = 1e-8
 
     # initialize step parameters
     step_params = dict()
@@ -121,7 +137,7 @@ def run_Schroedinger(
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30 if rank == 0 else 99
+    controller_params['logger_level'] = 15 if rank == 0 else 99
     controller_params['hook_class'] = hook_collection + (hook_class if type(hook_class) == list else [hook_class])
     controller_params['mssdc_jac'] = False
 
@@ -131,8 +147,8 @@ def run_Schroedinger(
 
     description = dict()
     description['problem_params'] = problem_params
-    description['problem_class'] = nonlinearschroedinger_imex
-    description['sweeper_class'] = imex_1st_order
+    description['problem_class'] = nonlinearschroedinger_imex if imex else nonlinearschroedinger_fully_implicit
+    description['sweeper_class'] = imex_1st_order if imex else generic_implicit
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -167,9 +183,8 @@ def run_Schroedinger(
         nvars = [me / 2 for me in problem_params['nvars']]
         nvars[0] += 1
 
-        rnd_args = {'iteration': 5, 'problem_pos': nvars, 'min_node': 1}
-        args = {'time': 0.3, 'target': 0}
-        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
+        rnd_args = {'problem_pos': nvars}
+        prepare_controller_for_faults(controller, fault_stuff, rnd_args)
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -178,7 +193,7 @@ def run_Schroedinger(
 
 
 def main():
-    stats, _, _ = run_Schroedinger(space_comm=MPI.COMM_WORLD, hook_class=live_plotting)
+    stats, _, _ = run_Schroedinger(space_comm=MPI.COMM_WORLD, hook_class=live_plotting, imex=False)
     plt.show()
 
 
