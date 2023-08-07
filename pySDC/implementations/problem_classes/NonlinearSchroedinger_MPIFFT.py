@@ -266,7 +266,6 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
             self.work_counters['rhs'].decrement()
             return x - factor * self.eval_f(u=x.reshape(self.init[0]), t=t).reshape(x.shape) - rhs.reshape(x.shape)
 
-        # breakpoint()
         try:
             sol = newton_krylov(
                 F=F,
@@ -276,14 +275,6 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
                 callback=self.work_counters['newton'],
                 method='gmres',
             )
-            # sol_ = root(
-            #    fun=F,
-            #    x0=u0.copy(),
-            #    #maxiter=self.liniter,
-            #    tol=self.lintol,
-            #    method='df-sane',
-            # )
-            # sol = sol_.x.reshape(self.init[0])
         except NoConvergence as e:
             sol = e.args[0]
 
