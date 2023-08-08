@@ -107,11 +107,14 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># we want to spread the smallest step size out of the steps that want to be restarted</span>
                 <span class="n">spread_from_step</span> <span class="o">=</span> <span class="n">restart_at</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">new_steps</span><span class="p">[</span><span class="n">restart_at</span><span class="p">:])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detected restart from step </span><span class="si">{</span><span class="n">restart_at</span><span class="si">}</span><span class="s1">. Spreading step size from step </span><span class="si">{</span><span class="n">spread_from_step</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Detected restart from step </span><span class="si">{</span><span class="n">restart_at</span><span class="si">}</span><span class="s1">. Spreading step size from step </span><span class="si">{</span><span class="n">spread_from_step</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">new_steps</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span>
+                <span class="n">S</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">restart_at</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">spread_from_step</span> <span class="o">=</span> <span class="n">restart_at</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Spreading step size from last step.&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Spreading step size from last step: </span><span class="si">{</span><span class="n">new_steps</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">spread_from_step</span><span class="p">,</span> <span class="n">restart_at</span></div></div>
 
