@@ -68,11 +68,14 @@ class SpreadStepSizesBlockwise(ConvergenceController):
             else:
                 # we want to spread the smallest step size out of the steps that want to be restarted
                 spread_from_step = restart_at + np.argmin(new_steps[restart_at:])
-            self.debug(f'Detected restart from step {restart_at}. Spreading step size from step {spread_from_step}.', S)
+            self.debug(
+                f'Detected restart from step {restart_at}. Spreading step size from step {spread_from_step}: {new_steps[restart_at]:.2e}.',
+                S,
+            )
         else:
             restart_at = size - 1
             spread_from_step = restart_at
-            self.debug('Spreading step size from last step.', S)
+            self.debug(f'Spreading step size from last step: {new_steps[restart_at]:.2e}.', S)
 
         return spread_from_step, restart_at
 
