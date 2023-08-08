@@ -276,10 +276,10 @@ class RungeKutta(sweeper):
             for j in range(1, m + 1):
                 rhs += lvl.dt * self.QI[m + 1, j] * self.get_full_f(lvl.f[j])
 
-            # implicit solve with prefactor stemming from the diagonal of Qd
+            # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             if self.coll.implicit:
                 lvl.u[m + 1][:] = prob.solve_system(
-                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[0], lvl.time + lvl.dt * self.coll.nodes[m]
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m]
                 )
             else:
                 lvl.u[m + 1][:] = rhs[:]
