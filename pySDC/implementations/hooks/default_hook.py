@@ -320,6 +320,7 @@ class DefaultHooks(hooks):
             type='timing_run',
             value=self.__t1_run - self.__t0_run,
         )
+        self.logger.info(f'Finished run after {self.__t1_run - self.__t0_run:.2f}s')
 
     def post_setup(self, step, level_number):
         """

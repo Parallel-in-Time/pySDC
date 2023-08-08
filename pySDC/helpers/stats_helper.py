@@ -42,13 +42,16 @@ def filter_stats(
         # delete values that have been recorded and superseded by similar, but not identical keys
         times_restarted = np.unique([me.time for me in result.keys() if me.num_restarts > 0])
         for t in times_restarted:
-            restarts = [(me.type, me.num_restarts) for me in filter_stats(result, time=t).keys()]
+            restarts = {}
+            for me in filter_stats(result, time=t).keys():
+                restarts[me.type] = max([restarts.get(me.type, 0), me.num_restarts])
+
             [
                 [
-                    [result.pop(you, None) for you in filter_stats(result, time=t, type=me[0], num_restarts=i).keys()]
-                    for i in range(me[1])
+                    [result.pop(you, None) for you in filter_stats(result, time=t, type=type_, num_restarts=i).keys()]
+                    for i in range(num_restarts_)
                 ]
-                for me in restarts
+                for type_, num_restarts_ in restarts.items()
             ]
 
         # delete values that were recorded at times that shouldn't be recorded because we performed a different step after the restart
