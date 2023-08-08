@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.convergence_controller_classes.basic_restarting &#8212; pySDC 5.3.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
@@ -105,7 +105,7 @@
             <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
             <span class="s2">&quot;max_restarts&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
             <span class="s2">&quot;crash_after_max_restarts&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;restart_from_first_step&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;restart_from_first_step&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
             <span class="s2">&quot;step_size_spreader&quot;</span><span class="p">:</span> <span class="n">SpreadStepSizesBlockwise</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="n">useMPI</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;useMPI&#39;</span><span class="p">]),</span>
         <span class="p">}</span>
 
@@ -281,7 +281,6 @@
         <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">OR</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">LOR</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">INT</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">INT</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">Pars</span><span class="p">({</span><span class="s2">&quot;restart&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;max_restart_reached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;restart_earlier&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
@@ -299,7 +298,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">==</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
+        <span class="n">crash_now</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
             <span class="c1"># check if we performed too many restarts</span>
@@ -308,7 +307,7 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">crash_after_max_restarts</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, surrendering now.&quot;</span><span class="p">)</span>
+                    <span class="n">crash_now</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Step(s) restarted </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span><span class="si">}</span><span class="s2"> time(s) already, maximum reached, moving </span><span class="se">\</span>
 <span class="s2">on...&quot;</span><span class="p">,</span>
@@ -316,18 +315,29 @@
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_from_first_step</span><span class="p">:</span>
             <span class="c1"># receive information about restarts from earlier ranks</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">restart_earlier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">buff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Recv</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_BOOL</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">restart_earlier</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">crash_now</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="c1"># decide whether to restart</span>
         <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">restart_earlier</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span>
 
         <span class="c1"># send information about restarts forward</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_from_first_step</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span><span class="p">))</span>
+            <span class="n">buff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span>
+            <span class="n">buff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="o">.</span><span class="n">max_restart_reached</span>
+            <span class="n">buff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">crash_now</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_BOOL</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_from_first_step</span><span class="p">:</span>
             <span class="n">max_restart_reached</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">max_restarts</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">OR</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">max_restart_reached</span>
+
+        <span class="k">if</span> <span class="n">crash_now</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="s2">&quot;Surrendering because of too many restarts...&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -356,14 +366,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span>
                 <span class="n">comm</span><span class="p">,</span>
                 <span class="n">dest</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">-</span> <span class="n">restart_from</span><span class="p">,</span>
-                <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INT</span><span class="p">],</span>
+                <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_INT</span><span class="p">],</span>
                 <span class="n">blocking</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="c1"># receive new number of restarts in a row</span>
         <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="n">restart_from</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">:</span>
             <span class="n">buff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Recv</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="n">restart_from</span><span class="p">),</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INT</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Recv</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="n">restart_from</span><span class="p">),</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_INT</span><span class="p">])</span>
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restarts_in_a_row</span> <span class="o">=</span> <span class="mi">0</span>

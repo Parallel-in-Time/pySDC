@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>core.ConvergenceController module &#8212; pySDC 5.3.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
@@ -330,6 +330,12 @@ This variable is an integer and you can see what the current order is by using
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_MPI_datatypes">
+<span class="sig-name descname"><span class="pre">prepare_MPI_datatypes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_MPI_datatypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_MPI_datatypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare MPI datatypes so we don’t need to import mpi4py all the time</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_next_block">
 <span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare stuff like spreading step sizes or whatever.</p>
@@ -543,6 +549,7 @@ relevant information about the controller are known.</p>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_spread_processing"><code class="docutils literal notranslate"><span class="pre">post_spread_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_step_processing"><code class="docutils literal notranslate"><span class="pre">post_step_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.pre_iteration_processing"><code class="docutils literal notranslate"><span class="pre">pre_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_MPI_datatypes"><code class="docutils literal notranslate"><span class="pre">prepare_MPI_datatypes()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">prepare_next_block()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.recv"><code class="docutils literal notranslate"><span class="pre">recv()</span></code></a></li>
 <li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">reset_buffers_nonMPI()</span></code></a></li>
