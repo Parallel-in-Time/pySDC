@@ -1,18 +1,25 @@
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
-from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
 if __name__ == '__main__':
     """
-    Convergence plot for the second order SDC:
-        K_iter: The number of iterations
-        time_iter: the number of time slices in the time/2**time_iter
-        axes: Axis to show the plot
-        RKN True or False: To implement together RKN method
-        VV True or False: To implement Velocity-Verlet scheme
+    Work-precision implementation for the Second-order SDC
+    All parameters are given in penningtrap_params
+    Note:
+        * time needs to be changed according to choosen axis
+        * Tend fixed but it can be changed by defining Tend and include in it in compute_error
+        * To implement Velocity-Verlet scheme set VV=True like run_work_precision(VV=True)
+        * RKN method can be removed by setting RKN=False like run_work_precision(RKN=False)
+        * dt timestep can be changed here as well
+        * Make sure dt_cont is setted manually to get suitable picture in work precision
+        * it moves RKN and VV line left and right to get right position with SDC and Picard iterations
     """
-    exec(open("check_data_folder.py").read())
+    controller_params, description = penningtrap_params()
+## =============================================================================
+##     dt-timestep and Tend can be changed here manually
     Tend = 128 * 0.015625
-    controller_params, description = penningtrap_param()
-    # description['level_params']['dt'] = 0.015625 * 2
+    description['level_params']['dt']= 0.015625
+    description['sweeper_params']['initial_guess'] = 'spread'  # 'zero', 'spread'
+## =============================================================================
     work_pre = compute_error(controller_params, description, time_iter=3, Tend=Tend, K_iter=(2, 4, 6), axes=(0,))
     work_pre.run_work_precision()

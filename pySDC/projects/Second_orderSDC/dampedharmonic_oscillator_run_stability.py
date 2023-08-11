@@ -71,8 +71,8 @@ if __name__ == '__main__':
     # exec(open("check_data_folder.py").read())
     description = dampedharmonic_oscillator_params()
     Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
-    Stability.run_SDC_stability
-    Stability.run_Picard_stability
-    Stability.run_RKN_stability
-    Stability.run_Ksdc
+    Stability.run_SDC_stability()
+    Stability.run_Picard_stability()
+    Stability.run_RKN_stability()
+    Stability.run_Ksdc()
     # Stability.run_Kpicard
