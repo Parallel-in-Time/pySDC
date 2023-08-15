@@ -1,6 +1,3 @@
-# It checks whether data folder exicits or not
-exec(open("check_data_folder.py").read())
-
 from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
 
@@ -18,6 +15,8 @@ if __name__ == '__main__':
     Note:
         Tend: final time value can be given manually by default Tend=2
     """
+    # It checks whether data folder exicits or not
+    exec(open("check_data_folder.py").read())
     # Get params for the penning trap problem from the function
     controller_params, description = penningtrap_params()
     ## =============================================================================
