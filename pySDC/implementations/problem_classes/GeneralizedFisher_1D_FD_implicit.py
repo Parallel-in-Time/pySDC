@@ -21,7 +21,9 @@ class generalized_fisher(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars, nu, lambda0, newton_maxiter, newton_tol, interval, stop_at_nan=True):
+    def __init__(
+        self, nvars=127, nu=1.0, lambda0=2.0, newton_maxiter=100, newton_tol=1e-12, interval=(-5, 5), stop_at_nan=True
+    ):
         """Initialization routine"""
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
@@ -57,16 +59,23 @@ class generalized_fisher(ptype):
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            urrent time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0)
@@ -117,14 +126,19 @@ class generalized_fisher(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         # set up boundary values to embed inner points
         lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
@@ -144,13 +158,17 @@ class generalized_fisher(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         me = self.dtype_u(self.init)

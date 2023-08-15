@@ -48,6 +48,19 @@ class ConvergenceController(object):
         self.dependencies(controller, description)
         self.logger = logging.getLogger(f"{type(self).__name__}")
 
+        if self.params.useMPI:
+            self.prepare_MPI_datatypes()
+
+    def prepare_MPI_datatypes(self):
+        """
+        Prepare MPI datatypes so we don't need to import mpi4py all the time
+        """
+        from mpi4py import MPI
+
+        self.MPI_INT = MPI.INT
+        self.MPI_DOUBLE = MPI.DOUBLE
+        self.MPI_BOOL = MPI.BOOL
+
     def log(self, msg, S, level=15, **kwargs):
         """
         Shortcut that has a default level for the logger. 15 is above debug but below info.
@@ -61,6 +74,20 @@ class ConvergenceController(object):
             None
         """
         self.logger.log(level, f'Process {S.status.slot:2d} on time {S.time:.6f} - {msg}')
+        return None
+
+    def debug(self, msg, S, **kwargs):
+        """
+        Shortcut to pass messages at debug level to the logger.
+
+        Args:
+            msg (str): Message you want to log
+            S (pySDC.step): The current step
+
+        Returns:
+            None
+        """
+        self.log(msg=msg, S=S, level=10, **kwargs)
         return None
 
     def setup(self, controller, params, description, **kwargs):
@@ -312,18 +339,15 @@ class ConvergenceController(object):
         Returns:
             request handle of the communication
         """
-        # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} initiates send to step {dest}')
-
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} {"" if blocking else "i"}sends to step {dest} with tag {kwargs["tag"]}')
 
         if blocking:
             req = comm.send(data, dest=dest, **kwargs)
         else:
             req = comm.isend(data, dest=dest, **kwargs)
-
-        # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} leaves send to step {dest}')
 
         return req
 
@@ -338,15 +362,57 @@ class ConvergenceController(object):
         Returns:
             whatever has been received
         """
-        # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} initiates receive from step {source}')
-
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} receives from step {source} with tag {kwargs["tag"]}')
 
         data = comm.recv(source=source, **kwargs)
 
+        return data
+
+    def Send(self, comm, dest, buffer, blocking=False, **kwargs):
+        """
+        Send data to a different rank
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            dest (int): The target rank
+            buffer: Buffer for the data
+            blocking (bool): Whether the communication is blocking or not
+
+        Returns:
+            request handle of the communication
+        """
+        kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
         # log what's happening for debug purposes
-        self.logger.debug(f'Step {comm.rank} leaves receive from step {source}')
+        self.logger.debug(f'Step {comm.rank} {"" if blocking else "i"}Sends to step {dest} with tag {kwargs["tag"]}')
+
+        if blocking:
+            req = comm.Send(buffer, dest=dest, **kwargs)
+        else:
+            req = comm.Isend(buffer, dest=dest, **kwargs)
+
+        return req
+
+    def Recv(self, comm, source, buffer, **kwargs):
+        """
+        Receive some data
+
+        Args:
+            comm (mpi4py.MPI.Intracomm): Communicator
+            source (int): Where to look for receiving
+
+        Returns:
+            whatever has been received
+        """
+        kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
+
+        # log what's happening for debug purposes
+        self.logger.debug(f'Step {comm.rank} Receives from step {source} with tag {kwargs["tag"]}')
+
+        data = comm.Recv(buffer, source=source, **kwargs)
 
         return data
 

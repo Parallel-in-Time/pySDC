@@ -123,6 +123,11 @@ class ButcherTableauEmbedded(object):
 
 
 class RungeKutta(sweeper):
+    nodes = None
+    weights = None
+    matrix = None
+    ButcherTableauClass = ButcherTableau
+
     """
     Runge-Kutta scheme that fits the interface of a sweeper.
     Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
@@ -146,8 +151,7 @@ class RungeKutta(sweeper):
 
     All of these variables are either determined by the RK rule, or are not part of an RK scheme.
 
-    Attributes:
-        butcher_tableau (ButcherTableau): Butcher tableau for the Runge-Kutta scheme that you want
+    The entries of the Butcher tableau are stored as class attributes.
     """
 
     def __init__(self, params):
@@ -160,22 +164,16 @@ class RungeKutta(sweeper):
         # set up logger
         self.logger = logging.getLogger('sweeper')
 
-        essential_keys = ['butcher_tableau']
-        for key in essential_keys:
-            if key not in params:
-                msg = 'need %s to instantiate step, only got %s' % (key, str(params.keys()))
-                self.logger.error(msg)
-                raise ParameterError(msg)
-
         # check if some parameters are set which only apply to actual sweepers
         for key in ['initial_guess', 'collocation_class', 'num_nodes']:
             if key in params:
                 self.logger.warning(f'"{key}" will be ignored by Runge-Kutta sweeper')
 
         # set parameters to their actual values
+        self.coll = self.get_Butcher_tableau()
         params['initial_guess'] = 'zero'
-        params['collocation_class'] = type(params['butcher_tableau'])
-        params['num_nodes'] = params['butcher_tableau'].num_nodes
+        params['collocation_class'] = type(self.ButcherTableauClass)
+        params['num_nodes'] = self.coll.num_nodes
 
         # disable residual computation by default
         params['skip_residual_computation'] = params.get(
@@ -187,13 +185,19 @@ class RungeKutta(sweeper):
 
         self.params = _Pars(params)
 
-        self.coll = params['butcher_tableau']
-
         # This will be set as soon as the sweeper is instantiated at the level
         self.__level = None
 
         self.parallelizable = False
         self.QI = self.coll.Qmat
+
+    @classmethod
+    def get_Q_matrix(cls):
+        return cls.get_Butcher_tableau().Qmat
+
+    @classmethod
+    def get_Butcher_tableau(cls):
+        return cls.ButcherTableauClass(cls.weights, cls.nodes, cls.matrix)
 
     @classmethod
     def get_update_order(cls):
@@ -220,7 +224,7 @@ class RungeKutta(sweeper):
             return f.impl + f.expl
         elif f is None:
             prob = self.level.prob
-            return prob.dtype_f(prob.init, val=0)
+            return self.get_full_f(prob.dtype_f(prob.init, val=0))
         else:
             raise NotImplementedError(f'Type \"{type(f)}\" not implemented in Runge-Kutta sweeper')
 
@@ -272,13 +276,13 @@ class RungeKutta(sweeper):
             for j in range(1, m + 1):
                 rhs += lvl.dt * self.QI[m + 1, j] * self.get_full_f(lvl.f[j])
 
-            # implicit solve with prefactor stemming from the diagonal of Qd
+            # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
             if self.coll.implicit:
-                lvl.u[m + 1] = prob.solve_system(
-                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m]
+                lvl.u[m + 1][:] = prob.solve_system(
+                    rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m]
                 )
             else:
-                lvl.u[m + 1] = rhs
+                lvl.u[m + 1][:] = rhs[:]
 
             # update function values (we don't usually need to evaluate the RHS at the solution of the step)
             if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
@@ -346,16 +350,13 @@ class ForwardEuler(RungeKutta):
     Not very stable first order method.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0.0])
-        weights = np.array([1.0])
-        matrix = np.array(
-            [
-                [0.0],
-            ]
-        )
-        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0.0])
+    weights = np.array([1.0])
+    matrix = np.array(
+        [
+            [0.0],
+        ]
+    )
 
 
 class BackwardEuler(RungeKutta):
@@ -365,16 +366,13 @@ class BackwardEuler(RungeKutta):
     A-stable first order method.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0.0])
-        weights = np.array([1.0])
-        matrix = np.array(
-            [
-                [1.0],
-            ]
-        )
-        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0.0])
+    weights = np.array([1.0])
+    matrix = np.array(
+        [
+            [1.0],
+        ]
+    )
 
 
 class CrankNicholson(RungeKutta):
@@ -382,14 +380,11 @@ class CrankNicholson(RungeKutta):
     Implicit Runge-Kutta method of second order, A-stable.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0, 1])
-        weights = np.array([0.5, 0.5])
-        matrix = np.zeros((2, 2))
-        matrix[1, 0] = 0.5
-        matrix[1, 1] = 0.5
-        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0, 1])
+    weights = np.array([0.5, 0.5])
+    matrix = np.zeros((2, 2))
+    matrix[1, 0] = 0.5
+    matrix[1, 1] = 0.5
 
 
 class ExplicitMidpointMethod(RungeKutta):
@@ -397,13 +392,10 @@ class ExplicitMidpointMethod(RungeKutta):
     Explicit Runge-Kutta method of second order.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0, 0.5])
-        weights = np.array([0, 1])
-        matrix = np.zeros((2, 2))
-        matrix[1, 0] = 0.5
-        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0, 0.5])
+    weights = np.array([0, 1])
+    matrix = np.zeros((2, 2))
+    matrix[1, 0] = 0.5
 
 
 class ImplicitMidpointMethod(RungeKutta):
@@ -411,13 +403,10 @@ class ImplicitMidpointMethod(RungeKutta):
     Implicit Runge-Kutta method of second order.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0.5])
-        weights = np.array([1])
-        matrix = np.zeros((1, 1))
-        matrix[0, 0] = 1.0 / 2.0
-        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0.5])
+    weights = np.array([1])
+    matrix = np.zeros((1, 1))
+    matrix[0, 0] = 1.0 / 2.0
 
 
 class RK4(RungeKutta):
@@ -425,15 +414,12 @@ class RK4(RungeKutta):
     Explicit Runge-Kutta of fourth order: Everybody's darling.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0, 0.5, 0.5, 1])
-        weights = np.array([1.0, 2.0, 2.0, 1.0]) / 6.0
-        matrix = np.zeros((4, 4))
-        matrix[1, 0] = 0.5
-        matrix[2, 1] = 0.5
-        matrix[3, 2] = 1.0
-        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0, 0.5, 0.5, 1])
+    weights = np.array([1.0, 2.0, 2.0, 1.0]) / 6.0
+    matrix = np.zeros((4, 4))
+    matrix[1, 0] = 0.5
+    matrix[2, 1] = 0.5
+    matrix[3, 2] = 1.0
 
 
 class Heun_Euler(RungeKutta):
@@ -441,13 +427,11 @@ class Heun_Euler(RungeKutta):
     Second order explicit embedded Runge-Kutta method.
     """
 
-    def __init__(self, params):
-        nodes = np.array([0, 1])
-        weights = np.array([[0.5, 0.5], [1, 0]])
-        matrix = np.zeros((2, 2))
-        matrix[1, 0] = 1
-        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0, 1])
+    weights = np.array([[0.5, 0.5], [1, 0]])
+    matrix = np.zeros((2, 2))
+    matrix[1, 0] = 1
+    ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
     def get_update_order(cls):
@@ -459,47 +443,108 @@ class Cash_Karp(RungeKutta):
     Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).
     """
 
-    def __init__(self, params):
-        nodes = np.array([0, 0.2, 0.3, 0.6, 1.0, 7.0 / 8.0])
-        weights = np.array(
-            [
-                [37.0 / 378.0, 0.0, 250.0 / 621.0, 125.0 / 594.0, 0.0, 512.0 / 1771.0],
-                [2825.0 / 27648.0, 0.0, 18575.0 / 48384.0, 13525.0 / 55296.0, 277.0 / 14336.0, 1.0 / 4.0],
-            ]
-        )
-        matrix = np.zeros((6, 6))
-        matrix[1, 0] = 1.0 / 5.0
-        matrix[2, :2] = [3.0 / 40.0, 9.0 / 40.0]
-        matrix[3, :3] = [0.3, -0.9, 1.2]
-        matrix[4, :4] = [-11.0 / 54.0, 5.0 / 2.0, -70.0 / 27.0, 35.0 / 27.0]
-        matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
-        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([0, 0.2, 0.3, 0.6, 1.0, 7.0 / 8.0])
+    weights = np.array(
+        [
+            [37.0 / 378.0, 0.0, 250.0 / 621.0, 125.0 / 594.0, 0.0, 512.0 / 1771.0],
+            [2825.0 / 27648.0, 0.0, 18575.0 / 48384.0, 13525.0 / 55296.0, 277.0 / 14336.0, 1.0 / 4.0],
+        ]
+    )
+    matrix = np.zeros((6, 6))
+    matrix[1, 0] = 1.0 / 5.0
+    matrix[2, :2] = [3.0 / 40.0, 9.0 / 40.0]
+    matrix[3, :3] = [0.3, -0.9, 1.2]
+    matrix[4, :4] = [-11.0 / 54.0, 5.0 / 2.0, -70.0 / 27.0, 35.0 / 27.0]
+    matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
+    ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
     def get_update_order(cls):
         return 5
 
 
-class DIRK34(RungeKutta):
+class DIRK43(RungeKutta):
     """
     Embedded A-stable diagonally implicit RK pair of order 3 and 4.
 
     Taken from [here](https://doi.org/10.1007/BF01934920).
     """
 
-    def __init__(self, params):
-        nodes = np.array([5.0 / 6.0, 10.0 / 39.0, 0, 1.0 / 6.0])
-        weights = np.array(
-            [[32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0], [61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0]]
-        )
-        matrix = np.zeros((4, 4))
-        matrix[0, 0] = 5.0 / 6.0
-        matrix[1, :2] = [-15.0 / 26.0, 5.0 / 6.0]
-        matrix[2, :3] = [215.0 / 54.0, -130.0 / 27.0, 5.0 / 6.0]
-        matrix[3, :] = [4007.0 / 6075.0, -31031.0 / 24300.0, -133.0 / 2700.0, 5.0 / 6.0]
-        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
-        super().__init__(params)
+    nodes = np.array([5.0 / 6.0, 10.0 / 39.0, 0, 1.0 / 6.0])
+    weights = np.array(
+        [[61.0 / 150.0, 2197.0 / 2100.0, 19.0 / 100.0, -9.0 / 14.0], [32.0 / 75.0, 169.0 / 300.0, 1.0 / 100.0, 0.0]]
+    )
+    matrix = np.zeros((4, 4))
+    matrix[0, 0] = 5.0 / 6.0
+    matrix[1, :2] = [-15.0 / 26.0, 5.0 / 6.0]
+    matrix[2, :3] = [215.0 / 54.0, -130.0 / 27.0, 5.0 / 6.0]
+    matrix[3, :] = [4007.0 / 6075.0, -31031.0 / 24300.0, -133.0 / 2700.0, 5.0 / 6.0]
+    ButcherTableauClass = ButcherTableauEmbedded
+
+    @classmethod
+    def get_update_order(cls):
+        return 4
+
+
+class ESDIRK53(RungeKutta):
+    """
+    A-stable embedded RK pair of orders 5 and 3.
+    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
+    """
+
+    nodes = np.array(
+        [0, 4024571134387.0 / 7237035672548.0, 14228244952610.0 / 13832614967709.0, 1.0 / 10.0, 3.0 / 50.0, 1.0]
+    )
+    matrix = np.zeros((6, 6))
+    matrix[1, :2] = [3282482714977.0 / 11805205429139.0, 3282482714977.0 / 11805205429139.0]
+    matrix[2, :3] = [
+        606638434273.0 / 1934588254988,
+        2719561380667.0 / 6223645057524,
+        3282482714977.0 / 11805205429139.0,
+    ]
+    matrix[3, :4] = [
+        -651839358321.0 / 6893317340882,
+        -1510159624805.0 / 11312503783159,
+        235043282255.0 / 4700683032009.0,
+        3282482714977.0 / 11805205429139.0,
+    ]
+    matrix[4, :5] = [
+        -5266892529762.0 / 23715740857879,
+        -1007523679375.0 / 10375683364751,
+        521543607658.0 / 16698046240053.0,
+        514935039541.0 / 7366641897523.0,
+        3282482714977.0 / 11805205429139.0,
+    ]
+    matrix[5, :] = [
+        -6225479754948.0 / 6925873918471,
+        6894665360202.0 / 11185215031699,
+        -2508324082331.0 / 20512393166649,
+        -7289596211309.0 / 4653106810017.0,
+        39811658682819.0 / 14781729060964.0,
+        3282482714977.0 / 11805205429139,
+    ]
+
+    weights = np.array(
+        [
+            [
+                -6225479754948.0 / 6925873918471,
+                6894665360202.0 / 11185215031699.0,
+                -2508324082331.0 / 20512393166649,
+                -7289596211309.0 / 4653106810017,
+                39811658682819.0 / 14781729060964.0,
+                3282482714977.0 / 11805205429139,
+            ],
+            [
+                -2512930284403.0 / 5616797563683,
+                5849584892053.0 / 8244045029872,
+                -718651703996.0 / 6000050726475.0,
+                -18982822128277.0 / 13735826808854.0,
+                23127941173280.0 / 11608435116569.0,
+                2847520232427.0 / 11515777524847.0,
+            ],
+        ]
+    )
+    ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
     def get_update_order(cls):

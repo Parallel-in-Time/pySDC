@@ -7,15 +7,35 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 # noinspection PyUnusedLocal
 class nonlinear_ODE_1(ptype):
-    """
-    Example implementing some simple nonlinear ODE with a singularity in the derivative, taken from
-    https://www.osti.gov/servlets/purl/6111421 (Problem E-4)
+    r"""
+    This class implements a simple nonlinear ODE with a singularity in the derivative, taken from
+    https://www.osti.gov/servlets/purl/6111421 (Problem E-4). For :math:`0 \leq t \leq 5`, the problem is
+    given by
+
+    .. math::
+        \frac{du(t)}{dt} = \sqrt(1 - u(t))
+
+    with initial condition :math:`u(0) = 0`. The exact solution is
+
+    .. math::
+        u(t) = t - \frac{t^2}{4}.
+
+    Parameters
+    ----------
+    u0 : float, optional
+        Initial condition.
+    newton_maxiter : float, optional
+        Maximum number of iterations for Newton's method.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate.
+    stop_at_nan : bool, optional
+        Indicates that Newton solver has to stop if nan values arise.
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, u0, newton_maxiter, newton_tol, stop_at_nan=True):
+    def __init__(self, u0=0.0, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
         nvars = 1
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
@@ -24,12 +44,17 @@ class nonlinear_ODE_1(ptype):
 
     def u_exact(self, t):
         """
-        Exact solution
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: mesh type containing the values
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         me = self.dtype_u(self.init)
@@ -38,13 +63,19 @@ class nonlinear_ODE_1(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): the current values
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS, 1 component
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem (one component).
         """
 
         f = self.dtype_f(self.init)
@@ -55,14 +86,21 @@ class nonlinear_ODE_1(ptype):
         """
         Simple Newton solver for the nonlinear equation
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)

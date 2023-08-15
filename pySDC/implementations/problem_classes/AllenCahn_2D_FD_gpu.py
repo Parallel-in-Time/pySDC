@@ -14,22 +14,58 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
 
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    nu : float
+        Problem parameter.
+    eps : float
+        Problem parameter.
+    newton_maxiter : int
+        Maximum number of iterations for the Newton solver.
+    newton_tol : float
+        Tolerance for Newton's method to terminate.
+    lin_tol : float
+        Tolerance for linear solver to terminate.
+    lin_maxiter : int
+        Maximum number of iterations for the linear solver.
+    radius : float
+        Radius of the circles.
+
+    Attributes
+    ----------
+    A : scipy.spdiags
+        Second-order FD discretization of the 2D laplace operator.
+    dx : float
+        Distance between two spatial nodes (same for both directions).
     """
 
     dtype_u = cupy_mesh
     dtype_f = cupy_mesh
 
-    def __init__(self, nvars, nu, eps, newton_maxiter, newton_tol, lin_tol, lin_maxiter, radius):
+    def __init__(
+        self,
+        nvars=(128, 128),
+        nu=2,
+        eps=0.04,
+        newton_maxiter=1e-12,
+        newton_tol=100,
+        lin_tol=1e-8,
+        lin_maxiter=100,
+        radius=0.25,
+    ):
         """
         Initialization routine
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: cupy_mesh data type (will be passed parent class)
-            dtype_f: cupy_mesh data type (will be passed parent class)
+        Parameters
+        ----------
+        problem_params : dict
+            Custom parameters for the example.
+        dtype_u : cupy_mesh data type
+            (will be passed parent class)
+        dtype_f : cupy_mesh data type
+            (will be passed parent class)
         """
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
@@ -67,14 +103,19 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     @staticmethod
     def __get_A(N, dx):
         """
-        Helper function to assemble FD matrix A in sparse format
+        Helper function to assemble FD matrix A in sparse format.
 
-        Args:
-            N (list): number of dofs
-            dx (float): distance between two spatial nodes
+        Parameters
+        ----------
+        N : list
+            Number of degrees of freedom.
+        dx : float
+            Distance between two spatial nodes.
 
-        Returns:
-             cupyx.scipy.sparse.csr_matrix: cupy-matrix A in CSR format
+        Returns
+        -------
+        A : cupyx.scipy.sparse.csr_matrix
+            CuPy-matrix A in CSR format.
         """
 
         stencil = cp.asarray([-2, 1])
@@ -91,16 +132,23 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -146,14 +194,19 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -163,13 +216,17 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
@@ -190,14 +247,19 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -207,17 +269,24 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         class context:
@@ -256,14 +325,19 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -274,16 +348,23 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -338,14 +419,19 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -355,17 +441,24 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         class context:
@@ -395,16 +488,23 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
     def solve_system_2(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -459,14 +559,19 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -477,16 +582,23 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -531,17 +643,24 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)

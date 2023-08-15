@@ -15,26 +15,58 @@ class allencahn_imex(ptype):
 
     mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
 
-    Attributes:
-        fft: fft object
-        X: grid coordinates in real space
-        K2: Laplace operator in spectral space
-        dx: mesh width in x direction
-        dy: mesh width in y direction
+    Parameters
+    ----------
+    nvars : int
+        Number of unknowns in the problem.
+    eps : float
+        Problem parameter.
+    radius : float
+        Radius of the circles.
+    spectral : bool
+        Indicates if spectral initial condition is used.
+    dw : float
+        Problem parameter.
+    L : int
+        Denotes the period of the function to be approximated for the Fourier transform.
+    init_type : str, optional
+        Initialises type of initial state.
+    comm : bool, optional
+        Communicator.
+
+    Attributes
+    ----------
+    fft :
+        fft object.
+    X : np.ogrid
+        Grid coordinates in real space.
+    K2 : np.ndarray
+        Laplace operator in spectral space
+    dx : float
+        Mesh width in x direction
+    dy : float
+        Mesh width in y direction
     """
 
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, eps, radius, spectral, dw=0.0, L=1.0, init_type='circle', comm=None):
-        """
-        Initialization routine
+    def __init__(
+        self,
+        nvars=None,
+        eps=0.04,
+        radius=0.25,
+        spectral=None,
+        dw=0.0,
+        L=1.0,
+        init_type='circle',
+        comm=None,
+    ):
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: fft data type (will be passed to parent class)
-            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
-        """
+        if nvars is None:
+            nvars = [(128, 128), (32, 32)]
+
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
@@ -81,14 +113,19 @@ class allencahn_imex(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -113,16 +150,23 @@ class allencahn_imex(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part
+        Simple FFT solver for the diffusion part.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         if self.spectral:
@@ -138,13 +182,17 @@ class allencahn_imex(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
@@ -194,14 +242,19 @@ class allencahn_imex_timeforcing(allencahn_imex):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)

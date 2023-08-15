@@ -4,31 +4,56 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class LorenzAttractor(ptype):
-    """
+    r"""
     Simple script to run a Lorenz attractor problem.
 
-    The Lorenz attractor is a system of three ordinary differential equations that exhibits some chaotic behaviour.
-    It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to Tend = 100 or
-    so to see this with these initial conditions) and because of the chaotic nature.
+    The Lorenz attractor is a system of three ordinary differential equations (ODEs) that exhibits some chaotic behaviour.
+    It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to :math:`T_{end} = 100`
+    or so to see this with these initial conditions) and because of the chaotic nature.
 
     Since the problem is non-linear, we need to use a Newton solver.
 
-    Problem and initial conditions do not originate from,
-    but were taken from doi.org/10.2140/camcos.2015.10.1
+    Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1
 
-    TODO : add equations with parameters
+    The system of ODEs is given by
+
+    .. math::
+        \frac{d y_1(t)}{dt} = \sigma (y_2 (t) - y_1 (t)),
+
+    .. math::
+        \frac{d y_2(t)}{dt} = \rho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),
+
+    .. math::
+        \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)
+
+    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem are
+    :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.
+
+    Parameters
+    ----------
+    sigma : float, optional
+        Parameter :math:`\sigma` of the problem.
+    rho : float, optional
+        Parameter :math:`\rho` of the problem.
+    beta : float, optional
+        Parameter :math:`\beta` of the problem.
+    newton_tol : float, optional
+        Tolerance for Newton for termination.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method.
+
+    Attributes
+    ----------
+    work_counter : dict
+        Counts the iterations/nfev (here for Newton's method and the nfev for the right-hand side).
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99):
-        """
-        Initialization routine
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-        """
         nvars = 3
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -41,14 +66,19 @@ class LorenzAttractor(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         # abbreviations
         sigma = self.sigma
@@ -68,14 +98,21 @@ class LorenzAttractor(ptype):
         """
         Simple Newton solver for the nonlinear system.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            dt (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         # abbreviations
@@ -141,14 +178,21 @@ class LorenzAttractor(ptype):
         """
         Routine to return initial conditions or to approximate exact solution using scipy.
 
-        Args:
-            t (float): current time
-            u_init (pySDC.implementations.problem_classes.Lorenz.dtype_u): initial conditions for getting the exact solution
-            t_init (float): the starting time
+        Parameters
+        ----------
+        t : float
+            Time at which the approximated exact solution is computed.
+        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The approximated exact solution.
         """
+
         me = self.dtype_u(self.init)
 
         if t > 0:

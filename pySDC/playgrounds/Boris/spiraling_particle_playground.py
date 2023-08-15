@@ -72,7 +72,7 @@ def plot_error_and_positions(uinit, stats, a0):
     R0 = np.linalg.norm(uinit.pos[:])
     H0 = 1 / 2 * np.dot(uinit.vel[:].T, uinit.vel[:]) + a0 / R0
 
-    energy_err = [abs(entry[1] - H0) / H0 for entry in sortedlist_stats]
+    energy_err = np.ravel([abs(entry[1] - H0) / H0 for entry in sortedlist_stats])
 
     plt.figure()
     plt.plot(energy_err, 'bo--')

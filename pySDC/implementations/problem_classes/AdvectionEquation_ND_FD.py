@@ -77,7 +77,7 @@ class advectionNd(GenericNDimFinDiff):
         super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, solver_type, bc)
 
         if solver_type == 'CG':  # pragma: no cover
-            self.logger.warn('CG is not usually used for advection equation')
+            self.logger.warning('CG is not usually used for advection equation')
         self._makeAttributeAndRegister('c', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('sigma', localVars=locals())
 
@@ -97,6 +97,11 @@ class advectionNd(GenericNDimFinDiff):
         sol : dtype_u
             The exact solution.
         """
+        if 'u_init' in kwargs.keys() or 't_init' in kwargs.keys():
+            self.logger.warning(
+                f'{type(self).__name__} uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
+            )
+
         # Initialize pointers and variables
         ndim, freq, c, sigma, sol = self.ndim, self.freq, self.c, self.sigma, self.u_init
 

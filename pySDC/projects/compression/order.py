@@ -5,7 +5,7 @@ from pySDC.projects.Resilience.advection import run_advection
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.plot_helper import figsize_by_journal
-import pySDC.implementations.hooks.log_errors as error_hooks
+from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
 
 from pySDC.projects.compression.compression_convergence_controller import Compression
 
@@ -29,11 +29,9 @@ def single_run(problem, description=None, thresh=1e-10, Tend=2e-1, useMPI=False,
         'logger_level': LOGGER_LEVEL,
     }
 
-    error_hook = error_hooks.LogGlobalErrorPostRunMPI if useMPI else error_hooks.LogGlobalErrorPostRun
-
     stats, _, _ = problem(
         custom_description=description,
-        hook_class=error_hook,
+        hook_class=LogGlobalErrorPostRun,
         Tend=Tend,
         use_MPI=useMPI,
         num_procs=num_procs,

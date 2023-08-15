@@ -7,20 +7,45 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 # noinspection PyUnusedLocal
 class vanderpol(ptype):
-    """
-    Example implementing the van der pol oscillator
+    r"""
+    This class implements the stiff Van der Pol oscillator given by the equation
 
-    TODO : doku
+    .. math::
+        \frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.
+
+    Parameters
+    ----------
+    u0 : sequence of array_like, optional
+        Initial condition.
+    mu : float, optional
+        Stiff parameter :math:`\mu`.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method to terminate.
+    newton_tol : float, optional
+        Tolerance for Newton to terminate.
+    stop_at_nan : bool, optional
+        Indicate whether Newton's method should stop if nan values arise.
+    crash_at_maxiter = bool, optional
+        Indicates whether Newton's method should stop if maximum number of iterations
+        `newton_maxiter` is reached.
+
+    Attributes
+    ----------
+    work_counters : WorkCounter
+        Counts different things, here: Number of evaluations of the right-hand side in `eval_f`
+        and number of Newton calls in each Newton iterations are counted.
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, u0, mu, newton_maxiter, newton_tol, stop_at_nan=True, crash_at_maxiter=True):
-        """
-        Initialization routine
-        """
+    def __init__(self, u0=None, mu=5.0, newton_maxiter=100, newton_tol=1e-9, stop_at_nan=True, crash_at_maxiter=True):
+        """Initialization routine"""
         nvars = 2
+
+        if u0 is None:
+            u0 = [2.0, 0.0]
+
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', 'u0', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
@@ -30,16 +55,22 @@ class vanderpol(ptype):
         self.work_counters['rhs'] = WorkCounter()
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at t=0
+        r"""
+        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at :math:`t=0`.
 
-        Args:
-            t (float): current time
-            u_init (pySDC.problem.vanderpol.dtype_u): initial conditions for getting the exact solution
-            t_init (float): the starting time
+        Parameters
+        ----------
+        t : float
+            Current time.
+        u_init : pySDC.problem.vanderpol.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
-        Returns:
-            dtype_u: approximate exact solution
+        Returns
+        -------
+        me : dtype_u
+            Approximate exact solution.
         """
 
         me = self.dtype_u(self.init)
@@ -56,13 +87,19 @@ class vanderpol(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS for both components simultaneously
+        Routine to compute the right-hand side for both components simultaneously.
 
-        Args:
-            u (dtype_u): the current values
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS, 2 components
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed (not used here).
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side (contains 2 components).
         """
 
         x1 = u[0]
@@ -75,16 +112,23 @@ class vanderpol(ptype):
 
     def solve_system(self, rhs, dt, u0, t):
         """
-        Simple Newton solver for the nonlinear system
+        Simple Newton solver for the nonlinear system.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution u.
         """
 
         mu = self.mu

@@ -333,8 +333,7 @@ class AdaptivityStrategy(Strategy):
 
             from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
-            flavor = 'MPI' if self.useMPI else 'nonMPI'
-            custom_description['convergence_controllers'][BasicRestarting.get_implementation(flavor)] = {
+            custom_description['convergence_controllers'][BasicRestarting.get_implementation(useMPI=self.useMPI)] = {
                 'max_restarts': 15
             }
         else:
@@ -760,7 +759,7 @@ class AdaptivityCollocationRefinementStrategy(AdaptivityCollocationStrategy):
             if key == 'work_newton' and op == sum:
                 return 1881
             elif key == 'e_global_post_run' and op == max:
-                return 3.3428689244496823e-06
+                return 3.3428689164005654e-06
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
@@ -833,7 +832,7 @@ class DIRKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
-        from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK34
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK43
 
         adaptivity_description = super().get_custom_description(problem, num_procs)
 
@@ -843,7 +842,7 @@ class DIRKStrategy(AdaptivityStrategy):
 
         rk_params = {
             'step_params': {'maxiter': 1},
-            'sweeper_class': DIRK34,
+            'sweeper_class': DIRK43,
             'convergence_controllers': {AdaptivityRK: {'e_tol': e_tol}},
         }
 
@@ -866,9 +865,9 @@ class DIRKStrategy(AdaptivityStrategy):
         """
         if problem.__name__ == "run_vdp":
             if key == 'work_newton' and op == sum:
-                return 3522
+                return 2168
             elif key == 'e_global_post_run' and op == max:
-                return 0.00020173129027772907
+                return 0.00024166437265116247
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
@@ -975,8 +974,9 @@ class DoubleAdaptivityStrategy(AdaptivityStrategy):
             'allowed_modifications': ['decrease'],
         }
 
-        flavor = 'MPI' if self.useMPI else 'nonMPI'
-        custom_description['convergence_controllers'][BasicRestarting.get_implementation(flavor)] = {'max_restarts': 15}
+        custom_description['convergence_controllers'][BasicRestarting.get_implementation(useMPI=self.useMPI)] = {
+            'max_restarts': 15
+        }
 
         return custom_description
 
@@ -1029,8 +1029,9 @@ class AdaptivityAvoidRestartsStrategy(AdaptivityStrategy):
 
         custom_description['convergence_controllers'][Adaptivity]['avoid_restarts'] = True
 
-        flavor = 'MPI' if self.useMPI else 'nonMPI'
-        custom_description['convergence_controllers'][BasicRestarting.get_implementation(flavor)] = {'max_restarts': 15}
+        custom_description['convergence_controllers'][BasicRestarting.get_implementation(useMPI=self.useMPI)] = {
+            'max_restarts': 15
+        }
 
         return custom_description
 
@@ -1087,8 +1088,9 @@ class AdaptivityInterpolationStrategy(AdaptivityStrategy):
         custom_description['convergence_controllers'][Adaptivity]['avoid_restarts'] = False
         custom_description['convergence_controllers'][InterpolateBetweenRestarts] = {}
 
-        flavor = 'MPI' if self.useMPI else 'nonMPI'
-        custom_description['convergence_controllers'][BasicRestarting.get_implementation(flavor)] = {'max_restarts': 15}
+        custom_description['convergence_controllers'][BasicRestarting.get_implementation(useMPI=self.useMPI)] = {
+            'max_restarts': 15
+        }
 
         return custom_description
 

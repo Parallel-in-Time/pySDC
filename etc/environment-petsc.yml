@@ -12,3 +12,5 @@ dependencies:
   - mpi4py>=3.0.0
   - pytest
   - pytest-cov
+  - pytest-timeout
+  - pytest-order

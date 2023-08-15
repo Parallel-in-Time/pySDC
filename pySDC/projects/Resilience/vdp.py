@@ -212,10 +212,14 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
         if type not in get_list_of_types(stats):
             raise ValueError(f"Can't read type \"{type}\" from stats, only got", get_list_of_types(stats))
 
-        if comm is None or use_MPI is False:
-            data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time')]
-        else:
-            data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time', comm=comm)]
+        data[type] = [
+            me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time', comm=comm if use_MPI else None)
+        ]
+
+    # add time
+    data['time'] = [
+        me[0] for me in get_sorted(stats, type='u', recomputed=None, sortby='time', comm=comm if use_MPI else None)
+    ]
     return data
 
 

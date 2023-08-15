@@ -63,7 +63,7 @@ def run_Schroedinger(efficient=False, num_procs=1, skip_residual_computation=Fal
     from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
     from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
     from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient
-    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRunMPI
+    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_solution import LogSolution
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
@@ -102,7 +102,7 @@ def run_Schroedinger(efficient=False, num_procs=1, skip_residual_computation=Fal
     # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30 if rank == 0 else 99
-    controller_params['hook_class'] = [LogSolution, LogWork, LogGlobalErrorPostRunMPI]
+    controller_params['hook_class'] = [LogSolution, LogWork, LogGlobalErrorPostRun]
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation

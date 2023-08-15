@@ -1,34 +1,37 @@
 import pytest
 
 STRATEGY_NAMES = [
-    'adaptivity',
-    'DIRK',
-    'iterate',
-    'explicitRK',
     'doubleAdaptivity',
     'collocationType',
     'collocationRefinement',
     'collocationDerefinement',
-    'adaptivityAvoidRestarts',
     # 'adaptivityInterpolation',
     'adaptivityQExtrapolation',
+    'adaptivityAvoidRestarts',
+    'adaptivity',
+    'iterate',
     'base',
+    'DIRK',
+    'explicitRK',
 ]
 STRATEGY_NAMES_NONMPIONLY = ['adaptiveHR', 'HotRod']
 LOGGER_LEVEL = 30
 
 
-def single_test_vdp(strategy_name, useMPI=False, num_procs=1):
+def single_test_vdp(strategy_name, useMPI, num_procs):
     import numpy as np
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.Resilience.vdp import run_vdp
     import pySDC.projects.Resilience.strategies as strategies
     from pySDC.implementations.hooks.log_work import LogWork
+    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
 
     if useMPI:
-        from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRunMPI as errorhook
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD.Split(True)
     else:
-        from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun as errorhook
+        comm = None
 
     # load the strategy
     avail_strategies = {
@@ -48,7 +51,6 @@ def single_test_vdp(strategy_name, useMPI=False, num_procs=1):
         'base': strategies.BaseStrategy(useMPI=useMPI),
     }
 
-    strategy = avail_strategies.get
     if strategy_name in avail_strategies.keys():
         strategy = avail_strategies[strategy_name]
     else:
@@ -58,9 +60,10 @@ def single_test_vdp(strategy_name, useMPI=False, num_procs=1):
     controller_params = {'logger_level': LOGGER_LEVEL}
     stats, _, Tend = prob(
         custom_description=strategy.get_custom_description(problem=prob, num_procs=num_procs),
-        hook_class=[errorhook, LogWork],
+        hook_class=[LogGlobalErrorPostRun, LogWork],
         use_MPI=useMPI,
         custom_controller_params=controller_params,
+        comm=comm,
     )
 
     # things we want to test
@@ -70,12 +73,15 @@ def single_test_vdp(strategy_name, useMPI=False, num_procs=1):
     }
 
     for key, val in tests.items():
-        act = val[1]([me[1] for me in get_sorted(stats, type=val[0])])
+        act = val[1]([me[1] for me in get_sorted(stats, type=val[0], comm=comm)])
         ref = strategy.get_reference_value(prob, val[0], val[1], num_procs)
 
         assert np.isclose(
             ref, act, rtol=1e-2
         ), f'Error in \"{strategy.name}\" strategy ({strategy_name})! Expected {key}={ref} but got {act}!'
+
+    if comm:
+        comm.Free()
 
 
 @pytest.mark.mpi4py

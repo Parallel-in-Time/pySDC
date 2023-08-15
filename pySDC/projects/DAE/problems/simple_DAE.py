@@ -95,7 +95,7 @@ class pendulum_2d(ptype_dae):
         elif t < self.t_end:
             me[:] = self.u_ref(t)
         else:
-            warnings.warn("Requested time exceeds domain of the reference solution. Returning zero.")
+            self.logger.warning("Requested time exceeds domain of the reference solution. Returning zero.")
             me[:] = (0, 0, 0, 0, 0)
         return me
 

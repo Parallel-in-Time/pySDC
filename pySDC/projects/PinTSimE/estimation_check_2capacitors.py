@@ -3,41 +3,58 @@ import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed, log_data
-from pySDC.projects.PinTSimE.piline_model import setup_mpl
+from pySDC.projects.PinTSimE.battery_model import controller_run, generate_description, get_recomputed
+
 from pySDC.projects.PinTSimE.battery_2capacitors_model import (
+    LogEvent,
     check_solution,
     proof_assertions_description,
     proof_assertions_time,
 )
+
+from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
+
+from pySDC.implementations.hooks.log_solution import LogSolution
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
 def run(cwd='./'):
     """
-    Routine to check the differences between using a switch estimator or not
+    Routine to check the differences between using a switch estimator or not.
 
-    Args:
-        cwd (str): current working directory
+    Parameters
+    ----------
+    cwd : str
+        Current working directory.
     """
 
-    dt_list = [4e-1, 4e-2, 4e-3]
+    dt_list = [4e-1, 4e-2]
     t0 = 0.0
     Tend = 3.5
 
     problem_classes = [battery_n_capacitors]
     sweeper_classes = [imex_1st_order]
+    num_nodes = 4
+    restol = -1
+    maxiter = 8
 
     ncapacitors = 2
     alpha = 5.0
     V_ref = np.array([1.0, 1.0])
     C = np.array([1.0, 1.0])
+
+    problem_params = dict()
+    problem_params['ncapacitors'] = ncapacitors
+    problem_params['C'] = C
+    problem_params['alpha'] = alpha
+    problem_params['V_ref'] = V_ref
+
+    hook_class = [LogSolution, LogEvent]
 
     use_switch_estimator = [True, False]
     restarts_all = []
@@ -49,13 +66,15 @@ def run(cwd='./'):
                     dt_item,
                     problem,
                     sweeper,
-                    log_data,
+                    num_nodes,
+                    hook_class,
                     False,
                     use_SE,
-                    ncapacitors,
-                    alpha,
-                    V_ref,
-                    C,
+                    problem_params,
+                    restol,
+                    maxiter,
+                    1,
+                    1e-8,
                 )
 
                 # Assertions
@@ -80,7 +99,7 @@ def run(cwd='./'):
                     restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=None))
                     restarts = restarts_dict[dt_item][:, 1]
                     restarts_all.append(np.sum(restarts))
-                    print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
+                    print(f"Restarts for dt: {dt_item:.2e} -- {np.sum(restarts):.0f}")
 
     V_ref = description['problem_params']['V_ref']
 
@@ -104,7 +123,6 @@ def run(cwd='./'):
 
         switches = get_recomputed(stats_true, type='switch', sortby='time')
         t_switch = [v[1] for v in switches]
-
         val_switch_all.append([t_switch[0], t_switch[1]])
 
         vC1_true = [me[1][1] for me in get_sorted(stats_true, type='u', recomputed=False)]
@@ -120,12 +138,8 @@ def run(cwd='./'):
         t_true = [me[0] for me in get_sorted(stats_true, type='u', recomputed=False)]
         t_false = [me[0] for me in get_sorted(stats_false, type='u', recomputed=False)]
 
-        diff_true_all1.append(
-            [diff_true1[m] for m in range(len(t_true)) if np.isclose(t_true[m], t_switch[0], atol=1e-15)]
-        )
-        diff_true_all2.append(
-            [diff_true2[m] for m in range(len(t_true)) if np.isclose(t_true[m], t_switch[1], atol=1e-15)]
-        )
+        diff_true_all1.append([diff_true1[m] for m in range(len(t_true)) if abs(t_true[m] - t_switch[0]) <= 1e-17])
+        diff_true_all2.append([diff_true2[np.argmin([abs(me - t_switch[1]) for me in t_true])]])
 
         diff_false_all_before1.append(
             [diff_false1[m - 1] for m in range(1, len(t_false)) if t_false[m - 1] < t_switch[0] < t_false[m]]
