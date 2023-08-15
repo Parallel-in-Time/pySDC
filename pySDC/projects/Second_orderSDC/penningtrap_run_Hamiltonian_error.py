@@ -1,3 +1,6 @@
+# It checks whether data folder exicits or not
+exec(open("check_data_folder.py").read())
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -8,65 +11,138 @@ from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.projects.Second_orderSDC.penningtrap_HookClass import particles_output
 from pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom import RKN
+from pySDC.projects.Second_orderSDC.penningtrap_Simulation import fixed_plot_params
 
-from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+def main(dt, tend, maxiter, M, sweeper):
+    """
+    Implementation of Hamiltonian error for Harmonic oscillator problem
+    mu=0
+    kappa=1
+    omega=1
+    Args:
+        dt: time step
+        tend: final time
+        maxiter: maximal iteration
+        M: Number of quadrature nodes
+        sweeper: sweeper class
+    returns:
+        Ham_err
+    """
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1e-16
+    level_params['dt'] = dt
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'GAUSS'
+    sweeper_params['num_nodes'] = M
 
-def get_ham_error(tend, dt, maxiter, sweeper):
-    controller_params, description= penningtrap_param()
-    description['level_params']['dt']=dt
-    description['sweeper_params']['num_nodes']=3
-    description['problem_params']['omega_E']=1
-    description['problem_params']['omega_B']=0
-    description['problem_params']['u0']=np.array([[0, 0, 0], [0, 0, 1], [1], [1]], dtype=object)
-    description['sweeper_class']=sweeper
-    description['step_params']['maxiter']=maxiter
+    # initialize problem parameters for the Penning trap
+    problem_params = dict()
+    problem_params['omega_E'] = 1
+    problem_params['omega_B'] = 0
+    problem_params['u0'] = np.array([[0, 0, 0], [0, 0, 1], [1], [1]], dtype=object)
+    problem_params['nparts'] = 1
+    problem_params['sig'] = 0.1
+    # problem_params['Tend'] = 16.0
 
-    controller=controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = maxiter
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['hook_class'] = particles_output  # specialized hook class for more statistics and output
+    controller_params['logger_level'] = 30
     penningtrap.Harmonic_oscillator=True
-    t0=0.0
-    Tend=tend
+    # Fill description dictionary for easy hierarchy creation
+    description = dict()
+    description['problem_class'] = penningtrap
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = sweeper
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    # description['space_transfer_class'] = particles_to_particles # this is only needed for more than 2 levels
+    description['step_params'] = step_params
 
+    # instantiate the controller (no controller parameters used here)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    # set time parameters
+    t0 = 0.0
+    Tend = tend
+
+    # get initial values on finest level
     P = controller.MS[0].levels[0].prob
-    uinit=P.u_init()
+    uinit = P.u_init()
 
-    uend, stats= controller.run(u0=uinit, t0=t0, Tend=Tend)
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    sortedlist_stats=get_sorted(stats, type='etot', sortby='time')
+    sortedlist_stats = get_sorted(stats, type='etot', sortby='time')
 
-    H0=0.5*(np.dot(uinit.vel[:].T, uinit.vel[:]) + np.dot(uinit.pos[:].T, uinit.pos[:]))
+    # energy = [entry[1] for entry in sortedlist_stats]
+    H0 = 1 / 2 * (np.dot(uinit.vel[:].T, uinit.vel[:]) + np.dot(uinit.pos[:].T, uinit.pos[:]))
 
-    Hamiltonian_err = np.ravel([abs(entry[1] - H0) / H0 for entry in sortedlist_stats])
+    Ham_err = np.ravel([abs(entry[1] - H0) / H0 for entry in sortedlist_stats])
+    return Ham_err
 
-    return Hamiltonian_err
-
-def plot_hamiltonian(Hamiltonian_error, Tend, dt, maxiter_list, step=3000):
-    time=np.arange(0, Tend, dt)
-    t_len=len(time)
-    plt.figure()
-    plt.loglog(time[:t_len:step], Hamiltonian_error['RKN'][:t_len:step], marker='.', ls=' ', label='RKN')
-    plt.loglog(time[:t_len:step], Hamiltonian_error['SDC2'][:t_len:step], marker='s', ls=' ', label=f'k={maxiter_list[0]}')
-    plt.loglog(time[:t_len:step], Hamiltonian_error['SDC3'][:t_len:step], marker='*', ls=' ', label=f'k={maxiter_list[1]}')
-    plt.loglog(time[:t_len:step], Hamiltonian_error['SDC4'][:t_len:step], marker='H', ls=' ', label=f'k={maxiter_list[2]}')
-    plt.ylabel('$\Delta H^{\mathrm{(rel)}}$')
+def plot_Hamiltonian_error(K, M, dt):  # pragma: no cover
+    """
+    Plot Hamiltonian Error
+    Args:
+        K: list of maxiter
+        M: number of quadrature nodes
+        dt: time step
+    """
+    fixed_plot_params()
+    # Define final time
+    time=1e+6
+    tn=dt
+    # Find time nodes
+    t=np.arange(0, time+tn, tn)
+    # Get saved data
+    t_len=len(t)
+    RKN1_=np.loadtxt('data/Ham_RKN1.csv', delimiter='*')
+    SDC2_=np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[0]), delimiter='*')
+    SDC3_=np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[1]), delimiter='*')
+    SDC4_=np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[2]), delimiter='*')
+    # Only save Hamiltonian error
+    RKN1=RKN1_[:,1]
+    SDC2=SDC2_[:,1]
+    SDC3=SDC3_[:,1]
+    SDC4=SDC4_[:,1]
+    step=3000
+    # plot Hamiltonian error
+    plt.loglog(t[:t_len:step], RKN1[:t_len:step], label='RKN-4', marker='.', linestyle=' ')
+    plt.loglog(t[:t_len:step], SDC2[:t_len:step], label='K={}'.format(K[0]), marker='s', linestyle=' ')
+    plt.loglog(t[:t_len:step], SDC3[:t_len:step], label='K={}'.format(K[1]), marker='*', linestyle=' ')
+    plt.loglog(t[:t_len:step], SDC4[:t_len:step], label='K={}'.format(K[2]), marker='H', linestyle=' ')
     plt.xlabel('$\omega \cdot t$')
-    plt.legend()
+    plt.ylabel('$\Delta H^{\mathrm{(rel)}}$')
+    plt.ylim(1e-11, 1e-3 +0.001)
+    plt.legend(fontsize=15)
     plt.tight_layout()
 
-if __name__=='__main__':
-    maxiter_list=(2, 3, 4)
-    tend=2*1e+6
-    dt=2*np.pi/10
-    Hamiltonian_error=dict()
-    Hamiltonian_error['SDC2']=get_ham_error(tend, dt, maxiter_list[0], boris_2nd_order)
-    # np.save('Ham_SDC2.npy', Ham_SDC2)
+if __name__ == "__main__":
+    """
+    Important:
+        * Every simulation needs to run individually otherwise it may crash at some point.
+            I don't know why
+        * All of the data saved in /data folder
+    """
+    K=(2,3,4)
+    M=3
+    dt = 2*np.pi/ 10
+    tend=2*np.pi*1e+6
 
-    Hamiltonian_error['SDC3']=get_ham_error(tend, dt, maxiter_list[1], boris_2nd_order)
-    # np.save('Ham_SDC3.npy', Ham_SDC3)
+    Ham_SDC1=main(dt, tend, K[0], M, boris_2nd_order)
 
-    Hamiltonian_error['SDC4']=get_ham_error(tend, dt, maxiter_list[2], boris_2nd_order)
-    # np.save('Ham_SDC4.npy', Ham_SDC4)
+    # Ham_SDC2=main(dt, tend, K[1], M, boris_2nd_order)
 
-    Hamiltonian_error['RKN']=get_ham_error(tend, dt, 1, RKN)
-    # np.save('Ham_RKN.npy', Ham_RKN)
 
-    plot_hamiltonian(Hamiltonian_error, tend, dt, maxiter_list)
+    # Ham_SDC3=main(dt, tend, K[2], M, boris_2nd_order)
+
+    # Ham_RKN=main(dt, tend, 1, M, RKN)
+
+    # plot_Hamiltonian_error(K, M, dt)

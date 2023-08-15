@@ -1,3 +1,6 @@
+# It checks whether data folder exicits or not
+exec(open("check_data_folder.py").read())
+
 from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
 
@@ -18,11 +21,12 @@ if __name__ == '__main__':
     # Get params for the penning trap problem from the function
     controller_params, description = penningtrap_params()
 ## =============================================================================
-##     dt-timestep can be changed here manually
-    description['level_params']['dt']= 0.015625
+##     dt-timestep and num_nodes can be changed here manually
+    description['level_params']['dt']= 0.015625 *4
+    description['sweeper_params']['num_nodes'] = 4
 ## =============================================================================
     # Give the parameters to the class
-    conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3), axes=(0,))
+    conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3, 10), axes=(2,))
     # Run local convergence order
     # conv.run_local_error()
     # Run global convergence order

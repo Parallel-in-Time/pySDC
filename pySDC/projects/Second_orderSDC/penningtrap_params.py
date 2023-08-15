@@ -12,8 +12,7 @@ def penningtrap_params():
         controller params
         description
     """
-    # It checks whether data folder exicits or not
-    exec(open("check_data_folder.py").read())
+
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-16
@@ -23,7 +22,7 @@ def penningtrap_params():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'GAUSS'
-    sweeper_params['num_nodes'] = 3
+    sweeper_params['num_nodes'] = 5
     sweeper_params['do_coll_update'] = True
     # initial guess can be changed and it affects the convergence order of the SDC method
     sweeper_params['initial_guess'] = 'random'  # 'zero', 'spread'

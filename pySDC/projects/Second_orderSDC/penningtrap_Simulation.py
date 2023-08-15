@@ -144,7 +144,7 @@ class plotmanager(object):  # pragma: no cover
 # =============================================================================
 #       Setting y axis min and max values
 # =============================================================================
-        if self.error_type == 'Global':
+        if self.error_type == 'global':
             ax2.set_ylim(1e-14, 1e1)
             ax1.set_ylim(1e-14, 1e1)
         else:
@@ -392,19 +392,10 @@ class plotmanager(object):  # pragma: no cover
 
         for jj in range(0, 3):
             if jj == 0:
-                file = open(self.cwd + 'data/{}_order_vs_approxorder.csv'.format(self.error_type), 'w')
-                file.write(
-                    'Expected pos'
-                    + ' | '
-                    + 'Measured convergence rate for pos'
-                    + ' | '
-                    'Expected vel'
-                    + ' | '
-                    + 'Measured convergence rate for vel'
-                    + '\n'
-                )
+                file = open(self.cwd + 'data/{}_order_vs_approx_order.csv'.format(self.error_type), 'w')
+
             else:
-                file = open(self.cwd + 'data/{}_order_vs_approxorder.csv'.format(self.error_type), 'a')
+                file = open(self.cwd + 'data/{}_order_vs_approx_order.csv'.format(self.error_type), 'a')
 
             for ii in range(0, N):
                 approx_order['pos'][0, ii] = np.polyfit(
@@ -474,7 +465,7 @@ class compute_error(plotmanager):
         self.plot_convergence()
 
 
-    def run_work_precision(self, RK=True, VV=False, dt_cont=3):  # pragma: no cover
+    def run_work_precision(self, RK=True, VV=False, dt_cont=1):  # pragma: no cover
         """
         To implement work-precision of Second-order SDC
         Args:

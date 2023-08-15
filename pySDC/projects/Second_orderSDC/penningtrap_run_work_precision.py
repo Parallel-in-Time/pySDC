@@ -1,3 +1,6 @@
+# It checks whether data folder exicits or not
+exec(open("check_data_folder.py").read())
+
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
 from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
@@ -18,8 +21,8 @@ if __name__ == '__main__':
 ## =============================================================================
 ##     dt-timestep and Tend can be changed here manually
     Tend = 128 * 0.015625
-    description['level_params']['dt']= 0.015625
+    description['level_params']['dt']= 0.015625*4
     description['sweeper_params']['initial_guess'] = 'spread'  # 'zero', 'spread'
 ## =============================================================================
-    work_pre = compute_error(controller_params, description, time_iter=3, Tend=Tend, K_iter=(2, 4, 6), axes=(0,))
-    work_pre.run_work_precision()
+    work_pre = compute_error(controller_params, description, time_iter=3, Tend=Tend, K_iter=(1, 2, 3), axes=(2,))
+    work_pre.run_work_precision(RK=True)
