@@ -47,8 +47,74 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <div class="viewcode-block" id="penningtrap"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap">[docs]</a><span class="k">class</span> <span class="nc">penningtrap</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing particles in a penning trap</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`</span>
+<span class="sd">    fully investigated in [1]_. The equations are given by the following equation of motion</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{dv}{dt}=f(x,v)=\alpha[E(x,t)+v\times B(x,t)],</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{dx}{dt}=v.</span>
+<span class="sd">    with the particles :math:`x, v\in \mathbb{R}^{3}`. For the penning trap problem, the other parameters are given by</span>
+<span class="sd">    The contant magnetic field :math:`B=\frac{\omega_{B}}{\alpha}\cdot \hat{e_{z}}\in \mathbb{R}^{3}`</span>
+<span class="sd">    along the :math:`z-` axis with the particle&#39;s charge-to-mass ratio :math:`\alpha=\frac{q}{m}` so that</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        v\times B=\frac{\omega_{B}}{\alpha}\left(</span>
+<span class="sd">            \begin{matrix}</span>
+<span class="sd">            0 &amp; 1 &amp; 0\\</span>
+<span class="sd">                -1 &amp; 0 &amp; 0\\</span>
+<span class="sd">                    0 &amp; 0 &amp; 0</span>
+<span class="sd">            \end{matrix}</span>
+<span class="sd">            \right)v.</span>
+
+<span class="sd">    The electric field :math:`E(x_{i})=E_{ext}(x_{i})+E_{int}(x_{i})\in \mathbb{R}^{3}` where</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        E_{ext}(x_{i})=-\epsilon\frac{\omega_{E}^{2}}{\alpha}\left(</span>
+<span class="sd">            \begin{matrix}</span>
+<span class="sd">            1 &amp; 0 &amp; 0\\</span>
+<span class="sd">                0 &amp; 1 &amp; 0\\</span>
+<span class="sd">                    0 &amp; 0 &amp; -2</span>
+<span class="sd">            \end{matrix}</span>
+<span class="sd">            \right)x_{i}.</span>
+
+<span class="sd">    and the inter-particle Coulomb interaction</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        E_{int}(x_{i})=\sum_{k=1, k\neq i}^{N_{particles}}Q_{k}\frac{x_{i}-x_{k}}{(|x_{i}-x_{k}|^{2}+\lambda^{2})^{3/2}}</span>
+
+<span class="sd">    with the smoothing parameter :math:`\lambda&gt;0`.</span>
+<span class="sd">    The exact solution also given for the single particle penning trap more detailed [1]_ [2]_.</span>
+<span class="sd">    For to solve nonlinear eqaution of system, Boris trick is used (see. [2]_)</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    ----------</span>
+<span class="sd">    omega_B : float</span>
+<span class="sd">        Amplitute of magnetic field.</span>
+<span class="sd">    omega_E : float</span>
+<span class="sd">        Amplitute of electric field.</span>
+<span class="sd">    u0 : array</span>
+<span class="sd">        initial condition for postion</span>
+
+<span class="sd">        initial condition for velocity</span>
+
+<span class="sd">        q : value</span>
+
+<span class="sd">        m : mass</span>
+<span class="sd">    nparts : int</span>
+<span class="sd">        The number of particles.</span>
+<span class="sd">    sig : float</span>
+<span class="sd">        The smoothing parameter :math:`\lambda&gt;0`.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] F. Penning. Die Glimmentladung bei niedrigem Druck zwischen koaxialen Zylindern in einem axialen Magnetfeld.</span>
+<span class="sd">        Physica. Vol. 3 (1936).</span>
+<span class="sd">    .. [2] Mathias Winkel, Robert Speck and Daniel Ruprecht. A high-order Boris integrator.</span>
+<span class="sd">        Journal of Computational Physics (2015).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>
@@ -115,8 +181,12 @@
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nparts</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">penningtrap</span><span class="o">.</span><span class="n">Harmonic_oscillator</span>
+            <span class="n">Emat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">Emat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
 
-        <span class="n">Emat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
         <span class="n">f</span><span class="o">.</span><span class="n">elec</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_interactions</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>

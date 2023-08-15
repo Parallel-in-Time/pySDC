@@ -54,18 +54,18 @@
             </div>
         </aside>
         <h2>
-            <span class="text">2 statements &nbsp;</span>
+            <span class="text">3 statements &nbsp;</span>
             <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
-            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">7<span class="text"> excluded</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">3<span class="text"> missing</span></button>
+            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">8<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
             <a id="prevFileLink" class="nav" href="d_e65ba0b64d945c43_penningtrap_run_error_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_cf9ddae6e6f0d80b_AllenCahn_contracting_circle_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-08-08 14:41 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
+            created at 2023-08-15 09:36 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -80,24 +80,34 @@
     </div>
 </header>
 <main id="source">
-    <p class="mis show_mis"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Second_orderSDC</span><span class="op">.</span><span class="nam">penningtrap_Simulation</span> <span class="key">import</span> <span class="nam">compute_error</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Second_orderSDC</span><span class="op">.</span><span class="nam">penningtrap_run_error</span> <span class="key">import</span> <span class="nam">penningtrap_param</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="com"># It checks whether data folder exicits or not</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="nam">exec</span><span class="op">(</span><span class="nam">open</span><span class="op">(</span><span class="str">"check_data_folder.py"</span><span class="op">)</span><span class="op">.</span><span class="nam">read</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">'__main__'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="str">    Convergence plot for the second order SDC:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="str">        K_iter: The number of iterations</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="str">        time_iter: the number of time slices in the time/2**time_iter</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="str">        axes: Axis to show the plot</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="str">        RKN True or False: To implement together RKN method</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="str">        VV True or False: To implement Velocity-Verlet scheme</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="nam">exec</span><span class="op">(</span><span class="nam">open</span><span class="op">(</span><span class="str">"check_data_folder.py"</span><span class="op">)</span><span class="op">.</span><span class="nam">read</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="nam">Tend</span> <span class="op">=</span> <span class="num">128</span> <span class="op">*</span> <span class="num">0.015625</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span> <span class="op">=</span> <span class="nam">penningtrap_param</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">    <span class="com"># description['level_params']['dt'] = 0.015625 * 2</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="nam">work_pre</span> <span class="op">=</span> <span class="nam">compute_error</span><span class="op">(</span><span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">,</span> <span class="nam">time_iter</span><span class="op">=</span><span class="num">3</span><span class="op">,</span> <span class="nam">Tend</span><span class="op">=</span><span class="nam">Tend</span><span class="op">,</span> <span class="nam">K_iter</span><span class="op">=</span><span class="op">(</span><span class="num">2</span><span class="op">,</span> <span class="num">4</span><span class="op">,</span> <span class="num">6</span><span class="op">)</span><span class="op">,</span> <span class="nam">axes</span><span class="op">=</span><span class="op">(</span><span class="num">0</span><span class="op">,</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">    <span class="nam">work_pre</span><span class="op">.</span><span class="nam">run_work_precision</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Second_orderSDC</span><span class="op">.</span><span class="nam">penningtrap_Simulation</span> <span class="key">import</span> <span class="nam">compute_error</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Second_orderSDC</span><span class="op">.</span><span class="nam">penningtrap_params</span> <span class="key">import</span> <span class="nam">penningtrap_params</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">'__main__'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="str">    Work-precision implementation for the Second-order SDC</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="str">    All parameters are given in penningtrap_params</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="str">    Note:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">        * time needs to be changed according to choosen axis</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">        * Tend fixed but it can be changed by defining Tend and include in it in compute_error</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">        * To implement Velocity-Verlet scheme set VV=True like run_work_precision(VV=True)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">        * RKN method can be removed by setting RKN=False like run_work_precision(RKN=False)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">        * dt timestep can be changed here as well</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">        * Make sure dt_cont is setted manually to get suitable picture in work precision</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="str">        * it moves RKN and VV line left and right to get right position with SDC and Picard iterations</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span> <span class="op">=</span> <span class="nam">penningtrap_params</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">    <span class="com">## =============================================================================</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">    <span class="com">##     dt-timestep and Tend can be changed here manually</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">    <span class="nam">Tend</span> <span class="op">=</span> <span class="num">128</span> <span class="op">*</span> <span class="num">0.015625</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'level_params'</span><span class="op">]</span><span class="op">[</span><span class="str">'dt'</span><span class="op">]</span> <span class="op">=</span> <span class="num">0.015625</span> <span class="op">*</span> <span class="num">4</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">'sweeper_params'</span><span class="op">]</span><span class="op">[</span><span class="str">'initial_guess'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'spread'</span>  <span class="com"># 'zero', 'spread'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">    <span class="com">## =============================================================================</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">    <span class="nam">work_pre</span> <span class="op">=</span> <span class="nam">compute_error</span><span class="op">(</span><span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">,</span> <span class="nam">time_iter</span><span class="op">=</span><span class="num">3</span><span class="op">,</span> <span class="nam">Tend</span><span class="op">=</span><span class="nam">Tend</span><span class="op">,</span> <span class="nam">K_iter</span><span class="op">=</span><span class="op">(</span><span class="num">1</span><span class="op">,</span> <span class="num">2</span><span class="op">,</span> <span class="num">3</span><span class="op">)</span><span class="op">,</span> <span class="nam">axes</span><span class="op">=</span><span class="op">(</span><span class="num">2</span><span class="op">,</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">    <span class="nam">work_pre</span><span class="op">.</span><span class="nam">run_work_precision</span><span class="op">(</span><span class="nam">RK</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -106,8 +116,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_cf9ddae6e6f0d80b_AllenCahn_contracting_circle_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-08-08 14:41 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
+            created at 2023-08-15 09:36 +0000
         </p>
     </div>
 </footer>

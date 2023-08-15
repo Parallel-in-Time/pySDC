@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,7 +53,67 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">penningtrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">omega_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing particles in a penning trap</p>
+<p>This class implements a standard Penning trap problem on the time interval <span class="math notranslate nohighlight">\([0, t_{end}]\)</span>
+fully investigated in <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The equations are given by the following equation of motion</p>
+<div class="math notranslate nohighlight">
+\[\frac{dv}{dt}=f(x,v)=\alpha[E(x,t)+v\times B(x,t)],\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{dx}{dt}=v.\]</div>
+<p>with the particles <span class="math notranslate nohighlight">\(x, v\in \mathbb{R}^{3}\)</span>. For the penning trap problem, the other parameters are given by
+The contant magnetic field <span class="math notranslate nohighlight">\(B=\frac{\omega_{B}}{\alpha}\cdot \hat{e_{z}}\in \mathbb{R}^{3}\)</span>
+along the <span class="math notranslate nohighlight">\(z-\)</span> axis with the particle’s charge-to-mass ratio <span class="math notranslate nohighlight">\(\alpha=\frac{q}{m}\)</span> so that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}v\times B=\frac{\omega_{B}}{\alpha}\left(
+    \begin{matrix}
+    0 &amp; 1 &amp; 0\\
+        -1 &amp; 0 &amp; 0\\
+            0 &amp; 0 &amp; 0
+    \end{matrix}
+    \right)v.\end{split}\]</div>
+<p>The electric field <span class="math notranslate nohighlight">\(E(x_{i})=E_{ext}(x_{i})+E_{int}(x_{i})\in \mathbb{R}^{3}\)</span> where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}E_{ext}(x_{i})=-\epsilon\frac{\omega_{E}^{2}}{\alpha}\left(
+    \begin{matrix}
+    1 &amp; 0 &amp; 0\\
+        0 &amp; 1 &amp; 0\\
+            0 &amp; 0 &amp; -2
+    \end{matrix}
+    \right)x_{i}.\end{split}\]</div>
+<p>and the inter-particle Coulomb interaction</p>
+<div class="math notranslate nohighlight">
+\[E_{int}(x_{i})=\sum_{k=1, k\neq i}^{N_{particles}}Q_{k}\frac{x_{i}-x_{k}}{(|x_{i}-x_{k}|^{2}+\lambda^{2})^{3/2}}\]</div>
+<p>with the smoothing parameter <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.
+The exact solution also given for the single particle penning trap more detailed <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
+For to solve nonlinear eqaution of system, Boris trick is used (see. <a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>)</p>
+<p>Parameters</p>
+<dl>
+<dt>omega_E<span class="classifier">float</span></dt><dd><p>Amplitute of electric field.</p>
+</dd>
+<dt>u0<span class="classifier">array</span></dt><dd><p>initial condition for postion</p>
+<p>initial condition for velocity</p>
+<p>q : value</p>
+<p>m : mass</p>
+</dd>
+<dt>nparts<span class="classifier">int</span></dt><dd><p>The number of particles.</p>
+</dd>
+<dt>sig<span class="classifier">float</span></dt><dd><p>The smoothing parameter <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>F. Penning. Die Glimmentladung bei niedrigem Druck zwischen koaxialen Zylindern in einem axialen Magnetfeld.
+Physica. Vol. 3 (1936).</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>Mathias Winkel, Robert Speck and Daniel Ruprecht. A high-order Boris integrator.
+Journal of Computational Physics (2015).</p>
+</aside>
+</aside>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver">
 <span class="sig-name descname"><span class="pre">boris_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_parts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/PenningTrap_3D.html#penningtrap.boris_solver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver" title="Permalink to this definition">¶</a></dt>
