@@ -14,7 +14,7 @@ from pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom import RKN
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import fixed_plot_params
 
 
-def main(dt, tend, maxiter, M, sweeper):
+def main(dt, tend, maxiter, M, sweeper):  # pragma: no cover
     """
     Implementation of Hamiltonian error for Harmonic oscillator problem
     mu=0
