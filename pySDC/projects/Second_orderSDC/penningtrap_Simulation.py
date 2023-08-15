@@ -22,16 +22,15 @@ def fixed_plot_params():  # pragma: no cover
     plt.rcParams['figure.figsize'] = 7.44, 6.74
     plt.rcParams['pgf.rcfonts'] = False
 
-
     plt.rcParams['lines.linewidth'] = 2.5
-    plt.rcParams['axes.titlesize'] = fs+5
-    plt.rcParams['axes.labelsize'] = fs+5
+    plt.rcParams['axes.titlesize'] = fs + 5
+    plt.rcParams['axes.labelsize'] = fs + 5
     plt.rcParams['xtick.labelsize'] = fs
     plt.rcParams['ytick.labelsize'] = fs
     plt.rcParams['xtick.major.pad'] = 5
     plt.rcParams['ytick.major.pad'] = 5
     plt.rcParams['axes.labelpad'] = 6
-    plt.rcParams['lines.markersize'] = fs-2
+    plt.rcParams['lines.markersize'] = fs - 2
     plt.rcParams['lines.markeredgewidth'] = 1
     plt.rcParams['mathtext.fontset'] = 'cm'
     plt.rcParams['mathtext.rm'] = 'serif'
@@ -42,6 +41,7 @@ class plotmanager(object):  # pragma: no cover
     """
     This class generates all of the plots of the Second-order SDC plots.
     """
+
     def __init__(self, controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd=''):
         self.controller_params = controller_params
         self.description = description
@@ -53,8 +53,6 @@ class plotmanager(object):  # pragma: no cover
         self.quad_type = self.description['sweeper_params']['quad_type']
         self.num_nodes = self.description['sweeper_params']['num_nodes']
         self.error_type = 'local'
-
-
 
     def plot_convergence(self):  # pragma: no cover
         """
@@ -80,7 +78,6 @@ class plotmanager(object):  # pragma: no cover
                 ' ',
                 color=color[ii],
                 marker=shape[ii],
-
                 label='k={}'.format(int(self.K_iter[ii])),
             )
             if value == 2:
@@ -88,14 +85,14 @@ class plotmanager(object):  # pragma: no cover
                     time_data[ii, 1],
                     0.25 * convline['pos'][value, ii, 1],
                     r"$\mathcal{O}(\Delta t^{%d})$" % (order_data['pos'][ii, 0, 1]),
-                    size=18
+                    size=18,
                 )
             else:
                 ax1.text(
                     time_data[ii, 1],
                     0.25 * convline['pos'][value, ii, 1],
                     r"$\mathcal{O}(\Delta t^{%d})$" % (order_data['pos'][ii, 0, 0]),
-                    size=18
+                    size=18,
                 )
 
             if self.error_type == 'Local':
@@ -125,14 +122,14 @@ class plotmanager(object):  # pragma: no cover
                     time_data[ii, 1],
                     0.25 * convline['vel'][value, ii, 1],
                     r"$\mathcal{O}(\Delta t^{%d})$" % (order_data['vel'][ii, 0, 1]),
-                    size=18
+                    size=18,
                 )
             else:
                 ax2.text(
                     time_data[ii, 1],
                     0.25 * convline['vel'][value, ii, 1],
                     r"$\mathcal{O}(\Delta t^{%d})$" % (order_data['vel'][ii, 0, 0]),
-                    size=18
+                    size=18,
                 )
 
             if self.error_type == 'Local':
@@ -141,9 +138,9 @@ class plotmanager(object):  # pragma: no cover
                 ax2.set_ylabel(r'$\Delta v^{\mathrm{(rel)}}_{%d}$' % (value + 1))
         ax2.set_title(r'{} order of convergence, $M={}$'.format(self.error_type, self.num_nodes))
         ax2.set_xlabel(r'$\omega_{B} \cdot \Delta t$')
-# =============================================================================
-#       Setting y axis min and max values
-# =============================================================================
+        # =============================================================================
+        #       Setting y axis min and max values
+        # =============================================================================
         if self.error_type == 'global':
             ax2.set_ylim(1e-14, 1e1)
             ax1.set_ylim(1e-14, 1e1)
@@ -164,8 +161,6 @@ class plotmanager(object):  # pragma: no cover
         else:
             formatter = "{:1.0f}K".format(data_value * 0.001)
         return formatter
-
-
 
     def plot_work_precision(self):  # pragma: no cover
         """
@@ -222,7 +217,7 @@ class plotmanager(object):  # pragma: no cover
                 ls='dashdot',
                 color='blue',
                 marker='H',
-                label='Velocity-Verlet'
+                label='Velocity-Verlet',
             )
             ax2.loglog(
                 func_eval_VV[0],
@@ -230,12 +225,12 @@ class plotmanager(object):  # pragma: no cover
                 ls='dashdot',
                 color='blue',
                 marker='H',
-                label='Velocity-Verlet'
+                label='Velocity-Verlet',
             )
 
         for ii, jj in enumerate(self.K_iter):
-# =============================================================================
-#           # If you want to get exactly the same picture like in paper uncomment this only for vertical axis
+            # =============================================================================
+            #           # If you want to get exactly the same picture like in paper uncomment this only for vertical axis
             # if ii==0 or ii==1:
             #     ax1.loglog(func_eval_SDC[ii, :][1:], error_SDC['pos'][value, ii, :][1:], ls='solid', color=color[ii], marker=shape[ii], label='k={}'.format(jj))
             #     ax1.loglog(func_eval_picard[ii,:][1:], error_picard['pos'][value, ii, :][1:], ls='--', color=color[ii], marker=shape[ii])
@@ -249,22 +244,18 @@ class plotmanager(object):  # pragma: no cover
 
             #     ax2.loglog(func_eval_SDC[ii, :][:-1], error_SDC['vel'][value, ii, :][:-1], ls='solid', color=color[ii], marker=shape[ii], label='k={}'.format(jj))
             #     ax2.loglog(func_eval_picard[ii,:][:-1], error_picard['vel'][value, ii, :][:-1], ls='--', color=color[ii], marker=shape[ii])
-#
-# =============================================================================
+            #
+            # =============================================================================
             ax1.loglog(
                 func_eval_SDC[ii, :],
                 error_SDC['pos'][value, ii, :],
                 ls='solid',
                 color=color[ii],
                 marker=shape[ii],
-                label='k={}'.format(jj)
+                label='k={}'.format(jj),
             )
             ax1.loglog(
-                func_eval_picard[ii, :],
-                error_picard['pos'][value, ii, :],
-                ls='--',
-                color=color[ii],
-                marker=shape[ii]
+                func_eval_picard[ii, :], error_picard['pos'][value, ii, :], ls='--', color=color[ii], marker=shape[ii]
             )
 
             ax2.loglog(
@@ -273,14 +264,10 @@ class plotmanager(object):  # pragma: no cover
                 ls='solid',
                 color=color[ii],
                 marker=shape[ii],
-                label='k={}'.format(jj)
+                label='k={}'.format(jj),
             )
             ax2.loglog(
-                func_eval_picard[ii, :],
-                error_picard['vel'][value, ii, :],
-                ls='--',
-                color=color[ii],
-                marker=shape[ii]
+                func_eval_picard[ii, :], error_picard['vel'][value, ii, :], ls='--', color=color[ii], marker=shape[ii]
             )
 
         xmin = np.min(ax1.get_xlim())
@@ -305,7 +292,7 @@ class plotmanager(object):  # pragma: no cover
         ax1.set_ylim(np.min(ax1.get_ylim()), np.max(ax2.get_ylim()))
         # ax1.set_ylim(1e-14, 1e+0)
 
-        ax1.legend(loc="best", fontsize=12)#,
+        ax1.legend(loc="best", fontsize=12)
         fig1.tight_layout()
         fig1.savefig(self.cwd + "data/f_eval_pos_{}_M={}.pdf".format(value, self.num_nodes))
 
@@ -325,8 +312,6 @@ class plotmanager(object):  # pragma: no cover
         fig2.savefig(self.cwd + "data/f_eval_vel_{}_M={}.pdf".format(value, self.num_nodes))
         plt.show()
 
-
-
     def organize_data(self, filename='data/dt_vs_local_errorSDC.csv', time_iter=None):  # pragma: no cover
         """
         Organize data according to plot
@@ -337,12 +322,9 @@ class plotmanager(object):  # pragma: no cover
         if time_iter == None:
             time_iter = self.time_iter
 
-
-        items=np.genfromtxt(filename, delimiter=',', skip_header=1)
-        time=items[:,0]
+        items = np.genfromtxt(filename, delimiter=',', skip_header=1)
+        time = items[:, 0]
         N = int(np.size(time) / time_iter)
-
-
 
         error_data = {'pos': np.zeros([3, N, time_iter]), 'vel': np.zeros([3, N, time_iter])}
         order_data = {'pos': np.zeros([N, time_iter, 2]), 'vel': np.zeros([N, time_iter, 2])}
@@ -357,8 +339,8 @@ class plotmanager(object):  # pragma: no cover
         order_data['vel'][:, :, 1] = items[:, 7].reshape([N, time_iter])
 
         for ii in range(0, 3):
-            error_data['pos'][ii, :, :] = items[:,ii + 3].reshape([N, time_iter])
-            error_data['vel'][ii, :, :] = items[:,ii + 8].reshape([N, time_iter])
+            error_data['pos'][ii, :, :] = items[:, ii + 3].reshape([N, time_iter])
+            error_data['vel'][ii, :, :] = items[:, ii + 8].reshape([N, time_iter])
 
         for jj in range(0, 3):
             if jj == 2:
@@ -428,14 +410,6 @@ class plotmanager(object):  # pragma: no cover
                 )
         file.close()
 
-    def plot_hamiltonian(self, ham_SDC, ham_RKN):
-        tn=np.max(np.shape(ham_RKN))
-        time=np.linspace(0, self.Tend, tn)
-        import pdb
-        pdb.set_trace()
-        plt.semilogy(time, ham_RKN[:,1])
-
-
 
 class compute_error(plotmanager):
     """
@@ -443,8 +417,9 @@ class compute_error(plotmanager):
     """
 
     def __init__(self, controller_params, description, time_iter=3, K_iter=(1, 2, 3), Tend=2, axes=(1,), cwd=''):
-        super().__init__(controller_params, description, time_iter=time_iter, K_iter=K_iter, Tend=Tend, axes=axes, cwd='')
-
+        super().__init__(
+            controller_params, description, time_iter=time_iter, K_iter=K_iter, Tend=Tend, axes=axes, cwd=''
+        )
 
     def run_local_error(self):  # pragma: no cover
         """
@@ -454,7 +429,6 @@ class compute_error(plotmanager):
         # self.find_approximate_order()
         self.plot_convergence()
 
-
     def run_global_error(self):  # pragma: no cover
         """
         This function for the global convergence order together it finds approximate order
@@ -463,7 +437,6 @@ class compute_error(plotmanager):
         self.compute_global_error_data()
         self.find_approximate_order(filename='data/dt_vs_global_errorSDC.csv')
         self.plot_convergence()
-
 
     def run_work_precision(self, RK=True, VV=False, dt_cont=1):  # pragma: no cover
         """
@@ -483,14 +456,7 @@ class compute_error(plotmanager):
             self.compute_global_error_data(VV=VV, work_counter=True, dt_cont=dt_cont)
         self.plot_work_precision()
 
-    def run_hamiltonian_error(self):
-        Hamiltonian_SDC=self.compute_global_error_data()
-        Hamiltonia_RKN=self.compute_error_RKN_VV()
-        self.plot_hamiltonian(Hamiltonian_SDC, Hamiltonia_RKN)
-
-
     def compute_local_error_data(self):
-
         """
         Compute local convergece rate and save this data
         """
@@ -499,25 +465,23 @@ class compute_error(plotmanager):
         dt_val = self.description['level_params']['dt']
 
         for order in self.K_iter:
-
-
-
             step_params['maxiter'] = order
             self.description['step_params'] = step_params
 
             if order == self.K_iter[0]:
                 file = open(self.cwd + 'data/dt_vs_local_errorSDC.csv', 'w')
-                file.write(str('Time_steps')
-                + " | "
-                + str('Order_pos')
-                + " | "
-                + str('Abs_error_position')
-                + " | "
-                + str('Order_vel')
-                + " | "
-                + str('Abs_error_velocity')
-                + '\n'
-            )
+                file.write(
+                    str('Time_steps')
+                    + " | "
+                    + str('Order_pos')
+                    + " | "
+                    + str('Abs_error_position')
+                    + " | "
+                    + str('Order_vel')
+                    + " | "
+                    + str('Abs_error_velocity')
+                    + '\n'
+                )
             else:
                 file = open(self.cwd + 'data/dt_vs_local_errorSDC.csv', 'a')
 
@@ -553,9 +517,8 @@ class compute_error(plotmanager):
                 order_pos = list(self.local_order_pos(order, coll_order))
                 order_vel = list(self.local_order_vel(order, coll_order))
                 # evaluate error
-                error_pos=list(np.abs((uex-uend).pos).T[0])
-                error_vel=list(np.abs((uex-uend).vel).T[0])
-
+                error_pos = list(np.abs((uex - uend).pos).T[0])
+                error_vel = list(np.abs((uex - uend).vel).T[0])
 
                 dt_omega = dt * self.description['problem_params']['omega_B']
                 file.write(
@@ -573,7 +536,6 @@ class compute_error(plotmanager):
 
             file.close()
 
-
     def compute_global_error_data(self, Picard=False, RK=False, VV=False, work_counter=False, dt_cont=1):
         """
         Compute global convergence data and save it into the data folder
@@ -585,7 +547,7 @@ class compute_error(plotmanager):
             dt_cont: moves the data left to right for RK and VV method
         """
 
-        K_iter=self.K_iter
+        K_iter = self.K_iter
         if Picard:
             name = 'Picard'
             description = self.description
@@ -593,15 +555,15 @@ class compute_error(plotmanager):
             description['sweeper_params']['QE'] = 'PIC'
 
         elif RK:
-            K_iter=(1, )
-            name='RKN'
-            description=self.description
-            description['sweeper_class']=RKN
+            K_iter = (1,)
+            name = 'RKN'
+            description = self.description
+            description['sweeper_class'] = RKN
         elif VV:
-            K_iter=(1, )
-            name='VV'
-            description=self.description
-            description['sweeper_class']=Velocity_Verlet
+            K_iter = (1,)
+            name = 'VV'
+            description = self.description
+            description['sweeper_class'] = Velocity_Verlet
         else:
             name = 'SDC'
             description = self.description
@@ -612,7 +574,7 @@ class compute_error(plotmanager):
         values = ['position', 'velocity']
 
         error = dict()
-        # Hamiltonian=dict()
+
         if work_counter:
             filename = 'data/rhs_eval_vs_global_error{}.csv'.format(name)
         else:
@@ -627,17 +589,18 @@ class compute_error(plotmanager):
 
             if order == K_iter[0]:
                 file = open(self.cwd + filename, 'w')
-                file.write(str('Time_steps/Work_counter')
-                + " | "
-                + str('Order_pos')
-                + " | "
-                + str('Abs_error_position')
-                + " | "
-                + str('Order_vel')
-                + " | "
-                + str('Abs_error_velocity')
-                + '\n'
-            )
+                file.write(
+                    str('Time_steps/Work_counter')
+                    + " | "
+                    + str('Order_pos')
+                    + " | "
+                    + str('Abs_error_position')
+                    + " | "
+                    + str('Order_vel')
+                    + " | "
+                    + str('Abs_error_velocity')
+                    + '\n'
+                )
             else:
                 file = open(self.cwd + filename, 'a')
 
@@ -677,16 +640,13 @@ class compute_error(plotmanager):
                 func_eval = P.work_counters['Boris_solver'].niter + P.work_counters['rhs'].niter
                 # extract values from stats
                 for _, nn in enumerate(values):
-                    u_val[nn]=get_sorted(stats,type=nn, sortby='time')
-                    uex_val[nn]=get_sorted(stats,type=nn+'_exact', sortby='time')
-                    error[nn]=self.relative_error(uex_val[nn], u_val[nn])
-                    error[nn]=list(error[nn].T[0])
+                    u_val[nn] = get_sorted(stats, type=nn, sortby='time')
+                    uex_val[nn] = get_sorted(stats, type=nn + '_exact', sortby='time')
+                    error[nn] = self.relative_error(uex_val[nn], u_val[nn])
+                    error[nn] = list(error[nn].T[0])
 
-
-                # if ii==0:
-                #     Hamiltonian[order]=self.Hamiltonian_error(u_val, uinit)
                 if RK or VV:
-                    global_order=np.array([4,4])
+                    global_order = np.array([4, 4])
                 else:
                     coll_order = controller.MS[0].levels[0].sweep.coll.order
                     global_order = list(self.global_order(order, coll_order))
@@ -708,8 +668,6 @@ class compute_error(plotmanager):
                     + '\n'
                 )
             file.close()
-
-        # return Hamiltonian
 
     # find expected local convergence order for position
     def local_order_pos(self, order_K, order_quad):
@@ -756,23 +714,9 @@ class compute_error(plotmanager):
 
     # compute relative error
     def relative_error(self, uex_data, u_data):
-        u_ex=np.array([entry[1] for entry in uex_data])
-        u=np.array([entry[1] for entry in u_data])
+        u_ex = np.array([entry[1] for entry in uex_data])
+        u = np.array([entry[1] for entry in u_data])
         return np.linalg.norm(np.abs((u_ex - u)), np.inf, 0) / np.linalg.norm(u_ex, np.inf, 0)
-
-    def Hamiltonian_error(self, u, u0):
-        shape=np.shape(u['position'])
-
-        Hn=0.5*(u['position']**2+u['velocity']**2)
-
-        u0pos=u0.pos.T*np.ones(shape)
-        u0vel=u0.vel.T*np.ones(shape)
-        H0=0.5*(u0pos**2+u0vel**2)
-
-        H=np.abs(Hn-H0)/np.abs(H0)
-
-        return H
-
 
 
 class Stability_implementation(object):
@@ -793,7 +737,6 @@ class Stability_implementation(object):
         self.dt = description['level_params']['dt']
         self.SDC, self.Ksdc, self.picard, self.Kpicard = self.stability_data()
         self.cwd = cwd
-
 
     def stability_data(self):
         """
@@ -881,8 +824,6 @@ class Stability_implementation(object):
             dt * domain_Kpicard.real,
         )
 
-
-
     def stability_function_RKN(self, k, mu, dt):
         """
         Stability function of RKN method
@@ -939,7 +880,6 @@ class Stability_implementation(object):
 
         plt.clabel(CS1, inline=True, fmt="%3.2f")
 
-
         plt.gca().set_xticks(np.arange(0, int(lam_k_max) + 3, 3))
         plt.gca().set_yticks(np.arange(0, int(lam_mu_max) + 3, 3))
         plt.gca().tick_params(axis="both", which="both")
@@ -957,27 +897,26 @@ class Stability_implementation(object):
         plt.tight_layout()
         plt.savefig(self.cwd + "data/M={}_K={}_redion_{}.pdf".format(self.num_nodes, self.K_iter, title))
 
-
     def run_SDC_stability(self):  # pragma: no cover
         self.RKN = False
-        self.radius=False
+        self.radius = False
         self.plot_stability(self.SDC, title="SDC stability region")
 
     def run_Picard_stability(self):  # pragma: no cover
         self.RKN = False
-        self.radius=False
+        self.radius = False
         self.plot_stability(self.picard, title="Picard stability region")
 
     def run_Ksdc(self):  # pragma: no cover
-        self.radius=True
+        self.radius = True
         self.plot_stability(self.Ksdc, title="$K_{sdc}$ spectral radius")
 
     def run_Kpicard(self):  # pragma: no cover
-        self.radius=True
+        self.radius = True
         self.plot_stability(self.Kpicard, title="$K_{picard}$ spectral radius")
 
     def run_RKN_stability(self):  # pragma: no cover
         self.RKN = True
-        self.radius=False
+        self.radius = False
         region_RKN = self.stability_data_RKN()
         self.plot_stability(region_RKN.T, title='RKN-4 stability region')

@@ -89,8 +89,6 @@ class penningtrap(ptype):
         self.work_counters['Boris_solver'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
 
-
-
     @staticmethod
     @jit(nopython=True, nogil=True)
     def fast_interactions(N, pos, sig, q):
@@ -148,8 +146,7 @@ class penningtrap(ptype):
             penningtrap.Harmonic_oscillator
             Emat = np.diag([0, 0, -1])
         except AttributeError:
-            Emat = np.diag([1,1,-2])
-
+            Emat = np.diag([1, 1, -2])
 
         f = self.dtype_f(self.init)
 

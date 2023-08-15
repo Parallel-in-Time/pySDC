@@ -4,7 +4,6 @@ from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
 
-
 def penningtrap_params():
     """
     Define the penning trap probem params
@@ -29,11 +28,13 @@ def penningtrap_params():
 
     # initialize problem parameters for the penning trap
     problem_params = dict()
-    problem_params['omega_E'] = 4.9 # amplititude of electric field
-    problem_params['omega_B'] = 25.0 # amplititude of magnetic field
-    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]], dtype=object) # initial condition together q and m values
-    problem_params['nparts'] = 1 # number of particles
-    problem_params['sig'] = 0.1 # sigma
+    problem_params['omega_E'] = 4.9  # amplititude of electric field
+    problem_params['omega_B'] = 25.0  # amplititude of magnetic field
+    problem_params['u0'] = np.array(
+        [[10, 0, 0], [100, 0, 100], [1], [1]], dtype=object
+    )  # initial condition together q and m values
+    problem_params['nparts'] = 1  # number of particles
+    problem_params['sig'] = 0.1  # sigma
 
     # initialize controller parameters
     controller_params = dict()

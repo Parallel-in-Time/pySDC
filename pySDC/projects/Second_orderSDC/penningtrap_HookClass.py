@@ -1,6 +1,6 @@
-
 from pySDC.core.Hooks import hooks
 import numpy as np
+
 
 class particles_output(hooks):
     def __init__(self):
@@ -8,7 +8,6 @@ class particles_output(hooks):
         Initialization of particles output
         """
         super(particles_output, self).__init__()
-
 
     def pre_run(self, step, level_number):
         """
@@ -36,29 +35,29 @@ class particles_output(hooks):
 
         L.sweep.compute_end_point()
         part = L.uend
-        N=L.prob.nparts
+        N = L.prob.nparts
 
-# =============================================================================
-#
+        # =============================================================================
+        #
 
         try:
             L.prob.Harmonic_oscillator
 
-           # add up kinetic and potntial contributions to total energy
+            # add up kinetic and potntial contributions to total energy
             epot = 0
             ekin = 0
-            name=str(L.sweep)
+            name = str(L.sweep)
             for n in range(N):
                 epot += 1 / 2.0 * np.dot(part.pos[:, n], part.pos[:, n])
                 ekin += 1 / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
-                Energy=epot+ekin
-            uinit=L.u[0]
+                Energy = epot + ekin
+            uinit = L.u[0]
             H0 = 1 / 2 * (np.dot(uinit.vel[:].T, uinit.vel[:]) + np.dot(uinit.pos[:].T, uinit.pos[:]))
-            Ham=abs(Energy - H0) / abs(H0)
+            Ham = abs(Energy - H0) / abs(H0)
             if 'RKN' in name:
-                filename='data/Ham_RKN'+ '{}.txt'.format(step.params.maxiter)
+                filename = 'data/Ham_RKN' + '{}.txt'.format(step.params.maxiter)
             else:
-                filename='data/Ham_SDC'+'{}{}.txt'.format(L.sweep.coll.num_nodes ,step.params.maxiter)
+                filename = 'data/Ham_SDC' + '{}{}.txt'.format(L.sweep.coll.num_nodes, step.params.maxiter)
 
             if L.time == 0.0:
                 file = open(filename, 'w')
@@ -71,9 +70,9 @@ class particles_output(hooks):
             file.close()
         except AttributeError:
             pass
-# =============================================================================
+        # =============================================================================
 
-        part_exact=L.prob.u_exact(L.time + L.dt)
+        part_exact = L.prob.u_exact(L.time + L.dt)
         self.add_to_stats(
             process=step.status.slot,
             time=L.time,

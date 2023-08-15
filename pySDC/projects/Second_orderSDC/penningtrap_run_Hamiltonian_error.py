@@ -13,6 +13,7 @@ from pySDC.projects.Second_orderSDC.penningtrap_HookClass import particles_outpu
 from pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom import RKN
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import fixed_plot_params
 
+
 def main(dt, tend, maxiter, M, sweeper):
     """
     Implementation of Hamiltonian error for Harmonic oscillator problem
@@ -54,7 +55,7 @@ def main(dt, tend, maxiter, M, sweeper):
     controller_params = dict()
     controller_params['hook_class'] = particles_output  # specialized hook class for more statistics and output
     controller_params['logger_level'] = 30
-    penningtrap.Harmonic_oscillator=True
+    penningtrap.Harmonic_oscillator = True
     # Fill description dictionary for easy hierarchy creation
     description = dict()
     description['problem_class'] = penningtrap
@@ -87,6 +88,7 @@ def main(dt, tend, maxiter, M, sweeper):
     Ham_err = np.ravel([abs(entry[1] - H0) / H0 for entry in sortedlist_stats])
     return Ham_err
 
+
 def plot_Hamiltonian_error(K, M, dt):  # pragma: no cover
     """
     Plot Hamiltonian Error
@@ -97,22 +99,22 @@ def plot_Hamiltonian_error(K, M, dt):  # pragma: no cover
     """
     fixed_plot_params()
     # Define final time
-    time=1e+6
-    tn=dt
+    time = 1e6
+    tn = dt
     # Find time nodes
-    t=np.arange(0, time+tn, tn)
+    t = np.arange(0, time + tn, tn)
     # Get saved data
-    t_len=len(t)
-    RKN1_=np.loadtxt('data/Ham_RKN1.csv', delimiter='*')
-    SDC2_=np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[0]), delimiter='*')
-    SDC3_=np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[1]), delimiter='*')
-    SDC4_=np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[2]), delimiter='*')
+    t_len = len(t)
+    RKN1_ = np.loadtxt('data/Ham_RKN1.csv', delimiter='*')
+    SDC2_ = np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[0]), delimiter='*')
+    SDC3_ = np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[1]), delimiter='*')
+    SDC4_ = np.loadtxt('data/Ham_SDC{}{}.csv'.format(M, K[2]), delimiter='*')
     # Only save Hamiltonian error
-    RKN1=RKN1_[:,1]
-    SDC2=SDC2_[:,1]
-    SDC3=SDC3_[:,1]
-    SDC4=SDC4_[:,1]
-    step=3000
+    RKN1 = RKN1_[:, 1]
+    SDC2 = SDC2_[:, 1]
+    SDC3 = SDC3_[:, 1]
+    SDC4 = SDC4_[:, 1]
+    step = 3000
     # plot Hamiltonian error
     plt.loglog(t[:t_len:step], RKN1[:t_len:step], label='RKN-4', marker='.', linestyle=' ')
     plt.loglog(t[:t_len:step], SDC2[:t_len:step], label='K={}'.format(K[0]), marker='s', linestyle=' ')
@@ -120,9 +122,10 @@ def plot_Hamiltonian_error(K, M, dt):  # pragma: no cover
     plt.loglog(t[:t_len:step], SDC4[:t_len:step], label='K={}'.format(K[2]), marker='H', linestyle=' ')
     plt.xlabel('$\omega \cdot t$')
     plt.ylabel('$\Delta H^{\mathrm{(rel)}}$')
-    plt.ylim(1e-11, 1e-3 +0.001)
+    plt.ylim(1e-11, 1e-3 + 0.001)
     plt.legend(fontsize=15)
     plt.tight_layout()
+
 
 if __name__ == "__main__":
     """
@@ -131,15 +134,14 @@ if __name__ == "__main__":
             I don't know why
         * All of the data saved in /data folder
     """
-    K=(2,3,4)
-    M=3
-    dt = 2*np.pi/ 10
-    tend=2*np.pi*1e+6
+    K = (2, 3, 4)
+    M = 3
+    dt = 2 * np.pi / 10
+    tend = 2 * np.pi * 1e6
 
-    Ham_SDC1=main(dt, tend, K[0], M, boris_2nd_order)
+    Ham_SDC1 = main(dt, tend, K[0], M, boris_2nd_order)
 
     # Ham_SDC2=main(dt, tend, K[1], M, boris_2nd_order)
-
 
     # Ham_SDC3=main(dt, tend, K[2], M, boris_2nd_order)
 

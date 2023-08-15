@@ -18,11 +18,11 @@ if __name__ == '__main__':
         * it moves RKN and VV line left and right to get right position with SDC and Picard iterations
     """
     controller_params, description = penningtrap_params()
-## =============================================================================
-##     dt-timestep and Tend can be changed here manually
+    ## =============================================================================
+    ##     dt-timestep and Tend can be changed here manually
     Tend = 128 * 0.015625
-    description['level_params']['dt']= 0.015625*4
+    description['level_params']['dt'] = 0.015625 * 4
     description['sweeper_params']['initial_guess'] = 'spread'  # 'zero', 'spread'
-## =============================================================================
+    ## =============================================================================
     work_pre = compute_error(controller_params, description, time_iter=3, Tend=Tend, K_iter=(1, 2, 3), axes=(2,))
     work_pre.run_work_precision(RK=True)
