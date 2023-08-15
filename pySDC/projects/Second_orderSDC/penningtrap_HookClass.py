@@ -40,7 +40,7 @@ class particles_output(hooks):
         # =============================================================================
         #
 
-        try:
+        try:  # pragma: no cover
             L.prob.Harmonic_oscillator
 
             # add up kinetic and potntial contributions to total energy
