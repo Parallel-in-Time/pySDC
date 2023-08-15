@@ -8,8 +8,74 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 
 # noinspection PyUnusedLocal
 class penningtrap(ptype):
-    """
-    Example implementing particles in a penning trap
+    r"""
+    This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`
+    fully investigated in [1]_. The equations are given by the following equation of motion
+
+    .. math::
+        \frac{dv}{dt}=f(x,v)=\alpha[E(x,t)+v\times B(x,t)],
+
+    .. math::
+        \frac{dx}{dt}=v.
+    with the particles :math:`x, v\in \mathbb{R}^{3}`. For the penning trap problem, the other parameters are given by
+    The contant magnetic field :math:`B=\frac{\omega_{B}}{\alpha}\cdot \hat{e_{z}}\in \mathbb{R}^{3}`
+    along the :math:`z-` axis with the particle's charge-to-mass ratio :math:`\alpha=\frac{q}{m}` so that
+
+    .. math::
+        v\times B=\frac{\omega_{B}}{\alpha}\left(
+            \begin{matrix}
+            0 & 1 & 0\\
+                -1 & 0 & 0\\
+                    0 & 0 & 0
+            \end{matrix}
+            \right)v.
+
+    The electric field :math:`E(x_{i})=E_{ext}(x_{i})+E_{int}(x_{i})\in \mathbb{R}^{3}` where
+
+    .. math::
+        E_{ext}(x_{i})=-\epsilon\frac{\omega_{E}^{2}}{\alpha}\left(
+            \begin{matrix}
+            1 & 0 & 0\\
+                0 & 1 & 0\\
+                    0 & 0 & -2
+            \end{matrix}
+            \right)x_{i}.
+
+    and the inter-particle Coulomb interaction
+
+    .. math::
+        E_{int}(x_{i})=\sum_{k=1, k\neq i}^{N_{particles}}Q_{k}\frac{x_{i}-x_{k}}{(|x_{i}-x_{k}|^{2}+\lambda^{2})^{3/2}}
+
+    with the smoothing parameter :math:`\lambda>0`.
+    The exact solution also given for the single particle penning trap more detailed [1]_ [2]_.
+    For to solve nonlinear eqaution of system, Boris trick is used (see. [2]_)
+
+    Parameters
+
+    ----------
+    omega_B : float
+        Amplitute of magnetic field.
+    omega_E : float
+        Amplitute of electric field.
+    u0 : array
+        initial condition for postion
+
+        initial condition for velocity
+
+        q : value
+
+        m : mass
+    nparts : int
+        The number of particles.
+    sig : float
+        The smoothing parameter :math:`\lambda>0`.
+
+    References
+    ----------
+    .. [1] F. Penning. Die Glimmentladung bei niedrigem Druck zwischen koaxialen Zylindern in einem axialen Magnetfeld.
+        Physica. Vol. 3 (1936).
+    .. [2] Mathias Winkel, Robert Speck and Daniel Ruprecht. A high-order Boris integrator.
+        Journal of Computational Physics (2015).
     """
 
     dtype_u = particles
@@ -76,8 +142,12 @@ class penningtrap(ptype):
         N = self.nparts
 
         self.work_counters['rhs']()
+        try:
+            penningtrap.Harmonic_oscillator
+            Emat = np.diag([0, 0, -1])
+        except AttributeError:
+            Emat = np.diag([1, 1, -2])
 
-        Emat = np.diag([1, 1, -2])
         f = self.dtype_f(self.init)
 
         f.elec[:] = self.get_interactions(part)

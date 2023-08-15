@@ -34,18 +34,18 @@ def test_global_convergence(axis):
 
 
 def BorisSDC_global_convergence():
-    from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+    from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
     from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
 
-    controller_params, description = penningtrap_param()
+    controller_params, description = penningtrap_params()
     description['level_params']['dt'] = 0.015625 * 2
     conv = compute_error(controller_params, description, time_iter=3, K_iter=(1, 2, 3))
     conv.error_type = 'global'
     conv.compute_global_error_data()
 
-    conv.find_approximate_order(filename='data/dt_vs_global_errorSDC.txt')
+    conv.find_approximate_order(filename='data/dt_vs_global_errorSDC.csv')
 
-    expected_order, num_order = sort_order(filename='data/global_order_vs_approxorder.txt')
+    expected_order, num_order = sort_order(filename='data/global_order_vs_approx_order.csv')
 
     return expected_order, num_order
 
@@ -58,13 +58,14 @@ def string_to_array(string):
     return np.array(array)
 
 
-def sort_order(cwd='', filename='data/local_order_vs_approxorder.txt'):
+def sort_order(cwd='', filename='data/local_order_vs_approx_order.csv'):
     import numpy as np
 
     expected_order = {'position': np.array([]).reshape([0, 3]), 'velocity': np.array([]).reshape([0, 3])}
     num_order = {'position': np.array([]).reshape([0, 3]), 'velocity': np.array([]).reshape([0, 3])}
 
     file = open(cwd + filename, 'r')
+
     while True:
         line = file.readline()
         if not line:
@@ -72,8 +73,9 @@ def sort_order(cwd='', filename='data/local_order_vs_approxorder.txt'):
 
         items = str.split(
             line,
-            " * ",
+            " | ",
         )
+
         expected_order['position'] = np.vstack((expected_order['position'], string_to_array(items[0])))
         expected_order['velocity'] = np.vstack((expected_order['velocity'], string_to_array(items[2])))
         num_order['position'] = np.vstack((num_order['position'], np.round(string_to_array(items[1]))))
@@ -84,9 +86,9 @@ def sort_order(cwd='', filename='data/local_order_vs_approxorder.txt'):
 
 def BorisSDC_horizontal_axis():
     from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
-    from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+    from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
-    controller_params, description = penningtrap_param()
+    controller_params, description = penningtrap_params()
     description['level_params']['dt'] = 0.015625 / 8
 
     conv = compute_error(controller_params, description, time_iter=3)
@@ -112,9 +114,9 @@ def test_horizontal_axis(value):
 
 def BorisSDC_vertical_axis():
     from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
-    from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+    from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
-    controller_params, description = penningtrap_param()
+    controller_params, description = penningtrap_params()
     description['level_params']['dt'] = 0.015625 * 8
 
     conv = compute_error(controller_params, description, time_iter=3)
@@ -149,9 +151,9 @@ def numerical_order(time_data, error):
 def test_RKN_VV(sweeper_name, cwd=''):
     import numpy as np
     from pySDC.projects.Second_orderSDC.penningtrap_Simulation import compute_error
-    from pySDC.projects.Second_orderSDC.penningtrap_run_error import penningtrap_param
+    from pySDC.projects.Second_orderSDC.penningtrap_params import penningtrap_params
 
-    controller_params, description = penningtrap_param()
+    controller_params, description = penningtrap_params()
     description['sweeper_class'] = get_sweeper(sweeper_name)
     orders = {'RKN': 4, 'Velocity_Verlet': 2}
     description['level_params']['dt'] = 0.015625
@@ -160,19 +162,19 @@ def test_RKN_VV(sweeper_name, cwd=''):
 
     P = compute_error(controller_params, description, time_iter=3)
 
-    P.compute_error_RKN_VV()
     if sweeper_name == 'Velocity_Verlet':
-        P.compute_error_RKN_VV(VV=True)
-    if sweeper_name == 'RKN':
-        [N, func_eval_RKN, error_RKN, *_] = P.organize_data(
-            filename=cwd + 'data/rhs_eval_vs_global_errorRKN.txt', time_iter=P.time_iter
-        )
-        num_order = round(numerical_order(time, error_RKN['pos'][0, :][0]))
-    elif sweeper_name == 'Velocity_Verlet':
+        P.compute_global_error_data(VV=True, work_counter=True)
         [N, func_eval_VV, error_VV, *_] = P.organize_data(
-            filename=cwd + 'data/rhs_eval_vs_global_errorVV.txt', time_iter=P.time_iter
+            filename=cwd + 'data/rhs_eval_vs_global_errorVV.csv', time_iter=P.time_iter
         )
         num_order = round(numerical_order(time, error_VV['pos'][0, :][0]))
+
+    if sweeper_name == 'RKN':
+        P.compute_global_error_data(RK=True, work_counter=True)
+        [N, func_eval_RKN, error_RKN, *_] = P.organize_data(
+            filename=cwd + 'data/rhs_eval_vs_global_errorRKN.csv', time_iter=P.time_iter
+        )
+        num_order = round(numerical_order(time, error_RKN['pos'][0, :][0]))
 
     expected_order = orders.get(sweeper_name)
 

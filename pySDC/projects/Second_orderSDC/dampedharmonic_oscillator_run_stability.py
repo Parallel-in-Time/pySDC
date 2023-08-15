@@ -9,19 +9,8 @@ def dampedharmonic_oscillator_params():
     """
     Runtine to compute modulues of the stability function
 
-    Args:
-        None
-
-
     Returns:
-        numpy.narray: values for the spring pendulum
-        numpy.narray: values for the Friction
-        numpy.narray: number of num_nodes
-        numpy.narray: number of iterations
-        numpy.narray: moduli for the SDC
-        numpy.narray: moduli for the K_{sdc} marrix
-        numpy.narray: moduli for the Pircard iteration
-        numpy.narray: moduli for the K_{sdc} Picard iteration
+        description
     """
 
     # initialize level parameters
@@ -44,7 +33,7 @@ def dampedharmonic_oscillator_params():
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 100
+    step_params['maxiter'] = 50
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -71,8 +60,8 @@ if __name__ == '__main__':
     # exec(open("check_data_folder.py").read())
     description = dampedharmonic_oscillator_params()
     Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
-    Stability.run_SDC_stability
-    Stability.run_Picard_stability
-    Stability.run_RKN_stability
-    Stability.run_Ksdc
+    Stability.run_SDC_stability()
+    Stability.run_Picard_stability()
+    Stability.run_RKN_stability()
+    Stability.run_Ksdc()
     # Stability.run_Kpicard
