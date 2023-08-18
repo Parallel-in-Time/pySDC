@@ -16,10 +16,11 @@ class penningtrap(ptype):
         \frac{dv}{dt}=f(x,v)=\alpha[E(x,t)+v\times B(x,t)],
 
     .. math::
-        \frac{dx}{dt}=v.
+        \frac{dx}{dt}=v
+
     with the particles :math:`x, v\in \mathbb{R}^{3}`. For the penning trap problem, the other parameters are given by
-    The contant magnetic field :math:`B=\frac{\omega_{B}}{\alpha}\cdot \hat{e_{z}}\in \mathbb{R}^{3}`
-    along the :math:`z-` axis with the particle's charge-to-mass ratio :math:`\alpha=\frac{q}{m}` so that
+    the constant magnetic field :math:`B=\frac{\omega_{B}}{\alpha}\cdot \hat{e_{z}}\in \mathbb{R}^{3}`
+    along the :math:`z`-axis with the particle's charge-to-mass ratio :math:`\alpha=\frac{q}{m}` so that
 
     .. math::
         v\times B=\frac{\omega_{B}}{\alpha}\left(
@@ -39,7 +40,7 @@ class penningtrap(ptype):
                 0 & 1 & 0\\
                     0 & 0 & -2
             \end{matrix}
-            \right)x_{i}.
+            \right)x_{i}
 
     and the inter-particle Coulomb interaction
 
@@ -47,28 +48,30 @@ class penningtrap(ptype):
         E_{int}(x_{i})=\sum_{k=1, k\neq i}^{N_{particles}}Q_{k}\frac{x_{i}-x_{k}}{(|x_{i}-x_{k}|^{2}+\lambda^{2})^{3/2}}
 
     with the smoothing parameter :math:`\lambda>0`.
-    The exact solution also given for the single particle penning trap more detailed [1]_ [2]_.
-    For to solve nonlinear eqaution of system, Boris trick is used (see. [2]_)
+    The exact solution also given for the single particle penning trap more detailed [1]_, [2]_.
+    For to solve nonlinear equation of system, Boris trick is used (see [2]_).
 
     Parameters
-
     ----------
     omega_B : float
-        Amplitute of magnetic field.
+        Amplitude of magnetic field.
     omega_E : float
-        Amplitute of electric field.
-    u0 : array
-        initial condition for postion
-
-        initial condition for velocity
-
-        q : value
-
-        m : mass
+        Amplitude of electric field.
+    u0 : np.1darray
+        Initial condition for position, and for velocity.
+    q : np.1darray
+        Particle's charge.
+    m : np.1darray
+        Mass.
     nparts : int
         The number of particles.
     sig : float
         The smoothing parameter :math:`\lambda>0`.
+
+    Attributes
+    ----------
+    work_counter : dict
+        Counts the calls of the right-hand side, and calls of the Boris solver.
 
     References
     ----------
@@ -92,6 +95,25 @@ class penningtrap(ptype):
     @staticmethod
     @jit(nopython=True, nogil=True)
     def fast_interactions(N, pos, sig, q):
+        r"""
+        Computes the fast interactions.
+
+        Parameters
+        ----------
+        N : int
+            Number of particles.
+        pos : np.2darray
+            Position.
+        sig : float
+            The smoothing parameter :math:`\lambda > 0`.
+        q : np.1darray
+            Particle's charge.
+
+        Returns
+        -------
+        Efield : np.2darray
+            The internal E field for each particle.
+        """
         Efield = np.zeros((3, N))
         contrib = np.zeros(3)
 
@@ -112,14 +134,18 @@ class penningtrap(ptype):
         return Efield
 
     def get_interactions(self, part):
-        """
-        Routine to compute the particle-particle interaction, assuming q = 1 for all particles
+        r"""
+        Routine to compute the particle-particle interaction, assuming :math:`q = 1` for all particles.
 
-        Args:
-            part (dtype_u): the particles
-        Returns:
-            numpy.ndarray: the internal E field for each particle
+        Parameters
+        ----------
+        part : dtype_u
+            The particles.
 
+        Returns
+        -------
+        Efield : np.ndarray
+            The internal E field for each particle.
         """
 
         N = self.nparts
@@ -130,13 +156,19 @@ class penningtrap(ptype):
 
     def eval_f(self, part, t):
         """
-        Routine to compute the E and B fields (named f for consistency with the original PEPC version)
+        Routine to compute the E and B fields (named f for consistency with the original PEPC version).
 
-        Args:
-            part (dtype_u): the particles
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: Fields for the particles (internal and external)
+        Parameters
+        ----------
+        part : dtype_u
+            The particles.
+        t : float
+            Current time of the particles (not used here).
+
+        Returns
+        -------
+        f : dtype_f
+            Fields for the particles (internal and external), i.e., the right-hand side of the problem.
         """
 
         N = self.nparts
@@ -161,10 +193,12 @@ class penningtrap(ptype):
     # TODO : Warning, this should be moved to u_exact(t=0) !
     def u_init(self):
         """
-        Routine to compute the starting values for the particles
+        Routine to compute the starting values for the particles.
 
-        Returns:
-            dtype_u: particle set filled with initial data
+        Returns
+        -------
+        u : dtype_u
+            Particle set filled with initial data.
         """
 
         u0 = self.u0
@@ -220,12 +254,17 @@ class penningtrap(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact trajectory at time t (only for single-particle setup)
+        Routine to compute the exact trajectory at time t (only for single-particle setup).
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: particle type containing the exact position and velocity
+        Parameters
+        ----------
+        t : float
+            Current time of the exact trajectory.
+
+        Returns
+        -------
+        u : dtype_u
+            Particle type containing the exact position and velocity.
         """
 
         # some abbreviations
@@ -268,14 +307,21 @@ class penningtrap(ptype):
 
     def build_f(self, f, part, t):
         """
-        Helper function to assemble the correct right-hand side out of B and E field
+        Helper function to assemble the correct right-hand side out of B and E field.
 
-        Args:
-            f (dtype_f): the field values
-            part (dtype_u): the current particles data
-            t (float): the current time
-        Returns:
-            acceleration: correct RHS of type acceleration
+        Parameters
+        ----------
+        f : dtype_f
+            The field values.
+        part : dtype_u
+            The current particles data.
+        t : float
+            The current time.
+
+        Returns
+        -------
+        rhs : acceleration
+            Correct right-hand side of type acceleration.
         """
 
         if not isinstance(part, particles):
@@ -291,17 +337,26 @@ class penningtrap(ptype):
 
     # noinspection PyTypeChecker
     def boris_solver(self, c, dt, old_fields, new_fields, old_parts):
-        """
-        The actual Boris solver for static (!) B fields, extended by the c-term
+        r"""
+        The actual Boris solver for static (!) B fields, extended by the c-term.
 
-        Args:
-            c (dtype_u): the c term gathering the known values from the previous iteration
-            dt (float): the (probably scaled) time step size
-            old_fields (dtype_f): the field values at the previous node m
-            new_fields (dtype_f): the field values at the current node m+1
-            old_parts (dtype_u): the particles at the previous node m
-        Returns:
-            the velocities at the (m+1)th node
+        Parameters
+        ----------
+        c : dtype_u
+            The c term gathering the known values from the previous iteration.
+        dt : float
+            The (probably scaled) time step size.
+        old_fields : dtype_f
+            The field values at the previous node :math:`m`.
+        new_fields : dtype_f
+            The field values at the current node :math:`m+1`.
+        old_parts : dtype_u
+            The particles at the previous node :math:`m`.
+
+        Returns
+        -------
+        vel : particles
+            The velocities at the :math:`(m+1)`-th node.
         """
 
         N = self.nparts
