@@ -9,30 +9,77 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 
 # noinspection PyUnusedLocal
 class fenics_heat_weak_fullyimplicit(ptype):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation
+    r"""
+    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
-    Attributes:
-        V: function space
-        w: function for weak form
-        a_K: weak form of RHS (incl. BC)
-        M: mass matrix for FEM
-        g: forcing term
-        bc: boundary conditions
+    .. math::
+        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
+
+    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+
+    .. math::
+        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+
+    The exact solution of the problem is
+
+    .. math::
+        u(x, t) = \sin(\pi x)\cos(t).
+
+    In this class the problem is implemented in the way that it is solved in space using FEniCS [1]_. Hence, the problem
+    is reformulated to the *weak formulation*
+
+    .. math:
+        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+
+    Since this is a problem in the *space-time* domain, the solution in space solved by FEniCS is solved in time via SDC.
+    The nonlinear system is solved in an *fully-implicit* way using Dolfin's weak solver provided by the routine
+    `df.NonlinearVariationalSolver`.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Numbers of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of polynomials used to create the function space
+        for the trail and test functions. The default is 'CG', which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. Setting to :math:`1` leads to no refinement.
+    nu : float, optional
+        Diffusion coefficient.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    w : Function
+        Function for the weak form.
+    a_K : scalar, vector, matrix or higher rank tensor
+        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).
+    M : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`\int_\Omega u_t v dx`.
+    g : Expression
+        The forcing term :math:`f` in the heat equation.
+    bc : DirichletBC
+        Denotes the Dirichlet boundary conditions.
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh
     dtype_f = fenics_mesh
 
     def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data type (will be passed to parent class)
-        """
+        """Initialization routine"""
 
         # define the Dirichlet boundary
         def Boundary(x, on_boundary):
@@ -212,30 +259,80 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
 
 class fenics_heat_weak_imex(ptype):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation, IMEX
+    r"""
+    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
-    Attributes:
-        V: function space
-        w: function for weak form
-        a_K: weak form of RHS (incl. BC)
-        M: mass matrix for FEM
-        g: forcing term
-        bc: boundary conditions
+    .. math::
+        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
+
+    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+
+    .. math::
+        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+
+    The exact solution of the problem is
+
+    .. math::
+        u(x, t) = \sin(\pi x)\cos(t).
+
+    In this class the problem is implemented in the way that it is solved in space using FEniCS [1]_. Hence, the problem
+    is reformulated to the *weak formulation*
+
+    .. math:
+        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+
+    Since this is a problem in the *space-time* domain, the solution in space solved by FEniCS is solved in time via SDC.
+    The problem is solved in an *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where
+    it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved
+    implicitly.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Numbers of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of polynomials used to create the function space
+        for the trail and test functions. The default is 'CG', which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. Setting to :math:`1` leads to no refinement.
+    nu : float, optional
+        Diffusion coefficient.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    u : TrialFunction
+        The unknown function of the problem.
+    v : TestFunction
+        The test function for the weak form.
+    a_K : scalar, vector, matrix or higher rank tensor
+        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).
+    M : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`\int_\Omega u_t v dx`.
+    g : Expression
+        The forcing term :math:`f` in the heat equation.
+    bc : DirichletBC
+        Denotes the Dirichlet boundary conditions.
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh
     dtype_f = rhs_fenics_mesh
 
     def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
-        """
+        """Initialization routine"""
 
         # define the Dirichlet boundary
         def Boundary(x, on_boundary):
