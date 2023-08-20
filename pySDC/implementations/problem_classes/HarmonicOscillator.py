@@ -7,14 +7,33 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 
 # noinspection PyUnusedLocal
 class harmonic_oscillator(ptype):
-    """
-    Example implementing the harmonic oscillator
+    r"""
+    Example implementing the harmonic oscillator with mass :math:`1`
+
+    .. math::
+        \frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},
+
+    which is a second-order problem. The unknown function :math:`x` denotes the position of the mass, and their
+    derivative is the velocity. :math:`\mu` defines the damping and :math:`k` is the spring constant.
+
+    Parameters
+    ----------
+    k : float, optional
+        Spring constant :math:`k`.
+    mu : float, optional
+        Damping parameter :math:`\mu`.
+    u0 : tuple, optional
+        Initial condition for the position, and the velocity. Should be a tuple, e.g. (1, 0).
+    phase : float, optional
+        Phase of the oscillation.
+    amp : float, optional
+        Amplitude of the oscillation.
     """
 
     dtype_u = particles
     dtype_f = acceleration
 
-    def __init__(self, k=0, mu=0.0, u0=(1, 0), phase=1.0, amp=0.0):
+    def __init__(self, k=1.0, mu=0.0, u0=(1, 0), phase=0.0, amp=1.0):
         """Initialization routine"""
         # invoke super init, passing nparts, dtype_u and dtype_f
         u0 = np.asarray(u0)
@@ -123,7 +142,7 @@ class harmonic_oscillator(ptype):
         Parameters
         ----------
         u : dtype_u
-            Current values of The particles.
+            Current values of the particles.
 
         Returns
         -------
