@@ -15,7 +15,7 @@ class fenics_grayscott(ptype):
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
-    :math:`u,\, v`. This process is describes by the one-dimensional model using Dirichlet boundary conditions
+    :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions
 
     .. math::
         \frac{d u}{d t} = D_u \Delta u - u v^2 + A (1 - u),
@@ -23,7 +23,7 @@ class fenics_grayscott(ptype):
     .. math::
         \frac{d v}{d t} = D_v \Delta v + u v^2 - B u
 
-    for :math:`x \in \Omega:[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the
+    for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the
     system with a test function :math:`q`:
 
     .. math::
