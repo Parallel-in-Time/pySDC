@@ -31,26 +31,25 @@ class fenics_heat_weak_fullyimplicit(ptype):
     .. math:
         \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
 
-    Since this is a problem in the *space-time* domain, the solution in space solved by FEniCS is solved in time via SDC.
     The nonlinear system is solved in an *fully-implicit* way using Dolfin's weak solver provided by the routine
     `df.NonlinearVariationalSolver`.
 
     Parameters
     ----------
     c_nvars : int, optional
-        Numbers of degrees of freedom in space.
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
     t0 : float, optional
         Starting time.
     family : str, optional
-        Indicates the family of polynomials used to create the function space
+        Indicates the family of elements used to create the function space
         for the trail and test functions. The default is 'CG', which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. Setting to :math:`1` leads to no refinement.
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
     nu : float, optional
-        Diffusion coefficient.
+        Diffusion coefficient :math:`\nu`.
 
     Attributes
     ----------
@@ -177,7 +176,7 @@ class fenics_heat_weak_fullyimplicit(ptype):
         Returns
         -------
         sol : dtype_u
-            The solution as mesh.
+            Solution.
         """
 
         sol = self.dtype_u(self.V)
@@ -248,7 +247,7 @@ class fenics_heat_weak_fullyimplicit(ptype):
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            Exact solution.
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
@@ -281,7 +280,6 @@ class fenics_heat_weak_imex(ptype):
     .. math:
         \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
 
-    Since this is a problem in the *space-time* domain, the solution in space solved by FEniCS is solved in time via SDC.
     The problem is solved in an *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where
     it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved
     implicitly.
@@ -289,19 +287,19 @@ class fenics_heat_weak_imex(ptype):
     Parameters
     ----------
     c_nvars : int, optional
-        Numbers of degrees of freedom in space.
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
     t0 : float, optional
         Starting time.
     family : str, optional
-        Indicates the family of polynomials used to create the function space
+        Indicates the family of elements used to create the function space
         for the trail and test functions. The default is 'CG', which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. Setting to :math:`1` leads to no refinement.
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
     nu : float, optional
-        Diffusion coefficient.
+        Diffusion coefficient :math:`\nu`.
 
     Attributes
     ----------
@@ -425,7 +423,7 @@ class fenics_heat_weak_imex(ptype):
         Returns
         -------
         sol : dtype_u
-            The solution as mesh.
+            Solution.
         """
 
         sol = self.dtype_u(u0)
@@ -513,7 +511,7 @@ class fenics_heat_weak_imex(ptype):
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            Exact solution.
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)

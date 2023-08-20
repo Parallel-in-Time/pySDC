@@ -31,26 +31,25 @@ class fenics_heat(ptype):
     .. math:
         \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
 
-    Since this is a problem in the *space-time* domain, the solution in space solved by FEniCS is solved in time via SDC,
-    where the part containing the forcing term is treated explicitly, where it is interpolated in the function space.
+    The part containing the forcing term is treated explicitly, where it is interpolated in the function space.
     The other part will be treated in an implicit way.
 
     Parameters
     ----------
     c_nvars : int, optional
-        Numbers of degrees of freedom in space.
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
     t0 : float, optional
         Starting time.
     family : str, optional
-        Indicates the family of polynomials used to create the function space
+        Indicates the family of elements used to create the function space
         for the trail and test functions. The default is 'CG', which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. Setting to :math:`1` leads to no refinement.
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
     nu : float, optional
-        Diffusion coefficient.
+        Diffusion coefficient :math:`\nu`.
 
     Attributes
     ----------
@@ -153,7 +152,7 @@ class fenics_heat(ptype):
         Returns
         -------
         u : dtype_u
-            The solution as mesh.
+            Solution.
         """
 
         b = self.apply_mass_matrix(rhs)
@@ -222,7 +221,7 @@ class fenics_heat(ptype):
         Returns
         -------
         f : dtype_f
-            The right-hand side  divided into two parts.
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.V)
@@ -285,7 +284,7 @@ class fenics_heat(ptype):
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            Exact solution.
         """
 
         u0 = df.Expression('cos(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
@@ -318,26 +317,25 @@ class fenics_heat_mass(fenics_heat):
     .. math:
         \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
 
-    Since this is a problem in the *space-time* domain, the solution in space solved by FEniCS is solved in time via SDC.
     The forcing term is treated explicitly, and is expressed via the mass matrix resulting from the left-hand side term
     :math:`\int_\Omega u_t v dx`, and the other part will be treated in an implicit way.
 
     Parameters
     ----------
     c_nvars : int, optional
-        Numbers of degrees of freedom in space.
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
     t0 : float, optional
         Starting time.
     family : str, optional
-        Indicates the family of polynomials used to create the function space
+        Indicates the family of elements used to create the function space
         for the trail and test functions. The default is 'CG', which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. Setting to :math:`1` leads to no refinement.
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
     nu : float, optional
-        Diffusion coefficient.
+        Diffusion coefficient :math:`\nu`.
 
     Attributes
     ----------
@@ -378,7 +376,7 @@ class fenics_heat_mass(fenics_heat):
         Returns
         -------
         u : dtype_u
-            The solution as mesh.
+            Solution.
         """
 
         u = self.dtype_u(u0)
