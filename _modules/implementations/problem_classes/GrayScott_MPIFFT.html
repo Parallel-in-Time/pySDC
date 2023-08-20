@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.GrayScott_MPIFFT &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -49,7 +49,9 @@
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">newDistArray</span>
 
 
-<div class="viewcode-block" id="grayscott_imex_diffusion"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">[docs]</a><span class="k">class</span> <span class="nc">grayscott_imex_diffusion</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="grayscott_imex_diffusion">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">[docs]</a>
+<span class="k">class</span> <span class="nc">grayscott_imex_diffusion</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Gray-Scott equation in 2-3D using mpi4py-fft for solving linear parts,</span>
 <span class="sd">    IMEX time-stepping (implicit diffusion, explicit reaction)</span>
@@ -125,7 +127,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-<div class="viewcode-block" id="grayscott_imex_diffusion.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="grayscott_imex_diffusion.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -168,7 +172,10 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="grayscott_imex_diffusion.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_imex_diffusion.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple FFT solver for the diffusion part.</span>
 
@@ -204,7 +211,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="grayscott_imex_diffusion.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_imex_diffusion.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t=0, see https://www.chebfun.org/examples/pde/GrayScott.html</span>
 
@@ -239,16 +249,22 @@
         <span class="c1"># me[..., 0] = self.fft.forward(tmpu)</span>
         <span class="c1"># me[..., 1] = self.fft.forward(tmpv)</span>
 
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="grayscott_imex_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear">[docs]</a><span class="k">class</span> <span class="nc">grayscott_imex_linear</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_imex_linear">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear">[docs]</a>
+<span class="k">class</span> <span class="nc">grayscott_imex_linear</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span> <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">0.086</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">Du</span><span class="p">,</span> <span class="n">Dv</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">spectral</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span>
 
-<div class="viewcode-block" id="grayscott_imex_linear.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="grayscott_imex_linear.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -289,10 +305,14 @@
             <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
             <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
 
-        <span class="k">return</span> <span class="n">f</span></div></div>
+        <span class="k">return</span> <span class="n">f</span></div>
+</div>
 
 
-<div class="viewcode-block" id="grayscott_mi_diffusion"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion">[docs]</a><span class="k">class</span> <span class="nc">grayscott_mi_diffusion</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_mi_diffusion">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion">[docs]</a>
+<span class="k">class</span> <span class="nc">grayscott_mi_diffusion</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -312,7 +332,9 @@
         <span class="c1"># This may not run in parallel yet..</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
 
-<div class="viewcode-block" id="grayscott_mi_diffusion.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="grayscott_mi_diffusion.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -355,7 +377,10 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="grayscott_mi_diffusion.solve_system_1"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_1">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_mi_diffusion.solve_system_1">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_1">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solver for the first component, can just call the super function.</span>
 
@@ -379,7 +404,10 @@
         <span class="n">me</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_mi_diffusion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="grayscott_mi_diffusion.solve_system_2"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_2">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_mi_diffusion.solve_system_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_2">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Newton-Solver for the second component.</span>
 
@@ -475,10 +503,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpu</span>
             <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpv</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="grayscott_mi_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear">[docs]</a><span class="k">class</span> <span class="nc">grayscott_mi_linear</span><span class="p">(</span><span class="n">grayscott_imex_linear</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_mi_linear">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear">[docs]</a>
+<span class="k">class</span> <span class="nc">grayscott_mi_linear</span><span class="p">(</span><span class="n">grayscott_imex_linear</span><span class="p">):</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -498,7 +530,9 @@
         <span class="c1"># This may not run in parallel yet..</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
 
-<div class="viewcode-block" id="grayscott_mi_linear.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="grayscott_mi_linear.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -541,7 +575,10 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="grayscott_mi_linear.solve_system_1"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_1">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_mi_linear.solve_system_1">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_1">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solver for the first component, can just call the super function.</span>
 
@@ -565,7 +602,10 @@
         <span class="n">me</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_mi_linear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="grayscott_mi_linear.solve_system_2"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_2">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="grayscott_mi_linear.solve_system_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_2">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Newton-Solver for the second component.</span>
 
@@ -661,7 +701,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpu</span>
             <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpv</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -700,7 +742,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

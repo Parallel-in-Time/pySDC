@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.sweeper_classes.Runge_Kutta_Nystrom &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -48,7 +48,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span> <span class="kn">import</span> <span class="n">RungeKutta</span>
 
 
-<div class="viewcode-block" id="RungeKuttaNystrom"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">[docs]</a><span class="k">class</span> <span class="nc">RungeKuttaNystrom</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<div class="viewcode-block" id="RungeKuttaNystrom">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">[docs]</a>
+<span class="k">class</span> <span class="nc">RungeKuttaNystrom</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runge-Kutta scheme that fits the interface of a sweeper.</span>
 <span class="sd">    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions</span>
@@ -120,7 +122,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_bar</span><span class="o">.</span><span class="n">Qmat</span>
 
-<div class="viewcode-block" id="RungeKuttaNystrom.get_full_f"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">[docs]</a>    <span class="k">def</span> <span class="nf">get_full_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<div class="viewcode-block" id="RungeKuttaNystrom.get_full_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_full_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test the right hand side funtion is the correct type</span>
 
@@ -136,7 +140,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Type </span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RungeKuttaNystrom.update_nodes"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKuttaNystrom.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes</span>
 
@@ -197,14 +204,21 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="RungeKuttaNystrom.compute_end_point"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point">[docs]</a>    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKuttaNystrom.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In this Runge-Kutta implementation, the solution to the step is always stored in the last node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RKN"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">[docs]</a><span class="k">class</span> <span class="nc">RKN</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RKN">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">[docs]</a>
+<span class="k">class</span> <span class="nc">RKN</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runge-Kutta-Nystrom method</span>
 <span class="sd">    https://link.springer.com/book/10.1007/978-3-540-78862-1</span>
@@ -231,7 +245,10 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">RKN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Velocity_Verlet"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">[docs]</a><span class="k">class</span> <span class="nc">Velocity_Verlet</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Velocity_Verlet">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">[docs]</a>
+<span class="k">class</span> <span class="nc">Velocity_Verlet</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Velocity-Verlet scheme</span>
 <span class="sd">    https://de.wikipedia.org/wiki/Verlet-Algorithmus</span>
@@ -249,6 +266,7 @@
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;Velocity_verlet&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">Velocity_Verlet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -287,7 +305,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

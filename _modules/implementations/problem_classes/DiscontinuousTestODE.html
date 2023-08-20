@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.DiscontinuousTestODE &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -44,7 +44,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 
 
-<div class="viewcode-block" id="DiscontinuousTestODE"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">[docs]</a><span class="k">class</span> <span class="nc">DiscontinuousTestODE</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="DiscontinuousTestODE">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">[docs]</a>
+<span class="k">class</span> <span class="nc">DiscontinuousTestODE</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements a very simple test case of a ordinary differential equation consisting of one discrete event. The dynamics of</span>
 <span class="sd">    the solution changes when the state function :math:`h(u) := u - 5` changes the sign. The problem is defined by:</span>
@@ -95,7 +97,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">newton_itercount</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="DiscontinuousTestODE.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="DiscontinuousTestODE.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -122,7 +126,10 @@
             <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="DiscontinuousTestODE.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -189,7 +196,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="DiscontinuousTestODE.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t.</span>
 
@@ -220,7 +230,10 @@
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="DiscontinuousTestODE.get_switching_info"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_switching_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.get_switching_info">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_switching_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provides information about the state function of the problem. When the state function changes its sign,</span>
 <span class="sd">        typically an event occurs. So the check for an event should be done in the way that the state function</span>
@@ -258,11 +271,16 @@
         <span class="n">state_function</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">))]</span> <span class="k">if</span> <span class="n">switch_detected</span> <span class="k">else</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="n">switch_detected</span><span class="p">,</span> <span class="n">m_guess</span><span class="p">,</span> <span class="n">state_function</span></div>
 
-<div class="viewcode-block" id="DiscontinuousTestODE.count_switches"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches">[docs]</a>    <span class="k">def</span> <span class="nf">count_switches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiscontinuousTestODE.count_switches">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches">[docs]</a>
+    <span class="k">def</span> <span class="nf">count_switches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter to update the number of switches if one is found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nswitches</span> <span class="o">+=</span> <span class="mi">1</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -301,7 +319,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

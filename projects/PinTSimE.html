@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Parallel-in-time simulation for multi-modal energy systems &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,7 +45,7 @@
           <div class="body" role="main">
             
   <section id="parallel-in-time-simulation-for-multi-modal-energy-systems">
-<h1>Parallel-in-time simulation for multi-modal energy systems<a class="headerlink" href="#parallel-in-time-simulation-for-multi-modal-energy-systems" title="Permalink to this heading">¶</a></h1>
+<h1>Parallel-in-time simulation for multi-modal energy systems<a class="headerlink" href="#parallel-in-time-simulation-for-multi-modal-energy-systems" title="Link to this heading">¶</a></h1>
 <p>This project deals with the parallel-in-time simulation of energy systems. Components of, for example, an DC-DC microgrid are:</p>
 <blockquote>
 <div><ul class="simple">
@@ -61,24 +61,24 @@ SDC can now be restarted with a new step size such that the event occurs on the 
 <p>The switch estimator is not restricted to application in the field of power system modelling but also intended to use it in other fields where discrete events occur in the solution, and the time point of the events are not known.
 Thus, in this project also some other experiments regarding discontinuity handling can be found.</p>
 <section id="what-are-switching-processes-in-power-systems">
-<h2>What are switching processes in power systems?<a class="headerlink" href="#what-are-switching-processes-in-power-systems" title="Permalink to this heading">¶</a></h2>
+<h2>What are switching processes in power systems?<a class="headerlink" href="#what-are-switching-processes-in-power-systems" title="Link to this heading">¶</a></h2>
 <p>Buck converters emulate the power consumption behavior of a household. They convert a large input voltage into a smaller target output voltage, which is done by multiple switchings. In each step, the actual output value will be compared with a target output voltage. Based on the error, the duty cycle is recalculated to control the switching process.
 Here, the switching is typically down after a fixed number of time steps.
 The battery drain model is not a component in a microgrid, but rather a test case to investigate how SDC behaves with a discontinuity.
 Here, the discontinuity depends on the system dynamics itself and the time point of the event is not known. Below a more detailed explanation of the battery draining model is provided.</p>
 </section>
 <section id="pi-line">
-<h2>Pi-line<a class="headerlink" href="#pi-line" title="Permalink to this heading">¶</a></h2>
+<h2>Pi-line<a class="headerlink" href="#pi-line" title="Link to this heading">¶</a></h2>
 <p>The plot below shows the simulation of the pi-line model. There can be seen the two voltages along the capacitor and the current along the coil. Both the voltages and the current settle down over the time. As a background information: the pi-line model serves as transmission line, which transports the energy. The behavior which can be seen in the plot is what we would expect.</p>
 <a class="reference internal image-reference" href="../_images/piline_model_solution.png"><img alt="../_images/piline_model_solution.png" class="align-center" src="../_images/piline_model_solution.png" style="width: 35%;" /></a>
 </section>
 <section id="buck-converter">
-<h2>Buck converter<a class="headerlink" href="#buck-converter" title="Permalink to this heading">¶</a></h2>
+<h2>Buck converter<a class="headerlink" href="#buck-converter" title="Link to this heading">¶</a></h2>
 <p>In the test case of the buck converter there are multiple switches in the considered time domain. In the so-called open-loop control, a controller monitors the actual output voltage. It compares the output with a target output voltage. Regularly, after a fixed number of time steps, the duty cycle to control the switching is recalculated based on the error. The simulation illustrates the switching behavior in the simulation: The voltage values settle down between the reference.</p>
 <a class="reference internal image-reference" href="../_images/buck_model_solution.png"><img alt="../_images/buck_model_solution.png" class="align-center" src="../_images/buck_model_solution.png" style="width: 35%;" /></a>
 </section>
 <section id="battery-drain-model">
-<h2>Battery drain model<a class="headerlink" href="#battery-drain-model" title="Permalink to this heading">¶</a></h2>
+<h2>Battery drain model<a class="headerlink" href="#battery-drain-model" title="Link to this heading">¶</a></h2>
 <p>This model is a simple example for system internal switching, which means switching depends on system dynamics.
 When the capacitor voltage drops below the reference value, the circuit switches to the voltage source.
 An illustration of the process is clarified in the plot below: The capacitor voltage drops down, and after switching the voltage value along the capacitor no longer changes.</p>
@@ -158,7 +158,7 @@ An illustration of the process is clarified in the plot below: The capacitor vol
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

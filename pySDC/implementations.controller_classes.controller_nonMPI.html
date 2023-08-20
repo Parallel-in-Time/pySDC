@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.controller_classes.controller_nonMPI module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,16 +46,16 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.controller_classes.controller_nonMPI">
-<span id="implementations-controller-classes-controller-nonmpi-module"></span><h1>implementations.controller_classes.controller_nonMPI module<a class="headerlink" href="#module-implementations.controller_classes.controller_nonMPI" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-controller-classes-controller-nonmpi-module">
+<h1>implementations.controller_classes.controller_nonMPI module<a class="headerlink" href="#implementations-controller-classes-controller-nonmpi-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.controller_classes.controller_nonMPI">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">controller_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">controller_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">controller</span></code></p>
 <p>PFASST controller, running serialized version of PFASST in blocks (MG-style)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">
-<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default" title="Link to this definition">¶</a></dt>
 <dd><p>Default routine to catch wrong status</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -66,7 +66,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check">
-<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check" title="Link to this definition">¶</a></dt>
 <dd><p>Key routine to check for convergence/termination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -77,7 +77,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse">
-<span class="sig-name descname"><span class="pre">it_coarse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_coarse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">it_coarse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_coarse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse" title="Link to this definition">¶</a></dt>
 <dd><p>Coarse sweep</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -88,7 +88,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down">
-<span class="sig-name descname"><span class="pre">it_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">it_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down" title="Link to this definition">¶</a></dt>
 <dd><p>Go down the hierarchy from finest to coarsest level</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -99,7 +99,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">
-<span class="sig-name descname"><span class="pre">it_fine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_fine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">it_fine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_fine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine" title="Link to this definition">¶</a></dt>
 <dd><p>Fine sweeps</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -110,7 +110,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up">
-<span class="sig-name descname"><span class="pre">it_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">it_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up" title="Link to this definition">¶</a></dt>
 <dd><p>Prolong corrections up to finest level (parallel)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -121,7 +121,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst">
-<span class="sig-name descname"><span class="pre">pfasst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_active</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.pfasst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">pfasst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_active</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.pfasst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst" title="Link to this definition">¶</a></dt>
 <dd><p>Main function including the stages of SDC, MLSDC and PFASST (the “controller”)</p>
 <p>For the workflow of this controller, check out one of our PFASST talks or the pySDC paper</p>
 <p>This method changes self.MS directly by accessing active steps through local_MS_active. Nothing is returned.</p>
@@ -134,7 +134,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict" title="Link to this definition">¶</a></dt>
 <dd><p>Predictor phase</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -145,7 +145,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full">
-<span class="sig-name descname"><span class="pre">recv_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.recv_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">recv_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.recv_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full" title="Link to this definition">¶</a></dt>
 <dd><p>Function to perform the recv, including bookkeeping and logging</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -160,7 +160,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">
-<span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block" title="Link to this definition">¶</a></dt>
 <dd><p>Helper routine to reset/restart block of (active) steps</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -175,7 +175,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run" title="Link to this definition">¶</a></dt>
 <dd><p>Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -194,7 +194,7 @@ stats object containing statistics for each step, each level and each iteration<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full">
-<span class="sig-name descname"><span class="pre">send_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.send_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">send_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.send_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full" title="Link to this definition">¶</a></dt>
 <dd><p>Function to perform the send, including bookkeeping and logging</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -209,7 +209,7 @@ stats object containing statistics for each step, each level and each iteration<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">
-<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread" title="Link to this definition">¶</a></dt>
 <dd><p>Spreading phase</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -308,7 +308,7 @@ stats object containing statistics for each step, each level and each iteration<
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

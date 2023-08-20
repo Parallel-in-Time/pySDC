@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.problem_classes.Boussinesq_2D_FD_imex module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -47,11 +47,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.problem_classes.Boussinesq_2D_FD_imex">
-<span id="implementations-problem-classes-boussinesq-2d-fd-imex-module"></span><h1>implementations.problem_classes.Boussinesq_2D_FD_imex module<a class="headerlink" href="#module-implementations.problem_classes.Boussinesq_2D_FD_imex" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-problem-classes-boussinesq-2d-fd-imex-module">
+<h1>implementations.problem_classes.Boussinesq_2D_FD_imex module<a class="headerlink" href="#implementations-problem-classes-boussinesq-2d-fd-imex-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.problem_classes.Boussinesq_2D_FD_imex">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boussinesq_2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_adv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nfreq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_upw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_tol_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boussinesq_2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_adv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nfreq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_upw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmres_tol_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>This class implements the two-dimensional Boussinesq equations for different boundary conditions with</p>
 <div class="math notranslate nohighlight">
@@ -82,7 +82,7 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N">
-<span class="sig-name descname"><span class="pre">N</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.N" title="Link to this definition">¶</a></dt>
 <dd><p>List of number of unknowns nvars.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -93,7 +93,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_hor">
-<span class="sig-name descname"><span class="pre">bc_hor</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_hor" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">bc_hor</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_hor" title="Link to this definition">¶</a></dt>
 <dd><p>Contains type of boundary conditions for both boundaries for both dimensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -104,13 +104,13 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver">
-<span class="sig-name descname"><span class="pre">bc_ver</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">bc_ver</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver" title="Link to this definition">¶</a></dt>
 <dd><p>Contains type of boundary conditions for both boundaries for both dimemsions, e.g. ‘neumann’ or ‘dirichlet’.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx">
-<span class="sig-name descname"><span class="pre">xx</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xx</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx" title="Link to this definition">¶</a></dt>
 <dd><p>List of np.ndarrays for mesh in x-direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -121,7 +121,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.zz">
-<span class="sig-name descname"><span class="pre">zz</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.zz" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">zz</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.zz" title="Link to this definition">¶</a></dt>
 <dd><p>List of np.ndarrays for mesh in z-direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -132,7 +132,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.h">
-<span class="sig-name descname"><span class="pre">h</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.h" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">h</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.h" title="Link to this definition">¶</a></dt>
 <dd><p>Mesh size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -143,7 +143,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id">
-<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id" title="Link to this definition">¶</a></dt>
 <dd><p>Identity matrix for the equation of appropriate size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -154,7 +154,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.M">
-<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.M" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.M" title="Link to this definition">¶</a></dt>
 <dd><p>Boussinesq 2D Matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -165,7 +165,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.D_upwind">
-<span class="sig-name descname"><span class="pre">D_upwind</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.D_upwind" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">D_upwind</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.D_upwind" title="Link to this definition">¶</a></dt>
 <dd><p>Boussinesq 2D Upwind matrix for discretization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -176,7 +176,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger">
-<span class="sig-name descname"><span class="pre">gmres_logger</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gmres_logger</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger" title="Link to this definition">¶</a></dt>
 <dd><p>Logger for GMRES solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -195,19 +195,19 @@
 </aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_f" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_u" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.dtype_u" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to evaluate both parts of the RHS</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -227,7 +227,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I - factor A) \vec{u} = \vec{rhs}\)</span> using GMRES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -249,7 +249,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact">
-<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -356,7 +356,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

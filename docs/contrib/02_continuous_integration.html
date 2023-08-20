@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Continuous Integration in pySDC &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -37,12 +37,12 @@
           <div class="body" role="main">
             
   <section id="continuous-integration-in-pysdc">
-<span id="docs-contrib-02-continuous-integration-continuous-integration-in-pysdc"></span><h1>Continuous Integration in pySDC<a class="headerlink" href="#continuous-integration-in-pysdc" title="Permalink to this heading">¶</a></h1>
+<span id="docs-contrib-02-continuous-integration-continuous-integration-in-pysdc"></span><h1>Continuous Integration in pySDC<a class="headerlink" href="#continuous-integration-in-pysdc" title="Link to this heading">¶</a></h1>
 <p>Any commit in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> are tested by GitHub continuous integration (CI). You can see in in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">action panel</a> the tests for each branches.
 Those tests are currently divided in three main categories : <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting"><span class="std std-ref">code linting</span></a>, <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing</span></a> and <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-coverage"><span class="std std-ref">code coverage</span></a>.
 Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation"><span class="std std-ref">documentation generation</span></a> section.</p>
 <section id="code-linting">
-<span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Link to this heading">¶</a></h2>
 <p>Code style linting is performed using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a> and <a class="reference external" href="https://flakeheaven.readthedocs.io/en/latest/">flakeheaven</a> for code syntax checking. In particular, <code class="docutils literal notranslate"><span class="pre">black</span></code> is used to check compliance with (most of) <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>.</p>
 <p>Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> before pushing any commit :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
@@ -114,7 +114,7 @@ To obtain this functionality, add the following to <code class="docutils literal
 This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.</p>
 </section>
 <section id="code-testing">
-<span id="docs-contrib-02-continuous-integration-code-testing"></span><h2>Code testing<a class="headerlink" href="#code-testing" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-02-continuous-integration-code-testing"></span><h2>Code testing<a class="headerlink" href="#code-testing" title="Link to this heading">¶</a></h2>
 <p>This is done using <a class="reference external" href="https://docs.pytest.org/en/7.2.x/">pytest</a>, and runs all the tests written in the <code class="docutils literal notranslate"><span class="pre">pySDC/tests</span></code> folder. You can run those locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> using :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
 pip<span class="w"> </span>install<span class="w"> </span>pytest&lt;<span class="m">7</span>.2.0<span class="w"> </span>pytest-benchmark<span class="w"> </span>coverage<span class="o">[</span>toml<span class="o">]</span>
@@ -131,7 +131,7 @@ When working on a single part of the code, you can run only the corresponding pa
 </div></blockquote>
 </section>
 <section id="code-coverage">
-<span id="docs-contrib-02-continuous-integration-code-coverage"></span><h2>Code coverage<a class="headerlink" href="#code-coverage" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-02-continuous-integration-code-coverage"></span><h2>Code coverage<a class="headerlink" href="#code-coverage" title="Link to this heading">¶</a></h2>
 <p>This stage allows to checks how much of the <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> code is tested by the previous stage. It is based on the <a class="reference external" href="https://pypi.org/project/coverage/">coverage</a> library and currently applied to the following directories :</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pySDC/core</span></code></p></li>
@@ -158,7 +158,7 @@ python<span class="w"> </span>-m<span class="w"> </span>coverage<span class="w">
 <div><p>⚠️ Coverage can be lower if some tests fails (for instance, if you did not install all required python package to run all the tests).</p>
 </div></blockquote>
 <section id="coverage-exceptions">
-<span id="docs-contrib-02-continuous-integration-coverage-exceptions"></span><h3>Coverage exceptions<a class="headerlink" href="#coverage-exceptions" title="Permalink to this heading">¶</a></h3>
+<span id="docs-contrib-02-continuous-integration-coverage-exceptions"></span><h3>Coverage exceptions<a class="headerlink" href="#coverage-exceptions" title="Link to this heading">¶</a></h3>
 <p>Some types of code lines will be ignored by the coverage analysis (<em>e.g</em> lines starting with <code class="docutils literal notranslate"><span class="pre">raise</span></code>, …), see the <code class="docutils literal notranslate"><span class="pre">[tool.coverage.report]</span></code> section in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.
 Part of code (functions, conditionaly, for loops, etc …) can be ignored by coverage analysis using the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">no</span> <span class="pre">cover</span></code>, for instance</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
@@ -182,7 +182,7 @@ Part of code (functions, conditionaly, for loops, etc …) can be ignored by cov
 </section>
 </section>
 <section id="documentation-generation">
-<span id="docs-contrib-02-continuous-integration-documentation-generation"></span><h2>Documentation generation<a class="headerlink" href="#documentation-generation" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-02-continuous-integration-documentation-generation"></span><h2>Documentation generation<a class="headerlink" href="#documentation-generation" title="Link to this heading">¶</a></h2>
 <p>Documentation is built using <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a>.
 To check its generation, you can wait for all the CI tasks to download the <code class="docutils literal notranslate"><span class="pre">docs</span></code> artifacts, unzip it and open the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file there with you favorite browser.</p>
 <p>However, when you are working on documentation (of the project, of the code, etc …), you can already build and check the website locally :</p>
@@ -265,7 +265,7 @@ This approach can be considered for local testing of your contribution when it d
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

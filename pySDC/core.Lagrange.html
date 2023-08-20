@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>core.Lagrange module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,11 +46,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-core.Lagrange">
-<span id="core-lagrange-module"></span><h1>core.Lagrange module<a class="headerlink" href="#module-core.Lagrange" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="core-lagrange-module">
+<h1>core.Lagrange module<a class="headerlink" href="#core-lagrange-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-core.Lagrange">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LagrangeApproximation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LagrangeApproximation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class approximating any function on a given set of points using barycentric
 Lagrange interpolation.</p>
@@ -73,7 +73,7 @@ ordered in increasing order.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.points">
-<span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.points" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.points" title="Link to this definition">¶</a></dt>
 <dd><p>The interpolating points</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -84,7 +84,7 @@ ordered in increasing order.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.weights" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.weights" title="Link to this definition">¶</a></dt>
 <dd><p>The associated barycentric weights</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -95,7 +95,7 @@ ordered in increasing order.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.getIntegrationMatrix">
-<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the integration matrix for a given set of intervals.</p>
 <p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
 <span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> values, and
@@ -138,7 +138,7 @@ and <span class="math notranslate nohighlight">\(n\)</span> columns.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.getInterpolationMatrix">
-<span class="sig-name descname"><span class="pre">getInterpolationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getInterpolationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getInterpolationMatrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getInterpolationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getInterpolationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getInterpolationMatrix" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the interpolation matrix for a given set of discrete “time”
 points.</p>
 <p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
@@ -166,14 +166,14 @@ parameter) and <span class="math notranslate nohighlight">\(n\)</span> columns.<
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.n">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.n" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.n" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="core.Lagrange.computeFejerRule">
-<span class="sig-name descname"><span class="pre">computeFejerRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#computeFejerRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.computeFejerRule" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">computeFejerRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#computeFejerRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.computeFejerRule" title="Link to this definition">¶</a></dt>
 <dd><p>Compute a Fejer rule of the first kind, using DFT (Waldvogel 2006)
 Inspired from quadpy (<a class="reference external" href="https://github.com/nschloe/quadpy">https://github.com/nschloe/quadpy</a> &#64;Nico_Schlömer)</p>
 <dl class="field-list simple">
@@ -270,7 +270,7 @@ Inspired from quadpy (<a class="reference external" href="https://github.com/nsc
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

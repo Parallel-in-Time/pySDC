@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.NonlinearSchroedinger_MPIFFT &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -51,7 +51,9 @@
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">newDistArray</span>
 
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">[docs]</a><span class="k">class</span> <span class="nc">nonlinearschroedinger_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_imex">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">[docs]</a>
+<span class="k">class</span> <span class="nc">nonlinearschroedinger_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the nonlinear Schrödinger equation in 2-3D using mpi4py-fft for solving linear parts,</span>
 <span class="sd">    IMEX time-stepping</span>
@@ -123,7 +125,9 @@
         <span class="c1"># work counters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_imex.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -157,7 +161,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nonlinearschroedinger_imex.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple FFT solver for the diffusion part.</span>
 
@@ -189,7 +196,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="nonlinearschroedinger_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nonlinearschroedinger_imex.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t, see (1.3) https://arxiv.org/pdf/nlin/0702010.pdf for details</span>
 
@@ -225,10 +235,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">nls_exact_1D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit">[docs]</a><span class="k">class</span> <span class="nc">nonlinearschroedinger_fully_implicit</span><span class="p">(</span><span class="n">nonlinearschroedinger_imex</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit">[docs]</a>
+<span class="k">class</span> <span class="nc">nonlinearschroedinger_fully_implicit</span><span class="p">(</span><span class="n">nonlinearschroedinger_imex</span><span class="p">):</span>
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
@@ -238,7 +252,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
-<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -270,7 +286,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nonlinearschroedinger_fully_implicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solve the nonlinear system `(1 - factor * f)(u) = rhs` using a scipy Newton-Krylov solver.</span>
 <span class="sd">        See this page for details on the solver: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html</span>
@@ -318,7 +337,9 @@
             <span class="n">sol</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">sol</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -357,7 +378,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

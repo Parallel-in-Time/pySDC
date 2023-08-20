@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.acoustic_helpers.standard_integrators &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -48,7 +48,9 @@
 <span class="c1">#</span>
 <span class="c1"># Runge-Kutta IMEX methods of order 1 to 3</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="rk_imex"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex">[docs]</a><span class="k">class</span> <span class="nc">rk_imex</span><span class="p">:</span>
+<div class="viewcode-block" id="rk_imex">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex">[docs]</a>
+<span class="k">class</span> <span class="nc">rk_imex</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M_fast</span><span class="p">,</span> <span class="n">M_slow</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M_fast</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M_fast</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;A_fast must be square&quot;</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M_slow</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M_slow</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;A_slow must be square&quot;</span>
@@ -244,7 +246,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">stages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndof</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="rk_imex.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<div class="viewcode-block" id="rk_imex.timestep">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.timestep">[docs]</a>
+    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="c1"># Solve for stages</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">):</span>
             <span class="c1"># Construct RHS</span>
@@ -269,58 +273,86 @@
 
         <span class="k">return</span> <span class="n">u0</span></div>
 
-<div class="viewcode-block" id="rk_imex.f_slow"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_slow">[docs]</a>    <span class="k">def</span> <span class="nf">f_slow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+
+<div class="viewcode-block" id="rk_imex.f_slow">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_slow">[docs]</a>
+    <span class="k">def</span> <span class="nf">f_slow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">M_slow</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="rk_imex.f_fast"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast">[docs]</a>    <span class="k">def</span> <span class="nf">f_fast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+
+<div class="viewcode-block" id="rk_imex.f_fast">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast">[docs]</a>
+    <span class="k">def</span> <span class="nf">f_fast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">M_fast</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="rk_imex.f_fast_solve"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast_solve">[docs]</a>    <span class="k">def</span> <span class="nf">f_fast_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+
+<div class="viewcode-block" id="rk_imex.f_fast_solve">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex.f_fast_solve">[docs]</a>
+    <span class="k">def</span> <span class="nf">f_fast_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndof</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M_fast</span>
-        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="c1">#</span>
 <span class="c1"># Trapezoidal rule</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="trapezoidal"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal">[docs]</a><span class="k">class</span> <span class="nc">trapezoidal</span><span class="p">:</span>
+<div class="viewcode-block" id="trapezoidal">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal">[docs]</a>
+<span class="k">class</span> <span class="nc">trapezoidal</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Matrix M must be quadratic&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
 
-<div class="viewcode-block" id="trapezoidal.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<div class="viewcode-block" id="trapezoidal.timestep">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.trapezoidal.timestep">[docs]</a>
+    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">M_trap</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
         <span class="n">B_trap</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">B_trap</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">M_trap</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">M_trap</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="c1">#</span>
 <span class="c1"># A BDF-2 implicit two-step method</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="bdf2"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2">[docs]</a><span class="k">class</span> <span class="nc">bdf2</span><span class="p">:</span>
+<div class="viewcode-block" id="bdf2">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2">[docs]</a>
+<span class="k">class</span> <span class="nc">bdf2</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Matrix M must be quadratic&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M</span>
 
-<div class="viewcode-block" id="bdf2.firsttimestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.firsttimestep">[docs]</a>    <span class="k">def</span> <span class="nf">firsttimestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<div class="viewcode-block" id="bdf2.firsttimestep">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.firsttimestep">[docs]</a>
+    <span class="k">def</span> <span class="nf">firsttimestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">u0</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
         <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="bdf2.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">um1</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+
+<div class="viewcode-block" id="bdf2.timestep">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.timestep">[docs]</a>
+    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">um1</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">um1</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
-        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="c1">#</span>
 <span class="c1"># A diagonally implicit Runge-Kutta method of order 2, 3 or 4</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="dirk"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">[docs]</a><span class="k">class</span> <span class="nc">dirk</span><span class="p">:</span>
+<div class="viewcode-block" id="dirk">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">[docs]</a>
+<span class="k">class</span> <span class="nc">dirk</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Matrix M must be quadratic&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">M</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -422,7 +454,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">stages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="dirk.timestep"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.timestep">[docs]</a>    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<div class="viewcode-block" id="dirk.timestep">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.timestep">[docs]</a>
+    <span class="k">def</span> <span class="nf">timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">uend</span> <span class="o">=</span> <span class="n">u0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstages</span><span class="p">):</span>
             <span class="n">b</span> <span class="o">=</span> <span class="n">u0</span>
@@ -439,18 +473,26 @@
 
         <span class="k">return</span> <span class="n">uend</span></div>
 
+
     <span class="c1">#</span>
     <span class="c1"># Returns f(u) = c*u</span>
     <span class="c1">#</span>
-<div class="viewcode-block" id="dirk.f"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f">[docs]</a>    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<div class="viewcode-block" id="dirk.f">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f">[docs]</a>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span></div>
+
 
     <span class="c1">#</span>
     <span class="c1"># Solves (Id - alpha*c)*u = b for u</span>
     <span class="c1">#</span>
-<div class="viewcode-block" id="dirk.f_solve"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f_solve">[docs]</a>    <span class="k">def</span> <span class="nf">f_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+<div class="viewcode-block" id="dirk.f_solve">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk.f_solve">[docs]</a>
+    <span class="k">def</span> <span class="nf">f_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndof</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
-        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">LA</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -489,7 +531,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>core.Level &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -75,7 +75,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="level"><a class="viewcode-back" href="../../pySDC/core.Level.html#core.Level.level">[docs]</a><span class="k">class</span> <span class="nc">level</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+<div class="viewcode-block" id="level">
+<a class="viewcode-back" href="../../pySDC/core.Level.html#core.Level.level">[docs]</a>
+<span class="k">class</span> <span class="nc">level</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Level class containing all management functionality for a single level</span>
 
@@ -135,7 +137,9 @@
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
-<div class="viewcode-block" id="level.reset_level"><a class="viewcode-back" href="../../pySDC/core.Level.html#core.Level.level.reset_level">[docs]</a>    <span class="k">def</span> <span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_status</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="level.reset_level">
+<a class="viewcode-back" href="../../pySDC/core.Level.html#core.Level.level.reset_level">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_status</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to clean-up the level for the next time step</span>
 
@@ -157,6 +161,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -217,6 +222,7 @@
 <span class="sd">            t: new tag for sending/receiving</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tag</span> <span class="o">=</span> <span class="n">t</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -255,7 +261,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.GrayScott_2D_PETSc_periodic &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -44,7 +44,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.petsc_vec</span> <span class="kn">import</span> <span class="n">petsc_vec</span><span class="p">,</span> <span class="n">petsc_vec_imex</span><span class="p">,</span> <span class="n">petsc_vec_comp2</span>
 
 
-<div class="viewcode-block" id="GS_full"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">[docs]</a><span class="k">class</span> <span class="nc">GS_full</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="GS_full">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">[docs]</a>
+<span class="k">class</span> <span class="nc">GS_full</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -68,7 +70,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="n">dy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">localX</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">createLocalVec</span><span class="p">()</span>
 
-<div class="viewcode-block" id="GS_full.formFunction"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction">[docs]</a>    <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<div class="viewcode-block" id="GS_full.formFunction">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction">[docs]</a>
+    <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to evaluate the residual for the Newton solver</span>
 
@@ -112,7 +116,10 @@
                     <span class="p">)</span>
                 <span class="p">)</span></div>
 
-<div class="viewcode-block" id="GS_full.formJacobian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian">[docs]</a>    <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GS_full.formJacobian">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian">[docs]</a>
+    <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to return the Jacobian matrix</span>
 
@@ -193,10 +200,14 @@
         <span class="n">P</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">J</span> <span class="o">!=</span> <span class="n">P</span><span class="p">:</span>
             <span class="n">J</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>  <span class="c1"># matrix-free operator</span>
-        <span class="k">return</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">SAME_NONZERO_PATTERN</span></div></div>
+        <span class="k">return</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">SAME_NONZERO_PATTERN</span></div>
+</div>
 
 
-<div class="viewcode-block" id="GS_reaction"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">[docs]</a><span class="k">class</span> <span class="nc">GS_reaction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GS_reaction">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">[docs]</a>
+<span class="k">class</span> <span class="nc">GS_reaction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -216,7 +227,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">localX</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">createLocalVec</span><span class="p">()</span>
 
-<div class="viewcode-block" id="GS_reaction.formFunction"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction">[docs]</a>    <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<div class="viewcode-block" id="GS_reaction.formFunction">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction">[docs]</a>
+    <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to evaluate the residual for the Newton solver</span>
 
@@ -241,7 +254,10 @@
                 <span class="p">)</span>
                 <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span></div>
 
-<div class="viewcode-block" id="GS_reaction.formJacobian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian">[docs]</a>    <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GS_reaction.formJacobian">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian">[docs]</a>
+    <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to return the Jacobian matrix</span>
 
@@ -280,10 +296,14 @@
         <span class="n">P</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">J</span> <span class="o">!=</span> <span class="n">P</span><span class="p">:</span>
             <span class="n">J</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>  <span class="c1"># matrix-free operator</span>
-        <span class="k">return</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">SAME_NONZERO_PATTERN</span></div></div>
+        <span class="k">return</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">SAME_NONZERO_PATTERN</span></div>
+</div>
 
 
-<div class="viewcode-block" id="petsc_grayscott_multiimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit">[docs]</a><span class="k">class</span> <span class="nc">petsc_grayscott_multiimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">petsc_grayscott_multiimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -465,7 +485,9 @@
 
         <span class="k">return</span> <span class="n">Id</span>
 
-<div class="viewcode-block" id="petsc_grayscott_multiimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -489,7 +511,10 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_1"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_1">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Linear solver for (I-factor*A)u = rhs</span>
 
@@ -512,7 +537,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_2"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nonlinear solver for (I-factor*F)(u) = rhs</span>
 
@@ -541,7 +569,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="petsc_grayscott_multiimplicit.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t</span>
 
@@ -565,17 +596,23 @@
                     <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">100</span><span class="p">),</span> <span class="mi">100</span>
                 <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="petsc_grayscott_fullyimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit">[docs]</a><span class="k">class</span> <span class="nc">petsc_grayscott_fullyimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_fullyimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">petsc_grayscott_fullyimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec</span>
 
-<div class="viewcode-block" id="petsc_grayscott_fullyimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="petsc_grayscott_fullyimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -599,7 +636,10 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="petsc_grayscott_fullyimplicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_fullyimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nonlinear solver for (I-factor*F)(u) = rhs</span>
 
@@ -627,17 +667,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">snes_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="petsc_grayscott_semiimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit">[docs]</a><span class="k">class</span> <span class="nc">petsc_grayscott_semiimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_semiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">petsc_grayscott_semiimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec_imex</span>
 
-<div class="viewcode-block" id="petsc_grayscott_semiimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="petsc_grayscott_semiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -661,7 +707,10 @@
 
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="petsc_grayscott_semiimplicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="petsc_grayscott_semiimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Linear solver for (I-factor*A)u = rhs</span>
 
@@ -682,7 +731,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ksp_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -721,7 +772,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

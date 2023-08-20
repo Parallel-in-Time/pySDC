@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Step-1: A first spatial problem &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,11 +45,11 @@
           <div class="body" role="main">
             
   <section id="step-1-a-first-spatial-problem">
-<h1>Step-1: A first spatial problem<a class="headerlink" href="#step-1-a-first-spatial-problem" title="Permalink to this heading">¶</a></h1>
+<h1>Step-1: A first spatial problem<a class="headerlink" href="#step-1-a-first-spatial-problem" title="Link to this heading">¶</a></h1>
 <p>In this step, we create a spatial problem and play with it a little bit.
 No SDC, no multi-level here so far.</p>
 <section id="part-a-spatial-problem-setup">
-<h2>Part A: Spatial problem setup<a class="headerlink" href="#part-a-spatial-problem-setup" title="Permalink to this heading">¶</a></h2>
+<h2>Part A: Spatial problem setup<a class="headerlink" href="#part-a-spatial-problem-setup" title="Link to this heading">¶</a></h2>
 <p>We start as simple as possible by creating a first, very simple problem
 using one of the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>, namely <code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD</span></code>.
 This basically consists only of the matrix <code class="docutils literal notranslate"><span class="pre">A</span></code>, which represents a
@@ -144,7 +144,7 @@ instantiate things within subroutines</p></li>
 </div>
 </section>
 <section id="part-b-spatial-accuracy-check">
-<h2>Part B: Spatial accuracy check<a class="headerlink" href="#part-b-spatial-accuracy-check" title="Permalink to this heading">¶</a></h2>
+<h2>Part B: Spatial accuracy check<a class="headerlink" href="#part-b-spatial-accuracy-check" title="Link to this heading">¶</a></h2>
 <p>We now do a more thorough test of the accuracy of the spatial
 discretization. We loop over a set of <code class="docutils literal notranslate"><span class="pre">nvars</span></code>, compute the Laplacian
 of our test vector and look at the error. Then, the order of accuracy in
@@ -364,7 +364,7 @@ the data! Also, use headers to store meta-information.</p></li>
 <a class="reference internal image-reference" href="../_images/step_1_accuracy_test_space.png"><img alt="../_images/step_1_accuracy_test_space.png" src="../_images/step_1_accuracy_test_space.png" style="width: 513.5px; height: 343.0px;" /></a>
 </section>
 <section id="part-c-collocation-problem-setup">
-<h2>Part C: Collocation problem setup<a class="headerlink" href="#part-c-collocation-problem-setup" title="Permalink to this heading">¶</a></h2>
+<h2>Part C: Collocation problem setup<a class="headerlink" href="#part-c-collocation-problem-setup" title="Link to this heading">¶</a></h2>
 <p>Here, we set up our first collocation problem using one of the
 <code class="docutils literal notranslate"><span class="pre">collocation_classes</span></code>, namely <code class="docutils literal notranslate"><span class="pre">GaussRadau_Right</span></code>. Using the spatial
 operator, we can build the <strong>collocation problem</strong> which in this case is
@@ -472,7 +472,7 @@ space is fine? …</p></li>
 </div>
 </section>
 <section id="part-d-collocation-accuracy-test">
-<h2>Part D: Collocation accuracy test<a class="headerlink" href="#part-d-collocation-accuracy-test" title="Permalink to this heading">¶</a></h2>
+<h2>Part D: Collocation accuracy test<a class="headerlink" href="#part-d-collocation-accuracy-test" title="Link to this heading">¶</a></h2>
 <p>As for the spatial operator, we now test the accuracy in time. This
 time, we loop over a set of <code class="docutils literal notranslate"><span class="pre">dt</span></code>, compute the solution to the
 collocation problem and look at the error.</p>
@@ -769,7 +769,7 @@ compute 0 very, very thoroughly…</p></li>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

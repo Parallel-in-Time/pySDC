@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -47,7 +47,9 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="getBoussinesq2DUpwindMatrix"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix">[docs]</a><span class="k">def</span> <span class="nf">getBoussinesq2DUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u_adv</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<div class="viewcode-block" id="getBoussinesq2DUpwindMatrix">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix">[docs]</a>
+<span class="k">def</span> <span class="nf">getBoussinesq2DUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u_adv</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="n">Dx</span> <span class="o">=</span> <span class="n">get2DUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
     <span class="c1"># Note: In the equations it is u_t + u_adv* D_x u = ... so in order to comply with the form u_t = M u,</span>
@@ -63,7 +65,10 @@
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="getBoussinesq2DMatrix"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DMatrix">[docs]</a><span class="k">def</span> <span class="nf">getBoussinesq2DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">,</span> <span class="n">c_s</span><span class="p">,</span> <span class="n">Nfreq</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+
+<div class="viewcode-block" id="getBoussinesq2DMatrix">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DMatrix">[docs]</a>
+<span class="k">def</span> <span class="nf">getBoussinesq2DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">,</span> <span class="n">c_s</span><span class="p">,</span> <span class="n">Nfreq</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
     <span class="n">Dx_u</span><span class="p">,</span> <span class="n">Dz_u</span> <span class="o">=</span> <span class="n">get2DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bc_ver</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">order</span><span class="p">)</span>
     <span class="n">Dx_w</span><span class="p">,</span> <span class="n">Dz_w</span> <span class="o">=</span> <span class="n">get2DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bc_ver</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">order</span><span class="p">)</span>
     <span class="c1"># Dx_b, Dz_b = get2DMatrix(N, h, bc_hor[2], bc_ver[2], order)</span>
@@ -88,7 +93,10 @@
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">Id</span><span class="p">),</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="getBoussinesqBCHorizontal"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCHorizontal">[docs]</a><span class="k">def</span> <span class="nf">getBoussinesqBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="getBoussinesqBCHorizontal">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCHorizontal">[docs]</a>
+<span class="k">def</span> <span class="nf">getBoussinesqBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">):</span>
     <span class="n">bu_left</span><span class="p">,</span> <span class="n">bu_right</span> <span class="o">=</span> <span class="n">getBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">bw_left</span><span class="p">,</span> <span class="n">bw_right</span> <span class="o">=</span> <span class="n">getBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="c1"># bb_left, bb_right = getBCHorizontal(value[2], N, dx, bc_hor[2])</span>
@@ -99,8 +107,12 @@
     <span class="k">return</span> <span class="n">b_left</span><span class="p">,</span> <span class="n">b_right</span></div>
 
 
-<div class="viewcode-block" id="getBoussinesqBCVertical"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCVertical">[docs]</a><span class="k">def</span> <span class="nf">getBoussinesqBCVertical</span><span class="p">():</span>
+
+<div class="viewcode-block" id="getBoussinesqBCVertical">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCVertical">[docs]</a>
+<span class="k">def</span> <span class="nf">getBoussinesqBCVertical</span><span class="p">():</span>
     <span class="k">return</span> <span class="mf">0.0</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -139,7 +151,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

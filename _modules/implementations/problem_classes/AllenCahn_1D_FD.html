@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.AllenCahn_1D_FD &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -47,7 +47,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span><span class="p">,</span> <span class="n">comp2_mesh</span>
 
 
-<div class="viewcode-block" id="allencahn_front_fullyimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">[docs]</a><span class="k">class</span> <span class="nc">allencahn_front_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_front_fullyimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">allencahn_front_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,</span>
 <span class="sd">    with driving force, 0-1 formulation (Bayreuth example).</span>
@@ -128,7 +130,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="allencahn_front_fullyimplicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_front_fullyimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -215,7 +219,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="allencahn_front_fullyimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_front_fullyimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -246,7 +253,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="allencahn_front_fullyimplicit.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_front_fullyimplicit.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t.</span>
 
@@ -264,10 +274,14 @@
         <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="allencahn_front_semiimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">[docs]</a><span class="k">class</span> <span class="nc">allencahn_front_semiimplicit</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_front_semiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">allencahn_front_semiimplicit</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,</span>
 <span class="sd">    with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping</span>
@@ -282,7 +296,9 @@
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-<div class="viewcode-block" id="allencahn_front_semiimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_front_semiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -308,7 +324,10 @@
         <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="allencahn_front_semiimplicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_front_semiimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -334,17 +353,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[:]</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="allencahn_front_finel"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">[docs]</a><span class="k">class</span> <span class="nc">allencahn_front_finel</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_front_finel">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">[docs]</a>
+<span class="k">class</span> <span class="nc">allencahn_front_finel</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,</span>
 <span class="sd">    with driving force, 0-1 formulation (Bayreuth example), Finel&#39;s trick/parametrization</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># noinspection PyTypeChecker</span>
-<div class="viewcode-block" id="allencahn_front_finel.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_front_finel.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -427,7 +452,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="allencahn_front_finel.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_front_finel.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -454,10 +482,14 @@
         <span class="n">gprim</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">gprim</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span></div></div>
+        <span class="k">return</span> <span class="n">f</span></div>
+</div>
 
 
-<div class="viewcode-block" id="allencahn_periodic_fullyimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">[docs]</a><span class="k">class</span> <span class="nc">allencahn_periodic_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">allencahn_periodic_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,</span>
 <span class="sd">    with driving force, 0-1 formulation (Bayreuth example)</span>
@@ -541,7 +573,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver.</span>
 
@@ -617,7 +651,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -637,7 +674,10 @@
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_fullyimplicit.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t.</span>
 
@@ -655,10 +695,14 @@
         <span class="n">v</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">)</span> <span class="o">-</span> <span class="n">v</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
 
 
-<div class="viewcode-block" id="allencahn_periodic_semiimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">[docs]</a><span class="k">class</span> <span class="nc">allencahn_periodic_semiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_semiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">allencahn_periodic_semiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,</span>
 <span class="sd">    with driving force, 0-1 formulation (Bayreuth example)</span>
@@ -699,7 +743,9 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">dw</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">-=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>
 
-<div class="viewcode-block" id="allencahn_periodic_semiimplicit.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_periodic_semiimplicit.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -724,7 +770,10 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="allencahn_periodic_semiimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_semiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -745,10 +794,14 @@
             <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span>
             <span class="o">+</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span></div></div>
+        <span class="k">return</span> <span class="n">f</span></div>
+</div>
 
 
-<div class="viewcode-block" id="allencahn_periodic_multiimplicit"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">[docs]</a><span class="k">class</span> <span class="nc">allencahn_periodic_multiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">[docs]</a>
+<span class="k">class</span> <span class="nc">allencahn_periodic_multiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,</span>
 <span class="sd">    with driving force, 0-1 formulation (Bayreuth example)</span>
@@ -789,7 +842,9 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">dw</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="p">,</span> <span class="n">newton_tol</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">-=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>
 
-<div class="viewcode-block" id="allencahn_periodic_multiimplicit.solve_system_1"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit.solve_system_1">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_1">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -814,7 +869,10 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spsolve</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="allencahn_periodic_multiimplicit.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -839,7 +897,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="allencahn_periodic_multiimplicit.solve_system_2"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="allencahn_periodic_multiimplicit.solve_system_2">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.solve_system_2">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -912,7 +973,9 @@
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
 
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -951,7 +1014,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

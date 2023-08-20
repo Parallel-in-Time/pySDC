@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.problem_classes.DiscontinuousTestODE module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -47,11 +47,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.problem_classes.DiscontinuousTestODE">
-<span id="implementations-problem-classes-discontinuoustestode-module"></span><h1>implementations.problem_classes.DiscontinuousTestODE module<a class="headerlink" href="#module-implementations.problem_classes.DiscontinuousTestODE" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-problem-classes-discontinuoustestode-module">
+<h1>implementations.problem_classes.DiscontinuousTestODE module<a class="headerlink" href="#implementations-problem-classes-discontinuoustestode-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.problem_classes.DiscontinuousTestODE">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>This class implements a very simple test case of a ordinary differential equation consisting of one discrete event. The dynamics of
 the solution changes when the state function <span class="math notranslate nohighlight">\(h(u) := u - 5\)</span> changes the sign. The problem is defined by:</p>
@@ -69,7 +69,7 @@ the solution changes when the state function <span class="math notranslate nohig
 <span class="math notranslate nohighlight">\(u(t) = \exp(t)\)</span>; for <span class="math notranslate nohighlight">\(h(u) \geq 0\)</span>, i.e., <span class="math notranslate nohighlight">\(t \geq t^*\)</span> the exact solution is <span class="math notranslate nohighlight">\(u(t) = \frac{4 t}{t^*} + 1\)</span>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact">
-<span class="sig-name descname"><span class="pre">t_switch_exact</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">t_switch_exact</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Exact event time with <span class="math notranslate nohighlight">\(t^* = \log(5)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -80,7 +80,7 @@ the solution changes when the state function <span class="math notranslate nohig
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch">
-<span class="sig-name descname"><span class="pre">t_switch</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">t_switch</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch" title="Link to this definition">¶</a></dt>
 <dd><p>Time point of the discrete event found by switch estimation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -91,7 +91,7 @@ the solution changes when the state function <span class="math notranslate nohig
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.nswitches">
-<span class="sig-name descname"><span class="pre">nswitches</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.nswitches" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nswitches</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.nswitches" title="Link to this definition">¶</a></dt>
 <dd><p>Number of switches found by switch estimation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -102,7 +102,7 @@ the solution changes when the state function <span class="math notranslate nohig
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount">
-<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount" title="Link to this definition">¶</a></dt>
 <dd><p>Counts the number of Newton iterations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -113,7 +113,7 @@ the solution changes when the state function <span class="math notranslate nohig
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls">
-<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls" title="Link to this definition">¶</a></dt>
 <dd><p>Counts the number of how often Newton is called in the simulation of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -124,25 +124,25 @@ the solution changes when the state function <span class="math notranslate nohig
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches">
-<span class="sig-name descname"><span class="pre">count_switches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.count_switches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">count_switches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.count_switches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches" title="Link to this definition">¶</a></dt>
 <dd><p>Setter to update the number of switches if one is found.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.eval_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.eval_f" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -162,7 +162,7 @@ the solution changes when the state function <span class="math notranslate nohig
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info">
-<span class="sig-name descname"><span class="pre">get_switching_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.get_switching_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_switching_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.get_switching_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info" title="Link to this definition">¶</a></dt>
 <dd><p>Provides information about the state function of the problem. When the state function changes its sign,
 typically an event occurs. So the check for an event should be done in the way that the state function
 is checked for a sign change. If this is the case, the intermediate value theorem states a root in this
@@ -187,7 +187,7 @@ step.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.solve_system" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple Newton solver for <span class="math notranslate nohighlight">\((I-factor\cdot A)\vec{u}=\vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -209,7 +209,7 @@ step.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact">
-<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -317,7 +317,7 @@ step.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

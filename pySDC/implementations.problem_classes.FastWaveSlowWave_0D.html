@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.problem_classes.FastWaveSlowWave_0D module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -47,11 +47,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.problem_classes.FastWaveSlowWave_0D">
-<span id="implementations-problem-classes-fastwaveslowwave-0d-module"></span><h1>implementations.problem_classes.FastWaveSlowWave_0D module<a class="headerlink" href="#module-implementations.problem_classes.FastWaveSlowWave_0D" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-problem-classes-fastwaveslowwave-0d-module">
+<h1>implementations.problem_classes.FastWaveSlowWave_0D module<a class="headerlink" href="#implementations-problem-classes-fastwaveslowwave-0d-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.problem_classes.FastWaveSlowWave_0D">
 <dt class="sig sig-object py" id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">swfw_scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambda_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">swfw_scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambda_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>This class implements the fast-wave-slow-wave scalar problem fully investigated in <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. It is defined by</p>
 <div class="math notranslate nohighlight">
@@ -80,19 +80,19 @@ SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).</p>
 </aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_f" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_u" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.dtype_u" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to evaluate both parts of the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -112,7 +112,7 @@ SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.solve_system" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple im=nversion of (1-dt*lambda)u = rhs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -134,7 +134,7 @@ SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact">
-<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -231,7 +231,7 @@ SIAM J. Sci. Comput. Vol. 38 No. 4 (2016).</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

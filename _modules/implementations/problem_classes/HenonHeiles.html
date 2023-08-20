@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.HenonHeiles &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -44,7 +44,9 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="henon_heiles"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles">[docs]</a><span class="k">class</span> <span class="nc">henon_heiles</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="henon_heiles">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles">[docs]</a>
+<span class="k">class</span> <span class="nc">henon_heiles</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the harmonic oscillator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -57,7 +59,9 @@
         <span class="c1"># invoke super init, passing nparts</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="henon_heiles.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="henon_heiles.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the right-hand side of the problem.</span>
 
@@ -78,7 +82,10 @@
         <span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="henon_heiles.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="henon_heiles.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact/initial trajectory at time t.</span>
 
@@ -107,7 +114,10 @@
         <span class="n">me</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">p2</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="henon_heiles.eval_hamiltonian"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian">[docs]</a>    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+
+<div class="viewcode-block" id="henon_heiles.eval_hamiltonian">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the Hamiltonian.</span>
 
@@ -125,7 +135,9 @@
         <span class="n">ham</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">ham</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">ham</span> <span class="o">+=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="mf">3.0</span>
-        <span class="k">return</span> <span class="n">ham</span></div></div>
+        <span class="k">return</span> <span class="n">ham</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -164,7 +176,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.sweeper_classes.explicit &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -40,7 +40,9 @@
 <span></span><span class="kn">from</span> <span class="nn">pySDC.core.Sweeper</span> <span class="kn">import</span> <span class="n">sweeper</span>
 
 
-<div class="viewcode-block" id="explicit"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit">[docs]</a><span class="k">class</span> <span class="nc">explicit</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
+<div class="viewcode-block" id="explicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit">[docs]</a>
+<span class="k">class</span> <span class="nc">explicit</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
@@ -65,7 +67,9 @@
         <span class="c1"># integration matrix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="n">coll</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="p">)</span>
 
-<div class="viewcode-block" id="explicit.integrate"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="explicit.integrate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.integrate">[docs]</a>
+    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Integrates the right-hand side</span>
 
@@ -88,7 +92,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="explicit.update_nodes"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.update_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="explicit.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.update_nodes">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
@@ -136,7 +143,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="explicit.compute_end_point"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.compute_end_point">[docs]</a>    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="explicit.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.explicit.html#implementations.sweeper_classes.explicit.explicit.compute_end_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
@@ -163,7 +173,9 @@
             <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -202,7 +214,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

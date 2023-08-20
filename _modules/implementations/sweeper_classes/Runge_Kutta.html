@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.sweeper_classes.Runge_Kutta &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -46,7 +46,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">imex_mesh</span><span class="p">,</span> <span class="n">mesh</span>
 
 
-<div class="viewcode-block" id="ButcherTableau"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau">[docs]</a><span class="k">class</span> <span class="nc">ButcherTableau</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ButcherTableau">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableau">[docs]</a>
+<span class="k">class</span> <span class="nc">ButcherTableau</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine to get a quadrature matrix out of a Butcher tableau</span>
@@ -102,7 +104,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="ButcherTableauEmbedded"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded">[docs]</a><span class="k">class</span> <span class="nc">ButcherTableauEmbedded</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ButcherTableauEmbedded">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded">[docs]</a>
+<span class="k">class</span> <span class="nc">ButcherTableauEmbedded</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization routine to get a quadrature matrix out of a Butcher tableau for embedded RK methods.</span>
@@ -161,7 +166,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">implicit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_solution_stages</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="RungeKutta"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKutta">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">[docs]</a>
+<span class="k">class</span> <span class="nc">RungeKutta</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
     <span class="n">nodes</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
@@ -230,15 +238,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span>
 
-<div class="viewcode-block" id="RungeKutta.get_Q_matrix"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="RungeKutta.get_Q_matrix">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_Q_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_Butcher_tableau</span><span class="p">()</span><span class="o">.</span><span class="n">Qmat</span></div>
 
-<div class="viewcode-block" id="RungeKutta.get_Butcher_tableau"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="RungeKutta.get_Butcher_tableau">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_Butcher_tableau</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RungeKutta.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="RungeKutta.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</span>
@@ -247,7 +263,10 @@
             <span class="sa">f</span><span class="s2">&quot;There is not an update order for RK scheme </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> implemented. Maybe it is not an embedded scheme?&quot;</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="RungeKutta.get_full_f"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">[docs]</a>    <span class="k">def</span> <span class="nf">get_full_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKutta.get_full_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_full_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the full right hand side as a `mesh` from the right hand side</span>
 
@@ -267,7 +286,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Type </span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s1"> not implemented in Runge-Kutta sweeper&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RungeKutta.integrate"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKutta.integrate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.integrate">[docs]</a>
+    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Integrates the right-hand side</span>
 
@@ -290,7 +312,10 @@
 
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="RungeKutta.update_nodes"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKutta.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes</span>
 
@@ -332,11 +357,15 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="RungeKutta.compute_end_point"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">[docs]</a>    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RungeKutta.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.compute_end_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In this Runge-Kutta implementation, the solution to the step is always stored in the last node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -365,7 +394,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">lvl</span>
 
-<div class="viewcode-block" id="RungeKutta.predict"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RungeKutta.predict">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Predictor to fill values at nodes before first sweep</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -379,10 +410,14 @@
 
         <span class="c1"># indicate that this level is now ready for sweeps</span>
         <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ForwardEuler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler">[docs]</a><span class="k">class</span> <span class="nc">ForwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ForwardEuler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler">[docs]</a>
+<span class="k">class</span> <span class="nc">ForwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Forward Euler. Still a classic.</span>
 
@@ -398,7 +433,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="BackwardEuler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler">[docs]</a><span class="k">class</span> <span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BackwardEuler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.BackwardEuler">[docs]</a>
+<span class="k">class</span> <span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Backward Euler. A favorite among true connoisseurs of the heat equation.</span>
 
@@ -414,7 +452,10 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="CrankNicholson"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson">[docs]</a><span class="k">class</span> <span class="nc">CrankNicholson</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CrankNicholson">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson">[docs]</a>
+<span class="k">class</span> <span class="nc">CrankNicholson</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implicit Runge-Kutta method of second order, A-stable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -426,7 +467,10 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span></div>
 
 
-<div class="viewcode-block" id="ExplicitMidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">ExplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExplicitMidpointMethod">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ExplicitMidpointMethod">[docs]</a>
+<span class="k">class</span> <span class="nc">ExplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Explicit Runge-Kutta method of second order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -437,7 +481,10 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span></div>
 
 
-<div class="viewcode-block" id="ImplicitMidpointMethod"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod">[docs]</a><span class="k">class</span> <span class="nc">ImplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImplicitMidpointMethod">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ImplicitMidpointMethod">[docs]</a>
+<span class="k">class</span> <span class="nc">ImplicitMidpointMethod</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implicit Runge-Kutta method of second order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -448,7 +495,10 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span></div>
 
 
-<div class="viewcode-block" id="RK4"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4">[docs]</a><span class="k">class</span> <span class="nc">RK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RK4">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RK4">[docs]</a>
+<span class="k">class</span> <span class="nc">RK4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Explicit Runge-Kutta of fourth order: Everybody&#39;s darling.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -461,7 +511,10 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
 
 
-<div class="viewcode-block" id="Heun_Euler"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">[docs]</a><span class="k">class</span> <span class="nc">Heun_Euler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Heun_Euler">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler">[docs]</a>
+<span class="k">class</span> <span class="nc">Heun_Euler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Second order explicit embedded Runge-Kutta method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -472,12 +525,18 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
-<div class="viewcode-block" id="Heun_Euler.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Heun_Euler.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">2</span></div></div>
+        <span class="k">return</span> <span class="mi">2</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Cash_Karp"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp">[docs]</a><span class="k">class</span> <span class="nc">Cash_Karp</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Cash_Karp">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp">[docs]</a>
+<span class="k">class</span> <span class="nc">Cash_Karp</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fifth order explicit embedded Runge-Kutta. See [here](https://doi.org/10.1145/79505.79507).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -497,12 +556,18 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1631.0</span> <span class="o">/</span> <span class="mf">55296.0</span><span class="p">,</span> <span class="mf">175.0</span> <span class="o">/</span> <span class="mf">512.0</span><span class="p">,</span> <span class="mf">575.0</span> <span class="o">/</span> <span class="mf">13824.0</span><span class="p">,</span> <span class="mf">44275.0</span> <span class="o">/</span> <span class="mf">110592.0</span><span class="p">,</span> <span class="mf">253.0</span> <span class="o">/</span> <span class="mf">4096.0</span><span class="p">]</span>
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
-<div class="viewcode-block" id="Cash_Karp.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Cash_Karp.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">5</span></div></div>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DIRK43"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43">[docs]</a><span class="k">class</span> <span class="nc">DIRK43</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DIRK43">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43">[docs]</a>
+<span class="k">class</span> <span class="nc">DIRK43</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Embedded A-stable diagonally implicit RK pair of order 3 and 4.</span>
 
@@ -520,12 +585,18 @@
     <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4007.0</span> <span class="o">/</span> <span class="mf">6075.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">31031.0</span> <span class="o">/</span> <span class="mf">24300.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">133.0</span> <span class="o">/</span> <span class="mf">2700.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">]</span>
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
-<div class="viewcode-block" id="DIRK43.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="DIRK43.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">4</span></div></div>
+        <span class="k">return</span> <span class="mi">4</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ESDIRK53"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53">[docs]</a><span class="k">class</span> <span class="nc">ESDIRK53</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ESDIRK53">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53">[docs]</a>
+<span class="k">class</span> <span class="nc">ESDIRK53</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A-stable embedded RK pair of orders 5 and 3.</span>
 <span class="sd">    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)</span>
@@ -585,9 +656,13 @@
     <span class="p">)</span>
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 
-<div class="viewcode-block" id="ESDIRK53.get_update_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ESDIRK53.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">4</span></div></div>
+        <span class="k">return</span> <span class="mi">4</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -626,7 +701,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

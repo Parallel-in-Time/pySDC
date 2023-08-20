@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>core.Collocation module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,11 +45,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-core.Collocation">
-<span id="core-collocation-module"></span><h1>core.Collocation module<a class="headerlink" href="#module-core.Collocation" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="core-collocation-module">
+<h1>core.Collocation module<a class="headerlink" href="#core-collocation-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-core.Collocation">
 <dt class="sig sig-object py" id="core.Collocation.CollBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Generic collocation class, that contains everything to do integration over
 intervals and between nodes.
@@ -112,7 +112,7 @@ in pySDC :</p>
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.num_nodes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.num_nodes" title="Link to this definition">¶</a></dt>
 <dd><p>number of collocation nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -123,7 +123,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.tleft">
-<span class="sig-name descname"><span class="pre">tleft</span></span><a class="headerlink" href="#core.Collocation.CollBase.tleft" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tleft</span></span><a class="headerlink" href="#core.Collocation.CollBase.tleft" title="Link to this definition">¶</a></dt>
 <dd><p>left interval point</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -134,7 +134,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.tright">
-<span class="sig-name descname"><span class="pre">tright</span></span><a class="headerlink" href="#core.Collocation.CollBase.tright" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tright</span></span><a class="headerlink" href="#core.Collocation.CollBase.tright" title="Link to this definition">¶</a></dt>
 <dd><p>right interval point</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -145,7 +145,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.nodes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.nodes" title="Link to this definition">¶</a></dt>
 <dd><p>array of quadrature nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -156,7 +156,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Collocation.CollBase.weights" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Collocation.CollBase.weights" title="Link to this definition">¶</a></dt>
 <dd><p>array of quadrature weights for the full interval</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -167,7 +167,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.Qmat">
-<span class="sig-name descname"><span class="pre">Qmat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Qmat" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Qmat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Qmat" title="Link to this definition">¶</a></dt>
 <dd><p>matrix containing the weights for tleft to node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -178,7 +178,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.Smat">
-<span class="sig-name descname"><span class="pre">Smat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Smat" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Smat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Smat" title="Link to this definition">¶</a></dt>
 <dd><p>matrix containing the weights for node to node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -189,7 +189,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.delta_m">
-<span class="sig-name descname"><span class="pre">delta_m</span></span><a class="headerlink" href="#core.Collocation.CollBase.delta_m" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">delta_m</span></span><a class="headerlink" href="#core.Collocation.CollBase.delta_m" title="Link to this definition">¶</a></dt>
 <dd><p>array of distances between nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -200,7 +200,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.right_is_node">
-<span class="sig-name descname"><span class="pre">right_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.right_is_node" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">right_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.right_is_node" title="Link to this definition">¶</a></dt>
 <dd><p>flag to indicate whether right point is collocation node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -211,7 +211,7 @@ in pySDC :</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.left_is_node">
-<span class="sig-name descname"><span class="pre">left_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.left_is_node" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">left_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.left_is_node" title="Link to this definition">¶</a></dt>
 <dd><p>flag to indicate whether left point is collocation node</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -222,7 +222,7 @@ in pySDC :</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Collocation.CollBase.evaluate">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase.evaluate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase.evaluate" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluates the quadrature over the full interval</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -327,7 +327,7 @@ in pySDC :</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

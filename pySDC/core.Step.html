@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>core.Step module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,18 +45,18 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-core.Step">
-<span id="core-step-module"></span><h1>core.Step module<a class="headerlink" href="#module-core.Step" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="core-step-module">
+<h1>core.Step module<a class="headerlink" href="#core-step-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-core.Step">
 <dt class="sig sig-object py" id="core.Step.step">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenClass</span></code></p>
 <p>Step class, referencing most of the structure needed for the time-stepping</p>
 <p>This class bundles multiple levels and the corresponding transfer operators and is used by the controller
 (e.g. SDC and MLSDC). Status variables like the current time are hidden via properties and setters methods.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Step.step.params">
-<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Step.step.params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Step.step.params" title="Link to this definition">¶</a></dt>
 <dd><p>parameters given by the user</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -67,7 +67,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Step.step.status">
-<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#core.Step.step.status" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#core.Step.step.status" title="Link to this definition">¶</a></dt>
 <dd><p>status class for the step</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -78,13 +78,13 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Step.step.logger">
-<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#core.Step.step.logger" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#core.Step.step.logger" title="Link to this definition">¶</a></dt>
 <dd><p>custom logger for step-related logging</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Step.step.levels">
-<span class="sig-name descname"><span class="pre">levels</span></span><a class="headerlink" href="#core.Step.step.levels" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">levels</span></span><a class="headerlink" href="#core.Step.step.levels" title="Link to this definition">¶</a></dt>
 <dd><p>list of levels</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -95,7 +95,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Step.step.connect_levels">
-<span class="sig-name descname"><span class="pre">connect_levels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fine_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.connect_levels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.connect_levels" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">connect_levels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fine_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.connect_levels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.connect_levels" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to couple levels with base_transfer operators</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -113,7 +113,7 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Step.step.dt">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#core.Step.step.dt" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#core.Step.step.dt" title="Link to this definition">¶</a></dt>
 <dd><p>Getter for current time-step size</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -127,7 +127,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Step.step.init_step">
-<span class="sig-name descname"><span class="pre">init_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.init_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.init_step" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">init_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.init_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.init_step" title="Link to this definition">¶</a></dt>
 <dd><p>Initialization routine for a new step.</p>
 <p>This routine uses initial values u0 to set up the u[0] values at the finest level</p>
 <dl class="field-list simple">
@@ -139,7 +139,7 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Step.step.next">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next</span></span><a class="headerlink" href="#core.Step.step.next" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next</span></span><a class="headerlink" href="#core.Step.step.next" title="Link to this definition">¶</a></dt>
 <dd><p>Getter for next step</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -150,7 +150,7 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Step.step.prev">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prev</span></span><a class="headerlink" href="#core.Step.step.prev" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prev</span></span><a class="headerlink" href="#core.Step.step.prev" title="Link to this definition">¶</a></dt>
 <dd><p>Getter for previous step</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -161,13 +161,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Step.step.reset_step">
-<span class="sig-name descname"><span class="pre">reset_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.reset_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.reset_step" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reset_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.reset_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.reset_step" title="Link to this definition">¶</a></dt>
 <dd><p>Routine so clean-up step structure and the corresp. levels for further uses</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="core.Step.step.time">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.Step.step.time" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.Step.step.time" title="Link to this definition">¶</a></dt>
 <dd><p>Getter for current time</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -181,7 +181,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Step.step.transfer">
-<span class="sig-name descname"><span class="pre">transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.transfer" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.transfer" title="Link to this definition">¶</a></dt>
 <dd><p>Wrapper routine to ease the call of the transfer functions</p>
 <p>This function can be called in the multilevel stepper (e.g. MLSDC), passing a source and a target level.
 Using the transfer dictionary, the calling stepper does not need to specify whether to use restrict of
@@ -284,7 +284,7 @@ prolong.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.convergence_controller_classes.check_convergence &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -42,7 +42,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
 
 
-<div class="viewcode-block" id="CheckConvergence"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence">[docs]</a><span class="k">class</span> <span class="nc">CheckConvergence</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="CheckConvergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence">[docs]</a>
+<span class="k">class</span> <span class="nc">CheckConvergence</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Perform simple checks on convergence for SDC iterations.</span>
 
@@ -51,7 +53,9 @@
 <span class="sd">     - Maximum number of iterations</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CheckConvergence.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CheckConvergence.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define default parameters here</span>
 
@@ -67,7 +71,10 @@
 
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="CheckConvergence.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CheckConvergence.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.dependencies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the embedded error estimator if needed.</span>
 
@@ -92,7 +99,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="CheckConvergence.check_convergence"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="CheckConvergence.check_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_convergence">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check the convergence of a single step.</span>
@@ -129,7 +139,10 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">converged</span></div>
 
-<div class="viewcode-block" id="CheckConvergence.check_iteration_status"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CheckConvergence.check_iteration_status">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.check_iteration_status">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)</span>
 
@@ -149,7 +162,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="CheckConvergence.communicate_convergence"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">[docs]</a>    <span class="k">def</span> <span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CheckConvergence.communicate_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">[docs]</a>
+    <span class="k">def</span> <span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Communicate the convergence status during `check_iteration_status` if MPI is used.</span>
 
@@ -194,7 +210,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="p">[</span><span class="n">buff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPI_BOOL</span><span class="p">])</span>
 
             <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
-                <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+                <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -233,7 +251,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

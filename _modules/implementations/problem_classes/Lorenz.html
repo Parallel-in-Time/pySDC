@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.Lorenz &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -42,7 +42,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 
 
-<div class="viewcode-block" id="LorenzAttractor"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor">[docs]</a><span class="k">class</span> <span class="nc">LorenzAttractor</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="LorenzAttractor">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor">[docs]</a>
+<span class="k">class</span> <span class="nc">LorenzAttractor</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple script to run a Lorenz attractor problem.</span>
 
@@ -103,7 +105,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
-<div class="viewcode-block" id="LorenzAttractor.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="LorenzAttractor.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
@@ -133,7 +137,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="LorenzAttractor.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LorenzAttractor.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple Newton solver for the nonlinear system.</span>
 
@@ -213,7 +220,10 @@
 
         <span class="k">return</span> <span class="n">u</span></div>
 
-<div class="viewcode-block" id="LorenzAttractor.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LorenzAttractor.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to return initial conditions or to approximate exact solution using scipy.</span>
 
@@ -252,7 +262,9 @@
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -291,7 +303,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

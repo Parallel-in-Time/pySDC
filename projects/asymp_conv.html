@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Asymptotic convergence of PFASST &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,12 +45,12 @@
           <div class="body" role="main">
             
   <section id="asymptotic-convergence-of-pfasst">
-<h1>Asymptotic convergence of PFASST<a class="headerlink" href="#asymptotic-convergence-of-pfasst" title="Permalink to this heading">¶</a></h1>
+<h1>Asymptotic convergence of PFASST<a class="headerlink" href="#asymptotic-convergence-of-pfasst" title="Link to this heading">¶</a></h1>
 <p>This project investigates the impact of the convergence results described in the paper “Asymptotic convergence of PFASST for linear problems”.
 We use 1D heat equation and advection equation to show how PFASST converges in the stiff as well as in the non-stiff limit.
 Note that due to the long runtime, not all results are generated via CI.</p>
 <section id="organisation-of-the-project">
-<h2>Organisation of the project<a class="headerlink" href="#organisation-of-the-project" title="Permalink to this heading">¶</a></h2>
+<h2>Organisation of the project<a class="headerlink" href="#organisation-of-the-project" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">conv_test_to0.py</span></code> and <code class="docutils literal notranslate"><span class="pre">conv_test_toinf.py</span></code>: plots spectral radius of the smoother’s iteration matrix for different eigenvalues. See Figures 1 and 2 in the paper.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">smoother_specrad_heatmap.py</span></code>: generates heatmap of the spectral radius of the smoother’s iteration matrix for different eigenvalues in the test equation. See Figure 3.</p></li>
@@ -133,7 +133,7 @@ Note that due to the long runtime, not all results are generated via CI.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

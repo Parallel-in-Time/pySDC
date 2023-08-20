@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.transfer_classes.TransferMesh_MPIFFT &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -43,7 +43,9 @@
 <span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span><span class="p">,</span> <span class="n">newDistArray</span>
 
 
-<div class="viewcode-block" id="fft_to_fft"><a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft">[docs]</a><span class="k">class</span> <span class="nc">fft_to_fft</span><span class="p">(</span><span class="n">space_transfer</span><span class="p">):</span>
+<div class="viewcode-block" id="fft_to_fft">
+<a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft">[docs]</a>
+<span class="k">class</span> <span class="nc">fft_to_fft</span><span class="p">(</span><span class="n">space_transfer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custon base_transfer class, implements Transfer.py</span>
 
@@ -81,7 +83,9 @@
             <span class="n">slab</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="fft_to_fft.restrict"><a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.restrict">[docs]</a>    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<div class="viewcode-block" id="fft_to_fft.restrict">
+<a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.restrict">[docs]</a>
+    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Restriction implementation</span>
 
@@ -109,7 +113,10 @@
 
         <span class="k">return</span> <span class="n">G</span></div>
 
-<div class="viewcode-block" id="fft_to_fft.prolong"><a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.prolong">[docs]</a>    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
+
+<div class="viewcode-block" id="fft_to_fft.prolong">
+<a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh_MPIFFT.html#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.prolong">[docs]</a>
+    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prolongation implementation</span>
 
@@ -165,7 +172,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">&#39;Unknown data type, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">F</span></div></div>
+        <span class="k">return</span> <span class="n">F</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -204,7 +213,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

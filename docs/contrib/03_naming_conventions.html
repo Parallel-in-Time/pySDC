@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Naming conventions in pySDC &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -37,7 +37,7 @@
           <div class="body" role="main">
             
   <section id="naming-conventions-in-pysdc">
-<span id="docs-contrib-03-naming-conventions-naming-conventions-in-pysdc"></span><h1>Naming conventions in pySDC<a class="headerlink" href="#naming-conventions-in-pysdc" title="Permalink to this heading">¶</a></h1>
+<span id="docs-contrib-03-naming-conventions-naming-conventions-in-pysdc"></span><h1>Naming conventions in pySDC<a class="headerlink" href="#naming-conventions-in-pysdc" title="Link to this heading">¶</a></h1>
 <blockquote>
 <div><p>📜 Those rules may not be enforced by the current implementation of pySDC. However, they should be enforced for any contribution.</p>
 </div></blockquote>
@@ -52,7 +52,7 @@
 </ul>
 <p>Both aspects are interdependent to ease maintaining/development of any code and improve its attractiveness to potential users.</p>
 <section id="first-definitions">
-<span id="docs-contrib-03-naming-conventions-first-definitions"></span><h2>First definitions<a class="headerlink" href="#first-definitions" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-03-naming-conventions-first-definitions"></span><h2>First definitions<a class="headerlink" href="#first-definitions" title="Link to this heading">¶</a></h2>
 <p>Possible Naming formats :</p>
 <ul class="simple">
 <li><p>all-lowercase : <code class="docutils literal notranslate"><span class="pre">variablenamelikethis</span></code></p></li>
@@ -64,13 +64,13 @@
 </ul>
 </section>
 <section id="packages-and-modules-names">
-<span id="docs-contrib-03-naming-conventions-packages-and-modules-names"></span><h2>Packages and modules names<a class="headerlink" href="#packages-and-modules-names" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-03-naming-conventions-packages-and-modules-names"></span><h2>Packages and modules names<a class="headerlink" href="#packages-and-modules-names" title="Link to this heading">¶</a></h2>
 <p>Modules should have short, all-lowercase names. Underscores can be used in the module name if it improves readability (<em>i.e</em> use snake_case only if it helps,
 else try to stick to all-lowercase).
 Python packages should also have short, all-lowercase names, although the use of underscores is discouraged.</p>
 </section>
 <section id="class-names">
-<span id="docs-contrib-03-naming-conventions-class-names"></span><h2>Class names<a class="headerlink" href="#class-names" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-03-naming-conventions-class-names"></span><h2>Class names<a class="headerlink" href="#class-names" title="Link to this heading">¶</a></h2>
 <p>Class names should use PascalCase formatting, for instance :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AdvectionDiffusion</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
     <span class="k">pass</span>
@@ -83,7 +83,7 @@ Python packages should also have short, all-lowercase names, although the use of
 </div>
 </section>
 <section id="function-and-variables-names">
-<span id="docs-contrib-03-naming-conventions-function-and-variables-names"></span><h2>Function and variables names<a class="headerlink" href="#function-and-variables-names" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-03-naming-conventions-function-and-variables-names"></span><h2>Function and variables names<a class="headerlink" href="#function-and-variables-names" title="Link to this heading">¶</a></h2>
 <p>Function (or method) and variable names should use camelCase formatting, and same goes for function arguments. For instance :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tLeft</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">quadType</span> <span class="o">=</span> <span class="s1">&#39;LEGENDRE&#39;</span>
@@ -122,7 +122,7 @@ Python packages should also have short, all-lowercase names, although the use of
 </div>
 </section>
 <section id="private-and-public-attributes">
-<span id="docs-contrib-03-naming-conventions-private-and-public-attributes"></span><h2>Private and public attributes<a class="headerlink" href="#private-and-public-attributes" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-03-naming-conventions-private-and-public-attributes"></span><h2>Private and public attributes<a class="headerlink" href="#private-and-public-attributes" title="Link to this heading">¶</a></h2>
 <p>There is no such thing as private or public attributes in Python. But some attributes, if uses only within the object methods, can be indicated as private using the <code class="docutils literal notranslate"><span class="pre">_</span></code> prefix. For instance :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ChuckNorris</span><span class="p">():</span>
 
@@ -141,7 +141,7 @@ Python packages should also have short, all-lowercase names, although the use of
 <p>📜 In general, variable name starting with double underscore <code class="docutils literal notranslate"><span class="pre">__</span></code> are usually left for Python built-in names, <em>e.g</em> <code class="docutils literal notranslate"><span class="pre">__dict__</span></code>, <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, …</p>
 </section>
 <section id="constants">
-<span id="docs-contrib-03-naming-conventions-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this heading">¶</a></h2>
+<span id="docs-contrib-03-naming-conventions-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Link to this heading">¶</a></h2>
 <p>Constants are usually defined on a module level and written in all-uppercase with underscores (all-uppercase with minus are not allowed by Python syntax). Examples :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NODE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EQUID&#39;</span><span class="p">,</span> <span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-1&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-2&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-3&#39;</span><span class="p">,</span> <span class="s1">&#39;CHEBY-4&#39;</span><span class="p">]</span>
 <span class="n">QUAD_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GAUSS&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-LEFT&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;LOBATTO&#39;</span><span class="p">]</span>
@@ -230,7 +230,7 @@ Python packages should also have short, all-lowercase names, although the use of
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

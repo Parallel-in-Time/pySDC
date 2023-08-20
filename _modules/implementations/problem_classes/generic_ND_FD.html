@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.generic_ND_FD &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -54,7 +54,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
 
 
-<div class="viewcode-block" id="GenericNDimFinDiff"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">[docs]</a><span class="k">class</span> <span class="nc">GenericNDimFinDiff</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericNDimFinDiff">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">[docs]</a>
+<span class="k">class</span> <span class="nc">GenericNDimFinDiff</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
@@ -163,7 +165,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
 
-<div class="viewcode-block" id="GenericNDimFinDiff.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="GenericNDimFinDiff.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the RHS</span>
 
@@ -183,7 +187,10 @@
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="GenericNDimFinDiff.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GenericNDimFinDiff.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for (I-factor*A)u = rhs.</span>
 
@@ -239,7 +246,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;solver type &quot;</span><span class="si">{</span><span class="n">solver_type</span><span class="si">}</span><span class="s1">&quot; not known in generic advection-diffusion implementation!&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">sol</span></div></div>
+        <span class="k">return</span> <span class="n">sol</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -278,7 +287,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

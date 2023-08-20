@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.convergence_controller_classes.hotrod &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -42,7 +42,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
 
 
-<div class="viewcode-block" id="HotRod"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod">[docs]</a><span class="k">class</span> <span class="nc">HotRod</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="HotRod">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod">[docs]</a>
+<span class="k">class</span> <span class="nc">HotRod</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class that incorporates the Hot Rod detector [1] for soft faults. Based on comparing two estimates of the local</span>
 <span class="sd">    error.</span>
@@ -54,7 +56,9 @@
 <span class="sd">    Guhur et al. 2016, Springer. DOI: https://doi.org/10.1007/978-3-319-43659-3_47</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="HotRod.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="HotRod.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setup default values for crucial parameters.</span>
 
@@ -73,7 +77,10 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">default_params</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="HotRod.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HotRod.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.dependencies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the dependencies of Hot Rod, which are the two error estimators</span>
 
@@ -107,7 +114,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Don&#39;t know how to estimate extrapolated error with MPI&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HotRod.check_parameters"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.check_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HotRod.check_parameters">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.check_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
 
@@ -141,7 +151,10 @@
 
         <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="HotRod.determine_restart"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.determine_restart">[docs]</a>    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HotRod.determine_restart">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.determine_restart">[docs]</a>
+    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the difference between the error estimates exceeds the allowed tolerance</span>
 
@@ -177,7 +190,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="HotRod.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="HotRod.post_iteration_processing">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.hotrod.html#implementations.convergence_controller_classes.hotrod.HotRod.post_iteration_processing">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Throw away the final sweep to match the error estimates.</span>
 
@@ -192,7 +208,9 @@
             <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">uold</span><span class="p">[:]</span>
 
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -231,7 +249,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

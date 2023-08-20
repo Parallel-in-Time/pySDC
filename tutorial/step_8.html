@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Step-8: Advanced topics &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,11 +45,11 @@
           <div class="body" role="main">
             
   <section id="step-8-advanced-topics">
-<h1>Step-8: Advanced topics<a class="headerlink" href="#step-8-advanced-topics" title="Permalink to this heading">¶</a></h1>
+<h1>Step-8: Advanced topics<a class="headerlink" href="#step-8-advanced-topics" title="Link to this heading">¶</a></h1>
 <p>Since we now have explored the basic features of pySDC, we are actually ready to do some serious science (e.g. in the projects).
 However, we gather here further interesting cases, e.g. special flags or more alternative implementations of components.</p>
 <section id="part-a-visualizing-residuals">
-<h2>Part A: Visualizing Residuals<a class="headerlink" href="#part-a-visualizing-residuals" title="Permalink to this heading">¶</a></h2>
+<h2>Part A: Visualizing Residuals<a class="headerlink" href="#part-a-visualizing-residuals" title="Link to this heading">¶</a></h2>
 <p>In this part, we briefly introduce the visualization of residuals, built in into pySDC’s plugins.
 The application is (supposed) to be simple: merely put the <code class="docutils literal notranslate"><span class="pre">stats</span></code> object into the function <code class="docutils literal notranslate"><span class="pre">show_residual_across_simulation</span></code> and look at the resulting figure.</p>
 <p>Important things to note:</p>
@@ -139,7 +139,7 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 <a class="reference internal image-reference" href="../_images/step_8_residuals.png"><img alt="../_images/step_8_residuals.png" src="../_images/step_8_residuals.png" style="width: 605.0px; height: 424.5px;" /></a>
 </section>
 <section id="part-b-multi-step-sdc">
-<h2>Part B: Multi-step SDC<a class="headerlink" href="#part-b-multi-step-sdc" title="Permalink to this heading">¶</a></h2>
+<h2>Part B: Multi-step SDC<a class="headerlink" href="#part-b-multi-step-sdc" title="Link to this heading">¶</a></h2>
 <p>One interesting question when playing around with the different configurations is this: what happens, if we want parallel time-steps but only a single level?
 The result is called multi-step SDC. Here, after each sweep the result is sent forward, but is picked up in the next (and not current) iteration.
 This corresponds to performing only the smoother stage in a multigrid scheme.
@@ -344,7 +344,7 @@ To prevent this, information can be sent forward immediately, but then this is n
 <a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_gs.png"><img alt="../_images/step_8_residuals_mssdc_gs.png" src="../_images/step_8_residuals_mssdc_gs.png" style="width: 605.0px; height: 424.5px;" /></a>
 </section>
 <section id="part-c-iteration-estimator">
-<h2>Part C: Iteration estimator<a class="headerlink" href="#part-c-iteration-estimator" title="Permalink to this heading">¶</a></h2>
+<h2>Part C: Iteration estimator<a class="headerlink" href="#part-c-iteration-estimator" title="Link to this heading">¶</a></h2>
 <p>One may ask when to stop the SDC, MLSDC, PFASST iterations. So far, we have used a residual threshold or a fixed number of iterations to stop the process.
 Another option is to estimate the number of iterations it takes to reach a given error w.r.t. the exact collocation solution.
 This can be done by using two consecutive iterates to estimate the Lipschitz constant of the iteration procedure.
@@ -674,7 +674,7 @@ This example takes three different test cases and checks how well the iteration 
    Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.8821e-13
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.8707e-13
 
-...done, took 0.4683448339999359 seconds!
+...done, took 0.42640719499991064 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -688,7 +688,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 2.1250e-13
    Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 2.1660e-13
 
-...done, took 0.9966580380000778 seconds!
+...done, took 0.9642959339998924 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -702,7 +702,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 7.7716e-16
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 5.5511e-16
 
-...done, took 0.2772465629998351 seconds!
+...done, took 0.25920862899988606 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -716,7 +716,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1841e-13
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1808e-13
 
-...done, took 0.7834773370000221 seconds!
+...done, took 0.7641677599999639 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -730,7 +730,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.17844951600000059 seconds!
+...done, took 0.17201261099990006 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -744,13 +744,13 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.21246248600004947 seconds!
+...done, took 0.20999286700021003 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
 </section>
 <section id="part-x-to-be-continued">
-<h2>Part X: To be continued…<a class="headerlink" href="#part-x-to-be-continued" title="Permalink to this heading">¶</a></h2>
+<h2>Part X: To be continued…<a class="headerlink" href="#part-x-to-be-continued" title="Link to this heading">¶</a></h2>
 <p>We shall see what comes next…</p>
 </section>
 </section>
@@ -827,7 +827,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

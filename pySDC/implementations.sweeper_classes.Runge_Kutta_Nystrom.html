@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.sweeper_classes.Runge_Kutta_Nystrom module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,11 +46,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.sweeper_classes.Runge_Kutta_Nystrom">
-<span id="implementations-sweeper-classes-runge-kutta-nystrom-module"></span><h1>implementations.sweeper_classes.Runge_Kutta_Nystrom module<a class="headerlink" href="#module-implementations.sweeper_classes.Runge_Kutta_Nystrom" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-sweeper-classes-runge-kutta-nystrom-module">
+<h1>implementations.sweeper_classes.Runge_Kutta_Nystrom module<a class="headerlink" href="#implementations-sweeper-classes-runge-kutta-nystrom-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.sweeper_classes.Runge_Kutta_Nystrom">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RKN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RKN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
 <p>Runge-Kutta-Nystrom method
 <a class="reference external" href="https://link.springer.com/book/10.1007/978-3-540-78862-1">https://link.springer.com/book/10.1007/978-3-540-78862-1</a>
@@ -60,7 +60,7 @@ Chapter: II.14 Numerical methods for Second order differential equations</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RungeKuttaNystrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></p>
 <p>Runge-Kutta scheme that fits the interface of a sweeper.
 Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
@@ -88,13 +88,13 @@ method, which does not require us to solve a system of equations to compute the 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point">
-<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.compute_end_point" title="Link to this definition">¶</a></dt>
 <dd><p>In this Runge-Kutta implementation, the solution to the step is always stored in the last node</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f">
-<span class="sig-name descname"><span class="pre">get_full_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_full_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_full_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.get_full_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_full_f" title="Link to this definition">¶</a></dt>
 <dd><p>Test the right hand side funtion is the correct type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -111,7 +111,7 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes">
-<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#RungeKuttaNystrom.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.update_nodes" title="Link to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -124,7 +124,7 @@ method, which does not require us to solve a system of equations to compute the 
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Velocity_Verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta_Nystrom.html#Velocity_Verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom" title="implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaNystrom</span></code></a></p>
 <p>Velocity-Verlet scheme
 <a class="reference external" href="https://de.wikipedia.org/wiki/Verlet-Algorithmus">https://de.wikipedia.org/wiki/Verlet-Algorithmus</a></p>
@@ -210,7 +210,7 @@ method, which does not require us to solve a system of equations to compute the 
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.convergence_controller_classes.step_size_limiter &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -41,14 +41,18 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
 
 
-<div class="viewcode-block" id="StepSizeLimiter"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter">[docs]</a><span class="k">class</span> <span class="nc">StepSizeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="StepSizeLimiter">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter">[docs]</a>
+<span class="k">class</span> <span class="nc">StepSizeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to set limits to adaptive step size computation during run time</span>
 
 <span class="sd">    Please supply dt_min or dt_max in the params to limit in either direction</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StepSizeLimiter.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="StepSizeLimiter.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here</span>
 
@@ -67,7 +71,10 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="StepSizeLimiter.dependencies"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StepSizeLimiter.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.dependencies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the slope limiter if needed.</span>
 
@@ -90,7 +97,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="StepSizeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StepSizeLimiter.get_new_step_size">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter.get_new_step_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enforce an upper and lower limit to the step size here.</span>
 <span class="sd">        Be aware that this is only tested when a new step size has been determined. That means if you set an initial</span>
@@ -122,17 +132,23 @@
                     <span class="p">)</span>
                     <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt_max</span>
 
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
 
 
-<div class="viewcode-block" id="StepSizeSlopeLimiter"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter">[docs]</a><span class="k">class</span> <span class="nc">StepSizeSlopeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StepSizeSlopeLimiter">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter">[docs]</a>
+<span class="k">class</span> <span class="nc">StepSizeSlopeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to set limits to adaptive step size computation during run time</span>
 
 <span class="sd">    Please supply dt_min or dt_max in the params to limit in either direction</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StepSizeSlopeLimiter.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="StepSizeSlopeLimiter.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define parameters here</span>
 
@@ -151,7 +167,10 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="StepSizeSlopeLimiter.get_new_step_size"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.get_new_step_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StepSizeSlopeLimiter.get_new_step_size">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.get_new_step_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enforce an upper and lower limit to the slope of the step size here.</span>
 <span class="sd">        The final step is adjusted such that we reach Tend as best as possible, which might give step sizes below</span>
@@ -183,7 +202,9 @@
                     <span class="p">)</span>
                     <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="n">dt_new</span>
 
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -222,7 +243,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

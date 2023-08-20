@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>core.SpaceTransfer &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -55,7 +55,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="space_transfer"><a class="viewcode-back" href="../../pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer">[docs]</a><span class="k">class</span> <span class="nc">space_transfer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="space_transfer">
+<a class="viewcode-back" href="../../pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer">[docs]</a>
+<span class="k">class</span> <span class="nc">space_transfer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract space_transfer class</span>
 
@@ -85,7 +87,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span> <span class="o">=</span> <span class="n">fine_prob</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span> <span class="o">=</span> <span class="n">coarse_prob</span>
 
-<div class="viewcode-block" id="space_transfer.restrict"><a class="viewcode-back" href="../../pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.restrict">[docs]</a>    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<div class="viewcode-block" id="space_transfer.restrict">
+<a class="viewcode-back" href="../../pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.restrict">[docs]</a>
+    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface for restriction in space</span>
 
@@ -94,14 +98,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: space_transfer has to implement restrict(self, F)&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="space_transfer.prolong"><a class="viewcode-back" href="../../pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.prolong">[docs]</a>    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
+
+<div class="viewcode-block" id="space_transfer.prolong">
+<a class="viewcode-back" href="../../pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.prolong">[docs]</a>
+    <span class="k">def</span> <span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abstract interface for prolongation in space</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data (easier to access than via the coarse attribute)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: space_transfer has to implement prolong(self, G)&#39;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: space_transfer has to implement prolong(self, G)&#39;</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -140,7 +149,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

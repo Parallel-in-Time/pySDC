@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.convergence_controller_classes.interpolate_between_restarts &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -42,7 +42,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.Lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
 
-<div class="viewcode-block" id="InterpolateBetweenRestarts"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts">[docs]</a><span class="k">class</span> <span class="nc">InterpolateBetweenRestarts</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="InterpolateBetweenRestarts">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts">[docs]</a>
+<span class="k">class</span> <span class="nc">InterpolateBetweenRestarts</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interpolate the solution and right hand side to the new set of collocation nodes after a restart.</span>
 <span class="sd">    The idea is that when you adjust the step size between restarts, you already know what the new quadrature method</span>
@@ -50,7 +52,9 @@
 <span class="sd">    spreading the initial conditions or whatever you usually like to do.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="InterpolateBetweenRestarts.setup"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="InterpolateBetweenRestarts.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the initial guess used in the sweeper when no restart has happened</span>
 
@@ -64,7 +68,10 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="InterpolateBetweenRestarts.setup_status_variables"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables">[docs]</a>    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InterpolateBetweenRestarts.setup_status_variables">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add variables to the sweeper containing the interpolated solution and right hand side.</span>
 
@@ -77,7 +84,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">f_inter</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">perform_interpolation</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="InterpolateBetweenRestarts.post_spread_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InterpolateBetweenRestarts.post_spread_processing">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spread the interpolated values to the collocation nodes. This overrides whatever the sweeper uses for prediction.</span>
 
@@ -97,7 +107,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u_inter</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">f_inter</span> <span class="o">=</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="InterpolateBetweenRestarts.post_iteration_processing"><a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InterpolateBetweenRestarts.post_iteration_processing">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.interpolate_between_restarts.html#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Interpolate the solution and right hand sides and store them in the sweeper, where they will be distributed</span>
 <span class="sd">        accordingly in the prediction step.</span>
@@ -128,7 +141,9 @@
                 <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">perform_interpolation</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">perform_interpolation</span> <span class="o">=</span> <span class="kc">False</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -167,7 +182,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.convergence_controller_classes.interpolate_between_restarts module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,11 +46,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.convergence_controller_classes.interpolate_between_restarts">
-<span id="implementations-convergence-controller-classes-interpolate-between-restarts-module"></span><h1>implementations.convergence_controller_classes.interpolate_between_restarts module<a class="headerlink" href="#module-implementations.convergence_controller_classes.interpolate_between_restarts" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-convergence-controller-classes-interpolate-between-restarts-module">
+<h1>implementations.convergence_controller_classes.interpolate_between_restarts module<a class="headerlink" href="#implementations-convergence-controller-classes-interpolate-between-restarts-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.convergence_controller_classes.interpolate_between_restarts">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InterpolateBetweenRestarts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InterpolateBetweenRestarts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
 <p>Interpolate the solution and right hand side to the new set of collocation nodes after a restart.
 The idea is that when you adjust the step size between restarts, you already know what the new quadrature method
@@ -58,7 +58,7 @@ is going to be and possibly interpolating the current iterate to these results i
 spreading the initial conditions or whatever you usually like to do.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing">
-<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_iteration_processing" title="Link to this definition">¶</a></dt>
 <dd><p>Interpolate the solution and right hand sides and store them in the sweeper, where they will be distributed
 accordingly in the prediction step.</p>
 <p>This function is called after every iteration instead of just after the step because we might choose to stop
@@ -77,7 +77,7 @@ efficient implementation and you may choose to write a different convergence con
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing">
-<span class="sig-name descname"><span class="pre">post_spread_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.post_spread_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">post_spread_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.post_spread_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.post_spread_processing" title="Link to this definition">¶</a></dt>
 <dd><p>Spread the interpolated values to the collocation nodes. This overrides whatever the sweeper uses for prediction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -91,7 +91,7 @@ efficient implementation and you may choose to write a different convergence con
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup" title="Link to this definition">¶</a></dt>
 <dd><p>Store the initial guess used in the sweeper when no restart has happened</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -106,7 +106,7 @@ efficient implementation and you may choose to write a different convergence con
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables">
-<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/interpolate_between_restarts.html#InterpolateBetweenRestarts.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.interpolate_between_restarts.InterpolateBetweenRestarts.setup_status_variables" title="Link to this definition">¶</a></dt>
 <dd><p>Add variables to the sweeper containing the interpolated solution and right hand side.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -196,7 +196,7 @@ efficient implementation and you may choose to write a different convergence con
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

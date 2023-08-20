@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>core.Hooks &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -45,7 +45,9 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames</span>
-<div class="viewcode-block" id="hooks"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks">[docs]</a><span class="k">class</span> <span class="nc">hooks</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="hooks">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks">[docs]</a>
+<span class="k">class</span> <span class="nc">hooks</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)</span>
 
@@ -72,7 +74,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__entry</span> <span class="o">=</span> <span class="n">Entry</span>
 
-<div class="viewcode-block" id="hooks.add_to_stats"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.add_to_stats">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="hooks.add_to_stats">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.add_to_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_to_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to add data to the statistics dict</span>
 
@@ -98,7 +102,10 @@
             <span class="p">)</span>
         <span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="hooks.increment_stats"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.increment_stats">[docs]</a>    <span class="k">def</span> <span class="nf">increment_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">initialize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.increment_stats">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.increment_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">increment_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">initialize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to</span>
 <span class="sd">        initialize if applicable and to value otherwise</span>
@@ -123,7 +130,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="hooks.return_stats"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.return_stats">[docs]</a>    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.return_stats">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.return_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for the stats</span>
 
@@ -132,13 +142,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span></div>
 
-<div class="viewcode-block" id="hooks.reset_stats"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.reset_stats">[docs]</a>    <span class="k">def</span> <span class="nf">reset_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.reset_stats">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.reset_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to reset the stats for multiple runs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span> <span class="o">=</span> <span class="p">{}</span></div>
 
-<div class="viewcode-block" id="hooks.pre_setup"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_setup">[docs]</a>    <span class="k">def</span> <span class="nf">pre_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_setup">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called before setup starts</span>
 
@@ -148,7 +164,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.pre_run"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_run">[docs]</a>    <span class="k">def</span> <span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_run">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called before time-loop starts</span>
 
@@ -158,7 +177,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.pre_predict"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_predict">[docs]</a>    <span class="k">def</span> <span class="nf">pre_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_predict">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called before predictor starts</span>
 
@@ -168,7 +190,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.pre_step"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_step">[docs]</a>    <span class="k">def</span> <span class="nf">pre_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_step">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_step">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Hook called before each step</span>
 
@@ -178,7 +203,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.pre_iteration"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">pre_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_iteration">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_iteration">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called before iteration starts</span>
 
@@ -188,7 +216,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.pre_sweep"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">pre_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_sweep">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_sweep">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called before sweep starts</span>
 
@@ -198,7 +229,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.pre_comm"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_comm">[docs]</a>    <span class="k">def</span> <span class="nf">pre_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.pre_comm">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.pre_comm">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called before communication starts</span>
 
@@ -208,7 +242,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_comm"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_comm">[docs]</a>    <span class="k">def</span> <span class="nf">post_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_comm">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_comm">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after each communication</span>
 
@@ -219,7 +256,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_sweep"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">post_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_sweep">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_sweep">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after each sweep</span>
 
@@ -229,7 +269,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_iteration"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">post_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_iteration">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_iteration">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after each iteration</span>
 
@@ -239,7 +282,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_step"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_step">[docs]</a>    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_step">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_step">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after each step or block</span>
 
@@ -249,7 +295,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_predict"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_predict">[docs]</a>    <span class="k">def</span> <span class="nf">post_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_predict">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after each predictor</span>
 
@@ -259,7 +308,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_run"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_run">[docs]</a>    <span class="k">def</span> <span class="nf">post_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_run">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after each run</span>
 
@@ -269,7 +321,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="hooks.post_setup"><a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_setup">[docs]</a>    <span class="k">def</span> <span class="nf">post_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+
+<div class="viewcode-block" id="hooks.post_setup">
+<a class="viewcode-back" href="../../pySDC/core.Hooks.html#core.Hooks.hooks.post_setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Default routine called after setup</span>
 
@@ -277,7 +332,9 @@
 <span class="sd">            step (pySDC.Step.step): the current step</span>
 <span class="sd">            level_number (int): the current level number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__num_restarts</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restarts_in_a_row&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -316,7 +373,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

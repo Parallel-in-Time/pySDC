@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>helpers.stats_helper module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,11 +45,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-helpers.stats_helper">
-<span id="helpers-stats-helper-module"></span><h1>helpers.stats_helper module<a class="headerlink" href="#module-helpers.stats_helper" title="Permalink to this heading">¶</a></h1>
-<dl class="py function">
+  <section id="helpers-stats-helper-module">
+<h1>helpers.stats_helper module<a class="headerlink" href="#helpers-stats-helper-module" title="Link to this heading">¶</a></h1>
+<dl class="py function" id="module-helpers.stats_helper">
 <dt class="sig sig-object py" id="helpers.stats_helper.filter_stats">
-<span class="sig-name descname"><span class="pre">filter_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recomputed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Link to this definition">¶</a></dt>
 <dd><p>Helper function to extract data from the dictionary of statistics</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -75,7 +75,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.get_list_of_types">
-<span class="sig-name descname"><span class="pre">get_list_of_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_list_of_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_list_of_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_list_of_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_list_of_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_list_of_types" title="Link to this definition">¶</a></dt>
 <dd><p>Helper function to get list of types registered in stats</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -92,7 +92,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.get_sorted">
-<span class="sig-name descname"><span class="pre">get_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_sorted" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.get_sorted" title="Link to this definition">¶</a></dt>
 <dd><p>Utility for filtering and sorting stats in a single call. Pass a communicator if using MPI.
 Keyword arguments are passed to <cite>filter_stats</cite> for filtering.</p>
 <p>stats (dict): raw statistics from a controller run
@@ -109,7 +109,7 @@ sortby (str): string to specify which key to use for sorting</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.stats_helper.sort_stats">
-<span class="sig-name descname"><span class="pre">sort_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#sort_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.sort_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sort_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sortby</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#sort_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.stats_helper.sort_stats" title="Link to this definition">¶</a></dt>
 <dd><p>Helper function to transform stats dictionary to sorted list of tuples</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -202,7 +202,7 @@ sortby (str): string to specify which key to use for sorting</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

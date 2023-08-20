@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.problem_classes.AcousticAdvection_1D_FD_imex &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -50,7 +50,9 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="acoustic_1d_imex"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex">[docs]</a><span class="k">class</span> <span class="nc">acoustic_1d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="acoustic_1d_imex">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex">[docs]</a>
+<span class="k">class</span> <span class="nc">acoustic_1d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the one-dimensional acoustics advection equation on a periodic domain :math:`[0, 1]`</span>
 <span class="sd">    fully investigated in [1]_. The equations are given by</span>
@@ -123,7 +125,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">getWave1DMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">cs</span> <span class="o">*</span> <span class="n">A</span>
 
-<div class="viewcode-block" id="acoustic_1d_imex.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="acoustic_1d_imex.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.solve_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
 
@@ -154,6 +158,7 @@
         <span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
+
 
     <span class="k">def</span> <span class="nf">__eval_fexpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -205,7 +210,9 @@
 
         <span class="k">return</span> <span class="n">fimpl</span>
 
-<div class="viewcode-block" id="acoustic_1d_imex.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="acoustic_1d_imex.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate both parts of the right-hand side of the problem.</span>
 
@@ -227,7 +234,10 @@
         <span class="n">f</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eval_fexpl</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
-<div class="viewcode-block" id="acoustic_1d_imex.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+
+<div class="viewcode-block" id="acoustic_1d_imex.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t.</span>
 
@@ -252,7 +262,9 @@
         <span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u_initial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadv</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cs</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">waveno</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u_initial</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadv</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cs</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">waveno</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">me</span></div></div>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -291,7 +303,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

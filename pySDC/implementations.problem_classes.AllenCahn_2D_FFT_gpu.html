@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>implementations.problem_classes.AllenCahn_2D_FFT_gpu module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,11 +46,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.problem_classes.AllenCahn_2D_FFT_gpu">
-<span id="implementations-problem-classes-allencahn-2d-fft-gpu-module"></span><h1>implementations.problem_classes.AllenCahn_2D_FFT_gpu module<a class="headerlink" href="#module-implementations.problem_classes.AllenCahn_2D_FFT_gpu" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="implementations-problem-classes-allencahn-2d-fft-gpu-module">
+<h1>implementations.problem_classes.AllenCahn_2D_FFT_gpu module<a class="headerlink" href="#implementations-problem-classes-allencahn-2d-fft-gpu-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.problem_classes.AllenCahn_2D_FFT_gpu">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn2d_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping</p>
 <dl class="field-list simple">
@@ -67,7 +67,7 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.xvalues">
-<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.xvalues" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.xvalues" title="Link to this definition">¶</a></dt>
 <dd><p>Grid points in space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -78,7 +78,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dx">
-<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dx" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dx" title="Link to this definition">¶</a></dt>
 <dd><p>Cupy mesh width.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -89,7 +89,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.lap">
-<span class="sig-name descname"><span class="pre">lap</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.lap" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lap</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.lap" title="Link to this definition">¶</a></dt>
 <dd><p>Spectral operator for Laplacian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -100,31 +100,31 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.rfft_object">
-<span class="sig-name descname"><span class="pre">rfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.rfft_object" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">rfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.rfft_object" title="Link to this definition">¶</a></dt>
 <dd><p>Planned real FFT for forward transformation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.irfft_object">
-<span class="sig-name descname"><span class="pre">irfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.irfft_object" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">irfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.irfft_object" title="Link to this definition">¶</a></dt>
 <dd><p>Planned IFFT for backward transformation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dtype_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dtype_f" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_cupy_mesh</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dtype_u" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.dtype_u" title="Link to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">cupy_mesh</span></code></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.eval_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.eval_f" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -144,7 +144,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.solve_system" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple FFT solver for the diffusion part.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -161,7 +161,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.u_exact">
-<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.u_exact" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -180,7 +180,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn2d_imex_stab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex_stab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn2d_imex_stab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex_stab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex" title="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn2d_imex</span></code></a></p>
 <p>Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
 stabilized splitting</p>
@@ -198,7 +198,7 @@ stabilized splitting</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.xvalues">
-<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.xvalues" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.xvalues" title="Link to this definition">¶</a></dt>
 <dd><p>Grid points in space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -209,7 +209,7 @@ stabilized splitting</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.dx">
-<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.dx" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.dx" title="Link to this definition">¶</a></dt>
 <dd><p>Cupy mesh width.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -220,7 +220,7 @@ stabilized splitting</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.lap">
-<span class="sig-name descname"><span class="pre">lap</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.lap" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lap</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.lap" title="Link to this definition">¶</a></dt>
 <dd><p>Spectral operator for Laplacian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -231,19 +231,19 @@ stabilized splitting</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.rfft_object">
-<span class="sig-name descname"><span class="pre">rfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.rfft_object" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">rfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.rfft_object" title="Link to this definition">¶</a></dt>
 <dd><p>Planned real FFT for forward transformation.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.irfft_object">
-<span class="sig-name descname"><span class="pre">irfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.irfft_object" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">irfft_object</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.irfft_object" title="Link to this definition">¶</a></dt>
 <dd><p>Planned IFFT for backward transformation.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex_stab.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.eval_f" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex_stab.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.eval_f" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -263,7 +263,7 @@ stabilized splitting</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex_stab.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.solve_system" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT_gpu.html#allencahn2d_imex_stab.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Simple FFT solver for the diffusion part.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -380,7 +380,7 @@ stabilized splitting</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

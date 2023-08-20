@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Compression in pySDC &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,12 +45,12 @@
           <div class="body" role="main">
             
   <section id="compression-in-pysdc">
-<h1>Compression in pySDC<a class="headerlink" href="#compression-in-pysdc" title="Permalink to this heading">¶</a></h1>
+<h1>Compression in pySDC<a class="headerlink" href="#compression-in-pysdc" title="Link to this heading">¶</a></h1>
 <p>This project aims to implement compression in pySDC in whatever way proves to be useful.
 It is a collaboration between Clemson University, Argonne National Laboratory and Forschungszentrum Juelich under the umbrella of <a class="reference external" href="https://jlesc.github.io">JLESC</a>.
 See the project web page <a class="reference external" href="https://jlesc.github.io/projects/lossy-compress-linear-algebra/">here</a>.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>PDE solvers provide ample opportunity for compression to improve certain aspects of the code.
 See for instance <a class="reference external" href="https://doi.org/10.3390/a12090197">Sebastian Goetschel’s and Martin Weiser’s nice review</a> on the topic.</p>
 <p>Due to current hardware trends, codes are often memory bound rather than compute bound, which means computational resources are perhaps more wisely spent on compression such that memory access can be reduced and more performance can be leveraged.
@@ -72,7 +72,7 @@ A resilient algorithm might trigger a costly restart which is unnecessary as the
 We will see how the project progresses and update this page accordingly.</p>
 </section>
 <section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
 <p>Since pySDC is a prototyping library, it provides a good playground to easily implement compression.
 However, we may not be able to measure a reduction in memory footprint due to Python’s memory management.</p>
 <p>For compression, we use the <a class="reference external" href="https://github.com/robertu94/libpressio">libpressio</a> library maintained by Robert Underwood at Argonne National Laboratory.
@@ -81,7 +81,7 @@ We use a docker container with an installation of libpressio and pySDC working t
 See the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/projects/compression/Docker">guide</a> on how to use the container.</p>
 </section>
 <section id="proof-of-concept">
-<h2>Proof of Concept<a class="headerlink" href="#proof-of-concept" title="Permalink to this heading">¶</a></h2>
+<h2>Proof of Concept<a class="headerlink" href="#proof-of-concept" title="Link to this heading">¶</a></h2>
 <p>For a proof of concept, we take the solution and right hand sides and compress and immediately decompress them every time they get updated during the sweeps.
 While this provides no benefit, it should capture the downsides of compression.
 We measure the local order of accuracy in time and verify that it increases by one with each sweep for an advection problem.
@@ -168,7 +168,7 @@ After establishing that the downsides of compression can be controlled, it remai
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

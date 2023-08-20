@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>implementations.sweeper_classes.boris_2nd_order &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -42,7 +42,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.Sweeper</span> <span class="kn">import</span> <span class="n">sweeper</span>
 
 
-<div class="viewcode-block" id="boris_2nd_order"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order">[docs]</a><span class="k">class</span> <span class="nc">boris_2nd_order</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
+<div class="viewcode-block" id="boris_2nd_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order">[docs]</a>
+<span class="k">class</span> <span class="nc">boris_2nd_order</span><span class="p">(</span><span class="n">sweeper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom sweeper class, implements Sweeper.py</span>
 
@@ -128,7 +130,9 @@
 
         <span class="k">return</span> <span class="p">[</span><span class="n">S</span><span class="p">,</span> <span class="n">ST</span><span class="p">,</span> <span class="n">SQ</span><span class="p">,</span> <span class="n">Sx</span><span class="p">,</span> <span class="n">QQ</span><span class="p">,</span> <span class="n">QI</span><span class="p">,</span> <span class="n">QT</span><span class="p">,</span> <span class="n">Qx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">]</span>
 
-<div class="viewcode-block" id="boris_2nd_order.update_nodes"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="boris_2nd_order.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</span>
 
@@ -193,7 +197,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="boris_2nd_order.integrate"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate">[docs]</a>    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="boris_2nd_order.integrate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate">[docs]</a>
+    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Integrates the right-hand side</span>
 
@@ -219,7 +226,10 @@
 
         <span class="k">return</span> <span class="n">p</span></div>
 
-<div class="viewcode-block" id="boris_2nd_order.compute_end_point"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point">[docs]</a>    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="boris_2nd_order.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
@@ -245,7 +255,10 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="boris_2nd_order.get_sweeper_mats"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="boris_2nd_order.get_sweeper_mats">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the matrices Q, QQ, Qx, QT which define the sweeper.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -257,7 +270,10 @@
 
         <span class="k">return</span> <span class="n">Q</span><span class="p">,</span> <span class="n">QQ</span><span class="p">,</span> <span class="n">Qx</span><span class="p">,</span> <span class="n">QT</span></div>
 
-<div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_sweeper_mats"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">[docs]</a>    <span class="k">def</span> <span class="nf">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_sweeper_mats">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_scalar_problems_sweeper_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function returns the corresponding matrices of an SDC sweep matrix formulation</span>
 
@@ -302,7 +318,10 @@
 
         <span class="k">return</span> <span class="n">C_coll</span><span class="p">,</span> <span class="n">Q_coll</span><span class="p">,</span> <span class="n">Q_vv</span><span class="p">,</span> <span class="n">M_vv</span><span class="p">,</span> <span class="n">F</span></div>
 
-<div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_manysweep_mats"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">[docs]</a>    <span class="k">def</span> <span class="nf">get_scalar_problems_manysweep_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_manysweep_mats">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_scalar_problems_manysweep_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a scalar problem, K sweeps of SDC can be written in matrix form.</span>
 
@@ -328,7 +347,10 @@
 
         <span class="k">return</span> <span class="n">Mat_sweep</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Keig</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_picardsweep_mats"><a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">[docs]</a>    <span class="k">def</span> <span class="nf">get_scalar_problems_picardsweep_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="boris_2nd_order.get_scalar_problems_picardsweep_mats">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_scalar_problems_picardsweep_mats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsweeps</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a scalar problem, K sweeps of SDC can be written in matrix form.</span>
 
@@ -351,7 +373,9 @@
 
         <span class="n">Mat_sweep</span> <span class="o">=</span> <span class="n">Kp_sdc</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Kdot_sdc</span><span class="p">,</span> <span class="n">C_coll</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">Mat_sweep</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Keig</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="n">Mat_sweep</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Keig</span><span class="p">))</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -390,7 +414,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>

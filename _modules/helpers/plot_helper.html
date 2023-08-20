@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>helpers.plot_helper &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=89b800e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c40552b6" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e71ce01"></script>
+    <script src="../../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -44,7 +44,9 @@
 <span class="n">default_mpl_params</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="figsize"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize">[docs]</a><span class="k">def</span> <span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
+<div class="viewcode-block" id="figsize">
+<a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize">[docs]</a>
+<span class="k">def</span> <span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get figsize.</span>
 
@@ -64,7 +66,10 @@
     <span class="k">return</span> <span class="n">fig_size</span></div>
 
 
-<div class="viewcode-block" id="figsize_by_journal"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize_by_journal">[docs]</a><span class="k">def</span> <span class="nf">figsize_by_journal</span><span class="p">(</span><span class="n">journal</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+
+<div class="viewcode-block" id="figsize_by_journal">
+<a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize_by_journal">[docs]</a>
+<span class="k">def</span> <span class="nf">figsize_by_journal</span><span class="p">(</span><span class="n">journal</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get figsize for specific journal. If you supply a text height, we will rescale the figure to fit on the page instead</span>
 <span class="sd">    of the parameters supplied.</span>
@@ -101,7 +106,10 @@
     <span class="k">return</span> <span class="n">figsize</span><span class="p">(</span><span class="n">textwidths</span><span class="p">[</span><span class="n">journal</span><span class="p">],</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="setup_mpl"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.setup_mpl">[docs]</a><span class="k">def</span> <span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="setup_mpl">
+<a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.setup_mpl">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
         <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">default_mpl_params</span><span class="p">)</span>
 
@@ -151,13 +159,19 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="newfig"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">[docs]</a><span class="k">def</span> <span class="nf">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.6180339887</span><span class="p">):</span>
+
+<div class="viewcode-block" id="newfig">
+<a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">[docs]</a>
+<span class="k">def</span> <span class="nf">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.6180339887</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
 
 
-<div class="viewcode-block" id="savefig"><a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.savefig">[docs]</a><span class="k">def</span> <span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="savefig">
+<a class="viewcode-back" href="../../pySDC/helpers.plot_helper.html#helpers.plot_helper.savefig">[docs]</a>
+<span class="k">def</span> <span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">save_pgf</span> <span class="ow">and</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pgf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">save_pdf</span><span class="p">:</span>
@@ -165,6 +179,7 @@
     <span class="k">if</span> <span class="n">save_png</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -203,7 +218,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     </div>
   </body>
 </html>
