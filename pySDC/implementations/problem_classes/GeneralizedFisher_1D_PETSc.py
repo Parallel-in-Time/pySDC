@@ -7,7 +7,14 @@ from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_ve
 
 class Fisher_full(object):
     """
-    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
+    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES.
+
+    Parameters
+    ----------
+    da: DMDA object
+    prob: problem instance
+    factor: temporal factor (dt*Qd)
+    dx: grid spacing in x direction
     """
 
     def __init__(self, da, prob, factor, dx):
