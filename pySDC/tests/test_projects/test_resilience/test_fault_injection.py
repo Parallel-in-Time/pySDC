@@ -46,8 +46,7 @@ def test_float_conversion():
                 assert exp[i] in [
                     res,
                     1.0 / res,
-                ], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or \
-{1./res:.2e}'
+                ], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or {1./res:.2e}'
             else:
                 nan_counter += 1
     if nan_counter > 0:

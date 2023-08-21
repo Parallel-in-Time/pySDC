@@ -115,11 +115,13 @@ class generic_implicit_MPI(sweeper):
 
         # get current level and problem description
         L = self.level
+        P = L.prob
+        L.uend = P.dtype_u(P.init, val=0.0)
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
-            L.uend = self.params.comm.bcast(L.u[self.rank + 1], root=self.params.comm.Get_size() - 1)
+            L.uend[:] = self.params.comm.bcast(L.u[self.rank + 1], root=self.params.comm.Get_size() - 1)
         else:
             raise NotImplementedError('require last node to be identical with right interval boundary')
 
