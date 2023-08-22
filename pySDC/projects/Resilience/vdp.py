@@ -179,16 +179,13 @@ def run_vdp(
     if fault_stuff is not None:
         from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
-        rnd_args = {'iteration': 3}
-        # args = {'time': 0.9, 'target': 0}
-        args = {'time': 5.25, 'target': 0}
-        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
+        prepare_controller_for_faults(controller, fault_stuff, {}, {})
 
     # call main function to get things done...
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except (ProblemError, ConvergenceError):
-        print('Warning: Premature termination!')
+    except (ProblemError, ConvergenceError) as e:
+        print(f'Warning: Premature termination: {e}')
         stats = controller.return_stats()
 
     return stats, controller, Tend

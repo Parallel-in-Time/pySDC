@@ -1,7 +1,7 @@
 import numpy as np
-import pickle
 import matplotlib.pyplot as plt
 from mpi4py import MPI
+import pickle
 
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
@@ -22,8 +22,16 @@ from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
 
 from pySDC.projects.Resilience.strategies import BaseStrategy, AdaptivityStrategy, IterateStrategy, HotRodStrategy
+import logging
 
 plot_helper.setup_mpl(reset=True)
+
+LOGGER_LEVEL = 40
+
+RECOVERY_THRESH_ABS = {
+    run_quench: 5e-3,
+    # run_Schroedinger: 1.7e-6,
+}
 
 
 class FaultStats:
@@ -40,8 +48,9 @@ class FaultStats:
         recovery_thresh=1 + 1e-3,
         recovery_thresh_abs=0.0,
         num_procs=1,
-        mode='combination',
+        mode='default',
         stats_path='data/stats',
+        use_MPI=False,
         **kwargs,
     ):
         '''
@@ -63,12 +72,32 @@ class FaultStats:
         self.recovery_thresh = recovery_thresh
         self.recovery_thresh_abs = recovery_thresh_abs
         self.num_procs = num_procs
-        self.mode = mode
+        self.use_MPI = use_MPI
         self.stats_path = stats_path
         self.kwargs = {
             'fault_frequency_iter': 500,
             **kwargs,
         }
+
+        # decide mode
+        if mode == 'default':
+            if prob.__name__ in ['run_vdp', 'run_Lorenz']:
+                self.mode = 'combination'
+            else:
+                self.mode = 'random'
+        else:
+            self.mode = mode
+
+        self.logger = logging.getLogger('FaultStats')
+        self.logger.level = LOGGER_LEVEL
+
+        msg = 'Starting FaultStats with attributes'
+        for key, val in self.__dict__.items():
+            if key in ['logger']:
+                continue
+            item = [str(me) for me in val] if type(val) == list else str(val)
+            msg += '\n\t' f'{key}: {item}'
+        self.logger.log(25, msg)
 
     def get_Tend(self):
         '''
@@ -79,7 +108,9 @@ class FaultStats:
         '''
         return self.strategies[0].get_Tend(self.prob, self.num_procs)
 
-    def run_stats_generation(self, runs=1000, step=None, comm=None, kwargs_range=None, _reload=False, _runs_partial=0):
+    def run_stats_generation(
+        self, runs=1000, step=None, comm=None, kwargs_range=None, faults=None, _reload=False, _runs_partial=0
+    ):
         '''
         Run the generation of stats for all strategies in the `self.strategies` variable
 
@@ -87,19 +118,27 @@ class FaultStats:
             runs (int): Number of runs you want to do
             step (int): Number of runs you want to do between saving
             comm (MPI.Communicator): Communicator for distributing runs
+            faults (bool): Whether to do stats with faults or without
             kw_args_range (dict): Range for the parameters
             _reload, _runs_partial: Variables only used for recursion. Do not change!
 
         Returns:
             None
         '''
+        if faults is None:
+            for f in self.faults:
+                self.run_stats_generation(runs=runs, step=step, comm=comm, kwargs_range=kwargs_range, faults=f)
+            return None
+
         for key, val in kwargs_range.items() if kwargs_range is not None else {}:
             if type(val) == int:
                 self.kwargs[key] = val
             else:
                 for me in val:
                     kwargs_range_me = {**kwargs_range, key: me}
-                    self.run_stats_generation(runs=runs, step=step, comm=comm, kwargs_range=kwargs_range_me)
+                    self.run_stats_generation(
+                        runs=runs, step=step, comm=comm, kwargs_range=kwargs_range_me, faults=faults
+                    )
                 return None
 
         comm = MPI.COMM_WORLD if comm is None else comm
@@ -107,20 +146,25 @@ class FaultStats:
         _runs_partial = step if _runs_partial == 0 else _runs_partial
         reload = self.reload or _reload
 
-        max_runs = self.get_max_combinations() if self.mode == 'combination' else runs
+        # see if we limit the number of runs we want to do
+        max_runs = (
+            (min(self.get_max_combinations(), runs) if self.mode == 'combination' else runs) if faults else min(runs, 5)
+        )
 
         if reload:
             # sort the strategies to do some load balancing
             sorting_index = None
             if comm.rank == 0:
                 already_completed = np.array(
-                    [self.load(strategy=strategy, faults=True).get('runs', 0) for strategy in self.strategies]
+                    [self.load(strategy=strategy, faults=faults).get('runs', 0) for strategy in self.strategies]
                 )
                 sorting_index_ = np.argsort(already_completed)
                 sorting_index = sorting_index_[already_completed[sorting_index_] < max_runs]
+                _runs_partial = max(min(already_completed), _runs_partial)
 
             # tell all ranks what strategies to use
             sorting_index = comm.bcast(sorting_index, root=0)
+            _runs_partial = comm.bcast(_runs_partial, root=0)
             strategies = [self.strategies[i] for i in sorting_index]
             if len(strategies) == 0:  # check if we are already done
                 return None
@@ -130,20 +174,17 @@ class FaultStats:
         strategy_comm = comm.Split(comm.rank % len(strategies))
 
         for j in range(0, len(strategies), comm.size):
-            for f in self.faults:
-                if f:
-                    runs_partial = min(_runs_partial, max_runs)
-                else:
-                    runs_partial = min([5, _runs_partial])
-                self.generate_stats(
-                    strategy=strategies[j + (comm.rank % len(strategies) % (len(strategies)) - j)],
-                    runs=runs_partial,
-                    faults=f,
-                    reload=reload,
-                    comm=strategy_comm,
-                )
+            self.generate_stats(
+                strategy=strategies[j + (comm.rank % len(strategies) % (len(strategies)) - j)],
+                runs=min(_runs_partial, max_runs),
+                faults=faults,
+                reload=reload,
+                comm=strategy_comm,
+            )
         strategy_comm.Free()
-        self.run_stats_generation(runs=runs, step=step, comm=comm, _reload=True, _runs_partial=_runs_partial + step)
+        self.run_stats_generation(
+            runs=runs, step=step, comm=comm, faults=faults, _reload=True, _runs_partial=_runs_partial + step
+        )
 
         return None
 
@@ -178,6 +219,7 @@ class FaultStats:
             'total_newton_iteration': np.zeros(runs),
             'restarts': np.zeros(runs),
             'target': np.zeros(runs),
+            'rank': np.zeros(runs),
         }
 
         # store arguments for storing and loading
@@ -193,18 +235,19 @@ class FaultStats:
                 already_completed_ = self.load(**identifier_args)
             already_completed = comm.bcast(already_completed_, root=0)
             if already_completed['runs'] > 0 and already_completed['runs'] <= runs and comm.rank == 0:
+                avail_len = min([already_completed['runs'], runs])
                 for k in dat.keys():
-                    dat[k][: min([already_completed['runs'], runs])] = already_completed.get(k, [])
+                    dat[k][:avail_len] = already_completed.get(k, [None] * avail_len)
         else:
             already_completed = {'runs': 0}
 
         # prepare a message
         involved_ranks = comm.gather(MPI.COMM_WORLD.rank, root=0)
-        msg = f'{comm.size} rank(s) ({involved_ranks}) doing {strategy.name}{" with faults" if faults else ""} from {already_completed["runs"]} to {runs}'
+        msg = f'{comm.size} rank(s) ({involved_ranks}) doing {strategy.name}{" with faults" if faults else ""} with {self.num_procs} ranks for {self.prob.__name__} from {already_completed["runs"]} to {runs}'
         if comm.rank == 0 and already_completed['runs'] < runs:
             print(msg, flush=True)
 
-        space_comm = comm.Split(comm.rank)
+        space_comm = MPI.COMM_SELF.Split(True)
 
         # perform the remaining experiments
         for i in range(already_completed['runs'], runs):
@@ -218,11 +261,7 @@ class FaultStats:
             faults_run = get_sorted(stats, type='bitflip')
             t, u = get_sorted(stats, type='u', recomputed=False)[-1]
 
-            # check if we ran to the end
-            if t < Tend:
-                error = np.inf
-            else:
-                error = self.get_error(u, t, controller, strategy)
+            error = self.get_error(u, t, controller, strategy, Tend)
             total_iteration = sum([k[1] for k in get_sorted(stats, type='k')])
             total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='work_newton')])
 
@@ -235,12 +274,16 @@ class FaultStats:
                     dat['problem_pos'] += [faults_run[0][1][3]]
                     dat['bit'][i] = faults_run[0][1][4]
                     dat['target'][i] = faults_run[0][1][5]
+                    dat['rank'][i] = faults_run[0][1][6]
                 else:
                     assert self.mode == 'regular', f'No faults where recorded in run {i} of strategy {strategy.name}!'
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
             dat['total_newton_iteration'][i] = total_newton_iteration
-            dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restarts')])
+            dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restart')])
+
+        # free the space communicator
+        space_comm.Free()
 
         dat_full = {}
         for k in dat.keys():
@@ -253,14 +296,11 @@ class FaultStats:
             if comm.rank == 0:
                 self.store(dat_full, **identifier_args)
                 if self.faults:
-                    try:
-                        self.get_recovered(strategy=strategy)
-                    except KeyError:
-                        print('Warning: Can\'t compute recovery rate right now')
+                    self.get_recovered(strategy=strategy)
 
         return None
 
-    def get_error(self, u, t, controller, strategy):
+    def get_error(self, u, t, controller, strategy, Tend):
         """
         Compute the error.
 
@@ -269,13 +309,33 @@ class FaultStats:
             t (float): Time at which `u` was recorded
             controller (pySDC.controller.controller): The controller
             strategy (Strategy): The resilience strategy
+            Tend (float): Time you want to run to
 
         Returns:
             float: Error
         """
-        return abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+        lvl = controller.MS[0].levels[0]
 
-    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=None, space_comm=None, Tend=None):
+        # decide if we reached Tend
+        Tend_reached = t + lvl.params.dt_initial >= Tend
+
+        if Tend_reached:
+            return abs(u - lvl.prob.u_exact(t=t))
+        else:
+            print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
+            return np.inf
+
+    def single_run(
+        self,
+        strategy,
+        run=0,
+        faults=False,
+        force_params=None,
+        hook_class=None,
+        space_comm=None,
+        Tend=None,
+        time_comm=None,
+    ):
         '''
         Run the problem once with the specified parameters
 
@@ -285,6 +345,8 @@ class FaultStats:
             faults (bool): Whether or not to put faults in
             force_params (dict): Change parameters in the description of the problem
             space_comm (MPI.Communicator): A communicator for space parallelisation
+            Tend (float): Time you want to run to
+            time_comm (MPI.Intracomm.Communicator): Communicator in time
 
         Returns:
             dict: Stats object containing statistics for each step, each level and each iteration
@@ -299,13 +361,16 @@ class FaultStats:
         for k in force_params.keys():
             custom_description[k] = {**custom_description.get(k, {}), **force_params[k]}
 
-        custom_controller_params = force_params.get('controller_params', {})
+        custom_controller_params = {
+            'logger_level': LOGGER_LEVEL,
+            **force_params.get('controller_params', {}),
+        }
 
         if faults:
             fault_stuff = {
                 'rng': None,
                 'args': strategy.get_fault_args(self.prob, self.num_procs),
-                'rnd_params': strategy.get_fault_args(self.prob, self.num_procs),
+                'rnd_params': strategy.get_random_params(self.prob, self.num_procs),
             }
 
             # make parameters for faults:
@@ -334,6 +399,8 @@ class FaultStats:
             Tend=self.get_Tend() if Tend is None else Tend,
             custom_controller_params=custom_controller_params,
             space_comm=space_comm,
+            comm=time_comm,
+            use_MPI=time_comm is not None,
         )
 
     def compare_strategies(self, run=0, faults=False, ax=None):  # pragma: no cover
@@ -381,7 +448,7 @@ class FaultStats:
             plot_restarts (bool): Make vertical lines wherever restarts happened
 
         Returns:
-            None
+            dict: Stats from the run
         '''
         if ax is None:
             fig, ax = plt.subplots(1, 1)
@@ -415,7 +482,7 @@ class FaultStats:
 
         # plot restarts
         if plot_restarts:
-            restarts = get_sorted(stats, type='restarts')
+            restarts = get_sorted(stats, type='restart')
             [ax.axvline(me[0], color='black', ls='-.') if me[1] else '' for me in restarts]
 
         # decorate
@@ -428,38 +495,54 @@ class FaultStats:
             fig.tight_layout()
             plt.savefig(f'data/{self.get_name()}-{strategy.name}-details.pdf', transparent=True)
 
-    def scrutinize(self, strategy, run, faults=True):
+    def scrutinize(self, strategy, logger_level=15, **kwargs):
         '''
         Take a closer look at a specific run
 
         Args:
             strategy (Strategy): The resilience strategy you plan on using
-            run (int): The number of the run to get the appropriate random generator
-            faults (bool): Whether or not to include faults
 
         Returns:
             None
         '''
+        from pySDC.projects.Resilience.fault_injection import FaultInjector
+
         force_params = {}
-        force_params['controller_params'] = {'logger_level': 15}
+        force_params['controller_params'] = {'logger_level': logger_level}
+        force_params['sweeper_params'] = {'skip_residual_computation': ()}
 
-        stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params)
+        stats, controller, Tend = self.single_run(strategy=strategy, force_params=force_params, **kwargs)
 
-        t, u = get_sorted(stats, type='u')[-1]
-        print(max(u))
-        k = [me[1] for me in get_sorted(stats, type='k')]
-        print(k)
+        u_all = get_sorted(stats, type='u', recomputed=False)
+        t, u = get_sorted(stats, type='u', recomputed=False)[np.argmax([me[0] for me in u_all])]
+        k = get_sorted(stats, type='k')
+
+        fault_hook = [me for me in controller.hooks if type(me) == FaultInjector]
+
+        unhappened_faults = fault_hook[0].faults if len(fault_hook) > 0 else []
 
         print(f'\nOverview for {strategy.name} strategy')
+        # print faults
+        faults = get_sorted(stats, type='bitflip')
+        print('\nfaults:')
+        print('    t   | level | iter | node | bit | trgt | rank | pos')
+        print('--------+-------+------+------+-----+------+---------------------')
+        for f in faults:
+            print(
+                f' {f[0]:6.2f} | {f[1][0]:5d} | {f[1][1]:4d} | {f[1][2]:4d} | {f[1][4]:3d} | {f[1][5]:4d} | {f[1][6]:4d} |',
+                f[1][3],
+            )
+        print('--------+-------+------+------+-----+------+---------------------')
+        for f in unhappened_faults:
+            print(
+                f'!{f.time:6.2f} | {f.level_number:5d} | {f.iteration:4d} | {f.node:4d} | {f.bit:3d} | {f.target:4d} | {f.rank:4d} |',
+                f.problem_pos,
+            )
 
         # see if we can determine if the faults where recovered
         no_faults = self.load(strategy=strategy, faults=False)
         e_star = np.mean(no_faults.get('error', [0]))
-        if t < Tend:
-            error = np.inf
-            print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
-        else:
-            error = self.get_error(u, t, controller, strategy)
+        error = self.get_error(u, t, controller, strategy, Tend)
         recovery_thresh = self.get_thresh(strategy)
 
         print(
@@ -480,18 +563,10 @@ class FaultStats:
         print(f'dt: min: {np.min(dt):.2e}, max: {np.max(dt):.2e}, mean: {np.mean(dt):.2e}')
 
         # restarts
-        restarts = [me[1] for me in get_sorted(stats, type='restarts')]
+        restarts = [me[1] for me in get_sorted(stats, type='restart')]
         print(f'restarts: {sum(restarts)}, without faults: {no_faults["restarts"][0]}')
 
-        # print faults
-        faults = get_sorted(stats, type='bitflip')
-        print('\nfaults:')
-        print('    t   | level | iter | node | bit | trgt | pos')
-        print('--------+-------+------+------+-----+------+----')
-        for f in faults:
-            print(f' {f[0]:6.2f} | {f[1][0]:5d} | {f[1][1]:4d} | {f[1][2]:4d} | {f[1][4]:3d} | {f[1][5]:4d} |', f[1][3])
-
-        return None
+        return stats
 
     def convert_faults(self, faults):
         '''
@@ -571,7 +646,8 @@ class FaultStats:
         else:
             mode_thing = ''
 
-        return f'{prob_name}{strategy_name}{fault_name}-{self.num_procs}procs{mode_thing}'
+        mpi_thing = '-MPI' if self.use_MPI else ''
+        return f'{prob_name}{strategy_name}{fault_name}-{self.num_procs}procs{mode_thing}{mpi_thing}'
 
     def store(self, dat, **kwargs):
         '''
@@ -602,6 +678,7 @@ class FaultStats:
             with open(self.get_path(**kwargs), 'rb') as f:
                 dat = pickle.load(f)
         except FileNotFoundError:
+            self.logger.debug(f'File \"{self.get_path(**kwargs)}\" not found!')
             return {'runs': 0}
         return dat
 
@@ -613,8 +690,10 @@ class FaultStats:
             strategy (Strategy): The resilience strategy
         """
         fault_free = self.load(strategy=strategy, faults=False)
-        assert fault_free['error'].std() / fault_free['error'].mean() < 1e-5
-        return self.recovery_thresh_abs + self.recovery_thresh * fault_free["error"].mean()
+        assert (
+            fault_free['error'].std() / fault_free['error'].mean() < 1e-5
+        ), f'Got too large variation of errors in {strategy} strategy!'
+        return max([self.recovery_thresh_abs, self.recovery_thresh * fault_free["error"].mean()])
 
     def get_recovered(self, **kwargs):
         '''
@@ -630,8 +709,10 @@ class FaultStats:
                 with_faults = self.load(faults=True, **kwargs)
                 with_faults['recovered'] = with_faults['error'] < self.get_thresh(kwargs['strategy'])
                 self.store(faults=True, dat=with_faults, **kwargs)
-            except KeyError:
-                print("Can\'t compute recovery rate right now")
+            except KeyError as error:
+                print(
+                    f'Warning: Can\'t compute recovery rate for strategy {kwargs["strategy"].name} in {self.prob.__name__} problem right now: KeyError: {error}'
+                )
 
         return None
 
@@ -818,7 +899,9 @@ class FaultStats:
 
         return None
 
-    def plot_recovery_thresholds(self, strategies=None, thresh_range=None, ax=None):  # pragma: no cover
+    def plot_recovery_thresholds(
+        self, strategies=None, thresh_range=None, ax=None, mask=None, **kwargs
+    ):  # pragma: no cover
         '''
         Plot the recovery rate for a range of thresholds
 
@@ -826,12 +909,14 @@ class FaultStats:
             strategies (list): List of the strategies you want to plot, if None, all will be plotted
             thresh_range (list): thresholds for deciding whether to accept as recovered
             ax (Matplotlib.axes): Somewhere to plot
+            mask (Numpy.ndarray of shape (n)): The mask you want to know about
 
         Returns:
             None
         '''
         # fill default values if nothing is specified
         strategies = self.strategies if strategies is None else strategies
+
         thresh_range = 1 + np.linspace(-4e-2, 4e-2, 100) if thresh_range is None else thresh_range
         if ax is None:
             fig, ax = plt.subplots(1, 1)
@@ -844,10 +929,20 @@ class FaultStats:
             with_faults = self.load(strategy=strategy, faults=True)
 
             for thresh_idx in range(len(thresh_range)):
-                rec_mask = with_faults['error'] < thresh_range[thresh_idx] * fault_free['error'].mean()
-                rec_rates[strategy_idx][thresh_idx] = len(with_faults['error'][rec_mask]) / len(with_faults['error'])
+                rec_mask = self.get_mask(
+                    strategy=strategy,
+                    key='error',
+                    val=(thresh_range[thresh_idx] * fault_free['error'].mean()),
+                    op='gt',
+                    old_mask=mask,
+                )
+                rec_rates[strategy_idx][thresh_idx] = 1.0 - len(with_faults['error'][rec_mask]) / len(
+                    with_faults['error']
+                )
 
-            ax.plot(thresh_range, rec_rates[strategy_idx], color=strategy.color, label=strategy.label)
+            ax.plot(
+                thresh_range, rec_rates[strategy_idx], **{'color': strategy.color, 'label': strategy.label, **kwargs}
+            )
         ax.legend(frameon=False)
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
@@ -997,26 +1092,30 @@ class FaultStats:
 
         return [e_em[i][-1] for i in [0, 1]], [e_ex[i][-1] for i in [0, 1]], e_glob
 
-    def print_faults(self, mask=None):  # pragma: no cover
+    def print_faults(self, mask=None, strategy=None):  # pragma: no cover
         '''
         Print all faults that happened within a certain mask
 
         Args:
             mask (Numpy.ndarray of shape (n)): The mask you want to know the contents of
+            strategy (Strategy): The resilience strategy you want to see the error for
 
         Returns:
             None
         '''
+        strategy = BaseStrategy() if strategy is None else strategy
+
         index = self.get_index(mask)
-        dat = self.load()
+        dat = self.load(strategy=strategy)
+
+        e_star = np.mean(self.load(faults=False, strategy=strategy).get('error', [0]))
 
         # make a header
-        print('  run  | bit | node | iter | space pos')
-        print('-------+-----+------+------+-----------')
+        print('  run  | bit | node | iter | rank | rel err | space pos')
+        print('-------+-----+------+------+------+---------+-----------')
         for i in index:
             print(
-                f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | \
-{dat["problem_pos"][i]}'
+                f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {dat.get("rank", np.zeros_like(dat["iteration"]))[i]:4.0f} | {dat["error"][i] / e_star:.1e} | {dat["problem_pos"][i]}'
             )
 
         return None
@@ -1204,24 +1303,27 @@ class FaultStats:
 
         return occurrences, bins
 
-    def get_max_combinations(self, dat=None):
+    def get_max_combinations(self, dat=None, strategy=None):
         '''
         Count how many combinations of parameters for faults are possible
 
         Args:
             dat (dict): The recorded statistics
             keys (list): The keys in dat that you want to know the combinations of
+            strategy (Strategy): The resilience strategy
 
         Returns:
             int: Number of possible combinations
         '''
-        stats, controller, Tend = self.single_run(strategy=self.strategies[0], run=0, faults=True)
+        strategy = self.strategies[0] if strategy is None else strategy
+        stats, controller, Tend = self.single_run(strategy=strategy, run=0, faults=True)
         faultHook = get_fault_injector_hook(controller)
         ranges = [
             (0, faultHook.rnd_params['level_number']),
-            (0, faultHook.rnd_params['node'] + 1),
+            (faultHook.rnd_params.get('min_node', 0), faultHook.rnd_params['node'] + 1),
             (1, faultHook.rnd_params['iteration'] + 1),
             (0, faultHook.rnd_params['bit']),
+            (0, faultHook.rnd_params['rank']),
         ]
         ranges += [(0, i) for i in faultHook.rnd_params['problem_pos']]
         return np.prod([me[1] - me[0] for me in ranges], dtype=int)
@@ -1368,6 +1470,32 @@ class FaultStats:
 
         return None
 
+    def get_HR_tol(self, verbose=False):
+        from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
+
+        HR_strategy = HotRodStrategy(useMPI=self.use_MPI)
+
+        description = HR_strategy.get_custom_description(self.prob, self.num_procs)
+        description['convergence_controllers'][HotRod]['HotRod_tol'] = 1e2
+
+        stats, _, _ = self.single_run(HR_strategy, force_params=description)
+
+        e_extrapolation = get_sorted(stats, type='error_extrapolation_estimate')
+        diff = []
+        for i in range(len(e_extrapolation)):
+            if e_extrapolation[i][1] is not None:
+                e_embedded = get_sorted(stats, type='error_embedded_estimate', time=e_extrapolation[i][0])
+                diff += [abs(e_extrapolation[i][1] - e_embedded[-1][1])]
+
+        max_diff = max(diff)
+        proposed_tol = 2 * max_diff
+        if verbose:
+            print(
+                f'Max. diff: {max_diff:.6e} -> proposed HR tolerance: {proposed_tol:.6e} for {self.prob.__name__} problem with {self.num_procs} procs.'
+            )
+        else:
+            print(f'{proposed_tol:.6e}')
+
 
 def check_local_error():  # pragma: no cover
     """
@@ -1384,6 +1512,7 @@ def check_local_error():  # pragma: no cover
             faults=[False],
             reload=True,
             recovery_thresh=1.1,
+            recovery_thresh_abs=RECOVERY_THRESH_ABS.get(problems[i], 0),
             num_procs=1,
             mode='random',
         )
@@ -1391,32 +1520,129 @@ def check_local_error():  # pragma: no cover
     plt.show()
 
 
-def main():
-    stats_analyser = FaultStats(
-        prob=run_vdp,
-        strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
-        faults=[False, True],
-        reload=True,
-        recovery_thresh=1.1,
-        # recovery_thresh_abs=1e-5,
-        num_procs=1,
-        mode='random',
-        stats_path='data/stats-jusuf',
-    )
-    ########################
-    # msk = stats_analyser.get_mask(AdaptivityStrategy(), val=False, key='recovered')
-    # stats_analyser.print_faults(msk)
-    fig, ax = plt.subplots()
-    iter_ax = ax.twinx()
-    kwargs_range = {'fault_frequency_iter': (10, 100, 1000, 10000)}
-    stats_analyser.run_stats_generation(runs=10, kwargs_range=kwargs_range)
-    stats_analyser.fault_frequency_plot(ax=ax, iter_ax=iter_ax, kwargs_range=kwargs_range)
-    # stats_analyser.scrutinize(AdaptivityStrategy(), 4, True)
-    plt.show()
-    return None
-    ########################
+def parse_args():
+    import sys
 
-    stats_analyser.run_stats_generation(runs=5000)
+    kwargs = {}
+
+    for i in range(len(sys.argv)):
+        if 'prob' in sys.argv[i]:
+            if sys.argv[i + 1] == 'run_Lorenz':
+                kwargs['prob'] = run_Lorenz
+            elif sys.argv[i + 1] == 'run_vdp':
+                kwargs['prob'] = run_vdp
+            elif sys.argv[i + 1] == 'run_Schroedinger':
+                kwargs['prob'] = run_Schroedinger
+            elif sys.argv[i + 1] == 'run_quench':
+                kwargs['prob'] = run_quench
+            else:
+                raise NotImplementedError
+        elif 'num_procs' in sys.argv[i]:
+            kwargs['num_procs'] = int(sys.argv[i + 1])
+        elif 'runs' in sys.argv[i]:
+            kwargs['runs'] = int(sys.argv[i + 1])
+        elif 'mode' in sys.argv[i]:
+            kwargs['mode'] = str(sys.argv[i + 1])
+        elif 'reload' in sys.argv[i]:
+            kwargs['reload'] = False if sys.argv[i + 1] == 'False' else True
+
+    return kwargs
+
+
+def compare_adaptivity_modes():
+    from pySDC.projects.Resilience.strategies import AdaptivityRestartFirstStep
+
+    fig, axs = plt.subplots(2, 2, sharey=True)
+    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_quench]
+    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger', 'Quench']
+
+    for i in range(len(problems)):
+        ax = axs.flatten()[i]
+
+        ax.set_title(titles[i])
+
+        stats_analyser = FaultStats(
+            prob=problems[i],
+            strategies=[AdaptivityStrategy()],
+            faults=[False, True],
+            reload=True,
+            recovery_thresh=1.1,
+            recovery_thresh_abs=RECOVERY_THRESH_ABS.get(problems[i], 0),
+            num_procs=1,
+            mode='default',
+            stats_path='data/stats-jusuf',
+        )
+        stats_analyser.get_recovered()
+
+        for strategy in stats_analyser.strategies:
+            fixable = stats_analyser.get_fixable_faults_only(strategy=strategy)
+            stats_analyser.plot_things_per_things(
+                'recovered',
+                'bit',
+                False,
+                strategies=[strategy],
+                op=stats_analyser.rec_rate,
+                mask=fixable,
+                args={'ylabel': 'recovery rate', 'label': 'bla'},
+                name='fixable_recovery',
+                ax=ax,
+            )
+        single_proc = ax.lines[-1]
+        single_proc.set_label('single process')
+        single_proc.set_color('black')
+
+        stats_analyser = FaultStats(
+            prob=problems[i],
+            strategies=[AdaptivityStrategy(), AdaptivityRestartFirstStep()],
+            faults=[False, True],
+            reload=True,
+            recovery_thresh=1.5,
+            recovery_thresh_abs=RECOVERY_THRESH_ABS.get(problems[i], 0),
+            num_procs=4,
+            mode='default',
+            stats_path='data/stats-jusuf',
+        )
+        stats_analyser.get_recovered()
+
+        for strategy in stats_analyser.strategies:
+            fixable = stats_analyser.get_fixable_faults_only(strategy=strategy)
+            stats_analyser.plot_things_per_things(
+                'recovered',
+                'bit',
+                False,
+                strategies=[strategy],
+                op=stats_analyser.rec_rate,
+                mask=fixable,
+                args={'ylabel': 'recovery rate'},
+                name='fixable_recovery',
+                ax=ax,
+            )
+    fig.suptitle('Comparison of restart modes with adaptivity with 4 ranks')
+    fig.tight_layout()
+    plt.show()
+
+
+def main():
+    kwargs = {
+        'prob': run_quench,
+        'num_procs': 1,
+        'mode': 'default',
+        'runs': 5000,
+        'reload': True,
+        **parse_args(),
+    }
+    from pySDC.projects.Resilience.strategies import DIRKStrategy, ERKStrategy
+
+    stats_analyser = FaultStats(
+        # strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
+        strategies=[DIRKStrategy(), ERKStrategy()],
+        faults=[False, True],
+        recovery_thresh=1.5,
+        recovery_thresh_abs=RECOVERY_THRESH_ABS.get(kwargs.get('prob', None), 0),
+        stats_path='data/stats-jusuf',
+        **kwargs,
+    )
+    stats_analyser.run_stats_generation(runs=kwargs['runs'])
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
@@ -1487,5 +1713,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # check_local_error()
     main()
+    # compare_adaptivity_modes()
+    # check_local_error()
