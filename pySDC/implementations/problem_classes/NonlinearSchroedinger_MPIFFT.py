@@ -28,7 +28,7 @@ class nonlinearschroedinger_imex(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars=None, spectral=None, L=2 * np.pi, c=1.0, comm=MPI.COMM_WORLD):
+    def __init__(self, nvars=None, spectral=False, L=2 * np.pi, c=1.0, comm=MPI.COMM_WORLD):
         """Initialization routine"""
 
         if nvars is None:

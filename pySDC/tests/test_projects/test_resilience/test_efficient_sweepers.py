@@ -11,7 +11,7 @@ def run_Lorenz(efficient, skip_residual_computation, num_procs=1):
 
     # initialize level parameters
     level_params = {}
-    level_params['dt'] = 1e-2
+    level_params['dt'] = 1e-1
 
     # initialize sweeper parameters
     sweeper_params = {}
@@ -75,7 +75,7 @@ def run_Schroedinger(efficient=False, num_procs=1, skip_residual_computation=Fal
     # initialize level parameters
     level_params = {}
     level_params['restol'] = 1e-8
-    level_params['dt'] = 1e-01 / 2
+    level_params['dt'] = 2e-01
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
@@ -137,6 +137,7 @@ def test_generic_implicit_efficient(skip_residual_computation=True):
     stats_normal = run_Lorenz(efficient=False, skip_residual_computation=skip_residual_computation)
     stats_efficient = run_Lorenz(efficient=True, skip_residual_computation=skip_residual_computation)
     assert_sameness(stats_normal, stats_efficient, 'generic_implicit')
+    assert_benefit(stats_normal, stats_efficient)
 
 
 @pytest.mark.base
@@ -144,6 +145,7 @@ def test_residual_skipping():
     stats_normal = run_Lorenz(efficient=True, skip_residual_computation=False)
     stats_efficient = run_Lorenz(efficient=True, skip_residual_computation=True)
     assert_sameness(stats_normal, stats_efficient, 'generic_implicit', check_residual=False)
+    assert_benefit(stats_normal, stats_efficient)
 
 
 @pytest.mark.mpi4py
@@ -158,6 +160,7 @@ def test_imex_first_order_efficient():
     stats_normal = run_Schroedinger(efficient=False)
     stats_efficient = run_Schroedinger(efficient=True)
     assert_sameness(stats_normal, stats_efficient, 'imex_first_order')
+    assert_benefit(stats_normal, stats_efficient)
 
 
 def assert_sameness(stats_normal, stats_efficient, sweeper_name, check_residual=True):
@@ -168,6 +171,23 @@ def assert_sameness(stats_normal, stats_efficient, sweeper_name, check_residual=
         normal = [you[1] for you in get_sorted(stats_normal, type=me)]
         if 'timing' in me or all(you is None for you in normal) or (not check_residual and 'residual' in me):
             continue
-        assert np.allclose(
-            normal, [you[1] for you in get_sorted(stats_efficient, type=me)]
-        ), f'Stats don\'t match in type \"{me}\" for efficient and regular implementations of {sweeper_name} sweeper!'
+        elif 'work_rhs' in me:
+            efficient = [me[1] for me in get_sorted(stats_efficient, type=me)]
+            assert all(
+                normal[i] >= efficient[i] for i in range(len(efficient))
+            ), f'Efficient sweeper performs more right hand side evaluations than regular implementations of {sweeper_name} sweeper!'
+        else:
+            comp = [you[1] for you in get_sorted(stats_efficient, type=me)]
+            assert np.allclose(
+                normal, comp
+            ), f'Stats don\'t match in type \"{me}\" for efficient and regular implementations of {sweeper_name} sweeper!'
+
+
+def assert_benefit(stats_normal, stats_efficient):
+    from pySDC.helpers.stats_helper import get_sorted
+
+    rhs_evals_normal = sum([me[1] for me in get_sorted(stats_normal, type='work_rhs')])
+    rhs_evals_efficient = sum([me[1] for me in get_sorted(stats_efficient, type='work_rhs')])
+    assert (
+        rhs_evals_normal > rhs_evals_efficient
+    ), f"More efficient sweeper did not perform fewer rhs evaluations! ({rhs_evals_efficient} vs {rhs_evals_normal})"
