@@ -326,6 +326,27 @@ In serial this is the local error, but in block Gauss-Seidel MSSDC this is a sem
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_embedded_error.html#EstimateEmbeddedErrorLinearizedNonMPI.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Add option for averaging the local errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -366,6 +387,7 @@ In serial this is the local error, but in block Gauss-Seidel MSSDC this is a sem
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI"><code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedErrorLinearizedNonMPI</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">reset_buffers_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorLinearizedNonMPI.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 </ul>

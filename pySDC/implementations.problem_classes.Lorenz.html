@@ -57,8 +57,12 @@
 <p>The Lorenz attractor is a system of three ordinary differential equations (ODEs) that exhibits some chaotic behaviour.
 It is well known for the “Butterfly Effect”, because the solution looks like a butterfly (solve to <span class="math notranslate nohighlight">\(T_{end} = 100\)</span>
 or so to see this with these initial conditions) and because of the chaotic nature.</p>
+<p>Lorenz developed this system from equations modelling convection in a layer of fluid with the top and bottom surfaces
+kept at different temperatures. In the notation used here, the first component of u is proportional to the convective
+motion, the second component is proportional to the temperature difference between the surfaces and the third component
+is proportional to the distortion of the vertical temperature profile from linearity.</p>
+<p>See doi.org/10.1175/1520-0469(1963)020&lt;0130:DNF&gt;2.0.CO;2 for the original publication.</p>
 <p>Since the problem is non-linear, we need to use a Newton solver.</p>
-<p>Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1</p>
 <p>The system of ODEs is given by</p>
 <div class="math notranslate nohighlight">
 \[\frac{d y_1(t)}{dt} = \sigma (y_2 (t) - y_1 (t)),\]</div>
@@ -66,8 +70,10 @@ or so to see this with these initial conditions) and because of the chaotic natu
 \[\frac{d y_2(t)}{dt} = \rho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)\]</div>
-<p>with initial condition <span class="math notranslate nohighlight">\(y(0) = (1, 1, 1)^{T}\)</span> for <span class="math notranslate nohighlight">\(t \in [0, 1]\)</span>. The problem parameters for this problem are
-<span class="math notranslate nohighlight">\(\sigma = 10\)</span>, <span class="math notranslate nohighlight">\(\rho = 28\)</span> and <span class="math notranslate nohighlight">\(\beta = 8/3\)</span>.</p>
+<p>with initial condition <span class="math notranslate nohighlight">\(y(0) = (1, 1, 1)^{T}\)</span> for <span class="math notranslate nohighlight">\(t \in [0, 1]\)</span>. The problem parameters for this problem
+are <span class="math notranslate nohighlight">\(\sigma = 10\)</span>, <span class="math notranslate nohighlight">\(\rho = 28\)</span> and <span class="math notranslate nohighlight">\(\beta = 8/3\)</span>.
+Lorenz chose these parameters such that the Reynolds number <span class="math notranslate nohighlight">\(\rho\)</span> is slightly supercritical as to provoke
+instability of steady convection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

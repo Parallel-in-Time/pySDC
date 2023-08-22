@@ -52,9 +52,14 @@
 <span class="sd">    It is well known for the &quot;Butterfly Effect&quot;, because the solution looks like a butterfly (solve to :math:`T_{end} = 100`</span>
 <span class="sd">    or so to see this with these initial conditions) and because of the chaotic nature.</span>
 
-<span class="sd">    Since the problem is non-linear, we need to use a Newton solver.</span>
+<span class="sd">    Lorenz developed this system from equations modelling convection in a layer of fluid with the top and bottom surfaces</span>
+<span class="sd">    kept at different temperatures. In the notation used here, the first component of u is proportional to the convective</span>
+<span class="sd">    motion, the second component is proportional to the temperature difference between the surfaces and the third component</span>
+<span class="sd">    is proportional to the distortion of the vertical temperature profile from linearity.</span>
 
-<span class="sd">    Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1</span>
+<span class="sd">    See doi.org/10.1175/1520-0469(1963)020&lt;0130:DNF&gt;2.0.CO;2 for the original publication.</span>
+
+<span class="sd">    Since the problem is non-linear, we need to use a Newton solver.</span>
 
 <span class="sd">    The system of ODEs is given by</span>
 
@@ -67,8 +72,10 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)</span>
 
-<span class="sd">    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem are</span>
-<span class="sd">    :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.</span>
+<span class="sd">    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem</span>
+<span class="sd">    are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.</span>
+<span class="sd">    Lorenz chose these parameters such that the Reynolds number :math:`\rho` is slightly supercritical as to provoke</span>
+<span class="sd">    instability of steady convection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -100,7 +107,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
