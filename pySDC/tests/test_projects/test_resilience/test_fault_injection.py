@@ -14,7 +14,7 @@ def get_random_float():
     """
     rand = 0.0
     while np.isclose(rand, 0.0, atol=1e-12):
-        rand = np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
+        rand = np.random.uniform(low=np.finfo(float).min / 1e1, high=np.finfo(float).max / 1e1, size=1)[0]
     return rand
 
 
@@ -86,6 +86,7 @@ def test_fault_injection():
         'iteration': 3,
         'problem_pos': (2,),
         'bit': 64,
+        'rank': 4,
     }
 
     reference = {
@@ -99,17 +100,19 @@ def test_fault_injection():
             'bit': 48,
             'target': 0,
             'when': 'after',
+            'rank': 3,
         },
         1: {
             'time': 1.0,
             'timestep': None,
             'level_number': 0,
             'iteration': 3,
-            'node': 3,
+            'node': 2,
             'problem_pos': [0],
-            'bit': 26,
+            'bit': 7,
             'target': 0,
             'when': 'after',
+            'rank': 1,
         },
         2: {
             'time': 1.0,
@@ -121,6 +124,7 @@ def test_fault_injection():
             'bit': 0,
             'target': 0,
             'when': 'after',
+            'rank': 0,
         },
         3: {
             'time': 1.0,
@@ -132,6 +136,7 @@ def test_fault_injection():
             'bit': 0,
             'target': 0,
             'when': 'after',
+            'rank': 0,
         },
     }
 
@@ -140,9 +145,10 @@ def test_fault_injection():
         injector.add_fault(args=args, rnd_args=rnd_args)
         if i >= 1:  # switch to combination based adding
             injector.random_generator = i - 1
-        assert (
-            injector.faults[i].__dict__ == reference[i]
-        ), f'Expected fault with parameters {reference[i]}, got {injector.faults[i].__dict__}!'
+        for key in reference[i].keys():
+            assert (
+                injector.faults[i].__dict__[key] == reference[i][key]
+            ), f'Expected fault with parameter {key}={reference[i][key]}, got {injector.faults[i].__dict__[key]} in fault number {i}!'
 
 
 @pytest.mark.mpi4py

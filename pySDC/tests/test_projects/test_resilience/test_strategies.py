@@ -13,6 +13,7 @@ STRATEGY_NAMES = [
     'base',
     'DIRK',
     'explicitRK',
+    'ESDIRK',
 ]
 STRATEGY_NAMES_NONMPIONLY = ['adaptiveHR', 'HotRod']
 LOGGER_LEVEL = 30
@@ -49,6 +50,7 @@ def single_test_vdp(strategy_name, useMPI, num_procs):
         'adaptivityInterpolation': strategies.AdaptivityInterpolationStrategy(useMPI=useMPI),
         'adaptivityQExtrapolation': strategies.AdaptivityExtrapolationWithinQStrategy(useMPI=useMPI),
         'base': strategies.BaseStrategy(useMPI=useMPI),
+        'ESDIRK': strategies.ESDIRKStrategy(useMPI=useMPI),
     }
 
     if strategy_name in avail_strategies.keys():

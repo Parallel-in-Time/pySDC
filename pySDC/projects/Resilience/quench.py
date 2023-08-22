@@ -100,6 +100,11 @@ def run_quench(
         controller: The controller
         Tend: The time that was supposed to be integrated to
     """
+    if custom_description is not None:
+        problem_params = custom_description.get('problem_params', {})
+        if 'imex' in problem_params.keys():
+            imex = problem_params['imex']
+            problem_params.pop('imex', None)
 
     # initialize level parameters
     level_params = {}
@@ -166,9 +171,7 @@ def run_quench(
     if fault_stuff is not None:
         from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
-        rnd_args = {'iteration': 1, 'min_node': 1}
-        args = {'time': 31.0, 'target': 0}
-        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
+        prepare_controller_for_faults(controller, fault_stuff)
 
     # call main function to get things done...
     try:
