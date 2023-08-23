@@ -13,7 +13,7 @@ from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advect
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
-from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
+from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
 # from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
 

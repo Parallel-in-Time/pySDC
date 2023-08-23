@@ -23,7 +23,7 @@ class generic_implicit_MPI(sweeper):
             params['QI'] = 'IE'
 
         # call parent's initialization routine
-        super(generic_implicit_MPI, self).__init__(params)
+        super().__init__(params)
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
