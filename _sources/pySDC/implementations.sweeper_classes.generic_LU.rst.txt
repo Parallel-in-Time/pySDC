@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.generic\_LU module
-===================================================
-
-.. automodule:: implementations.sweeper_classes.generic_LU
-   :members:
-   :undoc-members:
-   :show-inheritance:

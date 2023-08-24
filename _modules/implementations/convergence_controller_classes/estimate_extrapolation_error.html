@@ -505,10 +505,11 @@
 <span class="sd">    solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination</span>
 <span class="sd">    of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don&#39;t share the order of</span>
 <span class="sd">    accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of</span>
-<span class="sd">    nodes + 1 (locally).</span>
+<span class="sd">    nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order</span>
+<span class="sd">    of the number of nodes.</span>
 <span class="sd">    That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling</span>
 <span class="sd">    terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error</span>
-<span class="sd">    estimate that is of the order accuracy of the stages.</span>
+<span class="sd">    estimate that is of the order of accuracy of the stages.</span>
 <span class="sd">    This can be used for adaptivity, for instance, with the nice property that it doesn&#39;t matter how we arrived at the</span>
 <span class="sd">    converged collocation solution, as long as we did. We don&#39;t rely on knowing the order of accuracy after every sweep,</span>
 <span class="sd">    only after convergence of the collocation problem has been achieved, which we can check from the residual.</span>
@@ -529,7 +530,11 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Updated parameters with default values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+
         <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">][</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
 
         <span class="n">default_params</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;Taylor_order&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num_nodes</span><span class="p">,</span>
@@ -552,9 +557,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">lvl</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -582,7 +586,7 @@
 <span class="s2"> works with types imex_mesh and mesh&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">u_ex</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.0</span>
+        <span class="n">u_ex</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
             <span class="n">u_ex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
@@ -629,7 +633,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
     </div>
   </body>
 </html>

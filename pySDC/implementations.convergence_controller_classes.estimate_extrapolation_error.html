@@ -313,10 +313,11 @@ where only values are used for extrapolation which are in memory of other proces
 solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
 of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don’t share the order of
 accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
-nodes + 1 (locally).
+nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order
+of the number of nodes.
 That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling
 terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error
-estimate that is of the order accuracy of the stages.
+estimate that is of the order of accuracy of the stages.
 This can be used for adaptivity, for instance, with the nice property that it doesn’t matter how we arrived at the
 converged collocation solution, as long as we did. We don’t rely on knowing the order of accuracy after every sweep,
 only after convergence of the collocation problem has been achieved, which we can check from the residual.</p>
@@ -456,7 +457,7 @@ to be converged.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
     </div>
   </body>
 </html>

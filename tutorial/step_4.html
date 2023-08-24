@@ -196,7 +196,7 @@ replace this by defining <code class="docutils literal notranslate"><span class=
 <span class="kn">from</span> <span class="nn">pySDC.core.Step</span> <span class="kn">import</span> <span class="n">step</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 
 
@@ -214,6 +214,7 @@ replace this by defining <code class="docutils literal notranslate"><span class=
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -233,14 +234,14 @@ replace this by defining <code class="docutils literal notranslate"><span class=
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass parameters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>
 
     <span class="c1"># now the description contains more or less everything we need to create a step with multiple levels</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
@@ -304,7 +305,7 @@ description. See also Part D.</p></li>
 
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 
 
@@ -323,11 +324,13 @@ description. See also Part D.</p></li>
     <span class="n">sweeper_params_sdc</span><span class="p">[</span><span class="s1">&#39;node_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LEGENDRE&#39;</span>
     <span class="n">sweeper_params_sdc</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params_sdc</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">sweeper_params_sdc</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
 
     <span class="n">sweeper_params_mlsdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">sweeper_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;node_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LEGENDRE&#39;</span>
     <span class="n">sweeper_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">sweeper_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params_sdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -357,23 +360,23 @@ description. See also Part D.</p></li>
 
     <span class="c1"># fill description dictionary for SDC</span>
     <span class="n">description_sdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params_sdc</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
-    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params_sdc</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params_sdc</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params_sdc</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
 
     <span class="c1"># fill description dictionary for MLSDC</span>
     <span class="n">description_mlsdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params_mlsdc</span>  <span class="c1"># pass problem parameters</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params_mlsdc</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass parameters for spatial transfer</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params_mlsdc</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params_mlsdc</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>
 
     <span class="c1"># instantiate the controller (no controller parameters used here)</span>
     <span class="n">controller_sdc</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description_sdc</span><span class="p">)</span>
@@ -425,8 +428,8 @@ description. See also Part D.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">SDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mf">3.96232017e-08</span> <span class="o">--</span> <span class="mf">3.95409335e-08</span>
-<span class="n">Difference</span> <span class="n">SDC</span> <span class="n">vs</span><span class="o">.</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mf">8.22683310e-11</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">SDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mf">3.96227149e-08</span> <span class="o">--</span> <span class="mf">3.95404452e-08</span>
+<span class="n">Difference</span> <span class="n">SDC</span> <span class="n">vs</span><span class="o">.</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mf">8.22714952e-11</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">SDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mi">12</span> <span class="o">--</span>  <span class="mi">6</span>
 </pre></div>
 </div>
@@ -616,11 +619,11 @@ nodes leads to increased iteration counts here.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">7.38692276</span> <span class="o">--</span>   <span class="mf">8.30832463</span> <span class="o">--</span>   <span class="mf">9.57582661</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">4.76108088</span> <span class="o">--</span>   <span class="mf">5.32237654</span> <span class="o">--</span>   <span class="mf">6.16732429</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">406977.9425667246</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
-<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">6</span><span class="p">:</span> <span class="mf">406977.9425660003</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">6</span><span class="p">:</span> <span class="mf">406977.9425660004</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">7</span><span class="p">:</span> <span class="mf">406977.9428639794</span> <span class="o">--</span> <span class="mf">2.35039579e-03</span>
 </pre></div>
@@ -700,7 +703,7 @@ nodes leads to increased iteration counts here.</p></li>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
     </div>
   </body>
 </html>

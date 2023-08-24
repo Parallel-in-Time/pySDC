@@ -12,8 +12,8 @@ Submodules
    implementations.sweeper_classes.Runge_Kutta_Nystrom
    implementations.sweeper_classes.boris_2nd_order
    implementations.sweeper_classes.explicit
-   implementations.sweeper_classes.generic_LU
    implementations.sweeper_classes.generic_implicit
+   implementations.sweeper_classes.generic_implicit_MPI
    implementations.sweeper_classes.imex_1st_order
    implementations.sweeper_classes.imex_1st_order_mass
    implementations.sweeper_classes.multi_implicit

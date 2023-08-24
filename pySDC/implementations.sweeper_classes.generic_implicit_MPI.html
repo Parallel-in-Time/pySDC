@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes.generic_implicit_MPI module &#8212; pySDC 5.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.imex_1st_order module" href="implementations.sweeper_classes.imex_1st_order.html" />
+    <link rel="prev" title="implementations.sweeper_classes.generic_implicit module" href="implementations.sweeper_classes.generic_implicit.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.imex_1st_order.html" title="implementations.sweeper_classes.imex_1st_order module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.generic_implicit.html" title="implementations.sweeper_classes.generic_implicit module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.generic_implicit_MPI module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="implementations-sweeper-classes-generic-implicit-mpi-module">
+<h1>implementations.sweeper_classes.generic_implicit_MPI module<a class="headerlink" href="#implementations-sweeper-classes-generic-implicit-mpi-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-implementations.sweeper_classes.generic_implicit_MPI">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generic_implicit_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
+<p>Generic implicit sweeper, expecting lower triangular matrix type as input</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.QI">
+<span class="sig-name descname"><span class="pre">QI</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.QI" title="Link to this definition">¶</a></dt>
+<dd><p>lower triangular matrix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_end_point">
+<span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_end_point" title="Link to this definition">¶</a></dt>
+<dd><p>Compute u at the right point of the interval</p>
+<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_residual">
+<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Computation of the residual using the collocation matrix Q</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The current stage of the step the level belongs to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.integrate" title="Link to this definition">¶</a></dt>
+<dd><p>Integrates the right-hand side</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>containing the integral as values</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.predict" title="Link to this definition">¶</a></dt>
+<dd><p>Predictor to fill values at nodes before first sweep</p>
+<p>Default prediction for the sweepers, only copies the values to all collocation nodes
+and evaluates the RHS of the ODE there</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.update_nodes">
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#generic_implicit_MPI.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.update_nodes" title="Link to this definition">¶</a></dt>
+<dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.generic_implicit_MPI module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI"><code class="docutils literal notranslate"><span class="pre">generic_implicit_MPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.QI"><code class="docutils literal notranslate"><span class="pre">QI</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.generic_implicit.html"
+                          title="previous chapter">implementations.sweeper_classes.generic_implicit module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.imex_1st_order.html"
+                          title="next chapter">implementations.sweeper_classes.imex_1st_order module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.generic_implicit_MPI.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.imex_1st_order.html" title="implementations.sweeper_classes.imex_1st_order module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.generic_implicit.html" title="implementations.sweeper_classes.generic_implicit module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.generic_implicit_MPI module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
+    </div>
+  </body>
+</html>

@@ -161,7 +161,7 @@ To prevent this, information can be sent forward immediately, but then this is n
 
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 
 
@@ -179,6 +179,7 @@ To prevent this, information can be sent forward immediately, but then this is n
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -201,13 +202,13 @@ To prevent this, information can be sent forward immediately, but then this is n
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass parameters for spatial transfer</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>
 
     <span class="c1"># set up parameters for PFASST run</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">63</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>
@@ -324,12 +325,12 @@ To prevent this, information can be sent forward immediately, but then this is n
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">PFASST</span><span class="p">:</span> <span class="mf">2.87344391e-07</span>
-<span class="n">Error</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87650037e-07</span>
-<span class="n">Error</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87540078e-07</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646564e-10</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687390e-10</span>
-<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959177e-10</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">PFASST</span><span class="p">:</span> <span class="mf">2.87344394e-07</span>
+<span class="n">Error</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87650041e-07</span>
+<span class="n">Error</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87540082e-07</span>
+<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646553e-10</span>
+<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687348e-10</span>
+<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959205e-10</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span>  <span class="mi">8</span> <span class="o">/</span>  <span class="mi">8</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">/</span>  <span class="mi">9</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">6</span> <span class="o">/</span> <span class="mi">11</span> <span class="o">/</span>  <span class="mi">9</span>
@@ -665,58 +666,58 @@ This example takes three different test cases and checks how well the iteration 
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 5.75
-   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 3.4661e-13
-   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 2.7990e-13
-   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 3.2885e-13
-   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 3.4972e-13
-   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 4.9860e-13
-   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 3.1719e-13
-   Errors after step   0.8750 with 6 iterations: 3.6531e-08 / 3.6286e-13
-   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 2.9104e-13
+   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 3.9169e-13
+   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 3.3698e-13
+   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 2.5890e-13
+   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 2.8007e-13
+   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 2.9410e-13
+   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 1.3529e-13
+   Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.8821e-13
+   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.8707e-13
 
-...done, took 0.6599156109998603 seconds!
+...done, took 0.40979025399997226 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 3.00
-   Errors after step   0.1250 with 3 iterations: 9.8191e-09 / 3.3584e-13
-   Errors after step   0.2500 with 3 iterations: 1.7174e-08 / 5.0082e-13
-   Errors after step   0.3750 with 3 iterations: 2.2849e-08 / 5.9169e-13
-   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 5.2691e-13
-   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 2.4523e-13
-   Errors after step   0.7500 with 3 iterations: 3.3516e-08 / 3.9030e-13
-   Errors after step   0.8750 with 3 iterations: 3.5501e-08 / 3.4489e-13
-   Errors after step   1.0000 with 3 iterations: 3.6812e-08 / 2.7528e-13
+   Errors after step   0.1250 with 3 iterations: 9.8190e-09 / 3.2108e-13
+   Errors after step   0.2500 with 3 iterations: 1.7174e-08 / 4.1256e-13
+   Errors after step   0.3750 with 3 iterations: 2.2849e-08 / 2.6208e-13
+   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 2.5857e-13
+   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 4.3643e-13
+   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 2.7439e-13
+   Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 2.1250e-13
+   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 2.1660e-13
 
-...done, took 1.5692264540000451 seconds!
+...done, took 0.9242209270000785 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 4.00
-   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 5.5511e-16
-   Errors after step   0.2500 with 4 iterations: 7.2907e-09 / 5.5511e-16
-   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 4.4409e-16
-   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 8.8818e-16
+   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 6.6613e-16
+   Errors after step   0.2500 with 4 iterations: 7.2907e-09 / 4.4409e-16
+   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 5.5511e-16
+   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 4.4409e-16
    Errors after step   0.6250 with 4 iterations: 1.8225e-08 / 4.4409e-16
    Errors after step   0.7500 with 4 iterations: 2.1875e-08 / 6.6613e-16
-   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 5.5511e-16
-   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 4.4409e-16
+   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 7.7716e-16
+   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 5.5511e-16
 
-...done, took 0.40786485900002845 seconds!
+...done, took 0.2528574269999808 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 2.00
-   Errors after step   0.1250 with 2 iterations: 3.7050e-09 / 3.1841e-13
-   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.1841e-13
-   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.1830e-13
+   Errors after step   0.1250 with 2 iterations: 3.7050e-09 / 3.1852e-13
+   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.1875e-13
+   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.1808e-13
    Errors after step   0.5000 with 2 iterations: 1.4836e-08 / 3.1875e-13
-   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.1841e-13
+   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.1830e-13
    Errors after step   0.7500 with 2 iterations: 2.2256e-08 / 3.1830e-13
-   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1863e-13
-   Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1797e-13
+   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1841e-13
+   Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1808e-13
 
-...done, took 1.2241883819999657 seconds!
+...done, took 0.7328938279999875 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -730,7 +731,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.2757428350000737 seconds!
+...done, took 0.17034125500003938 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -744,7 +745,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.33143476700001884 seconds!
+...done, took 0.2063472309998815 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
@@ -827,7 +828,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
     </div>
   </body>
 </html>
