@@ -418,8 +418,6 @@
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.generic_implicit.html#implementations.sweeper_classes.generic_implicit.generic_implicit.compute_end_point">(generic_implicit method)</a>
 </li>
-        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_end_point">(generic_implicit_MPI method)</a>
-</li>
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.compute_end_point">(imex_1st_order method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point">(imex_1st_order_mass method)</a>
@@ -434,6 +432,8 @@
 </li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.compute_end_point">(sweeper method)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_end_point">(SweeperMPI method)</a>
+</li>
         <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.compute_end_point">(verlet method)</a>
 </li>
       </ul></li>
@@ -441,14 +441,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase.compute_optimal_step_size">compute_optimal_step_size() (AdaptivityBase method)</a>
 </li>
-      <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_residual">compute_residual() (generic_implicit_MPI method)</a>
+      <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">compute_residual() (imex_1st_order_mass method)</a>
 
       <ul>
-        <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order_mass.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">(imex_1st_order_mass method)</a>
-</li>
         <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.compute_residual">(MultiStep method)</a>
 </li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.compute_residual">(sweeper method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_residual">(SweeperMPI method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.Lagrange.html#core.Lagrange.computeFejerRule">computeFejerRule() (in module core.Lagrange)</a>
@@ -3052,13 +3052,13 @@
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">(controller_nonMPI method)</a>
 </li>
-        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.predict">(generic_implicit_MPI method)</a>
-</li>
         <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.predict">(MultiStep method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta.predict">(RungeKutta method)</a>
 </li>
         <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.predict">(sweeper method)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.predict">(SweeperMPI method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.prepare_MPI_datatypes">prepare_MPI_datatypes() (ConvergenceController method)</a>
@@ -3142,15 +3142,13 @@
       <li><a href="pySDC/implementations.sweeper_classes.generic_implicit.html#implementations.sweeper_classes.generic_implicit.generic_implicit.QI">QI (generic_implicit attribute)</a>
 
       <ul>
-        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.QI">(generic_implicit_MPI attribute)</a>
-</li>
         <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QI">(imex_1st_order attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.Qmat">Qmat (CollBase attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.QQ">QQ (verlet attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.verlet.html#implementations.sweeper_classes.verlet.verlet.qQ">qQ (verlet attribute)</a>
@@ -3172,6 +3170,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.radius">radius (allencahn_temp_imex attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.rank">rank (generic_implicit_MPI attribute)</a>
 </li>
       <li><a href="pySDC/core.Errors.html#core.Errors.ReadOnlyError">ReadOnlyError</a>
 </li>
@@ -3598,6 +3598,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper">sweeper (class in core.Sweeper)</a>
+</li>
+      <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI">SweeperMPI (class in implementations.sweeper_classes.generic_implicit_MPI)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.FastWaveSlowWave_0D.html#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar">swfw_scalar (class in implementations.problem_classes.FastWaveSlowWave_0D)</a>
 </li>

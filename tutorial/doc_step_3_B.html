@@ -145,7 +145,7 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2023-08-24 06:59:39,950 - controller - Controller - welcome_message - 146 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2023-08-25 09:50:58,825 - controller - Controller - welcome_message - 146 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
                                  _____ _____   _____ 
                                 / ____|  __ \ / ____|
                     _ __  _   _| (___ | |  | | |     
@@ -155,8 +155,8 @@
                    | |     __/ |                     
                    |_|    |___/                      
                                                      
-2023-08-24 06:59:39,950 - controller - Controller - dump_setup - 160 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
-2023-08-24 06:59:39,950 - controller - Controller - dump_setup - 226 - INFO: ----------------------------------------------------------------------------------------------------
+2023-08-25 09:50:58,825 - controller - Controller - dump_setup - 160 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
+2023-08-25 09:50:58,826 - controller - Controller - dump_setup - 226 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     mssdc_jac = True
@@ -180,10 +180,10 @@ Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
             residual_type = full_abs
 --&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.PenningTrap_3D.penningtrap&#39;&gt;
 --&gt;             omega_B = 25.0
---&gt;             nparts = 1
---&gt;             omega_E = 4.9
---&gt;             sig = 0.1
 --&gt;             u0 = [list([10, 0, 0]) list([100, 0, 100]) list([1]) list([1])]
+--&gt;             nparts = 1
+--&gt;             sig = 0.1
+--&gt;             omega_E = 4.9
 --&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.particles.particles&#39;&gt;
 --&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.particles.fields&#39;&gt;
 --&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
@@ -203,21 +203,21 @@ Active convergence controllers:
  -&gt; |  1 |   100 | SpreadStepSizesBlockwiseNonMPI
     |  2 |   200 | CheckConvergence
 
-2023-08-24 06:59:39,950 - controller - Controller - dump_setup - 229 - INFO: ----------------------------------------------------------------------------------------------------
-2023-08-24 06:59:39,950 - controller - Controller - dump_setup - 231 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
+2023-08-25 09:50:58,826 - controller - Controller - dump_setup - 229 - INFO: ----------------------------------------------------------------------------------------------------
+2023-08-25 09:50:58,826 - controller - Controller - dump_setup - 231 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
 
-2023-08-24 06:59:39,958 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2023-08-24 06:59:39,965 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2023-08-24 06:59:39,972 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2023-08-24 06:59:39,979 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2023-08-24 06:59:39,986 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2023-08-24 06:59:39,993 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2023-08-24 06:59:40,000 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2023-08-24 06:59:40,007 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
-2023-08-24 06:59:40,014 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2023-08-24 06:59:40,020 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
-2023-08-24 06:59:40,028 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
-2023-08-24 06:59:40,030 - hooks - default_hook - post_run - 323 - INFO: Finished run after 0.08s
+2023-08-25 09:50:58,834 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2023-08-25 09:50:58,841 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2023-08-25 09:50:58,848 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2023-08-25 09:50:58,855 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2023-08-25 09:50:58,862 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2023-08-25 09:50:58,869 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2023-08-25 09:50:58,876 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2023-08-25 09:50:58,883 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
+2023-08-25 09:50:58,890 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
+2023-08-25 09:50:58,897 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
+2023-08-25 09:50:58,904 - hooks - default_hook - post_sweep - 169 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2023-08-25 09:50:58,907 - hooks - default_hook - post_run - 323 - INFO: Finished run after 0.08s
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>
