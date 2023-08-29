@@ -18,8 +18,8 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
        (dict): Stats object generated during the run
        (pySDC.Controller.controller): Controller used in the run
     """
-    from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
     from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
+    from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
     from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
@@ -46,8 +46,7 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
     sweeper_params['QI'] = QI
     sweeper_params['comm'] = comm
 
-    problem_params = {}
-    # problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'stencil_type': 'center', 'order': 6, 'bc': 'periodic'}
+    problem_params = {'degree': num_nodes}
 
     # initialize step parameters
     step_params = {}
@@ -61,7 +60,7 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = vanderpol
+    description['problem_class'] = polynomial_testequation
     description['problem_params'] = problem_params
     description['sweeper_class'] = sweeper_class
     description['sweeper_params'] = sweeper_params
@@ -97,8 +96,6 @@ def single_test(**kwargs):
     """
     import numpy as np
 
-    rng = np.random.RandomState(seed=125)  # unlock manual controls on Vostok
-
     coll_params_type = {
         'quad_type': ['GAUSS', 'RADAU-RIGHT'],
     }
@@ -118,32 +115,35 @@ def single_test(**kwargs):
     stats, controller = single_run(**args)
     step = controller.MS[0]
     level = step.levels[0]
+    prob = level.prob
     cont = controller.convergence_controllers[
         np.arange(len(controller.convergence_controllers))[
             [type(me).__name__ == 'AdaptiveCollocation' for me in controller.convergence_controllers]
         ][0]
     ]
-    poly = np.polynomial.Polynomial(rng.rand(level.sweep.coll.num_nodes))
     nodes = np.append([0], level.sweep.coll.nodes)
 
     # initialize variables
     cont.status.active_coll = 0
     step.status.slot = 0
-    level.u[0] = level.prob.u_exact(t=0)
+    level.u[0] = prob.u_exact(t=0)
     level.status.time = 0.0
     level.sweep.predict()
     for i in range(len(level.u)):
         if level.u[i] is not None:
-            level.u[i][:] = poly(nodes)[i]
+            level.u[i][:] = prob.u_exact(nodes[i])
 
     # perform the interpolation
     cont.switch_sweeper(controller.MS[0])
     cont.status.active_coll = 1
     cont.switch_sweeper(controller.MS[0])
     nodes = np.append([0], level.sweep.coll.nodes)
-    error = max([abs(level.u[i][0] - poly(nodes[i])) for i in range(len(level.u)) if level.u[i] is not None])
+    error = max([abs(level.u[i] - prob.u_exact(nodes[i])) for i in range(len(level.u)) if level.u[i] is not None])
     assert error < 1e-15, f'Interpolation not exact!, Got {error}'
     print(f'Passed test with error {error}')
+
+    diff = min([abs(level.u[0] - prob.u_exact(nodes[i])) for i in range(1, len(level.u)) if level.u[i] is not None])
+    assert diff > 1e-15, 'Solution is constant!'
 
 
 @pytest.mark.base
@@ -156,19 +156,21 @@ def test_adaptive_collocation_MPI():
     import subprocess
     import os
 
+    num_nodes = 3
+
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
     my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
 
-    cmd = f"mpirun -np {3} python {__file__} MPI".split()
+    cmd = f"mpirun -np {num_nodes} python {__file__} MPI".split()
 
     p = subprocess.Popen(cmd, env=my_env, cwd=".")
 
     p.wait()
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
         p.returncode,
-        3,
+        num_nodes,
     )
 
 
