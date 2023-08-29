@@ -47,7 +47,6 @@ class SweeperMPI(sweeper):
             None
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
         L.uend = P.dtype_u(P.init, val=0.0)
@@ -69,7 +68,6 @@ class SweeperMPI(sweeper):
             stage (str): The current stage of the step the level belongs to
         """
 
-        # get current level and problem description
         L = self.level
 
         # Check if we want to skip the residual computation to gain performance
@@ -108,7 +106,6 @@ class SweeperMPI(sweeper):
         and evaluates the RHS of the ODE there
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 
@@ -144,7 +141,6 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
             list of dtype_u: containing the integral as values
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 
@@ -165,7 +161,6 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
             None
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 
@@ -215,7 +210,6 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
             None
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
         L.uend = P.dtype_u(P.init, val=0.0)

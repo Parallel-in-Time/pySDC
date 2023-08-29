@@ -23,10 +23,6 @@ class polynomial_testequation(ptype):
         self.poly = np.polynomial.Polynomial(self.rng.rand(degree))
         self._makeAttributeAndRegister('degree', 'seed', localVars=locals(), readOnly=True)
 
-        # differentiation matrix
-        self.A = np.diag(np.arange(self.degree - 1) + 1, k=1)
-        self.I = np.eye(self.degree)
-
     def eval_f(self, u, t):
         """
         Derivative of the polynomial.

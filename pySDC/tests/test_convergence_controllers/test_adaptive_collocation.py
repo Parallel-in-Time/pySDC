@@ -1,13 +1,11 @@
 import pytest
 
 
-def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
+def single_run(num_nodes, quad_type, QI, useMPI, params):
     """
     Runs a single advection problem with certain parameters
 
     Args:
-        dt (float): Step size
-        Tend (float): Final time
         num_nodes (int): Number of nodes
         quad_type (str): Type of quadrature
         QI (str): Preconditioner
@@ -18,10 +16,8 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
        (dict): Stats object generated during the run
        (pySDC.Controller.controller): Controller used in the run
     """
-    from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
     from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
 
     if useMPI:
@@ -36,8 +32,8 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
 
     # initialize level parameters
     level_params = {}
-    level_params['dt'] = dt
-    level_params['restol'] = 1e-10
+    level_params['dt'] = 1.0
+    level_params['restol'] = 1.0
 
     # initialize sweeper parameters
     sweeper_params = {}
@@ -55,8 +51,6 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
     # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = LogGlobalErrorPostStep
-    controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = {}
@@ -68,22 +62,8 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI, params):
     description['step_params'] = step_params
     description['convergence_controllers'] = {AdaptiveCollocation: params}
 
-    # set time parameters
-    t0 = 0.0
-
-    # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    # call main function to get things done...
-    if Tend > 0:
-        uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    else:
-        stats = {}
-    return stats, controller
+    return controller
 
 
 def single_test(**kwargs):
@@ -101,8 +81,6 @@ def single_test(**kwargs):
     }
 
     args = {
-        'dt': 0.1,
-        'Tend': 0.0,
         'num_nodes': 3,
         'quad_type': 'RADAU-RIGHT',
         'QI': 'MIN',
@@ -112,7 +90,7 @@ def single_test(**kwargs):
     }
 
     # prepare variables
-    stats, controller = single_run(**args)
+    controller = single_run(**args)
     step = controller.MS[0]
     level = step.levels[0]
     prob = level.prob
