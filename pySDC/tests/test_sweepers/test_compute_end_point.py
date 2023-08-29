@@ -2,6 +2,13 @@ import pytest
 
 
 def compute_end_point_generic_implicit(num_nodes, useMPI):
+    """
+    Check if the end point is computed exactly for a polynomial of sufficiently low degree.
+
+    Args:
+        num_nodes (int): Number of collocation nodes
+        useMPI (bool): Use MPI or not
+    """
     import numpy as np
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -24,6 +31,7 @@ def compute_end_point_generic_implicit(num_nodes, useMPI):
     description['step_params'] = {}
     description['problem_class'] = polynomial_testequation
 
+    # prepare variables
     controller = controller_nonMPI(1, {'logger_level': 30}, description)
     step = controller.MS[0]
     level = step.levels[0]
@@ -31,11 +39,13 @@ def compute_end_point_generic_implicit(num_nodes, useMPI):
     sweep = level.sweep
     nodes = np.append([0], level.sweep.coll.nodes)
 
+    # initialize variables
     for i in range(len(level.u)):
         level.u[i] = prob.u_exact(nodes[i])
         level.f[i] = prob.eval_f(level.u[i], nodes[i])
-    sweep.compute_end_point()
 
+    # check if the end point was computed exactly
+    sweep.compute_end_point()
     error = abs(level.uend - prob.u_exact(1.0))
     assert error < 1e-15, f'Failed to compute end point! Error: {error}'
     print(f'Passed with error to exact end point: {error}')
@@ -77,7 +87,7 @@ if __name__ == "__main__":
     kwargs = {}
     if len(sys.argv) > 1:
         kwargs = {
-            'useMPI': True,
+            'useMPI': bool(sys.argv[1]),
             'num_nodes': int(sys.argv[2]),
         }
     compute_end_point_generic_implicit(**kwargs)

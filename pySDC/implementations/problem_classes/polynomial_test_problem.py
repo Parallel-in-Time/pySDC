@@ -1,15 +1,15 @@
-from pySDC.core.Problem import ptype
-
-
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype, WorkCounter
+from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-# noinspection PyUnusedLocal
 class polynomial_testequation(ptype):
+    """
+    Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of
+    solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.
+    """
+
     dtype_u = mesh
     dtype_f = mesh
 
@@ -22,6 +22,10 @@ class polynomial_testequation(ptype):
         self.rng = np.random.RandomState(seed=seed)
         self.poly = np.polynomial.Polynomial(self.rng.rand(degree))
         self._makeAttributeAndRegister('degree', 'seed', localVars=locals(), readOnly=True)
+
+        # differentiation matrix
+        self.A = np.diag(np.arange(self.degree - 1) + 1, k=1)
+        self.I = np.eye(self.degree)
 
     def eval_f(self, u, t):
         """
@@ -46,7 +50,7 @@ class polynomial_testequation(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Again, just do nothing.
+        Just return the exact solution...
 
         Parameters
         ----------
@@ -65,9 +69,7 @@ class polynomial_testequation(ptype):
             The solution as mesh.
         """
 
-        me = self.dtype_u(self.init)
-        me[:] = u0[:]
-        return me
+        return self.u_exact(t)
 
     def u_exact(self, t, **kwargs):
         """
