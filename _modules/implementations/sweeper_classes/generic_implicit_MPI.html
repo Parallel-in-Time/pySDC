@@ -90,7 +90,6 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
         <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -115,7 +114,6 @@
 <span class="sd">            stage (str): The current stage of the step the level belongs to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
 
         <span class="c1"># Check if we want to skip the residual computation to gain performance</span>
@@ -157,7 +155,6 @@
 <span class="sd">        and evaluates the RHS of the ODE there</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
 
@@ -199,7 +196,6 @@
 <span class="sd">            list of dtype_u: containing the integral as values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
 
@@ -223,7 +219,6 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get current level and problem description</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
 
@@ -261,6 +256,36 @@
         <span class="c1"># indicate presence of new values at this level</span>
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
 
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="generic_implicit_MPI.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.compute_end_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute u at the right point of the interval</span>
+
+<span class="sd">        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># check if Mth node is equal to right point and do_coll_update is false, perform a simple copy</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># add up tau correction of the full interval (last entry)</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 </div>
 
@@ -302,7 +327,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
     </div>
   </body>
 </html>

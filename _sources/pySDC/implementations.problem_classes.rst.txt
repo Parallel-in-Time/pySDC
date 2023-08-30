@@ -58,6 +58,7 @@ Submodules
    implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
    implementations.problem_classes.generic_ND_FD
    implementations.problem_classes.nonlinear_ODE_1
+   implementations.problem_classes.polynomial_test_problem
 
 Module contents
 ---------------

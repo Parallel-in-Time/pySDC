@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.problem_classes.polynomial_test_problem module &#8212; pySDC 5.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes package" href="implementations.sweeper_classes.html" />
+    <link rel="prev" title="implementations.problem_classes.nonlinear_ODE_1 module" href="implementations.problem_classes.nonlinear_ODE_1.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.polynomial_test_problem module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.problem_classes.polynomial_test_problem">
+<span id="implementations-problem-classes-polynomial-test-problem-module"></span><h1>implementations.problem_classes.polynomial_test_problem module<a class="headerlink" href="#module-implementations.problem_classes.polynomial_test_problem" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">polynomial_testequation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26266</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
+<p>Dummy problem for tests only! In particular, the <cite>solve_system</cite> function just returns the exact solution instead of
+solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u">
+<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Derivative of the polynomial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.solve_system" title="Link to this definition">¶</a></dt>
+<dd><p>Just return the exact solution…</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.u_exact" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the polynomial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
+<li><p><strong>u_init</strong> (<em>pySDC.problem.testequation0d.dtype_u</em>) – Initial solution.</p></li>
+<li><p><strong>t_init</strong> (<em>float</em>) – The initial time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.problem_classes.polynomial_test_problem module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation"><code class="docutils literal notranslate"><span class="pre">polynomial_testequation</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.nonlinear_ODE_1.html"
+                          title="previous chapter">implementations.problem_classes.nonlinear_ODE_1 module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.html"
+                          title="next chapter">implementations.sweeper_classes package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.problem_classes.polynomial_test_problem.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.nonlinear_ODE_1.html" title="implementations.problem_classes.nonlinear_ODE_1 module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.polynomial_test_problem module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
+    </div>
+  </body>
+</html>
