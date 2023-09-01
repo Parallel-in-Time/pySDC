@@ -42,7 +42,7 @@ class convection_hook(hooks):
         )
 
 
-def run_Lorenz(useMPI):
+def win_space_race(useMPI):
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
@@ -126,7 +126,7 @@ def run_Lorenz(useMPI):
 
 @pytest.mark.base
 def test_entry_class():
-    run_Lorenz(False)
+    win_space_race(False)
 
 
 @pytest.mark.mpi4py
@@ -155,4 +155,4 @@ def test_entry_class_MPI():
 if __name__ == "__main__":
     import sys
 
-    run_Lorenz(True)
+    win_space_race(True)
