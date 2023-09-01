@@ -2,7 +2,18 @@ import logging
 from collections import namedtuple
 
 
-Entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'sweep', 'type', 'num_restarts'])
+# metadata with defaults
+meta_data = {
+    'process': None,
+    'process_sweeper': None,
+    'time': None,
+    'level': None,
+    'iter': None,
+    'sweep': None,
+    'type': None,
+    'num_restarts': None,
+}
+Entry = namedtuple('Entry', meta_data.keys())
 
 
 # noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames
@@ -18,8 +29,11 @@ class hooks(object):
         logger: logger instance for output
         __num_restarts (int): number of restarts of the current step
         __stats (dict): dictionary for gathering the statistics of a run
-        __entry (namedtuple): statistics entry containing all information to identify the value
+        entry (namedtuple): statistics entry containing all information to identify the value
     """
+
+    entry = Entry
+    meta_data = meta_data
 
     def __init__(self):
         """
@@ -31,52 +45,39 @@ class hooks(object):
 
         # create statistics and entry elements
         self.__stats = {}
-        self.__entry = Entry
 
-    def add_to_stats(self, process, time, level, iter, sweep, type, value):
+    def add_to_stats(self, value, **kwargs):
         """
-        Routine to add data to the statistics dict
+        Routine to add data to the statistics dict. Please supply the metadata as keyword arguments in accordance with
+        the entry class.
 
         Args:
-            process: the current process recording this data
-            time (float): the current simulation time
-            level (int): the current level index
-            iter (int): the current iteration count
-            sweep (int): the current sweep count
-            type (str): string to describe the type of value
             value: the actual data
         """
         # create named tuple for the key and add to dict
-        self.__stats[
-            self.__entry(
-                process=process,
-                time=time,
-                level=level,
-                iter=iter,
-                sweep=sweep,
-                type=type,
-                num_restarts=self.__num_restarts,
-            )
-        ] = value
+        meta = {
+            **self.meta_data,
+            **kwargs,
+            'num_restarts': self.__num_restarts,
+        }
+        self.__stats[self.entry(**meta)] = value
 
-    def increment_stats(self, process, time, level, iter, sweep, type, value, initialize=None):
+    def increment_stats(self, value, initialize=None, **kwargs):
         """
         Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
-        initialize if applicable and to value otherwise
+        initialize if applicable and to value otherwise. Please supply metadata as keyword arguments in accordance with
+        the entry class.
 
         Args:
-            process: the current process recording this data
-            time (float): the current simulation time
-            level (int): the current level index
-            iter (int): the current iteration count
-            sweep (int): the current sweep count
-            type (str): string to describe the type of value
             value: the actual data
             initialize: if supplied and data does not exist already, this will be used over value
         """
-        key = self.__entry(
-            process=process, time=time, level=level, iter=iter, sweep=sweep, type=type, num_restarts=self.__num_restarts
-        )
+        meta = {
+            **meta_data,
+            **kwargs,
+            'num_restarts': self.__num_restarts,
+        }
+        key = self.entry(**meta)
         if key in self.__stats.keys():
             self.__stats[key] += value
         elif initialize is not None:

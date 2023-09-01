@@ -30,12 +30,18 @@ class SweeperMPI(sweeper):
             self.logger.debug('Using MPI.COMM_WORLD for the communicator because none was supplied in the params.')
         super().__init__(params)
 
-        self.rank = self.params.comm.Get_rank()
-
         if self.params.comm.size != self.coll.num_nodes:
             raise NotImplementedError(
-                f'The communicator in the {type(self).__name__} sweeper needs to have one rank for each node as of now! That means we need {self.coll.num_nodes} nodes, but got {self.params.comm.size} nodes.'
+                f'The communicator in the {type(self).__name__} sweeper needs to have one rank for each node as of now! That means we need {self.coll.num_nodes} nodes, but got {self.params.comm.size} processes.'
             )
+
+    @property
+    def comm(self):
+        return self.params.comm
+
+    @property
+    def rank(self):
+        return self.comm.rank
 
     def compute_end_point(self):
         """

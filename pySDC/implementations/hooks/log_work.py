@@ -45,6 +45,7 @@ class LogWork(hooks):
         for key in self.__work_last_step[step.status.slot][level_number].keys():
             self.add_to_stats(
                 process=step.status.slot,
+                process_sweeper=L.sweep.rank,
                 time=L.time + L.dt,
                 level=L.level_index,
                 iter=step.status.iter,
