@@ -32,6 +32,7 @@ class LogError(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
@@ -41,6 +42,7 @@ class LogError(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
@@ -69,6 +71,7 @@ class LogError(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
@@ -176,6 +179,7 @@ class LogGlobalErrorPostRun(hooks):
 
             self.add_to_stats(
                 process=step.status.slot,
+                process_sweeper=L.sweep.rank,
                 time=self.t_last_solution,
                 level=L.level_index,
                 iter=step.status.iter,
@@ -185,6 +189,7 @@ class LogGlobalErrorPostRun(hooks):
             )
             self.add_to_stats(
                 process=step.status.slot,
+                process_sweeper=L.sweep.rank,
                 time=self.t_last_solution,
                 level=L.level_index,
                 iter=step.status.iter,

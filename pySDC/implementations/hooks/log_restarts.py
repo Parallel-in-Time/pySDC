@@ -20,6 +20,7 @@ class LogRestarts(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,

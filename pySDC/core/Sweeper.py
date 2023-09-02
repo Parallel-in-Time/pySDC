@@ -455,3 +455,7 @@ class sweeper(object):
         """
         assert isinstance(L, level)
         self.__level = L
+
+    @property
+    def rank(self):
+        return 0

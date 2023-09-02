@@ -144,6 +144,7 @@ class DefaultHooks(hooks):
 
             self.add_to_stats(
                 process=step.status.slot,
+                process_sweeper=L.sweep.rank,
                 time=L.time,
                 level=L.level_index,
                 iter=step.status.iter,
@@ -179,6 +180,7 @@ class DefaultHooks(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,
@@ -188,6 +190,7 @@ class DefaultHooks(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,
@@ -211,6 +214,7 @@ class DefaultHooks(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=-1,
             iter=step.status.iter,
@@ -220,6 +224,7 @@ class DefaultHooks(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,
@@ -243,6 +248,7 @@ class DefaultHooks(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,
@@ -252,6 +258,7 @@ class DefaultHooks(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=-1,
             iter=step.status.iter,
@@ -261,6 +268,7 @@ class DefaultHooks(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=-1,
@@ -272,7 +280,14 @@ class DefaultHooks(hooks):
         # record the recomputed quantities at weird positions to make sure there is only one value for each step
         for t in [L.time, L.time + L.dt]:
             self.add_to_stats(
-                process=-1, time=t, level=-1, iter=-1, sweep=-1, type='_recomputed', value=step.status.get('restart')
+                process=-1,
+                time=t,
+                level=-1,
+                iter=-1,
+                sweep=-1,
+                type='_recomputed',
+                value=step.status.get('restart'),
+                process_sweeper=-1,
             )
 
     def post_predict(self, step, level_number):
@@ -290,6 +305,7 @@ class DefaultHooks(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,
@@ -313,6 +329,7 @@ class DefaultHooks(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time,
             level=L.level_index,
             iter=step.status.iter,
@@ -335,6 +352,7 @@ class DefaultHooks(hooks):
 
         self.add_to_stats(
             process=-1,
+            process_sweeper=-1,
             time=-1,
             level=-1,
             iter=-1,
