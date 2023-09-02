@@ -69,16 +69,14 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.__entry">__entry (hooks attribute)</a>
-</li>
       <li><a href="pySDC/helpers.pysdc_helper.html#helpers.pysdc_helper.FrozenClass.__isfrozen">__isfrozen (FrozenClass attribute)</a>
 </li>
       <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.__num_restarts">__num_restarts (hooks attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.__stats">__stats (hooks attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh._comm">_comm (mesh attribute)</a>
 </li>
       <li><a href="pySDC/core.Common.html#core.Common.RegisterParams._parNames">_parNames (RegisterParams attribute)</a>
@@ -389,6 +387,8 @@
         <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.comm">(cupy_mesh property)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.mesh.html#implementations.datatype_classes.mesh.mesh.comm">(mesh property)</a>
+</li>
+        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm">(SweeperMPI property)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">communicate_convergence() (CheckConvergence method)</a>
@@ -933,6 +933,8 @@
       <li><a href="pySDC/implementations.datatype_classes.particles.html#implementations.datatype_classes.particles.fields.elec">elec (fields attribute)</a>
 </li>
       <li><a href="pySDC/core.Hooks.html#core.Hooks.Entry">Entry (class in core.Hooks)</a>
+</li>
+      <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.entry">entry (hooks attribute)</a>, <a href="pySDC/core.Hooks.html#id0">[1]</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.eps">eps (allencahn_temp_imex attribute)</a>
 </li>
@@ -2561,6 +2563,8 @@
 </li>
       <li><a href="pySDC/implementations.transfer_classes.TransferPETScDMDA.html#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda">mesh_to_mesh_petsc_dmda (class in implementations.transfer_classes.TransferPETScDMDA)</a>
 </li>
+      <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.meta_data">meta_data (hooks attribute)</a>
+</li>
       <li>
     module
 
@@ -3106,6 +3110,8 @@
 </li>
       <li><a href="pySDC/core.Hooks.html#core.Hooks.Entry.process">process (Entry attribute)</a>
 </li>
+      <li><a href="pySDC/core.Hooks.html#core.Hooks.Entry.process_sweeper">process_sweeper (Entry attribute)</a>
+</li>
       <li><a href="pySDC/implementations.transfer_classes.TransferFenicsMesh.html#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project">project() (mesh_to_mesh_fenics method)</a>
 </li>
       <li><a href="pySDC/core.BaseTransfer.html#core.BaseTransfer.base_transfer.prolong">prolong() (base_transfer method)</a>
@@ -3193,7 +3199,13 @@
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.radius">radius (allencahn_temp_imex attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.rank">rank (generic_implicit_MPI attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.rank">(sweeper property)</a>
 </li>
+        <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank">(SweeperMPI property)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.Errors.html#core.Errors.ReadOnlyError">ReadOnlyError</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.recv">recv() (controller_MPI method)</a>
@@ -3256,6 +3268,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.BaseTransfer.html#core.BaseTransfer.base_transfer.restrict">restrict() (base_transfer method)</a>
 
       <ul>
@@ -3278,8 +3292,6 @@
         <li><a href="pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.restrict">(space_transfer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.restriction_matrix_1d">restriction_matrix_1d() (in module helpers.transfer_helper)</a>
 </li>
       <li><a href="pySDC/core.Controller.html#core.Controller.controller.return_stats">return_stats() (controller method)</a>
@@ -4008,7 +4020,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

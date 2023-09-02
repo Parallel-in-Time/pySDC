@@ -63,6 +63,11 @@ class adds a communicator and nothing else. The <cite>generic_implicit</cite> im
 It’s a bit confusing because <cite>self.params</cite> is overwritten in the second call to the <cite>__init__</cite> of the core <cite>sweeper</cite>
 class, but the <cite>SweeperMPI</cite> class adds parameters to the <cite>params</cite> dictionary, which will again be added in
 <cite>generic_implicit</cite>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_end_point">
 <span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#SweeperMPI.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_end_point" title="Link to this definition">¶</a></dt>
@@ -93,6 +98,11 @@ class, but the <cite>SweeperMPI</cite> class adds parameters to the <cite>params
 <p>Default prediction for the sweepers, only copies the values to all collocation nodes
 and evaluates the RHS of the ODE there</p>
 </dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -166,9 +176,11 @@ Please supply a communicator as <cite>comm</cite> to the parameters!</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.sweeper_classes.generic_implicit_MPI module</a><ul>
 <li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI"><code class="docutils literal notranslate"><span class="pre">SweeperMPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank"><code class="docutils literal notranslate"><span class="pre">rank</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI"><code class="docutils literal notranslate"><span class="pre">generic_implicit_MPI</span></code></a><ul>
@@ -237,7 +249,7 @@ Please supply a communicator as <cite>comm</cite> to the parameters!</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

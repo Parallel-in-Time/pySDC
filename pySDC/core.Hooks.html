@@ -49,24 +49,24 @@
 <span id="core-hooks-module"></span><h1>core.Hooks module<a class="headerlink" href="#module-core.Hooks" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Hooks.Entry">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.Hooks.Entry" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_sweeper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_restarts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.Hooks.Entry" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.Entry.iter">
 <span class="sig-name descname"><span class="pre">iter</span></span><a class="headerlink" href="#core.Hooks.Entry.iter" title="Link to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
+<dd><p>Alias for field number 4</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.Entry.level">
 <span class="sig-name descname"><span class="pre">level</span></span><a class="headerlink" href="#core.Hooks.Entry.level" title="Link to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
+<dd><p>Alias for field number 3</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.Entry.num_restarts">
 <span class="sig-name descname"><span class="pre">num_restarts</span></span><a class="headerlink" href="#core.Hooks.Entry.num_restarts" title="Link to this definition">¶</a></dt>
-<dd><p>Alias for field number 6</p>
+<dd><p>Alias for field number 7</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -76,21 +76,27 @@
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.Entry.process_sweeper">
+<span class="sig-name descname"><span class="pre">process_sweeper</span></span><a class="headerlink" href="#core.Hooks.Entry.process_sweeper" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.Entry.sweep">
 <span class="sig-name descname"><span class="pre">sweep</span></span><a class="headerlink" href="#core.Hooks.Entry.sweep" title="Link to this definition">¶</a></dt>
-<dd><p>Alias for field number 4</p>
+<dd><p>Alias for field number 5</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.Entry.time">
 <span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.Hooks.Entry.time" title="Link to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
+<dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Hooks.Entry.type">
 <span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#core.Hooks.Entry.type" title="Link to this definition">¶</a></dt>
-<dd><p>Alias for field number 5</p>
+<dd><p>Alias for field number 6</p>
 </dd></dl>
 
 </dd></dl>
@@ -132,8 +138,8 @@ helper for post processing.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="core.Hooks.hooks.__entry">
-<span class="sig-name descname"><span class="pre">__entry</span></span><a class="headerlink" href="#core.Hooks.hooks.__entry" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="core.Hooks.hooks.entry">
+<span class="sig-name descname"><span class="pre">entry</span></span><a class="headerlink" href="#core.Hooks.hooks.entry" title="Link to this definition">¶</a></dt>
 <dd><p>statistics entry containing all information to identify the value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -144,43 +150,42 @@ helper for post processing.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Hooks.hooks.add_to_stats">
-<span class="sig-name descname"><span class="pre">add_to_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.add_to_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.add_to_stats" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to add data to the statistics dict</p>
+<span class="sig-name descname"><span class="pre">add_to_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.add_to_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.add_to_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to add data to the statistics dict. Please supply the metadata as keyword arguments in accordance with
+the entry class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>process</strong> – the current process recording this data</p></li>
-<li><p><strong>time</strong> (<em>float</em>) – the current simulation time</p></li>
-<li><p><strong>level</strong> (<em>int</em>) – the current level index</p></li>
-<li><p><strong>iter</strong> (<em>int</em>) – the current iteration count</p></li>
-<li><p><strong>sweep</strong> (<em>int</em>) – the current sweep count</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – string to describe the type of value</p></li>
-<li><p><strong>value</strong> – the actual data</p></li>
-</ul>
+<dd class="field-odd"><p><strong>value</strong> – the actual data</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">entry</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#core.Hooks.Entry" title="core.Hooks.Entry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Entry</span></code></a></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Hooks.hooks.increment_stats">
-<span class="sig-name descname"><span class="pre">increment_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.increment_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.increment_stats" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">increment_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.increment_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.increment_stats" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
-initialize if applicable and to value otherwise</p>
+initialize if applicable and to value otherwise. Please supply metadata as keyword arguments in accordance with
+the entry class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>process</strong> – the current process recording this data</p></li>
-<li><p><strong>time</strong> (<em>float</em>) – the current simulation time</p></li>
-<li><p><strong>level</strong> (<em>int</em>) – the current level index</p></li>
-<li><p><strong>iter</strong> (<em>int</em>) – the current iteration count</p></li>
-<li><p><strong>sweep</strong> (<em>int</em>) – the current sweep count</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – string to describe the type of value</p></li>
 <li><p><strong>value</strong> – the actual data</p></li>
 <li><p><strong>initialize</strong> – if supplied and data does not exist already, this will be used over value</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="core.Hooks.hooks.meta_data">
+<span class="sig-name descname"><span class="pre">meta_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'iter':</span> <span class="pre">None,</span> <span class="pre">'level':</span> <span class="pre">None,</span> <span class="pre">'num_restarts':</span> <span class="pre">None,</span> <span class="pre">'process':</span> <span class="pre">None,</span> <span class="pre">'process_sweeper':</span> <span class="pre">None,</span> <span class="pre">'sweep':</span> <span class="pre">None,</span> <span class="pre">'time':</span> <span class="pre">None,</span> <span class="pre">'type':</span> <span class="pre">None}</span></em><a class="headerlink" href="#core.Hooks.hooks.meta_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Hooks.hooks.post_comm">
@@ -419,6 +424,7 @@ initialize if applicable and to value otherwise</p>
 <li><a class="reference internal" href="#core.Hooks.Entry.level"><code class="docutils literal notranslate"><span class="pre">level</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.Entry.num_restarts"><code class="docutils literal notranslate"><span class="pre">num_restarts</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.Entry.process"><code class="docutils literal notranslate"><span class="pre">process</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.Entry.process_sweeper"><code class="docutils literal notranslate"><span class="pre">process_sweeper</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.Entry.sweep"><code class="docutils literal notranslate"><span class="pre">sweep</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.Entry.time"><code class="docutils literal notranslate"><span class="pre">time</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.Entry.type"><code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
@@ -428,9 +434,11 @@ initialize if applicable and to value otherwise</p>
 <li><a class="reference internal" href="#core.Hooks.hooks.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.__num_restarts"><code class="docutils literal notranslate"><span class="pre">__num_restarts</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.__stats"><code class="docutils literal notranslate"><span class="pre">__stats</span></code></a></li>
-<li><a class="reference internal" href="#core.Hooks.hooks.__entry"><code class="docutils literal notranslate"><span class="pre">__entry</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.entry"><code class="docutils literal notranslate"><span class="pre">entry</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.add_to_stats"><code class="docutils literal notranslate"><span class="pre">add_to_stats()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">entry</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.increment_stats"><code class="docutils literal notranslate"><span class="pre">increment_stats()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.meta_data"><code class="docutils literal notranslate"><span class="pre">meta_data</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.post_comm"><code class="docutils literal notranslate"><span class="pre">post_comm()</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.post_iteration"><code class="docutils literal notranslate"><span class="pre">post_iteration()</span></code></a></li>
 <li><a class="reference internal" href="#core.Hooks.hooks.post_predict"><code class="docutils literal notranslate"><span class="pre">post_predict()</span></code></a></li>
@@ -507,7 +515,7 @@ initialize if applicable and to value otherwise</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

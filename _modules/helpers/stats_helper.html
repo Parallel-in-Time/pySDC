@@ -42,19 +42,12 @@
 
 <div class="viewcode-block" id="filter_stats">
 <a class="viewcode-back" href="../../pySDC/helpers.stats_helper.html#helpers.stats_helper.filter_stats">[docs]</a>
-<span class="k">def</span> <span class="nf">filter_stats</span><span class="p">(</span>
-    <span class="n">stats</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_restarts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">):</span>
+<span class="k">def</span> <span class="nf">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper function to extract data from the dictionary of statistics</span>
+<span class="sd">    Helper function to extract data from the dictionary of statistics. Please supply metadata as keyword arguments.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stats (dict): raw statistics from a controller run</span>
-<span class="sd">        process (int): process number</span>
-<span class="sd">        time (float): the requested simulation time</span>
-<span class="sd">        level (int): the requested level index</span>
-<span class="sd">        iter (int): the requested iteration count</span>
-<span class="sd">        type (str): string to describe the requested type of value</span>
 <span class="sd">        recomputed (bool): filter recomputed values from stats if set to anything other than None</span>
 <span class="sd">        comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)</span>
 
@@ -62,17 +55,8 @@
 <span class="sd">        dict: dictionary containing only the entries corresponding to the filter</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
-
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="c1"># get data if key matches the filter (if specified)</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="n">time</span> <span class="ow">or</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">process</span> <span class="o">==</span> <span class="n">process</span> <span class="ow">or</span> <span class="n">process</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">level</span> <span class="ow">or</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="nb">iter</span> <span class="ow">or</span> <span class="nb">iter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="nb">type</span> <span class="ow">or</span> <span class="nb">type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">num_restarts</span> <span class="o">==</span> <span class="n">num_restarts</span> <span class="ow">or</span> <span class="n">num_restarts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k2</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">v2</span> <span class="k">for</span> <span class="n">k2</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="kc">True</span><span class="p">]):</span>
             <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
     <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -96,7 +80,7 @@
             <span class="p">]</span>
 
         <span class="c1"># delete values that were recorded at times that shouldn&#39;t be recorded because we performed a different step after the restart</span>
-        <span class="k">if</span> <span class="nb">type</span> <span class="o">!=</span> <span class="s1">&#39;_recomputed&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;_recomputed&#39;</span><span class="p">:</span>
             <span class="n">other_restarted_steps</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;_recomputed&#39;</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span>
             <span class="p">]</span>
@@ -213,7 +197,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>
