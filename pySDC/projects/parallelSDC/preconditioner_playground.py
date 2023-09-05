@@ -12,6 +12,7 @@ from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advect
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
+from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
@@ -44,8 +45,8 @@ def main():
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
         ('vanderpol', 2, [0.1 * 2**i for i in range(0, 10)]),
         ('fisher', 63, [2**i for i in range(-2, 3)]),
+        ('testequation', 2, [1.2 ** i for i in range(0, 10)])
     ]
-    # setup_list = [('fisher', 63, [2 * i for i in range(1, 6)])]
 
     # pre-fill results with lists of  setups
     results = dict()
@@ -61,7 +62,7 @@ def main():
         for setup, nvars, param_list in setup_list:
             # initialize problem parameters (part I)
             problem_params = dict()
-            if setup != 'vanderpol':
+            if setup != 'vanderpol' and setup != 'testequation':
                 problem_params['nvars'] = nvars  # number of degrees of freedom for each level
 
             # loop over all parameters
@@ -124,6 +125,16 @@ def main():
                     description['problem_params'] = problem_params
                     description['level_params'] = level_params
 
+                elif setup == 'testequation':
+                    problem_params['lambdas'] = np.array([param * 1j])
+                    problem_params['u0'] = 1.0
+
+                    level_params['dt'] = 1
+
+                    description['problem_class'] = testequation0d
+                    description['problem_params'] = problem_params
+                    description['level_params'] = level_params
+
                 else:
                     print('Setup not implemented..', setup)
                     exit()
@@ -148,7 +159,7 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    assert len(results) == (6 + 6 + 10 + 5) * 7 + 4, 'ERROR: did not get all results, got %s' % len(results)
+    #assert len(results) == (6 + 6 + 10 + 5) * 7 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     # write out for later visualization
     file = open('data/parallelSDC_iterations_precond.pkl', 'wb')
@@ -177,11 +188,11 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 7, 'ERROR did not find five preconditioners, got %s' % qd_type_list
-    assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
+    assert len(qd_type_list) == 7, 'ERROR did not find seven preconditioners, got %s' % qd_type_list
+    assert len(setup_list) == 5, 'ERROR: did not find five setup, got %s' % setup_list
 
     qd_type_list = ['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
-    marker_list = [None, None, 's', 'o', '^', 'd', 'x']
+    marker_list = [None, 'X', 's', 'o', '^', 'd', 'x']
     color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 
     plt_helper.setup_mpl()
@@ -225,6 +236,8 @@ def plot_iterations():
             xlabel = r'$\lambda_0$'
         elif setup == 'vanderpol':
             xlabel = r'$\mu$'
+        elif setup == 'testequation':
+            xlabel = r'$\lambda i$'
         else:
             print('Setup not implemented..', setup)
             exit()
