@@ -36,7 +36,8 @@ def main():
     controller_params['logger_level'] = 30
 
     # set up list of Q-delta types and setups
-    qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    #qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    qd_list = ['LU', 'IE', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-1']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
@@ -178,7 +179,7 @@ def plot_iterations():
     assert len(qd_type_list) == 7, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
+    qd_type_list = ['LU', 'IE', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-1']
     marker_list = [None, None, 's', 'o', '^', 'd', 'x']
     color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 

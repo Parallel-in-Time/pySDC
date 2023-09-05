@@ -204,6 +204,12 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         # indicate presence of new values at this level
         L.status.updated = True
 
+        # update the FLEX-MIN- preconditioner
+        if 'FLEX-MIN-' in self.params.QI:
+            k = int(qd_type[9:]) + 1
+            self.params.QI = 'FLEX-MIN-' + str(k)
+            self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
+
         return None
 
     def compute_end_point(self):
