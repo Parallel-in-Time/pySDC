@@ -26,6 +26,7 @@ def main():
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize step parameters
     step_params = dict()
@@ -37,7 +38,7 @@ def main():
 
     # set up list of Q-delta types and setups
     #qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
-    qd_list = ['LU', 'IE', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-1']
+    qd_list = ['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
@@ -179,7 +180,7 @@ def plot_iterations():
     assert len(qd_type_list) == 7, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'IE', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-1']
+    qd_type_list = ['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
     marker_list = [None, None, 's', 'o', '^', 'd', 'x']
     color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 
