@@ -15,6 +15,7 @@ Submodules
    implementations.convergence_controller_classes.estimate_contraction_factor
    implementations.convergence_controller_classes.estimate_embedded_error
    implementations.convergence_controller_classes.estimate_extrapolation_error
+   implementations.convergence_controller_classes.estimate_interpolation_error
    implementations.convergence_controller_classes.hotrod
    implementations.convergence_controller_classes.inexactness
    implementations.convergence_controller_classes.interpolate_between_restarts
