@@ -42,9 +42,6 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.step_size_limiter</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">StepSizeLimiter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BasicRestartingNonMPI</span><span class="p">,</span>
-<span class="p">)</span>
 
 
 <div class="viewcode-block" id="AdaptivityBase">
@@ -207,6 +204,68 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restarting: e=</span><span class="si">{</span><span class="n">e_est</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> &gt;= e_tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems">[docs]</a>
+<span class="k">class</span> <span class="nc">AdaptivityForConvergedCollocationProblems</span><span class="p">(</span><span class="n">AdaptivityBase</span><span class="p">):</span>
+<div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.get_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Please implement a way to check if the collocation problem is converged!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a default value for control order to the parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): Parameters for the convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Updated parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;restol_rel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;e_tol_rel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;restart_at_maxiter&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;restol_min&#39;</span><span class="p">:</span> <span class="mf">1e-12</span><span class="p">,</span>
+            <span class="s1">&#39;restol_max&#39;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+            <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxiter&#39;</span><span class="p">,</span> <span class="mi">99</span><span class="p">),</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restol_rel&#39;</span><span class="p">]:</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">][</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="p">[</span><span class="nb">max</span><span class="p">([</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restol_rel&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;e_tol&#39;</span><span class="p">],</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restol_min&#39;</span><span class="p">]]),</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restol_max&#39;</span><span class="p">]]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;e_tol_rel&#39;</span><span class="p">]:</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">][</span><span class="s1">&#39;e_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">max</span><span class="p">([</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;e_tol_rel&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;e_tol&#39;</span><span class="p">],</span> <span class="mf">1e-10</span><span class="p">]),</span> <span class="mf">1e-5</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restart_at_maxiter&#39;</span><span class="p">]:</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxiter&#39;</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">defaults</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.determine_restart">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart">[docs]</a>
+    <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_convergence</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_at_maxiter</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                    <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="mf">2.0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;Collocation problem not converged after max. number of iterations, halving step size to </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="n">S</span><span class="p">,</span>
+                    <span class="p">)</span></div>
 </div>
 
 
@@ -474,9 +533,11 @@
 <span class="sd">        Reutrns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.basic_restarting</span> <span class="kn">import</span> <span class="n">BasicRestarting</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">max_restarts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">conv_controllers</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">convergence_controllers</span>
-            <span class="n">restart_cont</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">conv_controllers</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="o">==</span> <span class="n">BasicRestartingNonMPI</span><span class="p">]</span>
+            <span class="n">restart_cont</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">conv_controllers</span> <span class="k">if</span> <span class="n">BasicRestarting</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">restart_cont</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Please implement override of maximum number of restarts!&quot;</span><span class="p">)</span>
@@ -490,7 +551,6 @@
     <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
-<span class="sd">        For adaptivity, we want a fixed order of the scheme.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -501,13 +561,6 @@
 <span class="sd">            bool: Whether the parameters are compatible</span>
 <span class="sd">            str: The error message</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;level_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;restol&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Adaptivity needs constant order in time and hence restol in the step parameters has to be </span><span class="se">\</span>
-<span class="s2">smaller than 0!&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-
         <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">mssdc_jac</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
@@ -570,7 +623,7 @@
 
 <div class="viewcode-block" id="AdaptivityCollocation">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation">[docs]</a>
-<span class="k">class</span> <span class="nc">AdaptivityCollocation</span><span class="p">(</span><span class="n">AdaptivityBase</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AdaptivityCollocation</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Control the step size via a collocation based estimate of the local error.</span>
 <span class="sd">    The error estimate works by subtracting two solutions to collocation problems with different order. You can</span>
@@ -602,6 +655,9 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;adaptive_coll_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;adaptive_coll_params&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
                 <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;num_colls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;num_colls&#39;</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;adaptive_coll_params&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])])</span>
+
+        <span class="k">if</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restart_at_maxiter&#39;</span><span class="p">]:</span>
+            <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxiter&#39;</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span> <span class="o">*</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;num_colls&#39;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">defaults</span></div>
 
@@ -643,6 +699,12 @@
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityCollocation.get_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_convergence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityCollocation.get_local_error_estimate">
@@ -698,37 +760,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Adjusting step size from </span><span class="si">{</span><span class="n">lvl</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="AdaptivityCollocation.check_parameters">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.check_parameters">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
-<span class="sd">        For adaptivity, we need to know the order of the scheme.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: Whether the parameters are compatible</span>
-<span class="sd">            str: The error message</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">mssdc_jac</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="s2">&quot;e_tol&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
-
-
 <div class="viewcode-block" id="AdaptivityCollocation.determine_restart">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.determine_restart">[docs]</a>
     <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -747,13 +778,38 @@
             <span class="k">if</span> <span class="n">e_est</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restarting: e=</span><span class="si">{</span><span class="n">e_est</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> &gt;= e_tol=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityCollocation.check_parameters">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.check_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
+<span class="sd">        For adaptivity, we need to know the order of the scheme.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Whether the parameters are compatible</span>
+<span class="sd">            str: The error message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;e_tol&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="AdaptivityExtrapolationWithinQ">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ">[docs]</a>
-<span class="k">class</span> <span class="nc">AdaptivityExtrapolationWithinQ</span><span class="p">(</span><span class="n">AdaptivityBase</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AdaptivityExtrapolationWithinQ</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to compute time step size adaptively based on error estimate obtained from extrapolation within the quadrature</span>
 <span class="sd">    nodes.</span>
@@ -764,21 +820,21 @@
 <div class="viewcode-block" id="AdaptivityExtrapolationWithinQ.setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.setup">[docs]</a>
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add a default value for control order to the parameters.</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): Parameters for the convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            dict: Updated parameters</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+            <span class="s1">&#39;high_Taylor_order&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">params</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">return</span> <span class="n">defaults</span></div>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityExtrapolationWithinQ.get_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_convergence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityExtrapolationWithinQ.dependencies">
@@ -803,33 +859,9 @@
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
             <span class="n">EstimateExtrapolationErrorWithinQ</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;high_Taylor_order&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">high_Taylor_order</span><span class="p">},</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
-
-
-<div class="viewcode-block" id="AdaptivityExtrapolationWithinQ.check_parameters">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.check_parameters">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
-<span class="sd">        For adaptivity, we need to know the order of the scheme.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
-<span class="sd">            description (dict): The description object used to instantiate the controller</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: Whether the parameters are compatible</span>
-<span class="sd">            str: The error message</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;e_tol&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityExtrapolationWithinQ.get_new_step_size">
@@ -845,14 +877,11 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># check if the step is converged</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
-
-        <span class="k">if</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_convergence</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="c1"># compute next step size</span>
-            <span class="n">order</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">high_Taylor_order</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
             <span class="n">e_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
             <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_optimal_step_size</span><span class="p">(</span>
@@ -865,9 +894,6 @@
                 <span class="n">level</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Adjusting step size from </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-
-            <span class="c1"># check if we need to restart</span>
-            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="n">e_est</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
@@ -886,6 +912,115 @@
 <span class="sd">            float: Embedded error estimate</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AdaptivityInterpolationError">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError">[docs]</a>
+<span class="k">class</span> <span class="nc">AdaptivityInterpolationError</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature</span>
+<span class="sd">    nodes.</span>
+
+<span class="sd">    This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AdaptivityInterpolationError.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityInterpolationError.get_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_convergence">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityInterpolationError.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.dependencies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the error estimator.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_interpolation_error</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">EstimateInterpolationError</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+            <span class="n">EstimateInterpolationError</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityInterpolationError.get_new_step_size">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_new_step_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine a step size for the next step from the error estimate.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_convergence</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># compute next step size</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+            <span class="n">e_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_optimal_step_size</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">,</span> <span class="n">e_est</span><span class="p">,</span> <span class="n">order</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Error target: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">, error estimate: </span><span class="si">{</span><span class="n">e_est</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">, update_order: </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">S</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Adjusting step size from </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityInterpolationError.get_local_error_estimate">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_local_error_estimate">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_local_error_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the embedded error estimate of the finest level of the step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Embedded error estimate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span></div>
 </div>
 
 </pre></div>
@@ -926,7 +1061,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

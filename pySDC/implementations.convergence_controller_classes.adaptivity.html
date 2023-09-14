@@ -309,7 +309,7 @@ It does not have to be an error estimate, but could be the residual or something
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityCollocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityCollocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems" title="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityForConvergedCollocationProblems</span></code></a></p>
 <p>Control the step size via a collocation based estimate of the local error.
 The error estimate works by subtracting two solutions to collocation problems with different order. You can
 interpolate between collocation methods as much as you want but the adaptive step size selection will always be
@@ -368,6 +368,11 @@ between collocation problems between iterations.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_convergence">
+<span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityCollocation.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_convergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_local_error_estimate">
@@ -477,33 +482,10 @@ instantiated.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityExtrapolationWithinQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems" title="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityForConvergedCollocationProblems</span></code></a></p>
 <p>Class to compute time step size adaptively based on error estimate obtained from extrapolation within the quadrature
 nodes.</p>
 <p>This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.check_parameters">
-<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.check_parameters" title="Link to this definition">¶</a></dt>
-<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
-For adaptivity, we need to know the order of the scheme.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
-<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Whether the parameters are compatible
-str: The error message</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.dependencies">
 <span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.dependencies" title="Link to this definition">¶</a></dt>
@@ -520,6 +502,11 @@ str: The error message</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_convergence">
+<span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_convergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_local_error_estimate">
@@ -561,6 +548,144 @@ str: The error message</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Add a default value for control order to the parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityForConvergedCollocationProblems</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart">
+<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence">
+<span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Add a default value for control order to the parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityInterpolationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityInterpolationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems" title="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityForConvergedCollocationProblems</span></code></a></p>
+<p>Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature
+nodes.</p>
+<p>This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityInterpolationError.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.dependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Load the error estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_convergence">
+<span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityInterpolationError.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_convergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_local_error_estimate">
+<span class="sig-name descname"><span class="pre">get_local_error_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityInterpolationError.get_local_error_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_local_error_estimate" title="Link to this definition">¶</a></dt>
+<dd><p>Get the embedded error estimate of the finest level of the step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Embedded error estimate</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityInterpolationError.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_new_step_size" title="Link to this definition">¶</a></dt>
+<dd><p>Determine a step size for the next step from the error estimate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityInterpolationError.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.setup" title="Link to this definition">¶</a></dt>
 <dd><p>Add a default value for control order to the parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -646,8 +771,7 @@ Please setup these parameters as “e_tol” and “e_tol_low”.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters">
 <span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityResidual.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityResidual.check_parameters" title="Link to this definition">¶</a></dt>
-<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
-For adaptivity, we want a fixed order of the scheme.</p>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -786,6 +910,7 @@ size.</p>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_convergence"><code class="docutils literal notranslate"><span class="pre">get_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
@@ -795,11 +920,25 @@ size.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ"><code class="docutils literal notranslate"><span class="pre">AdaptivityExtrapolationWithinQ</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_convergence"><code class="docutils literal notranslate"><span class="pre">get_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems"><code class="docutils literal notranslate"><span class="pre">AdaptivityForConvergedCollocationProblems</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence"><code class="docutils literal notranslate"><span class="pre">get_convergence()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError"><code class="docutils literal notranslate"><span class="pre">AdaptivityInterpolationError</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_convergence"><code class="docutils literal notranslate"><span class="pre">get_convergence()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_local_error_estimate"><code class="docutils literal notranslate"><span class="pre">get_local_error_estimate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK"><code class="docutils literal notranslate"><span class="pre">AdaptivityRK</span></code></a><ul>
@@ -874,7 +1013,7 @@ size.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>
