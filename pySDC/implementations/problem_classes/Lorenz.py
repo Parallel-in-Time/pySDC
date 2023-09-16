@@ -11,9 +11,14 @@ class LorenzAttractor(ptype):
     It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to :math:`T_{end} = 100`
     or so to see this with these initial conditions) and because of the chaotic nature.
 
-    Since the problem is non-linear, we need to use a Newton solver.
+    Lorenz developed this system from equations modelling convection in a layer of fluid with the top and bottom surfaces
+    kept at different temperatures. In the notation used here, the first component of u is proportional to the convective
+    motion, the second component is proportional to the temperature difference between the surfaces and the third component
+    is proportional to the distortion of the vertical temperature profile from linearity.
 
-    Problem and initial conditions do not originate from, but were taken from doi.org/10.2140/camcos.2015.10.1
+    See doi.org/10.1175/1520-0469(1963)020<0130:DNF>2.0.CO;2 for the original publication.
+
+    Since the problem is non-linear, we need to use a Newton solver.
 
     The system of ODEs is given by
 
@@ -26,8 +31,10 @@ class LorenzAttractor(ptype):
     .. math::
         \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)
 
-    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem are
-    :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.
+    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem
+    are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.
+    Lorenz chose these parameters such that the Reynolds number :math:`\rho` is slightly supercritical as to provoke
+    instability of steady convection.
 
     Parameters
     ----------
@@ -59,7 +66,7 @@ class LorenzAttractor(ptype):
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
-            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=True
+            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=False
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()

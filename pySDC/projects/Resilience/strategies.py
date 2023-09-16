@@ -36,6 +36,7 @@ class Strategy:
         Initialization routine
         '''
         self.useMPI = useMPI
+        self.max_steps = 1e4
 
         # set default values for plotting
         self.linestyle = '-'
@@ -76,6 +77,9 @@ class Strategy:
         self.precision_parameter = None
         self.precision_parameter_loc = []
 
+    def __str__(self):
+        return self.name
+
     def get_fixable_params(self, **kwargs):
         """
         Return a list containing dictionaries which can be passed to `FaultStats.get_mask` as keyword arguments to
@@ -97,8 +101,19 @@ class Strategy:
         Returns:
             dict: Arguments for the faults that are exempt from randomization
         '''
+        args = {}
+        args['target'] = 0
 
-        return {}
+        if problem.__name__ == "run_vdp":
+            args['time'] = 5.25
+        elif problem.__name__ == "run_Schroedinger":
+            args['time'] = 0.3
+        elif problem.__name__ == "run_quench":
+            args['time'] = 31.0
+        elif problem.__name__ == "run_Lorenz":
+            args['time'] = 0.3
+
+        return args
 
     def get_random_params(self, problem, num_procs):
         '''
@@ -111,8 +126,18 @@ class Strategy:
         Returns:
             dict: Randomization parameters
         '''
+        base_params = self.get_base_parameters(problem, num_procs)
 
-        return {}
+        rnd_params = {}
+        rnd_params['iteration'] = base_params['step_params']['maxiter']
+        rnd_params['rank'] = num_procs
+
+        if problem.__name__ in ['run_Schroedinger', 'run_quench']:
+            rnd_params['min_node'] = 1
+
+        if problem.__name__ == "run_quench":
+            rnd_params['iteration'] = 1
+        return rnd_params
 
     @property
     def style(self):
@@ -137,7 +162,8 @@ class Strategy:
         """
         return self.name
 
-    def get_Tend(self, problem, num_procs=1):
+    @classmethod
+    def get_Tend(cls, problem, num_procs=1):
         '''
         Get the final time of runs for fault stats based on the problem
 
@@ -162,9 +188,9 @@ class Strategy:
         else:
             raise NotImplementedError('I don\'t have a final time for your problem!')
 
-    def get_custom_description(self, problem, num_procs=1):
+    def get_base_parameters(self, problem, num_procs=1):
         '''
-        Get a custom description based on the problem
+        Get a base parameters for the problems independent of the strategy.
 
         Args:
             problem (function): A problem to run
@@ -173,6 +199,8 @@ class Strategy:
         Returns:
             dict: Custom description
         '''
+        from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+
         custom_description = {}
         if problem.__name__ == "run_vdp":
             custom_description['step_params'] = {'maxiter': 3}
@@ -194,6 +222,24 @@ class Strategy:
             custom_description['level_params'] = {'restol': -1, 'dt': 8.0}
             custom_description['step_params'] = {'maxiter': 5}
             custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-11}
+
+        custom_description['convergence_controllers'] = {
+            StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
+        }
+        return custom_description
+
+    def get_custom_description(self, problem, num_procs=1):
+        '''
+        Get a custom description based on the problem
+
+        Args:
+            problem (function): A problem to run
+            num_procs (int): Number of processes
+
+        Returns:
+            dict: Custom description
+        '''
+        custom_description = self.get_base_parameters(problem, num_procs)
         return merge_descriptions(custom_description, self.custom_description)
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -274,6 +320,10 @@ class AdaptivityStrategy(Strategy):
         self.precision_parameter = 'e_tol'
         self.precision_parameter_loc = ['convergence_controllers', Adaptivity, 'e_tol']
 
+    @property
+    def label(self):
+        return r'$\Delta t$ adaptivity'
+
     def get_fixable_params(self, maxiter, **kwargs):
         """
         Here faults occurring in the last iteration cannot be fixed.
@@ -334,7 +384,7 @@ class AdaptivityStrategy(Strategy):
             from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 
             custom_description['convergence_controllers'][BasicRestarting.get_implementation(useMPI=self.useMPI)] = {
-                'max_restarts': 15
+                'max_restarts': 15,
             }
         else:
             raise NotImplementedError(
@@ -370,6 +420,37 @@ class AdaptivityStrategy(Strategy):
                 return 1.3370376368393444e-05
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
+
+class AdaptivityRestartFirstStep(AdaptivityStrategy):
+    def __init__(self, useMPI=False):
+        super().__init__(useMPI=useMPI)
+        self.color = 'teal'
+        self.name = 'adaptivityRestartFirstStep'
+
+    def get_custom_description(self, problem, num_procs):
+        '''
+        Add the other version of basic restarting.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            The custom descriptions you can supply to the problem when running it
+        '''
+        custom_description = super().get_custom_description(problem, num_procs)
+        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
+
+        custom_description['convergence_controllers'][BasicRestarting.get_implementation(useMPI=self.useMPI)] = {
+            'max_restarts': 15,
+            'restart_from_first_step': True,
+        }
+        return custom_description
+
+    @property
+    def label(self):
+        return f'{super().label} restart from first step'
 
 
 class AdaptiveHotRodStrategy(Strategy):
@@ -565,16 +646,37 @@ class HotRodStrategy(Strategy):
         from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
         if problem.__name__ == "run_vdp":
-            HotRod_tol = 5e-7
+            if num_procs == 4:
+                HotRod_tol = 1.800804e-04
+            elif num_procs == 5:
+                HotRod_tol = 9.329361e-05
+            else:  # 1 process
+                HotRod_tol = 1.347949e-06  # 5e-7
+            HotRod_tol = 7e-6 if num_procs > 1 else 5e-7
             maxiter = 4
         elif problem.__name__ == "run_Lorenz":
-            HotRod_tol = 4e-7
+            if num_procs == 5:
+                HotRod_tol = 9.539348e-06
+            elif num_procs == 4:
+                HotRod_tol = 3.201e-6
+            else:
+                HotRod_tol = 7.720589e-07  # 4e-7
             maxiter = 6
         elif problem.__name__ == "run_Schroedinger":
-            HotRod_tol = 3e-7
+            if num_procs == 5:
+                HotRod_tol = 2.497697e-06
+            elif num_procs == 4:
+                HotRod_tol = 1.910405e-06
+            else:
+                HotRod_tol = 4.476790e-07
             maxiter = 6
         elif problem.__name__ == "run_quench":
-            HotRod_tol = 3e-5
+            if num_procs == 5:
+                HotRod_tol = 1.017534e-03
+            elif num_procs == 4:
+                HotRod_tol = 1.017534e-03
+            else:
+                HotRod_tol = 5.198620e-04
             maxiter = 6
         else:
             raise NotImplementedError(
@@ -582,12 +684,16 @@ class HotRodStrategy(Strategy):
  strategy'
             )
 
-        no_storage = num_procs > 1
+        no_storage = False  # num_procs > 1
 
         custom_description = {
             'convergence_controllers': {
                 HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
-                BasicRestartingNonMPI: {'max_restarts': 2, 'crash_after_max_restarts': False},
+                BasicRestartingNonMPI: {
+                    'max_restarts': 2,
+                    'crash_after_max_restarts': False,
+                    'restart_from_first_step': True,
+                },
             },
             'step_params': {'maxiter': maxiter},
         }
@@ -815,6 +921,7 @@ class DIRKStrategy(AdaptivityStrategy):
         self.bar_plot_x_label = 'DIRK4(3)'
         self.precision_parameter = 'e_tol'
         self.precision_parameter_loc = ['convergence_controllers', AdaptivityRK, 'e_tol']
+        self.max_steps = 1e5
 
     @property
     def label(self):
@@ -832,6 +939,7 @@ class DIRKStrategy(AdaptivityStrategy):
             The custom descriptions you can supply to the problem when running it
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
+        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
         from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK43
 
         adaptivity_description = super().get_custom_description(problem, num_procs)
@@ -843,7 +951,13 @@ class DIRKStrategy(AdaptivityStrategy):
         rk_params = {
             'step_params': {'maxiter': 1},
             'sweeper_class': DIRK43,
-            'convergence_controllers': {AdaptivityRK: {'e_tol': e_tol}},
+            'convergence_controllers': {
+                AdaptivityRK: {'e_tol': e_tol},
+                BasicRestarting.get_implementation(useMPI=self.useMPI): {
+                    'max_restarts': 49,
+                    'crash_after_max_restarts': False,
+                },
+            },
         }
 
         custom_description = merge_descriptions(adaptivity_description, rk_params)
@@ -871,6 +985,123 @@ class DIRKStrategy(AdaptivityStrategy):
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
 
+    def get_random_params(self, problem, num_procs):
+        '''
+        Routine to get parameters for the randomization of faults
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            dict: Randomization parameters
+        '''
+        rnd_params = super().get_random_params(problem, num_procs)
+        rnd_params['iteration'] = 1
+        rnd_params['min_node'] = 5
+
+        return rnd_params
+
+
+class ESDIRKStrategy(AdaptivityStrategy):
+    '''
+    ESDIRK5(3)
+    '''
+
+    def __init__(self, useMPI=False, skip_residual_computation='all'):
+        '''
+        Initialization routine
+        '''
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
+
+        super().__init__(useMPI=useMPI, skip_residual_computation=skip_residual_computation)
+        self.color = 'violet'
+        self.marker = '^'
+        self.name = 'ESDIRK'
+        self.bar_plot_x_label = 'ESDIRK5(3)'
+        self.precision_parameter = 'e_tol'
+        self.precision_parameter_loc = ['convergence_controllers', AdaptivityRK, 'e_tol']
+        self.max_steps = 1e5
+
+    @property
+    def label(self):
+        return 'ESDIRK5(3)'
+
+    def get_custom_description(self, problem, num_procs):
+        '''
+        Routine to get a custom description that adds adaptivity
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            The custom descriptions you can supply to the problem when running it
+        '''
+        from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK, Adaptivity
+        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
+        from pySDC.implementations.sweeper_classes.Runge_Kutta import ESDIRK53
+
+        adaptivity_description = super().get_custom_description(problem, num_procs)
+
+        e_tol = adaptivity_description['convergence_controllers'][Adaptivity]['e_tol']
+        adaptivity_description['convergence_controllers'].pop(Adaptivity, None)
+        adaptivity_description.pop('sweeper_params', None)
+
+        rk_params = {
+            'step_params': {'maxiter': 1},
+            'sweeper_class': ESDIRK53,
+            'convergence_controllers': {
+                AdaptivityRK: {'e_tol': e_tol},
+                BasicRestarting.get_implementation(useMPI=self.useMPI): {
+                    'max_restarts': 49,
+                    'crash_after_max_restarts': False,
+                },
+            },
+        }
+
+        custom_description = merge_descriptions(adaptivity_description, rk_params)
+
+        return custom_description
+
+    def get_reference_value(self, problem, key, op, num_procs=1):
+        """
+        Get a reference value for a given problem for testing in CI.
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            key (str): The name of the variable you want to compare
+            op (function): The operation you want to apply to the data
+            num_procs (int): Number of processes
+
+        Returns:
+            The reference value
+        """
+        if problem.__name__ == "run_vdp":
+            if key == 'work_newton' and op == sum:
+                return 1562
+            elif key == 'e_global_post_run' and op == max:
+                return 3.6982949243591356e-06
+
+        raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')
+
+    def get_random_params(self, problem, num_procs):
+        '''
+        Routine to get parameters for the randomization of faults
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            dict: Randomization parameters
+        '''
+        rnd_params = super().get_random_params(problem, num_procs)
+        rnd_params['iteration'] = 1
+        rnd_params['min_node'] = 6
+
+        return rnd_params
+
 
 class ERKStrategy(DIRKStrategy):
     """
@@ -891,9 +1122,21 @@ class ERKStrategy(DIRKStrategy):
     def label(self):
         return 'CP5(4)'
 
-    """
-    Explicit Cash-Karp's method
-    """
+    def get_random_params(self, problem, num_procs):
+        '''
+        Routine to get parameters for the randomization of faults
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processes you intend to run with
+
+        Returns:
+            dict: Randomization parameters
+        '''
+        rnd_params = super().get_random_params(problem, num_procs)
+        rnd_params['min_node'] = 7
+
+        return rnd_params
 
     def get_custom_description(self, problem, num_procs=1):
         from pySDC.implementations.sweeper_classes.Runge_Kutta import Cash_Karp
@@ -1179,6 +1422,15 @@ class AdaptivityExtrapolationWithinQStrategy(Strategy):
  strategy'
             )
 
+        if problem.__name__ in ['run_Schroedinger', 'run_quench']:
+            from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
+            sweeper_class = imex_1st_order
+        else:
+            from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+            sweeper_class = generic_implicit
+
         custom_description['level_params'] = {'restol': e_tol / 10 if self.restol is None else self.restol}
         custom_description['convergence_controllers'] = {
             AdaptivityExtrapolationWithinQ: {
@@ -1187,6 +1439,7 @@ class AdaptivityExtrapolationWithinQStrategy(Strategy):
                 'dt_max': dt_max,
             }
         }
+        custom_description['sweeper_class'] = sweeper_class
         return merge_descriptions(super().get_custom_description(problem, num_procs), custom_description)
 
     def get_reference_value(self, problem, key, op, num_procs=1):
@@ -1204,8 +1457,8 @@ class AdaptivityExtrapolationWithinQStrategy(Strategy):
         """
         if problem.__name__ == "run_vdp":
             if key == 'work_newton' and op == sum:
-                return 2259
+                return 2677
             elif key == 'e_global_post_run' and op == max:
-                return 9.319882663172407e-06
+                return 4.375184403937471e-06
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')

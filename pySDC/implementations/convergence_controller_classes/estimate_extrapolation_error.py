@@ -422,10 +422,11 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
     solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
     of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don't share the order of
     accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
-    nodes + 1 (locally).
+    nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order
+    of the number of nodes.
     That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling
     terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error
-    estimate that is of the order accuracy of the stages.
+    estimate that is of the order of accuracy of the stages.
     This can be used for adaptivity, for instance, with the nice property that it doesn't matter how we arrived at the
     converged collocation solution, as long as we did. We don't rely on knowing the order of accuracy after every sweep,
     only after convergence of the collocation problem has been achieved, which we can check from the residual.
@@ -444,7 +445,16 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         Returns:
             dict: Updated parameters with default values
         """
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+
         num_nodes = description['sweeper_params']['num_nodes']
+        self.comm = description['sweeper_params'].get('comm', None)
+        if self.comm:
+            from mpi4py import MPI
+
+            self.sum = MPI.SUM
+
+        self.check_convergence = CheckConvergence.check_convergence
 
         default_params = {
             'Taylor_order': 2 * num_nodes,
@@ -464,9 +474,8 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         Returns:
             None
         """
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
-        if not CheckConvergence.check_convergence(S):
+        if not self.check_convergence(S):
             return None
 
         lvl = S.levels[0]
@@ -494,10 +503,25 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
  works with types imex_mesh and mesh"
             )
 
-        u_ex = lvl.u[-1] * 0.0
-        for i in range(self.params.n):
-            u_ex += self.coeff.u[i] * lvl.u[i] + self.coeff.f[i] * f[i]
+        # compute the error with the weighted sum
+        if self.comm:
+            idx = (self.comm.rank + 1) % self.comm.size
+            sendbuf = self.coeff.u[idx] * lvl.u[idx] + self.coeff.f[idx] * lvl.f[idx]
+            u_ex = lvl.prob.dtype_u(lvl.prob.init, val=0.0) if self.comm.rank == self.comm.size - 1 else None
+            self.comm.Reduce(sendbuf, u_ex, op=self.sum, root=self.comm.size - 1)
+        else:
+            u_ex = lvl.prob.dtype_u(lvl.prob.init, val=0.0)
+            for i in range(self.params.n):
+                u_ex += self.coeff.u[i] * lvl.u[i] + self.coeff.f[i] * f[i]
 
         # store the error
-        lvl.status.error_extrapolation_estimate = abs(u_ex - lvl.u[-1]) * self.coeff.prefactor
+        if self.comm:
+            error = (
+                abs(u_ex - lvl.u[self.comm.rank + 1]) * self.coeff.prefactor
+                if self.comm.rank == self.comm.size - 1
+                else None
+            )
+            lvl.status.error_extrapolation_estimate = self.comm.bcast(error, root=self.comm.size - 1)
+        else:
+            lvl.status.error_extrapolation_estimate = abs(u_ex - lvl.u[-1]) * self.coeff.prefactor
         return None

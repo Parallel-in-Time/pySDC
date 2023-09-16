@@ -7,7 +7,6 @@ from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_n
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-# from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.playgrounds.EnergyGrids.log_data_battery import log_data_battery
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
@@ -55,11 +54,11 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = battery  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
+    description['problem_class'] = battery
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = imex_1st_order
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
     description['step_params'] = step_params
 
     # set time parameters

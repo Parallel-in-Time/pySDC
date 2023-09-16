@@ -12,7 +12,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
 from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor import monitor
 from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_MPI
-from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
+from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -76,7 +76,7 @@ def run_variant(variant=None):
         description['sweeper_class'] = generic_implicit  # pass sweeper
         description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     elif variant == 'sl_parallel':
-        maxmeaniters = 5.12
+        maxmeaniters = 5.125
         assert MPI.COMM_WORLD.Get_size() == sweeper_params['num_nodes']
         sweeper_params['QI'] = ['MIN3']
         sweeper_params['comm'] = MPI.COMM_WORLD
@@ -176,15 +176,17 @@ def main():
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
     my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
     cmd = (
         "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
         "run_variant(\'sl_parallel\');\""
     )
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
     p.wait()
-    (output, err) = p.communicate()
-    print(output)
+    for line in p.stdout:
+        print(line)
+    for line in p.stderr:
+        print(line)
+    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
 
     cmd = (
         "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
@@ -192,8 +194,11 @@ def main():
     )
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
     p.wait()
-    (output, err) = p.communicate()
-    print(output)
+    for line in p.stdout:
+        print(line)
+    for line in p.stderr:
+        print(line)
+    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
 
 
 if __name__ == "__main__":

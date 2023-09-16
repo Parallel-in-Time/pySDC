@@ -156,6 +156,23 @@ class EstimateEmbeddedErrorLinearizedNonMPI(EstimateEmbeddedError):
         super().__init__(controller, params, description, **kwargs)
         self.buffers = Pars({'e_em_last': 0.0})
 
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Add option for averaging the local errors.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters
+        """
+        return {
+            'averaged': False,
+            **super().setup(controller, params, description, **kwargs),
+        }
+
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
         Reset buffers for imitated communication.
@@ -188,11 +205,19 @@ level"
             )
 
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
+            if self.params.averaged:
+                averaging = float(S.status.slot + 1)
+            else:
+                averaging = 1.0
+
             for L in S.levels:
                 temp = self.estimate_embedded_error_serial(L)
-                L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
+                L.status.error_embedded_estimate = max(
+                    [abs(temp - self.buffers.e_em_last) / averaging, np.finfo(float).eps]
+                )
 
-            self.buffers.e_em_last = temp * 1.0
+            if not self.params.averaged:
+                self.buffers.e_em_last = temp * 1.0
 
         return None
 

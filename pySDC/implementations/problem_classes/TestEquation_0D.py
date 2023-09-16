@@ -33,7 +33,7 @@ class testequation0d(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, lambdas=1, u0=0.0):
+    def __init__(self, lambdas=None, u0=0.0):
         """Initialization routine"""
         assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
         nvars = len(lambdas)

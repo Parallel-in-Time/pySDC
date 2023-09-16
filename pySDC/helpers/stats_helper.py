@@ -1,19 +1,12 @@
 import numpy as np
 
 
-def filter_stats(
-    stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, num_restarts=None, comm=None
-):
+def filter_stats(stats, comm=None, recomputed=None, **kwargs):
     """
-    Helper function to extract data from the dictionary of statistics
+    Helper function to extract data from the dictionary of statistics. Please supply metadata as keyword arguments.
 
     Args:
         stats (dict): raw statistics from a controller run
-        process (int): process number
-        time (float): the requested simulation time
-        level (int): the requested level index
-        iter (int): the requested iteration count
-        type (str): string to describe the requested type of value
         recomputed (bool): filter recomputed values from stats if set to anything other than None
         comm (mpi4py.MPI.Intracomm): Communicator (or None if not applicable)
 
@@ -21,17 +14,8 @@ def filter_stats(
         dict: dictionary containing only the entries corresponding to the filter
     """
     result = {}
-
     for k, v in stats.items():
-        # get data if key matches the filter (if specified)
-        if (
-            (k.time == time or time is None)
-            and (k.process == process or process is None)
-            and (k.level == level or level is None)
-            and (k.iter == iter or iter is None)
-            and (k.type == type or type is None)
-            and (k.num_restarts == num_restarts or num_restarts is None)
-        ):
+        if all([k._asdict().get(k2, None) == v2 for k2, v2 in kwargs.items() if v2 is not None] + [True]):
             result[k] = v
 
     if comm is not None:
@@ -55,7 +39,7 @@ def filter_stats(
             ]
 
         # delete values that were recorded at times that shouldn't be recorded because we performed a different step after the restart
-        if type != '_recomputed':
+        if kwargs.get('type', None) != '_recomputed':
             other_restarted_steps = [
                 key for key, val in filter_stats(stats, type='_recomputed', recomputed=False, comm=comm).items() if val
             ]

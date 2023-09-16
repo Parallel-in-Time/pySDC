@@ -78,7 +78,38 @@ class AdaptiveCollocation(ConvergenceController):
 
                 defaults['num_colls'] = max([defaults['num_colls'], len(params[key])])
 
+        self.comm = description['sweeper_params'].get('comm', None)
+        if self.comm:
+            from mpi4py import MPI
+
+            self.MPI_SUM = MPI.SUM
+
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
+    def matmul(self, A, b):
+        """
+        Matrix vector multiplication, possibly MPI parallel.
+        The parallel implementation performs a reduce operation in every row of the matrix. While communicating the
+        entire vector once could reduce the number of communications, this way we never need to store the entire vector
+        on any specific rank.
+
+        Args:
+            A (2d np.ndarray): Matrix
+            b (list): Vector
+
+        Returns:
+            List: Axb
+        """
+        if self.comm:
+            res = [A[i, 0] * b[0] if b[i] is not None else None for i in range(A.shape[0])]
+            buf = b[0] * 0.0
+            for i in range(1, A.shape[1]):
+                self.comm.Reduce(A[i, self.comm.rank + 1] * b[self.comm.rank + 1], buf, op=self.MPI_SUM, root=i - 1)
+                if i == self.comm.rank + 1:
+                    res[i] += buf
+            return res
+        else:
+            return A @ b
 
     def switch_sweeper(self, S):
         """
@@ -105,7 +136,7 @@ class AdaptiveCollocation(ConvergenceController):
             P = L.prob
 
             # store solution of current level which will be interpolated to new level
-            u_old = [me.flatten() for me in L.u]
+            u_old = [me.flatten() if me is not None else me for me in L.u]
             nodes_old = L.sweep.coll.nodes.copy()
 
             # change sweeper
@@ -120,17 +151,19 @@ class AdaptiveCollocation(ConvergenceController):
             nodes_new = L.sweep.coll.nodes.copy()
             interpolator = LagrangeApproximation(points=np.append(0, nodes_old))
 
-            u_inter = interpolator.getInterpolationMatrix(np.append(0, nodes_new)) @ u_old
+            u_inter = self.matmul(interpolator.getInterpolationMatrix(np.append(0, nodes_new)), u_old)
 
             # assign the interpolated values to the nodes in the level
             for i in range(0, len(u_inter)):
-                me = P.dtype_u(P.init)
-                me[:] = np.reshape(u_inter[i], P.init[0])
-                L.u[i] = me
+                if u_inter[i] is not None:
+                    me = P.dtype_u(P.init)
+                    me[:] = np.reshape(u_inter[i], P.init[0])
+                    L.u[i] = me
 
             # reevaluate rhs
             for i in range(L.sweep.coll.num_nodes + 1):
-                L.f[i] = L.prob.eval_f(L.u[i], L.time)
+                if L.u[i] is not None:
+                    L.f[i] = L.prob.eval_f(L.u[i], L.time)
 
         # log the new parameters
         self.log(f'Switching to collocation {self.status.active_coll + 1} of {self.params.num_colls}', S, level=20)

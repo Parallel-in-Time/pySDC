@@ -8,7 +8,6 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-# from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.playgrounds.EnergyGrids.log_data import log_data
 import pySDC.helpers.plot_helper as plt_helper
 
