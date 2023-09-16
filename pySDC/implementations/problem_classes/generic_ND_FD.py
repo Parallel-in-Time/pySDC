@@ -16,6 +16,48 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class GenericNDimFinDiff(ptype):
+    r"""
+    Example implementing the N-dimensional linear equation
+
+    .. math::
+        \frac{d u}{dt} = A u,
+
+    where :math:`A  \in \mathbb{R}^{n \times n}` is a finite difference matrix arising from spatial discretization.
+    This generic class follows the MOL (method-of-lines) approach and can be used to discretize partial differential
+    equations such as the advection equation and the heat equation.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Spatial resolution for the ND problem. For :math:`N = 2`, set nvars=(16, 16).
+    coeff : float, optional
+        Factor for finite difference matrix :math:`A`.
+    derivative : int, optional
+        Order of the derivative used for finite difference discretization.
+    freq : int of tuple, optional
+        Spatial frequency, can be a tuple.
+    stencil_type : str, optional
+        Stencil type for finite differences.
+    order : int, optional
+        Order of the finite difference discretization.
+    lintol : float, optional
+        Tolerance for spatial solver.
+    liniter : int, optional
+        Maximum number of iterations for linear solver.
+    solver_type : str, optional
+        Type of solver. Can be 'direct', 'GMRES' or 'CG'.
+    bc : str, optional
+        Type of boundary conditions. Default is 'periodic'.
+
+    Attributes
+    ----------
+    A : sparse matrix (CSC)
+        FD discretization matrix of the ND operator.
+    Id : sparse matrix (CSC)
+        Identity matrix of the same dimension as A.
+    xvalues : np.1darray
+        Values of spatial grid.
+    """
     dtype_u = mesh
     dtype_f = mesh
 
@@ -126,7 +168,7 @@ class GenericNDimFinDiff(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
         Parameters
         ----------
@@ -138,15 +180,15 @@ class GenericNDimFinDiff(ptype):
         Returns
         -------
         f : dtype_f
-            The RHS values.
+            Values of the right-hand side of the problem.
         """
         f = self.f_init
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs.
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
         Parameters
         ----------

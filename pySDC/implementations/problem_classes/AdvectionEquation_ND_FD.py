@@ -50,10 +50,10 @@ class advectionNd(GenericNDimFinDiff):
 
     Attributes
     ----------
-    A: sparse matrix (CSC)
+    A : sparse matrix (CSC)
         FD discretization matrix of the ND grad operator.
-    Id: sparse matrix (CSC)
-        Identity matrix of the same dimension as A
+    Id : sparse matrix (CSC)
+        Identity matrix of the same dimension as A.
 
     Note
     ----
@@ -83,7 +83,7 @@ class advectionNd(GenericNDimFinDiff):
 
     def u_exact(self, t, **kwargs):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
         Parameters
         ----------

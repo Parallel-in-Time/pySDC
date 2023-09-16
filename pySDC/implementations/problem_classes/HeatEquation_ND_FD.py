@@ -56,7 +56,7 @@ class heatNd_unforced(GenericNDimFinDiff):
     Attributes
     ----------
     A : sparse matrix (CSC)
-        FD discretization matrix of the ND grad operator.
+        FD discretization matrix of the ND operator.
     Id : sparse matrix (CSC)
         Identity matrix of the same dimension as A
     """
