@@ -7,10 +7,40 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 
 # noinspection PyUnusedLocal
 class fermi_pasta_ulam_tsingou(ptype):
-    """
-    Example implementing the outer solar system problem
+    r"""
+    This class implements the second-order Fermi-Pasta-Ulam-Tsingou problem [1]_:
 
-    TODO : doku
+    .. math::
+        \frac{d^2 u_j}{d t^2} = (u_{j+1} - 2 u_j + u_{j-1}) (1 + \alpha (u_{j+1} - u_{j-1})),
+
+    where :math:`u_j(t)` is the position of the :math:`j`-th particle. [2]_ is used as setup for this
+    implemented problem class.
+
+    Parameters
+    ----------
+    npart : int, optional
+        Number of particles.
+    alpha : float, optional
+        Factor of the nonlinear force.
+    k : float, optional
+        Frequency of the initial conditions.
+    energy_modes : list, optional
+        Energy modes.
+
+    Attributes
+    ----------
+    dx : float
+        Mesh grid size.
+    xvalues : np.1darray
+        Spatial grid.
+    ones : np.1darray
+        Vector containing ones.
+
+    References
+    ----------
+    .. [1] Fermi E., Pasta J., Ulam S. Studies of nonlinear problems (1955). I. Los Alamos report LA-1940.
+        Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (1965)
+    .. [2] http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
     """
 
     dtype_u = particles
@@ -109,19 +139,18 @@ class fermi_pasta_ulam_tsingou(ptype):
         return ham
 
     def eval_mode_energy(self, u):
-        """
-        Routine to compute the energy following
-        http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
+        r"""
+        Routine to compute the energy following [1]_.
 
         Parameters
         ----------
         u : dtype_u
-            The particles.
+            Particles.
 
         Returns
         -------
         energy : dict
-            The energies.
+            Energies.
         """
 
         energy = {}
