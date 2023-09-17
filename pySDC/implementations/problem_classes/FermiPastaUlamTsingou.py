@@ -8,13 +8,21 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 # noinspection PyUnusedLocal
 class fermi_pasta_ulam_tsingou(ptype):
     r"""
-    This class implements the second-order Fermi-Pasta-Ulam-Tsingou problem [1]_:
+    The Fermi-Pasta-Ulam-Tsingou (FPUT) problem was one of the first computer experiments.  E. Fermi, J. Pasta
+    and S. Ulam investigated the behavior of a vibrating spring with a weak correction term (which is quadratic
+    for the FPU-:math:`\alpha` model, and cubic for the FPU-:math:`\beta` model [1]_). This can be modelled by
+    the second-order problem
 
     .. math::
-        \frac{d^2 u_j}{d t^2} = (u_{j+1} - 2 u_j + u_{j-1}) (1 + \alpha (u_{j+1} - u_{j-1})),
+        \frac{d^2 u_j(t)}{d t^2} = (u_{j+1}(t) - 2 u_j(t) + u_{j-1}(t)) (1 + \alpha (u_{j+1}(t) - u_{j-1}(t))),
 
     where :math:`u_j(t)` is the position of the :math:`j`-th particle. [2]_ is used as setup for this
-    implemented problem class.
+    implemented problem class. The Hamiltonian of this problem (needed for second-order SDC) is
+
+    .. math::
+        \sum_{i=1}^n \frac{1}{2}v^2_{i-1}(t) + \frac{1}{2}(u_{i+1}(t) - u_{i-1}(t))^2 + \frac{\alpha}{3}(u_{i+1}(t) - u_{i-1}(t))^3,
+
+    where :math:`v_j(t)` is the velocity of the :math:`j`-th particle.
 
     Parameters
     ----------
@@ -23,7 +31,7 @@ class fermi_pasta_ulam_tsingou(ptype):
     alpha : float, optional
         Factor of the nonlinear force.
     k : float, optional
-        Frequency of the initial conditions.
+        Mode for initial conditions.
     energy_modes : list, optional
         Energy modes.
 
@@ -38,7 +46,7 @@ class fermi_pasta_ulam_tsingou(ptype):
 
     References
     ----------
-    .. [1] Fermi E., Pasta J., Ulam S. Studies of nonlinear problems (1955). I. Los Alamos report LA-1940.
+    .. [1] E. Fermi, J. Pasta, S. Ulam. Studies of nonlinear problems (1955). I. Los Alamos report LA-1940.
         Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (1965)
     .. [2] http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
     """
