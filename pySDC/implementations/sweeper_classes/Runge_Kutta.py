@@ -343,6 +343,111 @@ class RungeKutta(sweeper):
         lvl.status.updated = True
 
 
+class RungeKuttaIMEX(RungeKutta):
+    """
+    Implicit-explicit split Runge Kutta base class. Only supports methods that share the nodes and weights.
+    """
+
+    matrix_explicit = None
+    ButcherTableauClass_explicit = ButcherTableau
+
+    def __init__(self, params):
+        """
+        Initialization routine
+
+        Args:
+            params: parameters for the sweeper
+        """
+        super().__init__(params)
+        self.coll_explicit = self.get_Butcher_tableau_explicit()
+        self.QE = self.coll_explicit.Qmat
+
+    def predict(self):
+        """
+        Predictor to fill values at nodes before first sweep
+        """
+
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
+
+        for m in range(1, self.coll.num_nodes + 1):
+            lvl.u[m] = prob.dtype_u(init=prob.init, val=0.0)
+            lvl.f[m] = prob.dtype_f(init=prob.init, val=0.0)
+
+        # indicate that this level is now ready for sweeps
+        lvl.status.unlocked = True
+        lvl.status.updated = True
+
+    @classmethod
+    def get_Butcher_tableau_explicit(cls):
+        return cls.ButcherTableauClass_explicit(cls.weights, cls.nodes, cls.matrix_explicit)
+
+    def integrate(self):
+        """
+        Integrates the right-hand side
+
+        Returns:
+            list of dtype_u: containing the integral as values
+        """
+
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
+
+        me = []
+
+        # integrate RHS over all collocation nodes
+        for m in range(1, self.coll.num_nodes + 1):
+            # new instance of dtype_u, initialize values with 0
+            me.append(prob.dtype_u(prob.init, val=0.0))
+            for j in range(1, self.coll.num_nodes + 1):
+                me[-1] += lvl.dt * (
+                    self.coll.Qmat[m, j] * lvl.f[j].impl + self.coll_explicit.Qmat[m, j] * lvl.f[j].expl
+                )
+
+        return me
+
+    def update_nodes(self):
+        """
+        Update the u- and f-values at the collocation nodes
+
+        Returns:
+            None
+        """
+
+        # get current level and problem
+        lvl = self.level
+        prob = lvl.prob
+
+        # only if the level has been touched before
+        assert lvl.status.unlocked
+        assert lvl.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
+
+        # get number of collocation nodes for easier access
+        M = self.coll.num_nodes
+
+        for m in range(0, M):
+            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
+            rhs = lvl.u[0]
+            for j in range(1, m + 1):
+                rhs += lvl.dt * (self.QI[m + 1, j] * lvl.f[j].impl + self.QE[m + 1, j] * lvl.f[j].expl)
+
+            # implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess
+            lvl.u[m + 1][:] = prob.solve_system(
+                rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m]
+            )
+
+            # update function values (we don't usually need to evaluate the RHS at the solution of the step)
+            if m < M - self.coll.num_solution_stages or self.params.eval_rhs_at_right_boundary:
+                lvl.f[m + 1] = prob.eval_f(lvl.u[m + 1], lvl.time + lvl.dt * self.coll.nodes[m])
+
+        # indicate presence of new values at this level
+        lvl.status.updated = True
+
+        return None
+
+
 class ForwardEuler(RungeKutta):
     """
     Forward Euler. Still a classic.
@@ -549,3 +654,151 @@ class ESDIRK53(RungeKutta):
     @classmethod
     def get_update_order(cls):
         return 4
+
+
+class ARK548L2SAERK(RungeKutta):
+    """
+    Explicit part of the ARK54 scheme.
+    """
+
+    ButcherTableauClass = ButcherTableauEmbedded
+    weights = np.array(
+        [
+            [
+                -872700587467.0 / 9133579230613.0,
+                0.0,
+                0.0,
+                22348218063261.0 / 9555858737531.0,
+                -1143369518992.0 / 8141816002931.0,
+                -39379526789629.0 / 19018526304540.0,
+                32727382324388.0 / 42900044865799.0,
+                41.0 / 200.0,
+            ],
+            [
+                -975461918565.0 / 9796059967033.0,
+                0.0,
+                0.0,
+                78070527104295.0 / 32432590147079.0,
+                -548382580838.0 / 3424219808633.0,
+                -33438840321285.0 / 15594753105479.0,
+                3629800801594.0 / 4656183773603.0,
+                4035322873751.0 / 18575991585200.0,
+            ],
+        ]
+    )
+
+    nodes = np.array(
+        [
+            0,
+            41.0 / 100.0,
+            2935347310677.0 / 11292855782101.0,
+            1426016391358.0 / 7196633302097.0,
+            92.0 / 100.0,
+            24.0 / 100.0,
+            3.0 / 5.0,
+            1.0,
+        ]
+    )
+
+    matrix = np.zeros((8, 8))
+    matrix[1, 0] = 41.0 / 100.0
+    matrix[2, :2] = [367902744464.0 / 2072280473677.0, 677623207551.0 / 8224143866563.0]
+    matrix[3, :3] = [1268023523408.0 / 10340822734521.0, 0.0, 1029933939417.0 / 13636558850479.0]
+    matrix[4, :4] = [
+        14463281900351.0 / 6315353703477.0,
+        0.0,
+        66114435211212.0 / 5879490589093.0,
+        -54053170152839.0 / 4284798021562.0,
+    ]
+    matrix[5, :5] = [
+        14090043504691.0 / 34967701212078.0,
+        0.0,
+        15191511035443.0 / 11219624916014.0,
+        -18461159152457.0 / 12425892160975.0,
+        -281667163811.0 / 9011619295870.0,
+    ]
+    matrix[6, :6] = [
+        19230459214898.0 / 13134317526959.0,
+        0.0,
+        21275331358303.0 / 2942455364971.0,
+        -38145345988419.0 / 4862620318723.0,
+        -1.0 / 8.0,
+        -1.0 / 8.0,
+    ]
+    matrix[7, :7] = [
+        -19977161125411.0 / 11928030595625.0,
+        0.0,
+        -40795976796054.0 / 6384907823539.0,
+        177454434618887.0 / 12078138498510.0,
+        782672205425.0 / 8267701900261.0,
+        -69563011059811.0 / 9646580694205.0,
+        7356628210526.0 / 4942186776405.0,
+    ]
+
+    @classmethod
+    def get_update_order(cls):
+        return 5
+
+
+class ARK548L2SAESDIRK(ARK548L2SAERK):
+    """
+    Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.
+    """
+
+    matrix = np.zeros((8, 8))
+    matrix[1, :2] = [41.0 / 200.0, 41.0 / 200.0]
+    matrix[2, :3] = [41.0 / 400.0, -567603406766.0 / 11931857230679.0, 41.0 / 200.0]
+    matrix[3, :4] = [683785636431.0 / 9252920307686.0, 0.0, -110385047103.0 / 1367015193373.0, 41.0 / 200.0]
+    matrix[4, :5] = [
+        3016520224154.0 / 10081342136671.0,
+        0.0,
+        30586259806659.0 / 12414158314087.0,
+        -22760509404356.0 / 11113319521817.0,
+        41.0 / 200.0,
+    ]
+    matrix[5, :6] = [
+        218866479029.0 / 1489978393911.0,
+        0.0,
+        638256894668.0 / 5436446318841.0,
+        -1179710474555.0 / 5321154724896.0,
+        -60928119172.0 / 8023461067671.0,
+        41.0 / 200.0,
+    ]
+    matrix[6, :7] = [
+        1020004230633.0 / 5715676835656.0,
+        0.0,
+        25762820946817.0 / 25263940353407.0,
+        -2161375909145.0 / 9755907335909.0,
+        -211217309593.0 / 5846859502534.0,
+        -4269925059573.0 / 7827059040749.0,
+        41.0 / 200.0,
+    ]
+    matrix[7, :] = [
+        -872700587467.0 / 9133579230613.0,
+        0.0,
+        0.0,
+        22348218063261.0 / 9555858737531.0,
+        -1143369518992.0 / 8141816002931.0,
+        -39379526789629.0 / 19018526304540.0,
+        32727382324388.0 / 42900044865799.0,
+        41.0 / 200.0,
+    ]
+
+
+class ARK54(RungeKuttaIMEX):
+    """
+    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](https://doi.org/10.1016/S0168-9274(02)00138-1).
+    """
+
+    ButcherTableauClass = ButcherTableauEmbedded
+    ButcherTableauClass_explicit = ButcherTableauEmbedded
+
+    nodes = ARK548L2SAERK.nodes
+    weights = ARK548L2SAERK.weights
+
+    matrix = ARK548L2SAESDIRK.matrix
+    matrix_explicit = ARK548L2SAERK.matrix
+
+    @classmethod
+    def get_update_order(cls):
+        return 5
