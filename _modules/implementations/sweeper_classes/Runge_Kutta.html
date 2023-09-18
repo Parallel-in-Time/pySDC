@@ -415,6 +415,126 @@
 
 
 
+<div class="viewcode-block" id="RungeKuttaIMEX">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX">[docs]</a>
+<span class="k">class</span> <span class="nc">RungeKuttaIMEX</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit-explicit split Runge Kutta base class. Only supports methods that share the nodes and weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableau</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            params: parameters for the sweeper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau_explicit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">Qmat</span>
+
+<div class="viewcode-block" id="RungeKuttaIMEX.predict">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predictor to fill values at nodes before first sweep</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># indicate that this level is now ready for sweeps</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.get_Butcher_tableau_explicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.get_Butcher_tableau_explicit">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_Butcher_tableau_explicit</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass_explicit</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix_explicit</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.integrate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.integrate">[docs]</a>
+    <span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrates the right-hand side</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of dtype_u: containing the integral as values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># integrate RHS over all collocation nodes</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># new instance of dtype_u, initialize values with 0</span>
+            <span class="n">me</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">me</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">expl</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="RungeKuttaIMEX.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.update_nodes">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the u- and f-values at the collocation nodes</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get current level and problem</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="c1"># only if the level has been touched before</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;RK schemes are direct solvers. Please perform only 1 iteration!&quot;</span>
+
+        <span class="c1"># get number of collocation nodes for easier access</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+            <span class="c1"># build rhs, consisting of the known values from above and new values from previous nodes (at k+1)</span>
+            <span class="n">rhs</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">rhs</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">QE</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+
+            <span class="c1"># implicit solve with prefactor stemming from the diagonal of Qd, use previous stage as initial guess</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span>
+                <span class="n">rhs</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="c1"># update function values (we don&#39;t usually need to evaluate the RHS at the solution of the step)</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="n">M</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_solution_stages</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">eval_rhs_at_right_boundary</span><span class="p">:</span>
+                <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+
+        <span class="c1"># indicate presence of new values at this level</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="ForwardEuler">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ForwardEuler">[docs]</a>
 <span class="k">class</span> <span class="nc">ForwardEuler</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
@@ -661,6 +781,169 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">4</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAERK">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK548L2SAERK</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit part of the ARK54 scheme.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span>
+                <span class="o">-</span><span class="mf">872700587467.0</span> <span class="o">/</span> <span class="mf">9133579230613.0</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">22348218063261.0</span> <span class="o">/</span> <span class="mf">9555858737531.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">1143369518992.0</span> <span class="o">/</span> <span class="mf">8141816002931.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">39379526789629.0</span> <span class="o">/</span> <span class="mf">19018526304540.0</span><span class="p">,</span>
+                <span class="mf">32727382324388.0</span> <span class="o">/</span> <span class="mf">42900044865799.0</span><span class="p">,</span>
+                <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+                <span class="o">-</span><span class="mf">975461918565.0</span> <span class="o">/</span> <span class="mf">9796059967033.0</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">78070527104295.0</span> <span class="o">/</span> <span class="mf">32432590147079.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">548382580838.0</span> <span class="o">/</span> <span class="mf">3424219808633.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">33438840321285.0</span> <span class="o">/</span> <span class="mf">15594753105479.0</span><span class="p">,</span>
+                <span class="mf">3629800801594.0</span> <span class="o">/</span> <span class="mf">4656183773603.0</span><span class="p">,</span>
+                <span class="mf">4035322873751.0</span> <span class="o">/</span> <span class="mf">18575991585200.0</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span>
+            <span class="mf">2935347310677.0</span> <span class="o">/</span> <span class="mf">11292855782101.0</span><span class="p">,</span>
+            <span class="mf">1426016391358.0</span> <span class="o">/</span> <span class="mf">7196633302097.0</span><span class="p">,</span>
+            <span class="mf">92.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span>
+            <span class="mf">24.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span>
+            <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">,</span>
+            <span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">100.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">367902744464.0</span> <span class="o">/</span> <span class="mf">2072280473677.0</span><span class="p">,</span> <span class="mf">677623207551.0</span> <span class="o">/</span> <span class="mf">8224143866563.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1268023523408.0</span> <span class="o">/</span> <span class="mf">10340822734521.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1029933939417.0</span> <span class="o">/</span> <span class="mf">13636558850479.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">14463281900351.0</span> <span class="o">/</span> <span class="mf">6315353703477.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">66114435211212.0</span> <span class="o">/</span> <span class="mf">5879490589093.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">54053170152839.0</span> <span class="o">/</span> <span class="mf">4284798021562.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">14090043504691.0</span> <span class="o">/</span> <span class="mf">34967701212078.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">15191511035443.0</span> <span class="o">/</span> <span class="mf">11219624916014.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">18461159152457.0</span> <span class="o">/</span> <span class="mf">12425892160975.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">281667163811.0</span> <span class="o">/</span> <span class="mf">9011619295870.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">19230459214898.0</span> <span class="o">/</span> <span class="mf">13134317526959.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">21275331358303.0</span> <span class="o">/</span> <span class="mf">2942455364971.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">38145345988419.0</span> <span class="o">/</span> <span class="mf">4862620318723.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">-</span><span class="mf">19977161125411.0</span> <span class="o">/</span> <span class="mf">11928030595625.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">40795976796054.0</span> <span class="o">/</span> <span class="mf">6384907823539.0</span><span class="p">,</span>
+        <span class="mf">177454434618887.0</span> <span class="o">/</span> <span class="mf">12078138498510.0</span><span class="p">,</span>
+        <span class="mf">782672205425.0</span> <span class="o">/</span> <span class="mf">8267701900261.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">69563011059811.0</span> <span class="o">/</span> <span class="mf">9646580694205.0</span><span class="p">,</span>
+        <span class="mf">7356628210526.0</span> <span class="o">/</span> <span class="mf">4942186776405.0</span><span class="p">,</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="ARK548L2SAERK.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAESDIRK">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK548L2SAESDIRK</span><span class="p">(</span><span class="n">ARK548L2SAERK</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span> <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">41.0</span> <span class="o">/</span> <span class="mf">400.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">567603406766.0</span> <span class="o">/</span> <span class="mf">11931857230679.0</span><span class="p">,</span> <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">683785636431.0</span> <span class="o">/</span> <span class="mf">9252920307686.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">110385047103.0</span> <span class="o">/</span> <span class="mf">1367015193373.0</span><span class="p">,</span> <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">3016520224154.0</span> <span class="o">/</span> <span class="mf">10081342136671.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">30586259806659.0</span> <span class="o">/</span> <span class="mf">12414158314087.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">22760509404356.0</span> <span class="o">/</span> <span class="mf">11113319521817.0</span><span class="p">,</span>
+        <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">218866479029.0</span> <span class="o">/</span> <span class="mf">1489978393911.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">638256894668.0</span> <span class="o">/</span> <span class="mf">5436446318841.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1179710474555.0</span> <span class="o">/</span> <span class="mf">5321154724896.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">60928119172.0</span> <span class="o">/</span> <span class="mf">8023461067671.0</span><span class="p">,</span>
+        <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">1020004230633.0</span> <span class="o">/</span> <span class="mf">5715676835656.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">25762820946817.0</span> <span class="o">/</span> <span class="mf">25263940353407.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">2161375909145.0</span> <span class="o">/</span> <span class="mf">9755907335909.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">211217309593.0</span> <span class="o">/</span> <span class="mf">5846859502534.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">4269925059573.0</span> <span class="o">/</span> <span class="mf">7827059040749.0</span><span class="p">,</span>
+        <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">-</span><span class="mf">872700587467.0</span> <span class="o">/</span> <span class="mf">9133579230613.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">22348218063261.0</span> <span class="o">/</span> <span class="mf">9555858737531.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1143369518992.0</span> <span class="o">/</span> <span class="mf">8141816002931.0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">39379526789629.0</span> <span class="o">/</span> <span class="mf">19018526304540.0</span><span class="p">,</span>
+        <span class="mf">32727382324388.0</span> <span class="o">/</span> <span class="mf">42900044865799.0</span><span class="p">,</span>
+        <span class="mf">41.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="ARK54">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK54">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK54</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](https://doi.org/10.1016/S0168-9274(02)00138-1).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">ARK548L2SAERK</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">ARK548L2SAERK</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">ARK548L2SAESDIRK</span><span class="o">.</span><span class="n">matrix</span>
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">ARK548L2SAERK</span><span class="o">.</span><span class="n">matrix</span>
+
+<div class="viewcode-block" id="ARK54.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK54.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
 </div>
 
 </pre></div>

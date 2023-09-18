@@ -95,7 +95,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Updated parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sweeper_type</span> <span class="o">=</span> <span class="s1">&#39;RK&#39;</span> <span class="k">if</span> <span class="n">RungeKutta</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__bases__</span> <span class="k">else</span> <span class="s1">&#39;SDC&#39;</span>
+        <span class="n">sweeper_type</span> <span class="o">=</span> <span class="s1">&#39;RK&#39;</span> <span class="k">if</span> <span class="n">RungeKutta</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__mro__</span> <span class="k">else</span> <span class="s1">&#39;SDC&#39;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">80</span><span class="p">,</span>
             <span class="s2">&quot;sweeper_type&quot;</span><span class="p">:</span> <span class="n">sweeper_type</span><span class="p">,</span>
