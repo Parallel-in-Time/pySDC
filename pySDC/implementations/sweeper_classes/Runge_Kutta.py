@@ -802,3 +802,137 @@ class ARK54(RungeKuttaIMEX):
     @classmethod
     def get_update_order(cls):
         return 5
+
+
+class ARK548L2SAESDIRK2(RungeKutta):
+    """
+    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+    This method is part of the IMEX method ARK548L2SA.
+    """
+
+    ButcherTableauClass = ButcherTableauEmbedded
+    gamma = 2.0 / 9.0
+    nodes = np.array(
+        [
+            0.0,
+            4.0 / 9.0,
+            6456083330201.0 / 8509243623797.0,
+            1632083962415.0 / 14158861528103.0,
+            6365430648612.0 / 17842476412687.0,
+            18.0 / 25.0,
+            191.0 / 200.0,
+            1.0,
+        ]
+    )
+
+    weights = np.array(
+        [
+            [
+                0.0,
+                0.0,
+                3517720773327.0 / 20256071687669.0,
+                4569610470461.0 / 17934693873752.0,
+                2819471173109.0 / 11655438449929.0,
+                3296210113763.0 / 10722700128969.0,
+                -1142099968913.0 / 5710983926999.0,
+                gamma,
+            ],
+            [
+                0.0,
+                0.0,
+                520639020421.0 / 8300446712847.0,
+                4550235134915.0 / 17827758688493.0,
+                1482366381361.0 / 6201654941325.0,
+                5551607622171.0 / 13911031047899.0,
+                -5266607656330.0 / 36788968843917.0,
+                1074053359553.0 / 5740751784926.0,
+            ],
+        ]
+    )
+
+    matrix = np.zeros((8, 8))
+    matrix[2, 1] = 2366667076620.0 / 8822750406821.0
+    matrix[3, 1] = -257962897183.0 / 4451812247028.0
+    matrix[3, 2] = 128530224461.0 / 14379561246022.0
+    matrix[4, 1] = -486229321650.0 / 11227943450093.0
+    matrix[4, 2] = -225633144460.0 / 6633558740617.0
+    matrix[4, 3] = 1741320951451.0 / 6824444397158.0
+    matrix[5, 1] = 621307788657.0 / 4714163060173.0
+    matrix[5, 2] = -125196015625.0 / 3866852212004.0
+    matrix[5, 3] = 940440206406.0 / 7593089888465.0
+    matrix[5, 4] = 961109811699.0 / 6734810228204.0
+    matrix[6, 1] = 2036305566805.0 / 6583108094622.0
+    matrix[6, 2] = -3039402635899.0 / 4450598839912.0
+    matrix[6, 3] = -1829510709469.0 / 31102090912115.0
+    matrix[6, 4] = -286320471013.0 / 6931253422520.0
+    matrix[6, 5] = 8651533662697.0 / 9642993110008.0
+
+    for i in range(matrix.shape[0]):
+        matrix[i, i] = gamma
+        matrix[i, 0] = matrix[i, 1]
+        matrix[7, i] = weights[0][i]
+
+    @classmethod
+    def get_update_order(cls):
+        return 5
+
+
+class ARK548L2SAERK2(ARK548L2SAESDIRK2):
+    """
+    Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+    This method is part of the IMEX method ARK548L2SA.
+    """
+
+    matrix = np.zeros((8, 8))
+    matrix[2, 0] = 1.0 / 9.0
+    matrix[2, 1] = 1183333538310.0 / 1827251437969.0
+    matrix[3, 0] = 895379019517.0 / 9750411845327.0
+    matrix[3, 1] = 477606656805.0 / 13473228687314.0
+    matrix[3, 2] = -112564739183.0 / 9373365219272.0
+    matrix[4, 0] = -4458043123994.0 / 13015289567637.0
+    matrix[4, 1] = -2500665203865.0 / 9342069639922.0
+    matrix[4, 2] = 983347055801.0 / 8893519644487.0
+    matrix[4, 3] = 2185051477207.0 / 2551468980502.0
+    matrix[5, 0] = -167316361917.0 / 17121522574472.0
+    matrix[5, 1] = 1605541814917.0 / 7619724128744.0
+    matrix[5, 2] = 991021770328.0 / 13052792161721.0
+    matrix[5, 3] = 2342280609577.0 / 11279663441611.0
+    matrix[5, 4] = 3012424348531.0 / 12792462456678.0
+    matrix[6, 0] = 6680998715867.0 / 14310383562358.0
+    matrix[6, 1] = 5029118570809.0 / 3897454228471.0
+    matrix[6, 2] = 2415062538259.0 / 6382199904604.0
+    matrix[6, 3] = -3924368632305.0 / 6964820224454.0
+    matrix[6, 4] = -4331110370267.0 / 15021686902756.0
+    matrix[6, 5] = -3944303808049.0 / 11994238218192.0
+    matrix[7, 0] = 2193717860234.0 / 3570523412979.0
+    matrix[7, 1] = 2193717860234.0 / 3570523412979.0
+    matrix[7, 2] = 5952760925747.0 / 18750164281544.0
+    matrix[7, 3] = -4412967128996.0 / 6196664114337.0
+    matrix[7, 4] = 4151782504231.0 / 36106512998704.0
+    matrix[7, 5] = 572599549169.0 / 6265429158920.0
+    matrix[7, 6] = -457874356192.0 / 11306498036315.0
+
+    matrix[1, 0] = ARK548L2SAESDIRK2.nodes[1]
+
+
+class ARK548L2SA(RungeKuttaIMEX):
+    """
+    IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method
+    ARK548L2SAESDIRK2 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+
+    According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available
+    as of now. And we are not aware of higher order ones. This one is newer then the other one and apparently better.
+    """
+
+    ButcherTableauClass = ButcherTableauEmbedded
+    ButcherTableauClass_explicit = ButcherTableauEmbedded
+
+    nodes = ARK548L2SAERK2.nodes
+    weights = ARK548L2SAERK2.weights
+
+    matrix = ARK548L2SAESDIRK2.matrix
+    matrix_explicit = ARK548L2SAERK2.matrix
+
+    @classmethod
+    def get_update_order(cls):
+        return 5

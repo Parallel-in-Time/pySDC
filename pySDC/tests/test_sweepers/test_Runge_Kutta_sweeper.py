@@ -13,9 +13,12 @@ SWEEPER_NAMES = [
     'Heun_Euler',
     'ARK548L2SAESDIRK',
     'ARK548L2SAERK',
+    'ARK548L2SAESDIRK2',
+    'ARK548L2SAERK2',
 ]
 IMEX_SWEEPERS = [
     'ARK54',
+    'ARK548L2SA',
 ]
 
 
@@ -132,16 +135,22 @@ def test_order(sweeper_name):
         'DIRK43': 5,
         'Heun_Euler': 3,
         'ARK548L2SAERK': 6,
+        'ARK548L2SAERK2': 6,
         'ARK548L2SAESDIRK': 6,
+        'ARK548L2SAESDIRK2': 6,
         'ARK54': 6,
+        'ARK548L2SA': 6,
     }
 
     dt_max = {
         'Cash_Karp': 1e0,
         'ESDIRK53': 1e0,
         'ARK548L2SAESDIRK': 6e-1,
+        'ARK548L2SAESDIRK2': 1e0,
         'ARK548L2SAERK': 1e0,
+        'ARK548L2SAERK2': 1e0,
         'ARK54': 5e-2,
+        'ARK548L2SA': 5e-2,
     }
 
     lambdas = [[-1.0e-1 + 0j]]
@@ -210,6 +219,8 @@ def test_stability(sweeper_name):
         'Heun_Euler': False,
         'ARK548L2SAESDIRK': True,
         'ARK548L2SAERK': False,
+        'ARK548L2SAESDIRK2': True,
+        'ARK548L2SAERK2': False,
     }
 
     re = -np.logspace(-3, 2, 50)
@@ -311,6 +322,6 @@ def test_sweeper_equivalence(sweeper_name):
 
 
 if __name__ == '__main__':
-    test_rhs_evals('ARK54')
-    # test_order('ARK548L2SAESDIRK')
+    # test_rhs_evals('ARK54')
+    test_order('ARK548L2SAERK2')
     # test_order('ARK54')
