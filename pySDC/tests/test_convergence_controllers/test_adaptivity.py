@@ -142,7 +142,7 @@ def single_test(adaptivity, num_experiments=3, **kwargs):
         error += [abs(prob.u_exact(level.dt) - level.uend)]
         dts += [level.status.dt_new]
 
-    return {'est': error_estimate, 'e': error, 'dt': dts}
+    return {'est': error_estimate, 'e': error, 'dt': dts, 'order': level.status.order_embedded_estimate}
 
 
 def multiple_tests(adaptivity, e_tol_range, num_nodes, **kwargs):
@@ -171,7 +171,7 @@ def multiple_tests(adaptivity, e_tol_range, num_nodes, **kwargs):
         not_passed += [(1, f'Errors larger than estimates! Got {errors}')]
 
     # check orders relative to step size
-    expected_order_estimate = num_nodes
+    expected_order_estimate = res[0]['order']
     expected_order_error = 2 * num_nodes + 1
 
     mask = np.logical_and(errors < 1e-0, errors > 3e-16)
@@ -208,16 +208,16 @@ def multiple_tests(adaptivity, e_tol_range, num_nodes, **kwargs):
 
 @pytest.mark.base
 @pytest.mark.parametrize('num_nodes', [2, 3, 4])
-def test_AdaptivityInterpolationError(num_nodes):
-    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityInterpolationError
+def test_AdaptivityPolynomialError(num_nodes):
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
     import numpy as np
 
-    e_tol_range = np.logspace(-1, -8, 2**3)
+    e_tol_range = np.logspace(-2, -8, 2**3)
     not_passed = multiple_tests(
-        AdaptivityInterpolationError, e_tol_range=e_tol_range, num_experiments=4, num_nodes=num_nodes
+        AdaptivityPolynomialError, e_tol_range=e_tol_range, num_experiments=4, num_nodes=num_nodes
     )
     assert not_passed == [], not_passed
 
 
 if __name__ == '__main__':
-    test_AdaptivityInterpolationError(3)
+    test_AdaptivityPolynomialError(4)

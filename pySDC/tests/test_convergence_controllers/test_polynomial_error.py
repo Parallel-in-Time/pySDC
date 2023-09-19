@@ -17,8 +17,8 @@ def get_controller(dt, num_nodes, quad_type, useMPI):
     """
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.implementations.convergence_controller_classes.estimate_interpolation_error import (
-        EstimateInterpolationError,
+    from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+        EstimatePolynomialError,
     )
 
     if useMPI:
@@ -61,7 +61,7 @@ def get_controller(dt, num_nodes, quad_type, useMPI):
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
-    description['convergence_controllers'] = {EstimateInterpolationError: {}}
+    description['convergence_controllers'] = {EstimatePolynomialError: {}}
 
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
     return controller
@@ -92,7 +92,7 @@ def single_test(**kwargs):
     prob = level.prob
     cont = controller.convergence_controllers[
         np.arange(len(controller.convergence_controllers))[
-            [type(me).__name__ == 'EstimateInterpolationError' for me in controller.convergence_controllers]
+            [type(me).__name__ == 'EstimatePolynomialError' for me in controller.convergence_controllers]
         ][0]
     ]
     nodes = np.append([0], level.sweep.coll.nodes)
@@ -113,8 +113,9 @@ def single_test(**kwargs):
     cont.reset_status_variables(controller)
     cont.post_iteration_processing(controller, step)
     error = level.status.error_embedded_estimate
+    order = level.status.order_embedded_estimate
 
-    return error
+    return error, order
 
 
 def multiple_runs(dts, **kwargs):
@@ -136,7 +137,7 @@ def multiple_runs(dts, **kwargs):
 
     for dt in dts:
         res[dt] = {}
-        res[dt]['e'] = single_test(dt=dt, **kwargs)
+        res[dt]['e'], res[dt]['order'] = single_test(dt=dt, **kwargs)
 
     return res
 
@@ -154,13 +155,13 @@ def check_order(dts, **kwargs):
 
     res = multiple_runs(dts, **kwargs)
     dts = np.array(list(res.keys()))
-    keys = list(res[dts[0]].keys())
+    # keys = list(res[dts[0]].keys())
 
     expected_order = {
-        'e': kwargs['num_nodes'],
+        'e': res[dts[0]]['order'],
     }
 
-    for key in keys:
+    for key in ['e']:
         errors = np.array([res[dt][key] for dt in dts])
 
         mask = np.logical_and(errors < 1e-0, errors > 1e-10)
@@ -188,7 +189,7 @@ def test_interpolation_error(num_nodes, quad_type):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('num_nodes', [2, 5])
-@pytest.mark.parametrize('quad_type', ['RADAU-RIGHT'])
+@pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
 def test_interpolation_error_MPI(num_nodes, quad_type):
     import subprocess
     import os
