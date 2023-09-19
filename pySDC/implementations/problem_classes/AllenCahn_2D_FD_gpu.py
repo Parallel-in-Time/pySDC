@@ -11,8 +11,21 @@ from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cup
 
 
 class allencahn_fullyimplicit(ptype):  # pragma: no cover
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated *fully-implicitly*, i.e., the nonlinear system is solved by Newton.
+
+    This class is especially developed for solving it on GPU's using CuPy.
 
     Parameters
     ----------
@@ -39,6 +52,16 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
         Second-order FD discretization of the 2D laplace operator.
     dx : float
         Distance between two spatial nodes (same for both directions).
+    xvalues : np.1darray
+        Spatial grid points, here both dimensions have the same grid points.
+    newton_itercount : int
+        Number of iterations of Newton solver.
+    lin_itercount
+        Number of iterations of linear solver.
+    newton_ncalls : int
+        Number of calls of Newton solver.
+    lin_ncalls
+        Number of calls of linear solver.
     """
 
     dtype_u = cupy_mesh
@@ -239,8 +262,22 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated in a *semi-implicit* way, i.e., the nonlinear system containing the second order term is solved by the
+    conjugate gradients method, and the system containing the rest of the right-hand side is only evaluated at each time.
+
+    This class is especially developed for solving it on GPU's using CuPy.
     """
 
     dtype_f = imex_cupy_mesh
@@ -317,8 +354,23 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
+    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is only evaluated at each time.
+
+    This class is especially developed for solving it on GPU's using CuPy.
     """
 
     dtype_f = imex_cupy_mesh
@@ -411,8 +463,22 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated in *multi-implicit* fashion, i.e., the nonlinear system containing the second order term is solved by the
+    conjugate gradients method, and the system containing the rest of the right-hand side will be solved by Newton's method.
+
+    This class is especially developed for solving it on GPU's using CuPy.
     """
 
     dtype_f = comp2_cupy_mesh
@@ -551,8 +617,23 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. The initial condition has the form of circles
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
+    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is solved by a linear solver provided by a scipy routine.
+
+    This class is especially developed for solving it on GPU's using CuPy.
     """
 
     dtype_f = comp2_cupy_mesh

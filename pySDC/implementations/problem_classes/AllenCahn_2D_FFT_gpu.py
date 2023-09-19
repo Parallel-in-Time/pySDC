@@ -7,8 +7,31 @@ from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cup
 
 
 class allencahn2d_imex(ptype):  # pragma: no cover
-    """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions
+    can be used, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),
+
+    or *checker-board*
+
+    .. math::
+        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
+
+    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of
+    spatial grid points. For time-stepping, the problem is treated *fully-implicitly*, i.e., the nonlinear system is solved by
+    Fast-Fourier Tranform (FFT).
+
+    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
+    by a scipy routine.
+
+    This class is especially developed for solving it on GPU's using CuPy.
 
     Parameters
     ----------
@@ -161,9 +184,32 @@ class allencahn2d_imex(ptype):  # pragma: no cover
 
 
 class allencahn2d_imex_stab(allencahn2d_imex):
-    """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
-    stabilized splitting
+    r"""
+    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    with stabilized splitting
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu) + \frac{2}{\varepsilon^2}u
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions
+    can be used here, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),
+
+    or *checker-board*
+
+    .. math::
+        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
+
+    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of
+    spatial grid points. For time-stepping, the problem is treated *fully-implicitly*, i.e., the nonlinear system is solved by
+    Fast-Fourier Tranform (FFT).
+
+    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
+    by a scipy routine.
+
+    This class is especially developed for solving it on GPU's using CuPy.
 
     Parameters
     ----------

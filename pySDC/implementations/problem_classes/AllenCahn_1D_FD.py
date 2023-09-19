@@ -9,16 +9,29 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 
 class allencahn_front_fullyimplicit(ptype):
-    """
-    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-    with driving force, 0-1 formulation (Bayreuth example).
+    r"""
+    Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+    boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    for :math:`u \in [0, 1]`. The second order spatial derivative is approximated using centered finite differences. The
+    exact solution is given by
+
+    .. math::
+        u(x, t).5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
+
+    with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem is implemented to be treated
+    *fully-implicit* using Newton to solve the nonlinear system.
 
     Parameters
     ----------
     nvars : int
         Number of unknowns in the problem.
     dw : float
-        Problem parameter.
+        Driving force.
     eps : float
         Problem parameter.
     newton_maxiter : int
@@ -36,6 +49,18 @@ class allencahn_front_fullyimplicit(ptype):
         Second-order FD discretization of the 1D laplace operator.
     dx : float
         Distance between two spatial nodes.
+    xvalues : np.1darray
+        Spatial grid values.
+    uext : dtype_u
+        Contains the external values of the boundary.
+    newton_itercount : int
+        Counter for iterations in Newton solver.
+    lin_itercount : int
+        Counter for iterations in linear solver.
+    newton_ncalls : int
+        Number of calls of Newton solver.
+    lin_ncalls : int
+        Number of calls of linear solver.
     """
 
     dtype_u = mesh
@@ -52,7 +77,7 @@ class allencahn_front_fullyimplicit(ptype):
         stop_at_nan=True,
     ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (nvars + 1) % 2 != 0:
+        if (nvars + 1) % 2 :
             raise ProblemError('setup requires nvars = 2^p - 1')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
@@ -84,10 +109,10 @@ class allencahn_front_fullyimplicit(ptype):
         )
         self.uext = self.dtype_u((self.init[0] + 2, self.init[1], self.init[2]), val=0.0)
 
-        self.newton_itercount = 0
-        self.lin_itercount = 0
-        self.newton_ncalls = 0
-        self.lin_ncalls = 0
+        self.newton_itercount
+        self.lin_itercount
+        self.newton_ncalls
+        self.lin_ncalls
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -122,11 +147,11 @@ class allencahn_front_fullyimplicit(ptype):
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
-        n = 0
+        n
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u) = 0
+            # form the function g with g(u)
             self.uext[1:-1] = u[:]
             g = (
                 u
@@ -229,16 +254,23 @@ class allencahn_front_fullyimplicit(ptype):
 
 
 class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-    with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping
+    r"""
+    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+    boundary conditions
 
-    Attributes
-    ----------
-    A : scipy.diags
-        Second-order FD discretization of the 1D laplace operator.
-    dx : float
-        Distance between two spatial nodes.
+    .. math::
+        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.
+    The exact solution is given by
+
+    .. math::
+        u(x, t).5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
+
+    with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem will be treated in a
+    *semi-implicit* way, i.e., the second order term is treated implicitly using Newton to solve the nonlinear system, and
+    the rest of the right-hand side will be handled explicitly.
     """
 
     dtype_f = imex_mesh
@@ -299,9 +331,36 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
 
 
 class allencahn_front_finel(allencahn_front_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-    with driving force, 0-1 formulation (Bayreuth example), Finel's trick/parametrization
+    r"""
+    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+    boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.
+    The exact solution is given by
+
+    .. math::
+        u(x, t).5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
+
+    with :math:`v = 3 \sqrt{2} \varepsilon d_w`.
+    
+    Let :math:`A` denote the finite difference matrix to discretize :math:`\frac{\partial^2 u}{\partial x^2}`. Here,
+    _Finel's trick_ is used. Let
+
+    .. math::
+        a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,
+
+    then, the right-hand side of the problem can be written as
+
+    .. math::
+        \frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
+                \frac{1 - a}{1 - a (2u - 1)^2} - 1
+            \right] (2u - 1).
+        
+    For time-stepping, this problem will be treated in a *fully-implicit* way the nonlinear system is solved using Newton.
     """
 
     # noinspection PyTypeChecker
@@ -338,11 +397,11 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
-        n = 0
+        n
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u) = 0
+            # form the function g with g(u)
             self.uext[1:-1] = u[:]
             gprim = 1.0 / self.dx**2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0) * (2.0 * u - 1.0)
             g = u - rhs - factor * (self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * dw * u * (1.0 - u))
@@ -419,16 +478,28 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
 
 
 class allencahn_periodic_fullyimplicit(ptype):
-    """
-    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
-    with driving force, 0-1 formulation (Bayreuth example)
+    r"""
+    Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.
+    The exact solution is
+
+    .. math::
+        u(x, t).5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
+
+    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
+    *fully-implicitly*, i.e., the nonlinear system is solved by Newton.
 
     Parameters
     ----------
     nvars : int
         Number of unknowns in the problem.
     dw : float
-        Problem parameter.
+        Driving force.
     eps : float
         Problem parameter.
     newton_maxiter : int
@@ -448,6 +519,16 @@ class allencahn_periodic_fullyimplicit(ptype):
         Second-order FD discretization of the 1D laplace operator.
     dx : float
         Distance between two spatial nodes.
+    xvalues : np.1darray
+        Spatial grid points.
+    newton_itercount : int
+        Number of iterations for Newton solver.
+    lin_itercount : int
+        Number of iterations for linear solver.
+    newton_ncalls : int
+        Number of calls of Newton solver.
+    lin_ncalls : int
+        Number of calls of linear solver.
     """
 
     dtype_u = mesh
@@ -465,7 +546,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         stop_at_nan=True,
     ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (nvars) % 2 != 0:
+        if (nvars) % 2 :
             raise ProblemError('setup requires nvars = 2^p')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
@@ -497,10 +578,10 @@ class allencahn_periodic_fullyimplicit(ptype):
             bc='periodic',
         )
 
-        self.newton_itercount = 0
-        self.lin_itercount = 0
-        self.newton_ncalls = 0
-        self.lin_ncalls = 0
+        self.newton_itercount
+        self.lin_itercount
+        self.newton_ncalls
+        self.lin_ncalls
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -530,11 +611,11 @@ class allencahn_periodic_fullyimplicit(ptype):
         Id = sp.eye(self.nvars)
 
         # start newton iteration
-        n = 0
+        n
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u) = 0
+            # form the function g with g(u)
             g = (
                 u
                 - rhs
@@ -620,28 +701,22 @@ class allencahn_periodic_fullyimplicit(ptype):
 
 
 class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
-    with driving force, 0-1 formulation (Bayreuth example)
+    r"""
+    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
 
-    Parameters
-    ----------
-    nvars : int
-        Number of unknowns in the problem.
-    dw : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    newton_maxiter : int
-        Maximum number of iterations for Newton's method.
-    newton_tol : float
-        Tolerance for Newton's method to terminate.
-    interval : list
-        Interval of spatial domain.
-    radius : float
-        Radius of the circles.
-    stop_at_nan : bool, optional
-        Indicates that the Newton solver should stop if nan values arise.
+    .. math::
+        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    for :math:`u \in [0, 1]`. For discretization of the second order spatial derivative, centered finite differences are used.
+    The exact solution is
+
+    .. math::
+        u(x, t).5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
+
+    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
+    in *semi-implicit* way, i.e., the part containing the second order term is treated implicitly, and the rest of the right-hand
+    side is only evaluated at each time.
     """
 
     dtype_f = imex_mesh
@@ -710,28 +785,23 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
 
 
 class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
-    with driving force, 0-1 formulation (Bayreuth example)
+    r"""
+    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
 
-    Parameters
-    ----------
-    nvars : int
-        Number of unknowns in the problem.
-    dw : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    newton_maxiter : int
-        Maximum number of iterations for Newton's method.
-    newton_tol : float
-        Tolerance for Newton's method to terminate.
-    interval : list
-        Interval of spatial domain.
-    radius : float
-        Radius of the circles.
-    stop_at_nan : bool, optional
-        Indicates that the Newton solver should stop if nan values arise.
+    .. math::
+        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    for :math:`u \in [0, 1]`. For discretization of the second order spatial derivative, centered finite differences are used.
+    The exact solution is then given by
+
+    .. math::
+        u(x, t).5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
+
+    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
+    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the second order term is solved with a
+    linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by
+    Newton's method.
     """
 
     dtype_f = comp2_mesh
@@ -828,11 +898,11 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         Id = sp.eye(self.nvars)
 
         # start newton iteration
-        n = 0
+        n
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u) = 0
+            # form the function g with g(u)
             g = (
                 u
                 - rhs

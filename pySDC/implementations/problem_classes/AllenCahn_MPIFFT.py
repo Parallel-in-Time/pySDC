@@ -10,10 +10,22 @@ from mpi4py_fft import newDistArray
 
 
 class allencahn_imex(ptype):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping
+    r"""
+    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
 
-    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, driving force :math:`d_w`, and :math:`N=2,3`. Different initial
+    conditions can be used, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated *semi-implicitly*,
+    i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand side will be treated explicitly using
+    mpi4py-fft [1]_ to solve them.
 
     Parameters
     ----------
@@ -32,20 +44,24 @@ class allencahn_imex(ptype):
     init_type : str, optional
         Initialises type of initial state.
     comm : bool, optional
-        Communicator.
+        Communicator for parallelization.
 
     Attributes
     ----------
-    fft :
-        fft object.
+    fft : fft object
+        Object for FFT.
     X : np.ogrid
         Grid coordinates in real space.
-    K2 : np.ndarray
+    K2 : np.1darray
         Laplace operator in spectral space
     dx : float
         Mesh width in x direction
     dy : float
         Mesh width in y direction
+
+    References
+    ----------
+    .. [1] https://mpi4py-fft.readthedocs.io/en/latest/
     """
 
     dtype_u = mesh
@@ -235,9 +251,23 @@ class allencahn_imex(ptype):
 
 
 class allencahn_imex_timeforcing(allencahn_imex):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping,
-    time-dependent forcing
+    r"""
+    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
+    using time-dependent forcing
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, driving force :math:`d_w`, and :math:`N=2,3`. Different initial
+    conditions can be used, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated *semi-implicitly*,
+    i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand side will be treated explicitly using
+    mpi4py-fft [1]_ to solve them.
     """
 
     def eval_f(self, u, t):
