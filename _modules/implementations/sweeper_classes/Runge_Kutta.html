@@ -946,6 +946,155 @@
         <span class="k">return</span> <span class="mi">5</span></div>
 </div>
 
+
+
+<div class="viewcode-block" id="ARK548L2SAESDIRK2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK548L2SAESDIRK2</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+<span class="sd">    This method is part of the IMEX method ARK548L2SA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">9.0</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="mf">0.0</span><span class="p">,</span>
+            <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">9.0</span><span class="p">,</span>
+            <span class="mf">6456083330201.0</span> <span class="o">/</span> <span class="mf">8509243623797.0</span><span class="p">,</span>
+            <span class="mf">1632083962415.0</span> <span class="o">/</span> <span class="mf">14158861528103.0</span><span class="p">,</span>
+            <span class="mf">6365430648612.0</span> <span class="o">/</span> <span class="mf">17842476412687.0</span><span class="p">,</span>
+            <span class="mf">18.0</span> <span class="o">/</span> <span class="mf">25.0</span><span class="p">,</span>
+            <span class="mf">191.0</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">,</span>
+            <span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">3517720773327.0</span> <span class="o">/</span> <span class="mf">20256071687669.0</span><span class="p">,</span>
+                <span class="mf">4569610470461.0</span> <span class="o">/</span> <span class="mf">17934693873752.0</span><span class="p">,</span>
+                <span class="mf">2819471173109.0</span> <span class="o">/</span> <span class="mf">11655438449929.0</span><span class="p">,</span>
+                <span class="mf">3296210113763.0</span> <span class="o">/</span> <span class="mf">10722700128969.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">1142099968913.0</span> <span class="o">/</span> <span class="mf">5710983926999.0</span><span class="p">,</span>
+                <span class="n">gamma</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">520639020421.0</span> <span class="o">/</span> <span class="mf">8300446712847.0</span><span class="p">,</span>
+                <span class="mf">4550235134915.0</span> <span class="o">/</span> <span class="mf">17827758688493.0</span><span class="p">,</span>
+                <span class="mf">1482366381361.0</span> <span class="o">/</span> <span class="mf">6201654941325.0</span><span class="p">,</span>
+                <span class="mf">5551607622171.0</span> <span class="o">/</span> <span class="mf">13911031047899.0</span><span class="p">,</span>
+                <span class="o">-</span><span class="mf">5266607656330.0</span> <span class="o">/</span> <span class="mf">36788968843917.0</span><span class="p">,</span>
+                <span class="mf">1074053359553.0</span> <span class="o">/</span> <span class="mf">5740751784926.0</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2366667076620.0</span> <span class="o">/</span> <span class="mf">8822750406821.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">257962897183.0</span> <span class="o">/</span> <span class="mf">4451812247028.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">128530224461.0</span> <span class="o">/</span> <span class="mf">14379561246022.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">486229321650.0</span> <span class="o">/</span> <span class="mf">11227943450093.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">225633144460.0</span> <span class="o">/</span> <span class="mf">6633558740617.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1741320951451.0</span> <span class="o">/</span> <span class="mf">6824444397158.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">621307788657.0</span> <span class="o">/</span> <span class="mf">4714163060173.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">125196015625.0</span> <span class="o">/</span> <span class="mf">3866852212004.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">940440206406.0</span> <span class="o">/</span> <span class="mf">7593089888465.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">961109811699.0</span> <span class="o">/</span> <span class="mf">6734810228204.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2036305566805.0</span> <span class="o">/</span> <span class="mf">6583108094622.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3039402635899.0</span> <span class="o">/</span> <span class="mf">4450598839912.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1829510709469.0</span> <span class="o">/</span> <span class="mf">31102090912115.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">286320471013.0</span> <span class="o">/</span> <span class="mf">6931253422520.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8651533662697.0</span> <span class="o">/</span> <span class="mf">9642993110008.0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">gamma</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ARK548L2SAESDIRK2.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SAERK2">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK548L2SAERK2</span><span class="p">(</span><span class="n">ARK548L2SAESDIRK2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+<span class="sd">    This method is part of the IMEX method ARK548L2SA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">9.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1183333538310.0</span> <span class="o">/</span> <span class="mf">1827251437969.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">895379019517.0</span> <span class="o">/</span> <span class="mf">9750411845327.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">477606656805.0</span> <span class="o">/</span> <span class="mf">13473228687314.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">112564739183.0</span> <span class="o">/</span> <span class="mf">9373365219272.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4458043123994.0</span> <span class="o">/</span> <span class="mf">13015289567637.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2500665203865.0</span> <span class="o">/</span> <span class="mf">9342069639922.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">983347055801.0</span> <span class="o">/</span> <span class="mf">8893519644487.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2185051477207.0</span> <span class="o">/</span> <span class="mf">2551468980502.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">167316361917.0</span> <span class="o">/</span> <span class="mf">17121522574472.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1605541814917.0</span> <span class="o">/</span> <span class="mf">7619724128744.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">991021770328.0</span> <span class="o">/</span> <span class="mf">13052792161721.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2342280609577.0</span> <span class="o">/</span> <span class="mf">11279663441611.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3012424348531.0</span> <span class="o">/</span> <span class="mf">12792462456678.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">6680998715867.0</span> <span class="o">/</span> <span class="mf">14310383562358.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5029118570809.0</span> <span class="o">/</span> <span class="mf">3897454228471.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2415062538259.0</span> <span class="o">/</span> <span class="mf">6382199904604.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3924368632305.0</span> <span class="o">/</span> <span class="mf">6964820224454.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4331110370267.0</span> <span class="o">/</span> <span class="mf">15021686902756.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3944303808049.0</span> <span class="o">/</span> <span class="mf">11994238218192.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2193717860234.0</span> <span class="o">/</span> <span class="mf">3570523412979.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2193717860234.0</span> <span class="o">/</span> <span class="mf">3570523412979.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5952760925747.0</span> <span class="o">/</span> <span class="mf">18750164281544.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4412967128996.0</span> <span class="o">/</span> <span class="mf">6196664114337.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4151782504231.0</span> <span class="o">/</span> <span class="mf">36106512998704.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mf">572599549169.0</span> <span class="o">/</span> <span class="mf">6265429158920.0</span>
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">457874356192.0</span> <span class="o">/</span> <span class="mf">11306498036315.0</span>
+
+    <span class="n">matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ARK548L2SAESDIRK2</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="ARK548L2SA">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA">[docs]</a>
+<span class="k">class</span> <span class="nc">ARK548L2SA</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method</span>
+<span class="sd">    ARK548L2SAESDIRK2 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+
+<span class="sd">    According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available</span>
+<span class="sd">    as of now. And we are not aware of higher order ones. This one is newer then the other one and apparently better.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+    <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">ARK548L2SAERK2</span><span class="o">.</span><span class="n">nodes</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">ARK548L2SAERK2</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">ARK548L2SAESDIRK2</span><span class="o">.</span><span class="n">matrix</span>
+    <span class="n">matrix_explicit</span> <span class="o">=</span> <span class="n">ARK548L2SAERK2</span><span class="o">.</span><span class="n">matrix</span>
+
+<div class="viewcode-block" id="ARK548L2SA.get_update_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA.get_update_order">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_update_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
