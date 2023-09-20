@@ -13,16 +13,42 @@ from mpi4py_fft import newDistArray
 
 
 class nonlinearschroedinger_imex(ptype):
-    """
-    Example implementing the nonlinear Schrödinger equation in 2-3D using mpi4py-fft for solving linear parts,
-    IMEX time-stepping
+    r"""
+    Example implementing the N-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
-    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
+    .. math::
+        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
 
-    Attributes:
-        fft: fft object
-        X: grid coordinates in real space
-        K2: Laplace operator in spectral space
+    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved in spatial using
+    mpi4py-fft [1]_. *Semi-explicit* time-stepping is used here for solve the problem in the temporal dimension, i.e., the
+    second order term will be handled implicitly.
+
+    Parameters
+    ----------
+    nvars : tuple, optional
+        Spatial resolution
+    spectral : bool, optional
+        If True, the solution is computed in spectral space.
+    L : float, optional
+        Denotes the period of the function to be approximated for the Fourier transform.
+    c : float, optional
+        Nonlinearity parameter.
+    comm : MPI.COMM_World
+        Communicator for parallelisation.
+
+    Attributes
+    ----------
+    fft : PFFT
+        Object for parallel FFT transforms.
+    X : mesh-grid
+        Grid coordinates in real space.
+    K2 : matrix
+        Laplace operator in spectral space.
+
+    References
+    ----------
+    .. [1] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+        Journal of Parallel and Distributed Computing (2019).
     """
 
     dtype_u = mesh
@@ -190,6 +216,16 @@ class nonlinearschroedinger_imex(ptype):
 
 
 class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
+    r"""
+    Example implementing the N-dimensional nonlinear Schrödinger equation with periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
+
+    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved in spatial using
+    mpi4py-fft [1]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
+    the full right-hand side is solved by GMRES method.
+    """
     dtype_u = mesh
     dtype_f = mesh
 

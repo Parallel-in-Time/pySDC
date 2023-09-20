@@ -7,7 +7,11 @@ from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDi
 class advectionNd(GenericNDimFinDiff):
     r"""
     Example implementing the unforced ND advection equation with periodic
-    or Dirichlet boundary conditions in :math:`[0,1]^N`,
+    or Dirichlet boundary conditions in :math:`[0,1]^N`
+
+    .. math::
+        \frac{\partial u}{\partial t} = -c \frac{\partial u}{\partial x},
+
     and initial solution of the form
 
     .. math::
