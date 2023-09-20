@@ -462,6 +462,7 @@ class QuenchIMEX(Quench):
     The problem is discretized in space using centered finite differences, and for time-stepping it is implemented in the way,
     that it will be solved in a *semi-implicit* way.
     """
+
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):
