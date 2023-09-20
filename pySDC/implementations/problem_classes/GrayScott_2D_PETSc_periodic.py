@@ -359,11 +359,11 @@ class petsc_grayscott_multiimplicit(ptype):
 
     def __init__(
         self,
-        nvars=(256, 256),
-        Du=1.0,
-        Dv=0.01,
-        A=0.09,
-        B=0.086,
+        nvars,
+        Du,
+        Dv,
+        A,
+        B,
         comm=PETSc.COMM_WORLD,
         lsol_tol=1e-10,
         nlsol_tol=1e-10,

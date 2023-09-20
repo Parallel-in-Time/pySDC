@@ -308,10 +308,10 @@ class petsc_fisher_multiimplicit(ptype):
 
     def __init__(
         self,
-        nvars=127,
-        lambda0=2.0,
-        nu=1.0,
-        interval=(-5, 5),
+        nvars,
+        lambda0,
+        nu,
+        interval,
         comm=PETSc.COMM_WORLD,
         lsol_tol=1e-10,
         nlsol_tol=1e-10,

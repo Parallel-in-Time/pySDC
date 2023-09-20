@@ -69,15 +69,11 @@ class heat2d_petsc_forced(ptype):
     dtype_u = petsc_vec
     dtype_f = petsc_vec_imex
 
-    def __init__(self, cnvars=None, nu=1.0, freq=1.0, refine=1, comm=PETSc.COMM_WORLD, sol_tol=1e-10, sol_maxiter=None):
+    def __init__(self, cnvars, nu, freq, refine, comm=PETSc.COMM_WORLD, sol_tol=1e-10, sol_maxiter=None):
         """Initialization routine"""
-        cnvars = (257, 257) if cnvars is None else cnvars
         # make sure parameters have the correct form
         if len(cnvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % cnvars)
-
-        if len(freq) != 1:
-            raise ProblemError('Frequency needs to be 1d, because it is used equally for both dimensions')
 
         # create DMDA object which will be used for all grid operations
         da = PETSc.DMDA().create([cnvars[0], cnvars[1]], stencil_width=1, comm=comm)
