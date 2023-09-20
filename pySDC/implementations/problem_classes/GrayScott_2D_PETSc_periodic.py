@@ -303,8 +303,8 @@ class petsc_grayscott_multiimplicit(ptype):
 
     Parameters
     ----------
-    nvars : int, optional
-        Spatial resolution, i.e., number of degrees of freedom in space.
+    nvars : tuple of int, optional
+        Spatial resolution, i.e., number of degrees of freedom in space, e.g. (256, 256).
     Du : float, optional
         Diffusion rate for :math:`u`.
     Dv: float, optional
@@ -344,7 +344,7 @@ class petsc_grayscott_multiimplicit(ptype):
         Number of iterations done by nonlinear solver.
     snes_ncalls : int
         Number of calls of PETSc's nonlinear solver.
-    
+
     References
     ----------
     .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms

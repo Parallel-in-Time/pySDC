@@ -431,7 +431,7 @@ class petsc_fisher_multiimplicit(ptype):
         Returns
         -------
         A : PETSc matrix object
-           Matrix for the system to solve. 
+           Matrix for the system to solve.
         """
 
         # create matrix and set basic options

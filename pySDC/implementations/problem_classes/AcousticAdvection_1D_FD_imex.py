@@ -40,14 +40,14 @@ class acoustic_1d_imex(ptype):
         Sound velocity :math:`c_s`.
     cadv : float, optional
         Advection speed :math:`U`.
-    order_adv : knt, optional
+    order_adv : int, optional
         Order of which the advective derivative is discretized.
     waveno : int, optional
         The wave number.
 
     Attributes
     ----------
-    mesh : np.ndarray
+    mesh : np.1darray
         1d mesh.
     dx : float
         Mesh size.

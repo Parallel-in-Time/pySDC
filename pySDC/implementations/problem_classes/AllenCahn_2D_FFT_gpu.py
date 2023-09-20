@@ -35,31 +35,27 @@ class allencahn2d_imex(ptype):  # pragma: no cover
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    L : int
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
-    init_type : str
+    init_type : str, optional
         Indicates which type of initial condition is used.
 
     Attributes
     ----------
-    xvalues : cp.ndarray
+    xvalues : cp.1darray
         Grid points in space.
     dx : float
         Cupy mesh width.
-    lap : cp.ndarray
+    lap : cp.1darray
         Spectral operator for Laplacian.
-    rfft_object :
-        Planned real FFT for forward transformation.
-    irfft_object :
-        Planned IFFT for backward transformation.
     """
 
     dtype_u = cupy_mesh
@@ -213,31 +209,27 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    L : int
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
-    init_type : str
+    init_type : str, optional
         Indicates which type of initial condition is used.
 
     Attributes
     ----------
-    xvalues : cp.ndarray
+    xvalues : cp.1darray
         Grid points in space.
     dx : float
         Cupy mesh width.
-    lap : cp.ndarray
+    lap : cp.1darray
         Spectral operator for Laplacian.
-    rfft_object :
-        Planned real FFT for forward transformation.
-    irfft_object :
-        Planned IFFT for backward transformation.
     """
 
     def __init__(self, nvars=None, nu=2, eps=0.04, radius=0.25, L=1.0, init_type='circle'):

@@ -9,13 +9,13 @@ class full_solar_system(outer_solar_system):
     r"""
     The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem bases
     on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
-    
+
     .. math::
         m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),
 
     where :math:`m_i` is the :math:`i`-th mass point with position described by the vector :math:`{\bf r}_i`, and :math:`G`
     is the gravitational constant. If only the sun influences the motion of the bodies gravitationally, the equations become
-    
+
     .. math::
         m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).
 
@@ -35,7 +35,7 @@ class full_solar_system(outer_solar_system):
     References
     ----------
     .. [1] https://www.aanda.org/articles/aa/full/2002/08/aa1405/aa1405.right.html
-    .. [2] https://en.wikipedia.org/wiki/Planetary_mass#Values_from_the_DE405_ephemeris 
+    .. [2] https://en.wikipedia.org/wiki/Planetary_mass#Values_from_the_DE405_ephemeris
     """
 
     dtype_u = particles

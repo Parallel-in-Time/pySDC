@@ -22,28 +22,27 @@ class allencahn_temp_imex(ptype):
     .. math::
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
 
-    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated *semi-implicitly*,
-    i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand side will be treated explicitly using
-    mpi4py-fft [1]_ to solve them.
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
+    *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
+    side will be treated explicitly using mpi4py-fft [1]_ to solve them.
 
     Attributes
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. [(128, 128), (64, 64)].
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    spectral : bool
+    spectral : bool, optional
         Indicates if spectral initial condition is used.
-    TM : float
-        Problem parameter.
-    D : float
-        Problem parameter.
-    dw : float
-        Problem parameter.
-    L : int
+    TM : float, optional
+        Problem parameter :math:`T_M`.
+    D : float, optional
+        Problem parameter :math:`D`.
+    dw : float, optional
+        Driving force.
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Initialises type of initial state.
@@ -84,18 +83,7 @@ class allencahn_temp_imex(ptype):
         init_type='circle',
         comm=None,
     ):
-        """
-        Initialization routine
-
-        Parameters
-        ----------
-        problem_params : dict
-            Custom parameters for the example.
-        dtype_u :
-            fft data type (will be passed to parent class).
-        dtype_f :
-            fft data type wuth implicit and explicit parts (will be passed to parent class).
-        """
+        """Initialization routine"""
 
         if nvars is None:
             nvars = [(128, 128)]

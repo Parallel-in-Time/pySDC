@@ -32,7 +32,7 @@ class grayscott_imex_diffusion(ptype):
 
     Parameters
     ----------
-    nvars : tuple, optional
+    nvars : tuple of int, optional
         Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. (127, 127).
     Du : float, optional
         Diffusion rate for :math:`u`.
@@ -68,6 +68,7 @@ class grayscott_imex_diffusion(ptype):
         of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
     .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
         Journal of Parallel and Distributed Computing (2019).
+    .. [3] https://www.chebfun.org/examples/pde/GrayScott.html
     """
 
     dtype_u = mesh
@@ -214,7 +215,7 @@ class grayscott_imex_diffusion(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t=0, see https://www.chebfun.org/examples/pde/GrayScott.html
+        Routine to compute the exact solution at time t=0, see [3]_.
 
         Parameters
         ----------
@@ -270,6 +271,7 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
     This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear
     part is computed in an explicit way).
     """
+
     def __init__(self, nvars=None, Du=1.0, Dv=0.01, A=0.09, B=0.086, spectral=None, L=2.0, comm=MPI.COMM_WORLD):
         """Initialization routine"""
         nvars = (127, 127) if nvars is None else nvars
@@ -343,7 +345,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     Parameters
     ----------
-    nvars : tuple, optional
+    nvars : tuple of int, optional
         Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. (127, 127).
     Du : float, optional
         Diffusion rate for :math:`u`.
@@ -380,6 +382,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
     .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
         Journal of Parallel and Distributed Computing (2019).
     """
+
     dtype_f = comp2_mesh
 
     def __init__(

@@ -29,7 +29,7 @@ class fermi_pasta_ulam_tsingou(ptype):
     npart : int, optional
         Number of particles.
     alpha : float, optional
-        Factor of the nonlinear force.
+        Factor of the nonlinear force :math:`\alpha`.
     k : float, optional
         Mode for initial conditions.
     energy_modes : list, optional

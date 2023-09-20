@@ -29,17 +29,17 @@ class allencahn_imex(ptype):
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    spectral : bool
+    spectral : bool, optional
         Indicates if spectral initial condition is used.
-    dw : float
-        Problem parameter.
-    L : int
+    dw : float, optional
+        Driving force.
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Initialises type of initial state.

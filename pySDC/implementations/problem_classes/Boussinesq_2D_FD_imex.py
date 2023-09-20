@@ -32,8 +32,8 @@ class boussinesq_2d_imex(ptype):
 
     Parameters
     ----------
-    nvars : list, optional
-        List of number of unknowns nvars.
+    nvars : list of tuple, optional
+        List of number of unknowns nvars, e.g. [(4, 300, 3)].
     c_s : float, optional
         Acoustic velocity :math:`c_s`.
     u_adv : float, optional
@@ -58,7 +58,7 @@ class boussinesq_2d_imex(ptype):
     Attributes
     ----------
     N : list
-        List of number of unknowns nvars.
+        List of number of unknowns.
     bc_hor : list
         Contains type of boundary conditions for both boundaries for both dimensions.
     bc_ver :

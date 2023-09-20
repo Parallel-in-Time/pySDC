@@ -29,23 +29,23 @@ class allencahn_fullyimplicit(ptype):
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    newton_maxiter : int
+    nvars : tuple of int, optional
+        Number of unknowns in the problem, e.g. (128, 128).
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    newton_maxiter : int, optional
         Maximum number of iterations for the Newton solver.
-    newton_tol : float
+    newton_tol : float, optional
         Tolerance for Newton's method to terminate.
-    lin_tol : float
+    lin_tol : float, optional
         Tolerance for linear solver to terminate.
-    lin_maxiter : int
+    lin_maxiter : int, optional
         Maximum number of iterations for the linear solver.
-    radius : float
+    radius : float, optional
         Radius of the circles.
-    order : int
+    order : int, optional
         Order of the finite difference matrix.
 
     Attributes
@@ -62,7 +62,7 @@ class allencahn_fullyimplicit(ptype):
         Number of iterations of linear solver.
     newton_ncalls : int
         Number of calls of Newton solver.
-    lin_ncalls
+    lin_ncalls : int
         Number of calls of linear solver.
     """
 

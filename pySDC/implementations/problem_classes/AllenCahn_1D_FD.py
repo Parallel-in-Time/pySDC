@@ -21,7 +21,7 @@ class allencahn_front_fullyimplicit(ptype):
     exact solution is given by
 
     .. math::
-        u(x, t).5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
+        u(x, t)= 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem is implemented to be treated
     *fully-implicit* using Newton to solve the nonlinear system.
@@ -33,7 +33,7 @@ class allencahn_front_fullyimplicit(ptype):
     dw : float
         Driving force.
     eps : float
-        Problem parameter.
+        Scaling parameter :math:`\varepsilon`.
     newton_maxiter : int
         Maximum number of iterations for Newton's method.
     newton_tol : float
@@ -52,7 +52,7 @@ class allencahn_front_fullyimplicit(ptype):
     xvalues : np.1darray
         Spatial grid values.
     uext : dtype_u
-        Contains the external values of the boundary.
+        Contains additionally the external values of the boundary.
     newton_itercount : int
         Counter for iterations in Newton solver.
     lin_itercount : int
@@ -77,7 +77,7 @@ class allencahn_front_fullyimplicit(ptype):
         stop_at_nan=True,
     ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (nvars + 1) % 2 :
+        if (nvars + 1) % 2:
             raise ProblemError('setup requires nvars = 2^p - 1')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
@@ -109,10 +109,10 @@ class allencahn_front_fullyimplicit(ptype):
         )
         self.uext = self.dtype_u((self.init[0] + 2, self.init[1], self.init[2]), val=0.0)
 
-        self.newton_itercount
-        self.lin_itercount
-        self.newton_ncalls
-        self.lin_ncalls
+        self.newton_itercount = 0
+        self.lin_itercount = 0
+        self.newton_ncalls = 0
+        self.lin_ncalls = 0
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -147,7 +147,7 @@ class allencahn_front_fullyimplicit(ptype):
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
-        n
+        n = 0
         res = 99
         while n < self.newton_maxiter:
             # print(n)
@@ -266,7 +266,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
     The exact solution is given by
 
     .. math::
-        u(x, t).5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
+        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem will be treated in a
     *semi-implicit* way, i.e., the second order term is treated implicitly using Newton to solve the nonlinear system, and
@@ -343,10 +343,10 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
     The exact solution is given by
 
     .. math::
-        u(x, t).5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
+        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w`.
-    
+
     Let :math:`A` denote the finite difference matrix to discretize :math:`\frac{\partial^2 u}{\partial x^2}`. Here,
     _Finel's trick_ is used. Let
 
@@ -359,7 +359,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         \frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
                 \frac{1 - a}{1 - a (2u - 1)^2} - 1
             \right] (2u - 1).
-        
+
     For time-stepping, this problem will be treated in a *fully-implicit* way the nonlinear system is solved using Newton.
     """
 
@@ -397,7 +397,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
-        n
+        n = 0
         res = 99
         while n < self.newton_maxiter:
             # print(n)
@@ -489,7 +489,7 @@ class allencahn_periodic_fullyimplicit(ptype):
     The exact solution is
 
     .. math::
-        u(x, t).5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
+        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
     *fully-implicitly*, i.e., the nonlinear system is solved by Newton.
@@ -501,7 +501,7 @@ class allencahn_periodic_fullyimplicit(ptype):
     dw : float
         Driving force.
     eps : float
-        Problem parameter.
+        Scaling parameter :math:`\varepsilon`.
     newton_maxiter : int
         Maximum number of iterations for Newton's method.
     newton_tol : float
@@ -546,7 +546,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         stop_at_nan=True,
     ):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (nvars) % 2 :
+        if (nvars) % 2:
             raise ProblemError('setup requires nvars = 2^p')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
@@ -578,10 +578,10 @@ class allencahn_periodic_fullyimplicit(ptype):
             bc='periodic',
         )
 
-        self.newton_itercount
-        self.lin_itercount
-        self.newton_ncalls
-        self.lin_ncalls
+        self.newton_itercount = 0
+        self.lin_itercount = 0
+        self.newton_ncalls = 0
+        self.lin_ncalls = 0
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -611,7 +611,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         Id = sp.eye(self.nvars)
 
         # start newton iteration
-        n
+        n = 0
         res = 99
         while n < self.newton_maxiter:
             # print(n)
@@ -712,7 +712,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     The exact solution is
 
     .. math::
-        u(x, t).5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
+        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
     in *semi-implicit* way, i.e., the part containing the second order term is treated implicitly, and the rest of the right-hand
@@ -796,7 +796,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     The exact solution is then given by
 
     .. math::
-        u(x, t).5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
+        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
     in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the second order term is solved with a
@@ -898,7 +898,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         Id = sp.eye(self.nvars)
 
         # start newton iteration
-        n
+        n = 0
         res = 99
         while n < self.newton_maxiter:
             # print(n)

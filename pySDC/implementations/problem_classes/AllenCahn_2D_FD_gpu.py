@@ -29,21 +29,21 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    newton_maxiter : int
+    nvars : tuple of int, optional
+        Number of unknowns in the problem, e.g. (128, 128).
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    newton_maxiter : int, optional
         Maximum number of iterations for the Newton solver.
-    newton_tol : float
+    newton_tol : float, optional
         Tolerance for Newton's method to terminate.
-    lin_tol : float
+    lin_tol : float, optional
         Tolerance for linear solver to terminate.
-    lin_maxiter : int
+    lin_maxiter : int, optional
         Maximum number of iterations for the linear solver.
-    radius : float
+    radius : float, optional
         Radius of the circles.
 
     Attributes
@@ -60,7 +60,7 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
         Number of iterations of linear solver.
     newton_ncalls : int
         Number of calls of Newton solver.
-    lin_ncalls
+    lin_ncalls : int
         Number of calls of linear solver.
     """
 
@@ -78,18 +78,7 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
         lin_maxiter=100,
         radius=0.25,
     ):
-        """
-        Initialization routine
-
-        Parameters
-        ----------
-        problem_params : dict
-            Custom parameters for the example.
-        dtype_u : cupy_mesh data type
-            (will be passed parent class)
-        dtype_f : cupy_mesh data type
-            (will be passed parent class)
-        """
+        """Initialization routine"""
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % nvars)
