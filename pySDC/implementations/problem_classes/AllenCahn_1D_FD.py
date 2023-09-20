@@ -151,7 +151,7 @@ class allencahn_front_fullyimplicit(ptype):
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u)
+            # # form the function g(u), such that the solution to the nonlinear problem is a root of g
             self.uext[1:-1] = u[:]
             g = (
                 u
@@ -269,8 +269,8 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem will be treated in a
-    *semi-implicit* way, i.e., the second order term is treated implicitly using Newton to solve the nonlinear system, and
-    the rest of the right-hand side will be handled explicitly.
+    *semi-implicit* way, i.e., the Laplacian is treated implicitly by solving the linear system including the
+    Laplacian, and the rest of the right-hand side will be handled explicitly.
     """
 
     dtype_f = imex_mesh
@@ -339,7 +339,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
             - 6 d_w u (1 - u)
 
-    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.
+    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the Laplacian.
     The exact solution is given by
 
     .. math::
@@ -401,7 +401,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u)
+            # form the function g(u), such that the solution to the nonlinear problem is a root of g
             self.uext[1:-1] = u[:]
             gprim = 1.0 / self.dx**2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0) * (2.0 * u - 1.0)
             g = u - rhs - factor * (self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * dw * u * (1.0 - u))
@@ -485,7 +485,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
             - 6 d_w u (1 - u)
 
-    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.
+    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the Laplacian.
     The exact solution is
 
     .. math::
@@ -615,7 +615,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u)
+            # form the function g(u), such that the solution to the nonlinear problem is a root of g
             g = (
                 u
                 - rhs
@@ -708,14 +708,14 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
             - 6 d_w u (1 - u)
 
-    for :math:`u \in [0, 1]`. For discretization of the second order spatial derivative, centered finite differences are used.
+    for :math:`u \in [0, 1]`. For discretization of the Laplacian, centered finite differences are used.
     The exact solution is
 
     .. math::
         u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
-    in *semi-implicit* way, i.e., the part containing the second order term is treated implicitly, and the rest of the right-hand
+    in *semi-implicit* way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand
     side is only evaluated at each time.
     """
 
@@ -799,7 +799,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
-    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the second order term is solved with a
+    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a
     linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by
     Newton's method.
     """
@@ -902,7 +902,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # print(n)
-            # form the function g with g(u)
+            # form the function g(u), such that the solution to the nonlinear problem is a root of g
             g = (
                 u
                 - rhs

@@ -19,9 +19,9 @@ class nonlinearschroedinger_imex(ptype):
     .. math::
         \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
 
-    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved in spatial using
-    mpi4py-fft [1]_. *Semi-explicit* time-stepping is used here for solve the problem in the temporal dimension, i.e., the
-    second order term will be handled implicitly.
+    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved using
+    mpi4py-fft [1]_. *Semi-explicit* time-stepping is used here to solve the problem in the temporal dimension, i.e., the
+    Laplacian will be handled implicitly.
 
     Parameters
     ----------
@@ -222,7 +222,7 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     .. math::
         \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
 
-    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved in spatial using
+    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be discretized using
     mpi4py-fft [1]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
     the full right-hand side is solved by GMRES method.
     """

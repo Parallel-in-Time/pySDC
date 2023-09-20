@@ -13,7 +13,7 @@ class harmonic_oscillator(ptype):
     .. math::
         \frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},
 
-    which is a second-order problem. The unknown function :math:`x` denotes the position of the mass, and their
+    which is a second-order problem. The unknown function :math:`x` denotes the position of the mass, and the
     derivative is the velocity. :math:`\mu` defines the damping and :math:`k` is the spring constant.
 
     Parameters

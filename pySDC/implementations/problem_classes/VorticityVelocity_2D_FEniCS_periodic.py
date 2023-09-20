@@ -17,13 +17,13 @@ class fenics_vortex_2d(ptype):
     .. math::
         \frac{\partial w}{\partial t} = \nu \Delta w
 
-    for some parameter :math:`\nu`. In this class the problem is implemented in the way that it is solved in space
-    using mFEniCS [1]_. Hence, the problem is reformulated to the *weak formulation*
+    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial port is solved
+    using FEniCS [1]_. Hence, the problem is reformulated to the *weak formulation*
 
     .. math::
         \int_\Omega w_t v dx = - \nu \int_\Omega \nabla w \nabla v dx
 
-    The nonlinear system is solved in an *fully-implicit* way using Dolfin's weak solver.
+    The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver.
 
     Parameters
     ----------

@@ -263,10 +263,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
 
     for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
-    treated in a *semi-implicit* way, i.e., the nonlinear system containing the second order term is solved by the
+    treated in a *semi-implicit* way, i.e., the linear system containing the Laplacian is solved by the
     conjugate gradients method, and the system containing the rest of the right-hand side is only evaluated at each time.
 
-    This class is especially developed for solving it on GPU's using CuPy.
+    This class is especially developed for solving it on GPUs using CuPy.
     """
 
     dtype_f = imex_cupy_mesh
@@ -359,7 +359,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
     is only evaluated at each time.
 
-    This class is especially developed for solving it on GPU's using CuPy.
+    This class is especially developed for solving it on GPUs using CuPy.
     """
 
     dtype_f = imex_cupy_mesh
@@ -467,7 +467,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     treated in *multi-implicit* fashion, i.e., the nonlinear system containing the second order term is solved by the
     conjugate gradients method, and the system containing the rest of the right-hand side will be solved by Newton's method.
 
-    This class is especially developed for solving it on GPU's using CuPy.
+    This class is especially developed for solving it on GPUs using CuPy.
     """
 
     dtype_f = comp2_cupy_mesh
@@ -622,7 +622,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
     is solved by a linear solver provided by a scipy routine.
 
-    This class is especially developed for solving it on GPU's using CuPy.
+    This class is especially developed for solving it on GPUs using CuPy.
     """
 
     dtype_f = comp2_cupy_mesh

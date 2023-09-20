@@ -25,13 +25,13 @@ class fenics_heat_weak_fullyimplicit(ptype):
     .. math::
         u(x, t) = \sin(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that it is solved in space using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
         \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
 
-    The nonlinear system is solved in an *fully-implicit* way using Dolfin's weak solver provided by the routine
+    The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver provided by the routine
     `df.NonlinearVariationalSolver`.
 
     Parameters
@@ -274,13 +274,13 @@ class fenics_heat_weak_imex(ptype):
     .. math::
         u(x, t) = \sin(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that it is solved in space using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
         \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
 
-    The problem is solved in an *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where
+    The problem is solved in a *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where
     it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved
     implicitly.
 

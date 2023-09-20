@@ -283,8 +283,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
 
     for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
-    treated in a *semi-implicit* way, i.e., the nonlinear system containing the second order term is solved by the
-    conjugate gradients method, and the system containing the rest of the right-hand side is only evaluated at each time.
+    treated in a *semi-implicit* way, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
+    method, and the system containing the rest of the right-hand side is only evaluated at each time.
     """
 
     dtype_f = imex_mesh
@@ -482,8 +482,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
 
     for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
-    treated in *multi-implicit* fashion, i.e., the nonlinear system containing the second order term is solved by the
-    conjugate gradients method, and the system containing the rest of the right-hand side will be solved by Newton's method.
+    treated in *multi-implicit* fashion, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
+    method, and the system containing the rest of the right-hand side will be solved by Newton's method.
     """
 
     dtype_f = comp2_mesh

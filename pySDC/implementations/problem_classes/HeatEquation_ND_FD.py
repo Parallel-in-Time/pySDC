@@ -154,7 +154,7 @@ class heatNd_forced(heatNd_unforced):
     .. math::
         u({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \cos(t).
 
-    The spatial term is discretized using central finite differences.
+    The spatial term is discretized using finite differences.
     """
 
     dtype_f = imex_mesh

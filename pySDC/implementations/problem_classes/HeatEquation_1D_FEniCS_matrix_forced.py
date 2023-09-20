@@ -25,7 +25,7 @@ class fenics_heat(ptype):
     .. math::
         u(x, t) = \cos(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that it is solved in space using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
@@ -311,7 +311,7 @@ class fenics_heat_mass(fenics_heat):
     .. math::
         u(x, t) = \cos(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that it is solved in space using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:

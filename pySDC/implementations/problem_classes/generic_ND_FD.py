@@ -17,14 +17,15 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 class GenericNDimFinDiff(ptype):
     r"""
-    Example implementing the N-dimensional linear equation
+    Base class for finite difference spatial discretisation in N-dimensions
 
     .. math::
         \frac{d u}{dt} = A u,
 
-    where :math:`A  \in \mathbb{R}^{n \times n}` is a finite difference matrix arising from spatial discretization.
-    This generic class follows the MOL (method-of-lines) approach and can be used to discretize partial differential
-    equations such as the advection equation and the heat equation.
+    where :math:`A \in \mathbb{R}^{nN \times nN} is a matrix arising from finite difference discretisation of spatial
+    derivatives with n degrees of freedom per dimension and N dimensions. This generic class follows the MOL
+    (method-of-lines) approach and can be used to discretize partial differential equations such as the advection
+    equation and the heat equation.
 
     Parameters
     ----------
@@ -33,13 +34,13 @@ class GenericNDimFinDiff(ptype):
     coeff : float, optional
         Factor for finite difference matrix :math:`A`.
     derivative : int, optional
-        Order of the derivative used for finite difference discretization.
+        Order of the spatial derivative.
     freq : int of tuple, optional
         Spatial frequency, can be a tuple.
     stencil_type : str, optional
         Stencil type for finite differences.
     order : int, optional
-        Order of the finite difference discretization.
+        Order of accuracy of the finite difference discretization.
     lintol : float, optional
         Tolerance for spatial solver.
     liniter : int, optional

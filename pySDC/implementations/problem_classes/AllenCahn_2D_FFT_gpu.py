@@ -25,13 +25,13 @@ class allencahn2d_imex(ptype):  # pragma: no cover
         u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
 
     or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of
-    spatial grid points. For time-stepping, the problem is treated *fully-implicitly*, i.e., the nonlinear system is solved by
-    Fast-Fourier Tranform (FFT).
+    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
+    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
 
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
     by a scipy routine.
 
-    This class is especially developed for solving it on GPU's using CuPy.
+    This class is especially developed for solving it on GPUs using CuPy.
 
     Parameters
     ----------
@@ -199,13 +199,13 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
 
     or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of
-    spatial grid points. For time-stepping, the problem is treated *fully-implicitly*, i.e., the nonlinear system is solved by
-    Fast-Fourier Tranform (FFT).
+    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
+    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
 
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
     by a scipy routine.
 
-    This class is especially developed for solving it on GPU's using CuPy.
+    This class is especially developed for solving it on GPUs using CuPy.
 
     Parameters
     ----------

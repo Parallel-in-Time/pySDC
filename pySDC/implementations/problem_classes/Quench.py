@@ -21,8 +21,7 @@ class Quench(ptype):
     We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
     leak itself.
 
-    The problem is discretized in space using centered finite differences, and for time-stepping it is implemented in the way,
-    that it will be solved *fully-implicitly*.
+    The problem is discretised with finite difference in space and treated *fully-implicitly*.
 
     Parameters
     ----------
@@ -53,11 +52,11 @@ class Quench(ptype):
     newton_tol : float, optional
         Tolerance for Newton to terminate.
     newton_iter : int, optional
-        Number of iterations for Newton to be done.
+        Maximum number of Newton iterations to be done.
     lintol : float, optional
         Tolerance for linear solver to be done.
     liniter : int, optional
-        Number of iterations for linear solver to be done.
+        Maximum number of linear iterations inside the Newton solver.
     direct_solver : bool, optional
         Indicates if a direct solver should be used.
     reference_sol_type : str, optional
@@ -459,8 +458,7 @@ class QuenchIMEX(Quench):
     We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
     leak itself.
 
-    The problem is discretized in space using centered finite differences, and for time-stepping it is implemented in the way,
-    that it will be solved in a *semi-implicit* way.
+    The problem is discretised with finite difference in space and treated *semi-implicitly*.
     """
 
     dtype_f = imex_mesh

@@ -7,8 +7,8 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 # noinspection PyUnusedLocal
 class outer_solar_system(ptype):
     r"""
-    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem bases
-    on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
+    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is
+    based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
 
     .. math::
         m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),
@@ -25,7 +25,7 @@ class outer_solar_system(ptype):
     Parameters
     ----------
     sun_only : bool, optional
-        If False, only the sun is taking into account for the influence of the motion.
+        If False, only the sun is taken into account for the influence of the motion.
 
     Attributes
     ----------
