@@ -251,18 +251,18 @@ class petsc_fisher_multiimplicit(ptype):
             \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
         \right].
 
-    This class is implemented to be solved in spatial using PETSc. For time-stepping, the problem will be solved
+    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem will be solved
     *multi-implicitly*.
 
     Parameters
     ----------
-    nvars : int
+    nvars : int, optional
         Spatial resolution.
-    lambda0 : float
+    lambda0 : float, optional
         Problem parameter : math:`\lambda_0`.
-    nu : float
+    nu : float, optional
         Problem parameter :math:`\nu`.
-    interval : tuple
+    interval : tuple, optional
         Defines the spatial domain.
     comm : PETSc.COMM_WORLD, optional
         Communicator for PETSc.
@@ -298,6 +298,9 @@ class petsc_fisher_multiimplicit(ptype):
     ----------
     .. [1] Z. Feng. Traveling wave behavior for a generalized fisher equation. Chaos Solitons Fractals 38(2),
         481–488 (2008).
+    .. [2] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).
+    .. [3] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,
+        Alejandro Cosimo. Advances in Water Resources (2011).
     """
 
     dtype_u = petsc_vec
@@ -470,7 +473,6 @@ class petsc_fisher_multiimplicit(ptype):
         ----------
         u : dtype_u
             Current values of the numerical solution.
-
         t : float
             Current time the numerical solution is computed.
 
@@ -617,7 +619,8 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
             \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
         \right].
 
-    This class is implemented to be solved in spatial using PETSc. For time-stepping, the problem is treated *fully-implicitly*.
+    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem is treated
+    *fully-implicitly*.
     """
 
     dtype_f = petsc_vec
@@ -713,8 +716,8 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
             \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
         \right].
 
-    This class is implemented to be solved in spatial using PETSc. For time-stepping, the problem here will be solved in
-    a *semi-implicit* way.
+    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem here will be
+    solved in a *semi-implicit* way.
     """
 
     dtype_f = petsc_vec_imex

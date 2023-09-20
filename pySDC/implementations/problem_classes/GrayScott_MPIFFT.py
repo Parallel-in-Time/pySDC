@@ -18,10 +18,10 @@ class grayscott_imex_diffusion(ptype):
     :math:`u,\, v`. Here, the process is described by the N-dimensional model
 
     .. math::
-        \frac{d u}{d t} = D_u \Delta u - u v^2 + A (1 - u),
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
     .. math::
-        \frac{d v}{d t} = D_v \Delta v + u v^2 - B u
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using
     Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also
@@ -251,6 +251,25 @@ class grayscott_imex_diffusion(ptype):
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. The model with linear (reaction) part is described by the N-dimensional model
+
+    .. math::
+        \frac{d u}{d t} = D_u \Delta u - u v^2 + A,
+
+    .. math::
+        \frac{d v}{d t} = D_v \Delta v + u v^2
+
+    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using
+    Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also
+    https://mpi4py-fft.readthedocs.io/en/latest/.
+
+    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear
+    part is computed in an explicit way).
+    """
     def __init__(self, nvars=None, Du=1.0, Dv=0.01, A=0.09, B=0.086, spectral=None, L=2.0, comm=MPI.COMM_WORLD):
         """Initialization routine"""
         nvars = (127, 127) if nvars is None else nvars
@@ -310,10 +329,10 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
     :math:`u,\, v`. Here, the process is described by the N-dimensional model
 
     .. math::
-        \frac{d u}{d t} = D_u \Delta u - u v^2 + A (1 - u),
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
     .. math::
-        \frac{d v}{d t} = D_v \Delta v + u v^2 - B u
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using
     Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also
@@ -549,6 +568,25 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 
 class grayscott_mi_linear(grayscott_imex_linear):
+    r"""
+    The original Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. The model with linear (reaction) part is described by the N-dimensional model
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A,
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2
+
+    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using
+    Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also
+    https://mpi4py-fft.readthedocs.io/en/latest/.
+
+    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing
+    the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.
+    """
     dtype_f = comp2_mesh
 
     def __init__(

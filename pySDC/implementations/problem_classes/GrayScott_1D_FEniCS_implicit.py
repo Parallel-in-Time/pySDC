@@ -18,10 +18,10 @@ class fenics_grayscott(ptype):
     :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions
 
     .. math::
-        \frac{d u}{d t} = D_u \Delta u - u v^2 + A (1 - u),
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
     .. math::
-        \frac{d v}{d t} = D_v \Delta v + u v^2 - B u
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
 
     for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the
     system with a test function :math:`q`:
