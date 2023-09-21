@@ -26,7 +26,7 @@ class heatNd_forced(ptype):  # pragma: no cover
 
     The spatial term is discretized using finite differences.
 
-    This class uses the CuPy package in order to make pySDC available for GPU's.
+    This class uses the CuPy package in order to make pySDC available for GPUs.
 
     Parameters
     ----------
@@ -298,9 +298,9 @@ class heatNd_unforced(heatNd_forced):
     .. math::
         u({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \cos(t).
 
-    The spatial term is discretized using central finite differences.
+    The spatial term is discretized using finite differences.
 
-    The implementation is this class uses the CuPy package in order to make pySDC available for GPU's.
+    The implementation is this class uses the CuPy package in order to make pySDC available for GPUs.
     """
     dtype_f = cupy_mesh
 
