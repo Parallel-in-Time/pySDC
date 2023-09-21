@@ -6,8 +6,31 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 
 # noinspection PyUnusedLocal
 class outer_solar_system(ptype):
-    """
-    Example implementing the outer solar system problem
+    r"""
+    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is
+    based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
+
+    .. math::
+        m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),
+
+    where :math:`m_i` is the :math:`i`-th mass point with position described by the vector :math:`{\bf r}_i`, and :math:`G`
+    is the gravitational constant. If only the sun influences the motion of the bodies gravitationally, the equations become
+
+    .. math::
+        m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).
+
+    This class implements the outer solar system consisting of the six outer planets: the sun, Jupiter, Saturn, Uranus,
+    Neptune, and Pluto, i.e., :math:`N=6`.
+
+    Parameters
+    ----------
+    sun_only : bool, optional
+        If False, only the sun is taken into account for the influence of the motion.
+
+    Attributes
+    ----------
+    G : float
+        Gravitational constant.
     """
 
     dtype_u = particles

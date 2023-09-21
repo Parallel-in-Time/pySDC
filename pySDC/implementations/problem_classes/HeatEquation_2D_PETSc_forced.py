@@ -8,30 +8,69 @@ from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_ve
 
 # noinspection PyUnusedLocal
 class heat2d_petsc_forced(ptype):
-    """
-    Example implementing the forced 2D heat equation with Dirichlet BCs in [0,1]^2,
-    discretized using central finite differences and realized with PETSc
+    r"""
+    Example implementing the forced two-dimensional heat equation with Dirichlet boundary conditions
+    :math:`(x, y) \in [0,1]^2`
 
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        Id: identity matrix
-        dx: distance between two spatial nodes in x direction
-        dy: distance between two spatial nodes in y direction
-        ksp: PETSc linear solver object
+    .. math::
+        \frac{\partial u}{\partial t} = \nu
+        \left(
+            \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}
+        \right) + f(x, y, t)
+
+    and forcing term :math:`f(x, y, t)` such that the exact solution is
+
+    .. math::
+        u(x, y, t) = \sin(2 \pi x) \sin(2 \pi y) \cos(t).
+
+    The spatial discretization uses central finite differences and is realized with PETSc [1]_, [2]_.
+
+    Parameters
+    ----------
+    cnvars : tuple, optional
+        Spatial resolution for the 2D problem, e.g. (16, 16).
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+    freq : int, optional
+        Spatial frequency of the initial conditions (equal for both dimensions).
+    refine : int, optional
+        Defines the refinement of the mesh, e.g. refine=2 means the mesh is refined with factor 2.
+    comm : COMM_WORLD
+        Communicator for PETSc.
+    sol_tol : float, optional
+        Tolerance that the solver needs to satisfy for termination.
+    sol_maxiter : int, optional
+        Maximum number of iterations for the solver to terminate.
+
+    Attributes
+    ----------
+    A : PETSc matrix object
+        Second-order FD discretization of the 2D Laplace operator.
+    Id : PETSc matrix object
+        Identity matrix.
+    dx : float
+        Distance between two spatial nodes in x direction.
+    dy : float
+        Distance between two spatial nodes in y direction.
+    ksp : object
+        PETSc linear solver object.
+    ksp_ncalls : int
+        Calls of PETSc's linear solver object.
+    ksp_itercount : int
+        Iterations done by PETSc's linear solver object.
+
+    References
+    ----------
+    .. [1] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).
+    .. [2] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,
+        Alejandro Cosimo. Advances in Water Resources (2011).
     """
 
     dtype_u = petsc_vec
     dtype_f = petsc_vec_imex
 
     def __init__(self, cnvars, nu, freq, refine, comm=PETSc.COMM_WORLD, sol_tol=1e-10, sol_maxiter=None):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: PETSc data type (will be passed parent class)
-            dtype_f: PETSc data type with implicit and explicit parts (will be passed parent class)
-        """
+        """Initialization routine"""
         # make sure parameters have the correct form
         if len(cnvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % cnvars)
@@ -81,10 +120,12 @@ class heat2d_petsc_forced(ptype):
 
     def __get_A(self):
         """
-        Helper function to assemble PETSc matrix A
+        Helper function to assemble PETSc matrix A.
 
-        Returns:
-            PETSc matrix object
+        Returns
+        -------
+        A : PETSc matrix object
+            Matrix A defining the 2D Laplace operator.
         """
         # create matrix and set basic options
         A = self.init.createMatrix()
@@ -123,10 +164,12 @@ class heat2d_petsc_forced(ptype):
 
     def __get_Id(self):
         """
-        Helper function to assemble PETSc identity matrix
+        Helper function to assemble PETSc identity matrix.
 
-        Returns:
-            PETSc matrix object
+        Returns
+        -------
+        Id : PETSc matrix object
+            Identity matrix.
         """
 
         # create matrix and set basic options
@@ -152,14 +195,19 @@ class heat2d_petsc_forced(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed at.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -178,17 +226,24 @@ class heat2d_petsc_forced(ptype):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        KSP linear solver for (I-factor*A)u = rhs
+        r"""
+        KSP linear solver for :math:`(I - factor \cdot A) \vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution
+        Returns
+        -------
+        me : dtype_u
+            Solution.
         """
 
         me = self.dtype_u(u0)
@@ -200,13 +255,17 @@ class heat2d_petsc_forced(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution.
         """
 
         me = self.dtype_u(self.init)

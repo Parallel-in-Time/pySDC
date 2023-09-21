@@ -13,7 +13,8 @@ class logistics_equation(ptype):
     .. math::
         \frac{du}{dt} = \lambda u(t)(1-u(t))
 
-    with :math:`\lambda` a given real coefficient. Its analytical solution is :
+    with :math:`\lambda` a given real coefficient. Its analytical solution is
+    given by
 
     .. math::
         u(t) = u(0) \frac{e^{\lambda t}}{1-u(0)+u(0)e^{\lambda t}}

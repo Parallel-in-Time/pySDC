@@ -29,23 +29,24 @@ class piline(ptype):
 
     Parameters
     ----------
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C1 : float
+    C1 : float, optional
         Capacitance of the capacitor :math:`C_1`.
-    Rpi : float
+    Rpi : float, optional
         Resistance of the resistor :math:`R_\pi`.
-    Lpi : float
+    Lpi : float, optional
         Inductance of the inductor :math:`L_\pi`.
-    C2 : float
+    C2 : float, optional
         Capacitance of the capacitor :math:`C_2`.
-    Rl : float
+    Rl : float, optional
         Resistance of the resistive load :math:`R_\ell`.
 
     Attributes:
-        A: system matrix, representing the 3 ODEs
+    A : np.2darray
+        Coefficient matrix of the linear ODE system.
     """
 
     dtype_u = mesh

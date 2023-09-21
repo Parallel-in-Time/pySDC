@@ -9,29 +9,74 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 
 # noinspection PyUnusedLocal
 class fenics_heat(ptype):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
+    r"""
+    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
-    Attributes:
-        V: function space
-        M: mass matrix for FEM
-        K: stiffness matrix incl. diffusion coefficient (and correct sign)
-        g: forcing term
-        bc: boundary conditions
+    .. math::
+        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
+
+    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+
+    .. math::
+        f(x, t) = -\cos(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+
+    The exact solution of the problem is
+
+    .. math::
+        u(x, t) = \cos(\pi x)\cos(t).
+
+    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
+    is reformulated to the *weak formulation*
+
+    .. math:
+        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+
+    The part containing the forcing term is treated explicitly, where it is interpolated in the function space.
+    The other part will be treated in an implicit way.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is 'CG', which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    M : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`\int_\Omega u_t v dx`.
+    K : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`- \nu \int_\Omega \nabla u \nabla v dx`.
+    g : Expression
+        The forcing term :math:`f` in the heat equation.
+    bc : DirichletBC
+        Denotes the Dirichlet boundary conditions (currently not used here).
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh
     dtype_f = rhs_fenics_mesh
 
     def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)
-        """
+        """Initialization routine"""
 
         # define the Dirichlet boundary
         # def Boundary(x, on_boundary):
@@ -107,7 +152,7 @@ class fenics_heat(ptype):
         Returns
         -------
         u : dtype_u
-            The solution as mesh.
+            Solution.
         """
 
         b = self.apply_mass_matrix(rhs)
@@ -176,7 +221,7 @@ class fenics_heat(ptype):
         Returns
         -------
         f : dtype_f
-            The right-hand side  divided into two parts.
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.V)
@@ -239,7 +284,7 @@ class fenics_heat(ptype):
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            Exact solution.
         """
 
         u0 = df.Expression('cos(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
@@ -250,9 +295,67 @@ class fenics_heat(ptype):
 
 # noinspection PyUnusedLocal
 class fenics_heat_mass(fenics_heat):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], expects mass matrix sweeper
+    r"""
+    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
+    .. math::
+        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
+
+    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+
+    .. math::
+        f(x, t) = -\cos(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+
+    The exact solution of the problem is
+
+    .. math::
+        u(x, t) = \cos(\pi x)\cos(t).
+
+    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
+    is reformulated to the *weak formulation*
+
+    .. math:
+        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+
+    The forcing term is treated explicitly, and is expressed via the mass matrix resulting from the left-hand side term
+    :math:`\int_\Omega u_t v dx`, and the other part will be treated in an implicit way.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is 'CG', which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    M : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`\int_\Omega u_t v dx`.
+    K : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`- \nu \int_\Omega \nabla u \nabla v dx`.
+    g : Expression
+        The forcing term :math:`f` in the heat equation.
+    bc : DirichletBC
+        Denotes the Dirichlet boundary conditions (currently not used here).
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     def solve_system(self, rhs, factor, u0, t):
@@ -273,7 +376,7 @@ class fenics_heat_mass(fenics_heat):
         Returns
         -------
         u : dtype_u
-            The solution as mesh.
+            Solution.
         """
 
         u = self.dtype_u(u0)

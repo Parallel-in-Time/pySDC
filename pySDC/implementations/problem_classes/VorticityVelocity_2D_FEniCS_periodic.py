@@ -10,13 +10,55 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 
 # noinspection PyUnusedLocal
 class fenics_vortex_2d(ptype):
-    """
-    Example implementing the 2d vorticity-velocity equation with periodic BC in [0,1]
+    r"""
+    This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
+    in :math:`[0, 1]^2`
 
-    Attributes:
-        V: function space
-        M: mass matrix for FEM
-        K: stiffness matrix incl. diffusion coefficient (and correct sign)
+    .. math::
+        \frac{\partial w}{\partial t} = \nu \Delta w
+
+    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial port is solved
+    using FEniCS [1]_. Hence, the problem is reformulated to the *weak formulation*
+
+    .. math::
+        \int_\Omega w_t v dx = - \nu \int_\Omega \nabla w \nabla v dx
+
+    The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver.
+
+    Parameters
+    ----------
+    c_nvars : List of int tuple, optional
+        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. [(128, 128)].
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is 'CG', which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+    rho : int, optional
+        Problem parameter.
+    delta : float, optional
+        Problem parameter.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    M : scalar, vector, matrix or higher rank tensor
+        Mass matrix for FENiCS.
+    K : scalar, vector, matrix or higher rank tensor
+        Stiffness matrix including diffusion coefficient (and correct sign).
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh

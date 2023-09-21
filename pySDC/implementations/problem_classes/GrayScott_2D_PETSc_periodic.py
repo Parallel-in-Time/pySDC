@@ -7,20 +7,29 @@ from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_ve
 
 class GS_full(object):
     """
-    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
+    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES.
+
+    Parameters
+    ----------
+    da : DMDA object
+        Object of PETSc.
+    prob : problem instance
+        Contains problem information for PETSc.
+    factor : float
+        Temporal factor (dt*Qd).
+    dx : float
+        Grid spacing in x direction.
+    dy : float
+        Grid spacing in y direction.
+
+    Attributes
+    ----------
+    localX : PETSc vector object
+        Local vector for PETSc.
     """
 
     def __init__(self, da, prob, factor, dx, dy):
-        """
-        Initialization routine
-
-        Args:
-            da: DMDA object
-            prob: problem instance
-            factor: temporal factor (dt*Qd)
-            dx: grid spacing in x direction
-            dy: grid spacing in x direction
-        """
+        """Initialization routine"""
         assert da.getDim() == 2
         self.da = da
         self.prob = prob
@@ -31,17 +40,22 @@ class GS_full(object):
 
     def formFunction(self, snes, X, F):
         """
-        Function to evaluate the residual for the Newton solver
+        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
+        in the solution.
 
-        This function should be equal to the RHS in the solution
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        F : PETSc vector object
+            Output vector F(X).
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            F: output vector F(X)
-
-        Returns:
-            None (overwrites F)
+        Returns
+        -------
+        None
+            Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -75,16 +89,23 @@ class GS_full(object):
 
     def formJacobian(self, snes, X, J, P):
         """
-        Function to return the Jacobian matrix
+        Function to return the Jacobian matrix.
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            J: Jacobian matrix (current?)
-            P: Jacobian matrix (new)
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        J : PETSc matrix object
+            Current Jacobian matrix.
+        P : PETSc matrix object
+            New Jacobian matrix.
 
-        Returns:
-            matrix status
+        Returns
+        -------
+        PETSc.Mat.Structure.SAME_NONZERO_PATTERN
+            Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -159,18 +180,25 @@ class GS_full(object):
 
 class GS_reaction(object):
     """
-    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
+    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES.
+
+    Parameters
+    ----------
+    da : DMDA object
+        Object of PETSc.
+    prob : problem instance
+        Contains problem information for PETSc.
+    factor : float
+        Temporal factor (dt*Qd).
+
+    Attributes
+    ----------
+    localX : PETSc vector object
+        Local vector for PETSc.
     """
 
     def __init__(self, da, prob, factor):
-        """
-        Initialization routine
-
-        Args:
-            da: DMDA object
-            prob: problem instance
-            factor: temporal factor (dt*Qd)
-        """
+        """Initialization routine"""
         assert da.getDim() == 2
         self.da = da
         self.prob = prob
@@ -179,17 +207,22 @@ class GS_reaction(object):
 
     def formFunction(self, snes, X, F):
         """
-        Function to evaluate the residual for the Newton solver
+        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
+        in the solution.
 
-        This function should be equal to the RHS in the solution
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        F : PETSc vector object
+            Output vector F(X).
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            F: output vector F(X)
-
-        Returns:
-            None (overwrites F)
+        Returns
+        -------
+        None
+            Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -204,16 +237,23 @@ class GS_reaction(object):
 
     def formJacobian(self, snes, X, J, P):
         """
-        Function to return the Jacobian matrix
+        Function to return the Jacobian matrix.
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            J: Jacobian matrix (current?)
-            P: Jacobian matrix (new)
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        J : PETSc matrix object
+            Current Jacobian matrix.
+        P : PETSc matrix object
+            New Jacobian matrix.
 
-        Returns:
-            matrix status
+        Returns
+        -------
+        PETSc.Mat.Structure.SAME_NONZERO_PATTERN
+            Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -245,8 +285,73 @@ class GS_reaction(object):
 
 
 class petsc_grayscott_multiimplicit(ptype):
-    """
-    Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by PETSc [2]_, [3]_. For time-stepping,
+    the diffusion part is solved by one of PETSc's linear solver, whereas the reaction part will be solved by a nonlinear
+    solver.
+
+    Parameters
+    ----------
+    nvars : tuple of int, optional
+        Spatial resolution, i.e., number of degrees of freedom in space, e.g. (256, 256).
+    Du : float, optional
+        Diffusion rate for :math:`u`.
+    Dv: float, optional
+        Diffusion rate for :math:`v`.
+    A : float, optional
+        Feed rate for :math:`v`.
+    B : float, optional
+        Overall decay rate for :math:`u`.
+    comm : PETSc.COMM_WORLD, optional
+        Communicator for PETSc.
+    lsol_tol : float, optional
+        Tolerance for linear solver to terminate.
+    nlsol_tol : float, optional
+        Tolerance for nonlinear solver to terminate.
+    lsol_maxiter : int, optional
+        Maximum number of iterations for linear solver.
+    nlsol_maxiter : int, optional
+        Maximum number of iterations for nonlinear solver.
+
+    Attributes
+    ----------
+    dx : float
+        Mesh grid width in x direction.
+    dy : float
+        Mesh grid width in y direction.
+    AMat : PETSc matrix object
+        Discretization matrix.
+    Id : PETSc matrix object
+        Identity matrix.
+    localX : PETSc vector object
+        Local vector for solution.
+    ksp : PETSc solver object
+        Linear solver object.
+    snes : PETSc solver object
+        Nonlinear solver object.
+    snes_itercount : int
+        Number of iterations done by nonlinear solver.
+    snes_ncalls : int
+        Number of calls of PETSc's nonlinear solver.
+
+    References
+    ----------
+    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [2] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).
+    .. [3] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,
+        Alejandro Cosimo. Advances in Water Resources (2011).
     """
 
     dtype_u = petsc_vec
@@ -265,14 +370,7 @@ class petsc_grayscott_multiimplicit(ptype):
         lsol_maxiter=None,
         nlsol_maxiter=None,
     ):
-        """
-        Initialization routine
-
-        Args:
-            problem_params: custom parameters for the example
-            dtype_u: PETSc data type (will be passed to parent class)
-            dtype_f: PETSc data type with 2 components (will be passed to parent class)
-        """
+        """Initialization routine"""
         # create DMDA object which will be used for all grid operations (boundary_type=3 -> periodic BC)
         da = PETSc.DMDA().create(
             [nvars[0], nvars[1]],
@@ -338,10 +436,12 @@ class petsc_grayscott_multiimplicit(ptype):
 
     def __get_A(self):
         """
-        Helper function to assemble PETSc matrix A
+        Helper function to assemble PETSc matrix A.
 
-        Returns:
-            PETSc matrix object
+        Returns
+        -------
+        A : PETSc matrix object
+            Discretization matrix.
         """
         A = self.init.createMatrix()
         A.setType('aij')  # sparse
@@ -399,10 +499,12 @@ class petsc_grayscott_multiimplicit(ptype):
 
     def __get_Id(self):
         """
-        Helper function to assemble PETSc identity matrix
+        Helper function to assemble PETSc identity matrix.
 
-        Returns:
-            PETSc matrix object
+        Returns
+        -------
+        Id : PETSc matrix object
+            Identity matrix.
         """
 
         Id = self.init.createMatrix()
@@ -428,14 +530,19 @@ class petsc_grayscott_multiimplicit(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -451,17 +558,24 @@ class petsc_grayscott_multiimplicit(ptype):
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
-        """
-        Linear solver for (I-factor*A)u = rhs
+        r"""
+        Linear solver for (I - factor A)\vec{u} = \vec{rhs}.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)
@@ -474,17 +588,24 @@ class petsc_grayscott_multiimplicit(ptype):
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
-        """
-        Nonlinear solver for (I-factor*F)(u) = rhs
+        r"""
+        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)
@@ -504,13 +625,17 @@ class petsc_grayscott_multiimplicit(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution.
         """
 
         assert t == 0, 'ERROR: u_exact is only valid for the initial solution'
@@ -530,22 +655,40 @@ class petsc_grayscott_multiimplicit(ptype):
 
 
 class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
-    """
-    Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by PETSc [2]_, [3]_. For time-stepping, the
+    problem is handled in a *fully-implicit* way, i.e., the nonlinear system containing the full right-hand side will be
+    solved by PETSc's nonlinear solver.
     """
 
     dtype_f = petsc_vec
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -561,17 +704,24 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Nonlinear solver for (I-factor*F)(u) = rhs
+        r"""
+        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)
@@ -592,22 +742,39 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
 
 
 class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
-    """
-    Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by PETSc [2]_, [3]_. For time-stepping, the
+    problem is treated *semi-implicitly*, i.e., the system with diffusion part is solved by PETSc's linear solver.
     """
 
     dtype_f = petsc_vec_imex
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)

@@ -7,7 +7,11 @@ from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDi
 class advectionNd(GenericNDimFinDiff):
     r"""
     Example implementing the unforced ND advection equation with periodic
-    or Dirichlet boundary conditions in :math:`[0,1]^N`,
+    or Dirichlet boundary conditions in :math:`[0,1]^N`
+
+    .. math::
+        \frac{\partial u}{\partial t} = -c \frac{\partial u}{\partial x},
+
     and initial solution of the form
 
     .. math::
@@ -50,10 +54,10 @@ class advectionNd(GenericNDimFinDiff):
 
     Attributes
     ----------
-    A: sparse matrix (CSC)
+    A : sparse matrix (CSC)
         FD discretization matrix of the ND grad operator.
-    Id: sparse matrix (CSC)
-        Identity matrix of the same dimension as A
+    Id : sparse matrix (CSC)
+        Identity matrix of the same dimension as A.
 
     Note
     ----
@@ -83,7 +87,7 @@ class advectionNd(GenericNDimFinDiff):
 
     def u_exact(self, t, **kwargs):
         """
-        Routine to compute the exact solution at time t
+        Routine to compute the exact solution at time t.
 
         Parameters
         ----------

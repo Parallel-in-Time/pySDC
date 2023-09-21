@@ -6,8 +6,36 @@ from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_s
 
 # noinspection PyUnusedLocal
 class full_solar_system(outer_solar_system):
-    """
-    Example implementing the full solar system problem
+    r"""
+    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem bases
+    on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
+
+    .. math::
+        m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),
+
+    where :math:`m_i` is the :math:`i`-th mass point with position described by the vector :math:`{\bf r}_i`, and :math:`G`
+    is the gravitational constant. If only the sun influences the motion of the bodies gravitationally, the equations become
+
+    .. math::
+        m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).
+
+    This class implements the full solar system containing all planets including earth's moon, i.e., :math:`N=10`. Initial conditions
+    are taken from [1]_, and masses relative to the sun taken from [2]_.
+
+    Parameters
+    ----------
+    sun_only : bool, optional
+        If False, only the sun is taken into account for the influence of the motion.
+
+    Attributes
+    ----------
+    G : float
+        Gravitational constant.
+
+    References
+    ----------
+    .. [1] https://www.aanda.org/articles/aa/full/2002/08/aa1405/aa1405.right.html
+    .. [2] https://en.wikipedia.org/wiki/Planetary_mass#Values_from_the_DE405_ephemeris
     """
 
     dtype_u = particles
@@ -21,7 +49,7 @@ class full_solar_system(outer_solar_system):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact/initial trajectory at time t.
+        Routine to compute the exact/initial trajectory at time t. Values here are taken from [1]_, [2]_.
 
         Parameters
         ----------
@@ -36,8 +64,6 @@ class full_solar_system(outer_solar_system):
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
         me = self.dtype_u(self.init)
 
-        # initial positions and velocities taken from
-        # https://www.aanda.org/articles/aa/full/2002/08/aa1405/aa1405.right.html
         me.pos[:, 0] = [0.0, 0.0, 0.0]
         me.pos[:, 1] = [-2.503321047836e-01, +1.873217481656e-01, +1.260230112145e-01]
         me.pos[:, 2] = [+1.747780055994e-02, -6.624210296743e-01, -2.991203277122e-01]
@@ -60,8 +86,6 @@ class full_solar_system(outer_solar_system):
         me.vel[:, 8] = [+2.568651772461e-03, +1.681832388267e-03, +6.245613982833e-04]
         me.vel[:, 9] = [+3.034112963576e-03, -1.111317562971e-03, -1.261841468083e-03]
 
-        # masses relative to the sun taken from
-        # https://en.wikipedia.org/wiki/Planetary_mass#Values_from_the_DE405_ephemeris
         me.m[0] = 1.0  # Sun
         me.m[1] = 0.1660100 * 1e-06  # Mercury
         me.m[2] = 2.4478383 * 1e-06  # Venus

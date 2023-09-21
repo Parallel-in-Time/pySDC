@@ -41,29 +41,30 @@ class buck_converter(ptype):
 
     Parameters
     ----------
-    duty : float
+    duty : float, optional
         Cycle between zero and one indicates the time period how long the converter stays on one switching state
         until it switches to the other state.
-    fsw : int
+    fsw : int, optional
         Switching frequency, it is used to determine the number of time steps after the switching state is changed.
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C1 : float
+    C1 : float, optional
         Capacitance of the capacitor :math:`C_1`.
-    Rp : float
-        Resistance of the resistor in front of the inductor.
-    L1 : float
+    Rp : float, optional
+        Resistance of the resistor in front of the inductor :math:`R_\pi`.
+    L1 : float, optional
         Inductance of the inductor :math:`L_1`.
-    C2 : float
+    C2 : float, optional
         Capacitance of the capacitor :math:`C_2`.
-    Rl : float
+    Rl : float, optional
         Resistance of the resistor :math:`R_\pi`
 
     Attributes
     ----------
-        A: system matrix, representing the 3 ODEs
+    A : np.2darray
+        Coefficient matrix of the ODE system.
 
     Note
     ----

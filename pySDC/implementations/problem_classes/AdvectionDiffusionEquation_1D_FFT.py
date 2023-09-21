@@ -13,7 +13,7 @@ class advectiondiffusion1d_imex(ptype):
     .. math::
         \frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}
 
-    with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. The advection part
+    with periodic boundary conditions in :math:`[-\frac{L}{2}, \frac{L}{2}]` in spectral space. The advection part
     :math:`- c \frac{\partial u(x,t)}{\partial x}` is treated explicitly, whereas the diffusion part
     :math:`\nu \frac{\partial^2 u(x,t)}{\partial x^2}` will be treated numerically in an implicit way. The exact solution is
     given by
@@ -29,12 +29,12 @@ class advectiondiffusion1d_imex(ptype):
     nvars : int, optional
         Number of points in spatial discretization.
     c : float, optional
-        Advection speed.
+        Advection speed :math:`c`.
     freq : int, optional
         Wave number :math:`k`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
-    L : int, optional
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
 
     Attributes
@@ -163,9 +163,8 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     .. math::
         \frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}
 
-    with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. This class implements the problem solving it
-    with fully-implicit time-stepping. The exact solution is
-    given by
+    with periodic boundary conditions in :math:`[-\frac{L}{2}, \frac{L}{2}]` in spectral space. This class implements the
+    problem solving it with fully-implicit time-stepping. The exact solution is given by
 
     .. math::
         u(x, t) = \sin(\omega (x - c t)) \exp(-t \nu \omega^2)
