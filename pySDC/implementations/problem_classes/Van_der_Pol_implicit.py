@@ -24,15 +24,15 @@ class vanderpol(ptype):
     newton_tol : float, optional
         Tolerance for Newton to terminate.
     stop_at_nan : bool, optional
-        Indicate whether Newton's method should stop if nan values arise.
-    crash_at_maxiter = bool, optional
+        Indicate whether Newton's method should stop if ``nan`` values arise.
+    crash_at_maxiter : bool, optional
         Indicates whether Newton's method should stop if maximum number of iterations
-        `newton_maxiter` is reached.
+        ``newton_maxiter`` is reached.
 
     Attributes
     ----------
     work_counters : WorkCounter
-        Counts different things, here: Number of evaluations of the right-hand side in `eval_f`
+        Counts different things, here: Number of evaluations of the right-hand side in ``eval_f``
         and number of Newton calls in each Newton iterations are counted.
     """
 
@@ -56,7 +56,7 @@ class vanderpol(ptype):
 
     def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at :math:`t=0`.
+        Routine to approximate the exact solution at time t by ``SciPy`` or give initial conditions when called at :math:`t=0`.
 
         Parameters
         ----------

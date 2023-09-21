@@ -16,10 +16,10 @@ class auzinger(ptype):
     .. math::
         \frac{d y_2 (t)}{dt} = y_1 (t) + 3 y_2 (t) (1 - y^2_1 (t) - y^2_2 (t))
 
-    with initial condition :math:`y(t) = (1, 0)^T` for :math:`t \in [0, 10]`. The exact solution of this problem is
+    with initial condition :math:`(y_1(t), y_2(t))^T = (1, 0)^T` for :math:`t \in [0, 10]`. The exact solution of this problem is
 
     .. math::
-        y (t) = (\cos(t), \sin(t))^T.
+        (y_1(t), y_2(t))^T = (\cos(t), \sin(t))^T.
 
     Attributes
     ----------
@@ -44,8 +44,8 @@ class auzinger(ptype):
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

@@ -27,12 +27,12 @@ class fenics_grayscott(ptype):
     system with a test function :math:`q`:
 
     .. math::
-        \int_\Omega u_t q dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,
+        \int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,
 
     .. math::
-        \int_\Omega v_t q dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,
+        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,
 
-    The spatial solve of the weak formulation is realized by FEniCS [2]_.
+    The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.
 
     Parameters
     ----------
@@ -42,13 +42,13 @@ class fenics_grayscott(ptype):
         Starting time.
     family : str, optional
         Indicates the family of elements used to create the function space
-        for the trail and test functions. The default is 'CG', which are the class
+        for the trail and test functions. The default is ``'CG'``, which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : list or tuple, optional
         Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
-        [2, 2] or (2, 2).
+        ``refinements=[2, 2]`` or ``refinements=(2, 2)``.
     Du : float, optional
         Diffusion rate for :math:`u`.
     Dv: float, optional
@@ -174,7 +174,7 @@ class fenics_grayscott(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Dolfin's linear solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.
+        Dolfin's linear solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -250,7 +250,7 @@ class fenics_grayscott(ptype):
 
     def u_exact(self, t):
         r"""
-        Routine to compute the exact solution at time t.
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

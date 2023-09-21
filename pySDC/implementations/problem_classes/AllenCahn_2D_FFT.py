@@ -24,17 +24,17 @@ class allencahn2d_imex(ptype):
     .. math::
         u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
 
-    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of
+    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
     spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by
     Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
 
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
-    by a scipy routine.
+    by a ``SciPy`` routine.
 
     Parameters
     ----------
     nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].
+        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
     nu : float, optional
         Problem parameter :math:`\nu`.
     eps : float, optional
@@ -148,8 +148,8 @@ class allencahn2d_imex(ptype):
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -209,17 +209,17 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     .. math::
         u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
 
-    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of
+    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
     spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
     Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
 
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
-    by a scipy routine.
+    by a ``SciPy`` routine.
 
     Parameters
     ----------
     nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].
+        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
     nu : float, optional
         Problem parameter :math:`\nu`.
     eps : float, optional

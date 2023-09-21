@@ -18,21 +18,21 @@ class fenics_heat_weak_fullyimplicit(ptype):
     for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
 
     .. math::
-        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
 
     The exact solution of the problem is
 
     .. math::
         u(x, t) = \sin(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
-        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
 
     The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver provided by the routine
-    `df.NonlinearVariationalSolver`.
+    ``df.NonlinearVariationalSolver``.
 
     Parameters
     ----------
@@ -42,12 +42,12 @@ class fenics_heat_weak_fullyimplicit(ptype):
         Starting time.
     family : str, optional
         Indicates the family of elements used to create the function space
-        for the trail and test functions. The default is 'CG', which are the class
+        for the trail and test functions. The default is ``'CG'``, which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
 
@@ -58,9 +58,9 @@ class fenics_heat_weak_fullyimplicit(ptype):
     w : Function
         Function for the weak form.
     a_K : scalar, vector, matrix or higher rank tensor
-        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).
+        The expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx` (incl. BC).
     M : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`\int_\Omega u_t v dx`.
+        Denotes the expression :math:`\int_\Omega u_t v\,dx`.
     g : Expression
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC
@@ -160,7 +160,7 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Dolfin's weak solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.
+        Dolfin's weak solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -236,8 +236,8 @@ class fenics_heat_weak_fullyimplicit(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -267,18 +267,18 @@ class fenics_heat_weak_imex(ptype):
     for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
 
     .. math::
-        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
 
     The exact solution of the problem is
 
     .. math::
         u(x, t) = \sin(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
-        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
 
     The problem is solved in a *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where
     it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved
@@ -292,12 +292,12 @@ class fenics_heat_weak_imex(ptype):
         Starting time.
     family : str, optional
         Indicates the family of elements used to create the function space
-        for the trail and test functions. The default is 'CG', which are the class
+        for the trail and test functions. The default is ``'CG'``, which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
 
@@ -310,9 +310,9 @@ class fenics_heat_weak_imex(ptype):
     v : TestFunction
         The test function for the weak form.
     a_K : scalar, vector, matrix or higher rank tensor
-        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).
+        The expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx` (incl. BC).
     M : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`\int_\Omega u_t v dx`.
+        Denotes the expression :math:`\int_\Omega u_t v\,dx`.
     g : Expression
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC
@@ -407,7 +407,7 @@ class fenics_heat_weak_imex(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Dolfin's weak solver for :math:`(M - factor A)\vec{u} = \vec{u}`.
+        Dolfin's weak solver for :math:`(M - factor \cdot A)\vec{u} = \vec{u}`.
 
         Parameters
         ----------
@@ -500,8 +500,8 @@ class fenics_heat_weak_imex(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

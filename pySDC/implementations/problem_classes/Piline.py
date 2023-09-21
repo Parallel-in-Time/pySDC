@@ -120,8 +120,8 @@ class piline(ptype):
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to approximate the exact solution at time t by scipy as a reference.
+        r"""
+        Routine to approximate the exact solution at time :math:`t` by ``SciPy`` as a reference.
 
         Parameters
         ----------

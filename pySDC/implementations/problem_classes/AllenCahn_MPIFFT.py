@@ -53,11 +53,11 @@ class allencahn_imex(ptype):
     X : np.ogrid
         Grid coordinates in real space.
     K2 : np.1darray
-        Laplace operator in spectral space
+        Laplace operator in spectral space.
     dx : float
-        Mesh width in x direction
+        Mesh width in x direction.
     dy : float
-        Mesh width in y direction
+        Mesh width in y direction.
 
     References
     ----------
@@ -197,8 +197,8 @@ class allencahn_imex(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -265,9 +265,9 @@ class allencahn_imex_timeforcing(allencahn_imex):
     .. math::
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
 
-    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
     *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
-    side will be treated explicitly using mpi4py-fft [1]_ to solve them.
+    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
     """
 
     def eval_f(self, u, t):

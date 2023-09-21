@@ -6,24 +6,24 @@ from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_ve
 
 
 class Fisher_full(object):
-    """
+    r"""
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES.
 
     Parameters
     ----------
     da : DMDA object
-        Object of PETSc.
+        Object of ``PETSc``.
     prob : problem instance
-        Contains problem information for PETSc.
+        Contains problem information for ``PETSc``.
     factor : float
-        Temporal factor (dt*Qd).
+        Temporal factor :math:`\Delta t Q_\Delta`.
     dx : float
         Grid spacing in x direction.
 
     Attributes
     ----------
     localX : PETSc vector object
-        Local vector for PETSc.
+        Local vector for ``PETSc``.
     xs, xe : int
         Defines the ranges for spatial domain.
     mx : tuple
@@ -48,7 +48,7 @@ class Fisher_full(object):
         self.col = PETSc.Mat.Stencil()
 
     def formFunction(self, snes, X, F):
-        """
+        r"""
         Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
         in the solution.
 
@@ -59,7 +59,7 @@ class Fisher_full(object):
         X : PETSc vector object
             Input vector.
         F : PETSc vector object
-            Output vector F(X).
+            Output vector :math:`F(X)`.
 
         Returns
         -------
@@ -128,24 +128,24 @@ class Fisher_full(object):
 
 
 class Fisher_reaction(object):
-    """
-    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES.
+    r"""
+    Helper class to generate residual and Jacobian matrix for ``PETSc``'s nonlinear solver SNES.
 
     Parameters
     ----------
     da : DMDA object
-        Object of PETSc.
+        Object of ``PETSc``.
     prob : problem instance
-        Contains problem information for PETSc.
+        Contains problem information for ``PETSc``.
     factor : float
-        Temporal factor (dt*Qd).
+        Temporal factor :math:`\Delta t Q_\Delta`.
     dx : float
         Grid spacing in x direction.
 
     Attributes
     ----------
     localX : PETSc vector object
-        Local vector for PETSc.
+        Local vector for ``PETSc``.
     """
 
     def __init__(self, da, prob, factor):
@@ -157,7 +157,7 @@ class Fisher_reaction(object):
         self.localX = da.createLocalVec()
 
     def formFunction(self, snes, X, F):
-        """
+        r"""
         Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
         in the solution.
 
@@ -168,7 +168,7 @@ class Fisher_reaction(object):
         X : PETSc vector object
             Input vector.
         F : PETSc vector object
-            Output vector F(X).
+            Output vector :math:`F(X)`.
 
         Returns
         -------
@@ -237,9 +237,10 @@ class petsc_fisher_multiimplicit(ptype):
 
     with exact solution
 
-    u(x, 0) = \left[
-            1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
-        \right]^{-2 / \nu}
+    .. math::
+        u(x, 0) = \left[
+                1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+            \right]^{-2 / \nu}
 
     for :math:`x \in \mathbb{R}`, and
 
@@ -251,7 +252,7 @@ class petsc_fisher_multiimplicit(ptype):
             \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
         \right].
 
-    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem will be solved
+    This class is implemented to be solved in spatial using ``PETSc`` [2]_, [3]_. For time-stepping, the problem will be solved
     *multi-implicitly*.
 
     Parameters
@@ -380,8 +381,8 @@ class petsc_fisher_multiimplicit(ptype):
         self.J = self.init.createMatrix()
 
     def __get_A(self):
-        """
-        Helper function to assemble PETSc matrix A.
+        r"""
+        Helper function to assemble ``PETSc`` matrix A.
 
         Returns
         -------
@@ -499,7 +500,7 @@ class petsc_fisher_multiimplicit(ptype):
 
     def solve_system_1(self, rhs, factor, u0, t):
         r"""
-        Linear solver for (I - factor A)\vec{u} = \vec{rhs}.
+        Linear solver for :math:`(I - factor \cdot A)\vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -530,7 +531,7 @@ class petsc_fisher_multiimplicit(ptype):
 
     def solve_system_2(self, rhs, factor, u0, t):
         r"""
-        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.
+        Nonlinear solver for :math:`(I - factor \cdot F)(\vec{u}) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -566,8 +567,8 @@ class petsc_fisher_multiimplicit(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -605,9 +606,10 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
 
     with exact solution
 
-    u(x, 0) = \left[
-            1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
-        \right]^{-2 / \nu}
+    .. math::
+        u(x, 0) = \left[
+                1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+            \right]^{-2 / \nu}
 
     for :math:`x \in \mathbb{R}`, and
 
@@ -619,7 +621,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
             \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
         \right].
 
-    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem is treated
+    This class is implemented to be solved in spatial using ``PETSc`` [2]_, [3]_. For time-stepping, the problem is treated
     *fully-implicitly*.
     """
 
@@ -656,7 +658,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.
+        Nonlinear solver for :math:`(I - factor \cdot F)(\vec{u}) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -702,9 +704,10 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
 
     with exact solution
 
-    u(x, 0) = \left[
-            1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
-        \right]^{-2 / \nu}
+    .. math::
+        u(x, 0) = \left[
+                1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+            \right]^{-2 / \nu}
 
     for :math:`x \in \mathbb{R}`, and
 
@@ -716,7 +719,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
             \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
         \right].
 
-    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem here will be
+    This class is implemented to be solved in spatial using ``PETSc`` [2]_, [3]_. For time-stepping, the problem here will be
     solved in a *semi-implicit* way.
     """
 
@@ -756,7 +759,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple linear solver for (I-factor A)\vec{u} = \{rhs}.
+        Simple linear solver for :math:`(I-factor \cdot A)\vec{u} = \vec{rhs}`.
 
         Parameters
         ----------

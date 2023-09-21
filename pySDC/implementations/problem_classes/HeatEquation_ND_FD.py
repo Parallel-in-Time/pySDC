@@ -6,7 +6,7 @@ from pySDC.implementations.datatype_classes.mesh import imex_mesh
 
 class heatNd_unforced(GenericNDimFinDiff):
     r"""
-    This class implements the unforced N-dimensional heat equation with periodic boundary conditions
+    This class implements the unforced :math:`N`-dimensional heat equation with periodic boundary conditions
 
     .. math::
         \frac{\partial u}{\partial t} = \nu
@@ -25,7 +25,7 @@ class heatNd_unforced(GenericNDimFinDiff):
     ----------
     nvars : int, optional
         Spatial resolution (same in all dimensions). Using a tuple allows to
-        consider several dimensions, e.g nvars=(16,16) for a 2D problem.
+        consider several dimensions, e.g ``nvars=(16,16)`` for a 2D problem.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     freq : int, optional
@@ -41,9 +41,9 @@ class heatNd_unforced(GenericNDimFinDiff):
     solver_type : str, optional
         Solve the linear system directly or using CG.
     bc : str, optional
-        Boundary conditions, either "periodic" or "dirichlet".
+        Boundary conditions, either ``'periodic'`` or ``'dirichlet'``.
     sigma : float, optional
-        If freq=-1 and ndim=1, uses a Gaussian initial solution of the form
+        If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form
 
         .. math::
             u(x,0) = e^{
@@ -82,8 +82,8 @@ class heatNd_unforced(GenericNDimFinDiff):
         self._makeAttributeAndRegister('sigma', localVars=locals())
 
     def u_exact(self, t, **kwargs):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -134,7 +134,7 @@ class heatNd_unforced(GenericNDimFinDiff):
 
 class heatNd_forced(heatNd_unforced):
     r"""
-    This class implements the forced N-dimensional heat equation with periodic boundary conditions
+    This class implements the forced :math:`N`-dimensional heat equation with periodic boundary conditions
 
     .. math::
         \frac{\partial u}{\partial t} = \nu
@@ -204,8 +204,8 @@ class heatNd_forced(heatNd_unforced):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

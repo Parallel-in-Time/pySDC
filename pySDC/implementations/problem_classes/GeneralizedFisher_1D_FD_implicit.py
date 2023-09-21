@@ -59,7 +59,7 @@ class generalized_fisher(ptype):
     interval : tuple, optional
         Defines the spatial domain.
     stop_at_nan : bool, optional
-        Indicates if the nonlinear solver should stop if nan values arise.
+        Indicates if the nonlinear solver should stop if ``nan`` values arise.
 
     Attributes
     ----------
@@ -213,8 +213,8 @@ class generalized_fisher(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

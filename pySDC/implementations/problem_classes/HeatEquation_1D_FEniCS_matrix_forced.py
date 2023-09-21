@@ -18,18 +18,18 @@ class fenics_heat(ptype):
     for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
 
     .. math::
-        f(x, t) = -\cos(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+        f(x, t) = -\cos(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
 
     The exact solution of the problem is
 
     .. math::
         u(x, t) = \cos(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
-        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
 
     The part containing the forcing term is treated explicitly, where it is interpolated in the function space.
     The other part will be treated in an implicit way.
@@ -42,12 +42,12 @@ class fenics_heat(ptype):
         Starting time.
     family : str, optional
         Indicates the family of elements used to create the function space
-        for the trail and test functions. The default is 'CG', which are the class
+        for the trail and test functions. The default is ``'CG'``, which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
 
@@ -56,9 +56,9 @@ class fenics_heat(ptype):
     V : FunctionSpace
         Defines the function space of the trial and test functions.
     M : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`\int_\Omega u_t v dx`.
+        Denotes the expression :math:`\int_\Omega u_t v\,dx`.
     K : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`- \nu \int_\Omega \nabla u \nabla v dx`.
+        Denotes the expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx`.
     g : Expression
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC
@@ -136,7 +136,7 @@ class fenics_heat(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Dolfin's linear solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.
+        Dolfin's linear solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -273,8 +273,8 @@ class fenics_heat(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -304,21 +304,21 @@ class fenics_heat_mass(fenics_heat):
     for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
 
     .. math::
-        f(x, t) = -\cos(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).
+        f(x, t) = -\cos(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
 
     The exact solution of the problem is
 
     .. math::
         u(x, t) = \cos(\pi x)\cos(t).
 
-    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
-        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
 
     The forcing term is treated explicitly, and is expressed via the mass matrix resulting from the left-hand side term
-    :math:`\int_\Omega u_t v dx`, and the other part will be treated in an implicit way.
+    :math:`\int_\Omega u_t v\,dx`, and the other part will be treated in an implicit way.
 
     Parameters
     ----------
@@ -328,12 +328,12 @@ class fenics_heat_mass(fenics_heat):
         Starting time.
     family : str, optional
         Indicates the family of elements used to create the function space
-        for the trail and test functions. The default is 'CG', which are the class
+        for the trail and test functions. The default is ``'CG'``, which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
 
@@ -342,9 +342,9 @@ class fenics_heat_mass(fenics_heat):
     V : FunctionSpace
         Defines the function space of the trial and test functions.
     M : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`\int_\Omega u_t v dx`.
+        Denotes the expression :math:`\int_\Omega u_t v\,dx`.
     K : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`- \nu \int_\Omega \nabla u \nabla v dx`.
+        Denotes the expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx`.
     g : Expression
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC

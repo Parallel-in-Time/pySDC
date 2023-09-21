@@ -31,10 +31,9 @@ class LorenzAttractor(ptype):
     .. math::
         \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)
 
-    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem
-    are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.
-    Lorenz chose these parameters such that the Reynolds number :math:`\rho` is slightly supercritical as to provoke
-    instability of steady convection.
+    with initial condition :math:`(y_1(0), y_2(0), y_3(0))^T = (1, 1, 1)^T` for :math:`t \in [0, 1]`. The problem parameters
+    for this problem are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`. Lorenz chose these parameters such
+    that the Reynolds number :math:`\rho` is slightly supercritical as to provoke instability of steady convection.
 
     Parameters
     ----------
@@ -182,8 +181,8 @@ class LorenzAttractor(ptype):
         return u
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to return initial conditions or to approximate exact solution using scipy.
+        r"""
+        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
 
         Parameters
         ----------
@@ -205,8 +204,8 @@ class LorenzAttractor(ptype):
         if t > 0:
 
             def eval_rhs(t, u):
-                """
-                Evaluate the right hand side, but switch the arguments for scipy.
+                r"""
+                Evaluate the right hand side, but switch the arguments for ``SciPy``.
 
                 Args:
                     t (float): Time

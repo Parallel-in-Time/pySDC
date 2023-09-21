@@ -20,8 +20,8 @@ class DiscontinuousTestODE(ptype):
         .. math::
             \frac{d u}{dt} = \frac{4}{t^*},
 
-    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) < 0`, i.e., :math:`t \leq t^*` the exact solution is
-    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
+    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) < 0`, i.e. :math:`t \leq t^*`, the exact solution is
+    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e. :math:`t \geq t^*`, the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
 
     Attributes
     ----------
@@ -151,8 +151,8 @@ class DiscontinuousTestODE(ptype):
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -182,7 +182,7 @@ class DiscontinuousTestODE(ptype):
         return me
 
     def get_switching_info(self, u, t):
-        """
+        r"""
         Provides information about the state function of the problem. When the state function changes its sign,
         typically an event occurs. So the check for an event should be done in the way that the state function
         is checked for a sign change. If this is the case, the intermediate value theorem states a root in this
@@ -191,7 +191,7 @@ class DiscontinuousTestODE(ptype):
         Parameters
         ----------
         u : dtype_u
-            Current values of the numerical solution at time t.
+            Current values of the numerical solution at time :math:`t`.
         t : float
             Current time of the numerical solution.
 
