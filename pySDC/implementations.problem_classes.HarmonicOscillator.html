@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,9 +51,24 @@
 <span id="implementations-problem-classes-harmonicoscillator-module"></span><h1>implementations.problem_classes.HarmonicOscillator module<a class="headerlink" href="#module-implementations.problem_classes.HarmonicOscillator" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harmonic_oscillator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harmonic_oscillator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the harmonic oscillator</p>
+<p>Example implementing the harmonic oscillator with mass <span class="math notranslate nohighlight">\(1\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},\]</div>
+<p>which is a second-order problem. The unknown function <span class="math notranslate nohighlight">\(x\)</span> denotes the position of the mass, and the
+derivative is the velocity. <span class="math notranslate nohighlight">\(\mu\)</span> defines the damping and <span class="math notranslate nohighlight">\(k\)</span> is the spring constant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>float</em><em>, </em><em>optional</em>) – Spring constant <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><strong>mu</strong> (<em>float</em><em>, </em><em>optional</em>) – Damping parameter <span class="math notranslate nohighlight">\(\mu\)</span>.</p></li>
+<li><p><strong>u0</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Initial condition for the position, and the velocity. Should be a tuple, e.g. (1, 0).</p></li>
+<li><p><strong>phase</strong> (<em>float</em><em>, </em><em>optional</em>) – Phase of the oscillation.</p></li>
+<li><p><strong>amp</strong> (<em>float</em><em>, </em><em>optional</em>) – Amplitude of the oscillation.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f" title="Link to this definition">¶</a></dt>
@@ -91,7 +107,7 @@
 <dd><p>Routine to compute the Hamiltonian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – Current values of The particles.</p>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the particles.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ham</strong> – The Hamiltonian.</p>

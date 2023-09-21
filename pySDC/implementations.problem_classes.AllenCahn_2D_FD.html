@@ -53,20 +53,26 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FD.html#allencahn_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC</p>
-<p>TODO : doku</p>
+<p>Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-1, 1]^2\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)\]</div>
+<p>for constant parameter <span class="math notranslate nohighlight">\(\nu\)</span>. Initial condition are circles of the form</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)\]</div>
+<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is
+treated <em>fully-implicitly</em>, i.e., the nonlinear system is solved by Newton.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
-<li><p><strong>nu</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for the Newton solver.</p></li>
-<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
-<li><p><strong>lin_tol</strong> (<em>float</em>) – Tolerance for linear solver to terminate.</p></li>
-<li><p><strong>lin_maxiter</strong> (<em>int</em>) – Maximum number of iterations for the linear solver.</p></li>
-<li><p><strong>radius</strong> (<em>float</em>) – Radius of the circles.</p></li>
-<li><p><strong>order</strong> (<em>int</em>) – Order of the finite difference matrix.</p></li>
+<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Number of unknowns in the problem, e.g. (128, 128).</p></li>
+<li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Problem parameter <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
+<li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for the Newton solver.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton’s method to terminate.</p></li>
+<li><p><strong>lin_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for linear solver to terminate.</p></li>
+<li><p><strong>lin_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for the linear solver.</p></li>
+<li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the circles.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the finite difference matrix.</p></li>
 </ul>
 </dd>
 </dl>
@@ -88,6 +94,56 @@
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid points, here both dimensions have the same grid points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_itercount">
+<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Number of iterations of Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_itercount">
+<span class="sig-name descname"><span class="pre">lin_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Number of iterations of linear solver.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_ncalls">
+<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_ncalls">
+<span class="sig-name descname"><span class="pre">lin_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of linear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -169,7 +225,15 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FD.html#allencahn_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit" title="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting</p>
+<p>Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-1, 1]^2\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)\]</div>
+<p>for constant parameter <span class="math notranslate nohighlight">\(\nu\)</span>. Initial condition are circles of the form</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)\]</div>
+<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is
+treated in <em>multi-implicit</em> fashion, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
+method, and the system containing the rest of the right-hand side will be solved by Newton’s method.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -246,7 +310,16 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit_v2">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_multiimplicit_v2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FD.html#allencahn_multiimplicit_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit_v2" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit" title="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting</p>
+<p>This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-1, 1]^2\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)\]</div>
+<p>for constant parameter <span class="math notranslate nohighlight">\(\nu\)</span>. The initial condition has the form of circles</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)\]</div>
+<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, a special AC-splitting
+is used here to get another kind of <em>semi-implicit</em> treatment of the problem: The term <span class="math notranslate nohighlight">\(\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}\)</span>
+is handled implicitly and the nonlinear system including this part will be solved by Newton. <span class="math notranslate nohighlight">\(\frac{1}{\varepsilon^2} u\)</span>
+is solved by a linear solver provided by a scipy routine.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit_v2.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit_v2.dtype_f" title="Link to this definition">¶</a></dt>
@@ -323,7 +396,15 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FD.html#allencahn_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit" title="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting</p>
+<p>This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-1, 1]^2\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)\]</div>
+<p>for constant parameter <span class="math notranslate nohighlight">\(\nu\)</span>. Initial condition are circles of the form</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)\]</div>
+<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is
+treated in a <em>semi-implicit</em> way, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
+method, and the system containing the rest of the right-hand side is only evaluated at each time.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -378,7 +459,16 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit_v2">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_semiimplicit_v2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FD.html#allencahn_semiimplicit_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit_v2" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit" title="implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting</p>
+<p>This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions <span class="math notranslate nohighlight">\(u \in [-1, 1]^2\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)\]</div>
+<p>for constant parameter <span class="math notranslate nohighlight">\(\nu\)</span>. Initial condition are circles of the form</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)\]</div>
+<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, a special AC-splitting
+is used to get a <em>semi-implicit</em> treatment of the problem: The term <span class="math notranslate nohighlight">\(\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}\)</span>
+is handled implicitly and the nonlinear system including this part will be solved by Newton. <span class="math notranslate nohighlight">\(\frac{1}{\varepsilon^2} u\)</span>
+is only evaluated at each time.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit_v2.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit_v2.dtype_f" title="Link to this definition">¶</a></dt>
@@ -445,6 +535,11 @@
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_fullyimplicit</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_itercount"><code class="docutils literal notranslate"><span class="pre">lin_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_ncalls"><code class="docutils literal notranslate"><span class="pre">lin_ncalls</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

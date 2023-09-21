@@ -47,8 +47,20 @@
 <div class="viewcode-block" id="henon_heiles">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HenonHeiles.html#implementations.problem_classes.HenonHeiles.henon_heiles">[docs]</a>
 <span class="k">class</span> <span class="nc">henon_heiles</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the harmonic oscillator</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the second-order Hénon-Heiles system</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d^2 x}{dt^2} = - x - 2 x y,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d^2 y}{dt} = - y - x^2 + y^2</span>
+
+<span class="sd">    with Hamiltonian</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        H = 0.5 \left[\left(\frac{d x}{d t}\right)^2 + \left(\frac{d y}{d t}\right)^2\right] + 0.5 \left(x^2 + y^2)</span>
+<span class="sd">            + x^2 y - \frac{y^3}{3}.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>

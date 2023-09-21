@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,10 +53,35 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">outer_solar_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sun_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the outer solar system problem</p>
+<p>The <span class="math notranslate nohighlight">\(N\)</span>-body problem describes the mutual influence of the motion of <span class="math notranslate nohighlight">\(N\)</span> bodies. Formulation of the problem is
+based on Newton’s second law. Therefore, the <span class="math notranslate nohighlight">\(N\)</span>-body problem is formulated as</p>
+<div class="math notranslate nohighlight">
+\[m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),\]</div>
+<p>where <span class="math notranslate nohighlight">\(m_i\)</span> is the <span class="math notranslate nohighlight">\(i\)</span>-th mass point with position described by the vector <span class="math notranslate nohighlight">\({\bf r}_i\)</span>, and <span class="math notranslate nohighlight">\(G\)</span>
+is the gravitational constant. If only the sun influences the motion of the bodies gravitationally, the equations become</p>
+<div class="math notranslate nohighlight">
+\[m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).\]</div>
+<p>This class implements the outer solar system consisting of the six outer planets: the sun, Jupiter, Saturn, Uranus,
+Neptune, and Pluto, i.e., <span class="math notranslate nohighlight">\(N=6\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sun_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, only the sun is taken into account for the influence of the motion.</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.G">
-<span class="sig-name descname"><span class="pre">G</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.000295912208286</span></em><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">G</span></span><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G" title="Link to this definition">¶</a></dt>
+<dd><p>Gravitational constant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">G</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.000295912208286</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -141,6 +167,7 @@
 <li><a class="reference internal" href="#">implementations.problem_classes.OuterSolarSystem module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system"><code class="docutils literal notranslate"><span class="pre">outer_solar_system</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G"><code class="docutils literal notranslate"><span class="pre">G</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">G</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

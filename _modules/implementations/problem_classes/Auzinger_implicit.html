@@ -48,8 +48,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Auzinger_implicit.html#implementations.problem_classes.Auzinger_implicit.auzinger">[docs]</a>
 <span class="k">class</span> <span class="nc">auzinger</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class implements the Auzinger equation as initial value problem. It can be found in doi.org/10.2140/camcos.2015.10.1.</span>
-<span class="sd">    The system of two ordinary differential equations (ODEs) is given by</span>
+<span class="sd">    This class implements the Auzinger equation [1]_ as initial value problem. The system of two ordinary differential equations</span>
+<span class="sd">    (ODEs) is given by</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d y_1 (t)}{dt} = -y_2 (t) + y_1 (t) (1 - y^2_1 (t) - y^2_2 (t)),</span>
@@ -68,6 +68,10 @@
 <span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
 <span class="sd">    newton_tol : float, optional</span>
 <span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] doi.org/10.2140/camcos.2015.10.1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>

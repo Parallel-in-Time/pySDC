@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,6 +53,12 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nonlinearschroedinger_fully_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.html#nonlinearschroedinger_fully_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex" title="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">nonlinearschroedinger_imex</span></code></a></p>
+<p>Example implementing the N-dimensional nonlinear Schrödinger equation with periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u\]</div>
+<p>for fixed parameter <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>. The linear parts of the problem will be discretized using
+mpi4py-fft <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. For time-stepping, the problem will be solved <em>fully-implicitly</em>, i.e., the nonlinear system containing
+the full right-hand side is solved by GMRES method.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -113,27 +120,65 @@ See this page for details on the solver: <a class="reference external" href="htt
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nonlinearschroedinger_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.COMM_WORLD</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.html#nonlinearschroedinger_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the nonlinear Schrödinger equation in 2-3D using mpi4py-fft for solving linear parts,
-IMEX time-stepping</p>
-<p>mpi4py-fft: <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a></p>
+<p>Example implementing the N-dimensional nonlinear Schrödinger equation with periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u\]</div>
+<p>for fixed parameter <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>. The linear parts of the problem will be solved using
+mpi4py-fft <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. <em>Semi-explicit</em> time-stepping is used here to solve the problem in the temporal dimension, i.e., the
+Laplacian will be handled implicitly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution</p></li>
+<li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space.</p></li>
+<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
+<li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Nonlinearity parameter.</p></li>
+<li><p><strong>comm</strong> (<em>MPI.COMM_World</em>) – Communicator for parallelisation.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.fft">
 <span class="sig-name descname"><span class="pre">fft</span></span><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.fft" title="Link to this definition">¶</a></dt>
-<dd><p>fft object</p>
+<dd><p>Object for parallel FFT transforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PFFT</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.X">
 <span class="sig-name descname"><span class="pre">X</span></span><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.X" title="Link to this definition">¶</a></dt>
-<dd><p>grid coordinates in real space</p>
+<dd><p>Grid coordinates in real space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mesh-grid</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.K2">
 <span class="sig-name descname"><span class="pre">K2</span></span><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.K2" title="Link to this definition">¶</a></dt>
-<dd><p>Laplace operator in spectral space</p>
+<dd><p>Laplace operator in spectral space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matrix</p>
+</dd>
+</dl>
 </dd></dl>
 
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+Journal of Parallel and Distributed Computing (2019).</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.dtype_f" title="Link to this definition">¶</a></dt>

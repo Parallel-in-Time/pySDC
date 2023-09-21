@@ -48,36 +48,53 @@
 <div class="viewcode-block" id="allencahn2d_imex">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn2d_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)</span>
+
+<span class="sd">    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions</span>
+<span class="sd">    can be used, for example, circles of the form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),</span>
+
+<span class="sd">    or *checker-board*</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),</span>
+
+<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of</span>
+<span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by</span>
+<span class="sd">    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</span>
+
+<span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
+<span class="sd">    by a scipy routine.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nvars : int</span>
-<span class="sd">        Number of unknowns in the problem.</span>
-<span class="sd">    nu : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    eps : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    radius : float</span>
+<span class="sd">    nvars : List of int tuples, optional</span>
+<span class="sd">        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Problem parameter :math:`\nu`.</span>
+<span class="sd">    eps : float, optional</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">    radius : float, optional</span>
 <span class="sd">        Radius of the circles.</span>
-<span class="sd">    L : int</span>
+<span class="sd">    L : float, optional</span>
 <span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
-<span class="sd">    init_type : str</span>
+<span class="sd">    init_type : str, optional</span>
 <span class="sd">        Indicates which type of initial condition is used.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    xvalues : np.ndarray</span>
+<span class="sd">    xvalues : np.1darray</span>
 <span class="sd">        Grid points in space.</span>
 <span class="sd">    dx : float</span>
 <span class="sd">        Mesh width.</span>
-<span class="sd">    lap : np.ndarray</span>
+<span class="sd">    lap : np.1darray</span>
 <span class="sd">        Spectral operator for Laplacian.</span>
-<span class="sd">    rfft_object :</span>
-<span class="sd">        Planned real FFT for forward transformation.</span>
-<span class="sd">    irfft_object :</span>
-<span class="sd">        Planned IFFT for backward transformation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -227,37 +244,54 @@
 <div class="viewcode-block" id="allencahn2d_imex_stab">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn2d_imex_stab</span><span class="p">(</span><span class="n">allencahn2d_imex</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with</span>
-<span class="sd">    stabilized splitting</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
+<span class="sd">    with stabilized splitting</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu) + \frac{2}{\varepsilon^2}u</span>
+
+<span class="sd">    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions</span>
+<span class="sd">    can be used here, for example, circles of the form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),</span>
+
+<span class="sd">    or *checker-board*</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),</span>
+
+<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of</span>
+<span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with</span>
+<span class="sd">    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</span>
+
+<span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
+<span class="sd">    by a scipy routine.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nvars : int</span>
-<span class="sd">        Number of unknowns in the problem.</span>
-<span class="sd">    nu : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    eps : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    radius : float</span>
+<span class="sd">    nvars : List of int tuples, optional</span>
+<span class="sd">        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Problem parameter :math:`\nu`.</span>
+<span class="sd">    eps : float, optional</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">    radius : float, optional</span>
 <span class="sd">        Radius of the circles.</span>
-<span class="sd">    L : int</span>
+<span class="sd">    L : float, optional</span>
 <span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
-<span class="sd">    init_type : str</span>
+<span class="sd">    init_type : str, optional</span>
 <span class="sd">        Indicates which type of initial condition is used.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    xvalues : np.ndarray</span>
+<span class="sd">    xvalues : np.1darray</span>
 <span class="sd">        Grid points in space.</span>
 <span class="sd">    dx : float</span>
 <span class="sd">        Mesh width.</span>
-<span class="sd">    lap : np.ndarray</span>
+<span class="sd">    lap : np.1darray</span>
 <span class="sd">        Spectral operator for Laplacian.</span>
-<span class="sd">    rfft_object :</span>
-<span class="sd">        Planned real FFT for forward transformation.</span>
-<span class="sd">    irfft_object :</span>
-<span class="sd">        Planned IFFT for backward transformation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">init_type</span><span class="o">=</span><span class="s1">&#39;circle&#39;</span><span class="p">):</span>

@@ -52,24 +52,72 @@
 <div class="viewcode-block" id="grayscott_imex_diffusion">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">[docs]</a>
 <span class="k">class</span> <span class="nc">grayscott_imex_diffusion</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Gray-Scott equation in 2-3D using mpi4py-fft for solving linear parts,</span>
-<span class="sd">    IMEX time-stepping (implicit diffusion, explicit reaction)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. Here, the process is described by the N-dimensional model</span>
 
-<span class="sd">    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        fft: fft object</span>
-<span class="sd">        X: grid coordinates in real space</span>
-<span class="sd">        ndim: number of spatial dimensions</span>
-<span class="sd">        Ku: Laplace operator in spectral space (u component)</span>
-<span class="sd">        Kv: Laplace operator in spectral space (v component)</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using</span>
+<span class="sd">    Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also</span>
+<span class="sd">    https://mpi4py-fft.readthedocs.io/en/latest/.</span>
+
+<span class="sd">    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and reaction</span>
+<span class="sd">    is computed in explicit fashion).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : tuple of int, optional</span>
+<span class="sd">        Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. (127, 127).</span>
+<span class="sd">    Du : float, optional</span>
+<span class="sd">        Diffusion rate for :math:`u`.</span>
+<span class="sd">    Dv: float, optional</span>
+<span class="sd">        Diffusion rate for :math:`v`.</span>
+<span class="sd">    A : float, optional</span>
+<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">    B : float, optional</span>
+<span class="sd">        Overall decay rate for :math:`u`.</span>
+<span class="sd">    spectral : bool, optional</span>
+<span class="sd">        If True, the solution is computed in spectral space.</span>
+<span class="sd">    L : int, optional</span>
+<span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
+<span class="sd">    comm : COMM_WORLD, optional</span>
+<span class="sd">        Communicator for mpi4py-fft.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fft : PFFT</span>
+<span class="sd">        Object for parallel FFT transforms.</span>
+<span class="sd">    X : mesh-grid</span>
+<span class="sd">        Grid coordinates in real space.</span>
+<span class="sd">    ndim : int</span>
+<span class="sd">        Number of spatial dimensions.</span>
+<span class="sd">    Ku : matrix</span>
+<span class="sd">        Laplace operator in spectral space (u component).</span>
+<span class="sd">    Kv : matrix</span>
+<span class="sd">        Laplace operator in spectral space (v component).</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms</span>
+<span class="sd">        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</span>
+<span class="sd">    .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.</span>
+<span class="sd">        Journal of Parallel and Distributed Computing (2019).</span>
+<span class="sd">    .. [3] https://www.chebfun.org/examples/pde/GrayScott.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span> <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">0.086</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">0.086</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">127</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span> <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nvars</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Need at least two dimensions&#39;</span><span class="p">)</span>
 
@@ -193,7 +241,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
-<span class="sd">            The solution as mesh.</span>
+<span class="sd">            Solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -216,7 +264,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t=0, see https://www.chebfun.org/examples/pde/GrayScott.html</span>
+<span class="sd">        Routine to compute the exact solution at time t=0, see [3]_.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -226,7 +274,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
-<span class="sd">            The exact solution.</span>
+<span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Exact solution only valid as initial condition&#39;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;The initial conditions are 2D for now..&#39;</span>
@@ -257,7 +305,29 @@
 <div class="viewcode-block" id="grayscott_imex_linear">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear">[docs]</a>
 <span class="k">class</span> <span class="nc">grayscott_imex_linear</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span> <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">0.086</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. The model with linear (reaction) part is described by the N-dimensional model</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u}{d t} = D_u \Delta u - u v^2 + A,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d v}{d t} = D_v \Delta v + u v^2</span>
+
+<span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using</span>
+<span class="sd">    Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also</span>
+<span class="sd">    https://mpi4py-fft.readthedocs.io/en/latest/.</span>
+
+<span class="sd">    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear</span>
+<span class="sd">    part is computed in an explicit way).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">0.086</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">127</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span> <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nvars</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">Du</span><span class="p">,</span> <span class="n">Dv</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">spectral</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span>
@@ -313,11 +383,70 @@
 <div class="viewcode-block" id="grayscott_mi_diffusion">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion">[docs]</a>
 <span class="k">class</span> <span class="nc">grayscott_mi_diffusion</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. Here, the process is described by the N-dimensional model</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using</span>
+<span class="sd">    Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also</span>
+<span class="sd">    https://mpi4py-fft.readthedocs.io/en/latest/.</span>
+
+<span class="sd">    This class implements the problem for *multi-implicit* time-stepping, i.e., both diffusion and reaction part will be treated</span>
+<span class="sd">    implicitly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : tuple of int, optional</span>
+<span class="sd">        Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. (127, 127).</span>
+<span class="sd">    Du : float, optional</span>
+<span class="sd">        Diffusion rate for :math:`u`.</span>
+<span class="sd">    Dv: float, optional</span>
+<span class="sd">        Diffusion rate for :math:`v`.</span>
+<span class="sd">    A : float, optional</span>
+<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">    B : float, optional</span>
+<span class="sd">        Overall decay rate for :math:`u`.</span>
+<span class="sd">    spectral : bool, optional</span>
+<span class="sd">        If True, the solution is computed in spectral space.</span>
+<span class="sd">    L : int, optional</span>
+<span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
+<span class="sd">    comm : COMM_WORLD, optional</span>
+<span class="sd">        Communicator for mpi4py-fft.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fft : PFFT</span>
+<span class="sd">        Object for parallel FFT transforms.</span>
+<span class="sd">    X : mesh-grid</span>
+<span class="sd">        Grid coordinates in real space.</span>
+<span class="sd">    ndim : int</span>
+<span class="sd">        Number of spatial dimensions.</span>
+<span class="sd">    Ku : matrix</span>
+<span class="sd">        Laplace operator in spectral space (u component).</span>
+<span class="sd">    Kv : matrix</span>
+<span class="sd">        Laplace operator in spectral space (v component).</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms</span>
+<span class="sd">        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</span>
+<span class="sd">    .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.</span>
+<span class="sd">        Journal of Parallel and Distributed Computing (2019).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">nvars</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
         <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span>
@@ -328,6 +457,8 @@
         <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
         <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">127</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span> <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nvars</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">Du</span><span class="p">,</span> <span class="n">Dv</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">spectral</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
         <span class="c1"># This may not run in parallel yet..</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
@@ -511,11 +642,30 @@
 <div class="viewcode-block" id="grayscott_mi_linear">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear">[docs]</a>
 <span class="k">class</span> <span class="nc">grayscott_mi_linear</span><span class="p">(</span><span class="n">grayscott_imex_linear</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The original Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. The model with linear (reaction) part is described by the N-dimensional model</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2</span>
+
+<span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`2 \leq N \leq 3`. Spatial discretization is done by using</span>
+<span class="sd">    Fast Fourier transformation for solving the linear parts provided by mpi4py-fft [2]_, see also</span>
+<span class="sd">    https://mpi4py-fft.readthedocs.io/en/latest/.</span>
+
+<span class="sd">    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing</span>
+<span class="sd">    the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">nvars</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
         <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span>
@@ -526,6 +676,8 @@
         <span class="n">L</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
         <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">127</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span> <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nvars</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">Du</span><span class="p">,</span> <span class="n">Dv</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">spectral</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
         <span class="c1"># This may not run in parallel yet..</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>

@@ -78,25 +78,26 @@ that the switches are always in only one state. If <span class="math notranslate
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>duty</strong> (<em>float</em>) – Cycle between zero and one indicates the time period how long the converter stays on one switching state
+<li><p><strong>duty</strong> (<em>float</em><em>, </em><em>optional</em>) – Cycle between zero and one indicates the time period how long the converter stays on one switching state
 until it switches to the other state.</p></li>
-<li><p><strong>fsw</strong> (<em>int</em>) – Switching frequency, it is used to determine the number of time steps after the switching state is changed.</p></li>
-<li><p><strong>Vs</strong> (<em>float</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
-<li><p><strong>Rs</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
-<li><p><strong>C1</strong> (<em>float</em>) – Capacitance of the capacitor <span class="math notranslate nohighlight">\(C_1\)</span>.</p></li>
-<li><p><strong>Rp</strong> (<em>float</em>) – Resistance of the resistor in front of the inductor.</p></li>
-<li><p><strong>L1</strong> (<em>float</em>) – Inductance of the inductor <span class="math notranslate nohighlight">\(L_1\)</span>.</p></li>
-<li><p><strong>C2</strong> (<em>float</em>) – Capacitance of the capacitor <span class="math notranslate nohighlight">\(C_2\)</span>.</p></li>
-<li><p><strong>Rl</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_\pi\)</span></p></li>
+<li><p><strong>fsw</strong> (<em>int</em><em>, </em><em>optional</em>) – Switching frequency, it is used to determine the number of time steps after the switching state is changed.</p></li>
+<li><p><strong>Vs</strong> (<em>float</em><em>, </em><em>optional</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C1</strong> (<em>float</em><em>, </em><em>optional</em>) – Capacitance of the capacitor <span class="math notranslate nohighlight">\(C_1\)</span>.</p></li>
+<li><p><strong>Rp</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor in front of the inductor <span class="math notranslate nohighlight">\(R_\pi\)</span>.</p></li>
+<li><p><strong>L1</strong> (<em>float</em><em>, </em><em>optional</em>) – Inductance of the inductor <span class="math notranslate nohighlight">\(L_1\)</span>.</p></li>
+<li><p><strong>C2</strong> (<em>float</em><em>, </em><em>optional</em>) – Capacitance of the capacitor <span class="math notranslate nohighlight">\(C_2\)</span>.</p></li>
+<li><p><strong>Rl</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_\pi\)</span></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter.A">
 <span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter.A" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Coefficient matrix of the ODE system.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>system matrix, representing the 3 ODEs</p>
+<dd class="field-odd"><p>np.2darray</p>
 </dd>
 </dl>
 </dd></dl>

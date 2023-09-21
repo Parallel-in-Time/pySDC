@@ -49,30 +49,69 @@
 <div class="viewcode-block" id="heat2d_petsc_forced">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced">[docs]</a>
 <span class="k">class</span> <span class="nc">heat2d_petsc_forced</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the forced 2D heat equation with Dirichlet BCs in [0,1]^2,</span>
-<span class="sd">    discretized using central finite differences and realized with PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the forced two-dimensional heat equation with Dirichlet boundary conditions</span>
+<span class="sd">    :math:`(x, y) \in [0,1]^2`</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        A: second-order FD discretization of the 2D laplace operator</span>
-<span class="sd">        Id: identity matrix</span>
-<span class="sd">        dx: distance between two spatial nodes in x direction</span>
-<span class="sd">        dy: distance between two spatial nodes in y direction</span>
-<span class="sd">        ksp: PETSc linear solver object</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \nu</span>
+<span class="sd">        \left(</span>
+<span class="sd">            \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}</span>
+<span class="sd">        \right) + f(x, y, t)</span>
+
+<span class="sd">    and forcing term :math:`f(x, y, t)` such that the exact solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, y, t) = \sin(2 \pi x) \sin(2 \pi y) \cos(t).</span>
+
+<span class="sd">    The spatial discretization uses central finite differences and is realized with PETSc [1]_, [2]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cnvars : tuple, optional</span>
+<span class="sd">        Spatial resolution for the 2D problem, e.g. (16, 16).</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Diffusion coefficient :math:`\nu`.</span>
+<span class="sd">    freq : int, optional</span>
+<span class="sd">        Spatial frequency of the initial conditions (equal for both dimensions).</span>
+<span class="sd">    refine : int, optional</span>
+<span class="sd">        Defines the refinement of the mesh, e.g. refine=2 means the mesh is refined with factor 2.</span>
+<span class="sd">    comm : COMM_WORLD</span>
+<span class="sd">        Communicator for PETSc.</span>
+<span class="sd">    sol_tol : float, optional</span>
+<span class="sd">        Tolerance that the solver needs to satisfy for termination.</span>
+<span class="sd">    sol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for the solver to terminate.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : PETSc matrix object</span>
+<span class="sd">        Second-order FD discretization of the 2D Laplace operator.</span>
+<span class="sd">    Id : PETSc matrix object</span>
+<span class="sd">        Identity matrix.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Distance between two spatial nodes in x direction.</span>
+<span class="sd">    dy : float</span>
+<span class="sd">        Distance between two spatial nodes in y direction.</span>
+<span class="sd">    ksp : object</span>
+<span class="sd">        PETSc linear solver object.</span>
+<span class="sd">    ksp_ncalls : int</span>
+<span class="sd">        Calls of PETSc&#39;s linear solver object.</span>
+<span class="sd">    ksp_itercount : int</span>
+<span class="sd">        Iterations done by PETSc&#39;s linear solver object.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).</span>
+<span class="sd">    .. [2] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,</span>
+<span class="sd">        Alejandro Cosimo. Advances in Water Resources (2011).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">petsc_vec</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec_imex</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cnvars</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">refine</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">PETSc</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">,</span> <span class="n">sol_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">sol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: PETSc data type (will be passed parent class)</span>
-<span class="sd">            dtype_f: PETSc data type with implicit and explicit parts (will be passed parent class)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="c1"># make sure parameters have the correct form</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cnvars</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;this is a 2d example, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cnvars</span><span class="p">)</span>
@@ -122,10 +161,12 @@
 
     <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc matrix A</span>
+<span class="sd">        Helper function to assemble PETSc matrix A.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            PETSc matrix object</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A : PETSc matrix object</span>
+<span class="sd">            Matrix A defining the 2D Laplace operator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># create matrix and set basic options</span>
         <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
@@ -164,10 +205,12 @@
 
     <span class="k">def</span> <span class="nf">__get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc identity matrix</span>
+<span class="sd">        Helper function to assemble PETSc identity matrix.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            PETSc matrix object</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Id : PETSc matrix object</span>
+<span class="sd">            Identity matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># create matrix and set basic options</span>
@@ -195,14 +238,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time at which the numerical solution is computed at.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -224,17 +272,24 @@
 <div class="viewcode-block" id="heat2d_petsc_forced.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        KSP linear solver for (I-factor*A)u = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        KSP linear solver for :math:`(I - factor \cdot A) \vec{u} = \vec{rhs}`.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -249,13 +304,17 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>

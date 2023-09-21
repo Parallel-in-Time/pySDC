@@ -48,10 +48,48 @@
 <div class="viewcode-block" id="fermi_pasta_ulam_tsingou">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">[docs]</a>
 <span class="k">class</span> <span class="nc">fermi_pasta_ulam_tsingou</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the outer solar system problem</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Fermi-Pasta-Ulam-Tsingou (FPUT) problem was one of the first computer experiments.  E. Fermi, J. Pasta</span>
+<span class="sd">    and S. Ulam investigated the behavior of a vibrating spring with a weak correction term (which is quadratic</span>
+<span class="sd">    for the FPU-:math:`\alpha` model, and cubic for the FPU-:math:`\beta` model [1]_). This can be modelled by</span>
+<span class="sd">    the second-order problem</span>
 
-<span class="sd">    TODO : doku</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d^2 u_j(t)}{d t^2} = (u_{j+1}(t) - 2 u_j(t) + u_{j-1}(t)) (1 + \alpha (u_{j+1}(t) - u_{j-1}(t))),</span>
+
+<span class="sd">    where :math:`u_j(t)` is the position of the :math:`j`-th particle. [2]_ is used as setup for this</span>
+<span class="sd">    implemented problem class. The Hamiltonian of this problem (needed for second-order SDC) is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \sum_{i=1}^n \frac{1}{2}v^2_{i-1}(t) + \frac{1}{2}(u_{i+1}(t) - u_{i-1}(t))^2 + \frac{\alpha}{3}(u_{i+1}(t) - u_{i-1}(t))^3,</span>
+
+<span class="sd">    where :math:`v_j(t)` is the velocity of the :math:`j`-th particle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    npart : int, optional</span>
+<span class="sd">        Number of particles.</span>
+<span class="sd">    alpha : float, optional</span>
+<span class="sd">        Factor of the nonlinear force :math:`\alpha`.</span>
+<span class="sd">    k : float, optional</span>
+<span class="sd">        Mode for initial conditions.</span>
+<span class="sd">    energy_modes : list, optional</span>
+<span class="sd">        Energy modes.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Mesh grid size.</span>
+<span class="sd">    xvalues : np.1darray</span>
+<span class="sd">        Spatial grid.</span>
+<span class="sd">    ones : np.1darray</span>
+<span class="sd">        Vector containing ones.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] E. Fermi, J. Pasta, S. Ulam. Studies of nonlinear problems (1955). I. Los Alamos report LA-1940.</span>
+<span class="sd">        Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (1965)</span>
+<span class="sd">    .. [2] http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>
@@ -161,19 +199,18 @@
 <div class="viewcode-block" id="fermi_pasta_ulam_tsingou.eval_mode_energy">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_mode_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the energy following</span>
-<span class="sd">        http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the energy following [1]_.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        u : dtype_u</span>
-<span class="sd">            The particles.</span>
+<span class="sd">            Particles.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        energy : dict</span>
-<span class="sd">            The energies.</span>
+<span class="sd">            Energies.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">energy</span> <span class="o">=</span> <span class="p">{}</span>

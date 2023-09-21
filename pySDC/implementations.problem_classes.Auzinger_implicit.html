@@ -53,8 +53,8 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">auzinger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>This class implements the Auzinger equation as initial value problem. It can be found in doi.org/10.2140/camcos.2015.10.1.
-The system of two ordinary differential equations (ODEs) is given by</p>
+<p>This class implements the Auzinger equation <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> as initial value problem. The system of two ordinary differential equations
+(ODEs) is given by</p>
 <div class="math notranslate nohighlight">
 \[\frac{d y_1 (t)}{dt} = -y_2 (t) + y_1 (t) (1 - y^2_1 (t) - y^2_2 (t)),\]</div>
 <div class="math notranslate nohighlight">
@@ -84,6 +84,13 @@ The system of two ordinary differential equations (ODEs) is given by</p>
 </dl>
 </dd></dl>
 
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>doi.org/10.2140/camcos.2015.10.1</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.dtype_f" title="Link to this definition">¶</a></dt>

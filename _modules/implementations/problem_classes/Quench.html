@@ -52,7 +52,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench">[docs]</a>
 <span class="k">class</span> <span class="nc">Quench</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is a toy problem to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
+<span class="sd">    This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
 <span class="sd">    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment</span>
 <span class="sd">    sufficiently, there will be a runaway effect heating up the entire magnet.</span>
 <span class="sd">    This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.</span>
@@ -61,6 +61,66 @@
 <span class="sd">    insulated from its environment except for the leak.</span>
 <span class="sd">    We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the</span>
 <span class="sd">    leak itself.</span>
+
+<span class="sd">    The problem is discretised with finite difference in space and treated *fully-implicitly*.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Cv : float, optional</span>
+<span class="sd">        Volumetric heat capacity.</span>
+<span class="sd">    K : float, optional</span>
+<span class="sd">        Thermal conductivity.</span>
+<span class="sd">    u_thresh : float, optional</span>
+<span class="sd">        Threshold for temperature.</span>
+<span class="sd">    u_max : float, optional</span>
+<span class="sd">        Maximum temperature.</span>
+<span class="sd">    Q_max : float, optional</span>
+<span class="sd">        Maximum heat source power density.</span>
+<span class="sd">    leak_range : tuple of float</span>
+<span class="sd">        Range of the leak.</span>
+<span class="sd">    leak_type : str, optional</span>
+<span class="sd">        Type of leak, choose between &#39;linear&#39; or &#39;exponential&#39;.</span>
+<span class="sd">    leak_transition : str, optional</span>
+<span class="sd">        Indicates how the heat in the leak propagates (?), choose between &#39;step&#39; and &#39;Gaussian&#39;.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Order of the finite difference discretization.</span>
+<span class="sd">    stencil_type : str, optional</span>
+<span class="sd">        Type of stencil for finite differences.</span>
+<span class="sd">    bc : str, optional</span>
+<span class="sd">        Type of boundary conditions. Default is &#39;neumann-zero&#39;.</span>
+<span class="sd">    nvars : int, optional</span>
+<span class="sd">        Spatial resolution.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Tolerance for Newton to terminate.</span>
+<span class="sd">    newton_iter : int, optional</span>
+<span class="sd">        Maximum number of Newton iterations to be done.</span>
+<span class="sd">    lintol : float, optional</span>
+<span class="sd">        Tolerance for linear solver to be done.</span>
+<span class="sd">    liniter : int, optional</span>
+<span class="sd">        Maximum number of linear iterations inside the Newton solver.</span>
+<span class="sd">    direct_solver : bool, optional</span>
+<span class="sd">        Indicates if a direct solver should be used.</span>
+<span class="sd">    reference_sol_type : str, optional</span>
+<span class="sd">        Indicates which method should be used to compute a reference solution.</span>
+<span class="sd">        Choose between &#39;scipy&#39;, &#39;SDC&#39;, or &#39;DIRK&#39;.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : sparse matrix (CSC)</span>
+<span class="sd">        FD discretization matrix of the ND grad operator.</span>
+<span class="sd">    Id : sparse matrix (CSC)</span>
+<span class="sd">        Identity matrix of the same dimension as A.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Distance between two spatial nodes.</span>
+<span class="sd">    xv : np.1darray</span>
+<span class="sd">        Spatial grid values.</span>
+<span class="sd">    leak : np.1darray of bool</span>
+<span class="sd">        Indicates the leak.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Thermal thin shell approximation towards finite element quench simulation. E. Schnaubelt, M. Wozniak, S. Schöps.</span>
+<span class="sd">       Supercond. Sci. Technol. 36 044004. DOI 10.1088/1361-6668/acbeea</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -446,6 +506,20 @@
 <div class="viewcode-block" id="QuenchIMEX">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX">[docs]</a>
 <span class="k">class</span> <span class="nc">QuenchIMEX</span><span class="p">(</span><span class="n">Quench</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
+<span class="sd">    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment</span>
+<span class="sd">    sufficiently, there will be a runaway effect heating up the entire magnet.</span>
+<span class="sd">    This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.</span>
+
+<span class="sd">    The model we use is a 1d heat equation with Neumann-zero boundary conditions, meaning this magnet is totally</span>
+<span class="sd">    insulated from its environment except for the leak.</span>
+<span class="sd">    We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the</span>
+<span class="sd">    leak itself.</span>
+
+<span class="sd">    The problem is discretised with finite difference in space and treated *semi-implicitly*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
 <div class="viewcode-block" id="QuenchIMEX.eval_f">

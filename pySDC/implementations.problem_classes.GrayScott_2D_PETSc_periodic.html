@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,22 +53,47 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GS_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction">
-<span class="sig-name descname"><span class="pre">formFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_full.formFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction" title="Link to this definition">¶</a></dt>
-<dd><p>Function to evaluate the residual for the Newton solver</p>
-<p>This function should be equal to the RHS in the solution</p>
+<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>snes</strong> – nonlinear solver object</p></li>
-<li><p><strong>X</strong> – input vector</p></li>
-<li><p><strong>F</strong> – output vector F(X)</p></li>
+<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of PETSc.</p></li>
+<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for PETSc.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor (dt*Qd).</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – Grid spacing in x direction.</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – Grid spacing in y direction.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.localX">
+<span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.localX" title="Link to this definition">¶</a></dt>
+<dd><p>Local vector for PETSc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc vector object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction">
+<span class="sig-name descname"><span class="pre">formFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_full.formFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction" title="Link to this definition">¶</a></dt>
+<dd><p>Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
+in the solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
+<li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
+<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector F(X).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None (overwrites F)</p>
+<dd class="field-even"><p>Overwrites F.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -75,18 +101,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian">
 <span class="sig-name descname"><span class="pre">formJacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_full.formJacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian" title="Link to this definition">¶</a></dt>
-<dd><p>Function to return the Jacobian matrix</p>
+<dd><p>Function to return the Jacobian matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>snes</strong> – nonlinear solver object</p></li>
-<li><p><strong>X</strong> – input vector</p></li>
-<li><p><strong>J</strong> – Jacobian matrix (current?)</p></li>
-<li><p><strong>P</strong> – Jacobian matrix (new)</p></li>
+<li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
+<li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
+<li><p><strong>J</strong> (<em>PETSc matrix object</em>) – Current Jacobian matrix.</p></li>
+<li><p><strong>P</strong> (<em>PETSc matrix object</em>) – New Jacobian matrix.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>matrix status</p>
+<dd class="field-even"><p>Matrix status.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc.Mat.Structure.SAME_NONZERO_PATTERN</p>
 </dd>
 </dl>
 </dd></dl>
@@ -97,22 +126,45 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GS_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction">
-<span class="sig-name descname"><span class="pre">formFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_reaction.formFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction" title="Link to this definition">¶</a></dt>
-<dd><p>Function to evaluate the residual for the Newton solver</p>
-<p>This function should be equal to the RHS in the solution</p>
+<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>snes</strong> – nonlinear solver object</p></li>
-<li><p><strong>X</strong> – input vector</p></li>
-<li><p><strong>F</strong> – output vector F(X)</p></li>
+<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of PETSc.</p></li>
+<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for PETSc.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor (dt*Qd).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.localX">
+<span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.localX" title="Link to this definition">¶</a></dt>
+<dd><p>Local vector for PETSc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc vector object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction">
+<span class="sig-name descname"><span class="pre">formFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_reaction.formFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction" title="Link to this definition">¶</a></dt>
+<dd><p>Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
+in the solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
+<li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
+<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector F(X).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None (overwrites F)</p>
+<dd class="field-even"><p>Overwrites F.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -120,18 +172,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian">
 <span class="sig-name descname"><span class="pre">formJacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_reaction.formJacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian" title="Link to this definition">¶</a></dt>
-<dd><p>Function to return the Jacobian matrix</p>
+<dd><p>Function to return the Jacobian matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>snes</strong> – nonlinear solver object</p></li>
-<li><p><strong>X</strong> – input vector</p></li>
-<li><p><strong>J</strong> – Jacobian matrix (current?)</p></li>
-<li><p><strong>P</strong> – Jacobian matrix (new)</p></li>
+<li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
+<li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
+<li><p><strong>J</strong> (<em>PETSc matrix object</em>) – Current Jacobian matrix.</p></li>
+<li><p><strong>P</strong> (<em>PETSc matrix object</em>) – New Jacobian matrix.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>matrix status</p>
+<dd class="field-even"><p>Matrix status.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc.Mat.Structure.SAME_NONZERO_PATTERN</p>
 </dd>
 </dl>
 </dd></dl>
@@ -142,7 +197,17 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">petsc_grayscott_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Du</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit" title="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc_grayscott_multiimplicit</span></code></a></p>
-<p>Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</p>
+<p>The Gray-Scott system <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
+where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
+whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. This process is described by the two-dimensional model using periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by PETSc <a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the
+problem is handled in a <em>fully-implicit</em> way, i.e., the nonlinear system containing the full right-hand side will be
+solved by PETSc’s nonlinear solver.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -152,16 +217,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_fullyimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -172,18 +237,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_fullyimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Nonlinear solver for (I-factor*F)(u) = rhs</p>
+<dd><p>Nonlinear solver for (I - factor F)(vec{u}) = {rhs}.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution as mesh</p>
+<dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -197,7 +262,152 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">petsc_grayscott_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Du</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</p>
+<p>The Gray-Scott system <a class="footnote-reference brackets" href="#id7" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
+where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
+whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. This process is described by the two-dimensional model using periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by PETSc <a class="footnote-reference brackets" href="#id8" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping,
+the diffusion part is solved by one of PETSc’s linear solver, whereas the reaction part will be solved by a nonlinear
+solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space, e.g. (256, 256).</p></li>
+<li><p><strong>Du</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>Dv</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
+<li><p><strong>A</strong> (<em>float</em><em>, </em><em>optional</em>) – Feed rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
+<li><p><strong>B</strong> (<em>float</em><em>, </em><em>optional</em>) – Overall decay rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>comm</strong> (<em>PETSc.COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for PETSc.</p></li>
+<li><p><strong>lsol_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for linear solver to terminate.</p></li>
+<li><p><strong>nlsol_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for nonlinear solver to terminate.</p></li>
+<li><p><strong>lsol_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for linear solver.</p></li>
+<li><p><strong>nlsol_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for nonlinear solver.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dx">
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dx" title="Link to this definition">¶</a></dt>
+<dd><p>Mesh grid width in x direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dy">
+<span class="sig-name descname"><span class="pre">dy</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dy" title="Link to this definition">¶</a></dt>
+<dd><p>Mesh grid width in y direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.AMat">
+<span class="sig-name descname"><span class="pre">AMat</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.AMat" title="Link to this definition">¶</a></dt>
+<dd><p>Discretization matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc matrix object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.Id">
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.Id" title="Link to this definition">¶</a></dt>
+<dd><p>Identity matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc matrix object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.localX">
+<span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.localX" title="Link to this definition">¶</a></dt>
+<dd><p>Local vector for solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc vector object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.ksp">
+<span class="sig-name descname"><span class="pre">ksp</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.ksp" title="Link to this definition">¶</a></dt>
+<dd><p>Linear solver object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc solver object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes">
+<span class="sig-name descname"><span class="pre">snes</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes" title="Link to this definition">¶</a></dt>
+<dd><p>Nonlinear solver object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PETSc solver object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_itercount">
+<span class="sig-name descname"><span class="pre">snes_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Number of iterations done by nonlinear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls">
+<span class="sig-name descname"><span class="pre">snes_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of PETSc’s nonlinear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>,<a role="doc-backlink" href="#id10">3</a>)</span>
+<p>Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id11">3</a>)</span>
+<p>PETSc Web page. Satish Balay et al. <a class="reference external" href="https://petsc.org/">https://petsc.org/</a> (2023).</p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id6">2</a>,<a role="doc-backlink" href="#id12">3</a>)</span>
+<p>Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,
+Alejandro Cosimo. Advances in Water Resources (2011).</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -213,16 +423,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -233,18 +443,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1">
 <span class="sig-name descname"><span class="pre">solve_system_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.solve_system_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1" title="Link to this definition">¶</a></dt>
-<dd><p>Linear solver for (I-factor*A)u = rhs</p>
+<dd><p>Linear solver for (I - factor A)vec{u} = vec{rhs}.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution</p>
+<dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -255,18 +465,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2">
 <span class="sig-name descname"><span class="pre">solve_system_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.solve_system_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2" title="Link to this definition">¶</a></dt>
-<dd><p>Nonlinear solver for (I-factor*F)(u) = rhs</p>
+<dd><p>Nonlinear solver for (I - factor F)(vec{u}) = {rhs}.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution</p>
+<dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -277,13 +487,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t</p>
+<dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>exact solution</p>
+<dd class="field-even"><p><strong>me</strong> – Exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -297,7 +507,16 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">petsc_grayscott_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Du</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">petsc4py.PETSc.COMM_WORLD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlsol_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit" title="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc_grayscott_multiimplicit</span></code></a></p>
-<p>Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</p>
+<p>The Gray-Scott system <a class="footnote-reference brackets" href="#id7" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
+where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
+whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. This process is described by the two-dimensional model using periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by PETSc <a class="footnote-reference brackets" href="#id8" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the
+problem is treated <em>semi-implicitly</em>, i.e., the system with diffusion part is solved by PETSc’s linear solver.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -307,16 +526,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_semiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS</p>
+<dd class="field-even"><p><strong>f</strong> – Right-hand side of the problem.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -362,11 +581,13 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.GrayScott_2D_PETSc_periodic module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full"><code class="docutils literal notranslate"><span class="pre">GS_full</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.localX"><code class="docutils literal notranslate"><span class="pre">localX</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction"><code class="docutils literal notranslate"><span class="pre">formFunction()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian"><code class="docutils literal notranslate"><span class="pre">formJacobian()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction"><code class="docutils literal notranslate"><span class="pre">GS_reaction</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.localX"><code class="docutils literal notranslate"><span class="pre">localX</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction"><code class="docutils literal notranslate"><span class="pre">formFunction()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian"><code class="docutils literal notranslate"><span class="pre">formJacobian()</span></code></a></li>
 </ul>
@@ -378,6 +599,15 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit"><code class="docutils literal notranslate"><span class="pre">petsc_grayscott_multiimplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dy"><code class="docutils literal notranslate"><span class="pre">dy</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.AMat"><code class="docutils literal notranslate"><span class="pre">AMat</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.Id"><code class="docutils literal notranslate"><span class="pre">Id</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.localX"><code class="docutils literal notranslate"><span class="pre">localX</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.ksp"><code class="docutils literal notranslate"><span class="pre">ksp</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes"><code class="docutils literal notranslate"><span class="pre">snes</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_itercount"><code class="docutils literal notranslate"><span class="pre">snes_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls"><code class="docutils literal notranslate"><span class="pre">snes_ncalls</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

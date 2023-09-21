@@ -53,55 +53,145 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fenics_grayscott</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CG'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refinements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Du</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.086</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</p>
+<p>The Gray-Scott system <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
+where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
+whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. This process is described by the one-dimensional model using Dirichlet boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The <em>weak formulation</em> of the problem can be obtained by multiplying the
+system with a test function <span class="math notranslate nohighlight">\(q\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\int_\Omega u_t q dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,\]</div>
+<div class="math notranslate nohighlight">
+\[\int_\Omega v_t q dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,\]</div>
+<p>The spatial solve of the weak formulation is realized by FEniCS <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c_nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space.</p></li>
+<li><p><strong>t0</strong> (<em>float</em><em>, </em><em>optional</em>) – Starting time.</p></li>
+<li><p><strong>family</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates the family of elements used to create the function space
+for the trail and test functions. The default is ‘CG’, which are the class
+of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, see <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the order of the elements in the function space.</p></li>
+<li><p><strong>refinements</strong> (<em>list</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
+[2, 2] or (2, 2).</p></li>
+<li><p><strong>Du</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>Dv</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
+<li><p><strong>A</strong> (<em>float</em><em>, </em><em>optional</em>) – Feed rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
+<li><p><strong>B</strong> (<em>float</em><em>, </em><em>optional</em>) – Overall decay rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.V">
 <span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.V" title="Link to this definition">¶</a></dt>
-<dd><p>function space</p>
+<dd><p>Defines the function space of the trial and test functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>FunctionSpace</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w">
 <span class="sig-name descname"><span class="pre">w</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w" title="Link to this definition">¶</a></dt>
-<dd><p>function for the RHS</p>
+<dd><p>Function for the right-hand side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Function</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1">
 <span class="sig-name descname"><span class="pre">w1</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1" title="Link to this definition">¶</a></dt>
-<dd><p>split of w, part 1</p>
+<dd><p>Split of w, part 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Function</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2">
 <span class="sig-name descname"><span class="pre">w2</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2" title="Link to this definition">¶</a></dt>
-<dd><p>split of w, part 2</p>
+<dd><p>Split of w, part 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Function</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F1">
 <span class="sig-name descname"><span class="pre">F1</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F1" title="Link to this definition">¶</a></dt>
-<dd><p>weak form of RHS, first part</p>
+<dd><p>Weak form of right-hand side, first part.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F2">
 <span class="sig-name descname"><span class="pre">F2</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F2" title="Link to this definition">¶</a></dt>
-<dd><p>weak form of RHS, second part</p>
+<dd><p>Weak form of right-hand side, second part.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F">
 <span class="sig-name descname"><span class="pre">F</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F" title="Link to this definition">¶</a></dt>
-<dd><p>weak form of RHS, full</p>
+<dd><p>Weak form of full right-hand side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M">
 <span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M" title="Link to this definition">¶</a></dt>
-<dd><p>full mass matrix for both parts</p>
+<dd><p>Full mass matrix for both parts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matrix</p>
+</dd>
+</dl>
 </dd></dl>
 
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+Wells and others. Springer (2012).</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.dtype_f" title="Link to this definition">¶</a></dt>
@@ -148,7 +238,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
+<dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>
@@ -165,7 +255,7 @@
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
+<dd class="field-even"><p><strong>me</strong> – Exact solution (only at <span class="math notranslate nohighlight">\(t_0 = 0.0\)</span>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>

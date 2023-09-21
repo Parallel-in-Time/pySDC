@@ -49,6 +49,7 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
@@ -96,8 +97,6 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.A">(allencahn_front_fullyimplicit attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.A">(allencahn_front_semiimplicit attribute)</a>
-</li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.A">(allencahn_fullyimplicit attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A">(allencahn_periodic_fullyimplicit attribute)</a>
@@ -108,9 +107,15 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.A">(generalized_fisher attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.A">(GenericNDimFinDiff attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.A">(heat2d_petsc_forced attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.A">(heatNd_forced attribute)</a>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.A">(heatNd_unforced attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.A">(petsc_fisher_multiimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.A">(Quench attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.A">(testequation0d attribute)</a>
 </li>
@@ -159,10 +164,10 @@
 </li>
       <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.add_variable">add_variable() (ConvergenceController method)</a>
 </li>
-      <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex">advectiondiffusion1d_imex (class in implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex">advectiondiffusion1d_imex (class in implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit">advectiondiffusion1d_implicit (class in implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">advectionNd (class in implementations.problem_classes.AdvectionEquation_ND_FD)</a>
@@ -219,6 +224,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep.alpha">(MultiStep attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.AMat">AMat (petsc_grayscott_multiimplicit attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix">apply_mass_matrix() (fenics_heat method)</a>
 
       <ul>
@@ -270,6 +277,8 @@
       <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc">bc (fenics_heat attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc">(fenics_heat_mass attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.bc">(fenics_heat_weak_fullyimplicit attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.bc">(fenics_heat_weak_imex attribute)</a>
@@ -406,6 +415,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.SpaceTransfer.html#core.SpaceTransfer.space_transfer.coarse_prob">coarse_prob (space_transfer attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.col">col (Fisher_full attribute)</a>
 </li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.coll">coll (sweeper attribute)</a>
 </li>
@@ -933,8 +944,6 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx">(allencahn_front_fullyimplicit attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx">(allencahn_front_semiimplicit attribute)</a>
-</li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.dx">(allencahn_fullyimplicit attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dx">(allencahn_imex attribute)</a>
@@ -943,13 +952,19 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dx">(allencahn_temp_imex attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dx">(fermi_pasta_ulam_tsingou attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher.dx">(generalized_fisher attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dx">(GenericNDimFinDiff property)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dx">(heat2d_petsc_forced attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dx">(heatNd_forced attribute)</a>
+        <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.dx">(petsc_fisher_multiimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dx">(petsc_grayscott_multiimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.dx">(Quench attribute)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dy">dy (allencahn_imex attribute)</a>
@@ -958,6 +973,8 @@
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dy">(allencahn_temp_imex attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.dy">(heat2d_petsc_forced attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.dy">(petsc_grayscott_multiimplicit attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1172,6 +1189,8 @@
 </li>
       <li><a href="pySDC/core.Level.html#core.Level.level.f">f (level attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.F">F (petsc_fisher_multiimplicit attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f">f() (bdf2 method)</a>
 
       <ul>
@@ -1236,6 +1255,8 @@
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.fft">(allencahn_temp_imex attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.fft">(grayscott_imex_diffusion attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.fft">(grayscott_mi_diffusion attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.fft">(nonlinearschroedinger_imex attribute)</a>
 </li>
@@ -1307,13 +1328,19 @@
       <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g">g (fenics_heat attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.g">(fenics_heat_mass attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.g">(fenics_heat_weak_fullyimplicit attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.g">(fenics_heat_weak_imex attribute)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G">G (outer_solar_system attribute)</a>
+      <li><a href="pySDC/implementations.problem_classes.FullSolarSystem.html#implementations.problem_classes.FullSolarSystem.full_solar_system.G">G (full_solar_system attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.OuterSolarSystem.html#id0">(outer_solar_system attribute)</a>, <a href="pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system.G">[1]</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.gamma">gamma (ARK548L2SAESDIRK2 attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html#implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.generalized_fisher">generalized_fisher (class in implementations.problem_classes.GeneralizedFisher_1D_FD_implicit)</a>
@@ -1430,10 +1457,10 @@
 </li>
       <li><a href="pySDC/core.Sweeper.html#core.Sweeper.sweeper.get_Qdelta_implicit">get_Qdelta_implicit() (sweeper method)</a>
 </li>
-      <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat">get_scalar_problems_manysweep_mat() (imex_1st_order method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat">get_scalar_problems_manysweep_mat() (imex_1st_order method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">get_scalar_problems_manysweep_mats() (boris_2nd_order method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">get_scalar_problems_picardsweep_mats() (boris_2nd_order method)</a>
@@ -1658,7 +1685,15 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.Id">(boussinesq_2d_imex attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.Id">(GenericNDimFinDiff attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.Id">(heat2d_petsc_forced attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.Id">(heatNd_unforced attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.Id">(petsc_grayscott_multiimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.Id">(Quench attribute)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.imex_1st_order.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order">imex_1st_order (class in implementations.sweeper_classes.imex_1st_order)</a>
@@ -2066,6 +2101,8 @@
         <li><a href="pySDC/implementations.problem_classes.FullSolarSystem.html#module-implementations.problem_classes.FullSolarSystem">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
 
@@ -2073,8 +2110,6 @@
         <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html#module-implementations.problem_classes.GeneralizedFisher_1D_FD_implicit">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_PETSc
 
@@ -2432,12 +2467,6 @@
         <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec.irecv">(petsc_vec method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.irfft_object">irfft_object (allencahn2d_imex attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.irfft_object">[1]</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.irfft_object">(allencahn2d_imex_stab attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.irfft_object">[1]</a>
-</li>
-      </ul></li>
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh_FFT.html#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine">irfft_object_fine (mesh_to_mesh_fft attribute)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">isend() (cupy_mesh method)</a>
@@ -2485,12 +2514,22 @@
   </ul></td>
 </tr></table>
 
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.J">J (petsc_fisher_multiimplicit attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K">K (fenics_heat attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.K">(fenics_heat_mass attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.K">(fenics_vortex_2d attribute)</a>
 </li>
       </ul></li>
@@ -2502,14 +2541,32 @@
         <li><a href="pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.K2">(nonlinearschroedinger_imex attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp">ksp (heat2d_petsc_forced attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.ksp">(petsc_fisher_multiimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.ksp">(petsc_grayscott_multiimplicit attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp">ksp (heat2d_petsc_forced attribute)</a>
+      <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp_itercount">ksp_itercount (heat2d_petsc_forced attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp_ncalls">ksp_ncalls (heat2d_petsc_forced attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Ku">Ku (grayscott_imex_diffusion attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.Ku">(grayscott_mi_diffusion attribute)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.Kv">Kv (grayscott_imex_diffusion attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.Kv">(grayscott_mi_diffusion attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -2528,6 +2585,8 @@
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.lap">(allencahn2d_imex_stab attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.lap">[1]</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.leak">leak (Quench attribute)</a>
+</li>
       <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.left_is_node">left_is_node (CollBase attribute)</a>
 </li>
       <li><a href="pySDC/core.Level.html#core.Level.level">level (class in core.Level)</a>
@@ -2542,10 +2601,40 @@
       </ul></li>
       <li><a href="pySDC/core.Level.html#core.Level.level.level_index">level_index (level attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Step.html#core.Step.step.levels">levels (step attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount">lin_itercount (allencahn_front_fullyimplicit attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_itercount">(allencahn_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount">(allencahn_periodic_fullyimplicit attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls">lin_ncalls (allencahn_front_fullyimplicit attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.lin_ncalls">(allencahn_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls">(allencahn_periodic_fullyimplicit attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.localX">localX (Fisher_full attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction.localX">(Fisher_reaction attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.localX">(GS_full attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.localX">(GS_reaction attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.localX">(petsc_fisher_multiimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.localX">(petsc_grayscott_multiimplicit attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.log">log() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/core.BaseTransfer.html#core.BaseTransfer.base_transfer.logger">logger (base_transfer attribute)</a>
@@ -2582,6 +2671,8 @@
         <li><a href="pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M">(fenics_grayscott attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.M">(fenics_heat attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.M">(fenics_heat_mass attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.M">(fenics_heat_weak_fullyimplicit attribute)</a>
 </li>
@@ -2921,6 +3012,8 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep">MultiStep (class in implementations.sweeper_classes.Multistep)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.mx">mx (Fisher_full attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -2936,20 +3029,34 @@
       <ul>
         <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.ndim">(grayscott_imex_diffusion attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.ndim">(grayscott_mi_diffusion attribute)</a>
+</li>
       </ul></li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.newfig">newfig() (in module helpers.plot_helper)</a>
 </li>
-      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.newton_itercount">newton_itercount (battery_implicit attribute)</a>
+      <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount">newton_itercount (allencahn_front_fullyimplicit attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_itercount">(allencahn_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount">(allencahn_periodic_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.newton_itercount">(battery_implicit attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount">(DiscontinuousTestODE attribute)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.Auzinger_implicit.html#implementations.problem_classes.Auzinger_implicit.auzinger.newton_maxiter">newton_maxiter (auzinger attribute)</a>
 </li>
-      <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.newton_ncalls">newton_ncalls (battery_implicit attribute)</a>
+      <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls">newton_ncalls (allencahn_front_fullyimplicit attribute)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.newton_ncalls">(allencahn_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls">(allencahn_periodic_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit.newton_ncalls">(battery_implicit attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls">(DiscontinuousTestODE attribute)</a>
 </li>
       </ul></li>
@@ -3030,6 +3137,10 @@
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.ones">ones (fermi_pasta_ulam_tsingou attribute)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.OuterSolarSystem.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system">outer_solar_system (class in implementations.problem_classes.OuterSolarSystem)</a>
 </li>
@@ -3415,12 +3526,6 @@
         <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.return_stats">(hooks method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.rfft_object">rfft_object (allencahn2d_imex attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex.rfft_object">[1]</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.rfft_object">(allencahn2d_imex_stab attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.rfft_object">[1]</a>
-</li>
-      </ul></li>
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh_FFT.html#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse">rfft_object_coarse (mesh_to_mesh_fft attribute)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh">rhs_fenics_mesh (class in implementations.datatype_classes.fenics_mesh)</a>
@@ -3438,6 +3543,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">RKN (class in implementations.sweeper_classes.Runge_Kutta_Nystrom)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.row">row (Fisher_full attribute)</a>
 </li>
       <li><a href="pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh.Rspace">Rspace (mesh_to_mesh attribute)</a>, <a href="pySDC/implementations.transfer_classes.TransferMesh_NoCoarse.html#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.Rspace">[1]</a>
 
@@ -3574,6 +3681,16 @@
       <li><a href="pySDC/helpers.visualization_tools.html#helpers.visualization_tools.show_residual_across_simulation">show_residual_across_simulation() (in module helpers.visualization_tools)</a>
 </li>
       <li><a href="pySDC/core.Collocation.html#core.Collocation.CollBase.Smat">Smat (CollBase attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.snes">snes (petsc_fisher_multiimplicit attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes">(petsc_grayscott_multiimplicit attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_itercount">snes_itercount (petsc_grayscott_multiimplicit attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls">snes_ncalls (petsc_grayscott_multiimplicit attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.solve_system">solve_system() (acoustic_1d_imex method)</a>
 
@@ -3835,8 +3952,12 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/core.Level.html#core.Level.level.u">u (level attribute)</a>
+      <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.u">u (fenics_heat_weak_imex attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.Level.html#core.Level.level.u">(level attribute)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.u_exact">u_exact() (acoustic_1d_imex method)</a>
 
       <ul>
@@ -3939,6 +4060,8 @@
       </ul></li>
       <li><a href="pySDC/core.Level.html#core.Level.level.uend">uend (level attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext">uext (allencahn_front_fullyimplicit attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.unflatten.html#implementations.problem_classes.boussinesq_helpers.unflatten.unflatten">unflatten() (in module implementations.problem_classes.boussinesq_helpers.unflatten)</a>
 </li>
       <li><a href="pySDC/core.Errors.html#core.Errors.UnlockError">UnlockError</a>
@@ -3986,15 +4109,19 @@
       <ul>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.V">(fenics_heat attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.V">(fenics_heat_mass attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.V">(fenics_heat_weak_fullyimplicit attribute)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.V">(fenics_heat_weak_imex attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V">(fenics_vortex_2d attribute)</a>
-</li>
       </ul></li>
+      <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.v">v (fenics_heat_weak_imex attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V">V (fenics_vortex_2d attribute)</a>
+</li>
       <li><a href="pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.fenics_mesh.values">values (fenics_mesh attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol">vanderpol (class in implementations.problem_classes.Van_der_Pol_implicit)</a>
@@ -4017,8 +4144,6 @@
 
       <ul>
         <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.w">(fenics_heat_weak_fullyimplicit attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.w">(fenics_heat_weak_imex attribute)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1">w1 (fenics_grayscott attribute)</a>
@@ -4090,11 +4215,13 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.X">(grayscott_imex_diffusion attribute)</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.X">(grayscott_mi_diffusion attribute)</a>
+</li>
         <li><a href="pySDC/implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex.X">(nonlinearschroedinger_imex attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.xv">xv (Quench attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.xvalues">xvalues (advectiondiffusion1d_imex attribute)</a>
 
       <ul>
@@ -4102,7 +4229,19 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.xvalues">(allencahn2d_imex_stab attribute)</a>, <a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab.xvalues">[1]</a>
 </li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues">(allencahn_front_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.xvalues">(allencahn_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues">(allencahn_periodic_fullyimplicit attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.FermiPastaUlamTsingou.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.xvalues">(fermi_pasta_ulam_tsingou attribute)</a>
+</li>
+        <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.xvalues">(GenericNDimFinDiff attribute)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.xx">xx (boussinesq_2d_imex attribute)</a>
 </li>
   </ul></td>

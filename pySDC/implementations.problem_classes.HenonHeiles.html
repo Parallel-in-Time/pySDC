@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,7 +53,15 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.HenonHeiles.henon_heiles">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">henon_heiles</span></span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the harmonic oscillator</p>
+<p>This class implements the second-order Hénon-Heiles system</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2 x}{dt^2} = - x - 2 x y,\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{d^2 y}{dt} = - y - x^2 + y^2\]</div>
+<p>with Hamiltonian</p>
+<div class="math notranslate nohighlight">
+\[H = 0.5 \left[\left(\frac{d x}{d t}\right)^2 + \left(\frac{d y}{d t}\right)^2\right] + 0.5 \left(x^2 + y^2)
+    + x^2 y - \frac{y^3}{3}.\]</div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HenonHeiles.henon_heiles.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.dtype_f" title="Link to this definition">¶</a></dt>

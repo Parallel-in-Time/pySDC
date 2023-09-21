@@ -56,7 +56,7 @@
 <p>Example implementing the unforced one-dimensional advection diffusion equation</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}\]</div>
-<p>with periodic boundary conditions in <span class="math notranslate nohighlight">\([-L/2, L/2]\)</span> in spectral space. The advection part
+<p>with periodic boundary conditions in <span class="math notranslate nohighlight">\([-\frac{L}{2}, \frac{L}{2}]\)</span> in spectral space. The advection part
 <span class="math notranslate nohighlight">\(- c \frac{\partial u(x,t)}{\partial x}\)</span> is treated explicitly, whereas the diffusion part
 <span class="math notranslate nohighlight">\(\nu \frac{\partial^2 u(x,t)}{\partial x^2}\)</span> will be treated numerically in an implicit way. The exact solution is
 given by</p>
@@ -68,10 +68,10 @@ discretization.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of points in spatial discretization.</p></li>
-<li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed.</p></li>
+<li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed <span class="math notranslate nohighlight">\(c\)</span>.</p></li>
 <li><p><strong>freq</strong> (<em>int</em><em>, </em><em>optional</em>) – Wave number <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
-<li><p><strong>L</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
+<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
 </ul>
 </dd>
 </dl>
@@ -188,9 +188,8 @@ discretization.</p>
 <p>Example implementing the unforced one-dimensional advection diffusion equation</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}\]</div>
-<p>with periodic boundary conditions in <span class="math notranslate nohighlight">\([-L/2, L/2]\)</span> in spectral space. This class implements the problem solving it
-with fully-implicit time-stepping. The exact solution is
-given by</p>
+<p>with periodic boundary conditions in <span class="math notranslate nohighlight">\([-\frac{L}{2}, \frac{L}{2}]\)</span> in spectral space. This class implements the
+problem solving it with fully-implicit time-stepping. The exact solution is given by</p>
 <div class="math notranslate nohighlight">
 \[u(x, t) = \sin(\omega (x - c t)) \exp(-t \nu \omega^2)\]</div>
 <p>for <span class="math notranslate nohighlight">\(\omega=2 \pi k\)</span>, where <span class="math notranslate nohighlight">\(k\)</span> denotes the wave number. Fast Fourier transform is used for the spatial

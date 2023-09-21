@@ -70,23 +70,24 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    Vs : float</span>
+<span class="sd">    Vs : float, optional</span>
 <span class="sd">        Voltage at the voltage source :math:`V_s`.</span>
-<span class="sd">    Rs : float</span>
+<span class="sd">    Rs : float, optional</span>
 <span class="sd">        Resistance of the resistor :math:`R_s` at the voltage source.</span>
-<span class="sd">    C1 : float</span>
+<span class="sd">    C1 : float, optional</span>
 <span class="sd">        Capacitance of the capacitor :math:`C_1`.</span>
-<span class="sd">    Rpi : float</span>
+<span class="sd">    Rpi : float, optional</span>
 <span class="sd">        Resistance of the resistor :math:`R_\pi`.</span>
-<span class="sd">    Lpi : float</span>
+<span class="sd">    Lpi : float, optional</span>
 <span class="sd">        Inductance of the inductor :math:`L_\pi`.</span>
-<span class="sd">    C2 : float</span>
+<span class="sd">    C2 : float, optional</span>
 <span class="sd">        Capacitance of the capacitor :math:`C_2`.</span>
-<span class="sd">    Rl : float</span>
+<span class="sd">    Rl : float, optional</span>
 <span class="sd">        Resistance of the resistive load :math:`R_\ell`.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        A: system matrix, representing the 3 ODEs</span>
+<span class="sd">    A : np.2darray</span>
+<span class="sd">        Coefficient matrix of the linear ODE system.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>

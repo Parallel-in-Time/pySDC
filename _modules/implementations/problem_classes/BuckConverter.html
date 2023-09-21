@@ -82,29 +82,30 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    duty : float</span>
+<span class="sd">    duty : float, optional</span>
 <span class="sd">        Cycle between zero and one indicates the time period how long the converter stays on one switching state</span>
 <span class="sd">        until it switches to the other state.</span>
-<span class="sd">    fsw : int</span>
+<span class="sd">    fsw : int, optional</span>
 <span class="sd">        Switching frequency, it is used to determine the number of time steps after the switching state is changed.</span>
-<span class="sd">    Vs : float</span>
+<span class="sd">    Vs : float, optional</span>
 <span class="sd">        Voltage at the voltage source :math:`V_s`.</span>
-<span class="sd">    Rs : float</span>
+<span class="sd">    Rs : float, optional</span>
 <span class="sd">        Resistance of the resistor :math:`R_s` at the voltage source.</span>
-<span class="sd">    C1 : float</span>
+<span class="sd">    C1 : float, optional</span>
 <span class="sd">        Capacitance of the capacitor :math:`C_1`.</span>
-<span class="sd">    Rp : float</span>
-<span class="sd">        Resistance of the resistor in front of the inductor.</span>
-<span class="sd">    L1 : float</span>
+<span class="sd">    Rp : float, optional</span>
+<span class="sd">        Resistance of the resistor in front of the inductor :math:`R_\pi`.</span>
+<span class="sd">    L1 : float, optional</span>
 <span class="sd">        Inductance of the inductor :math:`L_1`.</span>
-<span class="sd">    C2 : float</span>
+<span class="sd">    C2 : float, optional</span>
 <span class="sd">        Capacitance of the capacitor :math:`C_2`.</span>
-<span class="sd">    Rl : float</span>
+<span class="sd">    Rl : float, optional</span>
 <span class="sd">        Resistance of the resistor :math:`R_\pi`</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">        A: system matrix, representing the 3 ODEs</span>
+<span class="sd">    A : np.2darray</span>
+<span class="sd">        Coefficient matrix of the ODE system.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>

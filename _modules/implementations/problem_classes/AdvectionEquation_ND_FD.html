@@ -48,7 +48,11 @@
 <span class="k">class</span> <span class="nc">advectionNd</span><span class="p">(</span><span class="n">GenericNDimFinDiff</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Example implementing the unforced ND advection equation with periodic</span>
-<span class="sd">    or Dirichlet boundary conditions in :math:`[0,1]^N`,</span>
+<span class="sd">    or Dirichlet boundary conditions in :math:`[0,1]^N`</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = -c \frac{\partial u}{\partial x},</span>
+
 <span class="sd">    and initial solution of the form</span>
 
 <span class="sd">    .. math::</span>
@@ -91,10 +95,10 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    A: sparse matrix (CSC)</span>
+<span class="sd">    A : sparse matrix (CSC)</span>
 <span class="sd">        FD discretization matrix of the ND grad operator.</span>
-<span class="sd">    Id: sparse matrix (CSC)</span>
-<span class="sd">        Identity matrix of the same dimension as A</span>
+<span class="sd">    Id : sparse matrix (CSC)</span>
+<span class="sd">        Identity matrix of the same dimension as A.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -126,7 +130,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

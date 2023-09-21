@@ -53,7 +53,7 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Quench</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.45,</span> <span class="pre">0.55)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_transition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'neumann-zero'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_sol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scipy'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#Quench"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.Quench" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>This is a toy problem to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
+<p>This is a toy problem <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
 However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
 sufficiently, there will be a runaway effect heating up the entire magnet.
 This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.</p>
@@ -61,6 +61,96 @@ This effect has actually lead to huge magnets being destroyed at CERN in the pas
 insulated from its environment except for the leak.
 We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
 leak itself.</p>
+<p>The problem is discretised with finite difference in space and treated <em>fully-implicitly</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Cv</strong> (<em>float</em><em>, </em><em>optional</em>) – Volumetric heat capacity.</p></li>
+<li><p><strong>K</strong> (<em>float</em><em>, </em><em>optional</em>) – Thermal conductivity.</p></li>
+<li><p><strong>u_thresh</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold for temperature.</p></li>
+<li><p><strong>u_max</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum temperature.</p></li>
+<li><p><strong>Q_max</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum heat source power density.</p></li>
+<li><p><strong>leak_range</strong> (<em>tuple</em><em> of </em><em>float</em>) – Range of the leak.</p></li>
+<li><p><strong>leak_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of leak, choose between ‘linear’ or ‘exponential’.</p></li>
+<li><p><strong>leak_transition</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates how the heat in the leak propagates (?), choose between ‘step’ and ‘Gaussian’.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the finite difference discretization.</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of stencil for finite differences.</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is ‘neumann-zero’.</p></li>
+<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton to terminate.</p></li>
+<li><p><strong>newton_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of Newton iterations to be done.</p></li>
+<li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for linear solver to be done.</p></li>
+<li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of linear iterations inside the Newton solver.</p></li>
+<li><p><strong>direct_solver</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates if a direct solver should be used.</p></li>
+<li><p><strong>reference_sol_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates which method should be used to compute a reference solution.
+Choose between ‘scipy’, ‘SDC’, or ‘DIRK’.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.A" title="Link to this definition">¶</a></dt>
+<dd><p>FD discretization matrix of the ND grad operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.Id">
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.Id" title="Link to this definition">¶</a></dt>
+<dd><p>Identity matrix of the same dimension as A.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.dx">
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.dx" title="Link to this definition">¶</a></dt>
+<dd><p>Distance between two spatial nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.xv">
+<span class="sig-name descname"><span class="pre">xv</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.xv" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.leak">
+<span class="sig-name descname"><span class="pre">leak</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.leak" title="Link to this definition">¶</a></dt>
+<dd><p>Indicates the leak.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray of bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id3">2</a>)</span>
+<p>Thermal thin shell approximation towards finite element quench simulation. E. Schnaubelt, M. Wozniak, S. Schöps.
+Supercond. Sci. Technol. 36 044004. DOI 10.1088/1361-6668/acbeea</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.dtype_f" title="Link to this definition">¶</a></dt>
@@ -175,6 +265,15 @@ leak itself.</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.QuenchIMEX">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QuenchIMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.45,</span> <span class="pre">0.55)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_transition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'neumann-zero'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_sol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scipy'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#QuenchIMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.QuenchIMEX" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.Quench.Quench" title="implementations.problem_classes.Quench.Quench"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quench</span></code></a></p>
+<p>This is a toy problem <a class="footnote-reference brackets" href="#id2" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
+However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
+sufficiently, there will be a runaway effect heating up the entire magnet.
+This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.</p>
+<p>The model we use is a 1d heat equation with Neumann-zero boundary conditions, meaning this magnet is totally
+insulated from its environment except for the leak.
+We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
+leak itself.</p>
+<p>The problem is discretised with finite difference in space and treated <em>semi-implicitly</em>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.QuenchIMEX.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.Quench.QuenchIMEX.dtype_f" title="Link to this definition">¶</a></dt>
@@ -256,6 +355,11 @@ leak itself.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Quench module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench"><code class="docutils literal notranslate"><span class="pre">Quench</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.Id"><code class="docutils literal notranslate"><span class="pre">Id</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.xv"><code class="docutils literal notranslate"><span class="pre">xv</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.leak"><code class="docutils literal notranslate"><span class="pre">leak</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Quench.Quench.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

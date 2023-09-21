@@ -147,16 +147,16 @@ the following equations:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ncapacitors</strong> (<em>int</em>) – Number of capacitors in the circuit.</p></li>
-<li><p><strong>Vs</strong> (<em>float</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
-<li><p><strong>Rs</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
-<li><p><strong>C</strong> (<em>np.ndarray</em>) – Capacitances of the capacitors. Length of array must equal to number of capacitors.</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – Resistance for the load.</p></li>
-<li><p><strong>L</strong> (<em>float</em>) – Inductance of inductor.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – Factor greater than zero to describe the storage of the capacitor(s).</p></li>
-<li><p><strong>V_ref</strong> (<em>float</em>) – Reference value greater than zero for the battery to switch to the voltage source.</p></li>
-<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Number of maximum iterations for the Newton solver.</p></li>
-<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for determination of the Newton solver.</p></li>
+<li><p><strong>ncapacitors</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of capacitors in the circuit.</p></li>
+<li><p><strong>Vs</strong> (<em>float</em><em>, </em><em>optional</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C</strong> (<em>np.1darray</em><em>, </em><em>optional</em>) – Capacitances of the capacitors. Length of array must equal to number of capacitors.</p></li>
+<li><p><strong>R</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance for the load <span class="math notranslate nohighlight">\(R_\ell\)</span>.</p></li>
+<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Inductance of inductor <span class="math notranslate nohighlight">\(L\)</span>.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor greater than zero to describe the storage of the capacitor(s).</p></li>
+<li><p><strong>V_ref</strong> (<em>float</em><em>, </em><em>optional</em>) – Reference value greater than zero for the battery to switch to the voltage source.</p></li>
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of maximum iterations for the Newton solver.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for determination of the Newton solver.</p></li>
 </ul>
 </dd>
 </dl>
@@ -248,14 +248,14 @@ ordinary differential equations (ODEs)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ncapacitors</strong> (<em>int</em>) – Number of capacitors <span class="math notranslate nohighlight">\(n_{capacitors}\)</span> in the circuit.</p></li>
-<li><p><strong>Vs</strong> (<em>float</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
-<li><p><strong>Rs</strong> (<em>float</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
-<li><p><strong>C</strong> (<em>np.ndarray</em>) – Capacitances of the capacitors.</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – Resistance for the load.</p></li>
-<li><p><strong>L</strong> (<em>float</em>) – Inductance of inductor.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – Factor greater than zero to describe the storage of the capacitor(s).</p></li>
-<li><p><strong>V_ref</strong> (<em>np.ndarray</em>) – Array contains the reference values greater than zero for each capacitor to switch to the next energy source.</p></li>
+<li><p><strong>ncapacitors</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of capacitors <span class="math notranslate nohighlight">\(n_{capacitors}\)</span> in the circuit.</p></li>
+<li><p><strong>Vs</strong> (<em>float</em><em>, </em><em>optional</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C</strong> (<em>np.1darray</em><em>, </em><em>optional</em>) – Capacitances of the capacitors <span class="math notranslate nohighlight">\(C_n\)</span>.</p></li>
+<li><p><strong>R</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance for the load <span class="math notranslate nohighlight">\(R_\ell\)</span>.</p></li>
+<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Inductance of inductor <span class="math notranslate nohighlight">\(L\)</span>.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor greater than zero to describe the storage of the capacitor(s).</p></li>
+<li><p><strong>V_ref</strong> (<em>np.1darray</em><em>, </em><em>optional</em>) – Array contains the reference values greater than zero for each capacitor to switch to the next energy source.</p></li>
 </ul>
 </dd>
 </dl>

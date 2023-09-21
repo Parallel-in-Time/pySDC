@@ -48,14 +48,33 @@
 <div class="viewcode-block" id="harmonic_oscillator">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HarmonicOscillator.html#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator">[docs]</a>
 <span class="k">class</span> <span class="nc">harmonic_oscillator</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the harmonic oscillator</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the harmonic oscillator with mass :math:`1`</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},</span>
+
+<span class="sd">    which is a second-order problem. The unknown function :math:`x` denotes the position of the mass, and the</span>
+<span class="sd">    derivative is the velocity. :math:`\mu` defines the damping and :math:`k` is the spring constant.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    k : float, optional</span>
+<span class="sd">        Spring constant :math:`k`.</span>
+<span class="sd">    mu : float, optional</span>
+<span class="sd">        Damping parameter :math:`\mu`.</span>
+<span class="sd">    u0 : tuple, optional</span>
+<span class="sd">        Initial condition for the position, and the velocity. Should be a tuple, e.g. (1, 0).</span>
+<span class="sd">    phase : float, optional</span>
+<span class="sd">        Phase of the oscillation.</span>
+<span class="sd">    amp : float, optional</span>
+<span class="sd">        Amplitude of the oscillation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">particles</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">acceleration</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">phase</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">amp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">phase</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">amp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="c1"># invoke super init, passing nparts, dtype_u and dtype_f</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -175,7 +194,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        u : dtype_u</span>
-<span class="sd">            Current values of The particles.</span>
+<span class="sd">            Current values of the particles.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

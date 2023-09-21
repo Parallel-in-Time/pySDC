@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_Boussinesq_2D_FD_imex_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.1">coverage.py v7.3.1</a>,
-            created at 2023-09-19 14:10 +0000
+            created at 2023-09-21 10:37 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -103,34 +103,34 @@
     <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="str">    Parameters</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t"><span class="str">    ----------</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="str">    ncapacitors : int</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="str">    ncapacitors : int, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="str">        Number of capacitors :math:`n_{capacitors}` in the circuit.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t"><span class="str">    Vs : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t"><span class="str">    Vs : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="str">        Voltage at the voltage source :math:`V_s`.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="str">    Rs : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="str">    Rs : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t"><span class="str">        Resistance of the resistor :math:`R_s` at the voltage source.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    C : np.ndarray</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t"><span class="str">        Capacitances of the capacitors.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t"><span class="str">    R : float</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="str">        Resistance for the load.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t"><span class="str">    L : float</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t"><span class="str">        Inductance of inductor.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t"><span class="str">    alpha : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    C : np.1darray, optional</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t"><span class="str">        Capacitances of the capacitors :math:`C_n`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t"><span class="str">    R : float, optional</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="str">        Resistance for the load :math:`R_\ell`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t"><span class="str">    L : float, optional</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t"><span class="str">        Inductance of inductor :math:`L`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t"><span class="str">    alpha : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t"><span class="str">        Factor greater than zero to describe the storage of the capacitor(s).</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t"><span class="str">    V_ref : np.ndarray</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t"><span class="str">    V_ref : np.1darray, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t"><span class="str">        Array contains the reference values greater than zero for each capacitor to switch to the next energy source.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t"><span class="str">    Attributes</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t"><span class="str">    ----------</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t"><span class="str">    A: matrix</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t"><span class="str">    A : matrix</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t"><span class="str">        Coefficients matrix of the linear system of ordinary differential equations (ODEs).</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t"><span class="str">    switch_A: dict</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t"><span class="str">    switch_A : dict</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t"><span class="str">        Dictionary that contains the coefficients for the coefficient matrix A.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t"><span class="str">    switch_f: dict</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t"><span class="str">    switch_f : dict</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t"><span class="str">        Dictionary that contains the coefficients of the right-hand side f of the ODE system.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t"><span class="str">    t_switch: float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t"><span class="str">    t_switch : float</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t"><span class="str">        Time point of the discrete event found by switch estimation.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t"><span class="str">    nswitches: int</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t"><span class="str">    nswitches : int</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t"><span class="str">        Number of switches found by switch estimation.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t"><span class="str">    Note</span>&nbsp;</span><span class="r"></span></p>
@@ -482,25 +482,25 @@
     <p class="pln"><span class="n"><a id="t400" href="#t400">400</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t401" href="#t401">401</a></span><span class="t"><span class="str">    Parameters</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t402" href="#t402">402</a></span><span class="t"><span class="str">    ----------</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t403" href="#t403">403</a></span><span class="t"><span class="str">    ncapacitors : int</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t403" href="#t403">403</a></span><span class="t"><span class="str">    ncapacitors : int, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t404" href="#t404">404</a></span><span class="t"><span class="str">        Number of capacitors in the circuit.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t"><span class="str">    Vs : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t"><span class="str">    Vs : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t406" href="#t406">406</a></span><span class="t"><span class="str">        Voltage at the voltage source :math:`V_s`.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t"><span class="str">    Rs : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t"><span class="str">    Rs : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t408" href="#t408">408</a></span><span class="t"><span class="str">        Resistance of the resistor :math:`R_s` at the voltage source.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t409" href="#t409">409</a></span><span class="t"><span class="str">    C : np.ndarray</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t409" href="#t409">409</a></span><span class="t"><span class="str">    C : np.1darray, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t410" href="#t410">410</a></span><span class="t"><span class="str">        Capacitances of the capacitors. Length of array must equal to number of capacitors.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t411" href="#t411">411</a></span><span class="t"><span class="str">    R : float</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t412" href="#t412">412</a></span><span class="t"><span class="str">        Resistance for the load.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t413" href="#t413">413</a></span><span class="t"><span class="str">    L : float</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t414" href="#t414">414</a></span><span class="t"><span class="str">        Inductance of inductor.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t415" href="#t415">415</a></span><span class="t"><span class="str">    alpha : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t411" href="#t411">411</a></span><span class="t"><span class="str">    R : float, optional</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t412" href="#t412">412</a></span><span class="t"><span class="str">        Resistance for the load :math:`R_\ell`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t413" href="#t413">413</a></span><span class="t"><span class="str">    L : float, optional</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t414" href="#t414">414</a></span><span class="t"><span class="str">        Inductance of inductor :math:`L`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t415" href="#t415">415</a></span><span class="t"><span class="str">    alpha : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t416" href="#t416">416</a></span><span class="t"><span class="str">        Factor greater than zero to describe the storage of the capacitor(s).</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t417" href="#t417">417</a></span><span class="t"><span class="str">    V_ref : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t417" href="#t417">417</a></span><span class="t"><span class="str">    V_ref : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t418" href="#t418">418</a></span><span class="t"><span class="str">        Reference value greater than zero for the battery to switch to the voltage source.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t419" href="#t419">419</a></span><span class="t"><span class="str">    newton_maxiter : int</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t419" href="#t419">419</a></span><span class="t"><span class="str">    newton_maxiter : int, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t420" href="#t420">420</a></span><span class="t"><span class="str">        Number of maximum iterations for the Newton solver.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t421" href="#t421">421</a></span><span class="t"><span class="str">    newton_tol : float</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t421" href="#t421">421</a></span><span class="t"><span class="str">    newton_tol : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t422" href="#t422">422</a></span><span class="t"><span class="str">        Tolerance for determination of the Newton solver.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t423" href="#t423">423</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t424" href="#t424">424</a></span><span class="t"><span class="str">    Attributes</span>&nbsp;</span><span class="r"></span></p>
@@ -651,7 +651,7 @@
             <a id="nextFileLink" class="nav" href="d_91faa57f8583c837_Boussinesq_2D_FD_imex_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.1">coverage.py v7.3.1</a>,
-            created at 2023-09-19 14:10 +0000
+            created at 2023-09-21 10:37 +0000
         </p>
     </div>
 </footer>

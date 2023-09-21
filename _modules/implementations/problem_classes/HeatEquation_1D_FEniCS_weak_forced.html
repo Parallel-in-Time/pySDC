@@ -50,30 +50,76 @@
 <div class="viewcode-block" id="fenics_heat_weak_fullyimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">fenics_heat_weak_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        V: function space</span>
-<span class="sd">        w: function for weak form</span>
-<span class="sd">        a_K: weak form of RHS (incl. BC)</span>
-<span class="sd">        M: mass matrix for FEM</span>
-<span class="sd">        g: forcing term</span>
-<span class="sd">        bc: boundary conditions</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
+
+<span class="sd">    The exact solution of the problem is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = \sin(\pi x)\cos(t).</span>
+
+<span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem</span>
+<span class="sd">    is reformulated to the *weak formulation*</span>
+
+<span class="sd">    .. math:</span>
+<span class="sd">        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.</span>
+
+<span class="sd">    The nonlinear system is solved in a *fully-implicit* way using Dolfin&#39;s weak solver provided by the routine</span>
+<span class="sd">    `df.NonlinearVariationalSolver`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c_nvars : int, optional</span>
+<span class="sd">        Spatial resolution, i.e., numbers of degrees of freedom in space.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Starting time.</span>
+<span class="sd">    family : str, optional</span>
+<span class="sd">        Indicates the family of elements used to create the function space</span>
+<span class="sd">        for the trail and test functions. The default is &#39;CG&#39;, which are the class</span>
+<span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Defines the order of the elements in the function space.</span>
+<span class="sd">    refinements : int, optional</span>
+<span class="sd">        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Diffusion coefficient :math:`\nu`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    V : FunctionSpace</span>
+<span class="sd">        Defines the function space of the trial and test functions.</span>
+<span class="sd">    w : Function</span>
+<span class="sd">        Function for the weak form.</span>
+<span class="sd">    a_K : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).</span>
+<span class="sd">    M : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        Denotes the expression :math:`\int_\Omega u_t v dx`.</span>
+<span class="sd">    g : Expression</span>
+<span class="sd">        The forcing term :math:`f` in the heat equation.</span>
+<span class="sd">    bc : DirichletBC</span>
+<span class="sd">        Denotes the Dirichlet boundary conditions.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,</span>
+<span class="sd">        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).</span>
+<span class="sd">    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.</span>
+<span class="sd">        Wells and others. Springer (2012).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: FEniCS mesh data type (will be passed to parent class)</span>
-<span class="sd">            dtype_f: FEniCS mesh data type (will be passed to parent class)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="c1"># define the Dirichlet boundary</span>
         <span class="k">def</span> <span class="nf">Boundary</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
@@ -173,7 +219,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        sol : dtype_u</span>
-<span class="sd">            The solution as mesh.</span>
+<span class="sd">            Solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
@@ -250,7 +296,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
-<span class="sd">            The exact solution.</span>
+<span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">u0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="s1">&#39;sin(a*x[0]) * cos(t)&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
@@ -265,30 +311,79 @@
 <div class="viewcode-block" id="fenics_heat_weak_imex">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex">[docs]</a>
 <span class="k">class</span> <span class="nc">fenics_heat_weak_imex</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation, IMEX</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        V: function space</span>
-<span class="sd">        w: function for weak form</span>
-<span class="sd">        a_K: weak form of RHS (incl. BC)</span>
-<span class="sd">        M: mass matrix for FEM</span>
-<span class="sd">        g: forcing term</span>
-<span class="sd">        bc: boundary conditions</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
+
+<span class="sd">    The exact solution of the problem is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = \sin(\pi x)\cos(t).</span>
+
+<span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem</span>
+<span class="sd">    is reformulated to the *weak formulation*</span>
+
+<span class="sd">    .. math:</span>
+<span class="sd">        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.</span>
+
+<span class="sd">    The problem is solved in a *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where</span>
+<span class="sd">    it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved</span>
+<span class="sd">    implicitly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c_nvars : int, optional</span>
+<span class="sd">        Spatial resolution, i.e., numbers of degrees of freedom in space.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Starting time.</span>
+<span class="sd">    family : str, optional</span>
+<span class="sd">        Indicates the family of elements used to create the function space</span>
+<span class="sd">        for the trail and test functions. The default is &#39;CG&#39;, which are the class</span>
+<span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Defines the order of the elements in the function space.</span>
+<span class="sd">    refinements : int, optional</span>
+<span class="sd">        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Diffusion coefficient :math:`\nu`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    V : FunctionSpace</span>
+<span class="sd">        Defines the function space of the trial and test functions.</span>
+<span class="sd">    u : TrialFunction</span>
+<span class="sd">        The unknown function of the problem.</span>
+<span class="sd">    v : TestFunction</span>
+<span class="sd">        The test function for the weak form.</span>
+<span class="sd">    a_K : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).</span>
+<span class="sd">    M : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        Denotes the expression :math:`\int_\Omega u_t v dx`.</span>
+<span class="sd">    g : Expression</span>
+<span class="sd">        The forcing term :math:`f` in the heat equation.</span>
+<span class="sd">    bc : DirichletBC</span>
+<span class="sd">        Denotes the Dirichlet boundary conditions.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,</span>
+<span class="sd">        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).</span>
+<span class="sd">    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.</span>
+<span class="sd">        Wells and others. Springer (2012).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: particle data type (will be passed parent class)</span>
-<span class="sd">            dtype_f: acceleration data type (will be passed parent class)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="c1"># define the Dirichlet boundary</span>
         <span class="k">def</span> <span class="nf">Boundary</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
@@ -383,7 +478,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        sol : dtype_u</span>
-<span class="sd">            The solution as mesh.</span>
+<span class="sd">            Solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -477,7 +572,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
-<span class="sd">            The exact solution.</span>
+<span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">u0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="s1">&#39;sin(a*x[0]) * cos(t)&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>

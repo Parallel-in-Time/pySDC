@@ -48,20 +48,29 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">[docs]</a>
 <span class="k">class</span> <span class="nc">GS_full</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES</span>
+<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : DMDA object</span>
+<span class="sd">        Object of PETSc.</span>
+<span class="sd">    prob : problem instance</span>
+<span class="sd">        Contains problem information for PETSc.</span>
+<span class="sd">    factor : float</span>
+<span class="sd">        Temporal factor (dt*Qd).</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Grid spacing in x direction.</span>
+<span class="sd">    dy : float</span>
+<span class="sd">        Grid spacing in y direction.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for PETSc.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            da: DMDA object</span>
-<span class="sd">            prob: problem instance</span>
-<span class="sd">            factor: temporal factor (dt*Qd)</span>
-<span class="sd">            dx: grid spacing in x direction</span>
-<span class="sd">            dy: grid spacing in x direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">da</span><span class="o">.</span><span class="n">getDim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span>
@@ -74,17 +83,22 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction">[docs]</a>
     <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to evaluate the residual for the Newton solver</span>
+<span class="sd">        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS</span>
+<span class="sd">        in the solution.</span>
 
-<span class="sd">        This function should be equal to the RHS in the solution</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        F : PETSc vector object</span>
+<span class="sd">            Output vector F(X).</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            F: output vector F(X)</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None (overwrites F)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Overwrites F.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -121,16 +135,23 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian">[docs]</a>
     <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to return the Jacobian matrix</span>
+<span class="sd">        Function to return the Jacobian matrix.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            J: Jacobian matrix (current?)</span>
-<span class="sd">            P: Jacobian matrix (new)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        J : PETSc matrix object</span>
+<span class="sd">            Current Jacobian matrix.</span>
+<span class="sd">        P : PETSc matrix object</span>
+<span class="sd">            New Jacobian matrix.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            matrix status</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PETSc.Mat.Structure.SAME_NONZERO_PATTERN</span>
+<span class="sd">            Matrix status.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -209,18 +230,25 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">[docs]</a>
 <span class="k">class</span> <span class="nc">GS_reaction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES</span>
+<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : DMDA object</span>
+<span class="sd">        Object of PETSc.</span>
+<span class="sd">    prob : problem instance</span>
+<span class="sd">        Contains problem information for PETSc.</span>
+<span class="sd">    factor : float</span>
+<span class="sd">        Temporal factor (dt*Qd).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for PETSc.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            da: DMDA object</span>
-<span class="sd">            prob: problem instance</span>
-<span class="sd">            factor: temporal factor (dt*Qd)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">da</span><span class="o">.</span><span class="n">getDim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span>
@@ -231,17 +259,22 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction">[docs]</a>
     <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to evaluate the residual for the Newton solver</span>
+<span class="sd">        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS</span>
+<span class="sd">        in the solution.</span>
 
-<span class="sd">        This function should be equal to the RHS in the solution</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        F : PETSc vector object</span>
+<span class="sd">            Output vector F(X).</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            F: output vector F(X)</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None (overwrites F)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Overwrites F.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -259,16 +292,23 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian">[docs]</a>
     <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to return the Jacobian matrix</span>
+<span class="sd">        Function to return the Jacobian matrix.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            J: Jacobian matrix (current?)</span>
-<span class="sd">            P: Jacobian matrix (new)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        J : PETSc matrix object</span>
+<span class="sd">            Current Jacobian matrix.</span>
+<span class="sd">        P : PETSc matrix object</span>
+<span class="sd">            New Jacobian matrix.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            matrix status</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PETSc.Mat.Structure.SAME_NONZERO_PATTERN</span>
+<span class="sd">            Matrix status.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -304,8 +344,73 @@
 <div class="viewcode-block" id="petsc_grayscott_multiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">petsc_grayscott_multiimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by PETSc [2]_, [3]_. For time-stepping,</span>
+<span class="sd">    the diffusion part is solved by one of PETSc&#39;s linear solver, whereas the reaction part will be solved by a nonlinear</span>
+<span class="sd">    solver.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : tuple of int, optional</span>
+<span class="sd">        Spatial resolution, i.e., number of degrees of freedom in space, e.g. (256, 256).</span>
+<span class="sd">    Du : float, optional</span>
+<span class="sd">        Diffusion rate for :math:`u`.</span>
+<span class="sd">    Dv: float, optional</span>
+<span class="sd">        Diffusion rate for :math:`v`.</span>
+<span class="sd">    A : float, optional</span>
+<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">    B : float, optional</span>
+<span class="sd">        Overall decay rate for :math:`u`.</span>
+<span class="sd">    comm : PETSc.COMM_WORLD, optional</span>
+<span class="sd">        Communicator for PETSc.</span>
+<span class="sd">    lsol_tol : float, optional</span>
+<span class="sd">        Tolerance for linear solver to terminate.</span>
+<span class="sd">    nlsol_tol : float, optional</span>
+<span class="sd">        Tolerance for nonlinear solver to terminate.</span>
+<span class="sd">    lsol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for linear solver.</span>
+<span class="sd">    nlsol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for nonlinear solver.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Mesh grid width in x direction.</span>
+<span class="sd">    dy : float</span>
+<span class="sd">        Mesh grid width in y direction.</span>
+<span class="sd">    AMat : PETSc matrix object</span>
+<span class="sd">        Discretization matrix.</span>
+<span class="sd">    Id : PETSc matrix object</span>
+<span class="sd">        Identity matrix.</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for solution.</span>
+<span class="sd">    ksp : PETSc solver object</span>
+<span class="sd">        Linear solver object.</span>
+<span class="sd">    snes : PETSc solver object</span>
+<span class="sd">        Nonlinear solver object.</span>
+<span class="sd">    snes_itercount : int</span>
+<span class="sd">        Number of iterations done by nonlinear solver.</span>
+<span class="sd">    snes_ncalls : int</span>
+<span class="sd">        Number of calls of PETSc&#39;s nonlinear solver.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms</span>
+<span class="sd">        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</span>
+<span class="sd">    .. [2] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).</span>
+<span class="sd">    .. [3] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,</span>
+<span class="sd">        Alejandro Cosimo. Advances in Water Resources (2011).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">petsc_vec</span>
@@ -324,14 +429,7 @@
         <span class="n">lsol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">nlsol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params: custom parameters for the example</span>
-<span class="sd">            dtype_u: PETSc data type (will be passed to parent class)</span>
-<span class="sd">            dtype_f: PETSc data type with 2 components (will be passed to parent class)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="c1"># create DMDA object which will be used for all grid operations (boundary_type=3 -&gt; periodic BC)</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">DMDA</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="p">[</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
@@ -397,10 +495,12 @@
 
     <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc matrix A</span>
+<span class="sd">        Helper function to assemble PETSc matrix A.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            PETSc matrix object</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A : PETSc matrix object</span>
+<span class="sd">            Discretization matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">&#39;aij&#39;</span><span class="p">)</span>  <span class="c1"># sparse</span>
@@ -458,10 +558,12 @@
 
     <span class="k">def</span> <span class="nf">__get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc identity matrix</span>
+<span class="sd">        Helper function to assemble PETSc identity matrix.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            PETSc matrix object</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Id : PETSc matrix object</span>
+<span class="sd">            Identity matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
@@ -489,14 +591,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -515,17 +622,24 @@
 <div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_1">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Linear solver for (I-factor*A)u = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Linear solver for (I - factor A)\vec{u} = \vec{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -541,17 +655,24 @@
 <div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Nonlinear solver for (I-factor*F)(u) = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -574,13 +695,17 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact is only valid for the initial solution&#39;</span>
@@ -604,8 +729,21 @@
 <div class="viewcode-block" id="petsc_grayscott_fullyimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">petsc_grayscott_fullyimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by PETSc [2]_, [3]_. For time-stepping, the</span>
+<span class="sd">    problem is handled in a *fully-implicit* way, i.e., the nonlinear system containing the full right-hand side will be</span>
+<span class="sd">    solved by PETSc&#39;s nonlinear solver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec</span>
@@ -614,14 +752,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -640,17 +783,24 @@
 <div class="viewcode-block" id="petsc_grayscott_fullyimplicit.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Nonlinear solver for (I-factor*F)(u) = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -675,8 +825,20 @@
 <div class="viewcode-block" id="petsc_grayscott_semiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">petsc_grayscott_semiimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by PETSc [2]_, [3]_. For time-stepping, the</span>
+<span class="sd">    problem is treated *semi-implicitly*, i.e., the system with diffusion part is solved by PETSc&#39;s linear solver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec_imex</span>
@@ -685,14 +847,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>

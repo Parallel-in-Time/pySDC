@@ -53,8 +53,26 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_finel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-with driving force, 0-1 formulation (Bayreuth example), Finel’s trick/parametrization</p>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. Centered finite differences are used for discretization of the Laplacian.
+The exact solution is given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> denote the finite difference matrix to discretize <span class="math notranslate nohighlight">\(\frac{\partial^2 u}{\partial x^2}\)</span>. Here,
+_Finel’s <a href="#id1"><span class="problematic" id="id2">trick_</span></a> is used. Let</p>
+<div class="math notranslate nohighlight">
+\[a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,\]</div>
+<p>then, the right-hand side of the problem can be written as</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
+        \frac{1 - a}{1 - a (2u - 1)^2} - 1
+    \right] (2u - 1).\]</div>
+<p>For time-stepping, this problem will be treated in a <em>fully-implicit</em> way. The nonlinear system is solved using Newton.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_finel.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f" title="Link to this definition">¶</a></dt>
@@ -103,14 +121,23 @@ with driving force, 0-1 formulation (Bayreuth example), Finel’s trick/parametr
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-with driving force, 0-1 formulation (Bayreuth example).</p>
+<p>Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. The second order spatial derivative is approximated using centered finite differences. The
+exact solution is given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t)= 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>. For time-stepping, this problem is implemented to be treated
+<em>fully-implicit</em> using Newton to solve the nonlinear system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
-<li><p><strong>dw</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
+<li><p><strong>dw</strong> (<em>float</em>) – Driving force.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
 <li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
 <li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
 <li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
@@ -136,6 +163,72 @@ with driving force, 0-1 formulation (Bayreuth example).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext">
+<span class="sig-name descname"><span class="pre">uext</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext" title="Link to this definition">¶</a></dt>
+<dd><p>Contains additionally the external values of the boundary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount">
+<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Counter for iterations in Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount">
+<span class="sig-name descname"><span class="pre">lin_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Counter for iterations in linear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls">
+<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls">
+<span class="sig-name descname"><span class="pre">lin_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of linear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -217,30 +310,18 @@ with driving force, 0-1 formulation (Bayreuth example).</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_front_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">127</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.A">
-<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.A" title="Link to this definition">¶</a></dt>
-<dd><p>Second-order FD discretization of the 1D laplace operator.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>scipy.diags</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx">
-<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx" title="Link to this definition">¶</a></dt>
-<dd><p>Distance between two spatial nodes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
+boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. Centered finite differences are used for discretization of the second order spatial derivative.
+The exact solution is given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>. For time-stepping, this problem will be treated in a
+<em>semi-implicit</em> way, i.e., the Laplacian is treated implicitly, and the rest of the right-hand side will be handled
+explicitly.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -294,14 +375,22 @@ with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepp
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_fullyimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
-with driving force, 0-1 formulation (Bayreuth example)</p>
+<p>Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. Centered finite differences are used for discretization of the Laplacian.
+The exact solution is</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
+<em>fully-implicitly</em>, i.e., the nonlinear system is solved by Newton.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
-<li><p><strong>dw</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
+<li><p><strong>dw</strong> (<em>float</em>) – Driving force.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
 <li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
 <li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
 <li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
@@ -328,6 +417,61 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount">
+<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Number of iterations for Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount">
+<span class="sig-name descname"><span class="pre">lin_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Number of iterations for linear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls">
+<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of Newton solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls">
+<span class="sig-name descname"><span class="pre">lin_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Number of calls of linear solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -409,22 +553,18 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_multiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_multiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
-with driving force, 0-1 formulation (Bayreuth example)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
-<li><p><strong>dw</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
-<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
-<li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
-<li><p><strong>radius</strong> (<em>float</em>) – Radius of the circles.</p></li>
-<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if nan values arise.</p></li>
-</ul>
-</dd>
-</dl>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. For discretization of the second order spatial derivative, centered finite differences are used.
+The exact solution is then given by</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
+in a <em>multi-implicit</em> fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a
+linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by
+Newton’s method.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -501,22 +641,17 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allencahn_periodic_semiimplicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-0.5,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit" title="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="xref py py-class docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a></p>
-<p>Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,
-with driving force, 0-1 formulation (Bayreuth example)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>int</em>) – Number of unknowns in the problem.</p></li>
-<li><p><strong>dw</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>eps</strong> (<em>float</em>) – Problem parameter.</p></li>
-<li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
-<li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
-<li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
-<li><p><strong>radius</strong> (<em>float</em>) – Radius of the circles.</p></li>
-<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if nan values arise.</p></li>
-</ul>
-</dd>
-</dl>
+<p>This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+    - 6 d_w u (1 - u)\]</div>
+<p>for <span class="math notranslate nohighlight">\(u \in [0, 1]\)</span>. For discretization of the Laplacian, centered finite differences are used.
+The exact solution is</p>
+<div class="math notranslate nohighlight">
+\[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
+<p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
+in <em>semi-implicit</em> way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand
+side is only evaluated at each time.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -587,6 +722,12 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_front_fullyimplicit</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext"><code class="docutils literal notranslate"><span class="pre">uext</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount"><code class="docutils literal notranslate"><span class="pre">lin_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls"><code class="docutils literal notranslate"><span class="pre">lin_ncalls</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
@@ -595,8 +736,6 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_front_semiimplicit</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
@@ -605,6 +744,11 @@ with driving force, 0-1 formulation (Bayreuth example)</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit"><code class="docutils literal notranslate"><span class="pre">allencahn_periodic_fullyimplicit</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount"><code class="docutils literal notranslate"><span class="pre">lin_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls"><code class="docutils literal notranslate"><span class="pre">lin_ncalls</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

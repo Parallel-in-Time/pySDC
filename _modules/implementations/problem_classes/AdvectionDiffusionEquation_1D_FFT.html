@@ -54,7 +54,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}</span>
 
-<span class="sd">    with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. The advection part</span>
+<span class="sd">    with periodic boundary conditions in :math:`[-\frac{L}{2}, \frac{L}{2}]` in spectral space. The advection part</span>
 <span class="sd">    :math:`- c \frac{\partial u(x,t)}{\partial x}` is treated explicitly, whereas the diffusion part</span>
 <span class="sd">    :math:`\nu \frac{\partial^2 u(x,t)}{\partial x^2}` will be treated numerically in an implicit way. The exact solution is</span>
 <span class="sd">    given by</span>
@@ -70,12 +70,12 @@
 <span class="sd">    nvars : int, optional</span>
 <span class="sd">        Number of points in spatial discretization.</span>
 <span class="sd">    c : float, optional</span>
-<span class="sd">        Advection speed.</span>
+<span class="sd">        Advection speed :math:`c`.</span>
 <span class="sd">    freq : int, optional</span>
 <span class="sd">        Wave number :math:`k`.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
-<span class="sd">    L : int, optional</span>
+<span class="sd">    L : float, optional</span>
 <span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
 
 <span class="sd">    Attributes</span>
@@ -216,9 +216,8 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u(x,t)}{\partial t} = - c \frac{\partial u(x,t)}{\partial x} + \nu \frac{\partial^2 u(x,t)}{\partial x^2}</span>
 
-<span class="sd">    with periodic boundary conditions in :math:`[-L/2, L/2]` in spectral space. This class implements the problem solving it</span>
-<span class="sd">    with fully-implicit time-stepping. The exact solution is</span>
-<span class="sd">    given by</span>
+<span class="sd">    with periodic boundary conditions in :math:`[-\frac{L}{2}, \frac{L}{2}]` in spectral space. This class implements the</span>
+<span class="sd">    problem solving it with fully-implicit time-stepping. The exact solution is given by</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        u(x, t) = \sin(\omega (x - c t)) \exp(-t \nu \omega^2)</span>

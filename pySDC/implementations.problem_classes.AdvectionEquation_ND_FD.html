@@ -54,8 +54,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">advectionNd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericNDimFinDiff</span></code></p>
 <p>Example implementing the unforced ND advection equation with periodic
-or Dirichlet boundary conditions in <span class="math notranslate nohighlight">\([0,1]^N\)</span>,
-and initial solution of the form</p>
+or Dirichlet boundary conditions in <span class="math notranslate nohighlight">\([0,1]^N\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = -c \frac{\partial u}{\partial x},\]</div>
+<p>and initial solution of the form</p>
 <div class="math notranslate nohighlight">
 \[u({\bf x},0) = \prod_{i=1}^N \sin(f\pi x_i),\]</div>
 <p>with <span class="math notranslate nohighlight">\(x_i\)</span> the coordinate in <span class="math notranslate nohighlight">\(i^{th}\)</span> dimension.
@@ -99,7 +101,7 @@ consider several dimensions, e.g nvars=(16,16) for a 2D problem.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.Id">
 <span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.Id" title="Link to this definition">¶</a></dt>
-<dd><p>Identity matrix of the same dimension as A</p>
+<dd><p>Identity matrix of the same dimension as A.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>sparse matrix (CSC)</p>
@@ -115,7 +117,7 @@ Do, however, take care that all spatial parameters have the same dimension.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t</p>
+<dd><p>Routine to compute the exact solution at time t.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

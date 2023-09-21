@@ -52,32 +52,87 @@
 <div class="viewcode-block" id="fenics_grayscott">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott">[docs]</a>
 <span class="k">class</span> <span class="nc">fenics_grayscott</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        V: function space</span>
-<span class="sd">        w: function for the RHS</span>
-<span class="sd">        w1: split of w, part 1</span>
-<span class="sd">        w2: split of w, part 2</span>
-<span class="sd">        F1: weak form of RHS, first part</span>
-<span class="sd">        F2: weak form of RHS, second part</span>
-<span class="sd">        F: weak form of RHS, full</span>
-<span class="sd">        M: full mass matrix for both parts</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the</span>
+<span class="sd">    system with a test function :math:`q`:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \int_\Omega u_t q dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \int_\Omega v_t q dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,</span>
+
+<span class="sd">    The spatial solve of the weak formulation is realized by FEniCS [2]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c_nvars : int, optional</span>
+<span class="sd">        Spatial resolution, i.e., number of degrees of freedom in space.</span>
+<span class="sd">    t0 : float, optional</span>
+<span class="sd">        Starting time.</span>
+<span class="sd">    family : str, optional</span>
+<span class="sd">        Indicates the family of elements used to create the function space</span>
+<span class="sd">        for the trail and test functions. The default is &#39;CG&#39;, which are the class</span>
+<span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Defines the order of the elements in the function space.</span>
+<span class="sd">    refinements : list or tuple, optional</span>
+<span class="sd">        Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.</span>
+<span class="sd">        [2, 2] or (2, 2).</span>
+<span class="sd">    Du : float, optional</span>
+<span class="sd">        Diffusion rate for :math:`u`.</span>
+<span class="sd">    Dv: float, optional</span>
+<span class="sd">        Diffusion rate for :math:`v`.</span>
+<span class="sd">    A : float, optional</span>
+<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">    B : float, optional</span>
+<span class="sd">        Overall decay rate for :math:`u`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    V : FunctionSpace</span>
+<span class="sd">        Defines the function space of the trial and test functions.</span>
+<span class="sd">    w : Function</span>
+<span class="sd">        Function for the right-hand side.</span>
+<span class="sd">    w1 : Function</span>
+<span class="sd">        Split of w, part 1.</span>
+<span class="sd">    w2 : Function</span>
+<span class="sd">        Split of w, part 2.</span>
+<span class="sd">    F1 : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        Weak form of right-hand side, first part.</span>
+<span class="sd">    F2 : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        Weak form of right-hand side, second part.</span>
+<span class="sd">    F : scalar, vector, matrix or higher rank tensor</span>
+<span class="sd">        Weak form of full right-hand side.</span>
+<span class="sd">    M : matrix</span>
+<span class="sd">        Full mass matrix for both parts.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms</span>
+<span class="sd">        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</span>
+<span class="sd">    .. [2] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,</span>
+<span class="sd">        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).</span>
+<span class="sd">    .. [3] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.</span>
+<span class="sd">        Wells and others. Springer (2012).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">0.086</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params: custom parameters for the example</span>
-<span class="sd">            dtype_u: FEniCS mesh data type (will be passed to parent class)</span>
-<span class="sd">            dtype_f: FEniCS mesh data data type (will be passed to parent class)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">refinements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">refinements</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -178,7 +233,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
-<span class="sd">            The solution as mesh.</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
@@ -243,7 +298,7 @@
 <div class="viewcode-block" id="fenics_grayscott.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t.</span>
 
 <span class="sd">        Parameters</span>
@@ -254,7 +309,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        me : dtype_u</span>
-<span class="sd">            The exact solution.</span>
+<span class="sd">            Exact solution (only at :math:`t_0 = 0.0`).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">class</span> <span class="nc">InitialConditions</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>

@@ -53,25 +53,76 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fenics_vortex_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CG'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refinements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the 2d vorticity-velocity equation with periodic BC in [0,1]</p>
+<p>This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
+in <span class="math notranslate nohighlight">\([0, 1]^2\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial w}{\partial t} = \nu \Delta w\]</div>
+<p>for some parameter <span class="math notranslate nohighlight">\(\nu\)</span>. In this class the problem is implemented that the spatial port is solved
+using FEniCS <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Hence, the problem is reformulated to the <em>weak formulation</em></p>
+<div class="math notranslate nohighlight">
+\[\int_\Omega w_t v dx = - \nu \int_\Omega \nabla w \nabla v dx\]</div>
+<p>The nonlinear system is solved in a <em>fully-implicit</em> way using Dolfin’s weak solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c_nvars</strong> (<em>List</em><em> of </em><em>int tuple</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. [(128, 128)].</p></li>
+<li><p><strong>family</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates the family of elements used to create the function space
+for the trail and test functions. The default is ‘CG’, which are the class
+of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, see <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the order of the elements in the function space.</p></li>
+<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. refinements=2 refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
+<li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
+<li><p><strong>rho</strong> (<em>int</em><em>, </em><em>optional</em>) – Problem parameter.</p></li>
+<li><p><strong>delta</strong> (<em>float</em><em>, </em><em>optional</em>) – Problem parameter.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V">
 <span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V" title="Link to this definition">¶</a></dt>
-<dd><p>function space</p>
+<dd><p>Defines the function space of the trial and test functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>FunctionSpace</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.M">
 <span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.M" title="Link to this definition">¶</a></dt>
-<dd><p>mass matrix for FEM</p>
+<dd><p>Mass matrix for FENiCS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.K">
 <span class="sig-name descname"><span class="pre">K</span></span><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.K" title="Link to this definition">¶</a></dt>
-<dd><p>stiffness matrix incl. diffusion coefficient (and correct sign)</p>
+<dd><p>Stiffness matrix including diffusion coefficient (and correct sign).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+Wells and others. Springer (2012).</p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.dtype_f" title="Link to this definition">¶</a></dt>

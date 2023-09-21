@@ -50,18 +50,31 @@
 <div class="viewcode-block" id="allencahn_front_fullyimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_front_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,</span>
-<span class="sd">    with driving force, 0-1 formulation (Bayreuth example).</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
+<span class="sd">    boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. The second order spatial derivative is approximated using centered finite differences. The</span>
+<span class="sd">    exact solution is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t)= 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem is implemented to be treated</span>
+<span class="sd">    *fully-implicit* using Newton to solve the nonlinear system.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : int</span>
 <span class="sd">        Number of unknowns in the problem.</span>
 <span class="sd">    dw : float</span>
-<span class="sd">        Problem parameter.</span>
+<span class="sd">        Driving force.</span>
 <span class="sd">    eps : float</span>
-<span class="sd">        Problem parameter.</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
 <span class="sd">    newton_maxiter : int</span>
 <span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
 <span class="sd">    newton_tol : float</span>
@@ -77,6 +90,18 @@
 <span class="sd">        Second-order FD discretization of the 1D laplace operator.</span>
 <span class="sd">    dx : float</span>
 <span class="sd">        Distance between two spatial nodes.</span>
+<span class="sd">    xvalues : np.1darray</span>
+<span class="sd">        Spatial grid values.</span>
+<span class="sd">    uext : dtype_u</span>
+<span class="sd">        Contains additionally the external values of the boundary.</span>
+<span class="sd">    newton_itercount : int</span>
+<span class="sd">        Counter for iterations in Newton solver.</span>
+<span class="sd">    lin_itercount : int</span>
+<span class="sd">        Counter for iterations in linear solver.</span>
+<span class="sd">    newton_ncalls : int</span>
+<span class="sd">        Number of calls of Newton solver.</span>
+<span class="sd">    lin_ncalls : int</span>
+<span class="sd">        Number of calls of linear solver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -93,7 +118,7 @@
         <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;setup requires nvars = 2^p - 1&#39;</span><span class="p">)</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
@@ -169,7 +194,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
         <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
             <span class="c1"># print(n)</span>
-            <span class="c1"># form the function g with g(u) = 0</span>
+            <span class="c1"># # form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">u</span>
@@ -282,16 +307,23 @@
 <div class="viewcode-block" id="allencahn_front_semiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_front_semiimplicit</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,</span>
-<span class="sd">    with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
+<span class="sd">    boundary conditions</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    A : scipy.diags</span>
-<span class="sd">        Second-order FD discretization of the 1D laplace operator.</span>
-<span class="sd">    dx : float</span>
-<span class="sd">        Distance between two spatial nodes.</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the second order spatial derivative.</span>
+<span class="sd">    The exact solution is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem will be treated in a</span>
+<span class="sd">    *semi-implicit* way, i.e., the Laplacian is treated implicitly, and the rest of the right-hand side will be handled</span>
+<span class="sd">    explicitly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
@@ -361,9 +393,36 @@
 <div class="viewcode-block" id="allencahn_front_finel">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_front_finel</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,</span>
-<span class="sd">    with driving force, 0-1 formulation (Bayreuth example), Finel&#39;s trick/parametrization</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
+<span class="sd">    boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the Laplacian.</span>
+<span class="sd">    The exact solution is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`.</span>
+
+<span class="sd">    Let :math:`A` denote the finite difference matrix to discretize :math:`\frac{\partial^2 u}{\partial x^2}`. Here,</span>
+<span class="sd">    _Finel&#39;s trick_ is used. Let</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,</span>
+
+<span class="sd">    then, the right-hand side of the problem can be written as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[</span>
+<span class="sd">                \frac{1 - a}{1 - a (2u - 1)^2} - 1</span>
+<span class="sd">            \right] (2u - 1).</span>
+
+<span class="sd">    For time-stepping, this problem will be treated in a *fully-implicit* way. The nonlinear system is solved using Newton.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># noinspection PyTypeChecker</span>
@@ -406,7 +465,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
         <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
             <span class="c1"># print(n)</span>
-            <span class="c1"># form the function g with g(u) = 0</span>
+            <span class="c1"># form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:]</span>
             <span class="n">gprim</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">a2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="n">g</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">rhs</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uext</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">gprim</span> <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">dw</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="p">))</span>
@@ -490,18 +549,30 @@
 <div class="viewcode-block" id="allencahn_periodic_fullyimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_periodic_fullyimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,</span>
-<span class="sd">    with driving force, 0-1 formulation (Bayreuth example)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. Centered finite differences are used for discretization of the Laplacian.</span>
+<span class="sd">    The exact solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
+<span class="sd">    *fully-implicitly*, i.e., the nonlinear system is solved by Newton.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : int</span>
 <span class="sd">        Number of unknowns in the problem.</span>
 <span class="sd">    dw : float</span>
-<span class="sd">        Problem parameter.</span>
+<span class="sd">        Driving force.</span>
 <span class="sd">    eps : float</span>
-<span class="sd">        Problem parameter.</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
 <span class="sd">    newton_maxiter : int</span>
 <span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
 <span class="sd">    newton_tol : float</span>
@@ -519,6 +590,16 @@
 <span class="sd">        Second-order FD discretization of the 1D laplace operator.</span>
 <span class="sd">    dx : float</span>
 <span class="sd">        Distance between two spatial nodes.</span>
+<span class="sd">    xvalues : np.1darray</span>
+<span class="sd">        Spatial grid points.</span>
+<span class="sd">    newton_itercount : int</span>
+<span class="sd">        Number of iterations for Newton solver.</span>
+<span class="sd">    lin_itercount : int</span>
+<span class="sd">        Number of iterations for linear solver.</span>
+<span class="sd">    newton_ncalls : int</span>
+<span class="sd">        Number of calls of Newton solver.</span>
+<span class="sd">    lin_ncalls : int</span>
+<span class="sd">        Number of calls of linear solver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -536,7 +617,7 @@
         <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;setup requires nvars = 2^p&#39;</span><span class="p">)</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
@@ -607,7 +688,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
         <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
             <span class="c1"># print(n)</span>
-            <span class="c1"># form the function g with g(u) = 0</span>
+            <span class="c1"># form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">u</span>
                 <span class="o">-</span> <span class="n">rhs</span>
@@ -703,28 +784,22 @@
 <div class="viewcode-block" id="allencahn_periodic_semiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_periodic_semiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,</span>
-<span class="sd">    with driving force, 0-1 formulation (Bayreuth example)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    nvars : int</span>
-<span class="sd">        Number of unknowns in the problem.</span>
-<span class="sd">    dw : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    eps : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    newton_maxiter : int</span>
-<span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
-<span class="sd">    newton_tol : float</span>
-<span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
-<span class="sd">    interval : list</span>
-<span class="sd">        Interval of spatial domain.</span>
-<span class="sd">    radius : float</span>
-<span class="sd">        Radius of the circles.</span>
-<span class="sd">    stop_at_nan : bool, optional</span>
-<span class="sd">        Indicates that the Newton solver should stop if nan values arise.</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. For discretization of the Laplacian, centered finite differences are used.</span>
+<span class="sd">    The exact solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
+<span class="sd">    in *semi-implicit* way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand</span>
+<span class="sd">    side is only evaluated at each time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
@@ -802,28 +877,23 @@
 <div class="viewcode-block" id="allencahn_periodic_multiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_periodic_multiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the Allen-Cahn equation in 1D with finite differences and periodic BC,</span>
-<span class="sd">    with driving force, 0-1 formulation (Bayreuth example)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    nvars : int</span>
-<span class="sd">        Number of unknowns in the problem.</span>
-<span class="sd">    dw : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    eps : float</span>
-<span class="sd">        Problem parameter.</span>
-<span class="sd">    newton_maxiter : int</span>
-<span class="sd">        Maximum number of iterations for Newton&#39;s method.</span>
-<span class="sd">    newton_tol : float</span>
-<span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
-<span class="sd">    interval : list</span>
-<span class="sd">        Interval of spatial domain.</span>
-<span class="sd">    radius : float</span>
-<span class="sd">        Radius of the circles.</span>
-<span class="sd">    stop_at_nan : bool, optional</span>
-<span class="sd">        Indicates that the Newton solver should stop if nan values arise.</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
+<span class="sd">            - 6 d_w u (1 - u)</span>
+
+<span class="sd">    for :math:`u \in [0, 1]`. For discretization of the second order spatial derivative, centered finite differences are used.</span>
+<span class="sd">    The exact solution is then given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)</span>
+
+<span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
+<span class="sd">    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a</span>
+<span class="sd">    linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by</span>
+<span class="sd">    Newton&#39;s method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>
@@ -932,7 +1002,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
         <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
             <span class="c1"># print(n)</span>
-            <span class="c1"># form the function g with g(u) = 0</span>
+            <span class="c1"># form the function g(u), such that the solution to the nonlinear problem is a root of g</span>
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">u</span>
                 <span class="o">-</span> <span class="n">rhs</span>

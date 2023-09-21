@@ -48,19 +48,35 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full">[docs]</a>
 <span class="k">class</span> <span class="nc">Fisher_full</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES</span>
+<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : DMDA object</span>
+<span class="sd">        Object of PETSc.</span>
+<span class="sd">    prob : problem instance</span>
+<span class="sd">        Contains problem information for PETSc.</span>
+<span class="sd">    factor : float</span>
+<span class="sd">        Temporal factor (dt*Qd).</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Grid spacing in x direction.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for PETSc.</span>
+<span class="sd">    xs, xe : int</span>
+<span class="sd">        Defines the ranges for spatial domain.</span>
+<span class="sd">    mx : tuple</span>
+<span class="sd">        Get sizes for the vector containing the spatial points.</span>
+<span class="sd">    row : PETSc matrix stencil object</span>
+<span class="sd">        Row for a matrix.</span>
+<span class="sd">    col : PETSc matrix stencil object</span>
+<span class="sd">        Column for a matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            da: DMDA object</span>
-<span class="sd">            prob: problem instance</span>
-<span class="sd">            factor: temporal factor (dt*Qd)</span>
-<span class="sd">            dx: grid spacing in x direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">da</span><span class="o">.</span><span class="n">getDim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
@@ -76,17 +92,22 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.formFunction">[docs]</a>
     <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to evaluate the residual for the Newton solver</span>
+<span class="sd">        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS</span>
+<span class="sd">        in the solution.</span>
 
-<span class="sd">        This function should be equal to the RHS in the solution</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        F : PETSc vector object</span>
+<span class="sd">            Output vector F(X).</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            F: output vector F(X)</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None (overwrites F)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Overwrites F.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -107,16 +128,23 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.formJacobian">[docs]</a>
     <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to return the Jacobian matrix</span>
+<span class="sd">        Function to return the Jacobian matrix.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            J: Jacobian matrix (current?)</span>
-<span class="sd">            P: Jacobian matrix (new)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        J : PETSc matrix object</span>
+<span class="sd">            Current Jacobian matrix.</span>
+<span class="sd">        P : PETSc matrix object</span>
+<span class="sd">            New Jacobian matrix.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            matrix status</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PETSc.Mat.Structure.SAME_NONZERO_PATTERN</span>
+<span class="sd">            Matrix status.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -151,19 +179,27 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction">[docs]</a>
 <span class="k">class</span> <span class="nc">Fisher_reaction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES</span>
+<span class="sd">    Helper class to generate residual and Jacobian matrix for PETSc&#39;s nonlinear solver SNES.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : DMDA object</span>
+<span class="sd">        Object of PETSc.</span>
+<span class="sd">    prob : problem instance</span>
+<span class="sd">        Contains problem information for PETSc.</span>
+<span class="sd">    factor : float</span>
+<span class="sd">        Temporal factor (dt*Qd).</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Grid spacing in x direction.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for PETSc.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            da: DMDA object</span>
-<span class="sd">            prob: problem instance</span>
-<span class="sd">            factor: temporal factor (dt*Qd)</span>
-<span class="sd">            dx: grid spacing in x direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">da</span><span class="o">.</span><span class="n">getDim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span>
@@ -174,17 +210,22 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction.formFunction">[docs]</a>
     <span class="k">def</span> <span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to evaluate the residual for the Newton solver</span>
+<span class="sd">        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS</span>
+<span class="sd">        in the solution.</span>
 
-<span class="sd">        This function should be equal to the RHS in the solution</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        F : PETSc vector object</span>
+<span class="sd">            Output vector F(X).</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            F: output vector F(X)</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            None (overwrites F)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Overwrites F.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -202,16 +243,23 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction.formJacobian">[docs]</a>
     <span class="k">def</span> <span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to return the Jacobian matrix</span>
+<span class="sd">        Function to return the Jacobian matrix.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            snes: nonlinear solver object</span>
-<span class="sd">            X: input vector</span>
-<span class="sd">            J: Jacobian matrix (current?)</span>
-<span class="sd">            P: Jacobian matrix (new)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        J : PETSc matrix object</span>
+<span class="sd">            Current Jacobian matrix.</span>
+<span class="sd">        P : PETSc matrix object</span>
+<span class="sd">            New Jacobian matrix.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            matrix status</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PETSc.Mat.Structure.SAME_NONZERO_PATTERN</span>
+<span class="sd">            Matrix status.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
@@ -238,8 +286,80 @@
 <div class="viewcode-block" id="petsc_fisher_multiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">petsc_fisher_multiimplicit</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can</span>
+<span class="sd">    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov</span>
+<span class="sd">    problem [1]_ using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)</span>
+
+<span class="sd">    with exact solution</span>
+
+<span class="sd">    u(x, 0) = \left[</span>
+<span class="sd">            1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)</span>
+<span class="sd">        \right]^{-2 / \nu}</span>
+
+<span class="sd">    for :math:`x \in \mathbb{R}`, and</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \lambda_1 = \frac{\lambda_0}{2} \left[</span>
+<span class="sd">            \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}</span>
+<span class="sd">        \right].</span>
+
+<span class="sd">    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem will be solved</span>
+<span class="sd">    *multi-implicitly*.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int, optional</span>
+<span class="sd">        Spatial resolution.</span>
+<span class="sd">    lambda0 : float, optional</span>
+<span class="sd">        Problem parameter : math:`\lambda_0`.</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Problem parameter :math:`\nu`.</span>
+<span class="sd">    interval : tuple, optional</span>
+<span class="sd">        Defines the spatial domain.</span>
+<span class="sd">    comm : PETSc.COMM_WORLD, optional</span>
+<span class="sd">        Communicator for PETSc.</span>
+<span class="sd">    lsol_tol : float, optional</span>
+<span class="sd">        Tolerance for linear solver to terminate.</span>
+<span class="sd">    nlsol_tol : float, optional</span>
+<span class="sd">        Tolerance for nonlinear solver to terminate.</span>
+<span class="sd">    lsol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for linear solver.</span>
+<span class="sd">    nlsol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for nonlinear solver.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Mesh grid width.</span>
+<span class="sd">    xs, xe : int</span>
+<span class="sd">        Define the ranges.</span>
+<span class="sd">    A : PETSc matrix object</span>
+<span class="sd">        Discretization matrix.</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for solution.</span>
+<span class="sd">    ksp : PETSc solver object</span>
+<span class="sd">        Linear solver object.</span>
+<span class="sd">    snes : PETSc solver object</span>
+<span class="sd">        Nonlinear solver object.</span>
+<span class="sd">    F : PETSc vector object</span>
+<span class="sd">        Global vector.</span>
+<span class="sd">    J : PETSc matrix object</span>
+<span class="sd">        Jacobi matrix.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Z. Feng. Traveling wave behavior for a generalized fisher equation. Chaos Solitons Fractals 38(2),</span>
+<span class="sd">        481–488 (2008).</span>
+<span class="sd">    .. [2] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).</span>
+<span class="sd">    .. [3] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,</span>
+<span class="sd">        Alejandro Cosimo. Advances in Water Resources (2011).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">petsc_vec</span>
@@ -257,11 +377,7 @@
         <span class="n">lsol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">nlsol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        TODO : doku</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="c1"># create DMDA object which will be used for all grid operations</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">DMDA</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">([</span><span class="n">nvars</span><span class="p">],</span> <span class="n">dof</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stencil_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
 
@@ -324,10 +440,12 @@
 
     <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc matrix A</span>
+<span class="sd">        Helper function to assemble PETSc matrix A.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            PETSc matrix object</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A : PETSc matrix object</span>
+<span class="sd">            Discretization matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># create matrix and set basic options</span>
         <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
@@ -364,10 +482,17 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.get_sys_mat">[docs]</a>
     <span class="k">def</span> <span class="nf">get_sys_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble the system matrix of the linear problem</span>
+<span class="sd">        Helper function to assemble the system matrix of the linear problem.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            PETSc matrix object</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Factor to define the system matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A : PETSc matrix object</span>
+<span class="sd">           Matrix for the system to solve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># create matrix and set basic options</span>
@@ -406,14 +531,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -435,17 +565,24 @@
 <div class="viewcode-block" id="petsc_fisher_multiimplicit.solve_system_1">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.solve_system_1">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Linear solver for (I-factor*A)u = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Linear solver for (I - factor A)\vec{u} = \vec{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -462,17 +599,24 @@
 <div class="viewcode-block" id="petsc_fisher_multiimplicit.solve_system_2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.solve_system_2">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Nonlinear solver for (I-factor*F)(u) = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -496,13 +640,17 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">lam1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambda0</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">))</span>
@@ -524,8 +672,32 @@
 <div class="viewcode-block" id="petsc_fisher_fullyimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">petsc_fisher_fullyimplicit</span><span class="p">(</span><span class="n">petsc_fisher_multiimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can</span>
+<span class="sd">    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov</span>
+<span class="sd">    problem [1]_ using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)</span>
+
+<span class="sd">    with exact solution</span>
+
+<span class="sd">    u(x, 0) = \left[</span>
+<span class="sd">            1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)</span>
+<span class="sd">        \right]^{-2 / \nu}</span>
+
+<span class="sd">    for :math:`x \in \mathbb{R}`, and</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \lambda_1 = \frac{\lambda_0}{2} \left[</span>
+<span class="sd">            \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}</span>
+<span class="sd">        \right].</span>
+
+<span class="sd">    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem is treated</span>
+<span class="sd">    *fully-implicitly*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec</span>
@@ -534,14 +706,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -560,17 +737,24 @@
 <div class="viewcode-block" id="petsc_fisher_fullyimplicit.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Nonlinear solver for (I-factor*F)(u) = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Nonlinear solver for (I - factor F)(\vec{u}) = \{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
@@ -594,8 +778,32 @@
 <div class="viewcode-block" id="petsc_fisher_semiimplicit">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit">[docs]</a>
 <span class="k">class</span> <span class="nc">petsc_fisher_semiimplicit</span><span class="p">(</span><span class="n">petsc_fisher_multiimplicit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can</span>
+<span class="sd">    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov</span>
+<span class="sd">    problem [1]_ using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)</span>
+
+<span class="sd">    with exact solution</span>
+
+<span class="sd">    u(x, 0) = \left[</span>
+<span class="sd">            1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)</span>
+<span class="sd">        \right]^{-2 / \nu}</span>
+
+<span class="sd">    for :math:`x \in \mathbb{R}`, and</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \lambda_1 = \frac{\lambda_0}{2} \left[</span>
+<span class="sd">            \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}</span>
+<span class="sd">        \right].</span>
+
+<span class="sd">    This class is implemented to be solved in spatial using PETSc [2]_, [3]_. For time-stepping, the problem here will be</span>
+<span class="sd">    solved in a *semi-implicit* way.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec_imex</span>
@@ -604,14 +812,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate the RHS</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -633,17 +846,24 @@
 <div class="viewcode-block" id="petsc_fisher_semiimplicit.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple linear solver for (I-factor*A)u = rhs</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple linear solver for (I-factor A)\vec{u} = \{rhs}.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
-<span class="sd">            factor (float): abbrev. for the local stepsize (or any other factor required)</span>
-<span class="sd">            u0 (dtype_u): initial guess for the iterative solver</span>
-<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>

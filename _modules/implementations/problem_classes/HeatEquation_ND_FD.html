@@ -46,6 +46,62 @@
 <div class="viewcode-block" id="heatNd_unforced">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced">[docs]</a>
 <span class="k">class</span> <span class="nc">heatNd_unforced</span><span class="p">(</span><span class="n">GenericNDimFinDiff</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the unforced N-dimensional heat equation with periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \nu</span>
+<span class="sd">        \left(</span>
+<span class="sd">            \frac{\partial^2 u}{\partial x^2_1} + .. + \frac{\partial^2 u}{\partial x^2_N}</span>
+<span class="sd">        \right)</span>
+
+<span class="sd">    for :math:`(x_1,..,x_N) \in [0, 1]^{N}` with :math:`N \leq 3`. The initial solution is of the form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u({\bf x},0) = \prod_{i=1}^N \sin(\pi k_i x_i).</span>
+
+<span class="sd">    The spatial term is discretized using finite differences.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int, optional</span>
+<span class="sd">        Spatial resolution (same in all dimensions). Using a tuple allows to</span>
+<span class="sd">        consider several dimensions, e.g nvars=(16,16) for a 2D problem.</span>
+<span class="sd">    nu : float, optional</span>
+<span class="sd">        Diffusion coefficient :math:`\nu`.</span>
+<span class="sd">    freq : int, optional</span>
+<span class="sd">        Spatial frequency :math:`k_i` of the initial conditions, can be tuple.</span>
+<span class="sd">    stencil_type : str, optional</span>
+<span class="sd">        Type of the finite difference stencil.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Order of the finite difference discretization.</span>
+<span class="sd">    lintol : float, optional</span>
+<span class="sd">        Tolerance for spatial solver.</span>
+<span class="sd">    liniter : int, optional</span>
+<span class="sd">        Max. iterations number for spatial solver.</span>
+<span class="sd">    solver_type : str, optional</span>
+<span class="sd">        Solve the linear system directly or using CG.</span>
+<span class="sd">    bc : str, optional</span>
+<span class="sd">        Boundary conditions, either &quot;periodic&quot; or &quot;dirichlet&quot;.</span>
+<span class="sd">    sigma : float, optional</span>
+<span class="sd">        If freq=-1 and ndim=1, uses a Gaussian initial solution of the form</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            u(x,0) = e^{</span>
+<span class="sd">                \frac{\displaystyle 1}{\displaystyle 2}</span>
+<span class="sd">                \left(</span>
+<span class="sd">                    \frac{\displaystyle x-1/2}{\displaystyle \sigma}</span>
+<span class="sd">                \right)^2</span>
+<span class="sd">                }</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : sparse matrix (CSC)</span>
+<span class="sd">        FD discretization matrix of the ND operator.</span>
+<span class="sd">    Id : sparse matrix (CSC)</span>
+<span class="sd">        Identity matrix of the same dimension as A</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
@@ -59,6 +115,7 @@
         <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span>
         <span class="n">sigma</span><span class="o">=</span><span class="mf">6e-2</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">stencil_type</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">lintol</span><span class="p">,</span> <span class="n">liniter</span><span class="p">,</span> <span class="n">solver_type</span><span class="p">,</span> <span class="n">bc</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s1">&#39;GMRES&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;GMRES is not usually used for heat equation&#39;</span><span class="p">)</span>
@@ -123,13 +180,28 @@
 <div class="viewcode-block" id="heatNd_forced">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced">[docs]</a>
 <span class="k">class</span> <span class="nc">heatNd_forced</span><span class="p">(</span><span class="n">heatNd_unforced</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,</span>
-<span class="sd">    discretized using central finite differences</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the forced N-dimensional heat equation with periodic boundary conditions</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        A: FD discretization of the ND laplace operator</span>
-<span class="sd">        dx: distance between two spatial nodes (here: being the same in all dimensions)</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \nu</span>
+<span class="sd">        \left(</span>
+<span class="sd">            \frac{\partial^2 u}{\partial x^2_1} + .. + \frac{\partial^2 u}{\partial x^2_N}</span>
+<span class="sd">        \right) + f({\bf x}, t)</span>
+
+<span class="sd">    for :math:`(x_1,..,x_N) \in [0, 1]^{N}` with :math:`N \leq 3`, and forcing term</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        f({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \left(</span>
+<span class="sd">            \nu \pi^2 \sum_{i=1}^N k_i^2 \cos(t) - \sin(t)</span>
+<span class="sd">        \right),</span>
+
+<span class="sd">    where :math:`k_i` denotes the frequency in the :math:`i^{th}` dimension. The exact solution is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \cos(t).</span>
+
+<span class="sd">    The spatial term is discretized using finite differences.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>

@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,8 +53,73 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fermi_pasta_ulam_tsingou</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Example implementing the outer solar system problem</p>
-<p>TODO : doku</p>
+<p>The Fermi-Pasta-Ulam-Tsingou (FPUT) problem was one of the first computer experiments.  E. Fermi, J. Pasta
+and S. Ulam investigated the behavior of a vibrating spring with a weak correction term (which is quadratic
+for the FPU-<span class="math notranslate nohighlight">\(\alpha\)</span> model, and cubic for the FPU-<span class="math notranslate nohighlight">\(\beta\)</span> model <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>). This can be modelled by
+the second-order problem</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2 u_j(t)}{d t^2} = (u_{j+1}(t) - 2 u_j(t) + u_{j-1}(t)) (1 + \alpha (u_{j+1}(t) - u_{j-1}(t))),\]</div>
+<p>where <span class="math notranslate nohighlight">\(u_j(t)\)</span> is the position of the <span class="math notranslate nohighlight">\(j\)</span>-th particle. <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> is used as setup for this
+implemented problem class. The Hamiltonian of this problem (needed for second-order SDC) is</p>
+<div class="math notranslate nohighlight">
+\[\sum_{i=1}^n \frac{1}{2}v^2_{i-1}(t) + \frac{1}{2}(u_{i+1}(t) - u_{i-1}(t))^2 + \frac{\alpha}{3}(u_{i+1}(t) - u_{i-1}(t))^3,\]</div>
+<p>where <span class="math notranslate nohighlight">\(v_j(t)\)</span> is the velocity of the <span class="math notranslate nohighlight">\(j\)</span>-th particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>npart</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of particles.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor of the nonlinear force <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><strong>k</strong> (<em>float</em><em>, </em><em>optional</em>) – Mode for initial conditions.</p></li>
+<li><p><strong>energy_modes</strong> (<em>list</em><em>, </em><em>optional</em>) – Energy modes.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dx">
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dx" title="Link to this definition">¶</a></dt>
+<dd><p>Mesh grid size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.xvalues">
+<span class="sig-name descname"><span class="pre">xvalues</span></span><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.xvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Spatial grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.ones">
+<span class="sig-name descname"><span class="pre">ones</span></span><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.ones" title="Link to this definition">¶</a></dt>
+<dd><p>Vector containing ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>E. Fermi, J. Pasta, S. Ulam. Studies of nonlinear problems (1955). I. Los Alamos report LA-1940.
+Collected Papers of Enrico Fermi, E. Segré (Ed.), University of Chicago Press (1965)</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations">http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</a></p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_f" title="Link to this definition">¶</a></dt>
@@ -106,14 +172,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">
 <span class="sig-name descname"><span class="pre">eval_mode_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou.eval_mode_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the energy following
-<a class="reference external" href="http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations">http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</a></p>
+<dd><p>Routine to compute the energy following <a class="footnote-reference brackets" href="#id3" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – The particles.</p>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – Particles.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>energy</strong> – The energies.</p>
+<dd class="field-even"><p><strong>energy</strong> – Energies.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
@@ -154,6 +219,9 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.FermiPastaUlamTsingou module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou"><code class="docutils literal notranslate"><span class="pre">fermi_pasta_ulam_tsingou</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.ones"><code class="docutils literal notranslate"><span class="pre">ones</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

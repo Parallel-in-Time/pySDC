@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=5c0b1849"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,20 +53,21 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">heatNd_forced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_ND_FD.html#heatNd_forced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced" title="implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced"><code class="xref py py-class docutils literal notranslate"><span class="pre">heatNd_unforced</span></code></a></p>
-<p>Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,
-discretized using central finite differences</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.A">
-<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.A" title="Link to this definition">¶</a></dt>
-<dd><p>FD discretization of the ND laplace operator</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dx">
-<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dx" title="Link to this definition">¶</a></dt>
-<dd><p>distance between two spatial nodes (here: being the same in all dimensions)</p>
-</dd></dl>
-
+<p>This class implements the forced N-dimensional heat equation with periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \nu
+\left(
+    \frac{\partial^2 u}{\partial x^2_1} + .. + \frac{\partial^2 u}{\partial x^2_N}
+\right) + f({\bf x}, t)\]</div>
+<p>for <span class="math notranslate nohighlight">\((x_1,..,x_N) \in [0, 1]^{N}\)</span> with <span class="math notranslate nohighlight">\(N \leq 3\)</span>, and forcing term</p>
+<div class="math notranslate nohighlight">
+\[f({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \left(
+    \nu \pi^2 \sum_{i=1}^N k_i^2 \cos(t) - \sin(t)
+\right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(k_i\)</span> denotes the frequency in the <span class="math notranslate nohighlight">\(i^{th}\)</span> dimension. The exact solution is</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \cos(t).\]</div>
+<p>The spatial term is discretized using finite differences.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dtype_f" title="Link to this definition">¶</a></dt>
@@ -115,6 +117,63 @@ discretized using central finite differences</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">heatNd_unforced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_ND_FD.html#heatNd_unforced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericNDimFinDiff</span></code></p>
+<p>This class implements the unforced N-dimensional heat equation with periodic boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial u}{\partial t} = \nu
+\left(
+    \frac{\partial^2 u}{\partial x^2_1} + .. + \frac{\partial^2 u}{\partial x^2_N}
+\right)\]</div>
+<p>for <span class="math notranslate nohighlight">\((x_1,..,x_N) \in [0, 1]^{N}\)</span> with <span class="math notranslate nohighlight">\(N \leq 3\)</span>. The initial solution is of the form</p>
+<div class="math notranslate nohighlight">
+\[u({\bf x},0) = \prod_{i=1}^N \sin(\pi k_i x_i).\]</div>
+<p>The spatial term is discretized using finite differences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution (same in all dimensions). Using a tuple allows to
+consider several dimensions, e.g nvars=(16,16) for a 2D problem.</p></li>
+<li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
+<li><p><strong>freq</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial frequency <span class="math notranslate nohighlight">\(k_i\)</span> of the initial conditions, can be tuple.</p></li>
+<li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of the finite difference stencil.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the finite difference discretization.</p></li>
+<li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for spatial solver.</p></li>
+<li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Max. iterations number for spatial solver.</p></li>
+<li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Solve the linear system directly or using CG.</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Boundary conditions, either “periodic” or “dirichlet”.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>If freq=-1 and ndim=1, uses a Gaussian initial solution of the form</p>
+<div class="math notranslate nohighlight">
+\[u(x,0) = e^{
+    \frac{\displaystyle 1}{\displaystyle 2}
+    \left(
+        \frac{\displaystyle x-1/2}{\displaystyle \sigma}
+    \right)^2
+    }\]</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.A" title="Link to this definition">¶</a></dt>
+<dd><p>FD discretization matrix of the ND operator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.Id">
+<span class="sig-name descname"><span class="pre">Id</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.Id" title="Link to this definition">¶</a></dt>
+<dd><p>Identity matrix of the same dimension as A</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse matrix (CSC)</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_ND_FD.html#heatNd_unforced.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.u_exact" title="Link to this definition">¶</a></dt>
@@ -148,14 +207,14 @@ discretized using central finite differences</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.HeatEquation_ND_FD module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced"><code class="docutils literal notranslate"><span class="pre">heatNd_forced</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced"><code class="docutils literal notranslate"><span class="pre">heatNd_unforced</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.Id"><code class="docutils literal notranslate"><span class="pre">Id</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>
