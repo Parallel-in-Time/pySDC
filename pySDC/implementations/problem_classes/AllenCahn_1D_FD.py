@@ -269,8 +269,8 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w`. For time-stepping, this problem will be treated in a
-    *semi-implicit* way, i.e., the Laplacian is treated implicitly by solving the linear system including the
-    Laplacian, and the rest of the right-hand side will be handled explicitly.
+    *semi-implicit* way, i.e., the Laplacian is treated implicitly, and the rest of the right-hand side will be handled
+    explicitly.
     """
 
     dtype_f = imex_mesh
@@ -360,7 +360,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
                 \frac{1 - a}{1 - a (2u - 1)^2} - 1
             \right] (2u - 1).
 
-    For time-stepping, this problem will be treated in a *fully-implicit* way the nonlinear system is solved using Newton.
+    For time-stepping, this problem will be treated in a *fully-implicit* way. The nonlinear system is solved using Newton.
     """
 
     # noinspection PyTypeChecker
