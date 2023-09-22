@@ -5,7 +5,7 @@ from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Collocation import CollBase
 
 
-class EstimateInterpolationError(ConvergenceController):
+class EstimatePolynomialError(ConvergenceController):
     """
     Estimate the local error by using all but one collocation node in a polynomial interpolation to that node.
     While the converged collocation problem with M nodes gives a order M approximation to this point, the interpolation
@@ -13,6 +13,8 @@ class EstimateInterpolationError(ConvergenceController):
     That is to say this gives an error estimate that is order M. Keep in mind that the collocation problem should be
     converged for this and has order up to 2M. Still, the lower order method can be used for time step selection, for
     instance.
+    If the last node is not the end point, we can interpolate to that node, which is an order M approximation and compare
+    to the order 2M approximation we get from the extrapolation step.
     By default, we interpolate to the second to last node.
     """
 
@@ -29,9 +31,14 @@ class EstimateInterpolationError(ConvergenceController):
         from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
         from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
+        sweeper_params = description['sweeper_params']
+        num_nodes = sweeper_params['num_nodes']
+        quad_type = sweeper_params['quad_type']
+
         defaults = {
             'control_order': -75,
-            'estimate_on_node': description['sweeper_params'].get('num_nodes', 2) - 1,
+            'estimate_on_node': num_nodes + 1 if quad_type == 'GAUSS' else num_nodes - 1,
+            **super().setup(controller, params, description, **kwargs),
         }
         self.comm = description['sweeper_params'].get('comm', None)
 
@@ -44,7 +51,14 @@ class EstimateInterpolationError(ConvergenceController):
         controller.add_hook(LogEmbeddedErrorEstimate)
         self.check_convergence = CheckConvergence.check_convergence
 
-        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+        if quad_type != 'GAUSS' and defaults['estimate_on_node'] > num_nodes:
+            from pySDC.core.Errors import ParameterError
+
+            raise ParameterError(
+                'You cannot interpolate with lower accuracy to the end point if the end point is a node!'
+            )
+
+        return defaults
 
     def reset_status_variables(self, controller, **kwargs):
         """
@@ -67,6 +81,7 @@ class EstimateInterpolationError(ConvergenceController):
         where = ["levels", "status"]
         for S in steps:
             self.add_variable(S, name='error_embedded_estimate', where=where, init=None)
+            self.add_variable(S, name='order_embedded_estimate', where=where, init=None)
 
     def matmul(self, A, b):
         """
@@ -113,13 +128,13 @@ class EstimateInterpolationError(ConvergenceController):
         if self.check_convergence(S):
             L = S.levels[0]
             coll = L.sweep.coll
-            nodes = coll.nodes
+            nodes = np.append(np.append(0, coll.nodes), 1.0)
             estimate_on_node = self.params.estimate_on_node
 
             interpolator = LagrangeApproximation(
-                points=[0] + [nodes[i - 1] for i in range(1, coll.num_nodes + 1) if i != estimate_on_node]
+                points=[nodes[i] for i in range(coll.num_nodes + 1) if i != estimate_on_node]
             )
-            interpolation_matrix = interpolator.getInterpolationMatrix([nodes[estimate_on_node - 1]])
+            interpolation_matrix = interpolator.getInterpolationMatrix([nodes[estimate_on_node]])
             u = [
                 L.u[i].flatten() if L.u[i] is not None else L.u[i]
                 for i in range(coll.num_nodes + 1)
@@ -127,12 +142,24 @@ class EstimateInterpolationError(ConvergenceController):
             ]
             u_inter = self.matmul(interpolation_matrix, u)[0].reshape(L.prob.init[0])
 
+            # compute end point if needed
+            if estimate_on_node == len(nodes) - 1:
+                if L.uend is None:
+                    L.sweep.compute_end_point()
+                high_order_sol = L.uend
+                rank = 0
+                L.status.order_embedded_estimate = coll.num_nodes + 1
+            else:
+                high_order_sol = L.u[estimate_on_node]
+                rank = estimate_on_node - 1
+                L.status.order_embedded_estimate = coll.num_nodes * 1
+
             if self.comm:
-                buf = np.array(abs(u_inter - L.u[estimate_on_node]) if self.comm.rank == estimate_on_node - 1 else 0.0)
-                self.comm.Bcast(buf, root=estimate_on_node - 1)
+                buf = np.array(abs(u_inter - high_order_sol) if self.comm.rank == rank else 0.0)
+                self.comm.Bcast(buf, root=rank)
                 L.status.error_embedded_estimate = buf
             else:
-                L.status.error_embedded_estimate = abs(u_inter - L.u[estimate_on_node])
+                L.status.error_embedded_estimate = abs(u_inter - high_order_sol)
 
     def check_parameters(self, controller, params, description, **kwargs):
         """

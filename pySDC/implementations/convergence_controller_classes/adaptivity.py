@@ -748,7 +748,7 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
         return S.levels[0].status.error_extrapolation_estimate
 
 
-class AdaptivityInterpolationError(AdaptivityForConvergedCollocationProblems):
+class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
     """
     Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature
     nodes.
@@ -781,14 +781,14 @@ class AdaptivityInterpolationError(AdaptivityForConvergedCollocationProblems):
         Returns:
             None
         """
-        from pySDC.implementations.convergence_controller_classes.estimate_interpolation_error import (
-            EstimateInterpolationError,
+        from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+            EstimatePolynomialError,
         )
 
         super().dependencies(controller, description)
 
         controller.add_convergence_controller(
-            EstimateInterpolationError,
+            EstimatePolynomialError,
             description=description,
             params={},
         )
@@ -809,7 +809,7 @@ class AdaptivityInterpolationError(AdaptivityForConvergedCollocationProblems):
             L = S.levels[0]
 
             # compute next step size
-            order = L.sweep.coll.num_nodes
+            order = L.status.order_embedded_estimate
 
             e_est = self.get_local_error_estimate(controller, S)
             L.status.dt_new = self.compute_optimal_step_size(
