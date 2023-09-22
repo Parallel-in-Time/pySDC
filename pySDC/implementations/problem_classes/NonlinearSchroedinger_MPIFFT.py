@@ -220,7 +220,7 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
+        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|2 u
 
     for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be discretized using
     ``mpi4py-fft`` [1]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
