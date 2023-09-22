@@ -916,9 +916,9 @@
 
 
 
-<div class="viewcode-block" id="AdaptivityInterpolationError">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError">[docs]</a>
-<span class="k">class</span> <span class="nc">AdaptivityInterpolationError</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
+<div class="viewcode-block" id="AdaptivityPolynomialError">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError">[docs]</a>
+<span class="k">class</span> <span class="nc">AdaptivityPolynomialError</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature</span>
 <span class="sd">    nodes.</span>
@@ -926,8 +926,8 @@
 <span class="sd">    This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AdaptivityInterpolationError.setup">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.setup">[docs]</a>
+<div class="viewcode-block" id="AdaptivityPolynomialError.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.setup">[docs]</a>
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
 
@@ -940,14 +940,14 @@
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
 
-<div class="viewcode-block" id="AdaptivityInterpolationError.get_convergence">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_convergence">[docs]</a>
+<div class="viewcode-block" id="AdaptivityPolynomialError.get_convergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.get_convergence">[docs]</a>
     <span class="k">def</span> <span class="nf">get_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="AdaptivityInterpolationError.dependencies">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.dependencies">[docs]</a>
+<div class="viewcode-block" id="AdaptivityPolynomialError.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.dependencies">[docs]</a>
     <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the error estimator.</span>
@@ -959,22 +959,22 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_interpolation_error</span> <span class="kn">import</span> <span class="p">(</span>
-            <span class="n">EstimateInterpolationError</span><span class="p">,</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_polynomial_error</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">EstimatePolynomialError</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
-            <span class="n">EstimateInterpolationError</span><span class="p">,</span>
+            <span class="n">EstimatePolynomialError</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
             <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="AdaptivityInterpolationError.get_new_step_size">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_new_step_size">[docs]</a>
+<div class="viewcode-block" id="AdaptivityPolynomialError.get_new_step_size">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.get_new_step_size">[docs]</a>
     <span class="k">def</span> <span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determine a step size for the next step from the error estimate.</span>
@@ -990,7 +990,7 @@
             <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="c1"># compute next step size</span>
-            <span class="n">order</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order_embedded_estimate</span>
 
             <span class="n">e_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
             <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_optimal_step_size</span><span class="p">(</span>
@@ -1007,8 +1007,8 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="AdaptivityInterpolationError.get_local_error_estimate">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityInterpolationError.get_local_error_estimate">[docs]</a>
+<div class="viewcode-block" id="AdaptivityPolynomialError.get_local_error_estimate">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.get_local_error_estimate">[docs]</a>
     <span class="k">def</span> <span class="nf">get_local_error_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the embedded error estimate of the finest level of the step.</span>

@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.convergence_controller_classes.estimate_interpolation_error &#8212; pySDC 5.3.0 documentation</title>
+    <title>implementations.convergence_controller_classes.estimate_polynomial_error &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
@@ -27,7 +27,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_interpolation_error</a></li> 
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_polynomial_error</a></li> 
       </ul>
     </div>  
 
@@ -36,7 +36,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for implementations.convergence_controller_classes.estimate_interpolation_error</h1><div class="highlight"><pre>
+  <h1>Source code for implementations.convergence_controller_classes.estimate_polynomial_error</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
@@ -44,9 +44,9 @@
 <span class="kn">from</span> <span class="nn">pySDC.core.Collocation</span> <span class="kn">import</span> <span class="n">CollBase</span>
 
 
-<div class="viewcode-block" id="EstimateInterpolationError">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.html#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError">[docs]</a>
-<span class="k">class</span> <span class="nc">EstimateInterpolationError</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<div class="viewcode-block" id="EstimatePolynomialError">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError">[docs]</a>
+<span class="k">class</span> <span class="nc">EstimatePolynomialError</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Estimate the local error by using all but one collocation node in a polynomial interpolation to that node.</span>
 <span class="sd">    While the converged collocation problem with M nodes gives a order M approximation to this point, the interpolation</span>
@@ -54,11 +54,13 @@
 <span class="sd">    That is to say this gives an error estimate that is order M. Keep in mind that the collocation problem should be</span>
 <span class="sd">    converged for this and has order up to 2M. Still, the lower order method can be used for time step selection, for</span>
 <span class="sd">    instance.</span>
+<span class="sd">    If the last node is not the end point, we can interpolate to that node, which is an order M approximation and compare</span>
+<span class="sd">    to the order 2M approximation we get from the extrapolation step.</span>
 <span class="sd">    By default, we interpolate to the second to last node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EstimateInterpolationError.setup">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.html#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.setup">[docs]</a>
+<div class="viewcode-block" id="EstimatePolynomialError.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.setup">[docs]</a>
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
@@ -72,9 +74,14 @@
         <span class="kn">from</span> <span class="nn">pySDC.implementations.hooks.log_embedded_error_estimate</span> <span class="kn">import</span> <span class="n">LogEmbeddedErrorEstimate</span>
         <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
 
+        <span class="n">sweeper_params</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span>
+        <span class="n">quad_type</span> <span class="o">=</span> <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span>
+
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span>
-            <span class="s1">&#39;estimate_on_node&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;estimate_on_node&#39;</span><span class="p">:</span> <span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">quad_type</span> <span class="o">==</span> <span class="s1">&#39;GAUSS&#39;</span> <span class="k">else</span> <span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -87,11 +94,18 @@
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogEmbeddedErrorEstimate</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+        <span class="k">if</span> <span class="n">quad_type</span> <span class="o">!=</span> <span class="s1">&#39;GAUSS&#39;</span> <span class="ow">and</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;estimate_on_node&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">num_nodes</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
+                <span class="s1">&#39;You cannot interpolate with lower accuracy to the end point if the end point is a node!&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">defaults</span></div>
 
 
-<div class="viewcode-block" id="EstimateInterpolationError.reset_status_variables">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.html#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.reset_status_variables">[docs]</a>
+<div class="viewcode-block" id="EstimatePolynomialError.reset_status_variables">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables">[docs]</a>
     <span class="k">def</span> <span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add variable for embedded error</span>
@@ -112,11 +126,12 @@
 
         <span class="n">where</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;levels&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;error_embedded_estimate&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;error_embedded_estimate&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_variable</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;order_embedded_estimate&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="EstimateInterpolationError.matmul">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.html#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.matmul">[docs]</a>
+<div class="viewcode-block" id="EstimatePolynomialError.matmul">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.matmul">[docs]</a>
     <span class="k">def</span> <span class="nf">matmul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matrix vector multiplication, possibly MPI parallel.</span>
@@ -148,8 +163,8 @@
             <span class="k">return</span> <span class="n">A</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="EstimateInterpolationError.post_iteration_processing">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.html#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.post_iteration_processing">[docs]</a>
+<div class="viewcode-block" id="EstimatePolynomialError.post_iteration_processing">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.post_iteration_processing">[docs]</a>
     <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate the error</span>
@@ -165,13 +180,13 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
             <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">coll</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span>
-            <span class="n">nodes</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">nodes</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="n">estimate_on_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">estimate_on_node</span>
 
             <span class="n">interpolator</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span>
-                <span class="n">points</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span><span class="p">]</span>
+                <span class="n">points</span><span class="o">=</span><span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span><span class="p">]</span>
             <span class="p">)</span>
-            <span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">estimate_on_node</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]])</span>
+            <span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">]])</span>
             <span class="n">u</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -179,16 +194,28 @@
             <span class="p">]</span>
             <span class="n">u_inter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">interpolation_matrix</span><span class="p">,</span> <span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
+            <span class="c1"># compute end point if needed</span>
+            <span class="k">if</span> <span class="n">estimate_on_node</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+                <span class="n">high_order_sol</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span>
+                <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order_embedded_estimate</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">high_order_sol</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">]</span>
+                <span class="n">rank</span> <span class="o">=</span> <span class="n">estimate_on_node</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order_embedded_estimate</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">*</span> <span class="mi">1</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
-                <span class="n">buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">u_inter</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="n">estimate_on_node</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">estimate_on_node</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">u_inter</span> <span class="o">-</span> <span class="n">high_order_sol</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="n">rank</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="n">buf</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_inter</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">])</span></div>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_inter</span> <span class="o">-</span> <span class="n">high_order_sol</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="EstimateInterpolationError.check_parameters">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.html#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.check_parameters">[docs]</a>
+<div class="viewcode-block" id="EstimatePolynomialError.check_parameters">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.check_parameters">[docs]</a>
     <span class="k">def</span> <span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if we allow the scheme to solve the collocation problems to convergence.</span>
@@ -241,7 +268,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_interpolation_error</a></li> 
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_polynomial_error</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>implementations.convergence_controller_classes.estimate_interpolation_error module &#8212; pySDC 5.3.0 documentation</title>
+    <title>implementations.convergence_controller_classes.estimate_polynomial_error module &#8212; pySDC 5.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
@@ -37,7 +37,7 @@
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" accesskey="U">implementations.convergence_controller_classes package</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_interpolation_error module</a></li> 
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_polynomial_error module</a></li> 
       </ul>
     </div>  
 
@@ -46,11 +46,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-implementations.convergence_controller_classes.estimate_interpolation_error">
-<span id="implementations-convergence-controller-classes-estimate-interpolation-error-module"></span><h1>implementations.convergence_controller_classes.estimate_interpolation_error module<a class="headerlink" href="#module-implementations.convergence_controller_classes.estimate_interpolation_error" title="Link to this heading">¶</a></h1>
+  <section id="module-implementations.convergence_controller_classes.estimate_polynomial_error">
+<span id="implementations-convergence-controller-classes-estimate-polynomial-error-module"></span><h1>implementations.convergence_controller_classes.estimate_polynomial_error module<a class="headerlink" href="#module-implementations.convergence_controller_classes.estimate_polynomial_error" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimateInterpolationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_interpolation_error.html#EstimateInterpolationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EstimatePolynomialError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
 <p>Estimate the local error by using all but one collocation node in a polynomial interpolation to that node.
 While the converged collocation problem with M nodes gives a order M approximation to this point, the interpolation
@@ -58,10 +58,12 @@ gives only an order M-1 approximation. Hence, we have two solutions with differe
 That is to say this gives an error estimate that is order M. Keep in mind that the collocation problem should be
 converged for this and has order up to 2M. Still, the lower order method can be used for time step selection, for
 instance.
+If the last node is not the end point, we can interpolate to that node, which is an order M approximation and compare
+to the order 2M approximation we get from the extrapolation step.
 By default, we interpolate to the second to last node.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.check_parameters">
-<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_interpolation_error.html#EstimateInterpolationError.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.check_parameters" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.check_parameters" title="Link to this definition">¶</a></dt>
 <dd><p>Check if we allow the scheme to solve the collocation problems to convergence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -82,8 +84,8 @@ str: The error message</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.matmul">
-<span class="sig-name descname"><span class="pre">matmul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_interpolation_error.html#EstimateInterpolationError.matmul"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.matmul" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.matmul">
+<span class="sig-name descname"><span class="pre">matmul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError.matmul"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.matmul" title="Link to this definition">¶</a></dt>
 <dd><p>Matrix vector multiplication, possibly MPI parallel.
 The parallel implementation performs a reduce operation in every row of the matrix. While communicating the
 entire vector once could reduce the number of communications, this way we never need to store the entire vector
@@ -105,8 +107,8 @@ on any specific rank.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.post_iteration_processing">
-<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_interpolation_error.html#EstimateInterpolationError.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.post_iteration_processing" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.post_iteration_processing" title="Link to this definition">¶</a></dt>
 <dd><p>Estimate the error</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -122,8 +124,8 @@ on any specific rank.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.reset_status_variables">
-<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_interpolation_error.html#EstimateInterpolationError.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.reset_status_variables" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables">
+<span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables" title="Link to this definition">¶</a></dt>
 <dd><p>Add variable for embedded error</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -136,8 +138,8 @@ on any specific rank.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_interpolation_error.html#EstimateInterpolationError.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.setup" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_polynomial_error.html#EstimatePolynomialError.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.setup" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -169,13 +171,13 @@ on any specific rank.</p>
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">implementations.convergence_controller_classes.estimate_interpolation_error module</a><ul>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError"><code class="docutils literal notranslate"><span class="pre">EstimateInterpolationError</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.matmul"><code class="docutils literal notranslate"><span class="pre">matmul()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_interpolation_error.EstimateInterpolationError.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#">implementations.convergence_controller_classes.estimate_polynomial_error module</a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError"><code class="docutils literal notranslate"><span class="pre">EstimatePolynomialError</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.matmul"><code class="docutils literal notranslate"><span class="pre">matmul()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables"><code class="docutils literal notranslate"><span class="pre">reset_status_variables()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -196,7 +198,7 @@ on any specific rank.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/pySDC/implementations.convergence_controller_classes.estimate_interpolation_error.rst.txt"
+      <li><a href="../_sources/pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -232,7 +234,7 @@ on any specific rank.</p>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" >implementations.convergence_controller_classes package</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_interpolation_error module</a></li> 
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.estimate_polynomial_error module</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
