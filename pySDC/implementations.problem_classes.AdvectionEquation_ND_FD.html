@@ -66,7 +66,7 @@ Discretization uses central finite differences.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nvars</strong> (<em>int</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution (same in all dimensions). Using a tuple allows to
-consider several dimensions, e.g nvars=(16,16) for a 2D problem.</p></li>
+consider several dimensions, e.g <code class="docutils literal notranslate"><span class="pre">nvars=(16,16)</span></code> for a 2D problem.</p></li>
 <li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed (same in all dimensions).</p></li>
 <li><p><strong>freq</strong> (<em>int</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – Spatial frequency <span class="math notranslate nohighlight">\(f\)</span> of the initial conditions, can be tuple.</p></li>
 <li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of the finite difference stencil.</p></li>
@@ -74,8 +74,8 @@ consider several dimensions, e.g nvars=(16,16) for a 2D problem.</p></li>
 <li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for spatial solver (GMRES).</p></li>
 <li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Max. iterations number for GMRES.</p></li>
 <li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Solve the linear system directly or using GMRES or CG</p></li>
-<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Boundary conditions, either “periodic” or “dirichlet”.</p></li>
-<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>If freq=-1 and ndim=1, uses a Gaussian initial solution of the form</p>
+<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Boundary conditions, either <code class="docutils literal notranslate"><span class="pre">'periodic'</span></code> or <code class="docutils literal notranslate"><span class="pre">'dirichlet'</span></code>.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">freq=-1</span></code> and <code class="docutils literal notranslate"><span class="pre">ndim=1</span></code>, uses a Gaussian initial solution of the form</p>
 <div class="math notranslate nohighlight">
 \[u(x,0) = e^{
     \frac{\displaystyle 1}{\displaystyle 2}
@@ -117,7 +117,7 @@ Do, however, take care that all spatial parameters have the same dimension.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionEquation_ND_FD.html#advectionNd.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

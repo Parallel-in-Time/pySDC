@@ -55,26 +55,26 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericNDimFinDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
-<p>Base class for finite difference spatial discretisation in N-dimensions</p>
+<p>Base class for finite difference spatial discretisation in <span class="math notranslate nohighlight">\(N\)</span> dimensions</p>
 <div class="math notranslate nohighlight">
 \[\frac{d u}{dt} = A u,\]</div>
-<p>where :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>A in mathbb{R}^{nN times nN} is a matrix arising from finite difference discretisation of spatial
-derivatives with n degrees of freedom per dimension and N dimensions. This generic class follows the MOL
+<p>where <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{nN \times nN} is a matrix arising from finite difference discretisation of spatial
+derivatives with :math:`n\)</span> degrees of freedom per dimension and <span class="math notranslate nohighlight">\(N\)</span> dimensions. This generic class follows the MOL
 (method-of-lines) approach and can be used to discretize partial differential equations such as the advection
 equation and the heat equation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution for the ND problem. For <span class="math notranslate nohighlight">\(N = 2\)</span>, set nvars=(16, 16).</p></li>
+<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution for the ND problem. For <span class="math notranslate nohighlight">\(N = 2\)</span>, set <code class="docutils literal notranslate"><span class="pre">nvars=(16,</span> <span class="pre">16)</span></code>.</p></li>
 <li><p><strong>coeff</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor for finite difference matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
 <li><p><strong>derivative</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the spatial derivative.</p></li>
-<li><p><strong>freq</strong> (<em>int</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – Spatial frequency, can be a tuple.</p></li>
+<li><p><strong>freq</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial frequency, can be a tuple.</p></li>
 <li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Stencil type for finite differences.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of accuracy of the finite difference discretization.</p></li>
 <li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for spatial solver.</p></li>
 <li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for linear solver.</p></li>
-<li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of solver. Can be ‘direct’, ‘GMRES’ or ‘CG’.</p></li>
-<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is ‘periodic’.</p></li>
+<li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of solver. Can be <code class="docutils literal notranslate"><span class="pre">'direct'</span></code>, <code class="docutils literal notranslate"><span class="pre">'GMRES'</span></code> or <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>.</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is <code class="docutils literal notranslate"><span class="pre">'periodic'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>

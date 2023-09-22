@@ -63,15 +63,15 @@ can be used, for example, circles of the form</p>
 <p>or <em>checker-board</em></p>
 <div class="math notranslate nohighlight">
 \[u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),\]</div>
-<p>or uniform distributed random numbers in <span class="math notranslate nohighlight">\([-1, 1]\)</span> for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of
+<p>or uniform distributed random numbers in <span class="math notranslate nohighlight">\([-1, 1]\)</span> for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of
 spatial grid points. For time-stepping, the problem is treated <em>semi-implicitly</em>, i.e., the diffusion part is solved by
 Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</p>
 <p>An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
-by a scipy routine.</p>
+by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> routine.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>List</em><em> of </em><em>int tuples</em><em>, </em><em>optional</em>) – Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].</p></li>
+<li><p><strong>nvars</strong> (<em>List</em><em> of </em><em>int tuples</em><em>, </em><em>optional</em>) – Number of unknowns in the problem, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=[(128,</span> <span class="pre">128),</span> <span class="pre">(128,</span> <span class="pre">128)]</span></code>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Problem parameter <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
 <li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
 <li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the circles.</p></li>
@@ -170,7 +170,7 @@ by a scipy routine.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -205,15 +205,15 @@ can be used here, for example, circles of the form</p>
 <p>or <em>checker-board</em></p>
 <div class="math notranslate nohighlight">
 \[u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),\]</div>
-<p>or uniform distributed random numbers in <span class="math notranslate nohighlight">\([-1, 1]\)</span> for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of
+<p>or uniform distributed random numbers in <span class="math notranslate nohighlight">\([-1, 1]\)</span> for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of
 spatial grid points. For time-stepping, the problem is treated <em>semi-implicitly</em>, i.e., the diffusion part is solved with
 Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</p>
 <p>An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
-by a scipy routine.</p>
+by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> routine.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>List</em><em> of </em><em>int tuples</em><em>, </em><em>optional</em>) – Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].</p></li>
+<li><p><strong>nvars</strong> (<em>List</em><em> of </em><em>int tuples</em><em>, </em><em>optional</em>) – Number of unknowns in the problem, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=[(128,</span> <span class="pre">128),</span> <span class="pre">(128,</span> <span class="pre">128)]</span></code>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Problem parameter <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
 <li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
 <li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the circles.</p></li>

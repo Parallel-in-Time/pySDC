@@ -71,11 +71,11 @@ leak itself.</p>
 <li><p><strong>u_max</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum temperature.</p></li>
 <li><p><strong>Q_max</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum heat source power density.</p></li>
 <li><p><strong>leak_range</strong> (<em>tuple</em><em> of </em><em>float</em>) – Range of the leak.</p></li>
-<li><p><strong>leak_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of leak, choose between ‘linear’ or ‘exponential’.</p></li>
-<li><p><strong>leak_transition</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates how the heat in the leak propagates (?), choose between ‘step’ and ‘Gaussian’.</p></li>
+<li><p><strong>leak_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of leak, choose between <code class="docutils literal notranslate"><span class="pre">'linear'</span></code> or <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>.</p></li>
+<li><p><strong>leak_transition</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates how the heat in the leak propagates, choose between <code class="docutils literal notranslate"><span class="pre">'step'</span></code> and <code class="docutils literal notranslate"><span class="pre">'Gaussian'</span></code>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the finite difference discretization.</p></li>
 <li><p><strong>stencil_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of stencil for finite differences.</p></li>
-<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is ‘neumann-zero’.</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is <code class="docutils literal notranslate"><span class="pre">'neumann-zero'</span></code>.</p></li>
 <li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution.</p></li>
 <li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton to terminate.</p></li>
 <li><p><strong>newton_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of Newton iterations to be done.</p></li>
@@ -83,7 +83,7 @@ leak itself.</p>
 <li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of linear iterations inside the Newton solver.</p></li>
 <li><p><strong>direct_solver</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates if a direct solver should be used.</p></li>
 <li><p><strong>reference_sol_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates which method should be used to compute a reference solution.
-Choose between ‘scipy’, ‘SDC’, or ‘DIRK’.</p></li>
+Choose between <code class="docutils literal notranslate"><span class="pre">'scipy'</span></code>, <code class="docutils literal notranslate"><span class="pre">'SDC'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'DIRK'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -223,7 +223,7 @@ Supercond. Sci. Technol. 36 044004. DOI 10.1088/1361-6668/acbeea</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#Quench.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Simple Newton solver for <span class="math notranslate nohighlight">\((I - factor f)(\vec{u}) = \vec{rhs}\)</span>.</p>
+<dd><p>Simple Newton solver for <span class="math notranslate nohighlight">\((I - factor \cdot f)(\vec{u}) = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -245,7 +245,7 @@ Supercond. Sci. Technol. 36 044004. DOI 10.1088/1361-6668/acbeea</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.Quench.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#Quench.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.Quench.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -303,7 +303,7 @@ leak itself.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.QuenchIMEX.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#QuenchIMEX.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.QuenchIMEX.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I - factor f_{expl})(\vec{u}) = \vec{rhs}\)</span>.</p>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I - factor \cdot f_{expl})(\vec{u}) = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -325,7 +325,7 @@ leak itself.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Quench.QuenchIMEX.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Quench.html#QuenchIMEX.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Quench.QuenchIMEX.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

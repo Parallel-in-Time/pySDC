@@ -59,21 +59,21 @@
 <span class="sd">    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
+<span class="sd">        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
 
 <span class="sd">    The exact solution of the problem is</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        u(x, t) = \sin(\pi x)\cos(t).</span>
 
-<span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem</span>
+<span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem</span>
 <span class="sd">    is reformulated to the *weak formulation*</span>
 
 <span class="sd">    .. math:</span>
-<span class="sd">        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.</span>
+<span class="sd">        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.</span>
 
 <span class="sd">    The nonlinear system is solved in a *fully-implicit* way using Dolfin&#39;s weak solver provided by the routine</span>
-<span class="sd">    `df.NonlinearVariationalSolver`.</span>
+<span class="sd">    ``df.NonlinearVariationalSolver``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -83,12 +83,12 @@
 <span class="sd">        Starting time.</span>
 <span class="sd">    family : str, optional</span>
 <span class="sd">        Indicates the family of elements used to create the function space</span>
-<span class="sd">        for the trail and test functions. The default is &#39;CG&#39;, which are the class</span>
+<span class="sd">        for the trail and test functions. The default is ``&#39;CG&#39;``, which are the class</span>
 <span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Defines the order of the elements in the function space.</span>
 <span class="sd">    refinements : int, optional</span>
-<span class="sd">        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.</span>
+<span class="sd">        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
 
@@ -99,9 +99,9 @@
 <span class="sd">    w : Function</span>
 <span class="sd">        Function for the weak form.</span>
 <span class="sd">    a_K : scalar, vector, matrix or higher rank tensor</span>
-<span class="sd">        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).</span>
+<span class="sd">        The expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx` (incl. BC).</span>
 <span class="sd">    M : scalar, vector, matrix or higher rank tensor</span>
-<span class="sd">        Denotes the expression :math:`\int_\Omega u_t v dx`.</span>
+<span class="sd">        Denotes the expression :math:`\int_\Omega u_t v\,dx`.</span>
 <span class="sd">    g : Expression</span>
 <span class="sd">        The forcing term :math:`f` in the heat equation.</span>
 <span class="sd">    bc : DirichletBC</span>
@@ -203,7 +203,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Dolfin&#39;s weak solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.</span>
+<span class="sd">        Dolfin&#39;s weak solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -285,8 +285,8 @@
 <div class="viewcode-block" id="fenics_heat_weak_fullyimplicit.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -320,18 +320,18 @@
 <span class="sd">    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
+<span class="sd">        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
 
 <span class="sd">    The exact solution of the problem is</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        u(x, t) = \sin(\pi x)\cos(t).</span>
 
-<span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using FEniCS [1]_. Hence, the problem</span>
+<span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem</span>
 <span class="sd">    is reformulated to the *weak formulation*</span>
 
 <span class="sd">    .. math:</span>
-<span class="sd">        \int_\Omega u_t v dx = - \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx.</span>
+<span class="sd">        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.</span>
 
 <span class="sd">    The problem is solved in a *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where</span>
 <span class="sd">    it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved</span>
@@ -345,12 +345,12 @@
 <span class="sd">        Starting time.</span>
 <span class="sd">    family : str, optional</span>
 <span class="sd">        Indicates the family of elements used to create the function space</span>
-<span class="sd">        for the trail and test functions. The default is &#39;CG&#39;, which are the class</span>
+<span class="sd">        for the trail and test functions. The default is ``&#39;CG&#39;``, which are the class</span>
 <span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Defines the order of the elements in the function space.</span>
 <span class="sd">    refinements : int, optional</span>
-<span class="sd">        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.</span>
+<span class="sd">        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
 
@@ -363,9 +363,9 @@
 <span class="sd">    v : TestFunction</span>
 <span class="sd">        The test function for the weak form.</span>
 <span class="sd">    a_K : scalar, vector, matrix or higher rank tensor</span>
-<span class="sd">        The expression :math:`- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx` (incl. BC).</span>
+<span class="sd">        The expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx` (incl. BC).</span>
 <span class="sd">    M : scalar, vector, matrix or higher rank tensor</span>
-<span class="sd">        Denotes the expression :math:`\int_\Omega u_t v dx`.</span>
+<span class="sd">        Denotes the expression :math:`\int_\Omega u_t v\,dx`.</span>
 <span class="sd">    g : Expression</span>
 <span class="sd">        The forcing term :math:`f` in the heat equation.</span>
 <span class="sd">    bc : DirichletBC</span>
@@ -462,7 +462,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Dolfin&#39;s weak solver for :math:`(M - factor A)\vec{u} = \vec{u}`.</span>
+<span class="sd">        Dolfin&#39;s weak solver for :math:`(M - factor \cdot A)\vec{u} = \vec{u}`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -561,8 +561,8 @@
 <div class="viewcode-block" id="fenics_heat_weak_imex.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

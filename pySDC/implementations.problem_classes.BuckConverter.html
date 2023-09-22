@@ -58,9 +58,9 @@ states and each of this state can be expressed as a nonhomogeneous linear system
 <div class="math notranslate nohighlight">
 \[\frac{d u(t)}{dt} = A_k u(t) + f_k (t)\]</div>
 <p>for <span class="math notranslate nohighlight">\(k=1,2\)</span>. The two states are the following. Define <span class="math notranslate nohighlight">\(T_{sw}:=\frac{1}{f_{sw}}\)</span> as the switching period with
-switching frequency <span class="math notranslate nohighlight">\(f_{sw}\)</span>. The duty cycle <span class="math notranslate nohighlight">\(duty\)</span> defines the period of how long the switches are in one state
+switching frequency <span class="math notranslate nohighlight">\(f_{sw}\)</span>. The duty cycle <span class="math notranslate nohighlight">\(d\)</span> defines the period of how long the switches are in one state
 until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. A duty cycle of one means
-that the switches are always in only one state. If <span class="math notranslate nohighlight">\(0 \leq \frac{t}{T_{sw}} mod 1 \leq duty\)</span> <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
+that the switches are always in only one state. If <span class="math notranslate nohighlight">\(0 \leq \frac{t}{T_{sw}} \bmod 1 \leq d\)</span> <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[\frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_1} (t) + \frac{V_s}{R_s C_1},\]</div>
 <div class="math notranslate nohighlight">
@@ -78,8 +78,8 @@ that the switches are always in only one state. If <span class="math notranslate
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>duty</strong> (<em>float</em><em>, </em><em>optional</em>) – Cycle between zero and one indicates the time period how long the converter stays on one switching state
-until it switches to the other state.</p></li>
+<li><p><strong>duty</strong> (<em>float</em><em>, </em><em>optional</em>) – Duty cycle <span class="math notranslate nohighlight">\(d\)</span> between zero and one indicates the time period how long the converter stays on one switching
+state until it switches to the other state.</p></li>
 <li><p><strong>fsw</strong> (<em>int</em><em>, </em><em>optional</em>) – Switching frequency, it is used to determine the number of time steps after the switching state is changed.</p></li>
 <li><p><strong>Vs</strong> (<em>float</em><em>, </em><em>optional</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
 <li><p><strong>Rs</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
@@ -177,7 +177,7 @@ pulse-width-modulation controlled devices - application to the steady-state regi
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/BuckConverter.html#buck_converter.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

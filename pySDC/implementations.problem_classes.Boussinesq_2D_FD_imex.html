@@ -66,7 +66,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>list</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – List of number of unknowns nvars, e.g. [(4, 300, 3)].</p></li>
+<li><p><strong>nvars</strong> (<em>list</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – List of number of unknowns nvars, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=[(4,</span> <span class="pre">300,</span> <span class="pre">3)]</span></code>.</p></li>
 <li><p><strong>c_s</strong> (<em>float</em><em>, </em><em>optional</em>) – Acoustic velocity <span class="math notranslate nohighlight">\(c_s\)</span>.</p></li>
 <li><p><strong>u_adv</strong> (<em>float</em><em>, </em><em>optional</em>) – Advection speed <span class="math notranslate nohighlight">\(U\)</span>.</p></li>
 <li><p><strong>Nfreq</strong> (<em>float</em><em>, </em><em>optional</em>) – Stability frequency.</p></li>
@@ -105,7 +105,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver">
 <span class="sig-name descname"><span class="pre">bc_ver</span></span><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.bc_ver" title="Link to this definition">¶</a></dt>
-<dd><p>Contains type of boundary conditions for both boundaries for both dimemsions, e.g. ‘neumann’ or ‘dirichlet’.</p>
+<dd><p>Contains type of boundary conditions for both boundaries for both dimemsions, e.g. <code class="docutils literal notranslate"><span class="pre">'neumann'</span></code> or <code class="docutils literal notranslate"><span class="pre">'dirichlet'</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -208,16 +208,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to evaluate both parts of the RHS</p>
+<dd><p>Routine to evaluate both parts of the right-hand side.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time the numerical solution is computed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the RHS divided into two parts</p>
+<dd class="field-even"><p><strong>f</strong> – Right-hand side divided into two parts.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
@@ -228,7 +228,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I - factor A) \vec{u} = \vec{rhs}\)</span> using GMRES.</p>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I - factor \cdot A) \vec{u} = \vec{rhs}\)</span> using GMRES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -250,7 +250,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Boussinesq_2D_FD_imex.html#boussinesq_2d_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

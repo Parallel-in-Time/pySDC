@@ -58,19 +58,19 @@
 <span class="sd">            - 6 d_w \frac{u - T_M}{T_M}u (1 - u)</span>
 
 <span class="sd">    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, with driving force :math:`d_w`, and :math:`N=2,3`. :math:`D` and</span>
-<span class="sd">    :math:`T_M` are a fixed parameters. Different initial conditions can be used, for example, circles of the form</span>
+<span class="sd">    :math:`T_M` are fixed parameters. Different initial conditions can be used, for example, circles of the form</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
 <span class="sd">    *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand</span>
-<span class="sd">    side will be treated explicitly using mpi4py-fft [1]_ to solve them.</span>
+<span class="sd">    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : List of int tuples, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. [(128, 128), (64, 64)].</span>
+<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (64, 64)]``.</span>
 <span class="sd">    eps : float, optional</span>
 <span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
 <span class="sd">    radius : float, optional</span>
@@ -97,11 +97,11 @@
 <span class="sd">    X : np.ogrid</span>
 <span class="sd">        Grid coordinates in real space.</span>
 <span class="sd">    K2 : np.ndarray</span>
-<span class="sd">        Laplace operator in spectral space</span>
+<span class="sd">        Laplace operator in spectral space.</span>
 <span class="sd">    dx : float</span>
-<span class="sd">        Mesh width in x direction</span>
+<span class="sd">        Mesh width in x direction.</span>
 <span class="sd">    dy : float</span>
-<span class="sd">        Mesh width in y direction</span>
+<span class="sd">        Mesh width in y direction.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -285,8 +285,8 @@
 <div class="viewcode-block" id="allencahn_temp_imex.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

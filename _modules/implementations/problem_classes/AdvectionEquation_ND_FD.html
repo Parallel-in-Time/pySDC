@@ -65,7 +65,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : int of tuple, optional</span>
 <span class="sd">        Spatial resolution (same in all dimensions). Using a tuple allows to</span>
-<span class="sd">        consider several dimensions, e.g nvars=(16,16) for a 2D problem.</span>
+<span class="sd">        consider several dimensions, e.g ``nvars=(16,16)`` for a 2D problem.</span>
 <span class="sd">    c : float, optional</span>
 <span class="sd">        Advection speed (same in all dimensions).</span>
 <span class="sd">    freq : int of tuple, optional</span>
@@ -81,9 +81,9 @@
 <span class="sd">    solver_type : str, optional</span>
 <span class="sd">        Solve the linear system directly or using GMRES or CG</span>
 <span class="sd">    bc : str, optional</span>
-<span class="sd">        Boundary conditions, either &quot;periodic&quot; or &quot;dirichlet&quot;.</span>
+<span class="sd">        Boundary conditions, either ``&#39;periodic&#39;`` or ``&#39;dirichlet&#39;``.</span>
 <span class="sd">    sigma : float, optional</span>
-<span class="sd">        If freq=-1 and ndim=1, uses a Gaussian initial solution of the form</span>
+<span class="sd">        If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form</span>
 
 <span class="sd">        .. math::</span>
 <span class="sd">            u(x,0) = e^{</span>
@@ -129,8 +129,8 @@
 <div class="viewcode-block" id="advectionNd.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

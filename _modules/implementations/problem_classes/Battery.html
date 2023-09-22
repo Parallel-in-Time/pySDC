@@ -234,8 +234,8 @@
 <div class="viewcode-block" id="battery_n_capacitors.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -338,7 +338,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery">[docs]</a>
 <span class="k">class</span> <span class="nc">battery</span><span class="p">(</span><span class="n">battery_n_capacitors</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. This model is an example</span>
+<span class="sd">    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from ``battery_n_capacitors``. This model is an example</span>
 <span class="sd">    of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has</span>
 <span class="sd">    a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by</span>
 <span class="sd">    the following equations:</span>
@@ -441,8 +441,8 @@
 <div class="viewcode-block" id="battery.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

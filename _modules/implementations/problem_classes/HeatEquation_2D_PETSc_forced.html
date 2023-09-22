@@ -64,20 +64,20 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u(x, y, t) = \sin(2 \pi x) \sin(2 \pi y) \cos(t).</span>
 
-<span class="sd">    The spatial discretization uses central finite differences and is realized with PETSc [1]_, [2]_.</span>
+<span class="sd">    The spatial discretization uses central finite differences and is realized with ``PETSc`` [1]_, [2]_.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cnvars : tuple, optional</span>
-<span class="sd">        Spatial resolution for the 2D problem, e.g. (16, 16).</span>
+<span class="sd">        Spatial resolution for the 2D problem, e.g. ``cnvars=(16, 16)``.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
 <span class="sd">    freq : int, optional</span>
 <span class="sd">        Spatial frequency of the initial conditions (equal for both dimensions).</span>
 <span class="sd">    refine : int, optional</span>
-<span class="sd">        Defines the refinement of the mesh, e.g. refine=2 means the mesh is refined with factor 2.</span>
+<span class="sd">        Defines the refinement of the mesh, e.g. ``refine=2`` means the mesh is refined with factor 2.</span>
 <span class="sd">    comm : COMM_WORLD</span>
-<span class="sd">        Communicator for PETSc.</span>
+<span class="sd">        Communicator for ``PETSc``.</span>
 <span class="sd">    sol_tol : float, optional</span>
 <span class="sd">        Tolerance that the solver needs to satisfy for termination.</span>
 <span class="sd">    sol_maxiter : int, optional</span>
@@ -94,11 +94,11 @@
 <span class="sd">    dy : float</span>
 <span class="sd">        Distance between two spatial nodes in y direction.</span>
 <span class="sd">    ksp : object</span>
-<span class="sd">        PETSc linear solver object.</span>
+<span class="sd">        ``PETSc`` linear solver object.</span>
 <span class="sd">    ksp_ncalls : int</span>
-<span class="sd">        Calls of PETSc&#39;s linear solver object.</span>
+<span class="sd">        Calls of ``PETSc``&#39;s linear solver object.</span>
 <span class="sd">    ksp_itercount : int</span>
-<span class="sd">        Iterations done by PETSc&#39;s linear solver object.</span>
+<span class="sd">        Iterations done by ``PETSc``&#39;s linear solver object.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -160,8 +160,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc matrix A.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to assemble ``PETSc`` matrix A.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -204,8 +204,8 @@
         <span class="k">return</span> <span class="n">A</span>
 
     <span class="k">def</span> <span class="nf">__get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper function to assemble PETSc identity matrix.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to assemble ``PETSc`` identity matrix.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -303,8 +303,8 @@
 <div class="viewcode-block" id="heat2d_petsc_forced.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_2D_PETSc_forced.html#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

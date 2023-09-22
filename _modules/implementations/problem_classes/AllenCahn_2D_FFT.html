@@ -65,17 +65,17 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),</span>
 
-<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of</span>
+<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
 <span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by</span>
 <span class="sd">    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</span>
 
 <span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
-<span class="sd">    by a scipy routine.</span>
+<span class="sd">    by a ``SciPy`` routine.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : List of int tuples, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].</span>
+<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Problem parameter :math:`\nu`.</span>
 <span class="sd">    eps : float, optional</span>
@@ -197,8 +197,8 @@
 <div class="viewcode-block" id="allencahn2d_imex.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -262,17 +262,17 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),</span>
 
-<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math::`i, j=0,..,N-1`, where :math:`N` is the number of</span>
+<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
 <span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with</span>
 <span class="sd">    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.</span>
 
 <span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
-<span class="sd">    by a scipy routine.</span>
+<span class="sd">    by a ``SciPy`` routine.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : List of int tuples, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].</span>
+<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Problem parameter :math:`\nu`.</span>
 <span class="sd">    eps : float, optional</span>

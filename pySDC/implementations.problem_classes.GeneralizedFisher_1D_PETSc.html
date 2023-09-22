@@ -57,9 +57,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of PETSc.</p></li>
-<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for PETSc.</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor (dt*Qd).</p></li>
+<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor <span class="math notranslate nohighlight">\(\Delta t Q_\Delta\)</span>.</p></li>
 <li><p><strong>dx</strong> (<em>float</em>) – Grid spacing in x direction.</p></li>
 </ul>
 </dd>
@@ -67,7 +67,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.localX">
 <span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.localX" title="Link to this definition">¶</a></dt>
-<dd><p>Local vector for PETSc.</p>
+<dd><p>Local vector for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>PETSc vector object</p>
@@ -129,7 +129,7 @@ in the solution.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
 <li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
-<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector F(X).</p></li>
+<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector <span class="math notranslate nohighlight">\(F(X)\)</span>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -169,13 +169,13 @@ in the solution.</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Fisher_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#Fisher_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES.</p>
+<p>Helper class to generate residual and Jacobian matrix for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of PETSc.</p></li>
-<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for PETSc.</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor (dt*Qd).</p></li>
+<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor <span class="math notranslate nohighlight">\(\Delta t Q_\Delta\)</span>.</p></li>
 <li><p><strong>dx</strong> (<em>float</em>) – Grid spacing in x direction.</p></li>
 </ul>
 </dd>
@@ -183,7 +183,7 @@ in the solution.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction.localX">
 <span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_reaction.localX" title="Link to this definition">¶</a></dt>
-<dd><p>Local vector for PETSc.</p>
+<dd><p>Local vector for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>PETSc vector object</p>
@@ -201,7 +201,7 @@ in the solution.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
 <li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
-<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector F(X).</p></li>
+<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector <span class="math notranslate nohighlight">\(F(X)\)</span>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -247,13 +247,10 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)\]</div>
 <p>with exact solution</p>
-<dl>
-<dt>u(x, 0) = left[</dt><dd><blockquote>
-<div><p>1 + left(2^{nu / 2} - 1right) expleft(-(nu / 2)sigma_1 x + 2 lambda_1 tright)</p>
-</div></blockquote>
-<p>right]^{-2 / nu}</p>
-</dd>
-</dl>
+<div class="math notranslate nohighlight">
+\[u(x, 0) = \left[
+        1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+    \right]^{-2 / \nu}\]</div>
 <p>for <span class="math notranslate nohighlight">\(x \in \mathbb{R}\)</span>, and</p>
 <div class="math notranslate nohighlight">
 \[\sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},\]</div>
@@ -261,7 +258,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 \[\lambda_1 = \frac{\lambda_0}{2} \left[
     \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
 \right].\]</div>
-<p>This class is implemented to be solved in spatial using PETSc <a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the problem is treated
+<p>This class is implemented to be solved in spatial using <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the problem is treated
 <em>fully-implicitly</em>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.dtype_f">
@@ -292,7 +289,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-no
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_fullyimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Nonlinear solver for (I - factor F)(vec{u}) = {rhs}.</p>
+<dd><p>Nonlinear solver for <span class="math notranslate nohighlight">\((I - factor \cdot F)(\vec{u}) = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -323,13 +320,10 @@ problem <a class="footnote-reference brackets" href="#id7" id="id4" role="doc-no
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)\]</div>
 <p>with exact solution</p>
-<dl>
-<dt>u(x, 0) = left[</dt><dd><blockquote>
-<div><p>1 + left(2^{nu / 2} - 1right) expleft(-(nu / 2)sigma_1 x + 2 lambda_1 tright)</p>
-</div></blockquote>
-<p>right]^{-2 / nu}</p>
-</dd>
-</dl>
+<div class="math notranslate nohighlight">
+\[u(x, 0) = \left[
+        1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+    \right]^{-2 / \nu}\]</div>
 <p>for <span class="math notranslate nohighlight">\(x \in \mathbb{R}\)</span>, and</p>
 <div class="math notranslate nohighlight">
 \[\sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},\]</div>
@@ -337,7 +331,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id4" role="doc-no
 \[\lambda_1 = \frac{\lambda_0}{2} \left[
     \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
 \right].\]</div>
-<p>This class is implemented to be solved in spatial using PETSc <a class="footnote-reference brackets" href="#id8" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the problem will be solved
+<p>This class is implemented to be solved in spatial using <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id8" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the problem will be solved
 <em>multi-implicitly</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -514,7 +508,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.solve_system_1">
 <span class="sig-name descname"><span class="pre">solve_system_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_multiimplicit.solve_system_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.solve_system_1" title="Link to this definition">¶</a></dt>
-<dd><p>Linear solver for (I - factor A)vec{u} = vec{rhs}.</p>
+<dd><p>Linear solver for <span class="math notranslate nohighlight">\((I - factor \cdot A)\vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -536,7 +530,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.solve_system_2">
 <span class="sig-name descname"><span class="pre">solve_system_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_multiimplicit.solve_system_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.solve_system_2" title="Link to this definition">¶</a></dt>
-<dd><p>Nonlinear solver for (I - factor F)(vec{u}) = {rhs}.</p>
+<dd><p>Nonlinear solver for <span class="math notranslate nohighlight">\((I - factor \cdot F)(\vec{u}) = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -558,7 +552,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_multiimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -584,13 +578,10 @@ problem <a class="footnote-reference brackets" href="#id7" id="id10" role="doc-n
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)\]</div>
 <p>with exact solution</p>
-<dl>
-<dt>u(x, 0) = left[</dt><dd><blockquote>
-<div><p>1 + left(2^{nu / 2} - 1right) expleft(-(nu / 2)sigma_1 x + 2 lambda_1 tright)</p>
-</div></blockquote>
-<p>right]^{-2 / nu}</p>
-</dd>
-</dl>
+<div class="math notranslate nohighlight">
+\[u(x, 0) = \left[
+        1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+    \right]^{-2 / \nu}\]</div>
 <p>for <span class="math notranslate nohighlight">\(x \in \mathbb{R}\)</span>, and</p>
 <div class="math notranslate nohighlight">
 \[\sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},\]</div>
@@ -598,7 +589,7 @@ problem <a class="footnote-reference brackets" href="#id7" id="id10" role="doc-n
 \[\lambda_1 = \frac{\lambda_0}{2} \left[
     \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
 \right].\]</div>
-<p>This class is implemented to be solved in spatial using PETSc <a class="footnote-reference brackets" href="#id8" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the problem here will be
+<p>This class is implemented to be solved in spatial using <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id8" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the problem here will be
 solved in a <em>semi-implicit</em> way.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.dtype_f">
@@ -629,7 +620,7 @@ solved in a <em>semi-implicit</em> way.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GeneralizedFisher_1D_PETSc.html#petsc_fisher_semiimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Simple linear solver for (I-factor A)vec{u} = {rhs}.</p>
+<dd><p>Simple linear solver for <span class="math notranslate nohighlight">\((I-factor \cdot A)\vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

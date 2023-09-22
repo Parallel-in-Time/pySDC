@@ -58,24 +58,24 @@
 \[\frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f\]</div>
 <p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0,1]\)</span>, where the forcing term <span class="math notranslate nohighlight">\(f\)</span> is defined by</p>
 <div class="math notranslate nohighlight">
-\[f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).\]</div>
+\[f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).\]</div>
 <p>The exact solution of the problem is</p>
 <div class="math notranslate nohighlight">
 \[u(x, t) = \sin(\pi x)\cos(t).\]</div>
-<p>In this class the problem is implemented in the way that the spatial part is solved using FEniCS <a href="#id9"><span class="problematic" id="id1">[1]_</span></a>. Hence, the problem
+<p>In this class the problem is implemented in the way that the spatial part is solved using <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> <a href="#id9"><span class="problematic" id="id1">[1]_</span></a>. Hence, the problem
 is reformulated to the <em>weak formulation</em></p>
 <p>The nonlinear system is solved in a <em>fully-implicit</em> way using Dolfin’s weak solver provided by the routine
-<cite>df.NonlinearVariationalSolver</cite>.</p>
+<code class="docutils literal notranslate"><span class="pre">df.NonlinearVariationalSolver</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c_nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., numbers of degrees of freedom in space.</p></li>
 <li><p><strong>t0</strong> (<em>float</em><em>, </em><em>optional</em>) – Starting time.</p></li>
 <li><p><strong>family</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates the family of elements used to create the function space
-for the trail and test functions. The default is ‘CG’, which are the class
+for the trail and test functions. The default is <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>, which are the class
 of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, see <a href="#id10"><span class="problematic" id="id2">[2]_</span></a>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the order of the elements in the function space.</p></li>
-<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. refinements=2 refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
+<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. <code class="docutils literal notranslate"><span class="pre">refinements=2</span></code> refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
 </ul>
 </dd>
@@ -105,7 +105,7 @@ of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.a_K">
 <span class="sig-name descname"><span class="pre">a_K</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.a_K" title="Link to this definition">¶</a></dt>
-<dd><p>The expression <span class="math notranslate nohighlight">\(- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx\)</span> (incl. BC).</p>
+<dd><p>The expression <span class="math notranslate nohighlight">\(- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx\)</span> (incl. BC).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
@@ -116,7 +116,7 @@ of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.M">
 <span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.M" title="Link to this definition">¶</a></dt>
-<dd><p>Denotes the expression <span class="math notranslate nohighlight">\(\int_\Omega u_t v dx\)</span>.</p>
+<dd><p>Denotes the expression <span class="math notranslate nohighlight">\(\int_\Omega u_t v\,dx\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
@@ -194,7 +194,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_fullyimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Dolfin’s weak solver for <span class="math notranslate nohighlight">\((M - factor A) \vec{u} = \vec{rhs}\)</span>.</p>
+<dd><p>Dolfin’s weak solver for <span class="math notranslate nohighlight">\((M - factor \cdot A) \vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -216,7 +216,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_fullyimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -241,11 +241,11 @@ Wells and others. Springer (2012).</p>
 \[\frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f\]</div>
 <p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0,1]\)</span>, where the forcing term <span class="math notranslate nohighlight">\(f\)</span> is defined by</p>
 <div class="math notranslate nohighlight">
-\[f(x, t) = -\sin(\pi * x) (\sin(t) - \nu \pi^2 \cos(t)).\]</div>
+\[f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).\]</div>
 <p>The exact solution of the problem is</p>
 <div class="math notranslate nohighlight">
 \[u(x, t) = \sin(\pi x)\cos(t).\]</div>
-<p>In this class the problem is implemented in the way that the spatial part is solved using FEniCS <a href="#id11"><span class="problematic" id="id5">[1]_</span></a>. Hence, the problem
+<p>In this class the problem is implemented in the way that the spatial part is solved using <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> <a href="#id11"><span class="problematic" id="id5">[1]_</span></a>. Hence, the problem
 is reformulated to the <em>weak formulation</em></p>
 <p>The problem is solved in a <em>semi-explicit</em> way, i.e., the part containing the forcing term is treated explicitly, where
 it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved
@@ -256,10 +256,10 @@ implicitly.</p>
 <li><p><strong>c_nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., numbers of degrees of freedom in space.</p></li>
 <li><p><strong>t0</strong> (<em>float</em><em>, </em><em>optional</em>) – Starting time.</p></li>
 <li><p><strong>family</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates the family of elements used to create the function space
-for the trail and test functions. The default is ‘CG’, which are the class
+for the trail and test functions. The default is <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>, which are the class
 of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, see <a href="#id12"><span class="problematic" id="id6">[2]_</span></a>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the order of the elements in the function space.</p></li>
-<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. refinements=2 refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
+<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. <code class="docutils literal notranslate"><span class="pre">refinements=2</span></code> refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
 </ul>
 </dd>
@@ -300,7 +300,7 @@ of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.a_K">
 <span class="sig-name descname"><span class="pre">a_K</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.a_K" title="Link to this definition">¶</a></dt>
-<dd><p>The expression <span class="math notranslate nohighlight">\(- \nu \int_\Omega \nabla u \nabla v dx + \int_\Omega f v dx\)</span> (incl. BC).</p>
+<dd><p>The expression <span class="math notranslate nohighlight">\(- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx\)</span> (incl. BC).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
@@ -311,7 +311,7 @@ of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.M">
 <span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.M" title="Link to this definition">¶</a></dt>
-<dd><p>Denotes the expression <span class="math notranslate nohighlight">\(\int_\Omega u_t v dx\)</span>.</p>
+<dd><p>Denotes the expression <span class="math notranslate nohighlight">\(\int_\Omega u_t v\,dx\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>scalar, vector, matrix or higher rank tensor</p>
@@ -389,7 +389,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_imex.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Dolfin’s weak solver for <span class="math notranslate nohighlight">\((M - factor A)\vec{u} = \vec{u}\)</span>.</p>
+<dd><p>Dolfin’s weak solver for <span class="math notranslate nohighlight">\((M - factor \cdot A)\vec{u} = \vec{u}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -411,7 +411,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

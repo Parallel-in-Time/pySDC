@@ -54,9 +54,9 @@
 <span class="sd">        \frac{d u(t)}{dt} = A_k u(t) + f_k (t)</span>
 
 <span class="sd">    for :math:`k=1,2`. The two states are the following. Define :math:`T_{sw}:=\frac{1}{f_{sw}}` as the switching period with</span>
-<span class="sd">    switching frequency :math:`f_{sw}`. The duty cycle :math:`duty` defines the period of how long the switches are in one state</span>
+<span class="sd">    switching frequency :math:`f_{sw}`. The duty cycle :math:`d` defines the period of how long the switches are in one state</span>
 <span class="sd">    until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage [1]_. A duty cycle of one means</span>
-<span class="sd">    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} mod 1 \leq duty` [2]_:</span>
+<span class="sd">    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} \bmod 1 \leq d` [2]_:</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_1} (t) + \frac{V_s}{R_s C_1},</span>
@@ -83,8 +83,8 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    duty : float, optional</span>
-<span class="sd">        Cycle between zero and one indicates the time period how long the converter stays on one switching state</span>
-<span class="sd">        until it switches to the other state.</span>
+<span class="sd">        Duty cycle :math:`d` between zero and one indicates the time period how long the converter stays on one switching</span>
+<span class="sd">        state until it switches to the other state.</span>
 <span class="sd">    fsw : int, optional</span>
 <span class="sd">        Switching frequency, it is used to determine the number of time steps after the switching state is changed.</span>
 <span class="sd">    Vs : float, optional</span>
@@ -220,8 +220,8 @@
 <div class="viewcode-block" id="buck_converter.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.BuckConverter.html#implementations.problem_classes.BuckConverter.buck_converter.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

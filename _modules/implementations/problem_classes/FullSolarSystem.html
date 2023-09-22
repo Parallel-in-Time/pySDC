@@ -48,8 +48,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FullSolarSystem.html#implementations.problem_classes.FullSolarSystem.full_solar_system">[docs]</a>
 <span class="k">class</span> <span class="nc">full_solar_system</span><span class="p">(</span><span class="n">outer_solar_system</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem bases</span>
-<span class="sd">    on Newton&#39;s second law. Therefore, the :math:`N`-body problem is formulated as</span>
+<span class="sd">    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is</span>
+<span class="sd">    based on Newton&#39;s second law. Therefore, the :math:`N`-body problem is formulated as</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),</span>
@@ -60,7 +60,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).</span>
 
-<span class="sd">    This class implements the full solar system containing all planets including earth&#39;s moon, i.e., :math:`N=10`. Initial conditions</span>
+<span class="sd">    This class implements the full solar system containing all planets including Earth&#39;s moon, i.e., :math:`N=10`. Initial conditions</span>
 <span class="sd">    are taken from [1]_, and masses relative to the sun taken from [2]_.</span>
 
 <span class="sd">    Parameters</span>
@@ -91,8 +91,8 @@
 <div class="viewcode-block" id="full_solar_system.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.FullSolarSystem.html#implementations.problem_classes.FullSolarSystem.full_solar_system.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact/initial trajectory at time t. Values here are taken from [1]_, [2]_.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact/initial trajectory at time :math:`t`. Values here are taken from [1]_, [2]_.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

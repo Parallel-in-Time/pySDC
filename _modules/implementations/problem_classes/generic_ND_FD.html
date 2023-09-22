@@ -58,25 +58,25 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">[docs]</a>
 <span class="k">class</span> <span class="nc">GenericNDimFinDiff</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for finite difference spatial discretisation in N-dimensions</span>
+<span class="sd">    Base class for finite difference spatial discretisation in :math:`N` dimensions</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d u}{dt} = A u,</span>
 
 <span class="sd">    where :math:`A \in \mathbb{R}^{nN \times nN} is a matrix arising from finite difference discretisation of spatial</span>
-<span class="sd">    derivatives with n degrees of freedom per dimension and N dimensions. This generic class follows the MOL</span>
+<span class="sd">    derivatives with :math:`n` degrees of freedom per dimension and :math:`N` dimensions. This generic class follows the MOL</span>
 <span class="sd">    (method-of-lines) approach and can be used to discretize partial differential equations such as the advection</span>
 <span class="sd">    equation and the heat equation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : int, optional</span>
-<span class="sd">        Spatial resolution for the ND problem. For :math:`N = 2`, set nvars=(16, 16).</span>
+<span class="sd">        Spatial resolution for the ND problem. For :math:`N = 2`, set ``nvars=(16, 16)``.</span>
 <span class="sd">    coeff : float, optional</span>
 <span class="sd">        Factor for finite difference matrix :math:`A`.</span>
 <span class="sd">    derivative : int, optional</span>
 <span class="sd">        Order of the spatial derivative.</span>
-<span class="sd">    freq : int of tuple, optional</span>
+<span class="sd">    freq : tuple of int, optional</span>
 <span class="sd">        Spatial frequency, can be a tuple.</span>
 <span class="sd">    stencil_type : str, optional</span>
 <span class="sd">        Stencil type for finite differences.</span>
@@ -87,9 +87,9 @@
 <span class="sd">    liniter : int, optional</span>
 <span class="sd">        Maximum number of iterations for linear solver.</span>
 <span class="sd">    solver_type : str, optional</span>
-<span class="sd">        Type of solver. Can be &#39;direct&#39;, &#39;GMRES&#39; or &#39;CG&#39;.</span>
+<span class="sd">        Type of solver. Can be ``&#39;direct&#39;``, ``&#39;GMRES&#39;`` or ``&#39;CG&#39;``.</span>
 <span class="sd">    bc : str, optional</span>
-<span class="sd">        Type of boundary conditions. Default is &#39;periodic&#39;.</span>
+<span class="sd">        Type of boundary conditions. Default is ``&#39;periodic&#39;``.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>

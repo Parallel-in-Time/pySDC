@@ -56,27 +56,27 @@
 <p>The Gray-Scott system <a href="#id15"><span class="problematic" id="id1">[1]_</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
 where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
 whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
-<span class="math notranslate nohighlight">\(u,\, v\)</span>. Here, the process is described by the N-dimensional model</p>
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. Here, the process is described by the <span class="math notranslate nohighlight">\(N\)</span>-dimensional model</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
-<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(2 \leq N \leq 3\)</span>. Spatial discretization is done by using
-Fast Fourier transformation for solving the linear parts provided by mpi4py-fft <a href="#id16"><span class="problematic" id="id2">[2]_</span></a>, see also
+<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(N=2,3\)</span>. Spatial discretization is done by using
+Fast Fourier transformation for solving the linear parts provided by <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a href="#id16"><span class="problematic" id="id2">[2]_</span></a>, see also
 <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a>.</p>
 <p>This class implements the problem for <em>semi-explicit</em> time-stepping (diffusion is treated implicitly, and reaction
 is computed in explicit fashion).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. (127, 127).</p></li>
+<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=(127,</span> <span class="pre">127)</span></code>.</p></li>
 <li><p><strong>Du</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>Dv</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>A</strong> (<em>float</em><em>, </em><em>optional</em>) – Feed rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>B</strong> (<em>float</em><em>, </em><em>optional</em>) – Overall decay rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space.</p></li>
 <li><p><strong>L</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
-<li><p><strong>comm</strong> (<em>COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for mpi4py-fft.</p></li>
+<li><p><strong>comm</strong> (<em>COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -209,7 +209,7 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_MPIFFT.html#grayscott_imex_diffusion.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t=0, see <a class="footnote-reference brackets" href="#id5" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t = 0\)</span>, see <a class="footnote-reference brackets" href="#id5" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -232,13 +232,13 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <p>The Gray-Scott system <a href="#id17"><span class="problematic" id="id7">[1]_</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
 where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
 whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
-<span class="math notranslate nohighlight">\(u,\, v\)</span>. The model with linear (reaction) part is described by the N-dimensional model</p>
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. The model with linear (reaction) part is described by the <span class="math notranslate nohighlight">\(N\)</span>-dimensional model</p>
 <div class="math notranslate nohighlight">
 \[\frac{d u}{d t} = D_u \Delta u - u v^2 + A,\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{d v}{d t} = D_v \Delta v + u v^2\]</div>
-<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(2 \leq N \leq 3\)</span>. Spatial discretization is done by using
-Fast Fourier transformation for solving the linear parts provided by mpi4py-fft <a href="#id18"><span class="problematic" id="id8">[2]_</span></a>, see also
+<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(N=2,3\)</span>. Spatial discretization is done by using
+Fast Fourier transformation for solving the linear parts provided by <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a href="#id18"><span class="problematic" id="id8">[2]_</span></a>, see also
 <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a>.</p>
 <p>This class implements the problem for <em>semi-explicit</em> time-stepping (diffusion is treated implicitly, and linear
 part is computed in an explicit way).</p>
@@ -271,27 +271,27 @@ part is computed in an explicit way).</p>
 <p>The Gray-Scott system <a href="#id19"><span class="problematic" id="id9">[1]_</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
 where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
 whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
-<span class="math notranslate nohighlight">\(u,\, v\)</span>. Here, the process is described by the N-dimensional model</p>
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. Here, the process is described by the <span class="math notranslate nohighlight">\(N\)</span>-dimensional model</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
-<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(2 \leq N \leq 3\)</span>. Spatial discretization is done by using
-Fast Fourier transformation for solving the linear parts provided by mpi4py-fft <a href="#id20"><span class="problematic" id="id10">[2]_</span></a>, see also
+<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(N=2,3\)</span>. Spatial discretization is done by using
+Fast Fourier transformation for solving the linear parts provided by <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a href="#id20"><span class="problematic" id="id10">[2]_</span></a>, see also
 <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a>.</p>
 <p>This class implements the problem for <em>multi-implicit</em> time-stepping, i.e., both diffusion and reaction part will be treated
 implicitly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. (127, 127).</p></li>
+<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=(127,</span> <span class="pre">127)</span></code>.</p></li>
 <li><p><strong>Du</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>Dv</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>A</strong> (<em>float</em><em>, </em><em>optional</em>) – Feed rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>B</strong> (<em>float</em><em>, </em><em>optional</em>) – Overall decay rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space.</p></li>
 <li><p><strong>L</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
-<li><p><strong>comm</strong> (<em>COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for mpi4py-fft.</p></li>
+<li><p><strong>comm</strong> (<em>COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -442,13 +442,13 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <p>The original Gray-Scott system <a href="#id21"><span class="problematic" id="id13">[1]_</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
 where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
 whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
-<span class="math notranslate nohighlight">\(u,\, v\)</span>. The model with linear (reaction) part is described by the N-dimensional model</p>
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. The model with linear (reaction) part is described by the <span class="math notranslate nohighlight">\(N\)</span>-dimensional model</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A,\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2\]</div>
-<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(2 \leq N \leq 3\)</span>. Spatial discretization is done by using
-Fast Fourier transformation for solving the linear parts provided by mpi4py-fft <a href="#id22"><span class="problematic" id="id14">[2]_</span></a>, see also
+<p>in <span class="math notranslate nohighlight">\(x \in \Omega:=[-L/2, L/2]^N\)</span> with <span class="math notranslate nohighlight">\(N=2,3\)</span>. Spatial discretization is done by using
+Fast Fourier transformation for solving the linear parts provided by <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a href="#id22"><span class="problematic" id="id14">[2]_</span></a>, see also
 <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">https://mpi4py-fft.readthedocs.io/en/latest/</a>.</p>
 <p>The problem in this class will be treated in a <em>multi-implicit</em> way for time-stepping, i.e., for the system containing
 the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.</p>

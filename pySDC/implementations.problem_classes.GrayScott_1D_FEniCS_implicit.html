@@ -64,21 +64,21 @@ whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with
 <p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The <em>weak formulation</em> of the problem can be obtained by multiplying the
 system with a test function <span class="math notranslate nohighlight">\(q\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\int_\Omega u_t q dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,\]</div>
+\[\int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,\]</div>
 <div class="math notranslate nohighlight">
-\[\int_\Omega v_t q dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,\]</div>
-<p>The spatial solve of the weak formulation is realized by FEniCS <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+\[\int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,\]</div>
+<p>The spatial solve of the weak formulation is realized by <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c_nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space.</p></li>
 <li><p><strong>t0</strong> (<em>float</em><em>, </em><em>optional</em>) – Starting time.</p></li>
 <li><p><strong>family</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates the family of elements used to create the function space
-for the trail and test functions. The default is ‘CG’, which are the class
+for the trail and test functions. The default is <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>, which are the class
 of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, see <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the order of the elements in the function space.</p></li>
 <li><p><strong>refinements</strong> (<em>list</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
-[2, 2] or (2, 2).</p></li>
+<code class="docutils literal notranslate"><span class="pre">refinements=[2,</span> <span class="pre">2]</span></code> or <code class="docutils literal notranslate"><span class="pre">refinements=(2,</span> <span class="pre">2)</span></code>.</p></li>
 <li><p><strong>Du</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>Dv</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>A</strong> (<em>float</em><em>, </em><em>optional</em>) – Feed rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
@@ -227,7 +227,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Dolfin’s linear solver for <span class="math notranslate nohighlight">\((M - factor A) \vec{u} = \vec{rhs}\)</span>.</p>
+<dd><p>Dolfin’s linear solver for <span class="math notranslate nohighlight">\((M - factor \cdot A) \vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -249,7 +249,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

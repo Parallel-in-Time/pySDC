@@ -61,8 +61,8 @@
 <span class="sd">        .. math::</span>
 <span class="sd">            \frac{d u}{dt} = \frac{4}{t^*},</span>
 
-<span class="sd">    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) &lt; 0`, i.e., :math:`t \leq t^*` the exact solution is</span>
-<span class="sd">    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.</span>
+<span class="sd">    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) &lt; 0`, i.e. :math:`t \leq t^*`, the exact solution is</span>
+<span class="sd">    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e. :math:`t \geq t^*`, the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -200,8 +200,8 @@
 <div class="viewcode-block" id="DiscontinuousTestODE.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -234,7 +234,7 @@
 <div class="viewcode-block" id="DiscontinuousTestODE.get_switching_info">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.get_switching_info">[docs]</a>
     <span class="k">def</span> <span class="nf">get_switching_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provides information about the state function of the problem. When the state function changes its sign,</span>
 <span class="sd">        typically an event occurs. So the check for an event should be done in the way that the state function</span>
 <span class="sd">        is checked for a sign change. If this is the case, the intermediate value theorem states a root in this</span>
@@ -243,7 +243,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        u : dtype_u</span>
-<span class="sd">            Current values of the numerical solution at time t.</span>
+<span class="sd">            Current values of the numerical solution at time :math:`t`.</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Current time of the numerical solution.</span>
 

@@ -64,7 +64,7 @@ The exact solution is given by</p>
 \[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{x - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
 <p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span>.</p>
 <p>Let <span class="math notranslate nohighlight">\(A\)</span> denote the finite difference matrix to discretize <span class="math notranslate nohighlight">\(\frac{\partial^2 u}{\partial x^2}\)</span>. Here,
-_Finel’s <a href="#id1"><span class="problematic" id="id2">trick_</span></a> is used. Let</p>
+<em>Finel’s trick</em> is used. Let</p>
 <div class="math notranslate nohighlight">
 \[a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,\]</div>
 <p>then, the right-hand side of the problem can be written as</p>
@@ -141,7 +141,7 @@ exact solution is given by</p>
 <li><p><strong>newton_maxiter</strong> (<em>int</em>) – Maximum number of iterations for Newton’s method.</p></li>
 <li><p><strong>newton_tol</strong> (<em>float</em>) – Tolerance for Newton’s method to terminate.</p></li>
 <li><p><strong>interval</strong> (<em>list</em>) – Interval of spatial domain.</p></li>
-<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if nan values arise.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if <code class="docutils literal notranslate"><span class="pre">nan</span></code> values arise.</p></li>
 </ul>
 </dd>
 </dl>
@@ -290,7 +290,7 @@ exact solution is given by</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_fullyimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -331,7 +331,8 @@ explicitly.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_front_semiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
@@ -533,7 +534,7 @@ The exact solution is</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_fullyimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -563,7 +564,7 @@ The exact solution is then given by</p>
 \[u(x, t) = 0.5 \left(1 + \tanh\left(\frac{r - |x| - vt}{\sqrt{2}\varepsilon}\right)\right)\]</div>
 <p>with <span class="math notranslate nohighlight">\(v = 3 \sqrt{2} \varepsilon d_w\)</span> and radius <span class="math notranslate nohighlight">\(r\)</span> of the circles. For time-stepping, the problem is treated
 in a <em>multi-implicit</em> fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a
-linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by
+linear solver provided by a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> routine, and the nonlinear system including the rest of the right-hand side is solved by
 Newton’s method.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit.dtype_f">
@@ -661,7 +662,8 @@ side is only evaluated at each time.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_1D_FD.html#allencahn_periodic_semiimplicit.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Routine to evaluate the right-hand side of the problem.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>

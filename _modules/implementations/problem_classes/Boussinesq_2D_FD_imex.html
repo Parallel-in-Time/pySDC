@@ -74,7 +74,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : list of tuple, optional</span>
-<span class="sd">        List of number of unknowns nvars, e.g. [(4, 300, 3)].</span>
+<span class="sd">        List of number of unknowns nvars, e.g. ``nvars=[(4, 300, 3)]``.</span>
 <span class="sd">    c_s : float, optional</span>
 <span class="sd">        Acoustic velocity :math:`c_s`.</span>
 <span class="sd">    u_adv : float, optional</span>
@@ -103,7 +103,7 @@
 <span class="sd">    bc_hor : list</span>
 <span class="sd">        Contains type of boundary conditions for both boundaries for both dimensions.</span>
 <span class="sd">    bc_ver :</span>
-<span class="sd">        Contains type of boundary conditions for both boundaries for both dimemsions, e.g. &#39;neumann&#39; or &#39;dirichlet&#39;.</span>
+<span class="sd">        Contains type of boundary conditions for both boundaries for both dimemsions, e.g. ``&#39;neumann&#39;`` or ``&#39;dirichlet&#39;``.</span>
 <span class="sd">    xx : np.ndarray</span>
 <span class="sd">        List of np.ndarrays for mesh in x-direction.</span>
 <span class="sd">    zz : np.ndarray</span>
@@ -199,7 +199,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple linear solver for :math:`(I - factor A) \vec{u} = \vec{rhs}` using GMRES.</span>
+<span class="sd">        Simple linear solver for :math:`(I - factor \cdot A) \vec{u} = \vec{rhs}` using GMRES.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -293,14 +293,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to evaluate both parts of the RHS</span>
+<span class="sd">        Routine to evaluate both parts of the right-hand side.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            u (dtype_u): current values</span>
-<span class="sd">            t (float): current time</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dtype_f: the RHS divided into two parts</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side divided into two parts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -312,8 +317,8 @@
 <div class="viewcode-block" id="boussinesq_2d_imex.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

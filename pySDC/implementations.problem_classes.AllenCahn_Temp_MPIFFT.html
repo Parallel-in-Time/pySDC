@@ -58,16 +58,16 @@
 \[\frac{\partial u}{\partial t} = D \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
     - 6 d_w \frac{u - T_M}{T_M}u (1 - u)\]</div>
 <p>on a spatial domain <span class="math notranslate nohighlight">\([-\frac{L}{2}, \frac{L}{2}]^2\)</span>, with driving force <span class="math notranslate nohighlight">\(d_w\)</span>, and <span class="math notranslate nohighlight">\(N=2,3\)</span>. <span class="math notranslate nohighlight">\(D\)</span> and
-<span class="math notranslate nohighlight">\(T_M\)</span> are a fixed parameters. Different initial conditions can be used, for example, circles of the form</p>
+<span class="math notranslate nohighlight">\(T_M\)</span> are fixed parameters. Different initial conditions can be used, for example, circles of the form</p>
 <div class="math notranslate nohighlight">
 \[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),\]</div>
-<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is treated
+<p>for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is treated
 <em>semi-implicitly</em>, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
-side will be treated explicitly using mpi4py-fft <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to solve them.</p>
+side will be treated explicitly using <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to solve them.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.nvars">
 <span class="sig-name descname"><span class="pre">nvars</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.nvars" title="Link to this definition">¶</a></dt>
-<dd><p>Number of unknowns in the problem, e.g. [(128, 128), (64, 64)].</p>
+<dd><p>Number of unknowns in the problem, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=[(128,</span> <span class="pre">128),</span> <span class="pre">(64,</span> <span class="pre">64)]</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of int tuples, optional</p>
@@ -199,7 +199,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.K2">
 <span class="sig-name descname"><span class="pre">K2</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.K2" title="Link to this definition">¶</a></dt>
-<dd><p>Laplace operator in spectral space</p>
+<dd><p>Laplace operator in spectral space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
@@ -210,7 +210,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dx" title="Link to this definition">¶</a></dt>
-<dd><p>Mesh width in x direction</p>
+<dd><p>Mesh width in x direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -221,7 +221,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dy">
 <span class="sig-name descname"><span class="pre">dy</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dy" title="Link to this definition">¶</a></dt>
-<dd><p>Mesh width in y direction</p>
+<dd><p>Mesh width in y direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -293,7 +293,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_Temp_MPIFFT.html#allencahn_temp_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

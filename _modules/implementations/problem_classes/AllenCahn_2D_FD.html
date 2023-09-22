@@ -65,13 +65,13 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is</span>
 <span class="sd">    treated *fully-implicitly*, i.e., the nonlinear system is solved by Newton.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : tuple of int, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. (128, 128).</span>
+<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Problem parameter :math:`\nu`.</span>
 <span class="sd">    eps : float, optional</span>
@@ -294,8 +294,8 @@
 <div class="viewcode-block" id="allencahn_fullyimplicit.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -335,7 +335,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is</span>
 <span class="sd">    treated in a *semi-implicit* way, i.e., the linear system containing the Laplacian is solved by the conjugate gradients</span>
 <span class="sd">    method, and the system containing the rest of the right-hand side is only evaluated at each time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -425,7 +425,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit_v2">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_semiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
+<span class="sd">    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)</span>
@@ -435,7 +435,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting</span>
 <span class="sd">    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`</span>
 <span class="sd">    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`</span>
 <span class="sd">    is only evaluated at each time.</span>
@@ -552,7 +552,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is</span>
 <span class="sd">    treated in *multi-implicit* fashion, i.e., the linear system containing the Laplacian is solved by the conjugate gradients</span>
 <span class="sd">    method, and the system containing the rest of the right-hand side will be solved by Newton&#39;s method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -707,7 +707,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit_v2">[docs]</a>
 <span class="k">class</span> <span class="nc">allencahn_multiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
+<span class="sd">    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)</span>
@@ -717,10 +717,10 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting</span>
 <span class="sd">    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`</span>
 <span class="sd">    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`</span>
-<span class="sd">    is solved by a linear solver provided by a scipy routine.</span>
+<span class="sd">    is solved by a linear solver provided by a ``SciPy`` routine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>

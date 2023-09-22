@@ -63,15 +63,15 @@
 <p>and forcing term <span class="math notranslate nohighlight">\(f(x, y, t)\)</span> such that the exact solution is</p>
 <div class="math notranslate nohighlight">
 \[u(x, y, t) = \sin(2 \pi x) \sin(2 \pi y) \cos(t).\]</div>
-<p>The spatial discretization uses central finite differences and is realized with PETSc <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p>The spatial discretization uses central finite differences and is realized with <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cnvars</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution for the 2D problem, e.g. (16, 16).</p></li>
+<li><p><strong>cnvars</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution for the 2D problem, e.g. <code class="docutils literal notranslate"><span class="pre">cnvars=(16,</span> <span class="pre">16)</span></code>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
 <li><p><strong>freq</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial frequency of the initial conditions (equal for both dimensions).</p></li>
-<li><p><strong>refine</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the refinement of the mesh, e.g. refine=2 means the mesh is refined with factor 2.</p></li>
-<li><p><strong>comm</strong> (<em>COMM_WORLD</em>) – Communicator for PETSc.</p></li>
+<li><p><strong>refine</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the refinement of the mesh, e.g. <code class="docutils literal notranslate"><span class="pre">refine=2</span></code> means the mesh is refined with factor 2.</p></li>
+<li><p><strong>comm</strong> (<em>COMM_WORLD</em>) – Communicator for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
 <li><p><strong>sol_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance that the solver needs to satisfy for termination.</p></li>
 <li><p><strong>sol_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for the solver to terminate.</p></li>
 </ul>
@@ -124,7 +124,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp">
 <span class="sig-name descname"><span class="pre">ksp</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp" title="Link to this definition">¶</a></dt>
-<dd><p>PETSc linear solver object.</p>
+<dd><p><code class="docutils literal notranslate"><span class="pre">PETSc</span></code> linear solver object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>object</p>
@@ -135,7 +135,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp_ncalls">
 <span class="sig-name descname"><span class="pre">ksp_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Calls of PETSc’s linear solver object.</p>
+<dd><p>Calls of <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s linear solver object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
@@ -146,7 +146,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp_itercount">
 <span class="sig-name descname"><span class="pre">ksp_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.ksp_itercount" title="Link to this definition">¶</a></dt>
-<dd><p>Iterations done by PETSc’s linear solver object.</p>
+<dd><p>Iterations done by <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s linear solver object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
@@ -223,7 +223,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_2D_PETSc_forced.html#heat2d_petsc_forced.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_2D_PETSc_forced.heat2d_petsc_forced.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

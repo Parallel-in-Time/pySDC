@@ -79,15 +79,15 @@
 <span class="sd">    leak_range : tuple of float</span>
 <span class="sd">        Range of the leak.</span>
 <span class="sd">    leak_type : str, optional</span>
-<span class="sd">        Type of leak, choose between &#39;linear&#39; or &#39;exponential&#39;.</span>
+<span class="sd">        Type of leak, choose between ``&#39;linear&#39;`` or ``&#39;exponential&#39;``.</span>
 <span class="sd">    leak_transition : str, optional</span>
-<span class="sd">        Indicates how the heat in the leak propagates (?), choose between &#39;step&#39; and &#39;Gaussian&#39;.</span>
+<span class="sd">        Indicates how the heat in the leak propagates, choose between ``&#39;step&#39;`` and ``&#39;Gaussian&#39;``.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Order of the finite difference discretization.</span>
 <span class="sd">    stencil_type : str, optional</span>
 <span class="sd">        Type of stencil for finite differences.</span>
 <span class="sd">    bc : str, optional</span>
-<span class="sd">        Type of boundary conditions. Default is &#39;neumann-zero&#39;.</span>
+<span class="sd">        Type of boundary conditions. Default is ``&#39;neumann-zero&#39;``.</span>
 <span class="sd">    nvars : int, optional</span>
 <span class="sd">        Spatial resolution.</span>
 <span class="sd">    newton_tol : float, optional</span>
@@ -102,7 +102,7 @@
 <span class="sd">        Indicates if a direct solver should be used.</span>
 <span class="sd">    reference_sol_type : str, optional</span>
 <span class="sd">        Indicates which method should be used to compute a reference solution.</span>
-<span class="sd">        Choose between &#39;scipy&#39;, &#39;SDC&#39;, or &#39;DIRK&#39;.</span>
+<span class="sd">        Choose between ``&#39;scipy&#39;``, ``&#39;SDC&#39;``, or ``&#39;DIRK&#39;``.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -330,7 +330,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple Newton solver for :math:`(I - factor f)(\vec{u}) = \vec{rhs}`.</span>
+<span class="sd">        Simple Newton solver for :math:`(I - factor \cdot f)(\vec{u}) = \vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -399,8 +399,8 @@
 <div class="viewcode-block" id="Quench.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -422,25 +422,35 @@
 <span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                    Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`</span>
 
-<span class="sd">                    Args:</span>
-<span class="sd">                        t (float): The current time</span>
-<span class="sd">                        u (dtype_u): Current solution</span>
+<span class="sd">                    Parameters</span>
+<span class="sd">                    ----------</span>
+<span class="sd">                    t : float</span>
+<span class="sd">                        The current time.</span>
+<span class="sd">                    u : dtype_u</span>
+<span class="sd">                        Current solution.</span>
 
-<span class="sd">                    Returns:</span>
-<span class="sd">                        scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.</span>
+<span class="sd">                    Returns</span>
+<span class="sd">                    -------</span>
+<span class="sd">                    scipy.sparse.csc</span>
+<span class="sd">                        The derivative of the non-linear part of the solution w.r.t. to the solution.</span>
 <span class="sd">                    &quot;&quot;&quot;</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
 
                 <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">                    Function to pass to `scipy.solve_ivp` to evaluate the full RHS</span>
+<span class="sd">                    Function to pass to `scipy.solve_ivp` to evaluate the full right-hand side.</span>
 
-<span class="sd">                    Args:</span>
-<span class="sd">                        t (float): Current time</span>
-<span class="sd">                        u (numpy.1darray): Current solution</span>
+<span class="sd">                    Parameters</span>
+<span class="sd">                    ----------</span>
+<span class="sd">                    t : float</span>
+<span class="sd">                        Current time.</span>
+<span class="sd">                    u : numpy.1darray</span>
+<span class="sd">                        Current solution.</span>
 
-<span class="sd">                    Returns:</span>
-<span class="sd">                        (numpy.1darray): RHS</span>
+<span class="sd">                    Returns</span>
+<span class="sd">                    -------</span>
+<span class="sd">                    numpy.1darray</span>
+<span class="sd">                        Right-hand side.</span>
 <span class="sd">                    &quot;&quot;&quot;</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
@@ -553,7 +563,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple linear solver for :math:`(I - factor f_{expl})(\vec{u}) = \vec{rhs}`.</span>
+<span class="sd">        Simple linear solver for :math:`(I - factor \cdot f_{expl})(\vec{u}) = \vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -580,8 +590,8 @@
 <div class="viewcode-block" id="QuenchIMEX.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

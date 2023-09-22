@@ -72,10 +72,9 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)</span>
 
-<span class="sd">    with initial condition :math:`y(0) = (1, 1, 1)^{T}` for :math:`t \in [0, 1]`. The problem parameters for this problem</span>
-<span class="sd">    are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`.</span>
-<span class="sd">    Lorenz chose these parameters such that the Reynolds number :math:`\rho` is slightly supercritical as to provoke</span>
-<span class="sd">    instability of steady convection.</span>
+<span class="sd">    with initial condition :math:`(y_1(0), y_2(0), y_3(0))^T = (1, 1, 1)^T` for :math:`t \in [0, 1]`. The problem parameters</span>
+<span class="sd">    for this problem are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`. Lorenz chose these parameters such</span>
+<span class="sd">    that the Reynolds number :math:`\rho` is slightly supercritical as to provoke instability of steady convection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -231,8 +230,8 @@
 <div class="viewcode-block" id="LorenzAttractor.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to return initial conditions or to approximate exact solution using scipy.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to return initial conditions or to approximate exact solution using ``SciPy``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -254,8 +253,8 @@
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">                Evaluate the right hand side, but switch the arguments for scipy.</span>
+<span class="w">                </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                Evaluate the right hand side, but switch the arguments for ``SciPy``.</span>
 
 <span class="sd">                Args:</span>
 <span class="sd">                    t (float): Time</span>

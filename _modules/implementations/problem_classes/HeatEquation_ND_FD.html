@@ -47,7 +47,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced">[docs]</a>
 <span class="k">class</span> <span class="nc">heatNd_unforced</span><span class="p">(</span><span class="n">GenericNDimFinDiff</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class implements the unforced N-dimensional heat equation with periodic boundary conditions</span>
+<span class="sd">    This class implements the unforced :math:`N`-dimensional heat equation with periodic boundary conditions</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = \nu</span>
@@ -66,7 +66,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : int, optional</span>
 <span class="sd">        Spatial resolution (same in all dimensions). Using a tuple allows to</span>
-<span class="sd">        consider several dimensions, e.g nvars=(16,16) for a 2D problem.</span>
+<span class="sd">        consider several dimensions, e.g ``nvars=(16,16)`` for a 2D problem.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
 <span class="sd">    freq : int, optional</span>
@@ -82,9 +82,9 @@
 <span class="sd">    solver_type : str, optional</span>
 <span class="sd">        Solve the linear system directly or using CG.</span>
 <span class="sd">    bc : str, optional</span>
-<span class="sd">        Boundary conditions, either &quot;periodic&quot; or &quot;dirichlet&quot;.</span>
+<span class="sd">        Boundary conditions, either ``&#39;periodic&#39;`` or ``&#39;dirichlet&#39;``.</span>
 <span class="sd">    sigma : float, optional</span>
-<span class="sd">        If freq=-1 and ndim=1, uses a Gaussian initial solution of the form</span>
+<span class="sd">        If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form</span>
 
 <span class="sd">        .. math::</span>
 <span class="sd">            u(x,0) = e^{</span>
@@ -125,8 +125,8 @@
 <div class="viewcode-block" id="heatNd_unforced.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_unforced.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -181,7 +181,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced">[docs]</a>
 <span class="k">class</span> <span class="nc">heatNd_forced</span><span class="p">(</span><span class="n">heatNd_unforced</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class implements the forced N-dimensional heat equation with periodic boundary conditions</span>
+<span class="sd">    This class implements the forced :math:`N`-dimensional heat equation with periodic boundary conditions</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = \nu</span>
@@ -256,8 +256,8 @@
 <div class="viewcode-block" id="heatNd_forced.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

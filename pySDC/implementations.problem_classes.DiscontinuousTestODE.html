@@ -65,8 +65,8 @@ the solution changes when the state function <span class="math notranslate nohig
 <div><div class="math notranslate nohighlight">
 \[\frac{d u}{dt} = \frac{4}{t^*},\]</div>
 </div></blockquote>
-<p>where <span class="math notranslate nohighlight">\(t^* = \log(5) \approx 1.6094379\)</span>. For <span class="math notranslate nohighlight">\(h(u) &lt; 0\)</span>, i.e., <span class="math notranslate nohighlight">\(t \leq t^*\)</span> the exact solution is
-<span class="math notranslate nohighlight">\(u(t) = \exp(t)\)</span>; for <span class="math notranslate nohighlight">\(h(u) \geq 0\)</span>, i.e., <span class="math notranslate nohighlight">\(t \geq t^*\)</span> the exact solution is <span class="math notranslate nohighlight">\(u(t) = \frac{4 t}{t^*} + 1\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(t^* = \log(5) \approx 1.6094379\)</span>. For <span class="math notranslate nohighlight">\(h(u) &lt; 0\)</span>, i.e. <span class="math notranslate nohighlight">\(t \leq t^*\)</span>, the exact solution is
+<span class="math notranslate nohighlight">\(u(t) = \exp(t)\)</span>; for <span class="math notranslate nohighlight">\(h(u) \geq 0\)</span>, i.e. <span class="math notranslate nohighlight">\(t \geq t^*\)</span>, the exact solution is <span class="math notranslate nohighlight">\(u(t) = \frac{4 t}{t^*} + 1\)</span>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact">
 <span class="sig-name descname"><span class="pre">t_switch_exact</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact" title="Link to this definition">¶</a></dt>
@@ -170,7 +170,7 @@ step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution at time t.</p></li>
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution.</p></li>
 </ul>
 </dd>
@@ -210,7 +210,7 @@ step.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

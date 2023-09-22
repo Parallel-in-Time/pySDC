@@ -57,20 +57,20 @@
 in <span class="math notranslate nohighlight">\([0, 1]^2\)</span></p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial w}{\partial t} = \nu \Delta w\]</div>
-<p>for some parameter <span class="math notranslate nohighlight">\(\nu\)</span>. In this class the problem is implemented that the spatial port is solved
-using FEniCS <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Hence, the problem is reformulated to the <em>weak formulation</em></p>
+<p>for some parameter <span class="math notranslate nohighlight">\(\nu\)</span>. In this class the problem is implemented that the spatial part is solved
+using <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Hence, the problem is reformulated to the <em>weak formulation</em></p>
 <div class="math notranslate nohighlight">
-\[\int_\Omega w_t v dx = - \nu \int_\Omega \nabla w \nabla v dx\]</div>
+\[\int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx\]</div>
 <p>The nonlinear system is solved in a <em>fully-implicit</em> way using Dolfin’s weak solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>c_nvars</strong> (<em>List</em><em> of </em><em>int tuple</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. [(128, 128)].</p></li>
+<li><p><strong>c_nvars</strong> (<em>List</em><em> of </em><em>int tuple</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. <code class="docutils literal notranslate"><span class="pre">c_nvars=[(128,</span> <span class="pre">128)]</span></code>.</p></li>
 <li><p><strong>family</strong> (<em>str</em><em>, </em><em>optional</em>) – Indicates the family of elements used to create the function space
-for the trail and test functions. The default is ‘CG’, which are the class
+for the trail and test functions. The default is <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>, which are the class
 of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, see <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
 <li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – Defines the order of the elements in the function space.</p></li>
-<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. refinements=2 refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
+<li><p><strong>refinements</strong> (<em>int</em><em>, </em><em>optional</em>) – Denotes the refinement of the mesh. <code class="docutils literal notranslate"><span class="pre">refinements=2</span></code> refines the mesh by factor <span class="math notranslate nohighlight">\(2\)</span>.</p></li>
 <li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
 <li><p><strong>rho</strong> (<em>int</em><em>, </em><em>optional</em>) – Problem parameter.</p></li>
 <li><p><strong>delta</strong> (<em>float</em><em>, </em><em>optional</em>) – Problem parameter.</p></li>
@@ -158,7 +158,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Dolfin’s linear solver for <span class="math notranslate nohighlight">\((M - factor A)\vec{u} = \vec{rhs}\)</span>.</p>
+<dd><p>Dolfin’s linear solver for <span class="math notranslate nohighlight">\((M - factor \cdot A)\vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -180,7 +180,7 @@ Wells and others. Springer (2012).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>

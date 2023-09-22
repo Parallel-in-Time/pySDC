@@ -57,10 +57,10 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d y_2 (t)}{dt} = y_1 (t) + 3 y_2 (t) (1 - y^2_1 (t) - y^2_2 (t))</span>
 
-<span class="sd">    with initial condition :math:`y(t) = (1, 0)^T` for :math:`t \in [0, 10]`. The exact solution of this problem is</span>
+<span class="sd">    with initial condition :math:`(y_1(t), y_2(t))^T = (1, 0)^T` for :math:`t \in [0, 10]`. The exact solution of this problem is</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        y (t) = (\cos(t), \sin(t))^T.</span>
+<span class="sd">        (y_1(t), y_2(t))^T = (\cos(t), \sin(t))^T.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -87,8 +87,8 @@
 <div class="viewcode-block" id="auzinger.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Auzinger_implicit.html#implementations.problem_classes.Auzinger_implicit.auzinger.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

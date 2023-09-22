@@ -58,26 +58,26 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial w}{\partial t} = \nu \Delta w</span>
 
-<span class="sd">    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial port is solved</span>
-<span class="sd">    using FEniCS [1]_. Hence, the problem is reformulated to the *weak formulation*</span>
+<span class="sd">    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved</span>
+<span class="sd">    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \int_\Omega w_t v dx = - \nu \int_\Omega \nabla w \nabla v dx</span>
+<span class="sd">        \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx</span>
 
 <span class="sd">    The nonlinear system is solved in a *fully-implicit* way using Dolfin&#39;s weak solver.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    c_nvars : List of int tuple, optional</span>
-<span class="sd">        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. [(128, 128)].</span>
+<span class="sd">        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.</span>
 <span class="sd">    family : str, optional</span>
 <span class="sd">        Indicates the family of elements used to create the function space</span>
-<span class="sd">        for the trail and test functions. The default is &#39;CG&#39;, which are the class</span>
+<span class="sd">        for the trail and test functions. The default is ``&#39;CG&#39;``, which are the class</span>
 <span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Defines the order of the elements in the function space.</span>
 <span class="sd">    refinements : int, optional</span>
-<span class="sd">        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.</span>
+<span class="sd">        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
 <span class="sd">    rho : int, optional</span>
@@ -185,7 +185,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Dolfin&#39;s linear solver for :math:`(M - factor A)\vec{u} = \vec{rhs}`.</span>
+<span class="sd">        Dolfin&#39;s linear solver for :math:`(M - factor \cdot A)\vec{u} = \vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -336,8 +336,8 @@
 <div class="viewcode-block" id="fenics_vortex_2d.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

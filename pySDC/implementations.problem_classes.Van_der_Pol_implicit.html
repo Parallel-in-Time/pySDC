@@ -63,18 +63,16 @@
 <li><p><strong>mu</strong> (<em>float</em><em>, </em><em>optional</em>) – Stiff parameter <span class="math notranslate nohighlight">\(\mu\)</span>.</p></li>
 <li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method to terminate.</p></li>
 <li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton to terminate.</p></li>
-<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicate whether Newton’s method should stop if nan values arise.</p></li>
-<li><p><strong>bool</strong> (<em>crash_at_maxiter =</em>) – Indicates whether Newton’s method should stop if maximum number of iterations
-<cite>newton_maxiter</cite> is reached.</p></li>
-<li><p><strong>optional</strong> – Indicates whether Newton’s method should stop if maximum number of iterations
-<cite>newton_maxiter</cite> is reached.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicate whether Newton’s method should stop if <code class="docutils literal notranslate"><span class="pre">nan</span></code> values arise.</p></li>
+<li><p><strong>crash_at_maxiter</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether Newton’s method should stop if maximum number of iterations
+<code class="docutils literal notranslate"><span class="pre">newton_maxiter</span></code> is reached.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.work_counters">
 <span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.work_counters" title="Link to this definition">¶</a></dt>
-<dd><p>Counts different things, here: Number of evaluations of the right-hand side in <cite>eval_f</cite>
+<dd><p>Counts different things, here: Number of evaluations of the right-hand side in <code class="docutils literal notranslate"><span class="pre">eval_f</span></code>
 and number of Newton calls in each Newton iterations are counted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -140,7 +138,7 @@ and number of Newton calls in each Newton iterations are counted.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to approximate the exact solution at time t by scipy or give initial conditions when called at <span class="math notranslate nohighlight">\(t=0\)</span>.</p>
+<dd><p>Routine to approximate the exact solution at time t by <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> or give initial conditions when called at <span class="math notranslate nohighlight">\(t=0\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

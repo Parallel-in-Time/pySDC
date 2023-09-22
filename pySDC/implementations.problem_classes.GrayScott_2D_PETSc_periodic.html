@@ -53,13 +53,13 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GS_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES.</p>
+<p>Helper class to generate residual and Jacobian matrix for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of PETSc.</p></li>
-<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for PETSc.</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor (dt*Qd).</p></li>
+<li><p><strong>da</strong> (<em>DMDA object</em>) – Object of <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor <span class="math notranslate nohighlight">\(\Delta t Q_\Delta\)</span>.</p></li>
 <li><p><strong>dx</strong> (<em>float</em>) – Grid spacing in x direction.</p></li>
 <li><p><strong>dy</strong> (<em>float</em>) – Grid spacing in y direction.</p></li>
 </ul>
@@ -68,7 +68,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.localX">
 <span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.localX" title="Link to this definition">¶</a></dt>
-<dd><p>Local vector for PETSc.</p>
+<dd><p>Local vector for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>PETSc vector object</p>
@@ -86,7 +86,7 @@ in the solution.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
 <li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
-<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector F(X).</p></li>
+<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector <span class="math notranslate nohighlight">\(F(X)\)</span>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -126,20 +126,20 @@ in the solution.</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GS_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#GS_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Helper class to generate residual and Jacobian matrix for PETSc’s nonlinear solver SNES.</p>
+<p>Helper class to generate residual and Jacobian matrix for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s nonlinear solver SNES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>da</strong> (<em>DMDA object</em>) – Object of PETSc.</p></li>
-<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for PETSc.</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor (dt*Qd).</p></li>
+<li><p><strong>prob</strong> (<em>problem instance</em>) – Contains problem information for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Temporal factor <span class="math notranslate nohighlight">\(\Delta t Q_\Delta\)</span>.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.localX">
 <span class="sig-name descname"><span class="pre">localX</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.localX" title="Link to this definition">¶</a></dt>
-<dd><p>Local vector for PETSc.</p>
+<dd><p>Local vector for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>PETSc vector object</p>
@@ -157,7 +157,7 @@ in the solution.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>snes</strong> (<em>PETSc solver object</em>) – Nonlinear solver object.</p></li>
 <li><p><strong>X</strong> (<em>PETSc vector object</em>) – Input vector.</p></li>
-<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector F(X).</p></li>
+<li><p><strong>F</strong> (<em>PETSc vector object</em>) – Output vector <span class="math notranslate nohighlight">\(F(X)\)</span>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -205,7 +205,7 @@ whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
-<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by PETSc <a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the
 problem is handled in a <em>fully-implicit</em> way, i.e., the nonlinear system containing the full right-hand side will be
 solved by PETSc’s nonlinear solver.</p>
 <dl class="py attribute">
@@ -237,7 +237,7 @@ solved by PETSc’s nonlinear solver.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_fullyimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Nonlinear solver for (I - factor F)(vec{u}) = {rhs}.</p>
+<dd><p>Nonlinear solver for <span class="math notranslate nohighlight">\((I - factor \cdot F)(\vec{u}) = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -270,18 +270,18 @@ whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
-<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by PETSc <a class="footnote-reference brackets" href="#id8" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping,
-the diffusion part is solved by one of PETSc’s linear solver, whereas the reaction part will be solved by a nonlinear
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id8" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping,
+the diffusion part is solved by one of <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s linear solver, whereas the reaction part will be solved by a nonlinear
 solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space, e.g. (256, 256).</p></li>
+<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial resolution, i.e., number of degrees of freedom in space, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=(256,</span> <span class="pre">256)</span></code>.</p></li>
 <li><p><strong>Du</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>Dv</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>A</strong> (<em>float</em><em>, </em><em>optional</em>) – Feed rate for <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
 <li><p><strong>B</strong> (<em>float</em><em>, </em><em>optional</em>) – Overall decay rate for <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
-<li><p><strong>comm</strong> (<em>PETSc.COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for PETSc.</p></li>
+<li><p><strong>comm</strong> (<em>PETSc.COMM_WORLD</em><em>, </em><em>optional</em>) – Communicator for <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>.</p></li>
 <li><p><strong>lsol_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for linear solver to terminate.</p></li>
 <li><p><strong>nlsol_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for nonlinear solver to terminate.</p></li>
 <li><p><strong>lsol_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for linear solver.</p></li>
@@ -380,7 +380,7 @@ solver.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls">
 <span class="sig-name descname"><span class="pre">snes_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.snes_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Number of calls of PETSc’s nonlinear solver.</p>
+<dd><p>Number of calls of <code class="docutils literal notranslate"><span class="pre">PETSc</span></code>’s nonlinear solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
@@ -443,7 +443,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1">
 <span class="sig-name descname"><span class="pre">solve_system_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.solve_system_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1" title="Link to this definition">¶</a></dt>
-<dd><p>Linear solver for (I - factor A)vec{u} = vec{rhs}.</p>
+<dd><p>Linear solver for <span class="math notranslate nohighlight">\((I - factor \cdot A)\vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -465,7 +465,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2">
 <span class="sig-name descname"><span class="pre">solve_system_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.solve_system_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2" title="Link to this definition">¶</a></dt>
-<dd><p>Nonlinear solver for (I - factor F)(vec{u}) = {rhs}.</p>
+<dd><p>Nonlinear solver for <span class="math notranslate nohighlight">\((I - factor \cdot F)(\vec{u}) = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -487,7 +487,7 @@ Alejandro Cosimo. Advances in Water Resources (2011).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_multiimplicit.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -515,8 +515,8 @@ whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
 <div class="math notranslate nohighlight">
 \[\frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u\]</div>
-<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by PETSc <a class="footnote-reference brackets" href="#id8" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping, the
-problem is treated <em>semi-implicitly</em>, i.e., the system with diffusion part is solved by PETSc’s linear solver.</p>
+<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0, 100]\)</span>. The spatial solve of the problem is realized by <code class="docutils literal notranslate"><span class="pre">PETSc</span></code> <a class="footnote-reference brackets" href="#id8" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id9" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. For time-stepping,
+the problem is treated <em>semi-implicitly</em>, i.e., the system with diffusion part is solved by PETSc’s linear solver.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.dtype_f" title="Link to this definition">¶</a></dt>
@@ -546,18 +546,18 @@ problem is treated <em>semi-implicitly</em>, i.e., the system with diffusion par
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_2D_PETSc_periodic.html#petsc_grayscott_semiimplicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.solve_system" title="Link to this definition">¶</a></dt>
-<dd><p>Linear solver for (I-factor*A)u = rhs</p>
+<dd><p>Linear solver for <span class="math notranslate nohighlight">\((I - factor \cdot A)\vec{u} = \vec{rhs}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>solution</p>
+<dd class="field-even"><p><strong>me</strong> – Solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_u</p>

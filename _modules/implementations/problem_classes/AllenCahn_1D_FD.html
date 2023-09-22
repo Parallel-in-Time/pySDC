@@ -82,7 +82,7 @@
 <span class="sd">    interval : list</span>
 <span class="sd">        Interval of spatial domain.</span>
 <span class="sd">    stop_at_nan : bool, optional</span>
-<span class="sd">        Indicates that the Newton solver should stop if nan values arise.</span>
+<span class="sd">        Indicates that the Newton solver should stop if ``nan`` values arise.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -282,8 +282,8 @@
 <div class="viewcode-block" id="allencahn_front_fullyimplicit.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -332,6 +332,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        u : dtype_u</span>
@@ -410,7 +412,7 @@
 <span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w`.</span>
 
 <span class="sd">    Let :math:`A` denote the finite difference matrix to discretize :math:`\frac{\partial^2 u}{\partial x^2}`. Here,</span>
-<span class="sd">    _Finel&#39;s trick_ is used. Let</span>
+<span class="sd">    *Finel&#39;s trick* is used. Let</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,</span>
@@ -759,8 +761,8 @@
 <div class="viewcode-block" id="allencahn_periodic_fullyimplicit.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -850,6 +852,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        u : dtype_u</span>
@@ -892,7 +896,7 @@
 
 <span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
 <span class="sd">    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a</span>
-<span class="sd">    linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by</span>
+<span class="sd">    linear solver provided by a ``SciPy`` routine, and the nonlinear system including the rest of the right-hand side is solved by</span>
 <span class="sd">    Newton&#39;s method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

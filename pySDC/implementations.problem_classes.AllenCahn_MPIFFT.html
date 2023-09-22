@@ -103,7 +103,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.K2">
 <span class="sig-name descname"><span class="pre">K2</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.K2" title="Link to this definition">¶</a></dt>
-<dd><p>Laplace operator in spectral space</p>
+<dd><p>Laplace operator in spectral space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.1darray</p>
@@ -114,7 +114,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dx">
 <span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dx" title="Link to this definition">¶</a></dt>
-<dd><p>Mesh width in x direction</p>
+<dd><p>Mesh width in x direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -125,7 +125,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dy">
 <span class="sig-name descname"><span class="pre">dy</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.dy" title="Link to this definition">¶</a></dt>
-<dd><p>Mesh width in y direction</p>
+<dd><p>Mesh width in y direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -198,7 +198,7 @@ side will be treated explicitly using mpi4py-fft <a class="footnote-reference br
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.u_exact" title="Link to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t.</p>
+<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p>
@@ -227,9 +227,9 @@ using time-dependent forcing</p>
 conditions can be used, for example, circles of the form</p>
 <div class="math notranslate nohighlight">
 \[u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),\]</div>
-<p>for :math::<cite>i, j=0,..,N-1</cite>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is treated
+<p>for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is treated
 <em>semi-implicitly</em>, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
-side will be treated explicitly using mpi4py-fft <a class="footnote-reference brackets" href="#id2" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to solve them.</p>
+side will be treated explicitly using <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id2" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to solve them.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_MPIFFT.html#allencahn_imex_timeforcing.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing.eval_f" title="Link to this definition">¶</a></dt>

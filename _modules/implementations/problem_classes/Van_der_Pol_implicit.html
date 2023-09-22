@@ -65,15 +65,15 @@
 <span class="sd">    newton_tol : float, optional</span>
 <span class="sd">        Tolerance for Newton to terminate.</span>
 <span class="sd">    stop_at_nan : bool, optional</span>
-<span class="sd">        Indicate whether Newton&#39;s method should stop if nan values arise.</span>
-<span class="sd">    crash_at_maxiter = bool, optional</span>
+<span class="sd">        Indicate whether Newton&#39;s method should stop if ``nan`` values arise.</span>
+<span class="sd">    crash_at_maxiter : bool, optional</span>
 <span class="sd">        Indicates whether Newton&#39;s method should stop if maximum number of iterations</span>
-<span class="sd">        `newton_maxiter` is reached.</span>
+<span class="sd">        ``newton_maxiter`` is reached.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    work_counters : WorkCounter</span>
-<span class="sd">        Counts different things, here: Number of evaluations of the right-hand side in `eval_f`</span>
+<span class="sd">        Counts different things, here: Number of evaluations of the right-hand side in ``eval_f``</span>
 <span class="sd">        and number of Newton calls in each Newton iterations are counted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -99,7 +99,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at :math:`t=0`.</span>
+<span class="sd">        Routine to approximate the exact solution at time t by ``SciPy`` or give initial conditions when called at :math:`t=0`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

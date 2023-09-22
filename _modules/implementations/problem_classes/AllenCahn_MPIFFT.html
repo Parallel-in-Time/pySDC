@@ -94,11 +94,11 @@
 <span class="sd">    X : np.ogrid</span>
 <span class="sd">        Grid coordinates in real space.</span>
 <span class="sd">    K2 : np.1darray</span>
-<span class="sd">        Laplace operator in spectral space</span>
+<span class="sd">        Laplace operator in spectral space.</span>
 <span class="sd">    dx : float</span>
-<span class="sd">        Mesh width in x direction</span>
+<span class="sd">        Mesh width in x direction.</span>
 <span class="sd">    dy : float</span>
-<span class="sd">        Mesh width in y direction</span>
+<span class="sd">        Mesh width in y direction.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -246,8 +246,8 @@
 <div class="viewcode-block" id="allencahn_imex.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Routine to compute the exact solution at time t.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -318,9 +318,9 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
 
-<span class="sd">    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
+<span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
 <span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand</span>
-<span class="sd">    side will be treated explicitly using mpi4py-fft [1]_ to solve them.</span>
+<span class="sd">    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="allencahn_imex_timeforcing.eval_f">
