@@ -23,14 +23,14 @@ class allencahn_imex(ptype):
     .. math::
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
 
-    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
     *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
-    side will be treated explicitly using mpi4py-fft [1]_ to solve them.
+    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
 
     Parameters
     ----------
     nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. [(128, 128), (128, 128)].
+        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     radius : float, optional
