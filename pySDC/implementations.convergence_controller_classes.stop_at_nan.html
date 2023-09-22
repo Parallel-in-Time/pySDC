@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.convergence_controller_classes.stop_at_nan module &#8212; pySDC 5.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=5c0b1849"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.convergence_controller_classes.store_uold module" href="implementations.convergence_controller_classes.store_uold.html" />
+    <link rel="prev" title="implementations.convergence_controller_classes.step_size_limiter module" href="implementations.convergence_controller_classes.step_size_limiter.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.store_uold.html" title="implementations.convergence_controller_classes.store_uold module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.step_size_limiter.html" title="implementations.convergence_controller_classes.step_size_limiter module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" accesskey="U">implementations.convergence_controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.stop_at_nan module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.convergence_controller_classes.stop_at_nan">
+<span id="implementations-convergence-controller-classes-stop-at-nan-module"></span><h1>implementations.convergence_controller_classes.stop_at_nan module<a class="headerlink" href="#module-implementations.convergence_controller_classes.stop_at_nan" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.stop_at_nan.StopAtNan">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StopAtNan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/stop_at_nan.html#StopAtNan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.stop_at_nan.StopAtNan" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<p>Crash the code when the norm of the solution exceeds some limit or contains nan.
+This class is useful when running with MPI in the sweeper or controller.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.stop_at_nan.StopAtNan.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/stop_at_nan.html#StopAtNan.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.post_iteration_processing" title="Link to this definition">¶</a></dt>
+<dd><p>Check if we need to crash the code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller.controller</em>) – Controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step.step</em>) – Step</p></li>
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em><em> or </em><em>None</em>) – Communicator of the controller, if applicable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="core.Errors.html#core.Errors.ConvergenceError" title="core.Errors.ConvergenceError"><strong>ConvergenceError</strong></a> – If the solution does not fall within the allowed space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.stop_at_nan.StopAtNan.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/stop_at_nan.html#StopAtNan.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Define parameters here.</p>
+<dl class="simple">
+<dt>Default parameters are:</dt><dd><ul class="simple">
+<li><p>tresh (float): Crash the code when the norm of the solution exceeds this threshold</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated params dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.convergence_controller_classes.stop_at_nan module</a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.stop_at_nan.StopAtNan"><code class="docutils literal notranslate"><span class="pre">StopAtNan</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.convergence_controller_classes.step_size_limiter.html"
+                          title="previous chapter">implementations.convergence_controller_classes.step_size_limiter module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.convergence_controller_classes.store_uold.html"
+                          title="next chapter">implementations.convergence_controller_classes.store_uold module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.convergence_controller_classes.stop_at_nan.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.store_uold.html" title="implementations.convergence_controller_classes.store_uold module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.convergence_controller_classes.step_size_limiter.html" title="implementations.convergence_controller_classes.step_size_limiter module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.convergence_controller_classes.html" >implementations.convergence_controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.stop_at_nan module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

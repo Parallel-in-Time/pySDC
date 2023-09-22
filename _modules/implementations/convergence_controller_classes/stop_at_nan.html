@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.convergence_controller_classes.stop_at_nan &#8212; pySDC 5.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=514cf933" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=5c0b1849"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.stop_at_nan</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.convergence_controller_classes.stop_at_nan</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pySDC.core.ConvergenceController</span> <span class="kn">import</span> <span class="n">ConvergenceController</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ConvergenceError</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="StopAtNan">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.stop_at_nan.html#implementations.convergence_controller_classes.stop_at_nan.StopAtNan">[docs]</a>
+<span class="k">class</span> <span class="nc">StopAtNan</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crash the code when the norm of the solution exceeds some limit or contains nan.</span>
+<span class="sd">    This class is useful when running with MPI in the sweeper or controller.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPI_OR</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">LOR</span>
+
+<div class="viewcode-block" id="StopAtNan.setup">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.stop_at_nan.html#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define parameters here.</span>
+
+<span class="sd">        Default parameters are:</span>
+<span class="sd">         - tresh (float): Crash the code when the norm of the solution exceeds this threshold</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (dict): The updated params dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
+            <span class="s2">&quot;thresh&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="StopAtNan.post_iteration_processing">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.stop_at_nan.html#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.post_iteration_processing">[docs]</a>
+    <span class="k">def</span> <span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if we need to crash the code.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller.controller): Controller</span>
+<span class="sd">            S (pySDC.Step.step): Step</span>
+<span class="sd">            comm (mpi4py.MPI.Intracomm or None): Communicator of the controller, if applicable</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ConvergenceError: If the solution does not fall within the allowed space</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">isfinite</span><span class="p">,</span> <span class="n">below_limit</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span>
+        <span class="n">crash</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">lvl</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">isfinite</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
+                <span class="n">below_limit</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">thresh</span>
+
+                <span class="n">crash</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">isfinite</span> <span class="ow">and</span> <span class="n">below_limit</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">crash</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">crash</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
+            <span class="n">crash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">crash</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_OR</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">comm</span><span class="p">:</span>
+            <span class="n">crash</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">crash</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_OR</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">crash</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">isfinite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">below_limit</span>
+
+        <span class="k">if</span> <span class="n">crash</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConvergenceError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Solution exceeds bounds! Crashing code at </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.convergence_controller_classes.stop_at_nan</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

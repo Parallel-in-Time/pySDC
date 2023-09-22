@@ -21,6 +21,7 @@ Submodules
    implementations.convergence_controller_classes.interpolate_between_restarts
    implementations.convergence_controller_classes.spread_step_sizes
    implementations.convergence_controller_classes.step_size_limiter
+   implementations.convergence_controller_classes.stop_at_nan
    implementations.convergence_controller_classes.store_uold
 
 Module contents

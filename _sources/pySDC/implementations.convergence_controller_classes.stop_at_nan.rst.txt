@@ -1,0 +1,7 @@
+implementations.convergence\_controller\_classes.stop\_at\_nan module
+=====================================================================
+
+.. automodule:: implementations.convergence_controller_classes.stop_at_nan
+   :members:
+   :undoc-members:
+   :show-inheritance:
