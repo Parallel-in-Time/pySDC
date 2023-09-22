@@ -13,9 +13,9 @@ class buck_converter(ptype):
         \frac{d u(t)}{dt} = A_k u(t) + f_k (t)
 
     for :math:`k=1,2`. The two states are the following. Define :math:`T_{sw}:=\frac{1}{f_{sw}}` as the switching period with
-    switching frequency :math:`f_{sw}`. The duty cycle :math:`duty` defines the period of how long the switches are in one state
+    switching frequency :math:`f_{sw}`. The duty cycle :math:`d` defines the period of how long the switches are in one state
     until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage [1]_. A duty cycle of one means
-    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} mod 1 \leq duty` [2]_:
+    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} \bmod 1 \leq d` [2]_:
 
     .. math::
         \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_1} (t) + \frac{V_s}{R_s C_1},
@@ -42,8 +42,8 @@ class buck_converter(ptype):
     Parameters
     ----------
     duty : float, optional
-        Cycle between zero and one indicates the time period how long the converter stays on one switching state
-        until it switches to the other state.
+        Duty cycle :math:`d` between zero and one indicates the time period how long the converter stays on one switching
+        state until it switches to the other state.
     fsw : int, optional
         Switching frequency, it is used to determine the number of time steps after the switching state is changed.
     Vs : float, optional
@@ -171,8 +171,8 @@ class buck_converter(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

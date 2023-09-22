@@ -46,8 +46,8 @@ class swfw_scalar(ptype):
         self._makeAttributeAndRegister('lambda_s', 'lambda_f', 'u0', localVars=locals(), readOnly=True)
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple im=nversion of (1-dt*lambda)u = rhs.
+        r"""
+        Simple im=nversion of :math:`(1 - \Delta t \cdot \lambda)\vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -143,8 +143,8 @@ class swfw_scalar(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

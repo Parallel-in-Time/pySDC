@@ -23,20 +23,20 @@ class heat2d_petsc_forced(ptype):
     .. math::
         u(x, y, t) = \sin(2 \pi x) \sin(2 \pi y) \cos(t).
 
-    The spatial discretization uses central finite differences and is realized with PETSc [1]_, [2]_.
+    The spatial discretization uses central finite differences and is realized with ``PETSc`` [1]_, [2]_.
 
     Parameters
     ----------
     cnvars : tuple, optional
-        Spatial resolution for the 2D problem, e.g. (16, 16).
+        Spatial resolution for the 2D problem, e.g. ``cnvars=(16, 16)``.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     freq : int, optional
         Spatial frequency of the initial conditions (equal for both dimensions).
     refine : int, optional
-        Defines the refinement of the mesh, e.g. refine=2 means the mesh is refined with factor 2.
+        Defines the refinement of the mesh, e.g. ``refine=2`` means the mesh is refined with factor 2.
     comm : COMM_WORLD
-        Communicator for PETSc.
+        Communicator for ``PETSc``.
     sol_tol : float, optional
         Tolerance that the solver needs to satisfy for termination.
     sol_maxiter : int, optional
@@ -53,11 +53,11 @@ class heat2d_petsc_forced(ptype):
     dy : float
         Distance between two spatial nodes in y direction.
     ksp : object
-        PETSc linear solver object.
+        ``PETSc`` linear solver object.
     ksp_ncalls : int
-        Calls of PETSc's linear solver object.
+        Calls of ``PETSc``'s linear solver object.
     ksp_itercount : int
-        Iterations done by PETSc's linear solver object.
+        Iterations done by ``PETSc``'s linear solver object.
 
     References
     ----------
@@ -119,8 +119,8 @@ class heat2d_petsc_forced(ptype):
         self.ksp_itercount = 0
 
     def __get_A(self):
-        """
-        Helper function to assemble PETSc matrix A.
+        r"""
+        Helper function to assemble ``PETSc`` matrix A.
 
         Returns
         -------
@@ -163,8 +163,8 @@ class heat2d_petsc_forced(ptype):
         return A
 
     def __get_Id(self):
-        """
-        Helper function to assemble PETSc identity matrix.
+        r"""
+        Helper function to assemble ``PETSc`` identity matrix.
 
         Returns
         -------
@@ -254,8 +254,8 @@ class heat2d_petsc_forced(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

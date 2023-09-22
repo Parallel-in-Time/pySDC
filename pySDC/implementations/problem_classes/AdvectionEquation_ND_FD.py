@@ -24,7 +24,7 @@ class advectionNd(GenericNDimFinDiff):
     ----------
     nvars : int of tuple, optional
         Spatial resolution (same in all dimensions). Using a tuple allows to
-        consider several dimensions, e.g nvars=(16,16) for a 2D problem.
+        consider several dimensions, e.g ``nvars=(16,16)`` for a 2D problem.
     c : float, optional
         Advection speed (same in all dimensions).
     freq : int of tuple, optional
@@ -40,9 +40,9 @@ class advectionNd(GenericNDimFinDiff):
     solver_type : str, optional
         Solve the linear system directly or using GMRES or CG
     bc : str, optional
-        Boundary conditions, either "periodic" or "dirichlet".
+        Boundary conditions, either ``'periodic'`` or ``'dirichlet'``.
     sigma : float, optional
-        If freq=-1 and ndim=1, uses a Gaussian initial solution of the form
+        If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form
 
         .. math::
             u(x,0) = e^{
@@ -86,8 +86,8 @@ class advectionNd(GenericNDimFinDiff):
         self._makeAttributeAndRegister('sigma', localVars=locals())
 
     def u_exact(self, t, **kwargs):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

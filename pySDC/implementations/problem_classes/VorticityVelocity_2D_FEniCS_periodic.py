@@ -17,26 +17,26 @@ class fenics_vortex_2d(ptype):
     .. math::
         \frac{\partial w}{\partial t} = \nu \Delta w
 
-    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial port is solved
-    using FEniCS [1]_. Hence, the problem is reformulated to the *weak formulation*
+    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved
+    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*
 
     .. math::
-        \int_\Omega w_t v dx = - \nu \int_\Omega \nabla w \nabla v dx
+        \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
 
     The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver.
 
     Parameters
     ----------
     c_nvars : List of int tuple, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. [(128, 128)].
+        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.
     family : str, optional
         Indicates the family of elements used to create the function space
-        for the trail and test functions. The default is 'CG', which are the class
+        for the trail and test functions. The default is ``'CG'``, which are the class
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
-        Denotes the refinement of the mesh. refinements=2 refines the mesh by factor :math:`2`.
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     rho : int, optional
@@ -142,7 +142,7 @@ class fenics_vortex_2d(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Dolfin's linear solver for :math:`(M - factor A)\vec{u} = \vec{rhs}`.
+        Dolfin's linear solver for :math:`(M - factor \cdot A)\vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -287,8 +287,8 @@ class fenics_vortex_2d(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

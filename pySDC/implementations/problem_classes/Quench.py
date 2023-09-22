@@ -38,15 +38,15 @@ class Quench(ptype):
     leak_range : tuple of float
         Range of the leak.
     leak_type : str, optional
-        Type of leak, choose between 'linear' or 'exponential'.
+        Type of leak, choose between ``'linear'`` or ``'exponential'``.
     leak_transition : str, optional
-        Indicates how the heat in the leak propagates (?), choose between 'step' and 'Gaussian'.
+        Indicates how the heat in the leak propagates, choose between ``'step'`` and ``'Gaussian'``.
     order : int, optional
         Order of the finite difference discretization.
     stencil_type : str, optional
         Type of stencil for finite differences.
     bc : str, optional
-        Type of boundary conditions. Default is 'neumann-zero'.
+        Type of boundary conditions. Default is ``'neumann-zero'``.
     nvars : int, optional
         Spatial resolution.
     newton_tol : float, optional
@@ -61,7 +61,7 @@ class Quench(ptype):
         Indicates if a direct solver should be used.
     reference_sol_type : str, optional
         Indicates which method should be used to compute a reference solution.
-        Choose between 'scipy', 'SDC', or 'DIRK'.
+        Choose between ``'scipy'``, ``'SDC'``, or ``'DIRK'``.
 
     Attributes
     ----------
@@ -278,7 +278,7 @@ class Quench(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple Newton solver for :math:`(I - factor f)(\vec{u}) = \vec{rhs}`.
+        Simple Newton solver for :math:`(I - factor \cdot f)(\vec{u}) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -344,8 +344,8 @@ class Quench(ptype):
         return u
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -367,25 +367,35 @@ class Quench(ptype):
                     """
                     Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`
 
-                    Args:
-                        t (float): The current time
-                        u (dtype_u): Current solution
+                    Parameters
+                    ----------
+                    t : float
+                        The current time.
+                    u : dtype_u
+                        Current solution.
 
-                    Returns:
-                        scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                    Returns
+                    -------
+                    scipy.sparse.csc
+                        The derivative of the non-linear part of the solution w.r.t. to the solution.
                     """
                     return self.A + self.get_non_linear_Jacobian(u)
 
                 def eval_rhs(t, u):
                     """
-                    Function to pass to `scipy.solve_ivp` to evaluate the full RHS
+                    Function to pass to `scipy.solve_ivp` to evaluate the full right-hand side.
 
-                    Args:
-                        t (float): Current time
-                        u (numpy.1darray): Current solution
+                    Parameters
+                    ----------
+                    t : float
+                        Current time.
+                    u : numpy.1darray
+                        Current solution.
 
-                    Returns:
-                        (numpy.1darray): RHS
+                    Returns
+                    -------
+                    numpy.1darray
+                        Right-hand side.
                     """
                     return self.eval_f(u.reshape(self.init[0]), t).flatten()
 
@@ -489,7 +499,7 @@ class QuenchIMEX(Quench):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple linear solver for :math:`(I - factor f_{expl})(\vec{u}) = \vec{rhs}`.
+        Simple linear solver for :math:`(I - factor \cdot f_{expl})(\vec{u}) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -513,8 +523,8 @@ class QuenchIMEX(Quench):
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

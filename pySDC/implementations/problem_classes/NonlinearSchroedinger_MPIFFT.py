@@ -14,13 +14,13 @@ from mpi4py_fft import newDistArray
 
 class nonlinearschroedinger_imex(ptype):
     r"""
-    Example implementing the N-dimensional nonlinear Schrödinger equation with periodic boundary conditions
+    Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
+        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u
 
     for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved using
-    mpi4py-fft [1]_. *Semi-explicit* time-stepping is used here to solve the problem in the temporal dimension, i.e., the
+    ``mpi4py-fft`` [1]_. *Semi-explicit* time-stepping is used here to solve the problem in the temporal dimension, i.e., the
     Laplacian will be handled implicitly.
 
     Parameters
@@ -177,8 +177,8 @@ class nonlinearschroedinger_imex(ptype):
         return me
 
     def u_exact(self, t, **kwargs):
-        """
-        Routine to compute the exact solution at time t, see (1.3) https://arxiv.org/pdf/nlin/0702010.pdf for details
+        r"""
+        Routine to compute the exact solution at time :math:`t`, see (1.3) https://arxiv.org/pdf/nlin/0702010.pdf for details
 
         Parameters
         ----------
@@ -217,15 +217,20 @@ class nonlinearschroedinger_imex(ptype):
 
 class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     r"""
-    Example implementing the N-dimensional nonlinear Schrödinger equation with periodic boundary conditions
+    Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i abs(u)^2 u
+        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u
 
     for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be discretized using
-    mpi4py-fft [1]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
+    ``mpi4py-fft`` [1]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
     the full right-hand side is solved by GMRES method.
+
+    References
+    ----------
+    .. [1] https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html
     """
+
     dtype_u = mesh
     dtype_f = mesh
 
@@ -268,9 +273,9 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Solve the nonlinear system `(1 - factor * f)(u) = rhs` using a scipy Newton-Krylov solver.
-        See this page for details on the solver: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html
+        r"""
+        Solve the nonlinear system :math:`(1 - factor \cdot f)(\vec{u}) = \vec{rhs}` using a ``SciPy`` Newton-Krylov
+        solver. See page [1]_ for details on the solver.
 
         Parameters
         ----------
@@ -292,8 +297,8 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
 
         # assemble the nonlinear function F for the solver
         def F(x):
-            """
-            Nonlinear function for the scipy solver.
+            r"""
+            Nonlinear function for the ``SciPy`` solver.
 
             Args:
                 x : dtype_u

@@ -23,7 +23,7 @@ class harmonic_oscillator(ptype):
     mu : float, optional
         Damping parameter :math:`\mu`.
     u0 : tuple, optional
-        Initial condition for the position, and the velocity. Should be a tuple, e.g. (1, 0).
+        Initial condition for the position, and the velocity. Should be a tuple, e.g. ``u0=(1, 0)``.
     phase : float, optional
         Phase of the oscillation.
     amp : float, optional
@@ -74,8 +74,8 @@ class harmonic_oscillator(ptype):
         return u
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact trajectory at time t.
+        r"""
+        Routine to compute the exact trajectory at time :math:`t`.
 
         Parameters
         ----------

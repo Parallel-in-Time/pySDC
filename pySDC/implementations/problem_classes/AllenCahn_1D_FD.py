@@ -41,7 +41,7 @@ class allencahn_front_fullyimplicit(ptype):
     interval : list
         Interval of spatial domain.
     stop_at_nan : bool, optional
-        Indicates that the Newton solver should stop if nan values arise.
+        Indicates that the Newton solver should stop if ``nan`` values arise.
 
     Attributes
     ----------
@@ -233,8 +233,8 @@ class allencahn_front_fullyimplicit(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -277,6 +277,8 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
 
     def eval_f(self, u, t):
         """
+        Routine to evaluate the right-hand side of the problem.
+
         Parameters
         ----------
         u : dtype_u
@@ -348,7 +350,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
     with :math:`v = 3 \sqrt{2} \varepsilon d_w`.
 
     Let :math:`A` denote the finite difference matrix to discretize :math:`\frac{\partial^2 u}{\partial x^2}`. Here,
-    _Finel's trick_ is used. Let
+    *Finel's trick* is used. Let
 
     .. math::
         a = \tanh\left(\frac{\Delta x}{\sqrt{2}\varepsilon}\right)^2,
@@ -680,8 +682,8 @@ class allencahn_periodic_fullyimplicit(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -762,6 +764,8 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
 
     def eval_f(self, u, t):
         """
+        Routine to evaluate the right-hand side of the problem.
+
         Parameters
         ----------
         u : dtype_u
@@ -800,7 +804,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
 
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
     in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a
-    linear solver provided by a scipy routine, and the nonlinear system including the rest of the right-hand side is solved by
+    linear solver provided by a ``SciPy`` routine, and the nonlinear system including the rest of the right-hand side is solved by
     Newton's method.
     """
 

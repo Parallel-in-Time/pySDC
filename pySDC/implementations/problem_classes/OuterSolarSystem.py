@@ -84,8 +84,8 @@ class outer_solar_system(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact/initial trajectory at time t.
+        r"""
+        Routine to compute the exact/initial trajectory at time :math:`t`.
 
         Parameters
         ----------

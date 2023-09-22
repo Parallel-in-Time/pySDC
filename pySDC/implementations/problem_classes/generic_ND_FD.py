@@ -17,25 +17,25 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 class GenericNDimFinDiff(ptype):
     r"""
-    Base class for finite difference spatial discretisation in N-dimensions
+    Base class for finite difference spatial discretisation in :math:`N` dimensions
 
     .. math::
         \frac{d u}{dt} = A u,
 
     where :math:`A \in \mathbb{R}^{nN \times nN} is a matrix arising from finite difference discretisation of spatial
-    derivatives with n degrees of freedom per dimension and N dimensions. This generic class follows the MOL
+    derivatives with :math:`n` degrees of freedom per dimension and :math:`N` dimensions. This generic class follows the MOL
     (method-of-lines) approach and can be used to discretize partial differential equations such as the advection
     equation and the heat equation.
 
     Parameters
     ----------
     nvars : int, optional
-        Spatial resolution for the ND problem. For :math:`N = 2`, set nvars=(16, 16).
+        Spatial resolution for the ND problem. For :math:`N = 2`, set ``nvars=(16, 16)``.
     coeff : float, optional
         Factor for finite difference matrix :math:`A`.
     derivative : int, optional
         Order of the spatial derivative.
-    freq : int of tuple, optional
+    freq : tuple of int, optional
         Spatial frequency, can be a tuple.
     stencil_type : str, optional
         Stencil type for finite differences.
@@ -46,9 +46,9 @@ class GenericNDimFinDiff(ptype):
     liniter : int, optional
         Maximum number of iterations for linear solver.
     solver_type : str, optional
-        Type of solver. Can be 'direct', 'GMRES' or 'CG'.
+        Type of solver. Can be ``'direct'``, ``'GMRES'`` or ``'CG'``.
     bc : str, optional
-        Type of boundary conditions. Default is 'periodic'.
+        Type of boundary conditions. Default is ``'periodic'``.
 
     Attributes
     ----------

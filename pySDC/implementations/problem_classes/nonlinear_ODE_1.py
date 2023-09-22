@@ -29,7 +29,7 @@ class nonlinear_ODE_1(ptype):
     newton_tol : float, optional
         Tolerance for Newton's method to terminate.
     stop_at_nan : bool, optional
-        Indicates that Newton solver has to stop if nan values arise.
+        Indicates that Newton solver has to stop if ``nan`` values arise.
     """
 
     dtype_u = mesh
@@ -43,8 +43,8 @@ class nonlinear_ODE_1(ptype):
         )
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

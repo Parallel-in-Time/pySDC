@@ -7,8 +7,8 @@ from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_s
 # noinspection PyUnusedLocal
 class full_solar_system(outer_solar_system):
     r"""
-    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem bases
-    on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
+    The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is
+    based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
 
     .. math::
         m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),
@@ -19,7 +19,7 @@ class full_solar_system(outer_solar_system):
     .. math::
         m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).
 
-    This class implements the full solar system containing all planets including earth's moon, i.e., :math:`N=10`. Initial conditions
+    This class implements the full solar system containing all planets including Earth's moon, i.e., :math:`N=10`. Initial conditions
     are taken from [1]_, and masses relative to the sun taken from [2]_.
 
     Parameters
@@ -48,8 +48,8 @@ class full_solar_system(outer_solar_system):
         self.init = ((3, 10), None, np.dtype('float64'))
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact/initial trajectory at time t. Values here are taken from [1]_, [2]_.
+        r"""
+        Routine to compute the exact/initial trajectory at time :math:`t`. Values here are taken from [1]_, [2]_.
 
         Parameters
         ----------
