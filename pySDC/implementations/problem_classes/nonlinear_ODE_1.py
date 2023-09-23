@@ -13,7 +13,7 @@ class nonlinear_ODE_1(ptype):
     given by
 
     .. math::
-        \frac{du(t)}{dt} = \sqrt(1 - u(t))
+        \frac{du(t)}{dt} = \sqrt{1 - u(t)}
 
     with initial condition :math:`u(0) = 0`. The exact solution is
 
@@ -30,6 +30,13 @@ class nonlinear_ODE_1(ptype):
         Tolerance for Newton's method to terminate.
     stop_at_nan : bool, optional
         Indicates that Newton solver has to stop if ``nan`` values arise.
+
+    Attributes
+    ----------
+    newton_itercount : int
+        Counts the Newton iterations.
+    newton_ncalls : int
+        Counts calls of Newton method.
     """
 
     dtype_u = mesh
@@ -41,6 +48,9 @@ class nonlinear_ODE_1(ptype):
         self._makeAttributeAndRegister(
             'u0', 'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True
         )
+
+        self.newton_itercount = 0
+        self.newton_ncalls = 0
 
     def u_exact(self, t):
         r"""
@@ -125,12 +135,16 @@ class nonlinear_ODE_1(ptype):
             # increase iteration count
             n += 1
 
+            self.newton_itercount += 1
+
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
-            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+            self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
+
+        self.newton_ncalls += 1
 
         return u
