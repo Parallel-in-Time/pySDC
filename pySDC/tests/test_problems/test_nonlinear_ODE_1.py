@@ -20,7 +20,7 @@ def test_singularity():
     u_event = nonlinear_ODE_class.u_exact(t_event)
     f = nonlinear_ODE_class.eval_f(u_event, t_event)
 
-    assert f == 0, "Evaluation of right-hand side does not match with zero!"
+    assert f == 0, "Evaluation of right-hand side at singularity does not match with zero!"
 
     dt = 1e-1
     t0 = 1.9
@@ -33,7 +33,7 @@ def test_singularity():
     }
 
     sol = nonlinear_ODE_class.solve_system(**args)
-    assert abs(sol - 1) < 1e-14, f"Solution is not close enough to the value at singularity! Expected {1}, got {sol}"
+    assert abs(sol - 1) < 1e-14, f"Solution is not close enough to the value at singularity! Expected 1, got {sol}"
     assert (
         nonlinear_ODE_class.newton_itercount == nonlinear_ODE_class.newton_maxiter
     ), f"Expected {nonlinear_ODE_class.newton_maxiter} Newton iterations, got {nonlinear_ODE_class.newton_itercount}"
@@ -87,9 +87,9 @@ def test_SDC_on_problem_class():
     Tend = 2.0
 
     P = controller.MS[0].levels[0].prob
-    uex = P.u_exact(t0)
+    uex = P.u_exact(Tend)
 
     uend, _ = controller.run(u0=uex, t0=t0, Tend=Tend)
 
     err = abs(uex - uend)
-    assert err < 2.697e-7, f"Error is too large! Got {err}"
+    assert err < 1.968e-8, f"Error is too large! Got {err}"
