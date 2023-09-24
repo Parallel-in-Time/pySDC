@@ -57,7 +57,7 @@
 <a class="reference external" href="https://www.osti.gov/servlets/purl/6111421">https://www.osti.gov/servlets/purl/6111421</a> (Problem E-4). For <span class="math notranslate nohighlight">\(0 \leq t \leq 5\)</span>, the problem is
 given by</p>
 <div class="math notranslate nohighlight">
-\[\frac{du(t)}{dt} = \sqrt(1 - u(t))\]</div>
+\[\frac{du(t)}{dt} = \sqrt{1 - u(t)}\]</div>
 <p>with initial condition <span class="math notranslate nohighlight">\(u(0) = 0\)</span>. The exact solution is</p>
 <div class="math notranslate nohighlight">
 \[u(t) = t - \frac{t^2}{4}.\]</div>
@@ -71,6 +71,28 @@ given by</p>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.newton_itercount">
+<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.newton_itercount" title="Link to this definition">¶</a></dt>
+<dd><p>Counts the Newton iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.newton_ncalls">
+<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.newton_ncalls" title="Link to this definition">¶</a></dt>
+<dd><p>Counts calls of Newton method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f" title="Link to this definition">¶</a></dt>
@@ -158,6 +180,8 @@ given by</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.nonlinear_ODE_1 module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1"><code class="docutils literal notranslate"><span class="pre">nonlinear_ODE_1</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

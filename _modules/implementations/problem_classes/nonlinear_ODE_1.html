@@ -54,7 +54,7 @@
 <span class="sd">    given by</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{du(t)}{dt} = \sqrt(1 - u(t))</span>
+<span class="sd">        \frac{du(t)}{dt} = \sqrt{1 - u(t)}</span>
 
 <span class="sd">    with initial condition :math:`u(0) = 0`. The exact solution is</span>
 
@@ -71,6 +71,13 @@
 <span class="sd">        Tolerance for Newton&#39;s method to terminate.</span>
 <span class="sd">    stop_at_nan : bool, optional</span>
 <span class="sd">        Indicates that Newton solver has to stop if ``nan`` values arise.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    newton_itercount : int</span>
+<span class="sd">        Counts the Newton iterations.</span>
+<span class="sd">    newton_ncalls : int</span>
+<span class="sd">        Counts calls of Newton method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -82,6 +89,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
             <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span> <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span> <span class="s1">&#39;stop_at_nan&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_itercount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="nonlinear_ODE_1.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.nonlinear_ODE_1.html#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.u_exact">[docs]</a>
@@ -174,13 +184,17 @@
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
 
+            <span class="bp">self</span><span class="o">.</span><span class="n">newton_itercount</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">return</span> <span class="n">u</span></div>
 </div>
