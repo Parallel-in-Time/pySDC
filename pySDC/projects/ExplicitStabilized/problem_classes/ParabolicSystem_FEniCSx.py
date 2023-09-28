@@ -239,8 +239,11 @@ class parabolic_system(ptype):
     def write_solution(self,uh,t):        
         if self.enable_output:            
             uh.values.name = "u"         
-            for i in range(self.exact.size):   
-                self.xdmf.write_function(uh.sub(i), t)
+            if self.output_V_only:
+                self.xdmf.write_function(uh.sub(0), t)
+            else:
+                for i in range(self.exact.size):   
+                    self.xdmf.write_function(uh.sub(i), t)
 
     def initial_value(self):
         u0 = self.dtype_u(self.init,val=0.)
@@ -740,6 +743,10 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
         self.exp_indexes = [False]*self.exact.size
         for i in range(self.exact.size):            
             if self.lmbda_expr[i] is not None:
+                self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i], self.V.sub(i).element.interpolation_points())
+
+        for i in range(self.exact.size):            
+            if self.yinf_expr[i] is not None:
                 self.phi_one_f_expr_interp[i] = fem.Expression(\
                                                 ((ufl.exp(self.lmbda_expr[i]*self.exact.dt)-1.)/(self.exact.dt))*(self.exact.uh.sub(i)-self.yinf_expr[i]),\
                                                 self.V.sub(i).element.interpolation_points())
@@ -753,8 +760,7 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
                     phi_k = (phi_k-1./k_fac)/(self.lmbda_expr[i]*self.exact.dt)
                     self.phi_expr_interp[i].append(fem.Expression(phi_k,self.V.sub(i).element.interpolation_points()))
                     k_fac = k_fac*k
-    
-                self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i], self.V.sub(i).element.interpolation_points())                                
+                                                    
                 self.rhs_exp_expr_interp[i] = fem.Expression(self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i]),self.V.sub(i).element.interpolation_points())
                 self.F_exp += self.lmbda_expr[i]*(self.exact.uh.sub(i)-self.yinf_expr[i])*v[i]*ufl.dx                                              
                 self.exp_indexes[i] = True  

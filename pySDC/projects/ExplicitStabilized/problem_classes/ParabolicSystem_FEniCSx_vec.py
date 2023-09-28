@@ -251,9 +251,13 @@ class parabolic_system(ptype):
 
     def write_solution(self,uh,t):        
         if self.enable_output:
-            for i in range(self.exact.size):
-                uh.sub(i).name = f"u_{i+1}"            
-                self.xdmf.write_function(uh.sub(i), t)            
+            if self.output_V_only:
+                uh.sub(0).name = f"V"            
+                self.xdmf.write_function(uh.sub(0), t)            
+            else:
+                for i in range(self.exact.size):
+                    uh.sub(i).name = f"u_{i+1}"            
+                    self.xdmf.write_function(uh.sub(i), t)
 
     def initial_value(self):
         u0 = self.dtype_u(self.init,val=0.)
@@ -382,6 +386,7 @@ class parabolic_system(ptype):
             self.b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
 
             if i in self.exact.sp_ind:
+                print('fix memory leak')
                 self.K[i].multAdd(-u[i].values.vector,self.b,self.b) 
 
             self.invert_mass_matrix(self.b, fh[i].values.vector)
@@ -402,7 +407,9 @@ class parabolic_system_imex(parabolic_system):
 
     def __init__(self, **problem_params):        
         super(parabolic_system_imex,self).__init__(**problem_params)      
+        self.define_solvers()
 
+    def define_solvers(self):
         self.solver = [None]*self.exact.size
         self.prev_factor = -1.
         for i in self.exact.sp_ind:
@@ -533,9 +540,9 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
 
     def __init__(self, **problem_params):        
         super(parabolic_system_exp_expl_impl,self).__init__(**problem_params)                 
+        self.define_functions()
 
-    def define_variational_forms(self):        
-        super().define_variational_forms()
+    def define_functions(self):
 
         v = ufl.TestFunction(self.V)
 
@@ -564,6 +571,8 @@ class parabolic_system_exp_expl_impl(parabolic_system_imex):
             if self.lmbda_expr[i] is not None:
                 self.lmbda_expr_interp[i] = fem.Expression(self.lmbda_expr[i],self.V.element.interpolation_points())
 
+        for i in range(self.exact.size):            
+            if self.yinf_expr[i] is not None:
                 self.phi_expr_interp[i] = [None]*(self.phi_max+1)
                 self.phi[i] = [None]*(self.phi_max+1)
                 self.phi_form[i] = [None]*(self.phi_max+1)

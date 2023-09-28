@@ -19,9 +19,10 @@ class pde_hook(hooks):
         L = step.levels[level_number]
         P = L.prob
         if level_number == 0 and L.time == P.t0:
-            P.write_solution(L.u[0], P.t0)
-            self.t_val = np.array([P.t0])
-            self.u_val = P.eval_on_points(L.u[0])
+            # P.write_solution(L.u[0], P.t0)
+            # self.t_val = np.array([P.t0])
+            # self.u_val = P.eval_on_points(L.u[0])
+            pass
 
     def post_step(self, step, level_number):
         super(pde_hook, self).post_step(step, level_number)
@@ -29,7 +30,7 @@ class pde_hook(hooks):
         L = step.levels[level_number]
         if level_number == 0:
             P = L.prob
-            P.write_solution(L.uend, L.time + L.dt)
+            # P.write_solution(L.uend, L.time + L.dt)
             self.save_sol_at_points(L.uend, L.time + L.dt, P)
 
     def post_run(self, step, level_number):
@@ -39,10 +40,14 @@ class pde_hook(hooks):
             self.write_sol_at_points(P)
 
     def save_sol_at_points(self, u, t, P):
-        self.t_val = np.append(self.t_val, t)
-        unew = P.eval_on_points(u)
-        if P.domain.comm.rank == 0 and unew is not None:
-            self.u_val = np.append(self.u_val, unew, axis=1)
+        if hasattr(self, "t_val"):
+            self.t_val = np.append(self.t_val, t)
+            unew = P.eval_on_points(u)
+            if P.domain.comm.rank == 0 and unew is not None:
+                self.u_val = np.append(self.u_val, unew, axis=1)
+        else:
+            self.t_val = np.array([t])
+            self.u_val = P.eval_on_points(u)
 
     def write_sol_at_points(self, P):
         if P.domain.comm.rank == 0 and self.u_val is not None:

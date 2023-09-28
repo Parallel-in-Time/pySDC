@@ -7,6 +7,7 @@ from dolfinx import fem
 
 from pySDC.core.Errors import DataError
 
+
 class fenicsx_mesh(object):
     """
     FEniCSx Function data type with arbitrary dimensions
@@ -23,7 +24,7 @@ class fenicsx_mesh(object):
             values: a dolfinx.fem.Function
 
         Args:
-            init: can either be another fenicsx_mesh object to be copied, a fem.Function to be copied into values 
+            init: can either be another fenicsx_mesh object to be copied, a fem.Function to be copied into values
                   or a fem.FunctionSpace (with a constant value val to be assigned to the fem.Function)
             val: initial value (default: 0.0)
         Raises:
@@ -35,27 +36,26 @@ class fenicsx_mesh(object):
         # if init is another fenicsx_mesh, do a deepcopy (init by copy)
         if isinstance(init, type(self)):
             self.values = init.values.copy()
-            self.loc_to_glob_map = init.loc_to_glob_map            
+            self.loc_to_glob_map = init.loc_to_glob_map
         elif isinstance(init, df.fem.Function):
-            self.values = init.copy()            
+            self.values = init.copy()
         elif isinstance(init, df.fem.FunctionSpace):
             self.values = df.fem.Function(init)
-            if isinstance(val,str) and val=="random":
+            if isinstance(val, str) and val == "random":
                 self.values.x.array[:] = np.random.random(self.values.x.array.shape)[:]
-            elif isinstance(val,float):
+            elif isinstance(val, float):
                 self.values.vector.set(val)
-            elif isinstance(val,PETSc.Vec):
+            elif isinstance(val, PETSc.Vec):
                 self.values.vector.setArray(val)
             else:
-                raise DataError('something went wrong during %s initialization' % type(init))
+                raise DataError("something went wrong during %s initialization" % type(init))
         else:
-            raise DataError('something went wrong during %s initialization' % type(init))      
-        
+            raise DataError("something went wrong during %s initialization" % type(init))
+
         self.size = len(self.values.split())
 
         if self.loc_to_glob_map is None:
             self.init_loc_to_glob_map()
-        
 
     def init_loc_to_glob_map(self):
         self.loc_to_glob_map = []
@@ -64,11 +64,21 @@ class fenicsx_mesh(object):
             Vi, mapi = V.sub(i).collapse()
             self.loc_to_glob_map.append(mapi)
 
-    def copy(self,other):
+    def copy(self, other):
         if isinstance(other, type(self)):
             self.values.vector.setArray(other.values.vector)
         else:
             raise DataError("Type error: cannot copy %s to %s" % (type(other), type(self)))
+
+    def isend(self, dest=None, tag=None, comm=None):
+        return comm.Issend(self.values.vector.getArray(), dest=dest, tag=tag)
+
+    def irecv(self, source=None, tag=None, comm=None):
+        return comm.Irecv(self.values.vector.getArray(), source=source, tag=tag)
+
+    def bcast(self, root=None, comm=None):
+        comm.Bcast(self.values.vector.getArray(), root=root)
+        return self
 
     def __add__(self, other):
         """
@@ -94,19 +104,18 @@ class fenicsx_mesh(object):
             # self.values.vector.localForm().__exit__()
             # return me
             me = fenicsx_mesh(self)
-            me.values.vector.axpy(1.,other.values.vector)
+            me.values.vector.axpy(1.0, other.values.vector)
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
-        
+
     def __iadd__(self, other):
-       
-        if isinstance(other, type(self)):            
-            self.values.vector.axpy(1.,other.values.vector)
+        if isinstance(other, type(self)):
+            self.values.vector.axpy(1.0, other.values.vector)
             return self
         else:
             raise DataError("Type error: cannot iadd %s to %s" % (type(other), type(self)))
-        
+
     def __sub__(self, other):
         """
         Overloading the subtraction operator for mesh types
@@ -120,33 +129,31 @@ class fenicsx_mesh(object):
         """
 
         if isinstance(other, type(self)):
-            # always create new mesh, since otherwise c = a - b changes a as well!            
+            # always create new mesh, since otherwise c = a - b changes a as well!
             me = fenicsx_mesh(self)
-            me.values.vector.axpy(-1.,other.values.vector)
+            me.values.vector.axpy(-1.0, other.values.vector)
             return me
         else:
             raise DataError("Type error: cannot sub %s from %s" % (type(other), type(self)))
 
     def __isub__(self, other):
-       
-        if isinstance(other, type(self)):            
-            self.values.vector.axpy(-1.,other.values.vector)
+        if isinstance(other, type(self)):
+            self.values.vector.axpy(-1.0, other.values.vector)
             return self
         else:
             raise DataError("Type error: cannot isub %s to %s" % (type(other), type(self)))
 
-    def __mul__(self,other):
-
-        if isinstance(other,fenicsx_mesh):
-            mult = fenicsx_mesh(init=self.values.function_space,val=0.)    
+    def __mul__(self, other):
+        if isinstance(other, fenicsx_mesh):
+            mult = fenicsx_mesh(init=self.values.function_space, val=0.0)
             # for i in range(self.size):
-            #     mult.values.sub(i).interpolate(fem.Expression(self.values.sub(i)*other.values.sub(i),self.values.function_space.sub(i).element.interpolation_points()))     
-            mult.values.x.array[:] = self.values.x.array*other.values.x.array
+            #     mult.values.sub(i).interpolate(fem.Expression(self.values.sub(i)*other.values.sub(i),self.values.function_space.sub(i).element.interpolation_points()))
+            mult.values.x.array[:] = self.values.x.array * other.values.x.array
             return mult
 
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
-        
+
     def __rmul__(self, other):
         """
         Overloading the right multiply by factor operator for mesh types
@@ -161,11 +168,11 @@ class fenicsx_mesh(object):
 
         if isinstance(other, float):
             me = fenicsx_mesh(self)
-            me.values.vector.scale(other)            
+            me.values.vector.scale(other)
             return me
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
-        
+
     def __imul__(self, other):
         """
         Overloading the inplace right multiply by factor operator for mesh types
@@ -178,8 +185,8 @@ class fenicsx_mesh(object):
             fenicsx_mesh: original values scaled by factor
         """
 
-        if isinstance(other, float):            
-            self.values.vector.scale(other)         
+        if isinstance(other, float):
+            self.values.vector.scale(other)
             return self
         else:
             raise DataError("Type error: cannot imul %s to %s" % (type(other), type(self)))
@@ -205,8 +212,8 @@ class fenicsx_mesh(object):
         # norm_L2 = self.values.x.norm()/np.sqrt(self.values.x.array.size)
 
         return norm_L2
-    
-    def dot(self,other):
+
+    def dot(self, other):
         self.values.vector.dotBegin(other.values.vector)
         res = self.values.vector.dotEnd(other.values.vector)
         return res
@@ -217,27 +224,27 @@ class fenicsx_mesh(object):
         """
 
         if isinstance(x, type(self)):
-            self.values.vector.axpy(a,x.values.vector)                                  
+            self.values.vector.axpy(a, x.values.vector)
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
-        
+
     def aypx(self, a, x):
         """
         Performs self.values = x.values+a*self.values
         """
 
         if isinstance(x, type(self)):
-            self.values.vector.aypx(a,x.values.vector)                                  
+            self.values.vector.aypx(a, x.values.vector)
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
-        
+
     def axpby(self, a, b, x):
         """
         Performs self.values = a*x.values+b*self.values
         """
 
         if isinstance(x, type(self)):
-            self.values.vector.axpby(a,b,x.values.vector)                                  
+            self.values.vector.axpby(a, b, x.values.vector)
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(x), type(self)))
 
@@ -246,57 +253,57 @@ class fenicsx_mesh(object):
         Set to zero.
         """
         with self.values.vector.localForm() as loc_self:
-                loc_self.set(0.)
+            loc_self.set(0.0)
 
-    def ghostUpdate(self,addv,mode):        
+    def ghostUpdate(self, addv, mode):
         self.values.vector.ghostUpdate(addv, mode)
 
-    def interpolate(self,other):
-        if isinstance(other,fenicsx_mesh):
+    def interpolate(self, other):
+        if isinstance(other, fenicsx_mesh):
             for i in range(self.size):
                 self.values.sub(i).interpolate(other.values.sub(i))
         else:
             raise DataError("Type error: cannot interpolate %s to %s" % (type(other), type(self)))
-        
-    def sub(self,i):
+
+    def sub(self, i):
         return self.values.sub(i)
 
     @property
     def n_loc_dofs(self):
         return self.values.vector.getSizes()[0]
-    
+
     @property
     def n_ghost_dofs(self):
-        return self.values.x.array.size-self.n_loc_dofs
-    
-    def iadd_sub(self,other,indices):
+        return self.values.x.array.size - self.n_loc_dofs
+
+    def iadd_sub(self, other, indices):
         for i in indices:
             self.values.x.array[self.loc_to_glob_map[i]] += other.values.x.array[self.loc_to_glob_map[i]]
 
-    def isub_sub(self,other,indices):
+    def isub_sub(self, other, indices):
         for i in indices:
             self.values.x.array[self.loc_to_glob_map[i]] -= other.values.x.array[self.loc_to_glob_map[i]]
 
-    def imul_sub(self,other,indices):
+    def imul_sub(self, other, indices):
         for i in indices:
             self.values.x.array[self.loc_to_glob_map[i]] *= other
 
-    def axpby_sub(self,a,b,x,indices):
+    def axpby_sub(self, a, b, x, indices):
         for i in indices:
-            self.values.x.array[self.loc_to_glob_map[i]] = a*x.values.x.array[self.loc_to_glob_map[i]]\
-                                                            +b*self.values.x.array[self.loc_to_glob_map[i]]
+            self.values.x.array[self.loc_to_glob_map[i]] = a * x.values.x.array[self.loc_to_glob_map[i]] + b * self.values.x.array[self.loc_to_glob_map[i]]
 
-    def axpy_sub(self,a,x,indices):
+    def axpy_sub(self, a, x, indices):
         for i in indices:
-            self.values.x.array[self.loc_to_glob_map[i]] += a*x.values.x.array[self.loc_to_glob_map[i]]
+            self.values.x.array[self.loc_to_glob_map[i]] += a * x.values.x.array[self.loc_to_glob_map[i]]
 
-    def copy_sub(self,other,indices):
+    def copy_sub(self, other, indices):
         for i in indices:
             self.values.x.array[self.loc_to_glob_map[i]] = other.values.x.array[self.loc_to_glob_map[i]]
 
-    def zero_sub(self,indices):
+    def zero_sub(self, indices):
         for i in indices:
-            self.values.x.array[self.loc_to_glob_map[i]] = 0.
+            self.values.x.array[self.loc_to_glob_map[i]] = 0.0
+
 
 class rhs_fenicsx_mesh(object):
     """
@@ -330,7 +337,12 @@ class rhs_fenicsx_mesh(object):
             self.expl = fenicsx_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+            raise DataError("something went wrong during %s initialization" % type(self))
+
+    # def bcast(self, root=None, comm=None):
+    #     self.impl.bcast(root, comm)
+    #     self.expl.bcast(root, comm)
+    #     return self
 
     # def __add__(self, other):
 
@@ -340,7 +352,7 @@ class rhs_fenicsx_mesh(object):
     #         return me
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-    
+
     # def __sub__(self, other):
 
     #     if isinstance(other, rhs_fenicsx_mesh):
@@ -349,7 +361,7 @@ class rhs_fenicsx_mesh(object):
     #         return me
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __rmul__(self, other):
 
     #     if isinstance(other, float):
@@ -358,7 +370,7 @@ class rhs_fenicsx_mesh(object):
     #         return me
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __iadd__(self, other):
 
     #     if isinstance(other, rhs_fenicsx_mesh):
@@ -367,7 +379,7 @@ class rhs_fenicsx_mesh(object):
     #         return self
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __isub__(self, other):
 
     #     if isinstance(other, rhs_fenicsx_mesh):
@@ -376,7 +388,7 @@ class rhs_fenicsx_mesh(object):
     #         return self
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __imul__(self, other):
 
     #     if isinstance(other, float):
@@ -385,10 +397,11 @@ class rhs_fenicsx_mesh(object):
     #         return self
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __abs__(self):
     #     return abs(self.expl+self.impl)
-    
+
+
 class exp_rhs_fenicsx_mesh(object):
     """
     RHS data type for fenicsx_meshes with implicit, explicit and exponential components
@@ -424,7 +437,13 @@ class exp_rhs_fenicsx_mesh(object):
             self.exp = fenicsx_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+            raise DataError("something went wrong during %s initialization" % type(self))
+
+    # def bcast(self, root=None, comm=None):
+    #     self.impl.bcast(root, comm)
+    #     self.expl.bcast(root, comm)
+    #     self.exp.bcast(root, comm)
+    #     return self
 
     # def __add__(self, other):
 
@@ -434,7 +453,7 @@ class exp_rhs_fenicsx_mesh(object):
     #         return me
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-    
+
     # def __sub__(self, other):
 
     #     if isinstance(other, exp_rhs_fenicsx_mesh):
@@ -443,7 +462,7 @@ class exp_rhs_fenicsx_mesh(object):
     #         return me
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __rmul__(self, other):
 
     #     if isinstance(other, float):
@@ -452,7 +471,7 @@ class exp_rhs_fenicsx_mesh(object):
     #         return me
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __iadd__(self, other):
 
     #     if isinstance(other, exp_rhs_fenicsx_mesh):
@@ -462,7 +481,7 @@ class exp_rhs_fenicsx_mesh(object):
     #         return self
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __isub__(self, other):
 
     #     if isinstance(other, exp_rhs_fenicsx_mesh):
@@ -472,7 +491,7 @@ class exp_rhs_fenicsx_mesh(object):
     #         return self
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __imul__(self, other):
 
     #     if isinstance(other, float):
@@ -482,6 +501,6 @@ class exp_rhs_fenicsx_mesh(object):
     #         return self
     #     else:
     #         raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-        
+
     # def __abs__(self):
     #     return abs(self.expl+self.impl+self.exp)
