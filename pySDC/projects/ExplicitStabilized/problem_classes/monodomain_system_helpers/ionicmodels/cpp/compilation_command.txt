@@ -1,0 +1,8 @@
+Linux:
+c++ -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11 --includes) bindings_definitions.cpp -o ionicmodels$(python3-config --extension-suffix)
+
+Daint:
+c++ -march=haswell -O3 -Wall -shared -std=c++11 -fPIC -fvisibility=hidden $(python3 -m pybind11 --includes) bindings_definitions.cpp -o ionicmodels$(python3-config --extension-suffix)
+
+Mac:
+c++ -O3 -Wall -shared -std=c++11 -undefined dynamic_lookup $(python3 -m pybind11 --includes) bindings_definitions.cpp -o ionicmodels$(python3-config --extension-suffix)

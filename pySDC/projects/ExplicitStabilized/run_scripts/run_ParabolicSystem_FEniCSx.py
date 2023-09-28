@@ -18,6 +18,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
 from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK
+from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized as multirate_explicit_stabilized_ExpRK
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.exponential_splitting_explicit_stabilized import exponential_splitting_explicit_stabilized
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
 from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
@@ -28,11 +29,11 @@ from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.es_methods im
 
 def main():
 
-    # define integration methods
-    integrators = ['IMEX']
+    # define integration methods    
     integrators = ['IMEXEXP']
     integrators = ['IMEXEXP_EXPRK']
     integrators = ['exp_mES_EXPRK']
+    # integrators = ['mES_EXPRK']
     # integrators = ['ES']
     # integrators = ['mES']
     # integrators = ['exp_mES']
@@ -41,14 +42,14 @@ def main():
     
     num_procs = 1
 
-    ref = 1
-    time_order = 3
+    ref = 0
+    time_order = 2
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 5e-8
     level_params['dt'] = 0.1/2**ref
-    level_params['nsweeps'] = [3]
+    level_params['nsweeps'] = [1]
     level_params['residual_type'] = 'full_rel'
 
     # initialize sweeper parameters
@@ -56,6 +57,7 @@ def main():
     sweeper_params['initial_guess'] = 'spread'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
+    sweeper_params['QI'] = 'IE'
     # specific for explicit stabilized methods
     sweeper_params['es_class'] = RKW1
     sweeper_params['es_class_outer'] = RKW1
@@ -64,14 +66,14 @@ def main():
     # sweeper_params['es_s_inner'] = 0
     # sweeper_params['res_comp'] = 'f_eta'
     sweeper_params['damping'] = 0.05
-    sweeper_params['safe_add'] = 4
+    sweeper_params['safe_add'] = 1
     # sweeper_params['order'] = [3]
     # sweeper_params['nodes_choice'] = 'all' # closest_radau, last, all
     sweeper_params['rho_freq'] = 100
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 1
+    step_params['maxiter'] = 200
 
     # initialize problem parameters
     problem_params = dict()
@@ -79,7 +81,7 @@ def main():
     if problem_params['family']=='CG':
         problem_params['order'] = 1
         problem_params['mass_lumping'] = True # has effect for family=CG and order=1    
-        problem_params['n_elems'] = [20] #[10*2**(ref*time_order/2.)]
+        problem_params['n_elems'] = 200 # [10*2**(ref*time_order/2.)]
     elif problem_params['family']=='DG':
         problem_params['order'] = max(time_order-1,1)
         p = ref/2. if time_order==1 else ref
@@ -134,6 +136,10 @@ def main():
             problem_params['splitting'] = 'stiff_nonstiff'
             parabolic_system_type = parabolic_system_exp_expl_impl
             description['sweeper_class'] = multirate_explicit_stabilized
+        elif integrator == 'mES_EXPRK':                     
+            problem_params['splitting'] = 'stiff_nonstiff'
+            parabolic_system_type = parabolic_system_exp_expl_impl
+            description['sweeper_class'] = multirate_explicit_stabilized_ExpRK
         elif integrator == 'exp_mES':                     
             problem_params['splitting'] = 'exp_stiff_nonstiff'
             parabolic_system_type = parabolic_system_exp_expl_impl
@@ -141,7 +147,7 @@ def main():
         elif integrator == 'exp_mES_EXPRK':                     
             problem_params['splitting'] = 'exp_stiff_nonstiff_dir_sum'
             parabolic_system_type = parabolic_system_exp_expl_impl
-            description['sweeper_class'] = exponential_multirate_explicit_stabilized      
+            description['sweeper_class'] = exponential_multirate_explicit_stabilized_ExpRK      
         elif integrator == 'split_ES':                     
             problem_params['splitting'] = 'stiff_nonstiff'
             parabolic_system_type = parabolic_system_exp_expl_impl

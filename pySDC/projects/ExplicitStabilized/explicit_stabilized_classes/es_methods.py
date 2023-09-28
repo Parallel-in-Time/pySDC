@@ -35,9 +35,14 @@ class RKW1:
     def get_s(self, z):
         if 2.*self.dP[-1]<=z:
             raise NotImplementedError("Need too many stages and coefficients are not provided. Try to decrease step size.")
-        s = 1+np.argmax(2*self.dP>z)+self.safe_add
-        if s>self.s_max:
-            raise Exception("adding safe_add will require too many stages and coefficients are not provided")
+        # if z<1.5:
+        #     s = 1
+        if z<2.:
+            s = 1+self.safe_add
+        else:
+            s = 1+np.argmax(2*self.dP>z)+self.safe_add
+            if s>self.s_max:
+                raise Exception("adding safe_add will require too many stages and coefficients are not provided")
         return s
 
     def stability_boundary(self,s):        
@@ -96,10 +101,9 @@ class RKC1:
         self.c = c
 
     def get_s(self, z):
-
-        if z<1.5:
-            s = 1
-        elif z<2.:
+        # if z<1.5:
+        #     s = 1
+        if z<2.:
             s = 1+self.safe_add
         else:
             if self.damping<=0.1:
@@ -185,10 +189,9 @@ class RKU1:
         self.c = c
 
     def get_s(self, z):
-
-        if z<1.5:
-            s = 1
-        elif z<2.:
+        # if z<1.5:
+        #     s = 1
+        if z<2.:
             s = 1+self.safe_add
         else:
             s = int(np.ceil(np.sqrt(1+1.5*z)-1.))
@@ -244,8 +247,8 @@ class mRKC1:
         self.damping = damping        
         self.safe_add = safe_add
 
-        self.outer_method = outer_class(damping,safe_add)
-        self.inner_method = inner_class(damping,safe_add)
+        self.outer_method = eval(outer_class)(damping,safe_add)
+        self.inner_method = eval(inner_class)(damping,safe_add)
         self.even_s = self.outer_method.even_s
         self.even_m = self.inner_method.even_s
 
