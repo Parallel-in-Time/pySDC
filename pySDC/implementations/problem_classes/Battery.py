@@ -60,16 +60,24 @@ class battery_n_capacitors(ptype):
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, ncapacitors=2, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None):
+    def __init__(self, ncapacitors=1, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None):
         """Initialization routine"""
         n = ncapacitors
         nvars = n + 1
 
-        if C is None:
-            C = np.array([1.0, 1.0])
+        if C is None and ncapacitors == 1:
+            C = np.array([1.0])
+        else:
+            assert type(C) == np.ndarray, '"C" needs to be an np.ndarray'
+            assert (np.shape(C)[0] == n), 'Number of capacitance values needs to be equal to number of condensators'
 
-        if V_ref is None:
-            V_ref = np.array([1.0, 1.0])
+        if V_ref is None and ncapacitors == 1:
+            V_ref = np.array([1.0])
+        else:
+            assert (alpha > V_ref[k] for k in range(n)), 'Please set "alpha" greater than values of "V_ref"'
+            assert type(V_ref) == np.ndarray, '"V_ref" needs to be an np.ndarray'
+            assert (np.shape(V_ref)[0] == n), 'Number of reference values needs to be equal to number of condensators'
+            assert (V_ref[k] > 0 for k in range(n)), 'Please set values of "V_ref" greater than 0'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -230,6 +238,7 @@ class battery_n_capacitors(ptype):
         switch_detected = False
         m_guess = -100
         break_flag = False
+        k_detected = 1
         for m in range(1, len(u)):
             for k in range(1, self.nvars):
                 h_prev_node = u[m - 1][k] - self.V_ref[k - 1]
@@ -244,9 +253,7 @@ class battery_n_capacitors(ptype):
             if break_flag:
                 break
 
-        state_function = (
-            [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(len(u))] if switch_detected else []
-        )
+        state_function = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(len(u))]
 
         return switch_detected, m_guess, state_function
 
@@ -443,11 +450,20 @@ class battery_implicit(battery):
         newton_maxiter=100,
         newton_tol=1e-11,
     ):
+        n = ncapacitors
         if C is None:
             C = np.array([1.0])
+        else:
+            assert type(C) == np.ndarray, '"C" needs to be an np.ndarray'
+            assert (np.shape(C)[0] == n), 'Number of capacitance values needs to be equal to number of condensators'
 
         if V_ref is None:
             V_ref = np.array([1.0])
+        else:
+            assert alpha > V_ref[0], 'Please set "alpha" greater than values of "V_ref"'
+            assert type(V_ref) == np.ndarray, '"V_ref" needs to be an np.ndarray'
+            assert (np.shape(V_ref)[0] == n), 'Number of reference values needs to be equal to number of condensators'
+            assert V_ref[0] > 0, 'Please "V_ref" greater than 0'
 
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
