@@ -3,6 +3,6 @@ import pytest
 
 @pytest.mark.base
 def test_main():
-    from pySDC.projects.PinTSimE.battery_model import run
+    from pySDC.projects.PinTSimE.battery_model import main
 
-    run()
+    main()
