@@ -12,52 +12,206 @@ def WSCC9Bus():
 
     Returns
     -------
-    ppc_res : scipy.sparse.csr_matrix 
+    ppc_res : scipy.sparse.csr_matrix
         The data with buses, branches, generators and the Ybus to define the power system.
     """
     ppc = case9()
     ppc_res, success = runpf(ppc)
-    ppci = ext2int(ppc )
-    Ybus, yf, yt = makeYbus(ppci['baseMVA'],ppci['bus'],ppci['branch'])
+    ppci = ext2int(ppc)
+    Ybus, yf, yt = makeYbus(ppci['baseMVA'], ppci['bus'], ppci['branch'])
     ppc_res['Ybus'] = Ybus.todense()
     return ppc_res
 
 
 def get_initial_Ybus():
-        ybus = np.array([
-        [0-17.36111111111111j,0+0j,0+0j,0+17.36111111111111j,0+0j,0+0j,0+0j,0+0j,0+0j],
-        [0+0j,0-16j,0+0j,0+0j,0+0j,0+0j,0+0j,0+16j,0+0j],
-        [0+0j,0+0j,0-17.06484641638225j,0+0j,0+0j,0+17.06484641638225j,0+0j,0+0j,0+0j],
-        [0+17.36111111111111j,0+0j,0+0j,3.307378962025306-39.30888872611897j,-1.942191248714727+10.51068205186793j,0+0j,0+0j,0+0j,-1.36518771331058+11.60409556313993j],
-        [0+0j,0+0j,0+0j,-1.942191248714727+10.51068205186793j,3.224200387138842-15.84092701422946j,-1.282009138424115+5.588244962361526j,0+0j,0+0j,0+0j],
-        [0+0j,0+0j,0+17.06484641638225j,0+0j,-1.282009138424115+5.588244962361526j,2.437096619314212-32.15386180510696j,-1.155087480890097+9.784270426363173j,0+0j,0+0j],
-        [0+0j,0+0j,0+0j,0+0j,0+0j,-1.155087480890097+9.784270426363173j,2.772209954136233-23.30324902327162j,-1.617122473246136+13.69797859690844j,0+0j],
-        [0+0j,0+16j,0+0j,0+0j,0+0j,0+0j,-1.617122473246136+13.69797859690844j,2.804726852537284-35.44561313021703j,-1.187604379291148+5.975134533308591j],
-        [0+0j,0+0j,0+0j,-1.36518771331058+11.60409556313993j,0+0j,0+0j,0+0j,-1.187604379291148+5.975134533308591j,2.552792092601728-17.33823009644852j],
-    ], dtype=complex)
+    """
+    Provides the Ybus used before the line outage occurs.
 
-        return ybus
+    Returns
+    -------
+    ybus : complex np.2darray
+        Admittance matrix.
+    """
+    ybus = np.array(
+        [
+            [0 - 17.36111111111111j, 0 + 0j, 0 + 0j, 0 + 17.36111111111111j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j],
+            [0 + 0j, 0 - 16j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 16j, 0 + 0j],
+            [0 + 0j, 0 + 0j, 0 - 17.06484641638225j, 0 + 0j, 0 + 0j, 0 + 17.06484641638225j, 0 + 0j, 0 + 0j, 0 + 0j],
+            [
+                0 + 17.36111111111111j,
+                0 + 0j,
+                0 + 0j,
+                3.307378962025306 - 39.30888872611897j,
+                -1.942191248714727 + 10.51068205186793j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.36518771331058 + 11.60409556313993j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.942191248714727 + 10.51068205186793j,
+                3.224200387138842 - 15.84092701422946j,
+                -1.282009138424115 + 5.588244962361526j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 17.06484641638225j,
+                0 + 0j,
+                -1.282009138424115 + 5.588244962361526j,
+                2.437096619314212 - 32.15386180510696j,
+                -1.155087480890097 + 9.784270426363173j,
+                0 + 0j,
+                0 + 0j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.155087480890097 + 9.784270426363173j,
+                2.772209954136233 - 23.30324902327162j,
+                -1.617122473246136 + 13.69797859690844j,
+                0 + 0j,
+            ],
+            [
+                0 + 0j,
+                0 + 16j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.617122473246136 + 13.69797859690844j,
+                2.804726852537284 - 35.44561313021703j,
+                -1.187604379291148 + 5.975134533308591j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.36518771331058 + 11.60409556313993j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.187604379291148 + 5.975134533308591j,
+                2.552792092601728 - 17.33823009644852j,
+            ],
+        ],
+        dtype=complex,
+    )
+
+    return ybus
+
 
 def get_event_Ybus():
-        ybus = np.array([
-        [0-17.36111111111111j,0+0j,0+0j,0+17.36111111111111j,0+0j,0+0j,0+0j,0+0j,0+0j],
-        [0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j],
-        [0+0j,0+0j,0-17.06484641638225j,0+0j,0+0j,0+0j,0+0j,0+0j,0+17.06484641638225j],
-        [0+17.36111111111111j,0+0j,0+0j,3.307378962025306-39.30888872611897j,-1.36518771331058+11.60409556313993j,-1.942191248714727+10.51068205186793j,0+0j,0+0j,0+0j],
-        [0+0j,0+0j,0+0j,-1.36518771331058+11.60409556313993j,2.552792092601728-17.33823009644852j,0+0j,-1.187604379291148+5.975134533308591j,0+0j,0+0j],
-        [0+0j,0+0j,0+0j,-1.942191248714727+10.51068205186793j,0+0j,3.224200387138842-15.84092701422946j,0+0j,0+0j,-1.282009138424115+5.588244962361526j],
-        [0+0j,0+0j,0+0j,0+0j,-1.187604379291148+5.975134533308591j,0+0j,2.804726852537284-19.44561313021703j,-1.617122473246136+13.69797859690844j,0+0j],
-        [0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,-1.617122473246136+13.69797859690844j,2.772209954136233-23.30324902327162j,-1.155087480890097+9.784270426363173j],
-        [0+0j,0+0j,0+17.06484641638225j,0+0j,0+0j,-1.282009138424115+5.588244962361526j,0+0j,-1.155087480890097+9.784270426363173j,2.437096619314212-32.15386180510696j],
-    ], dtype=complex)
+    """
+    Provides the Ybus used for the line outage.
 
-        return ybus
+    Returns
+    -------
+    ybus : complex np.2darray
+        Admittance matrix.
+    """
+    ybus = np.array(
+        [
+            [0 - 17.36111111111111j, 0 + 0j, 0 + 0j, 0 + 17.36111111111111j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j],
+            [0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j],
+            [0 + 0j, 0 + 0j, 0 - 17.06484641638225j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 0j, 0 + 17.06484641638225j],
+            [
+                0 + 17.36111111111111j,
+                0 + 0j,
+                0 + 0j,
+                3.307378962025306 - 39.30888872611897j,
+                -1.36518771331058 + 11.60409556313993j,
+                -1.942191248714727 + 10.51068205186793j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.36518771331058 + 11.60409556313993j,
+                2.552792092601728 - 17.33823009644852j,
+                0 + 0j,
+                -1.187604379291148 + 5.975134533308591j,
+                0 + 0j,
+                0 + 0j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.942191248714727 + 10.51068205186793j,
+                0 + 0j,
+                3.224200387138842 - 15.84092701422946j,
+                0 + 0j,
+                0 + 0j,
+                -1.282009138424115 + 5.588244962361526j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.187604379291148 + 5.975134533308591j,
+                0 + 0j,
+                2.804726852537284 - 19.44561313021703j,
+                -1.617122473246136 + 13.69797859690844j,
+                0 + 0j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                0 + 0j,
+                -1.617122473246136 + 13.69797859690844j,
+                2.772209954136233 - 23.30324902327162j,
+                -1.155087480890097 + 9.784270426363173j,
+            ],
+            [
+                0 + 0j,
+                0 + 0j,
+                0 + 17.06484641638225j,
+                0 + 0j,
+                0 + 0j,
+                -1.282009138424115 + 5.588244962361526j,
+                0 + 0j,
+                -1.155087480890097 + 9.784270426363173j,
+                2.437096619314212 - 32.15386180510696j,
+            ],
+        ],
+        dtype=complex,
+    )
+
+    return ybus
 
 
 def get_YBus(ppc):
+    """Returns the Ybus (not used here)
 
+    Parameters
+    ----------
+    ppc : ppc_res : scipy.sparse.csr_matrix
+        The data with buses, branches, generators and the Ybus to define the power system.
+
+    Returns
+    -------
+    Ybus : dict
+        Nodal point admittance matrix.
+    """
     ppci = ext2int(ppc)
-    Ybus, yf, yt = makeYbus(ppci['baseMVA'],ppci['bus'],ppci['branch'])
+    Ybus, yf, yt = makeYbus(ppci['baseMVA'], ppci['bus'], ppci['branch'])
 
     return Ybus.todense()
 
@@ -135,7 +289,7 @@ class WSCC9BusSystem(ptype_dae):
     V0 : np.1darray
         Contains the :math:`1`-st column of ``IC``, initial condition for magnitude of bus voltage in per unit.
     VG0 : np.1darray
-        Initial condition for complex voltage phasor. 
+        Initial condition for complex voltage phasor.
     THG0 : np.1darray
         Initial condition for angle of the bus voltage in rad.
     H : np.1darray
@@ -271,41 +425,51 @@ class WSCC9BusSystem(ptype_dae):
         self.ws_vector = self.ws * np.ones(self.m)
 
         # Machine data (MD) as a 2D NumPy array
-        self.MD = np.array([
-            [23.640,                      6.4000,                    3.0100],                      # 1 - H
-            [0.1460,                      0.8958,                    1.3125],                      # 2 - Xd
-            [0.0608,                      0.1198,                    0.1813],                      # 3 - Xdp
-            [0.0489,                      0.0881,                    0.1133],                      # 4 - Xdpp
-            [0.0969,                      0.8645,                    1.2578],                      # 5 - Xq
-            [0.0969,                      0.1969,                    0.2500],                      # 6 - Xqp
-            [0.0396,                      0.0887,                    0.0833],                      # 7 - Xqpp
-            [8.960000000000001,           6.0000,                    5.8900],                      # 8 - Tdop
-            [0.1150,                      0.0337,                    0.0420],                      # 9 - Td0pp
-            [0.3100,                      0.5350,                    0.6000],                      # 10 - Tqop
-            [0.0330,                      0.0780,                    0.1875],                      # 11 - Tq0pp
-            [0.0041,                      0.0026,                    0.0035],                      # 12 - RS
-            [0.1200,                      0.1020,                    0.0750],                      # 13 - Xls
-            [0.1 * (2 * 23.64) / self.ws, 0.2 * (2 * 6.4) / self.ws, 0.3 * (2 * 3.01) / self.ws],  # 14 - Dm (ws should be defined)
-        ])
+        self.MD = np.array(
+            [
+                [23.640, 6.4000, 3.0100],  # 1 - H
+                [0.1460, 0.8958, 1.3125],  # 2 - Xd
+                [0.0608, 0.1198, 0.1813],  # 3 - Xdp
+                [0.0489, 0.0881, 0.1133],  # 4 - Xdpp
+                [0.0969, 0.8645, 1.2578],  # 5 - Xq
+                [0.0969, 0.1969, 0.2500],  # 6 - Xqp
+                [0.0396, 0.0887, 0.0833],  # 7 - Xqpp
+                [8.960000000000001, 6.0000, 5.8900],  # 8 - Tdop
+                [0.1150, 0.0337, 0.0420],  # 9 - Td0pp
+                [0.3100, 0.5350, 0.6000],  # 10 - Tqop
+                [0.0330, 0.0780, 0.1875],  # 11 - Tq0pp
+                [0.0041, 0.0026, 0.0035],  # 12 - RS
+                [0.1200, 0.1020, 0.0750],  # 13 - Xls
+                [
+                    0.1 * (2 * 23.64) / self.ws,
+                    0.2 * (2 * 6.4) / self.ws,
+                    0.3 * (2 * 3.01) / self.ws,
+                ],  # 14 - Dm (ws should be defined)
+            ]
+        )
 
         # Excitation data (ED) as a 2D NumPy array
-        self.ED = np.array([
-            20.000 * np.ones(self.m),   # 1- KA
-            0.2000 * np.ones(self.m),   # 2- TA
-            1.0000 * np.ones(self.m),   # 3- KE
-            0.3140 * np.ones(self.m),   # 4- TE
-            0.0630 * np.ones(self.m),   # 5- KF
-            0.3500 * np.ones(self.m),   # 6- TF
-            0.0039 * np.ones(self.m),   # 7- Ax
-            1.5550 * np.ones(self.m),   # 8- Bx
-        ])
+        self.ED = np.array(
+            [
+                20.000 * np.ones(self.m),  # 1- KA
+                0.2000 * np.ones(self.m),  # 2- TA
+                1.0000 * np.ones(self.m),  # 3- KE
+                0.3140 * np.ones(self.m),  # 4- TE
+                0.0630 * np.ones(self.m),  # 5- KF
+                0.3500 * np.ones(self.m),  # 6- TF
+                0.0039 * np.ones(self.m),  # 7- Ax
+                1.5550 * np.ones(self.m),  # 8- Bx
+            ]
+        )
 
         # Turbine data (TD) as a 2D NumPy array
-        self.TD = np.array([
-            0.10 * np.ones(self.m),     # 1- TCH
-            0.05 * np.ones(self.m),     # 2- TSV
-            0.05 * np.ones(self.m),     # 3- RD
-        ])
+        self.TD = np.array(
+            [
+                0.10 * np.ones(self.m),  # 1- TCH
+                0.05 * np.ones(self.m),  # 2- TSV
+                0.05 * np.ones(self.m),  # 3- RD
+            ]
+        )
 
         self.bus = self.mpc['bus']
         self.branch = self.mpc['branch']
@@ -313,11 +477,10 @@ class WSCC9BusSystem(ptype_dae):
         self.YBus = get_initial_Ybus()
 
         temp_mpc = self.mpc
-        temp_mpc['branch'] = np.delete(temp_mpc['branch'],6,0)
+        temp_mpc['branch'] = np.delete(temp_mpc['branch'], 6, 0)
         self.YBus_line6_8_outage = get_event_Ybus()
 
         # ---- excitation limiter vmax ----
-        # self.vmax = 2.1
         self.psv_max = 1.0
 
         self.IC1 = [row[7] for row in self.bus]  # Column 8 in MATLAB is indexed as 7 in Python (0-based index)
@@ -359,8 +522,8 @@ class WSCC9BusSystem(ptype_dae):
 
         self.TH0 = np.array([row[1] * np.pi / 180 for row in self.IC])
         self.V0 = np.array([row[0] for row in self.IC])
-        self.VG0 = self.V0[:self.m]
-        self.THG0 = self.TH0[:self.m]
+        self.VG0 = self.V0[: self.m]
+        self.THG0 = self.TH0[: self.m]
 
         # Extracting values from the MD array
         self.H = self.MD[0, :]
@@ -417,21 +580,25 @@ class WSCC9BusSystem(ptype_dae):
         # Calculate Edp0, Si2q0, Eqp0, and Si1d0
         self.Edp0 = (self.Xq - self.Xqp) * self.Iq0
         self.Si2q0 = (self.Xls - self.Xq) * self.Iq0
-        self.Eqp0 = self.Rs * self.Iq0 + self.Xdp * self.Id0 + self.V0[:self.m] * np.cos(self.D0 - self.TH0[:self.m])
+        self.Eqp0 = self.Rs * self.Iq0 + self.Xdp * self.Id0 + self.V0[: self.m] * np.cos(self.D0 - self.TH0[: self.m])
         self.Si1d0 = self.Eqp0 - (self.Xdp - self.Xls) * self.Id0
 
         # Calculate Efd0 and TM0
         self.Efd0 = self.Eqp0 + (self.Xd - self.Xdp) * self.Id0
-        self.TM0 = ((self.Xdpp - self.Xls) / (self.Xdp - self.Xls)) * self.Eqp0 * self.Iq0 + ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls)) * self.Si1d0 * self.Iq0 + \
-            ((self.Xqpp - self.Xls) / (self.Xqp - self.Xls)) * self.Edp0 * self.Id0 - ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls)) * self.Si2q0 * self.Id0 + \
-            (self.Xqpp - self.Xdpp) * self.Id0 * self.Iq0
+        self.TM0 = (
+            ((self.Xdpp - self.Xls) / (self.Xdp - self.Xls)) * self.Eqp0 * self.Iq0
+            + ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls)) * self.Si1d0 * self.Iq0
+            + ((self.Xqpp - self.Xls) / (self.Xqp - self.Xls)) * self.Edp0 * self.Id0
+            - ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls)) * self.Si2q0 * self.Id0
+            + (self.Xqpp - self.Xdpp) * self.Id0 * self.Iq0
+        )
 
         # Calculate VR0 and RF0
         self.VR0 = (self.KE + self.Ax * np.exp(self.Bx * self.Efd0)) * self.Efd0
         self.RF0 = (self.KF / self.TF) * self.Efd0
 
         # Calculate Vref and PSV0
-        self.Vref = self.V0[:self.m] + self.VR0 / self.KA
+        self.Vref = self.V0[: self.m] + self.VR0 / self.KA
         self.PSV0 = self.TM0
         self.PC = self.PSV0
 
@@ -467,19 +634,19 @@ class WSCC9BusSystem(ptype_dae):
             The right-hand side of f (contains two components).
         """
 
-        dEqp, dSi1d, dEdp = du[0:self.m], du[self.m:2*self.m], du[2*self.m:3*self.m]
-        dSi2q, dDelta = du[3*self.m:4*self.m], du[4*self.m:5*self.m]
-        dw, dEfd, dRF = du[5*self.m:6*self.m], du[6*self.m:7*self.m], du[7*self.m:8*self.m]
-        dVR, dTM, dPSV = du[8*self.m:9*self.m], du[9*self.m:10*self.m], du[10*self.m:11*self.m]
+        dEqp, dSi1d, dEdp = du[0 : self.m], du[self.m : 2 * self.m], du[2 * self.m : 3 * self.m]
+        dSi2q, dDelta = du[3 * self.m : 4 * self.m], du[4 * self.m : 5 * self.m]
+        dw, dEfd, dRF = du[5 * self.m : 6 * self.m], du[6 * self.m : 7 * self.m], du[7 * self.m : 8 * self.m]
+        dVR, dTM, dPSV = du[8 * self.m : 9 * self.m], du[9 * self.m : 10 * self.m], du[10 * self.m : 11 * self.m]
 
-        Eqp, Si1d, Edp = u[0:self.m], u[self.m:2*self.m], u[2*self.m:3*self.m]
-        Si2q, Delta = u[3*self.m:4*self.m], u[4*self.m:5*self.m]
-        w, Efd, RF = u[5*self.m:6*self.m], u[6*self.m:7*self.m], u[7*self.m:8*self.m]
-        VR, TM, PSV = u[8*self.m:9*self.m], u[9*self.m:10*self.m], u[10*self.m:11*self.m]
+        Eqp, Si1d, Edp = u[0 : self.m], u[self.m : 2 * self.m], u[2 * self.m : 3 * self.m]
+        Si2q, Delta = u[3 * self.m : 4 * self.m], u[4 * self.m : 5 * self.m]
+        w, Efd, RF = u[5 * self.m : 6 * self.m], u[6 * self.m : 7 * self.m], u[7 * self.m : 8 * self.m]
+        VR, TM, PSV = u[8 * self.m : 9 * self.m], u[9 * self.m : 10 * self.m], u[10 * self.m : 11 * self.m]
 
-        Id, Iq = u[11*self.m:11*self.m + self.m], u[11*self.m + self.m:11*self.m + 2*self.m]
-        V = u[11*self.m + 2*self.m : 11*self.m + 2*self.m + self.n]
-        TH = u[11*self.m + 2*self.m + self.n:11*self.m + 2*self.m + 2 * self.n]
+        Id, Iq = u[11 * self.m : 11 * self.m + self.m], u[11 * self.m + self.m : 11 * self.m + 2 * self.m]
+        V = u[11 * self.m + 2 * self.m : 11 * self.m + 2 * self.m + self.n]
+        TH = u[11 * self.m + 2 * self.m + self.n : 11 * self.m + 2 * self.m + 2 * self.n]
 
         # line outage disturbance:
         if t >= 0.05:
@@ -490,25 +657,33 @@ class WSCC9BusSystem(ptype_dae):
 
         COI = np.sum(w * self.MH) / np.sum(self.MH)
 
-        # Voltage-dependent active loads PL2, and voltage-dependent reactive loads QL2 
+        # Voltage-dependent active loads PL2, and voltage-dependent reactive loads QL2
         PL2 = np.array(self.PL)
         QL2 = np.array(self.QL)
 
         V = V.T
 
         # Vectorized calculations
-        Vectorized_angle1 = (np.array([TH.take(indices) for indices in self.bb1.T]) - np.array([TH.take(indices) for indices in self.aa1.T]) - self.Yang[:self.m, :self.n])
-        Vectorized_mag1 = (V[:self.m] * V[:self.n].reshape(-1, 1)).T * self.Yabs[:self.m, :self.n]
+        Vectorized_angle1 = (
+            np.array([TH.take(indices) for indices in self.bb1.T])
+            - np.array([TH.take(indices) for indices in self.aa1.T])
+            - self.Yang[: self.m, : self.n]
+        )
+        Vectorized_mag1 = (V[: self.m] * V[: self.n].reshape(-1, 1)).T * self.Yabs[: self.m, : self.n]
 
         sum1 = np.sum(Vectorized_mag1 * np.cos(Vectorized_angle1), axis=1)
         sum2 = np.sum(Vectorized_mag1 * np.sin(Vectorized_angle1), axis=1)
 
-        VG = V[:self.m]
-        THG = TH[:self.m]
+        VG = V[: self.m]
+        THG = TH[: self.m]
         Angle_diff = Delta - THG
 
-        Vectorized_angle2 = (np.array([TH.take(indices) for indices in self.bb2.T]) - np.array([TH.take(indices) for indices in self.aa2.T]) - self.Yang[self.m:self.n, :self.n])
-        Vectorized_mag2 = (V[self.m:self.n] * V[:self.n].reshape(-1, 1)).T * self.Yabs[self.m:self.n, : self.n]
+        Vectorized_angle2 = (
+            np.array([TH.take(indices) for indices in self.bb2.T])
+            - np.array([TH.take(indices) for indices in self.aa2.T])
+            - self.Yang[self.m : self.n, : self.n]
+        )
+        Vectorized_mag2 = (V[self.m : self.n] * V[: self.n].reshape(-1, 1)).T * self.Yabs[self.m : self.n, : self.n]
 
         sum3 = np.sum(Vectorized_mag2 * np.cos(Vectorized_angle2), axis=1)
         sum4 = np.sum(Vectorized_mag2 * np.sin(Vectorized_angle2), axis=1)
@@ -520,32 +695,87 @@ class WSCC9BusSystem(ptype_dae):
 
         # Equations as list
         eqs = []
-        eqs.append((1.0 / self.Td0p) * (-Eqp - (self.Xd - self.Xdp) * (Id - ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls) ** 2) * (Si1d + (self.Xdp - self.Xls) * Id - Eqp)) + Efd) - dEqp)  # (1)
+        eqs.append(
+            (1.0 / self.Td0p)
+            * (
+                -Eqp
+                - (self.Xd - self.Xdp)
+                * (
+                    Id
+                    - ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls) ** 2) * (Si1d + (self.Xdp - self.Xls) * Id - Eqp)
+                )
+                + Efd
+            )
+            - dEqp
+        )  # (1)
         eqs.append((1.0 / self.Td0pp) * (-Si1d + Eqp - (self.Xdp - self.Xls) * Id) - dSi1d)  # (2)
-        eqs.append((1.0 / self.Tq0p) * (-Edp + (self.Xq - self.Xqp) * (Iq - ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls) ** 2) * (Si2q + (self.Xqp - self.Xls) * Iq + Edp))) - dEdp)  # (3)
+        eqs.append(
+            (1.0 / self.Tq0p)
+            * (
+                -Edp
+                + (self.Xq - self.Xqp)
+                * (
+                    Iq
+                    - ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls) ** 2) * (Si2q + (self.Xqp - self.Xls) * Iq + Edp)
+                )
+            )
+            - dEdp
+        )  # (3)
         eqs.append((1.0 / self.Tq0pp) * (-Si2q - Edp - (self.Xqp - self.Xls) * Iq) - dSi2q)  # (4)
         eqs.append(w - COI - dDelta)  # (5)
-        eqs.append((self.ws / (2.0 * self.H)) * (TM - ((self.Xdpp - self.Xls) / (self.Xdp - self.Xls)) * Eqp * Iq - ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls)) * Si1d * Iq - ((self.Xqpp - self.Xls) / (self.Xqp - self.Xls)) * Edp * Id + ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls)) * Si2q * Id - (self.Xqpp - self.Xdpp) * Id * Iq - self.Dm * (w - self.ws)) - dw)  # (6)
+        eqs.append(
+            (self.ws / (2.0 * self.H))
+            * (
+                TM
+                - ((self.Xdpp - self.Xls) / (self.Xdp - self.Xls)) * Eqp * Iq
+                - ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls)) * Si1d * Iq
+                - ((self.Xqpp - self.Xls) / (self.Xqp - self.Xls)) * Edp * Id
+                + ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls)) * Si2q * Id
+                - (self.Xqpp - self.Xdpp) * Id * Iq
+                - self.Dm * (w - self.ws)
+            )
+            - dw
+        )  # (6)
         eqs.append((1.0 / self.TE) * ((-(self.KE + self.Ax * np.exp(self.Bx * Efd))) * Efd + VR) - dEfd)  # (7)
         eqs.append((1.0 / self.TF) * (-RF + (self.KF / self.TF) * Efd) - dRF)  # (8)
-        eqs.append((1.0 / self.TA) * (-VR + self.KA * RF - ((self.KA * self.KF) / self.TF) * Efd + self.KA * (self.Vref - V[:self.m])) - dVR)  # (9)
+        eqs.append(
+            (1.0 / self.TA)
+            * (-VR + self.KA * RF - ((self.KA * self.KF) / self.TF) * Efd + self.KA * (self.Vref - V[: self.m]))
+            - dVR
+        )  # (9)
 
         # --- Limitation of valve position Psv with limiter start ---
-        if(PSV[0] >= self.psv_max or t >= t_switch):
-            _temp_dPSV_g1 = (1.0 / self.TSV[1]) * (-PSV[1] + self.PSV0[1] - (1.0 / self.RD[1]) * (w[1] / self.ws - 1)) - dPSV[1]
-            _temp_dPSV_g2 = (1.0 / self.TSV[2]) * (-PSV[2] + self.PSV0[2] - (1.0 / self.RD[2]) * (w[2] / self.ws - 1)) - dPSV[2]
+        if PSV[0] >= self.psv_max or t >= t_switch:
+            _temp_dPSV_g1 = (1.0 / self.TSV[1]) * (
+                -PSV[1] + self.PSV0[1] - (1.0 / self.RD[1]) * (w[1] / self.ws - 1)
+            ) - dPSV[1]
+            _temp_dPSV_g2 = (1.0 / self.TSV[2]) * (
+                -PSV[2] + self.PSV0[2] - (1.0 / self.RD[2]) * (w[2] / self.ws - 1)
+            ) - dPSV[2]
             eqs.append(np.array([dPSV[0], _temp_dPSV_g1, _temp_dPSV_g2]))
         else:
             eqs.append((1.0 / self.TSV) * (-PSV + self.PSV0 - (1.0 / self.RD) * (w / self.ws - 1)) - dPSV)
         # --- Limitation of valve position Psv with limiter end---
 
         eqs.append((1.0 / self.TCH) * (-TM + PSV) - dTM)  # (10)
-        eqs.append(self.Rs * Id - self.Xqpp * Iq - ((self.Xqpp - self.Xls) / (self.Xqp - self.Xls)) * Edp + ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls)) * Si2q + VG * np.sin(Angle_diff))  # (12)
-        eqs.append(self.Rs * Iq + self.Xdpp * Id - ((self.Xdpp - self.Xls) / (self.Xdp - self.Xls)) * Eqp - ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls)) * Si1d + VG * np.cos(Angle_diff))  # (13)
-        eqs.append((Id * VG.T * np.sin(Angle_diff) + Iq * VG.T * np.cos(Angle_diff)) - PL2[0:self.m] - sum1)  # (14)
-        eqs.append((Id * VG.T * np.cos(Angle_diff) - Iq * VG.T * np.sin(Angle_diff))- QL2[0:self.m] - sum2)  # (15)
-        eqs.append(-PL2[self.m:self.n] - sum3)  # (16)
-        eqs.append(-QL2[self.m:self.n] - sum4)  # (17)
+        eqs.append(
+            self.Rs * Id
+            - self.Xqpp * Iq
+            - ((self.Xqpp - self.Xls) / (self.Xqp - self.Xls)) * Edp
+            + ((self.Xqp - self.Xqpp) / (self.Xqp - self.Xls)) * Si2q
+            + VG * np.sin(Angle_diff)
+        )  # (12)
+        eqs.append(
+            self.Rs * Iq
+            + self.Xdpp * Id
+            - ((self.Xdpp - self.Xls) / (self.Xdp - self.Xls)) * Eqp
+            - ((self.Xdp - self.Xdpp) / (self.Xdp - self.Xls)) * Si1d
+            + VG * np.cos(Angle_diff)
+        )  # (13)
+        eqs.append((Id * VG.T * np.sin(Angle_diff) + Iq * VG.T * np.cos(Angle_diff)) - PL2[0 : self.m] - sum1)  # (14)
+        eqs.append((Id * VG.T * np.cos(Angle_diff) - Iq * VG.T * np.sin(Angle_diff)) - QL2[0 : self.m] - sum2)  # (15)
+        eqs.append(-PL2[self.m : self.n] - sum3)  # (16)
+        eqs.append(-QL2[self.m : self.n] - sum4)  # (17)
         eqs_flatten = [item for sublist in eqs for item in sublist]
 
         f[:] = eqs_flatten
@@ -568,21 +798,21 @@ class WSCC9BusSystem(ptype_dae):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         me = self.dtype_u(self.init)
-        me[0:self.m] = self.Eqp0
-        me[self.m:2 * self.m] = self.Si1d0
-        me[2 * self.m:3 * self.m] = self.Edp0
-        me[3 * self.m:4 * self.m] = self.Si2q0
-        me[4 * self.m:5 * self.m] = self.D0
-        me[5 * self.m:6 * self.m] = self.ws_vector
-        me[6 * self.m:7 * self.m] = self.Efd0
-        me[7 * self.m:8 * self.m] = self.RF0
-        me[8 * self.m:9 * self.m] = self.VR0
-        me[9 * self.m:10 * self.m] = self.TM0
-        me[10 * self.m:11 * self.m] = self.PSV0
-        me[11*self.m:11*self.m + self.m] = self.Id0
-        me[11*self.m + self.m:11*self.m + 2*self.m] = self.Iq0
-        me[11*self.m + 2*self.m:11*self.m + 2*self.m + self.n] = self.V0
-        me[11*self.m + 2*self.m + self.n:11*self.m + 2*self.m + 2 *self.n] = self.TH0
+        me[0 : self.m] = self.Eqp0
+        me[self.m : 2 * self.m] = self.Si1d0
+        me[2 * self.m : 3 * self.m] = self.Edp0
+        me[3 * self.m : 4 * self.m] = self.Si2q0
+        me[4 * self.m : 5 * self.m] = self.D0
+        me[5 * self.m : 6 * self.m] = self.ws_vector
+        me[6 * self.m : 7 * self.m] = self.Efd0
+        me[7 * self.m : 8 * self.m] = self.RF0
+        me[8 * self.m : 9 * self.m] = self.VR0
+        me[9 * self.m : 10 * self.m] = self.TM0
+        me[10 * self.m : 11 * self.m] = self.PSV0
+        me[11 * self.m : 11 * self.m + self.m] = self.Id0
+        me[11 * self.m + self.m : 11 * self.m + 2 * self.m] = self.Iq0
+        me[11 * self.m + 2 * self.m : 11 * self.m + 2 * self.m + self.n] = self.V0
+        me[11 * self.m + 2 * self.m + self.n : 11 * self.m + 2 * self.m + 2 * self.n] = self.TH0
         return me
 
     def get_switching_info(self, u, t, du=None):
@@ -620,20 +850,20 @@ class WSCC9BusSystem(ptype_dae):
         already_detected = False
         m_guess = -100
         for m in range(1, len(u)):
-            h_prev_node = u[m - 1][10*self.m] - self.psv_max
-            h_curr_node = u[m][10*self.m] - self.psv_max
+            h_prev_node = u[m - 1][10 * self.m] - self.psv_max
+            h_curr_node = u[m][10 * self.m] - self.psv_max
             if h_prev_node < 0 and h_curr_node >= 0 and not already_detected:
                 switch_detected = True
                 m_guess = m - 1
-                state_function = [u[m][10*self.m] - self.psv_max for m in range(len(u))]
+                state_function = [u[m][10 * self.m] - self.psv_max for m in range(len(u))]
                 already_detected = True
                 break
             else:
-                state_function = [u[m][10*self.m] - self.psv_max for m in range(len(u))]
+                state_function = [u[m][10 * self.m] - self.psv_max for m in range(len(u))]
         return switch_detected, m_guess, state_function
 
     def count_switches(self):
         """
         Setter to update the number of switches if one is found.
         """
-        self.nswitches +=1
+        self.nswitches += 1

@@ -69,14 +69,14 @@ class battery_n_capacitors(ptype):
             C = np.array([1.0])
         else:
             assert type(C) == np.ndarray, '"C" needs to be an np.ndarray'
-            assert (np.shape(C)[0] == n), 'Number of capacitance values needs to be equal to number of condensators'
+            assert np.shape(C)[0] == n, 'Number of capacitance values needs to be equal to number of condensators'
 
         if V_ref is None and ncapacitors == 1:
             V_ref = np.array([1.0])
         else:
             assert (alpha > V_ref[k] for k in range(n)), 'Please set "alpha" greater than values of "V_ref"'
             assert type(V_ref) == np.ndarray, '"V_ref" needs to be an np.ndarray'
-            assert (np.shape(V_ref)[0] == n), 'Number of reference values needs to be equal to number of condensators'
+            assert np.shape(V_ref)[0] == n, 'Number of reference values needs to be equal to number of condensators'
             assert (V_ref[k] > 0 for k in range(n)), 'Please set values of "V_ref" greater than 0'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
@@ -455,14 +455,14 @@ class battery_implicit(battery):
             C = np.array([1.0])
         else:
             assert type(C) == np.ndarray, '"C" needs to be an np.ndarray'
-            assert (np.shape(C)[0] == n), 'Number of capacitance values needs to be equal to number of condensators'
+            assert np.shape(C)[0] == n, 'Number of capacitance values needs to be equal to number of condensators'
 
         if V_ref is None:
             V_ref = np.array([1.0])
         else:
             assert alpha > V_ref[0], 'Please set "alpha" greater than values of "V_ref"'
             assert type(V_ref) == np.ndarray, '"V_ref" needs to be an np.ndarray'
-            assert (np.shape(V_ref)[0] == n), 'Number of reference values needs to be equal to number of condensators'
+            assert np.shape(V_ref)[0] == n, 'Number of reference values needs to be equal to number of condensators'
             assert V_ref[0] > 0, 'Please "V_ref" greater than 0'
 
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)

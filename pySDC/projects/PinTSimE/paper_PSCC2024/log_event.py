@@ -11,7 +11,6 @@ class LogEventDiscontinuousTestDAE(hooks):
         super(LogEventDiscontinuousTestDAE, self).post_step(step, level_number)
 
         L = step.levels[level_number]
-        P = L.prob
 
         L.sweep.compute_end_point()
 

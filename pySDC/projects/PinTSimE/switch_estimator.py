@@ -48,8 +48,6 @@ class SwitchEstimator(ConvergenceController):
             'control_order': 0,
             'nodes': coll.nodes,
             'tol_zero': 1e-13,
-            't_interp': [],
-            'state_function': [],
         }
         return {**defaults, **params}
 
@@ -92,25 +90,25 @@ class SwitchEstimator(ConvergenceController):
         L = S.levels[0]
 
         if CheckConvergence.check_convergence(S):
-            self.status.switch_detected, m_guess, self.params.state_function = L.prob.get_switching_info(L.u, L.time)
+            self.status.switch_detected, m_guess, state_function = L.prob.get_switching_info(L.u, L.time)
 
             if self.status.switch_detected:
-                self.params.t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
-                self.params.t_interp, self.params.state_function = self.adapt_interpolation_info(
-                    L.time, L.sweep.coll.left_is_node, self.params.t_interp, self.params.state_function
+                t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
+                t_interp, state_function = self.adapt_interpolation_info(
+                    L.time, L.sweep.coll.left_is_node, t_interp, state_function
                 )
 
                 # when the state function is already close to zero the event is already resolved well
-                if abs(self.params.state_function[-1]) <= self.params.tol_zero or abs(self.params.state_function[0]) <= self.params.tol_zero:
-                    if abs(self.params.state_function[0]) <= self.params.tol_zero:
-                        t_switch = self.params.t_interp[0]
+                if abs(state_function[-1]) <= self.params.tol_zero or abs(state_function[0]) <= self.params.tol_zero:
+                    if abs(state_function[0]) <= self.params.tol_zero:
+                        t_switch = t_interp[0]
                         boundary = 'left'
-                    elif abs(self.params.state_function[-1]) <= self.params.tol_zero:
+                    elif abs(state_function[-1]) <= self.params.tol_zero:
                         boundary = 'right'
-                        t_switch = self.params.t_interp[-1]
+                        t_switch = t_interp[-1]
                     else:
-                        # dangerous! in case of nonmoving state function after event, event time could be distorted! 
-                        t_switch = self.params.t_interp[0]
+                        # dangerous! in case of nonmoving state function after event, event time could be distorted!
+                        t_switch = t_interp[0]
                         boundary = 'left'
                     self.log(f"Is already close enough to the {boundary} end point!", S)
                     self.log_event_time(
@@ -121,8 +119,8 @@ class SwitchEstimator(ConvergenceController):
                     self.status.is_zero = True
 
                 # intermediate value theorem states that a root is contained in current step
-                if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
+                if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
+                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess)
 
                     controller.hooks[0].add_to_stats(
                         process=S.status.slot,
@@ -140,7 +138,7 @@ class SwitchEstimator(ConvergenceController):
                         iter=0,
                         sweep=L.status.sweep,
                         type='h_all',
-                        value=max([abs(item) for item in self.params.state_function]),
+                        value=max([abs(item) for item in state_function]),
                     )
                     if L.time < self.status.t_switch < L.time + L.dt:
                         dt_switch = (self.status.t_switch - L.time) * self.params.alpha
@@ -277,11 +275,11 @@ class SwitchEstimator(ConvergenceController):
         Returns
         -------
         t_switch : float
-           Time point of the founded switch.
+           Time point of found event.
         """
 
         LagrangeInterpolator = LagrangeInterpolation(t_interp, state_function)
-     
+
         def p(t):
             """
             Simplifies the call of the interpolant.
@@ -315,10 +313,9 @@ class SwitchEstimator(ConvergenceController):
             dt_FD = 1e-10
             dp = (p(t + dt_FD) - p(t)) / dt_FD  # forward difference
             return dp
-        
+
         newton_tol, newton_maxiter = 1e-15, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
-
         return t_switch
 
     @staticmethod
@@ -391,7 +388,7 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
 
     root = x0
     msg = "Newton's method took {} iterations".format(n)
-    # print(msg)
+    print(msg)
 
     return root
 
@@ -402,18 +399,18 @@ class LagrangeInterpolation(object):
         self.ti = np.asarray(ti)
         self.yi = np.asarray(yi)
         self.n = len(ti)
-        
+
     def get_Lagrange_polynomial(self, t, i):
         """
         Computes the basis of the i-th Lagrange polynomial.
-        
+
         Parameters
         ----------
         t : float
             Time where the polynomial is computed at.
         i : int
             Index of the Lagrange polynomial
-            
+
         Returns
         -------
         product : float
@@ -421,16 +418,16 @@ class LagrangeInterpolation(object):
         """
         product = np.prod([(t - self.ti[k]) / (self.ti[i] - self.ti[k]) for k in range(self.n) if k != i])
         return product
-        
+
     def eval(self, t):
         """
         Evaluates the Lagrange interpolation at time t.
-        
+
         Parameters
         ----------
         t : float
             Time where interpolation is computed.
-            
+
         Returns
         -------
         p : float

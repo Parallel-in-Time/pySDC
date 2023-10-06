@@ -8,13 +8,12 @@ from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
 from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
 
-from pySDC.projects.PinTSimE.battery_model import generate_description, get_recomputed
-from pySDC.projects.PinTSimE.discontinuous_test_ODE_old import controller_run
+from pySDC.projects.PinTSimE.battery_model import generateDescription, getRecomputed
+from pySDC.projects.PinTSimE.battery_model import controllerRun
 from pySDC.helpers.stats_helper import get_sorted
 import pySDC.helpers.plot_helper as plt_helper
 
-# from pySDC.projects.DAE.run.discontinuous_test_DAE import LogEvent
-from pySDC.projects.PinTSimE.paper.log_event import LogEventDiscontinuousTestDAE, LogEventWSCC9
+from pySDC.projects.PinTSimE.paper_PSCC2024.log_event import LogEventDiscontinuousTestDAE, LogEventWSCC9
 from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
 from pySDC.implementations.hooks.log_restarts import LogRestarts
 
@@ -65,8 +64,8 @@ def make_plots_for_test_DAE():  # pragma: no cover
     t0 = 3.0
     Tend = 5.4
 
-    dt_list = [1 / (2 ** m) for m in range(2, 9)]
-    dt_fix = 1 / (2 ** 7)
+    dt_list = [1 / (2**m) for m in range(2, 9)]
+    dt_fix = 1 / (2**7)
 
     recomputed = False
 
@@ -91,7 +90,7 @@ def make_plots_for_test_DAE():  # pragma: no cover
                 results_state_function[M][dt][use_SE], results_event_error[M][dt][use_SE] = {}, {}
                 results_event_error_restarts[M][dt][use_SE] = {}
 
-                description, controller_params = generate_description(
+                description, controller_params = generateDescription(
                     dt,
                     problem_class,
                     sweeper,
@@ -109,7 +108,9 @@ def make_plots_for_test_DAE():  # pragma: no cover
                     alpha,
                 )
 
-                stats, t_switch_exact = controller_run(t0, Tend, controller_params, description, exact_event_time_avail=True)
+                stats, t_switch_exact = controllerRun(
+                    description, controller_params, t0, Tend, exact_event_time_avail=True
+                )
 
                 err_val = get_sorted(stats, type='e_global_post_step', sortby='time', recomputed=recomputed)
                 results_error_over_time[M][dt][use_SE] = err_val
@@ -122,7 +123,7 @@ def make_plots_for_test_DAE():  # pragma: no cover
                 results_state_function[M][dt][use_SE]['h_abs'] = h_abs
 
                 if use_SE:
-                    switches = get_recomputed(stats, type='switch', sortby='time')
+                    switches = getRecomputed(stats, type='switch', sortby='time')
 
                     t_switch = [item[1] for item in switches][-1]
                     results_event_error[M][dt][use_SE] = abs(t_switch_exact - t_switch)
@@ -138,9 +139,13 @@ def make_plots_for_test_DAE():  # pragma: no cover
                     h_val_all = get_sorted(stats, type='h_all', sortby='time', recomputed=None)
                     results_event_error_restarts[M][dt][use_SE]['h_max_event'] = [item[1] for item in h_val_all]
 
-    plot_functions_over_time(results_error_over_time, prob_class_name, r'Global error $|y(t) - y_{ex}(t)|$', 'upper left', dt_fix)
+    plot_functions_over_time(
+        results_error_over_time, prob_class_name, r'Global error $|y(t) - y_{ex}(t)|$', 'upper left', dt_fix
+    )
     plot_error_norm(results_error_norm, prob_class_name)
-    plot_state_function_detection(results_state_function, prob_class_name, r'Absolute value of $h$ $|h(y(T))|$', 'upper left')
+    plot_state_function_detection(
+        results_state_function, prob_class_name, r'Absolute value of $h$ $|h(y(T))|$', 'upper left'
+    )
     plot_event_time_error(results_event_error, prob_class_name)
     plot_event_time_error_before_restarts(results_event_error_restarts, prob_class_name, dt_fix)
 
@@ -188,8 +193,8 @@ def make_plots_for_WSCC9_test_case(cwd='./'):  # pragma: no cover
     t0 = 0.0
     Tend = 0.7
 
-    dt_list = [1 / (2 ** m) for m in range(5, 11)]
-    dt_fix = 1 / (2 ** 8)
+    dt_list = [1 / (2**m) for m in range(5, 11)]
+    dt_fix = 1 / (2**8)
 
     recomputed = False
 
@@ -202,10 +207,12 @@ def make_plots_for_WSCC9_test_case(cwd='./'):  # pragma: no cover
             results_state_function_over_time[M][dt], results_state_function_detection[M][dt] = {}, {}
 
             for use_SE in use_detection:
+                results_state_function_over_time[M][dt][use_SE], results_state_function_detection[M][dt][use_SE] = (
+                    {},
+                    {},
+                )
 
-                results_state_function_over_time[M][dt][use_SE], results_state_function_detection[M][dt][use_SE] = {}, {}
-
-                description, controller_params = generate_description(
+                description, controller_params = generateDescription(
                     dt,
                     problem_class,
                     sweeper,
@@ -223,7 +230,6 @@ def make_plots_for_WSCC9_test_case(cwd='./'):  # pragma: no cover
                     alpha,
                 )
 
-
                 # ---- either solution is computed or it is loaded from .dat file already created ----
                 path = Path('data/{}_M={}_dt={}_useSE={}.dat'.format(prob_class_name, M, dt, use_SE))
                 if path.is_file():
@@ -231,7 +237,7 @@ def make_plots_for_WSCC9_test_case(cwd='./'):  # pragma: no cover
                     stats = dill.load(f)
                     f.close()
                 else:
-                    stats, _ = controller_run(t0, Tend, controller_params, description)
+                    stats, _ = controllerRun(description, controller_params, t0, Tend)
 
                     fname = 'data/{}_M={}_dt={}_useSE={}.dat'.format(prob_class_name, M, dt, use_SE)
                     f = open(fname, 'wb')
@@ -249,8 +255,16 @@ def make_plots_for_WSCC9_test_case(cwd='./'):  # pragma: no cover
                     sum_restarts = sum([me[1] for me in restarts])
                     results_state_function_detection[M][dt][use_SE]['restarts'] = sum_restarts
 
-    plot_functions_over_time(results_state_function_over_time, prob_class_name, r'Absolute value of $h$ $|h(P_{SV,0}(t))|$', 'lower left', dt_fix)
-    plot_state_function_detection(results_state_function_detection, prob_class_name, r'Absolute value of $h$ $|h(P_{SV,0}(T))|$', 'upper right')
+    plot_functions_over_time(
+        results_state_function_over_time,
+        prob_class_name,
+        r'Absolute value of $h$ $|h(P_{SV,0}(t))|$',
+        'lower left',
+        dt_fix,
+    )
+    plot_state_function_detection(
+        results_state_function_detection, prob_class_name, r'Absolute value of $h$ $|h(P_{SV,0}(T))|$', 'upper right'
+    )
 
 
 def plot_styling_stuff(prob_class):  # pragma: no cover
@@ -275,14 +289,14 @@ def plot_styling_stuff(prob_class):  # pragma: no cover
     if prob_class == 'DiscontinuousTestDAE':
         xytext = {
             2: (-15.0, 16.5),
-            3: (-2.0, 55),  
+            3: (-2.0, 55),
             4: (-13.0, -27),
             5: (-1.0, -40),
         }
     elif prob_class == 'WSCC9BusSystem':
         xytext = {
             2: (-13.0, 16),
-            3: (-13.0, 30),  
+            3: (-13.0, 30),
             4: (-13.0, -17),
             5: (-1.0, -38),
         }
@@ -292,7 +306,9 @@ def plot_styling_stuff(prob_class):  # pragma: no cover
     return colors, markers, xytext
 
 
-def plot_functions_over_time(results_function_over_time, prob_class, y_label, loc_legend, dt_fix=None):  # pragma: no cover
+def plot_functions_over_time(
+    results_function_over_time, prob_class, y_label, loc_legend, dt_fix=None
+):  # pragma: no cover
     """
     Plots the functions over time for different numbers of collocation nodes in comparison with detection
     and not.
@@ -324,7 +340,7 @@ def plot_functions_over_time(results_function_over_time, prob_class, y_label, lo
                 t, err = [item[0] for item in err_val], [abs(item[1]) for item in err_val]
 
                 linestyle_detection = 'solid' if not use_SE else 'dashdot'
-                line, = ax.plot(t, err, color=colors[M], linestyle=linestyle_detection)
+                (line,) = ax.plot(t, err, color=colors[M], linestyle=linestyle_detection)
 
                 if not use_SE:
                     line.set_label(r'$M={}$'.format(M))
@@ -333,7 +349,7 @@ def plot_functions_over_time(results_function_over_time, prob_class, y_label, lo
                     ax.plot(x0, 0, color='black', linestyle=linestyle_detection, label='Detection: {}'.format(use_SE))
 
         ax.tick_params(axis='both', which='major', labelsize=16)
-        ax.set_ylim(1e-15, 1e+1)
+        ax.set_ylim(1e-15, 1e1)
         ax.set_yscale('log', base=10)
         ax.set_xlabel(r'Time $t$', fontsize=16)
         ax.set_ylabel(y_label, fontsize=16)
@@ -374,7 +390,7 @@ def plot_error_norm(results_error_norm, prob_class):  # pragma: no cover
             err_norm_dt = [results_error_norm[M][k][use_SE] for k in dt]
 
             linestyle_detection = 'solid' if not use_SE else 'dashdot'
-            line, = ax.loglog(
+            (line,) = ax.loglog(
                 dt,
                 err_norm_dt,
                 color=colors[M],
@@ -389,7 +405,7 @@ def plot_error_norm(results_error_norm, prob_class):  # pragma: no cover
                 ax.plot(0, 0, color='black', linestyle=linestyle_detection, label='Detection: {}'.format(use_SE))
 
     ax.tick_params(axis='both', which='major', labelsize=16)
-    ax.set_ylim(1e-15, 1e+3)
+    ax.set_ylim(1e-15, 1e3)
     ax.set_xscale('log', base=10)
     ax.set_yscale('log', base=10)
     ax.set_xlabel(r'Step size $\Delta t$', fontsize=16)
@@ -428,7 +444,7 @@ def plot_state_function_detection(results_state_function, prob_class, y_label, l
             h_abs = [results_state_function[M][k][use_SE]['h_abs'] for k in dt]
 
             linestyle_detection = 'solid' if not use_SE else 'dashdot'
-            line,  = ax.loglog(
+            (line,) = ax.loglog(
                 dt,
                 h_abs,
                 color=colors[M],
@@ -455,7 +471,7 @@ def plot_state_function_detection(results_state_function, prob_class, y_label, l
                 ax.plot(0, 0, color='black', linestyle=linestyle_detection, label='Detection: {}'.format(use_SE))
 
     ax.tick_params(axis='both', which='major', labelsize=16)
-    ax.set_ylim(1e-17, 1e+3)
+    ax.set_ylim(1e-17, 1e3)
     ax.set_xscale('log', base=10)
     ax.set_yscale('log', base=10)
     ax.set_xlabel(r'Step size $\Delta t$', fontsize=16)
@@ -507,7 +523,7 @@ def plot_event_time_error(results_event_error, prob_class):  # pragma: no cover
             )
 
     ax.tick_params(axis='both', which='major', labelsize=16)
-    ax.set_ylim(1e-15, 1e+1)
+    ax.set_ylim(1e-15, 1e1)
     ax.set_xscale('log', base=10)
     ax.set_yscale('log', base=10)
     ax.set_xlabel(r'Step size $\Delta t$', fontsize=16)
@@ -547,10 +563,7 @@ def plot_event_time_error_before_restarts(results_event_error_restarts, prob_cla
                 if use_SE:
                     event_error_all = results_event_error_restarts[M][dt][use_SE]['event_error_all']
 
-                    event_error_label = r'$M={}$'.format(M)
-                    h_val_event_label = r'State function $M={}$'.format(M)
-
-                    line, = ax.semilogy(
+                    (line,) = ax.semilogy(
                         np.arange(1, len(event_error_all) + 1),
                         event_error_all,
                         color=colors[M],
@@ -572,10 +585,12 @@ def plot_event_time_error_before_restarts(results_event_error_restarts, prob_cla
                     )
 
                     if M == 5:  # dummy plot for more pretty legend
-                        ax.plot(1, event_error_all[0], color='black', linestyle='solid', label=r'$|t^*_{ex} - t^*_{SE}|$')
+                        ax.plot(
+                            1, event_error_all[0], color='black', linestyle='solid', label=r'$|t^*_{ex} - t^*_{SE}|$'
+                        )
                         ax.plot(
                             1,
-                            1e+2,
+                            1e2,
                             color='black',
                             linestyle='dashdot',
                             marker=markers[M],
@@ -585,7 +600,7 @@ def plot_event_time_error_before_restarts(results_event_error_restarts, prob_cla
                         )
 
         h_ax.tick_params(labelsize=16)
-        h_ax.set_ylim(1e-11, 1e+0)
+        h_ax.set_ylim(1e-11, 1e0)
         h_ax.set_yscale('log', base=10)
         h_ax.set_ylabel(r'Maximum value of h $||h(t)||_\infty$', fontsize=16)
         h_ax.minorticks_off()
@@ -605,4 +620,4 @@ def plot_event_time_error_before_restarts(results_event_error_restarts, prob_cla
 
 if __name__ == "__main__":
     make_plots_for_test_DAE()
-    make_plots_for_WSCC9_test_case()
+    # make_plots_for_WSCC9_test_case()

@@ -16,7 +16,6 @@ from pySDC.implementations.hooks.log_step_size import LogStepSize
 from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
 
 
-
 def run_estimation_check():
     r"""
     Generates plots to visualise results applying the Switch Estimator and Adaptivity to the battery models
@@ -39,8 +38,10 @@ def run_estimation_check():
         'QI': 'IE',
     }
 
-    # --- defines parameters for event detection ----
+    # --- defines parameters for event detection and maximum number of iterations ----
     handling_params = {
+        'restol': -1,
+        'maxiter': 8,
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-10,
@@ -65,12 +66,6 @@ def run_estimation_check():
         'C': np.array([1.0, 1.0]),
         'alpha': 1.2,
         'V_ref': np.array([1.0, 1.0]),
-    }
-
-    problem_params = {
-        'battery': params_battery_1capacitor,
-        'battery_implicit': params_battery_1capacitor,
-        'battery_n_capacitors': params_battery_2capacitors,
     }
 
     # --- parameters for each problem class are stored in this dictionary ----
@@ -151,9 +146,9 @@ def plotAccuracyCheck(u_num, prob_cls_name, M_fix):  # pragma: no cover
         for use_SE in u_num[dt][M_fix].keys():
             dt_val = u_num[dt][M_fix][use_SE][use_A]['dt']
             e_em_val = u_num[dt][M_fix][use_SE][use_A]['e_em']
-            if use_SE: 
+            if use_SE:
                 t_switches = u_num[dt][M_fix][use_SE][use_A]['t_switches']
-                
+
                 for i in range(len(t_switches)):
                     ax.axvline(x=t_switches[i], linestyle='--', color='tomato', label='Event {}'.format(i + 1))
 
@@ -171,7 +166,7 @@ def plotAccuracyCheck(u_num, prob_cls_name, M_fix):  # pragma: no cover
         e_ax.minorticks_off()
 
         ax.tick_params(axis='both', which='major', labelsize=16)
-        ax.set_ylim(1e-9, 1e+0)
+        ax.set_ylim(1e-9, 1e0)
         ax.set_yscale('log', base=10)
         ax.set_xlabel(r'Time $t$', fontsize=16)
         ax.set_ylabel(r'Adapted step sizes $\Delta t_\mathrm{adapt}$', fontsize=16)
@@ -179,8 +174,12 @@ def plotAccuracyCheck(u_num, prob_cls_name, M_fix):  # pragma: no cover
         ax.minorticks_off()
         ax.legend(frameon=True, fontsize=12, loc='center left')
 
-        fig.savefig('data/detection_and_adaptivity_{}_dt={}_M={}.png'.format(prob_cls_name, dt, M_fix), dpi=300, bbox_inches='tight')
-        plt_helper.plt.close(fig)    
+        fig.savefig(
+            'data/detection_and_adaptivity_{}_dt={}_M={}.png'.format(prob_cls_name, dt, M_fix),
+            dpi=300,
+            bbox_inches='tight',
+        )
+        plt_helper.plt.close(fig)
 
 
 def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cover
@@ -222,7 +221,7 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                 h_val_no_handling = [u_num[dt][M_fix][False][False]['state_function'] for dt in dt_list]
                 h_no_handling = [item[:] if n == 1 else item[:, i] for item in h_val_no_handling]
                 h_no_handling = [item.reshape((item.shape[0],)) for item in h_no_handling]
-                
+
                 t_no_handling = [u_num[dt][M_fix][False][False]['t'] for dt in dt_list]
 
                 if not use_A and not use_SE:
@@ -244,7 +243,12 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
 
                         ax[0, ind].plot(
                             dt_list,
-                            [h_item[m] for (t_item, h_item, t_switch_item) in zip(t, h, t_switch) for m in range(len(t_item)) if abs(t_item[m] - t_switch_item) <= 1e-14],
+                            [
+                                h_item[m]
+                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
+                                for m in range(len(t_item))
+                                if abs(t_item[m] - t_switch_item) <= 1e-14
+                            ],
                             color='limegreen',
                             marker='s',
                             linestyle='solid',
@@ -254,7 +258,12 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
 
                         ax[0, ind].plot(
                             dt_list,
-                            [h_item[m - 1] for (t_item, h_item, t_switch_item) in zip(t_no_handling, h_no_handling, t_switch) for m in range(1, len(t_item)) if t_item[m - 1] < t_switch_item < t_item[m]],
+                            [
+                                h_item[m - 1]
+                                for (t_item, h_item, t_switch_item) in zip(t_no_handling, h_no_handling, t_switch)
+                                for m in range(1, len(t_item))
+                                if t_item[m - 1] < t_switch_item < t_item[m]
+                            ],
                             color='firebrick',
                             marker='o',
                             linestyle='solid',
@@ -264,7 +273,12 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
 
                         ax[0, ind].plot(
                             dt_list,
-                            [h_item[m] for (t_item, h_item, t_switch_item) in zip(t_no_handling, h_no_handling, t_switch) for m in range(1, len(t_item)) if t_item[m - 1] < t_switch_item < t_item[m]],
+                            [
+                                h_item[m]
+                                for (t_item, h_item, t_switch_item) in zip(t_no_handling, h_no_handling, t_switch)
+                                for m in range(1, len(t_item))
+                                if t_item[m - 1] < t_switch_item < t_item[m]
+                            ],
                             color='deepskyblue',
                             marker='*',
                             linestyle='solid',
@@ -275,7 +289,12 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                     else:
                         ax[0, ind].plot(
                             dt_list,
-                            [h_item[m - 1] for (t_item, h_item, t_switch_item) in zip(t, h, t_switch) for m in range(1, len(t_item)) if t_item[m - 1] < t_switch_item < t_item[m]],
+                            [
+                                h_item[m - 1]
+                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
+                                for m in range(1, len(t_item))
+                                if t_item[m - 1] < t_switch_item < t_item[m]
+                            ],
                             color='firebrick',
                             marker='o',
                             linestyle='solid',
@@ -285,7 +304,12 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
 
                         ax[0, ind].plot(
                             dt_list,
-                            [h_item[m] for (t_item, h_item, t_switch_item) in zip(t, h, t_switch) for m in range(1, len(t_item)) if t_item[m - 1] < t_switch_item < t_item[m]],
+                            [
+                                h_item[m]
+                                for (t_item, h_item, t_switch_item) in zip(t, h, t_switch)
+                                for m in range(1, len(t_item))
+                                if t_item[m - 1] < t_switch_item < t_item[m]
+                            ],
                             color='deepskyblue',
                             marker='*',
                             linestyle='solid',
@@ -296,7 +320,7 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                 ax[0, ind].tick_params(axis='both', which='major', labelsize=16)
                 ax[0, ind].set_xticks(dt_list)
                 ax[0, ind].set_xticklabels(dt_list)
-                ax[0, ind].set_ylim(1e-15, 1e+1)
+                ax[0, ind].set_ylim(1e-15, 1e1)
                 ax[0, ind].set_yscale('log', base=10)
                 ax[0, ind].set_xlabel(r'Step size $\Delta t$', fontsize=16)
                 ax[0, 0].set_ylabel(r'Absolute values of h $|h(v_{C_n}(t))|$', fontsize=16)
@@ -304,7 +328,9 @@ def plotStateFunctionAroundEvent(u_num, prob_cls_name, M_fix):  # pragma: no cov
                 ax[0, ind].minorticks_off()
                 ax[0, ind].legend(frameon=True, fontsize=12, loc='lower left')
 
-        fig.savefig('data/{}_comparison_event{}_M={}.png'.format(prob_cls_name, i + 1, M_fix), dpi=300, bbox_inches='tight')
+        fig.savefig(
+            'data/{}_comparison_event{}_M={}.png'.format(prob_cls_name, i + 1, M_fix), dpi=300, bbox_inches='tight'
+        )
         plt_helper.plt.close(fig)
 
 
@@ -333,7 +359,6 @@ def plotStateFunctionOverTime(u_num, prob_cls_name, M_fix):  # pragma: no cover
     for dt in dt_list:
         figsize = (7.5, 5) if n == 1 else (12, 5)
         fig, ax = plt_helper.plt.subplots(1, n, figsize=figsize, sharex='col', sharey='row', squeeze=False)
-        set_labeling = False
 
         for use_SE in use_detection:
             for use_A in use_adaptivity:
@@ -344,21 +369,26 @@ def plotStateFunctionOverTime(u_num, prob_cls_name, M_fix):  # pragma: no cover
                 for i in range(n):
                     h = h_val[:] if n == 1 else h_val[:, i]
                     ax[0, i].set_title(r'$n={}$'.format(i + 1))
-                    ax[0, i].plot(t, h, linestyle=linestyle, label='Detection: {}, Adaptivity: {}'.format(use_SE, use_A))
+                    ax[0, i].plot(
+                        t, h, linestyle=linestyle, label='Detection: {}, Adaptivity: {}'.format(use_SE, use_A)
+                    )
 
                     ax[0, i].tick_params(axis='both', which='major', labelsize=16)
-                    ax[0, i].set_ylim(1e-15, 1e+0)
+                    ax[0, i].set_ylim(1e-15, 1e0)
                     ax[0, i].set_yscale('log', base=10)
                     ax[0, i].set_xlabel(r'Time $t$', fontsize=16)
                     ax[0, 0].set_ylabel(r'Absolute values of h $|h(v_{C_n}(t))|$', fontsize=16)
                     ax[0, i].grid(visible=True)
                     ax[0, i].minorticks_off()
                     ax[0, i].legend(frameon=True, fontsize=12, loc='lower left')
-                set_labeling = True
 
-        fig.savefig('data/{}_state_function_over_time_dt={}_M={}.png'.format(prob_cls_name, dt, M_fix), dpi=300, bbox_inches='tight')
+        fig.savefig(
+            'data/{}_state_function_over_time_dt={}_M={}.png'.format(prob_cls_name, dt, M_fix),
+            dpi=300,
+            bbox_inches='tight',
+        )
         plt_helper.plt.close(fig)
 
-    
+
 if __name__ == "__main__":
     run_estimation_check()

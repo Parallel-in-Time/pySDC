@@ -233,8 +233,10 @@ def main():
         'QI': 'IE',
     }
 
-    # --- defines parameters for event detection ----
+    # --- defines parameters for event detection, restol, and max. number of iterations ----
     handling_params = {
+        'restol': -1,
+        'maxiter': 8,
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-10,
@@ -242,7 +244,7 @@ def main():
         'exact_event_time_avail': None,
     }
 
-    # ---- all parameters are stored in this dictionary ---- 
+    # ---- all parameters are stored in this dictionary ----
     all_params = {
         'sweeper_params': sweeper_params,
         'handling_params': handling_params,
@@ -254,7 +256,6 @@ def main():
     use_adaptivity = [True]
 
     for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit]):
-
         for defaults in [False, True]:
             # ---- for hardcoded solutions problem patameter defaults should match with parameters here ----
             if defaults:
@@ -269,7 +270,7 @@ def main():
                     'V_ref': np.array([1.0]),
                 }
 
-            all_params.update({'problem_params': params_battery_1capacitor}) 
+            all_params.update({'problem_params': params_battery_1capacitor})
 
             _ = runSimulation(
                 problem=problem,
@@ -340,15 +341,6 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
     Path("data").mkdir(parents=True, exist_ok=True)
 
     prob_cls_name = problem.__name__
-    unknowns = {
-        'battery': ['i_L', 'v_C'],
-        'battery_implicit': ['i_L', 'v_C'],
-        'battery_n_capacitors': ['i_L', 'v_C1', 'v_C2'],
-        'DiscontinuousTestODE': ['u'],
-    }
-
-    maxiter = 8
-    restol = -1
 
     u_num = {}
 
@@ -369,24 +361,28 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
                     handling_params = all_params['handling_params']
 
                     M_fix = sweeper_params['num_nodes']
-                    assert M_fix in nnodes, f"For fixed number of collocation nodes {M_fix} no solution will be computed!"
+                    assert (
+                        M_fix in nnodes
+                    ), f"For fixed number of collocation nodes {M_fix} no solution will be computed!"
+
+                    restol = -1 if use_A else handling_params['restol']
 
                     description, controller_params = generateDescription(
-                        dt,
-                        problem,
-                        sweeper,
-                        M,
-                        sweeper_params['quad_type'],
-                        sweeper_params['QI'],
-                        hook_class,
-                        use_adaptivity,
-                        use_SE,
-                        problem_params,
-                        restol,
-                        maxiter,
-                        handling_params['max_restarts'],
-                        handling_params['tol_event'],
-                        handling_params['alpha'],
+                        dt=dt,
+                        problem=problem,
+                        sweeper=sweeper,
+                        num_nodes=M,
+                        quad_type=sweeper_params['quad_type'],
+                        QI=sweeper_params['QI'],
+                        hook_class=hook_class,
+                        use_adaptivity=use_A,
+                        use_switch_estimator=use_SE,
+                        problem_params=problem_params,
+                        restol=restol,
+                        maxiter=handling_params['maxiter'],
+                        max_restarts=handling_params['max_restarts'],
+                        tol_event=handling_params['tol_event'],
+                        alpha=handling_params['alpha'],
                     )
 
                     stats, t_switch_exact = controllerRun(
@@ -398,7 +394,7 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
                     )
 
                     u_num[dt][M][use_SE][use_A] = getDataDict(
-                        stats, unknowns[prob_cls_name], use_A, use_SE, handling_params['recomputed'], t_switch_exact
+                        stats, prob_cls_name, use_A, use_SE, handling_params['recomputed'], t_switch_exact
                     )
 
                     plotSolution(u_num[dt][M][use_SE][use_A], prob_cls_name, use_A, use_SE)
@@ -406,6 +402,44 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
                     testSolution(u_num[dt][M_fix][use_SE][use_A], prob_cls_name, dt, use_A, use_SE)
 
     return u_num
+
+
+def getUnknownLabels(prob_cls_name):
+    """
+    Returns the unknown for a problem and corresponding labels for a plot.
+
+    Parameters
+    ----------
+    prob_cls_name : str
+        Name of the problem class.
+
+    Returns
+    -------
+    unknowns : list of str
+        Contains the names of unknowns.
+    unknowns_labels : list of str
+        Contains the labels of unknowns for plotting.
+    """
+
+    unknowns = {
+        'battery': ['iL', 'vC'],
+        'battery_implicit': ['iL', 'vC'],
+        'battery_n_capacitors': ['iL', 'vC1', 'vC2'],
+        'DiscontinuousTestODE': ['u'],
+        'piline': ['vC1', 'vC2', 'iLp'],
+        'buck_converter': ['vC1', 'vC2', 'iLp'],
+    }
+
+    unknowns_labels = {
+        'battery': [r'$i_L$', r'$v_C$'],
+        'battery_implicit': [r'$i_L$', r'$v_C$'],
+        'battery_n_capacitors': [r'$i_L$', r'$v_{C_1}$', r'$v_{C_2}$'],
+        'DiscontinuousTestODE': [r'$u$'],
+        'piline': [r'$v_{C_1}$', r'$v_{C_2}$', r'$i_{L_\pi}$'],
+        'buck_converter': [r'$v_{C_1}$', r'$v_{C_2}$', r'$i_{L_\pi}$'],
+    }
+
+    return unknowns[prob_cls_name], unknowns_labels[prob_cls_name]
 
 
 def plotStylingStuff():
@@ -445,8 +479,9 @@ def plotSolution(u_num, prob_cls_name, use_adaptivity, use_detection):  # pragma
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(7.5, 5))
 
     unknowns = u_num['unknowns']
-    for unknown in unknowns:
-        ax.plot(u_num['t'], u_num[unknown], label=r"${}$".format(unknown))
+    unknowns_labels = u_num['unknowns_labels']
+    for unknown, unknown_label in zip(unknowns, unknowns_labels):
+        ax.plot(u_num['t'], u_num[unknown], label=unknown_label)
 
     if use_detection:
         t_switches = u_num['t_switches']
@@ -468,13 +503,14 @@ def plotSolution(u_num, prob_cls_name, use_adaptivity, use_detection):  # pragma
     plt_helper.plt.close(fig)
 
 
-def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_switch_exact):
+def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed, t_switch_exact):
     r"""
     Extracts statistics and store it in a dictionary. In this routine, from ``stats`` different data are extracted
     such as
-    
+
     - each component of solution ``'u'`` and corresponding time domain ``'t'``,
-    - the unknowns of the problem as labels ``'unknowns'``,
+    - the unknowns of the problem ``'unknowns'``,
+    - the unknowns of the problem as labels for plotting ``'unknowns_labels'``,
     - global error ``'e_global'`` after each step,
     - events found by event detection ``'t_switches''``,
     - exact event time ``'t_switch_exact'``,
@@ -489,7 +525,7 @@ def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_sw
     ----
     In order to use these data, corresponding hook classes has to be defined before the simulation. Otherwise, no values can
     be obtained.
-    
+
     The global error does only make sense when an exact solution for the problem is available. Since ``'e_global'`` is stored
     for each problem class, only for ``DiscontinuousTestODE`` the global error is taken into account when testing the solution.
 
@@ -501,8 +537,8 @@ def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_sw
     ----------
     stats : dict
         Raw statistics of one simulation run.
-    unknowns : list
-        Unknowns of problem as string.
+    prob_cls_name : str
+        Name of the problem class.
     use_adaptivity : bool
         Indicates whether adaptivity is used in the simulation or not.
     use_detection : bool
@@ -518,7 +554,8 @@ def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_sw
         Dictionary with extracted data separated with reasonable keys.
     """
 
-    res =  {}
+    res = {}
+    unknowns, unknowns_labels = getUnknownLabels(prob_cls_name)
 
     # ---- numerical solution ----
     u_val = get_sorted(stats, type='u', sortby='time', recomputed=recomputed)
@@ -527,6 +564,7 @@ def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_sw
         res[label] = np.array([item[1][i] for item in u_val])
 
     res['unknowns'] = unknowns
+    res['unknowns_labels'] = unknowns_labels
 
     # ---- global error ----
     res['e_global'] = np.array(get_sorted(stats, type='e_global_post_step', sortby='time', recomputed=recomputed))
@@ -542,7 +580,9 @@ def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_sw
         res['t_switch_exact'] = t_switch_exact
 
         if not all(t is None for t in t_switch_exact):
-            event_err = [abs(num_item - ex_item) for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'])]
+            event_err = [
+                abs(num_item - ex_item) for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'])
+            ]
             res['e_event'] = event_err
 
     h_val = get_sorted(stats, type='state_function', sortby='time', recomputed=recomputed)
@@ -551,9 +591,7 @@ def getDataDict(stats, unknowns, use_adaptivity, use_detection, recomputed, t_sw
 
     # ---- embedded error and adapted step sizes----
     if use_adaptivity:
-        res['e_em'] = np.array(
-            get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed)
-        )
+        res['e_em'] = np.array(get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed))
         res['dt'] = np.array(get_sorted(stats, type='dt', recomputed=recomputed))
 
     # ---- sum over restarts ----

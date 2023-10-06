@@ -345,14 +345,18 @@ def test_DiscontinuousTestDAE_singularity():
     du_before_event = (np.sinh(t_before_event), np.cosh(t_before_event))
     f_before_event = disc_test_DAE.eval_f(u_before_event, du_before_event, t_before_event)
 
-    assert np.isclose(f_before_event[0], 0.0) and np.isclose(f_before_event[1], 0.0), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event}"
+    assert np.isclose(f_before_event[0], 0.0) and np.isclose(
+        f_before_event[1], 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event}"
 
     # test for t <= t^*
     u_event = disc_test_DAE.u_exact(t_event)
     du_event = (np.sinh(t_event), np.cosh(t_event))
     f_event = disc_test_DAE.eval_f(u_event, du_event, t_event)
 
-    assert np.isclose(f_event[0], 7 * np.sqrt(51.0)) and np.isclose(f_event[1], 0.0), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_event}"
+    assert np.isclose(f_event[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_event[1], 0.0
+    ), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_event}"
 
     # test for t > t^* by setting t^* = t^* + eps
     t_after_event = t_event + eps
@@ -360,7 +364,9 @@ def test_DiscontinuousTestDAE_singularity():
     du_after_event = (np.sinh(t_event), np.cosh(t_event))
     f_after_event = disc_test_DAE.eval_f(u_after_event, du_after_event, t_after_event)
 
-    assert np.isclose(f_after_event[0], 7 * np.sqrt(51.0)) and np.isclose(f_after_event[1], 0.0), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_after_event}"
+    assert np.isclose(f_after_event[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_after_event[1], 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_after_event}"
 
 
 @pytest.mark.base
@@ -383,7 +389,7 @@ def test_DiscontinuousTestDAE_SDC():
 
     for M in [2, 3, 4, 5]:
         level_params = {
-            'restol' : 1e-13,
+            'restol': 1e-13,
             'dt': 1e-1,
         }
 
@@ -436,7 +442,7 @@ def test_DiscontinuousTestDAE_SDC_detection():
     can be reduced.
     """
 
-    from pySDC.projects.PinTSimE.battery_model import get_recomputed
+    from pySDC.projects.PinTSimE.battery_model import getRecomputed
     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -459,7 +465,7 @@ def test_DiscontinuousTestDAE_SDC_detection():
 
     for M in [2, 3, 4, 5]:
         level_params = {
-            'restol' : 1e-13,
+            'restol': 1e-13,
             'dt': 1e-2,
         }
 
@@ -520,15 +526,16 @@ def test_DiscontinuousTestDAE_SDC_detection():
         err = abs(uex[0] - uend[0])
         assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
 
-        switches = get_recomputed(stats, type='switch', sortby='time')
+        switches = getRecomputed(stats, type='switch', sortby='time')
         assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
         t_switches = [item[1] for item in switches]
         t_switch = t_switches[-1]
 
         t_switch_exact = P.t_switch_exact
         event_err = abs(t_switch_exact - t_switch)
-        assert event_err < event_err_tol[M], f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
-
+        assert (
+            event_err < event_err_tol[M]
+        ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
 
 
 @pytest.mark.base
@@ -537,8 +544,8 @@ def test_WSCC9_SDC_detection():
     Test for one SDC run with event detection if the found event is close to the exact value and if the global error
     can be reduced.
     """
-  
-    from pySDC.projects.PinTSimE.battery_model import get_recomputed
+
+    from pySDC.projects.PinTSimE.battery_model import getRecomputed
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
@@ -558,17 +565,37 @@ def test_WSCC9_SDC_detection():
         'RF': [0.22357495, 0.35186554, 0.36373663],
         'VR': [1.3316767, 2.48163506, 2.97000777],
         'TM': [0.98658474, 0.63068939, 1.12527586],
-        'PSV': [1., 0.52018862, 1.24497292],
-        'Id': [1.03392984e+00, -7.55033973e-36, 1.39602103e+00],
-        'Iq': [1.80892723e+00, 1.15469164e-30, 6.38447393e-01],
-        'V': [0.97014097, 0.94376174, 0.86739643, 0.9361775, 0.88317809, 0.92201319, 0.83761267, 0.85049254, 0.85661891],
-        'TH': [-2.30672821, 9.90481234, -2.45484121, -2.42758466, -2.57057159, -2.4746599, -2.67639373, -2.62752952, -2.5584944],
+        'PSV': [1.0, 0.52018862, 1.24497292],
+        'Id': [1.03392984e00, -7.55033973e-36, 1.39602103e00],
+        'Iq': [1.80892723e00, 1.15469164e-30, 6.38447393e-01],
+        'V': [
+            0.97014097,
+            0.94376174,
+            0.86739643,
+            0.9361775,
+            0.88317809,
+            0.92201319,
+            0.83761267,
+            0.85049254,
+            0.85661891,
+        ],
+        'TH': [
+            -2.30672821,
+            9.90481234,
+            -2.45484121,
+            -2.42758466,
+            -2.57057159,
+            -2.4746599,
+            -2.67639373,
+            -2.62752952,
+            -2.5584944,
+        ],
         't_switch': [0.5937503078440701],
     }
 
     level_params = {
-        'restol' : 5e-13,
-        'dt': 1 / (2 ** 5),
+        'restol': 5e-13,
+        'dt': 1 / (2**5),
     }
 
     problem_params = {
@@ -627,22 +654,26 @@ def test_WSCC9_SDC_detection():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     Eqp = np.array([me[1][0:m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Si1d = np.array([me[1][m:2*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Edp = np.array([me[1][2*m:3*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Si2q = np.array([me[1][3*m:4*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Delta = np.array([me[1][4*m:5*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    w = np.array([me[1][5*m:6*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Efd = np.array([me[1][6*m:7*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    RF = np.array([me[1][7*m:8*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    VR = np.array([me[1][8*m:9*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    TM = np.array([me[1][9*m:10*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    PSV = np.array([me[1][10*m:11*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Id = np.array([me[1][11*m:11*m + m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Iq = np.array([me[1][11*m + m:11*m + 2*m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    V = np.array([me[1][11*m + 2*m:11*m + 2*m + n] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    TH = np.array([me[1][11*m + 2*m + n:11*m + 2*m + 2*n] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Si1d = np.array([me[1][m : 2 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Edp = np.array([me[1][2 * m : 3 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Si2q = np.array([me[1][3 * m : 4 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Delta = np.array([me[1][4 * m : 5 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    w = np.array([me[1][5 * m : 6 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Efd = np.array([me[1][6 * m : 7 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    RF = np.array([me[1][7 * m : 8 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    VR = np.array([me[1][8 * m : 9 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    TM = np.array([me[1][9 * m : 10 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    PSV = np.array([me[1][10 * m : 11 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Id = np.array([me[1][11 * m : 11 * m + m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    Iq = np.array([me[1][11 * m + m : 11 * m + 2 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+    V = np.array([me[1][11 * m + 2 * m : 11 * m + 2 * m + n] for me in get_sorted(stats, type='u', sortby='time')])[
+        -1, :
+    ]
+    TH = np.array(
+        [me[1][11 * m + 2 * m + n : 11 * m + 2 * m + 2 * n] for me in get_sorted(stats, type='u', sortby='time')]
+    )[-1, :]
 
-    switches = get_recomputed(stats, type='switch', sortby='time')
+    switches = getRecomputed(stats, type='switch', sortby='time')
     assert len(switches) >= 1, "ERROR: No events found!"
     t_switch = np.array([item[1] for item in switches])[-1]
 
@@ -662,8 +693,10 @@ def test_WSCC9_SDC_detection():
         'Iq': Iq,
         'V': V,
         'TH': TH,
-        't_switch': t_switch,    
+        't_switch': t_switch,
     }
 
     for key in ref.keys():
-        assert all(np.isclose(ref[key], num[key], atol=1e-4)) == True, "For {}: Values not equal! Expected {}, got {}".format(key, ref[key], num[key])
+        assert (
+            all(np.isclose(ref[key], num[key], atol=1e-4)) == True
+        ), "For {}: Values not equal! Expected {}, got {}".format(key, ref[key], num[key])

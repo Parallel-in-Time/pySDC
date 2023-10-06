@@ -63,6 +63,8 @@ def main():
 
     # --- defines parameters for event detection ----
     handling_params = {
+        'restol': 1e-13,
+        'maxiter': 8,
         'max_restarts': 50,
         'recomputed': False,
         'tol_event': 1e-12,
@@ -82,7 +84,7 @@ def main():
     use_detection = [True, False]
     use_adaptivity = [False]
 
-    u_num = runSimulation(
+    _ = runSimulation(
         problem=DiscontinuousTestODE,
         sweeper=generic_implicit,
         all_params=all_params,
