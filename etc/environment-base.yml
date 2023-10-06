@@ -15,4 +15,3 @@ dependencies:
   - pytest-order
   - coverage[toml]
   - sphinx
-  - pypower
