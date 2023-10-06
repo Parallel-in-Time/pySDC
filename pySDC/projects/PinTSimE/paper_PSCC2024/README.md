@@ -37,4 +37,4 @@ Then, executing `make_plots_for_WSCC9_test_case()` creates the plots, where func
 
 are used.
 
-It is important to note that the `SwitchEstimator` is under ongoing development. Using the newest version of `pySDC` could therefore lead to different results, and hence to different plots. For reproducing the plots in the paper, the commit (add commit here) should be used.
+It is important to note that the `SwitchEstimator` is under ongoing development. Using the newest version of `pySDC` could therefore lead to different results, and hence to different plots. For reproducing the plots in the paper, the commit [![6b56883](6b56883bc08404fab5f8937ef8cc80f6537ae946)](6b56883bc08404fab5f8937ef8cc80f6537ae946) should be used.
