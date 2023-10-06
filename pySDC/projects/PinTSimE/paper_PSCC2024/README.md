@@ -6,7 +6,7 @@ The Python file `paper_plots.py` creates all the plots contained in the publicat
 
 **Authors:** Junjie Zhang, Lisa Wimmer, Robert Speck, Matthias Bolten, Kyrill Ho, and Andrea Benigni
 
-**Conference:** [![PSCC 2024](http://http://pscc2024.fr/)](http://http://pscc2024.fr/)
+**Conference:** [![PSCC 2024](https://pscc2024.fr/)](https://pscc2024.fr/)
 
 Current status of the submission: ***submitted***
 
@@ -19,9 +19,9 @@ For event detection, if an event is found the step sizes will be adapted using t
 
 Then, executing `make_plots_for_test_DAE()` creates the plots, where functions in the script
 
-    - Fig. 1: `plot_functions_over_time()` for `dt_fix=1 / (2 ** 7)`,
-    - Fig. 2: `plot_state_function_detection()`,
-    - Fig. 3: `plot_event_time_error_before_restarts()` for `dt_fix=1 / (2 ** 7)`
+- Fig. 1: `plot_functions_over_time()` for `dt_fix=1 / (2 ** 7)`,
+- Fig. 2: `plot_state_function_detection()`,
+- Fig. 3: `plot_event_time_error_before_restarts()` for `dt_fix=1 / (2 ** 7)`
 
 are used. Here, the routine contains additional functions `plot_error_norm()` and `plot_event_time_error()` to create further plots
 not used in the publication. The interested applicant is referred to also consider these ones.
@@ -32,8 +32,8 @@ SDC terminates either the maximum number of iterations `maxiter=50` or the resid
 
 Then, executing `make_plots_for_WSCC9_test_case()` creates the plots, where functions in the script
 
-    - Fig. 5: `plot_state_function_detection()`,
-    - Fig. 6: `plot_functions_over_time()` for `dt_fix=1 / (2 ** 8)`
+- Fig. 5: `plot_state_function_detection()`,
+- Fig. 6: `plot_functions_over_time()` for `dt_fix=1 / (2 ** 8)`
 
 are used.
 

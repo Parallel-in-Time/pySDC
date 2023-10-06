@@ -15,12 +15,12 @@ class SwitchEstimator(ConvergenceController):
     """
 
     def setup(self, controller, params, description):
-        """
-        Function sets default variables to handle with the switch at the beginning. The default params are:
+        r"""
+        Function sets default variables to handle with the event at the beginning. The default params are:
 
-            - control_order : controls the order of the SE's call of convergence controllers
-            - coll.nodes : defines the collocation nodes for interpolation
-            - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate
+        - control_order : controls the order of the SE's call of convergence controllers
+        - coll.nodes : defines the collocation nodes for interpolation
+        - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate
 
         Parameters
         ----------
@@ -47,7 +47,6 @@ class SwitchEstimator(ConvergenceController):
         defaults = {
             'control_order': 0,
             'nodes': coll.nodes,
-            'count': 0,
             'tol_zero': 1e-13,
             't_interp': [],
             'state_function': [],
@@ -94,7 +93,7 @@ class SwitchEstimator(ConvergenceController):
 
         if CheckConvergence.check_convergence(S):
             self.status.switch_detected, m_guess, self.params.state_function = L.prob.get_switching_info(L.u, L.time)
-            # print(L.time, [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))], self.params.state_function)
+
             if self.status.switch_detected:
                 self.params.t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
                 self.params.t_interp, self.params.state_function = self.adapt_interpolation_info(
@@ -113,9 +112,7 @@ class SwitchEstimator(ConvergenceController):
                         # dangerous! in case of nonmoving state function after event, event time could be distorted! 
                         t_switch = self.params.t_interp[0]
                         boundary = 'left'
-                    # print(self.params.t_interp, self.params.state_function)
                     self.log(f"Is already close enough to the {boundary} end point!", S)
-                    # print(f"Is already close enough to the {boundary} end point!")
                     self.log_event_time(
                         controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_switch
                     )
@@ -125,9 +122,8 @@ class SwitchEstimator(ConvergenceController):
 
                 # intermediate value theorem states that a root is contained in current step
                 if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess, self.params.count)
-                    self.params.count += 1
-                    # print(self.status.t_switch)
+                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
+
                     controller.hooks[0].add_to_stats(
                         process=S.status.slot,
                         time=L.time,
@@ -154,7 +150,6 @@ class SwitchEstimator(ConvergenceController):
                             or abs((L.time + L.dt) - self.status.t_switch) <= self.params.tol
                         ):
                             self.log(f"Switch located at time {self.status.t_switch:.15f}", S)
-                            # print(f"Switch located at time {self.status.t_switch:.15f}")
                             L.prob.t_switch = self.status.t_switch
                             self.log_event_time(
                                 controller.hooks[0],
@@ -169,19 +164,18 @@ class SwitchEstimator(ConvergenceController):
 
                         else:
                             self.log(f"Located Switch at time {self.status.t_switch:.15f} is outside the range", S)
-                            # print(f"Located Switch at time {self.status.t_switch:.15f} is outside the range")
+
                         # when an event is found, step size matching with this event should be preferred
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
                         if self.status.switch_detected:
                             L.status.dt_new = dt_switch
                         else:
                             L.status.dt_new = min([dt_planned, dt_switch])
-                        # print('New time step size: {}'.format(L.status.dt_new))
+
                     else:
                         # event occurs on L.time or L.time + L.dt; no restart necessary
                         boundary = 'left boundary' if self.status.t_switch == L.time else 'right boundary'
                         self.log(f"Estimated switch {self.status.t_switch:.15f} occurs at {boundary}", S)
-                        print(f"Estimated switch {self.status.t_switch:.15f} occurs at {boundary}")
                         self.log_event_time(
                             controller.hooks[0],
                             S.status.slot,
@@ -267,7 +261,7 @@ class SwitchEstimator(ConvergenceController):
         )
 
     @staticmethod
-    def get_switch(t_interp, state_function, m_guess, count):
+    def get_switch(t_interp, state_function, m_guess):
         """
         Routine to do the interpolation and root finding stuff.
 
@@ -324,27 +318,6 @@ class SwitchEstimator(ConvergenceController):
         
         newton_tol, newton_maxiter = 1e-15, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
-        
-        # fig, ax = plt_helper.plt.subplots(1, 1, figsize=(7.5, 5))
-        # if self.params.t_interp[0] <= np.arccosh(50) <= self.params.t_interp[-1]:
-        #     ax.axvline(
-        #         x=np.arccosh(50),
-        #         linestyle='--',
-        #         linewidth=0.9,
-        #         color='k',
-        #         label='Exact event time',)
-        # ax.axvline(
-        #     x=t_switch,
-        #     linestyle='--',
-        #     linewidth=0.9,
-        #     color='g',
-        #     label='Founded event time',
-        # )
-        # ax.plot(self.params.t_interp, self.params.state_function, 'o', label='h')
-        # ax.plot(self.params.t_interp, [p(t) for t in self.params.t_interp], label='p')
-        # ax.legend(loc='upper right')
-        # fig.savefig('data/interpolation/self.params.state_function_interp_{}.png'.format(count), dpi=300, bbox_inches='tight')
-        # plt_helper.plt.close(fig)
 
         return t_switch
 
@@ -411,7 +384,7 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
     while n < newton_maxiter:
         if abs(p(x0)) < newton_tol or np.isnan(p(x0)) and np.isnan(fprime(x0)):
             break
-        # print(n, x0, p(x0), fprime(x0))
+
         x0 -= 1.0 / fprime(x0) * p(x0)
 
         n += 1
