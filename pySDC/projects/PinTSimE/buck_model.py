@@ -1,131 +1,64 @@
-import numpy as np
-import dill
-from pathlib import Path
-
-from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core.Collocation import CollBase as Collocation
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.projects.PinTSimE.piline_model import log_data, setup_mpl
-import pySDC.helpers.plot_helper as plt_helper
+
+from pySDC.projects.PinTSimE.battery_model import runSimulation
+
+from pySDC.implementations.hooks.log_solution import LogSolution
 
 
 def main():
+    r"""
+    Executes the simulation.
+
+    Note
+    ----
+    Hardcoded solutions for battery models in `pySDC.projects.PinTSimE.hardcoded_solutions` are only computed for
+    ``dt_list=[1e-2, 1e-3]`` and ``M_fix=4``. Hence changing ``dt_list`` and ``M_fix`` to different values could arise
+    an ``AssertionError``.
     """
-    A simple test program to do SDC/PFASST runs for the buck converter model
-    """
 
-    # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = 1e-12
-    level_params['dt'] = 1e-5
+    # --- defines parameters for sweeper ----
+    M_fix = 5
+    sweeper_params = {
+        'num_nodes': M_fix,
+        'quad_type': 'LOBATTO',
+        'QI': 'IE',
+    }
 
-    # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['collocation_class'] = Collocation
-    sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 5
-    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    # --- defines parameters for event detection, max. number of iterations and restol ----
+    handling_params = {
+        'restol': 1e-12,
+        'maxiter': 8,
+        'max_restarts': None,
+        'recomputed': None,
+        'tol_event': None,
+        'alpha': None,
+        'exact_event_time_avail': None,
+    }
 
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['duty'] = 0.5  # duty cycle
-    problem_params['fsw'] = 1e3  # switching freqency
+    # ---- all parameters are stored in this dictionary - note: defaults are used for the problem ----
+    all_params = {
+        'problem_params': {},
+        'sweeper_params': sweeper_params,
+        'handling_params': handling_params,
+    }
 
-    # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = 20
+    hook_class = [LogSolution]
 
-    # initialize controller parameters
-    controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
+    use_detection = [False]
+    use_adaptivity = [False]
 
-    # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = buck_converter  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params
-
-    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
-    assert 'duty' in description['problem_params'].keys(), 'Please supply "duty" in the problem parameters'
-    assert 'fsw' in description['problem_params'].keys(), 'Please supply "fsw" in the problem parameters'
-
-    assert 0 <= problem_params['duty'] <= 1, 'Please set "duty" greater than or equal to 0 and less than or equal to 1'
-
-    # set time parameters
-    t0 = 0.0
-    Tend = 2e-2
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-    Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/buck.dat'
-    f = open(fname, 'wb')
-    dill.dump(stats, f)
-    f.close()
-
-    # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', sortby='time')
-
-    # compute and print statistics
-    min_iter = 20
-    max_iter = 0
-
-    f = open('data/buck_out.txt', 'w')
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    f.write(out + '\n')
-    print(out)
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %1i' % item
-        f.write(out + '\n')
-        print(out)
-        min_iter = min(min_iter, item[1])
-        max_iter = max(max_iter, item[1])
-
-    assert np.mean(niters) <= 8, "Mean number of iterations is too high, got %s" % np.mean(niters)
-    f.close()
-
-    plot_voltages()
-
-
-def plot_voltages(cwd='./'):
-    f = open(cwd + 'data/buck.dat', 'rb')
-    stats = dill.load(f)
-    f.close()
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    v1 = get_sorted(stats, type='v1', sortby='time')
-    v2 = get_sorted(stats, type='v2', sortby='time')
-    p3 = get_sorted(stats, type='p3', sortby='time')
-
-    times = [v[0] for v in v1]
-
-    setup_mpl()
-    fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in v1], linewidth=1, label=r'$v_{C_1}$')
-    ax.plot(times, [v[1] for v in v2], linewidth=1, label=r'$v_{C_2}$')
-    ax.plot(times, [v[1] for v in p3], linewidth=1, label=r'$i_{L_\pi}$')
-    ax.legend(frameon=False, fontsize=12, loc='upper right')
-
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Energy')
-
-    fig.savefig('data/buck_model_solution.png', dpi=300, bbox_inches='tight')
-    plt_helper.plt.close(fig)
+    _ = runSimulation(
+        problem=buck_converter,
+        sweeper=imex_1st_order,
+        all_params=all_params,
+        use_adaptivity=use_adaptivity,
+        use_detection=use_detection,
+        hook_class=hook_class,
+        interval=(0.0, 2e-2),
+        dt_list=[1e-5, 2e-5],
+        nnodes=[M_fix],
+    )
 
 
 if __name__ == "__main__":
