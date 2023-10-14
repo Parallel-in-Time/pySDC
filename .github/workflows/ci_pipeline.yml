@@ -26,6 +26,8 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: ${{ env.YML }}
+          create-args: >-
+              python=3.10
 
       - name: Code reformatting with black
         run: |
