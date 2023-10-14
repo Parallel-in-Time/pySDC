@@ -8,7 +8,7 @@ dependencies:
   - matplotlib>=3.0
   - dill>=0.2.6
   - mpich
-  - petsc4py>=3.10.0
+  - petsc4py<3.20
   - mpi4py>=3.0.0
   - pytest
   - pytest-cov
