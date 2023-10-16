@@ -80,29 +80,44 @@ def get_finite_difference_matrix(
     derivative, order, stencil_type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False
 ):
     """
-    Build FD matrix from stencils, with boundary conditions
+    Build FD matrix from stencils, with boundary conditions.
+    Keep in mind that the boundary conditions may require further modification of the right hand side.
+
+    Args:
+        derivative (int): Order of the spatial derivative
+        order (int): Order of accuracy
+        stencil_type (str): Type of stencil
+        steps (list): Provide specific steps, overrides `stencil_type`
+        dx (float): Mesh width
+        size (int): Number of degrees of freedom per dimension
+        dim (int): Number of dimensions
+        bc (str): Boundary conditions for both sides
+        cupy (bool): Construct a GPU ready matrix if yes
+
+    Returns:
+        Sparse matrix: Finite difference matrix
     """
     if cupy:
         import cupyx.scipy.sparse as sp
     else:
         import scipy.sparse as sp
 
-    if order > 2 and bc != 'periodic':
-        raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
-
     # get stencil
     coeff, steps = get_finite_difference_stencil(
         derivative=derivative, order=order, stencil_type=stencil_type, steps=steps
     )
 
-    if bc == 'dirichlet-zero':
+    if "dirichlet" in bc:
         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
-    elif bc == 'neumann-zero':
-        A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
-        A_1d[0, 0] = -(dx ** (derivative - 1))
-        A_1d[0, 1] = +(dx ** (derivative - 1))
-        A_1d[-1, -1] = -(dx ** (derivative - 1))
-        A_1d[-1, -2] = +(dx ** (derivative - 1))
+    elif "neumann" in bc:
+        A_1d = sp.diags(coeff, steps, shape=(size, size), format='lil')
+
+        # replace the first and last lines with one-sided stencils for a first derivative of the same order as the rest
+        bc_coeff, bc_steps = get_finite_difference_stencil(derivative=1, order=order, stencil_type='forward')
+        A_1d[0, :] = 0.0
+        A_1d[0, bc_steps] = bc_coeff * (dx ** (derivative - 1))
+        A_1d[-1, :] = 0.0
+        A_1d[-1, -bc_steps - 1] = bc_coeff * (dx ** (derivative - 1))
     elif bc == 'periodic':
         A_1d = 0 * sp.eye(size, format='csc')
         for i in steps:

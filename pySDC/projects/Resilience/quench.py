@@ -307,7 +307,7 @@ def plot_solution(stats, controller):  # pragma: no cover
 
 def compare_imex_full(plotting=False, leak_type='linear'):
     """
-    Compare the results of IMEX and fully implicit runs. For IMEX we need to limit the step size in order to achieve convergence, but for fully implicit, adaptivity can handle itself better.
+    Compare the results of IMEX and fully implicit runs.
 
     Args:
         plotting (bool): Plot the solution or not
@@ -318,7 +318,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
 
     maxiter = 5
     num_nodes = 3
-    newton_iter_max = 99
+    newton_maxiter = 99
 
     res = {}
     rhs = {}
@@ -327,23 +327,23 @@ def compare_imex_full(plotting=False, leak_type='linear'):
     custom_description = {}
     custom_description['problem_params'] = {
         'newton_tol': 1e-10,
-        'newton_iter': newton_iter_max,
-        'nvars': 2**9,
+        'newton_maxiter': newton_maxiter,
+        'nvars': 2**7,
         'leak_type': leak_type,
     }
     custom_description['step_params'] = {'maxiter': maxiter}
     custom_description['sweeper_params'] = {'num_nodes': num_nodes}
     custom_description['convergence_controllers'] = {
-        Adaptivity: {'e_tol': 1e-6, 'dt_max': 50},
+        Adaptivity: {'e_tol': 1e-6},
     }
 
-    custom_controller_params = {'logger_level': 10}
+    custom_controller_params = {'logger_level': 15}
     for imex in [False, True]:
         stats, controller, _ = run_quench(
             custom_description=custom_description,
             custom_controller_params=custom_controller_params,
             imex=imex,
-            Tend=4.3e2,
+            Tend=5e2,
             use_MPI=False,
             hook_class=[LogWork, LogGlobalErrorPostRun],
         )
@@ -356,9 +356,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
         if imex:
             assert all(me == 0 for me in newton_iter), "IMEX is not supposed to do Newton iterations!"
         else:
-            assert (
-                max(newton_iter) / num_nodes / maxiter <= newton_iter_max
-            ), "Took more Newton iterations than allowed!"
+            assert max(newton_iter) / num_nodes / maxiter <= newton_maxiter, "Took more Newton iterations than allowed!"
         if plotting:  # pragma: no cover
             plot_solution(stats, controller)
 
@@ -376,7 +374,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
         rhs[True] == rhs[False]
     ), f"Expected IMEX and fully implicit schemes to take the same number of right hand side evaluations per step, but got {rhs[True]} and {rhs[False]}!"
 
-    assert error[True] < 1e-4, f'Expected error of IMEX version to be less than 1e-4, but got e={error[True]:.2e}!'
+    assert error[True] < 1.2e-4, f'Expected error of IMEX version to be less than 1.2e-4, but got e={error[True]:.2e}!'
     assert (
         error[False] < 7.7e-5
     ), f'Expected error of fully implicit version to be less than 7.7e-5, but got e={error[False]:.2e}!'
@@ -416,7 +414,7 @@ def compare_reference_solutions_single():
         description['level_params'] = {'dt': 5.0, 'restol': -1}
         description = merge_descriptions(description, strategy.get_custom_description(run_quench, 1))
         description['step_params'] = {'maxiter': 5}
-        description['convergence_controllers'][Adaptivity]['e_tol'] = 1e-4
+        description['convergence_controllers'][Adaptivity]['e_tol'] = 1e-7
 
         stats, controller, _ = run_quench(
             custom_description=description,
@@ -553,8 +551,8 @@ def check_order(reference_sol_type='scipy'):
 if __name__ == '__main__':
     compare_reference_solutions_single()
     # for reference_sol_type in ['DIRK', 'SDC', 'scipy']:
-    #    check_order(reference_sol_type=reference_sol_type)
-    ## faults(19)
-    ## # get_crossing_time()
+    #   check_order(reference_sol_type=reference_sol_type)
+    # faults(19)
+    # get_crossing_time()
     # compare_imex_full(plotting=True)
     plt.show()
