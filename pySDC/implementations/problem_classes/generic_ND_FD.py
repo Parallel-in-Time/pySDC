@@ -22,7 +22,7 @@ class GenericNDimFinDiff(ptype):
     .. math::
         \frac{d u}{dt} = A u,
 
-    where :math:`A \in \mathbb{R}^{nN \times nN} is a matrix arising from finite difference discretisation of spatial
+    where :math:`A \in \mathbb{R}^{nN \times nN}` is a matrix arising from finite difference discretisation of spatial
     derivatives with :math:`n` degrees of freedom per dimension and :math:`N` dimensions. This generic class follows the MOL
     (method-of-lines) approach and can be used to discretize partial differential equations such as the advection
     equation and the heat equation.
