@@ -155,19 +155,7 @@ class Quench(ptype):
             readOnly=False,
         )
 
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        if self.bc == 'periodic':
-            self.dx = 1.0 / self.nvars
-            xvalues = np.array([i * self.dx for i in range(self.nvars)])
-        elif self.bc in ['neumann-zero', 'dirichlet-zero']:
-            self.dx = 1.0 / (self.nvars + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.nvars)])
-        # elif self.bc == 'neumann-zero':
-        #     self.dx = 1.0 / (self.nvars -1)
-        #     xvalues = np.array([i * self.dx for i in range(self.nvars)])
-        else:
-            raise ProblemError(f'Boundary conditions {self.bc} not implemented.')
-
+        # setup finite difference discretization from problem helper
         self.dx, xvalues = problem_helper.get_1d_grid(size=self.nvars, bc=self.bc)
 
         self.A = problem_helper.get_finite_difference_matrix(
