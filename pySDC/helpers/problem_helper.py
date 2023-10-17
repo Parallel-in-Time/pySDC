@@ -127,7 +127,7 @@ def get_finite_difference_matrix(
             if steps[i] < 0:
                 A_1d += coeff[i] * sp.eye(size, k=size + steps[i])
     else:
-        raise NotImplementedError(f'Boundary conditions {bc} not implemented.')
+        raise NotImplementedError(f'Boundary conditions \"{bc}\" not implemented.')
 
     if dim == 1:
         A = A_1d
@@ -145,3 +145,33 @@ def get_finite_difference_matrix(
     A /= dx**derivative
 
     return A
+
+
+def get_1d_grid(size, bc, left_boundary=0.0, right_boundary=1.0):
+    """
+    Generate a grid in one dimension and obtain mesh spacing for finite difference discretization.
+
+    Args:
+        size (int): Number of degrees of freedom per dimension
+        bc (str): Boundary conditions for both sides
+        left_boundary (float): x value at the left boundary
+        right_boundary (float): x value at the right boundary
+
+    Returns:
+        float: mesh spacing
+        numpy.ndarray: 1d mesh
+    """
+    L = right_boundary - left_boundary
+    if bc == 'periodic':
+        dx = L / size
+        xvalues = np.array([left_boundary + dx * i for i in range(size)])
+    elif "dirichlet" in bc:
+        dx = L / (size + 1)
+        xvalues = np.array([left_boundary + dx * (i + 1) for i in range(size)])
+    elif "neumann" in bc:
+        dx = L / (size - 1)
+        xvalues = np.array([left_boundary + dx * i for i in range(size)])
+    else:
+        raise NotImplementedError(f'Boundary conditions \"{bc}\" not implemented.')
+
+    return dx, xvalues

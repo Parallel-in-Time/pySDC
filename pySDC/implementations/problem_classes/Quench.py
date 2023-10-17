@@ -168,6 +168,8 @@ class Quench(ptype):
         else:
             raise ProblemError(f'Boundary conditions {self.bc} not implemented.')
 
+        self.dx, xvalues = problem_helper.get_1d_grid(size=self.nvars, bc=self.bc)
+
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,

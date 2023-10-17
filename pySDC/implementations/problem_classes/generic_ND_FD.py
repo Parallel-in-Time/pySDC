@@ -115,15 +115,7 @@ class GenericNDimFinDiff(ptype):
         # invoke super init, passing number of dofs
         super().__init__(init=(nvars[0] if ndim == 1 else nvars, None, np.dtype('float64')))
 
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        if bc == 'periodic':
-            dx = 1.0 / nvars[0]
-            xvalues = np.array([i * dx for i in range(nvars[0])])
-        elif bc == 'dirichlet-zero':
-            dx = 1.0 / (nvars[0] + 1)
-            xvalues = np.array([(i + 1) * dx for i in range(nvars[0])])
-        else:
-            raise ProblemError(f'Boundary conditions {bc} not implemented.')
+        dx, xvalues = problem_helper.get_1d_grid(size=nvars[0], bc=bc, left_boundary=0.0, right_boundary=1.0)
 
         self.A = problem_helper.get_finite_difference_matrix(
             derivative=derivative,
