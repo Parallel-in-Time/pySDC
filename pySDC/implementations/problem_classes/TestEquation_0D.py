@@ -19,9 +19,9 @@ class testequation0d(ptype):
 
     Parameters
     ----------
-    lambdas : sequence of array_like
+    lambdas : sequence of array_like, optional
         List of lambda parameters.
-    u0 : sequence of array_like
+    u0 : sequence of array_like, optional
         Initial condition.
 
     Attributes

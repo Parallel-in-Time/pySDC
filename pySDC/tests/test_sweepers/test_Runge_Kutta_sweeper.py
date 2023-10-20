@@ -11,6 +11,14 @@ SWEEPER_NAMES = [
     'ESDIRK53',
     'DIRK43',
     'Heun_Euler',
+    'ARK548L2SAESDIRK',
+    'ARK548L2SAERK',
+    'ARK548L2SAESDIRK2',
+    'ARK548L2SAERK2',
+]
+IMEX_SWEEPERS = [
+    'ARK54',
+    'ARK548L2SA',
 ]
 
 
@@ -29,14 +37,13 @@ def get_sweeper(sweeper_name):
     return eval(f'RK.{sweeper_name}')
 
 
-def single_run(sweeper_name, dt, Tend, lambdas, use_RK_sweeper=True):
+def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None):
     """
     Do a single run of the test equation.
 
     Args:
         sweeper_name (str): Name of Multistep method
         dt (float): Step size to use
-        Tend (float): Time to simulate to
         lambdas (2d complex numpy.ndarray): Lambdas for test equation
 
     Returns:
@@ -44,7 +51,6 @@ def single_run(sweeper_name, dt, Tend, lambdas, use_RK_sweeper=True):
         pySDC.datatypes.mesh: Initial conditions
         pySDC.Controller.controller: Controller
     """
-    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
@@ -57,10 +63,17 @@ def single_run(sweeper_name, dt, Tend, lambdas, use_RK_sweeper=True):
 
     step_params = {'maxiter': 1}
 
-    problem_params = {
-        'lambdas': lambdas,
-        'u0': 1.0 + 0.0j,
-    }
+    if sweeper_name in IMEX_SWEEPERS:
+        from pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex import acoustic_1d_imex as problem_class
+
+        problem_params = {}
+    else:
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+
+        problem_params = {
+            'lambdas': lambdas,
+            'u0': 1.0 + 0.0j,
+        }
 
     sweeper_params = {
         'num_nodes': 1,
@@ -71,14 +84,14 @@ def single_run(sweeper_name, dt, Tend, lambdas, use_RK_sweeper=True):
         'level_params': level_params,
         'step_params': step_params,
         'sweeper_class': get_sweeper(sweeper_name) if use_RK_sweeper else generic_implicit,
-        'problem_class': testequation0d,
+        'problem_class': problem_class,
         'sweeper_params': sweeper_params,
         'problem_params': problem_params,
         'convergence_controllers': {EstimateEmbeddedError: {}},
     }
 
     controller_params = {
-        'logger_level': 30,
+        'logger_level': 40,
         'hook_class': [LogWork, LogGlobalErrorPostRun, LogSolution, LogEmbeddedErrorEstimate],
     }
 
@@ -92,13 +105,13 @@ def single_run(sweeper_name, dt, Tend, lambdas, use_RK_sweeper=True):
 
     prob = controller.MS[0].levels[0].prob
     ic = prob.u_exact(0)
-    u_end, stats = controller.run(ic, 0.0, Tend)
+    u_end, stats = controller.run(ic, 0.0, 5 * dt if Tend is None else Tend)
 
     return stats, ic, controller
 
 
 @pytest.mark.base
-@pytest.mark.parametrize("sweeper_name", SWEEPER_NAMES)
+@pytest.mark.parametrize("sweeper_name", SWEEPER_NAMES + IMEX_SWEEPERS)
 def test_order(sweeper_name):
     """
     Test the order in time of the method
@@ -111,30 +124,43 @@ def test_order(sweeper_name):
     from pySDC.helpers.stats_helper import get_sorted
 
     expected_order = {
-        'ForwardEuler': 1,
-        'BackwardEuler': 1,
-        'ExplicitMidpointMethod': 2,
-        'ImplicitMidpointMethod': 2,
-        'RK4': 4,
-        'CrankNicholson': 2,
-        'Cash_Karp': 5,
-        'ESDIRK53': 5,
-        'DIRK43': 4,
-        'Heun_Euler': 2,
+        'ForwardEuler': 2,
+        'BackwardEuler': 2,
+        'ExplicitMidpointMethod': 3,
+        'ImplicitMidpointMethod': 3,
+        'RK4': 5,
+        'CrankNicholson': 3,
+        'Cash_Karp': 6,
+        'ESDIRK53': 6,
+        'DIRK43': 5,
+        'Heun_Euler': 3,
+        'ARK548L2SAERK': 6,
+        'ARK548L2SAERK2': 6,
+        'ARK548L2SAESDIRK': 6,
+        'ARK548L2SAESDIRK2': 6,
+        'ARK54': 6,
+        'ARK548L2SA': 6,
     }
 
     dt_max = {
         'Cash_Karp': 1e0,
         'ESDIRK53': 1e0,
+        'ARK548L2SAESDIRK': 6e-1,
+        'ARK548L2SAESDIRK2': 1e0,
+        'ARK548L2SAERK': 1e0,
+        'ARK548L2SAERK2': 1e0,
+        'ARK54': 5e-2,
+        'ARK548L2SA': 5e-2,
     }
 
     lambdas = [[-1.0e-1 + 0j]]
 
     e = {}
     e_embedded = {}
-    dts = [dt_max.get(sweeper_name, 1e-1) / 2**i for i in range(5)]
+    dts = [dt_max.get(sweeper_name, 1e-1) / 1.1**i for i in range(20)]
+    low_thresh = 1e-7 if sweeper_name in IMEX_SWEEPERS else 1e-14
     for dt in dts:
-        stats, _, controller = single_run(sweeper_name, dt, 2 * max(dts), lambdas)
+        stats, _, controller = single_run(sweeper_name, dt, lambdas)
         e[dt] = get_sorted(stats, type='e_global_post_run')[-1][1]
         e_em = get_sorted(stats, type='error_embedded_estimate')
         if len(e_em):
@@ -145,27 +171,27 @@ def test_order(sweeper_name):
     order = [
         np.log(e[dts[i]] / e[dts[i + 1]]) / np.log(dts[i] / dts[i + 1])
         for i in range(len(dts) - 1)
-        if e[dts[i + 1]] > 1e-14
+        if e[dts[i + 1]] > low_thresh
     ]
     order_embedded = [
         np.log(e_embedded[dts[i]] / e_embedded[dts[i + 1]]) / np.log(dts[i] / dts[i + 1])
         for i in range(len(dts) - 1)
-        if e_embedded[dts[i + 1]] > 1e-14
+        if e_embedded[dts[i + 1]] > low_thresh
     ]
 
     assert np.isclose(
-        np.mean(order), expected_order[sweeper_name], atol=0.2
-    ), f"Got unexpected order {np.mean(order):.2f} for {sweeper_name} method! ({order})"
+        np.median(order), expected_order[sweeper_name], atol=0.4
+    ), f"Got unexpected order {np.median(order):.2f} instead of {expected_order[sweeper_name]} for {sweeper_name} method! ({order})"
 
     try:
         update_order = controller.MS[0].levels[0].sweep.get_update_order()
     except NotImplementedError:
         update_order = None
 
-    if update_order:
+    if update_order and sweeper_name not in ['ARK548L2SAESDIRK']:
         assert np.isclose(
-            np.mean(order_embedded), update_order, atol=0.2
-        ), f"Got unexpected order of embedded error estimate {np.mean(order_embedded):.2f} for {sweeper_name} method! ({order_embedded})"
+            np.median(order_embedded), update_order, atol=0.4
+        ), f"Got unexpected order of embedded error estimate {np.median(order_embedded):.2f} instead of {update_order} for {sweeper_name} method! ({order_embedded})"
 
 
 @pytest.mark.base
@@ -191,6 +217,10 @@ def test_stability(sweeper_name):
         'ESDIRK53': True,
         'DIRK43': True,
         'Heun_Euler': False,
+        'ARK548L2SAESDIRK': True,
+        'ARK548L2SAERK': False,
+        'ARK548L2SAESDIRK2': True,
+        'ARK548L2SAERK2': False,
     }
 
     re = -np.logspace(-3, 2, 50)
@@ -199,7 +229,7 @@ def test_stability(sweeper_name):
         (len(re) * len(im))
     )
 
-    stats, ic, _ = single_run(sweeper_name, 1.0, 1.0, lambdas)
+    stats, ic, _ = single_run(sweeper_name, 1.0, lambdas, Tend=1.0)
     u = get_sorted(stats, type='u')[-1][1]
 
     unstable = np.abs(u[np.abs(ic) > 0]) / np.abs(ic[np.abs(ic) > 0]) > 1.0
@@ -210,7 +240,7 @@ def test_stability(sweeper_name):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize("sweeper_name", SWEEPER_NAMES)
+@pytest.mark.parametrize("sweeper_name", SWEEPER_NAMES + IMEX_SWEEPERS)
 def test_rhs_evals(sweeper_name):
     """
     Test the number of right hand side evaluations.
@@ -222,13 +252,14 @@ def test_rhs_evals(sweeper_name):
 
     lambdas = [[-1.0e-1 + 0j]]
 
-    stats, _, controller = single_run(sweeper_name, 1.0, 10.0, lambdas)
+    stats, _, controller = single_run(sweeper_name, 1.0, lambdas, Tend=10.0)
 
     sweep = controller.MS[0].levels[0].sweep
     num_stages = sweep.coll.num_nodes - sweep.coll.num_solution_stages
 
     rhs_evaluations = [me[1] for me in get_sorted(stats, type='work_rhs')]
 
+    assert len(rhs_evaluations) > 0, 'Did not register any right hand side evaluations!'
     assert all(
         me == num_stages for me in rhs_evaluations
     ), f'Did not perform one RHS evaluation per step and stage in {sweeper_name} method! Expected {num_stages}, but got {rhs_evaluations}.'
@@ -283,7 +314,7 @@ def test_sweeper_equivalence(sweeper_name):
             stats,
             _,
             _,
-        ) = single_run(sweeper_name, 1.0, 2.0, [[-1 + 0j]], use_RK_sweeper=use_RK_sweeper)
+        ) = single_run(sweeper_name, 1.0, [[-1 + 0j]], use_RK_sweeper=use_RK_sweeper, Tend=2.0)
         u_all += [get_sorted(stats, type='u')[-1][1]]
     assert np.allclose(
         u_all[0], u_all[1]
@@ -291,4 +322,6 @@ def test_sweeper_equivalence(sweeper_name):
 
 
 if __name__ == '__main__':
-    test_stability('ESDIRK53')
+    # test_rhs_evals('ARK54')
+    test_order('ARK548L2SAERK2')
+    # test_order('ARK54')

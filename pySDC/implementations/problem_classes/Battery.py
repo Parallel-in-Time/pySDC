@@ -21,34 +21,34 @@ class battery_n_capacitors(ptype):
 
     Parameters
     ----------
-    ncapacitors : int
+    ncapacitors : int, optional
         Number of capacitors :math:`n_{capacitors}` in the circuit.
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C : np.ndarray
-        Capacitances of the capacitors.
-    R : float
-        Resistance for the load.
-    L : float
-        Inductance of inductor.
-    alpha : float
+    C : np.1darray, optional
+        Capacitances of the capacitors :math:`C_n`.
+    R : float, optional
+        Resistance for the load :math:`R_\ell`.
+    L : float, optional
+        Inductance of inductor :math:`L`.
+    alpha : float, optional
         Factor greater than zero to describe the storage of the capacitor(s).
-    V_ref : np.ndarray
+    V_ref : np.1darray, optional
         Array contains the reference values greater than zero for each capacitor to switch to the next energy source.
 
     Attributes
     ----------
-    A: matrix
+    A : matrix
         Coefficients matrix of the linear system of ordinary differential equations (ODEs).
-    switch_A: dict
+    switch_A : dict
         Dictionary that contains the coefficients for the coefficient matrix A.
-    switch_f: dict
+    switch_f : dict
         Dictionary that contains the coefficients of the right-hand side f of the ODE system.
-    t_switch: float
+    t_switch : float
         Time point of the discrete event found by switch estimation.
-    nswitches: int
+    nswitches : int
         Number of switches found by switch estimation.
 
     Note
@@ -185,8 +185,8 @@ class battery_n_capacitors(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -276,7 +276,7 @@ class battery_n_capacitors(ptype):
 
 class battery(battery_n_capacitors):
     r"""
-    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. This model is an example
+    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from ``battery_n_capacitors``. This model is an example
     of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has
     a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by
     the following equations:
@@ -371,8 +371,8 @@ class battery(battery_n_capacitors):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -400,25 +400,25 @@ class battery_implicit(battery):
 
     Parameters
     ----------
-    ncapacitors : int
+    ncapacitors : int, optional
         Number of capacitors in the circuit.
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C : np.ndarray
+    C : np.1darray, optional
         Capacitances of the capacitors. Length of array must equal to number of capacitors.
-    R : float
-        Resistance for the load.
-    L : float
-        Inductance of inductor.
-    alpha : float
+    R : float, optional
+        Resistance for the load :math:`R_\ell`.
+    L : float, optional
+        Inductance of inductor :math:`L`.
+    alpha : float, optional
         Factor greater than zero to describe the storage of the capacitor(s).
-    V_ref : float
+    V_ref : float, optional
         Reference value greater than zero for the battery to switch to the voltage source.
-    newton_maxiter : int
+    newton_maxiter : int, optional
         Number of maximum iterations for the Newton solver.
-    newton_tol : float
+    newton_tol : float, optional
         Tolerance for determination of the Newton solver.
 
     Attributes

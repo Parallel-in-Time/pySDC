@@ -253,8 +253,8 @@ class penningtrap(ptype):
         return u
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact trajectory at time t (only for single-particle setup).
+        r"""
+        Routine to compute the exact trajectory at time :math:`t` (only for single-particle setup).
 
         Parameters
         ----------

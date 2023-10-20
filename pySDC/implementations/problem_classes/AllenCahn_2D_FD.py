@@ -13,30 +13,39 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 
-    TODO : doku
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated *fully-implicitly*, i.e., the nonlinear system is solved by Newton.
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    newton_maxiter : int
+    nvars : tuple of int, optional
+        Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    newton_maxiter : int, optional
         Maximum number of iterations for the Newton solver.
-    newton_tol : float
+    newton_tol : float, optional
         Tolerance for Newton's method to terminate.
-    lin_tol : float
+    lin_tol : float, optional
         Tolerance for linear solver to terminate.
-    lin_maxiter : int
+    lin_maxiter : int, optional
         Maximum number of iterations for the linear solver.
-    radius : float
+    radius : float, optional
         Radius of the circles.
-    order : int
+    order : int, optional
         Order of the finite difference matrix.
 
     Attributes
@@ -45,6 +54,16 @@ class allencahn_fullyimplicit(ptype):
         Second-order FD discretization of the 2D laplace operator.
     dx : float
         Distance between two spatial nodes (same for both directions).
+    xvalues : np.1darray
+        Spatial grid points, here both dimensions have the same grid points.
+    newton_itercount : int
+        Number of iterations of Newton solver.
+    lin_itercount
+        Number of iterations of linear solver.
+    newton_ncalls : int
+        Number of calls of Newton solver.
+    lin_ncalls : int
+        Number of calls of linear solver.
     """
 
     dtype_u = mesh
@@ -62,9 +81,7 @@ class allencahn_fullyimplicit(ptype):
         radius=0.25,
         order=2,
     ):
-        """
-        Initialization routine
-        """
+        """Initialization routine"""
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % nvars)
@@ -228,8 +245,8 @@ class allencahn_fullyimplicit(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -254,8 +271,20 @@ class allencahn_fullyimplicit(ptype):
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated in a *semi-implicit* way, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
+    method, and the system containing the rest of the right-hand side is only evaluated at each time.
     """
 
     dtype_f = imex_mesh
@@ -333,8 +362,21 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
+    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is only evaluated at each time.
     """
 
     dtype_f = imex_mesh
@@ -428,8 +470,20 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated in *multi-implicit* fashion, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
+    method, and the system containing the rest of the right-hand side will be solved by Newton's method.
     """
 
     dtype_f = comp2_mesh
@@ -569,8 +623,21 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. The initial condition has the form of circles
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
+    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is solved by a linear solver provided by a ``SciPy`` routine.
     """
 
     dtype_f = comp2_mesh

@@ -13,9 +13,9 @@ class buck_converter(ptype):
         \frac{d u(t)}{dt} = A_k u(t) + f_k (t)
 
     for :math:`k=1,2`. The two states are the following. Define :math:`T_{sw}:=\frac{1}{f_{sw}}` as the switching period with
-    switching frequency :math:`f_{sw}`. The duty cycle :math:`duty` defines the period of how long the switches are in one state
+    switching frequency :math:`f_{sw}`. The duty cycle :math:`d` defines the period of how long the switches are in one state
     until they switch to the other state. Roughly saying, the duty cycle can be seen as a percentage [1]_. A duty cycle of one means
-    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} mod 1 \leq duty` [2]_:
+    that the switches are always in only one state. If :math:`0 \leq \frac{t}{T_{sw}} \bmod 1 \leq d` [2]_:
 
     .. math::
         \frac{d v_{C_1} (t)}{dt} = -\frac{1}{R_s C_1}v_{C_1} (t) - \frac{1}{C_1} i_{L_1} (t) + \frac{V_s}{R_s C_1},
@@ -41,29 +41,30 @@ class buck_converter(ptype):
 
     Parameters
     ----------
-    duty : float
-        Cycle between zero and one indicates the time period how long the converter stays on one switching state
-        until it switches to the other state.
-    fsw : int
+    duty : float, optional
+        Duty cycle :math:`d` between zero and one indicates the time period how long the converter stays on one switching
+        state until it switches to the other state.
+    fsw : int, optional
         Switching frequency, it is used to determine the number of time steps after the switching state is changed.
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C1 : float
+    C1 : float, optional
         Capacitance of the capacitor :math:`C_1`.
-    Rp : float
-        Resistance of the resistor in front of the inductor.
-    L1 : float
+    Rp : float, optional
+        Resistance of the resistor in front of the inductor :math:`R_\pi`.
+    L1 : float, optional
         Inductance of the inductor :math:`L_1`.
-    C2 : float
+    C2 : float, optional
         Capacitance of the capacitor :math:`C_2`.
-    Rl : float
+    Rl : float, optional
         Resistance of the resistor :math:`R_\pi`
 
     Attributes
     ----------
-        A: system matrix, representing the 3 ODEs
+    A : np.2darray
+        Coefficient matrix of the ODE system.
 
     Note
     ----
@@ -170,8 +171,8 @@ class buck_converter(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

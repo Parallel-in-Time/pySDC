@@ -7,36 +7,55 @@ from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cup
 
 
 class allencahn2d_imex(ptype):  # pragma: no cover
-    """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions
+    can be used, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),
+
+    or *checker-board*
+
+    .. math::
+        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
+
+    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
+    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
+    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
+
+    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
+    by a ``SciPy`` routine.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    L : int
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
-    init_type : str
+    init_type : str, optional
         Indicates which type of initial condition is used.
 
     Attributes
     ----------
-    xvalues : cp.ndarray
+    xvalues : cp.1darray
         Grid points in space.
     dx : float
         Cupy mesh width.
-    lap : cp.ndarray
+    lap : cp.1darray
         Spectral operator for Laplacian.
-    rfft_object :
-        Planned real FFT for forward transformation.
-    irfft_object :
-        Planned IFFT for backward transformation.
     """
 
     dtype_u = cupy_mesh
@@ -130,8 +149,8 @@ class allencahn2d_imex(ptype):  # pragma: no cover
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -161,37 +180,56 @@ class allencahn2d_imex(ptype):  # pragma: no cover
 
 
 class allencahn2d_imex_stab(allencahn2d_imex):
-    """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
-    stabilized splitting
+    r"""
+    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    with stabilized splitting
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu) + \frac{2}{\varepsilon^2}u
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions
+    can be used here, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),
+
+    or *checker-board*
+
+    .. math::
+        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
+
+    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
+    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
+    Fast-Fourier Tranform (FFT) and the nonlinear term is treated explicitly.
+
+    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
+    by a ``SciPy`` routine.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    nu : float
-        Problem parameter.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    L : int
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
-    init_type : str
+    init_type : str, optional
         Indicates which type of initial condition is used.
 
     Attributes
     ----------
-    xvalues : cp.ndarray
+    xvalues : cp.1darray
         Grid points in space.
     dx : float
         Cupy mesh width.
-    lap : cp.ndarray
+    lap : cp.1darray
         Spectral operator for Laplacian.
-    rfft_object :
-        Planned real FFT for forward transformation.
-    irfft_object :
-        Planned IFFT for backward transformation.
     """
 
     def __init__(self, nvars=None, nu=2, eps=0.04, radius=0.25, L=1.0, init_type='circle'):

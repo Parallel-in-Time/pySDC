@@ -10,42 +10,58 @@ from mpi4py_fft import newDistArray
 
 
 class allencahn_imex(ptype):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping
+    r"""
+    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
 
-    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, driving force :math:`d_w`, and :math:`N=2,3`. Different initial
+    conditions can be used, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
+    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
+    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
 
     Parameters
     ----------
-    nvars : int
-        Number of unknowns in the problem.
-    eps : float
-        Problem parameter.
-    radius : float
+    nvars : List of int tuples, optional
+        Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    radius : float, optional
         Radius of the circles.
-    spectral : bool
+    spectral : bool, optional
         Indicates if spectral initial condition is used.
-    dw : float
-        Problem parameter.
-    L : int
+    dw : float, optional
+        Driving force.
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Initialises type of initial state.
     comm : bool, optional
-        Communicator.
+        Communicator for parallelization.
 
     Attributes
     ----------
-    fft :
-        fft object.
+    fft : fft object
+        Object for FFT.
     X : np.ogrid
         Grid coordinates in real space.
-    K2 : np.ndarray
-        Laplace operator in spectral space
+    K2 : np.1darray
+        Laplace operator in spectral space.
     dx : float
-        Mesh width in x direction
+        Mesh width in x direction.
     dy : float
-        Mesh width in y direction
+        Mesh width in y direction.
+
+    References
+    ----------
+    .. [1] https://mpi4py-fft.readthedocs.io/en/latest/
     """
 
     dtype_u = mesh
@@ -60,12 +76,12 @@ class allencahn_imex(ptype):
         dw=0.0,
         L=1.0,
         init_type='circle',
-        comm=None,
+        comm=MPI.COMM_WORLD,
     ):
         """Initialization routine"""
 
         if nvars is None:
-            nvars = [(128, 128), (32, 32)]
+            nvars = (128, 128)
 
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
@@ -181,8 +197,8 @@ class allencahn_imex(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -235,9 +251,23 @@ class allencahn_imex(ptype):
 
 
 class allencahn_imex_timeforcing(allencahn_imex):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping,
-    time-dependent forcing
+    r"""
+    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
+    using time-dependent forcing
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w u (1 - u)
+
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, driving force :math:`d_w`, and :math:`N=2,3`. Different initial
+    conditions can be used, for example, circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
+    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
+    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
     """
 
     def eval_f(self, u, t):
