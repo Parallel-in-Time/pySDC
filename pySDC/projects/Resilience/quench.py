@@ -119,6 +119,7 @@ def run_quench(
 
     problem_params = {
         'newton_tol': 1e-9,
+        'direct_solver': False,
     }
 
     # initialize step parameters

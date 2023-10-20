@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import spsolve, gmres, inv
+from scipy.sparse.linalg import spsolve, gmres
+from scipy.linalg import inv
 
 from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype, WorkCounter
@@ -310,7 +311,7 @@ class Quench(ptype):
 
         # construct a preconditioner for the space solver
         if not self.direct_solver:
-            M = inv(self.Id - factor * self.A)
+            M = inv((self.Id - factor * self.A).toarray())
 
         for n in range(0, self.newton_maxiter):
             # assemble G such that G(u) = 0 at the solution of the step
