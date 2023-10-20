@@ -6,7 +6,7 @@ import numpy as np
 def fd_stencil_single(derivative, order, stencil_type):
     """
     Make a single tests where we generate a finite difference stencil using the generic framework above and compare to
-    harscoded stencils that were implemented in a previous version of the code.
+    hardcoded stencils that were implemented in a previous version of the code.
 
     Args:
         derivative (int): Order of the derivative
@@ -133,3 +133,66 @@ def test_fd_stencils():
     # test if we get the correct result when we put in steps rather than a stencil_type
     new_coeff, _ = get_finite_difference_stencil(derivative=2, order=2, steps=steps)
     assert np.allclose(coeff, new_coeff), f"Error when setting steps yourself! Expected {expect_coeff}, got {coeff}."
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('bc_left', [0.0, 7.0])
+@pytest.mark.parametrize('bc_right', [0.0, 9.0])
+@pytest.mark.parametrize('dx', [0.1, 10.0])
+@pytest.mark.parametrize('derivative', [1, 2])
+@pytest.mark.parametrize('order', [2])
+def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
+    from pySDC.helpers.problem_helper import get_finite_difference_matrix
+
+    A, b = get_finite_difference_matrix(
+        derivative=derivative,
+        order=order,
+        stencil_type='center',
+        bc='neumann',
+        bc_val_left=bc_left,
+        bc_val_right=bc_right,
+        dim=1,
+        size=4,
+        dx=dx,
+    )
+
+    if derivative == 1:
+        expect = np.zeros(A.shape[0])
+        expect[0] = -2 / (3 * dx)
+        expect[1] = +2 / (3 * dx)
+        assert np.allclose(
+            A.toarray()[0, :], expect
+        ), f'Error in left boundary, expected {expect} got {A.toarray()[0, :]}!'
+        expect = np.zeros(A.shape[0])
+        expect[-2] = -2 / (3 * dx)
+        expect[-1] = +2 / (3 * dx)
+        assert np.allclose(
+            A.toarray()[-1, :], expect
+        ), f'Error in right boundary, expected {expect} got {A.toarray()[-1, :]}!'
+
+        assert np.isclose(
+            b[-1], bc_right / 3.0
+        ), f'Error in right boundary value! Expected {bc_right / 3.}, got {b[-1]}'
+        assert np.isclose(b[0], bc_left / 3.0), f'Error in left boundary value! Expected {bc_left / 3}, got {b[0]}'
+
+    if derivative == 2:
+        expect = np.zeros(A.shape[0])
+        expect[0] = -2 / (3 * dx**2)
+        expect[1] = +2 / (3 * dx**2)
+        assert np.allclose(
+            A.toarray()[0, :], expect
+        ), f'Error in left boundary, expected {expect} got {A.toarray()[0, :]}!'
+        assert np.allclose(
+            A.toarray()[-1, :], expect[::-1]
+        ), f'Error in right boundary, expected {expect[::-1]} got {A.toarray()[-1, :]}!'
+
+        assert np.isclose(
+            b[-1], bc_right * 2 / (3 * dx)
+        ), f'Error in right boundary value! Expected {bc_right * 2 / (3*dx)}, got {b[-1]}'
+        assert np.isclose(
+            b[0], -bc_left * 2 / (3 * dx)
+        ), f'Error in left boundary value! Expected {-bc_left * 2 / (3*dx)}, got {b[0]}'
+
+
+if __name__ == '__main__':
+    test_Neumann_bcs(2, 0, 1, 3.0 / 3.0, 2)

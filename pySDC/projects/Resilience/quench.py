@@ -334,7 +334,7 @@ def compare_imex_full(plotting=False, leak_type='linear'):
     custom_description['step_params'] = {'maxiter': maxiter}
     custom_description['sweeper_params'] = {'num_nodes': num_nodes}
     custom_description['convergence_controllers'] = {
-        Adaptivity: {'e_tol': 1e-6},
+        Adaptivity: {'e_tol': 1e-7},
     }
 
     custom_controller_params = {'logger_level': 15}

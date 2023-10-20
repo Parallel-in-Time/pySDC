@@ -117,7 +117,7 @@ class GenericNDimFinDiff(ptype):
 
         dx, xvalues = problem_helper.get_1d_grid(size=nvars[0], bc=bc, left_boundary=0.0, right_boundary=1.0)
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=derivative,
             order=order,
             stencil_type=stencil_type,

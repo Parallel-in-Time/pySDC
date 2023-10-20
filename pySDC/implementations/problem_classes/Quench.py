@@ -89,8 +89,8 @@ class Quench(ptype):
         self,
         Cv=1000.0,
         K=1000.0,
-        u_thresh=1e-2,
-        u_max=2e-2,
+        u_thresh=3e-2,
+        u_max=6e-2,
         Q_max=1.0,
         leak_range=(0.45, 0.55),
         leak_type='linear',
@@ -158,7 +158,7 @@ class Quench(ptype):
         # setup finite difference discretization from problem helper
         self.dx, xvalues = problem_helper.get_1d_grid(size=self.nvars, bc=self.bc)
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, self.b = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,
             stencil_type=self.stencil_type,
@@ -178,26 +178,6 @@ class Quench(ptype):
         self.work_counters['rhs'] = WorkCounter()
         if not self.direct_solver:
             self.work_counters['linear'] = WorkCounter()
-
-    def apply_BCs(self, f):
-        """
-        Apply boundary conditions to the right hand side. Please supply only the nonlinear part as f!
-
-        Args:
-            dtype_f: nonlinear (!) part of the right hand side
-
-        Returns:
-            dtype_f: nonlinear part of the right hand side with boundary conditions
-        """
-        if self.bc == 'neumann-zero':
-            f[0] = 0.0
-            f[-1] = 0.0
-        elif self.bc == 'periodic':
-            pass
-        else:
-            raise NotImplementedError(f'BCs \"{self.bc}\" not implemented!')
-
-        return f
 
     def eval_f_non_linear(self, u, t):
         """
@@ -239,7 +219,7 @@ class Quench(ptype):
 
         me[:] /= self.Cv
 
-        return self.apply_BCs(me)
+        return me
 
     def eval_f(self, u, t):
         """
@@ -258,7 +238,7 @@ class Quench(ptype):
             The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.eval_f_non_linear(u, t)
+        f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.b + self.eval_f_non_linear(u, t)
 
         self.work_counters['rhs']()
         return f
@@ -301,7 +281,7 @@ class Quench(ptype):
 
         me[:] /= self.Cv
 
-        return sp.diags(self.apply_BCs(me), format='csc')
+        return sp.diags(me, format='csc')
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -523,7 +503,7 @@ class QuenchIMEX(Quench):
 
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.nvars)
-        f.expl[:] = self.eval_f_non_linear(u, t)
+        f.expl[:] = self.eval_f_non_linear(u, t) + self.b
 
         self.work_counters['rhs']()
         return f

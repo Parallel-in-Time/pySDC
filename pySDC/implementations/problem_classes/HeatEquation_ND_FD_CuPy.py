@@ -148,7 +148,7 @@ class heatNd_forced(ptype):  # pragma: no cover
         else:
             raise ProblemError(f'Boundary conditions {self.bc} not implemented.')
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,
             stencil_type=self.stencil_type,

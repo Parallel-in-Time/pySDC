@@ -108,7 +108,7 @@ class allencahn_fullyimplicit(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.nvars[0]
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,
             stencil_type='center',
