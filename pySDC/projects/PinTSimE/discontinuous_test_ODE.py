@@ -19,7 +19,7 @@ class LogEventDiscontinuousTestODE(hooks):
     """
 
     def post_step(self, step, level_number):
-        super(LogEventDiscontinuousTestODE, self).post_step(step, level_number)
+        super().post_step(step, level_number)
 
         L = step.levels[level_number]
 

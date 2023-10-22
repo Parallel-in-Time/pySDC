@@ -27,7 +27,7 @@ class LogEventBattery(hooks):
     """
 
     def post_step(self, step, level_number):
-        super(LogEventBattery, self).post_step(step, level_number)
+        super().post_step(step, level_number)
 
         L = step.levels[level_number]
         P = L.prob
@@ -170,7 +170,7 @@ def generateDescription(
     return description, controller_params
 
 
-def controllerRun(description, controller_params, t0, Tend, exact_event_time_avail=None):
+def controllerRun(description, controller_params, t0, Tend, exact_event_time_avail=False):
     """
     Executes a controller run for a problem defined in the description.
 
@@ -181,7 +181,7 @@ def controllerRun(description, controller_params, t0, Tend, exact_event_time_ava
     controller_params : dict
         Parameters needed for a controller run.
     t0 : float
-        Staring time of simulation.
+        Starting time of simulation.
     Tend : float
         End time of simulation.
     exact_event_time_avail : bool, optional
@@ -193,20 +193,13 @@ def controllerRun(description, controller_params, t0, Tend, exact_event_time_ava
         Raw statistics from a controller run.
     """
 
-    # ---- assume if it is set to False then no event time is available ----
-    if exact_event_time_avail is not None:
-        if not exact_event_time_avail:
-            exact_event_time_avail = None
-        else:
-            pass
-
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-    t_switch_exact = P.t_switch_exact if exact_event_time_avail is not None else None
+    t_switch_exact = P.t_switch_exact if exact_event_time_avail else None
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -225,7 +218,7 @@ def main():
     an ``AssertionError``.
     """
 
-    # --- defines parameters for sweeper ----
+    # defines parameters for sweeper
     M_fix = 4
     sweeper_params = {
         'num_nodes': M_fix,
@@ -233,7 +226,7 @@ def main():
         'QI': 'IE',
     }
 
-    # --- defines parameters for event detection, restol, and max. number of iterations ----
+    # defines parameters for event detection, restol, and max. number of iterations
     handling_params = {
         'restol': -1,
         'maxiter': 8,
@@ -244,7 +237,6 @@ def main():
         'exact_event_time_avail': None,
     }
 
-    # ---- all parameters are stored in this dictionary ----
     all_params = {
         'sweeper_params': sweeper_params,
         'handling_params': handling_params,
@@ -257,7 +249,7 @@ def main():
 
     for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit]):
         for defaults in [False, True]:
-            # ---- for hardcoded solutions problem patameter defaults should match with parameters here ----
+            # for hardcoded solutions problem parameter defaults should match with parameters here
             if defaults:
                 params_battery_1capacitor = {
                     'ncapacitors': 1,
@@ -284,7 +276,7 @@ def main():
                 nnodes=[M_fix],
             )
 
-    # --- defines parameters for the problem class ----
+    # defines parameters for the problem class
     params_battery_2capacitors = {
         'ncapacitors': 2,
         'C': np.array([1.0, 1.0]),
@@ -360,6 +352,7 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
                     sweeper_params = all_params['sweeper_params']
                     handling_params = all_params['handling_params']
 
+                    # plotting results for fixed M requires that M_fix is included in nnodes!
                     M_fix = sweeper_params['num_nodes']
                     assert (
                         M_fix in nnodes
@@ -442,7 +435,7 @@ def getUnknownLabels(prob_cls_name):
     return unknowns[prob_cls_name], unknowns_labels[prob_cls_name]
 
 
-def plotStylingStuff():
+def plotStylingStuff():  # pragma: no cover
     """
     Returns plot stuff such as colors, line styles for making plots more pretty.
     """
@@ -557,7 +550,7 @@ def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed,
     res = {}
     unknowns, unknowns_labels = getUnknownLabels(prob_cls_name)
 
-    # ---- numerical solution ----
+    # numerical solution
     u_val = get_sorted(stats, type='u', sortby='time', recomputed=recomputed)
     res['t'] = np.array([item[0] for item in u_val])
     for i, label in enumerate(unknowns):
@@ -566,12 +559,12 @@ def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed,
     res['unknowns'] = unknowns
     res['unknowns_labels'] = unknowns_labels
 
-    # ---- global error ----
+    # global error
     res['e_global'] = np.array(get_sorted(stats, type='e_global_post_step', sortby='time', recomputed=recomputed))
 
-    # ---- event time(s) found by event detection ----
+    # event time(s) found by event detection
     if use_detection:
-        switches = getRecomputed(stats, type='switch', sortby='time')
+        switches = get_sorted(stats, type='switch', sortby='time', recomputed=recomputed)
         assert len(switches) >= 1, 'No events found!'
         t_switches = [t[1] for t in switches]
         res['t_switches'] = t_switches
@@ -589,55 +582,18 @@ def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed,
     h = np.array([np.abs(val[1]) for val in h_val])
     res['state_function'] = h
 
-    # ---- embedded error and adapted step sizes----
+    # embedded error and adapted step sizes
     if use_adaptivity:
         res['e_em'] = np.array(get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed))
         res['dt'] = np.array(get_sorted(stats, type='dt', recomputed=recomputed))
 
-    # ---- sum over restarts ----
+    # sum over restarts
     if use_adaptivity or use_detection:
         res['sum_restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
 
-    # ---- sum over all iterations ----
+    # sum over all iterations
     res['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
     return res
-
-
-def getRecomputed(stats, type, sortby='time'):
-    """
-    Function that filters statistics after a recomputation. It stores all value of a type before restart. If there are
-    multiple values with same time point, it only stores the elements with unique times.
-
-    Parameters
-    ----------
-    stats : dict
-        Raw statistics from a controller run.
-    type : str
-        The type the be filtered.
-    sortby : str, optional
-        String to specify which key to use for sorting.
-
-    Returns
-    -------
-    sorted_list : list
-        List of filtered statistics.
-    """
-
-    sorted_nested_list = []
-    times_unique = np.unique([me[0] for me in get_sorted(stats, type=type)])
-    filtered_list = [
-        filter_stats(
-            stats,
-            time=t_unique,
-            num_restarts=max([me.num_restarts for me in filter_stats(stats, type=type, time=t_unique).keys()]),
-            type=type,
-        )
-        for t_unique in times_unique
-    ]
-    for item in filtered_list:
-        sorted_nested_list.append(sort_stats(item, sortby=sortby))
-    sorted_list = [item for sub_item in sorted_nested_list for item in sub_item]
-    return sorted_list
 
 
 if __name__ == "__main__":

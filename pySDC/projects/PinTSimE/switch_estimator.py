@@ -5,8 +5,6 @@ from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
-import pySDC.helpers.plot_helper as plt_helper
-
 
 class SwitchEstimator(ConvergenceController):
     """
@@ -106,11 +104,9 @@ class SwitchEstimator(ConvergenceController):
                     elif abs(state_function[-1]) <= self.params.tol_zero:
                         boundary = 'right'
                         t_switch = t_interp[-1]
-                    else:
-                        # dangerous! in case of nonmoving state function after event, event time could be distorted!
-                        t_switch = t_interp[0]
-                        boundary = 'left'
-                    self.log(f"Is already close enough to the {boundary} end point!", S)
+
+                    msg = f"The value of state function is close to zero, thus event time is already close enough to the {boundary} end point!"
+                    self.log(msg, S)
                     self.log_event_time(
                         controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_switch
                     )
@@ -324,7 +320,7 @@ class SwitchEstimator(ConvergenceController):
         Adapts the x- and y-axis for interpolation. For SDC, it is proven whether the left boundary is a
         collocation node or not. In case it is, the first entry of the state function has to be removed,
         because it would otherwise contain double values on starting time and the first node. Otherwise,
-        starting time L.time has to be added to self.params.t_interp to also take this value in the interpolation
+        starting time L.time has to be added to t_interp to also take this value in the interpolation
         into account.
 
         Parameters
@@ -387,8 +383,6 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
         n += 1
 
     root = x0
-    msg = "Newton's method took {} iterations".format(n)
-    print(msg)
 
     return root
 
