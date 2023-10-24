@@ -73,6 +73,10 @@ class ptype(RegisterParams):
         """Generate a data variable for RHS"""
         return self.dtype_f(self.init)
 
+    @classmethod
+    def get_default_sweeper_class(cls):
+        raise NotImplementedError(f'No default sweeper class implemented for {cls} problem!')
+
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE

@@ -14,7 +14,7 @@ class _Pars(FrozenClass):
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
-        self.dt_initial = self.dt * 1.0
+        self.dt_initial = self.dt * 1.0 if self.dt is not None else None
 
 
 # short helper class to bundle all status variables

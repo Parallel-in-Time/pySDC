@@ -167,6 +167,12 @@ class GenericNDimFinDiff(ptype):
         if self.ndim == 3:
             return x[None, :, None], x[:, None, None], x[None, None, :]
 
+    @classmethod
+    def get_default_sweeper_class(cls):
+        from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+        return generic_implicit
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
