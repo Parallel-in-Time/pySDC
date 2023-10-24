@@ -153,18 +153,15 @@ def get_finite_difference_matrix(
                         order=2 * (i + 1),
                         stencil_type='center',
                     )
-                    print(A_1d.toarray())
                     A_1d[i, :] = 0
                     A_1d[i, : len(b_coeff) - 1] = b_coeff[1:]
-                    b[i] = bc_params[0]['val'] * b_coeff[0] / dx**derivative
-                    print(A_1d.toarray())
-                    print(i, b_coeff, b_steps)
+                    b[i] = bc_params[0]['val'] * b_coeff[0]
             else:
                 for i in range(0, abs(min(steps))):
                     b_steps = np.arange(-(i + 1), order + derivative - (i + 1))
                     b_coeff, b_steps = get_finite_difference_stencil(derivative=derivative, order=order, steps=b_steps)
                     A_1d[i, : len(b_coeff) - 1] = b_coeff[1:]
-                    b[i] = bc_params[0]['val'] * b_coeff[0] / dx**derivative
+                    b[i] = bc_params[0]['val'] * b_coeff[0]
         if 'dirichlet' in bc[1]:
             if bc_params[1]['reduce']:
                 for i in range(0, abs(min(steps))):
@@ -173,14 +170,15 @@ def get_finite_difference_matrix(
                         order=2 * (i + 1),
                         stencil_type='center',
                     )
+                    A_1d[-i - 1, :] = 0
                     A_1d[-i - 1, -len(b_coeff) + 1 :] = b_coeff[:-1]
-                    b[-i - 1] = bc_params[1]['val'] * b_coeff[-1] / dx**derivative
+                    b[-i - 1] = bc_params[1]['val'] * b_coeff[-1]
             else:
                 for i in range(0, abs(max(steps))):
                     b_steps = np.arange(-(order + derivative) + (i + 2), (i + 2))
                     b_coeff, b_steps = get_finite_difference_stencil(derivative=derivative, order=order, steps=b_steps)
                     A_1d[-i - 1, -len(b_coeff) + 1 :] = b_coeff[:-1]
-                    b[-i - 1] = bc_params[1]['val'] * b_coeff[-1] / dx**derivative
+                    b[-i - 1] = bc_params[1]['val'] * b_coeff[-1]
         if 'neumann' in bc[0]:
             # generate the one-sided stencil to discretize the first derivative at the boundary
             bc_coeff_left, bc_steps_left = get_finite_difference_stencil(
@@ -216,8 +214,6 @@ def get_finite_difference_matrix(
             b[-1] = bc_params[1]['val'] * (coeff_right[-1] / dx**derivative) / (bc_coeff_right[0] / dx)
             A_1d[-1, -len(bc_coeff_right) + 1 :] -= coeff_right[-1] / bc_coeff_right[0] * bc_coeff_right[::-1][:-1]
 
-    print(A_1d.toarray())
-    print(b)
     # elif "dirichlet" in bc:
     # elif "neumann" in bc:
     #     """
@@ -311,6 +307,7 @@ def get_finite_difference_matrix(
         raise NotImplementedError(f'Dimension {dim} not implemented.')
 
     A /= dx**derivative
+    b /= dx**derivative
 
     return A, b
 

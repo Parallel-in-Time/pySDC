@@ -233,10 +233,9 @@ def test_Dirichtlet_bcs_sin(order):
     import numpy as np
 
     L = 2 * np.pi
-    # L = 7.
-    bc_right = rand()
-    bc_left = rand()
-    k = 4.0
+    bc_right = 1# rand()
+    bc_left = 1# rand()
+    k = 4
     reduce = True
 
     def u_num(size):
@@ -252,25 +251,33 @@ def test_Dirichtlet_bcs_sin(order):
             dx=dx,
             bc_params=[{'val': bc_left, 'reduce': reduce}, {'val': bc_right, 'reduce': reduce}],
         )
-        print(np.linalg.cond(A.toarray()))
 
         source_term = np.sin(k * x)
 
         u = spsolve(A, source_term - b)
+        # u = np.linalg.solve(A.todense(), source_term - b)
 
         u_expect = (bc_right - bc_left) * x / L + bc_left - np.sin(k * x) / k**2
+
+        # import matplotlib.pyplot as plt
+        # plt.plot(np.concatenate(([bc_left], u, [bc_right])), 'o-')
+        # plt.plot(np.concatenate(([bc_left], u_expect, [bc_right])))
+        # plt.plot(np.concatenate(([0], source_term, [0])))
+
         return max(np.abs(u - u_expect))
 
-    sizes = [int(128 / 2**i) for i in [-2, -1, 0, 1, 2, 3, 4]]
-    # sizes = [6]
+    sizes = 32 * 2**np.arange(5)
+    # sizes = sizes[-1:]
     errors = np.array([u_num(size) for size in sizes])
-    order = np.array(
-        [-np.log(errors[i + 1] / errors[i]) / np.log(sizes[i + 1] / sizes[i]) for i in range(len(sizes) - 1)]
-    )
-    print(order)
-    print(errors)
-    print(sizes)
+    orders = np.log2(errors[:-1]/errors[1:])
+    print("order :", orders)
+    print("errors :", errors)
+    print("size :", sizes)
+
+    import matplotlib.pyplot as plt
+    plt.loglog(sizes, errors)
+    plt.loglog(sizes, (1/sizes)**order, '--')
 
 
 if __name__ == '__main__':
-    test_Dirichtlet_bcs_sin(4)
+    test_Dirichtlet_bcs_sin(6)
