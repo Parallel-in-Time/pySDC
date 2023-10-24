@@ -31,6 +31,7 @@ def test_setup_helper():
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
+    description['convergence_controllers'] = {}
 
     easy_description = generate_description(
         problem_class=advectionNd, **problem_params, **level_params, **sweeper_params, **step_params
@@ -39,6 +40,19 @@ def test_setup_helper():
     assert (
         easy_description == description
     ), 'The generate description function did not reproduce the desired description'
+
+    easy_description = generate_description(
+        problem_class=advectionNd,
+        sweeper_class=generic_implicit,
+        **problem_params,
+        **level_params,
+        **sweeper_params,
+        **step_params
+    )
+
+    assert (
+        easy_description == description
+    ), 'The generate description function did not reproduce the desired description when supplying a sweeper class'
 
 
 if __name__ == '__main__':

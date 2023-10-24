@@ -18,15 +18,16 @@ def generate_description(problem_class, **kwargs):
         'sweeper_params': {},
         'problem_class': problem_class,
         'step_params': {},
+        'sweeper_class': kwargs.get('sweeper_class', problem_class.get_default_sweeper_class()),
+        'convergence_controllers': {},
     }
-
-    sweeper_class = kwargs.get('sweeper_class', problem_class.get_default_sweeper_class())
 
     problem_keys = problem_class.__init__.__code__.co_varnames
     level_keys = level_params({}).__dict__.keys()
-    sweeper_keys = sweeper_class({'num_nodes': 1, 'quad_type': 'RADAU-RIGHT'}).params.__dict__.keys()
+    sweeper_keys = description['sweeper_class']({'num_nodes': 1, 'quad_type': 'RADAU-RIGHT'}).params.__dict__.keys()
     step_keys = step_params({}).__dict__.keys()
 
+    # TODO: add convergence controllers
     for key, val in kwargs.items():
         if key in problem_keys:
             description['problem_params'][key] = val
@@ -36,9 +37,9 @@ def generate_description(problem_class, **kwargs):
             description['sweeper_params'][key] = val
         elif key in step_keys:
             description['step_params'][key] = val
+        elif key == 'sweeper_class':
+            pass
         else:
             raise ValueError(f'Don\'t know what parameter \"{key}\" is for!')
-
-    description['sweeper_class'] = sweeper_class
 
     return description
