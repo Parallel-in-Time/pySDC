@@ -1,3 +1,7 @@
+import pytest
+
+
+@pytest.mark.base
 def test_setup_helper():
     from pySDC.helpers.setup_helper import generate_description
     from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
