@@ -86,9 +86,7 @@ def get_finite_difference_matrix(
     dim=None,
     bc=None,
     cupy=False,
-    bc_val_left=0.0,
-    bc_val_right=0.0,
-    neumann_bc_order=None,
+    bc_params=None,
 ):
     """
     Build FD matrix from stencils, with boundary conditions.
@@ -104,9 +102,6 @@ def get_finite_difference_matrix(
         dim (int): Number of dimensions
         bc (str): Boundary conditions for both sides
         cupy (bool): Construct a GPU ready matrix if yes
-        bc_val_left (float): Value for left boundary condition
-        bc_val_right (float): Value for right boundary condition
-        neumann_bc_order (int): Order of accuracy of Neumann BC, optional
 
     Returns:
         Sparse matrix: Finite difference matrix
@@ -122,75 +117,16 @@ def get_finite_difference_matrix(
         derivative=derivative, order=order, stencil_type=stencil_type, steps=steps
     )
 
+    if type(bc) is not tuple:
+        assert type(bc) == str, 'Please pass BCs as string or tuple of strings'
+        bc = (bc, bc)
+    bc_params = bc_params if bc_params is not None else {}
+    if type(bc_params) is not list:
+        bc_params = [bc_params, bc_params]
+
     b = np.zeros(size**dim)
 
-    if "dirichlet" in bc:
-        A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
-    elif "neumann" in bc:
-        """
-        We will solve only for values within the boundary because the values on the boundary can be determined from the
-        discretization of the boundary condition (BC). Therefore, we discretize both the BC and the original problem
-        such that the stencils reach into the boundary with one element. We then proceed to eliminate the values on the
-        boundary, which modifies the finite difference matrix and yields an inhomogeneity if the BCs are inhomogeneous.
-
-        Keep in mind that centered stencils are often more efficient in terms of sparsity of the resulting matrix. High
-        order centered discretizations will reach beyond the boundary and hence need to be replaced with lopsided
-        stencils near the boundary, changing the number of non-zero diagonals.
-        """
-        # check if we need to alter the sparsity structure because of the BC
-        if steps.min() < -1 or steps.max() > 1:
-            A_1d = sp.diags(coeff, steps, shape=(size, size), format='lil')
-        else:
-            A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
-
-        if derivative == 1 and (steps.min() < -1 or steps.max() > 1):
-            neumann_bc_order = neumann_bc_order if neumann_bc_order else order + 1
-            assert neumann_bc_order != order, 'Need different stencils for BC and the rest'
-        else:
-            neumann_bc_order = neumann_bc_order if neumann_bc_order else order
-
-        if dim > 1 and (bc_val_left != 0.0 or bc_val_right != 0):
-            raise NotImplementedError(
-                f'Non-zero Neumann BCs are only implemented in 1D. You asked for {dim} dimensions.'
-            )
-
-        # ---- left boundary ----
-        # generate the one-sided stencil to discretize the first derivative at the boundary
-        bc_coeff_left, bc_steps_left = get_finite_difference_stencil(
-            derivative=1, order=neumann_bc_order, stencil_type='forward'
-        )
-
-        # check if we can just use the available stencil or if we need to generate a new one
-        if steps.min() == -1:
-            coeff_left = coeff.copy()
-        else:  # need to generate lopsided stencils
-            raise NotImplementedError(
-                'Neumann BCs on the right are not implemented for your desired stencil. Maybe try a lower order'
-            )
-
-        # modify system matrix and inhomogeneity according to BC
-        b[0] = bc_val_left * (coeff_left[0] / dx**derivative) / (bc_coeff_left[0] / dx)
-        A_1d[0, : len(bc_coeff_left) - 1] -= coeff_left[0] / bc_coeff_left[0] * bc_coeff_left[1:]
-
-        # ---- right boundary ----
-        # generate the one-sided stencil to discretize the first derivative at the boundary
-        bc_coeff_right, bc_steps_right = get_finite_difference_stencil(
-            derivative=1, order=neumann_bc_order, stencil_type='backward'
-        )
-
-        # check if we can just use the available stencil or if we need to generate a new one
-        if steps.max() == +1:
-            coeff_right = coeff.copy()
-        else:  # need to generate lopsided stencils
-            raise NotImplementedError(
-                'Neumann BCs on the right are not implemented for your desired stencil. Maybe try a lower order'
-            )
-
-        # modify system matrix and inhomogeneity according to BC
-        b[-1] = bc_val_right * (coeff_right[-1] / dx**derivative) / (bc_coeff_right[0] / dx)
-        A_1d[-1, -len(bc_coeff_right) + 1 :] -= coeff_right[-1] / bc_coeff_right[0] * bc_coeff_right[::-1][:-1]
-
-    elif bc == 'periodic':
+    if bc[0] == 'periodic' and bc[1] == 'periodic':
         A_1d = 0 * sp.eye(size, format='csc')
         for i in steps:
             A_1d += coeff[i] * sp.eye(size, k=steps[i])
@@ -199,9 +135,168 @@ def get_finite_difference_matrix(
             if steps[i] < 0:
                 A_1d += coeff[i] * sp.eye(size, k=size + steps[i])
     else:
-        raise NotImplementedError(f'Boundary conditions \"{bc}\" not implemented.')
+        A_1d = sp.diags(coeff, steps, shape=(size, size), format='lil')
+
+        bc_params_defaults = {
+            'val': 0.0,
+            'neumann_bc_order': order,
+            'reduce': False,
+        }
+        bc_params[0] = {**bc_params_defaults, **bc_params[0]}
+        bc_params[1] = {**bc_params_defaults, **bc_params[1]}
+
+        if 'dirichlet' in bc[0]:
+            if bc_params[0]['reduce']:
+                for i in range(0, abs(min(steps))):
+                    b_coeff, b_steps = get_finite_difference_stencil(
+                        derivative=derivative,
+                        order=2 * (i + 1),
+                        stencil_type='center',
+                    )
+                    print(A_1d.toarray())
+                    A_1d[i, :] = 0
+                    A_1d[i, : len(b_coeff) - 1] = b_coeff[1:]
+                    b[i] = bc_params[0]['val'] * b_coeff[0] / dx**derivative
+                    print(A_1d.toarray())
+                    print(i, b_coeff, b_steps)
+            else:
+                for i in range(0, abs(min(steps))):
+                    b_steps = np.arange(-(i + 1), order + derivative - (i + 1))
+                    b_coeff, b_steps = get_finite_difference_stencil(derivative=derivative, order=order, steps=b_steps)
+                    A_1d[i, : len(b_coeff) - 1] = b_coeff[1:]
+                    b[i] = bc_params[0]['val'] * b_coeff[0] / dx**derivative
+        if 'dirichlet' in bc[1]:
+            if bc_params[1]['reduce']:
+                for i in range(0, abs(min(steps))):
+                    b_coeff, b_steps = get_finite_difference_stencil(
+                        derivative=derivative,
+                        order=2 * (i + 1),
+                        stencil_type='center',
+                    )
+                    A_1d[-i - 1, -len(b_coeff) + 1 :] = b_coeff[:-1]
+                    b[-i - 1] = bc_params[1]['val'] * b_coeff[-1] / dx**derivative
+            else:
+                for i in range(0, abs(max(steps))):
+                    b_steps = np.arange(-(order + derivative) + (i + 2), (i + 2))
+                    b_coeff, b_steps = get_finite_difference_stencil(derivative=derivative, order=order, steps=b_steps)
+                    A_1d[-i - 1, -len(b_coeff) + 1 :] = b_coeff[:-1]
+                    b[-i - 1] = bc_params[1]['val'] * b_coeff[-1] / dx**derivative
+        if 'neumann' in bc[0]:
+            # generate the one-sided stencil to discretize the first derivative at the boundary
+            bc_coeff_left, bc_steps_left = get_finite_difference_stencil(
+                derivative=1, order=bc_params[0]['neumann_bc_order'], stencil_type='forward'
+            )
+
+            # check if we can just use the available stencil or if we need to generate a new one
+            if steps.min() == -1:
+                coeff_left = coeff.copy()
+            else:  # need to generate lopsided stencils
+                raise NotImplementedError(
+                    'Neumann BCs on the right are not implemented for your desired stencil. Maybe try a lower order'
+                )
+
+            # modify system matrix and inhomogeneity according to BC
+            b[0] = bc_params[0]['val'] * (coeff_left[0] / dx**derivative) / (bc_coeff_left[0] / dx)
+            A_1d[0, : len(bc_coeff_left) - 1] -= coeff_left[0] / bc_coeff_left[0] * bc_coeff_left[1:]
+        if 'neumann' in bc[1]:
+            # generate the one-sided stencil to discretize the first derivative at the boundary
+            bc_coeff_right, bc_steps_right = get_finite_difference_stencil(
+                derivative=1, order=bc_params[1]['neumann_bc_order'], stencil_type='backward'
+            )
+
+            # check if we can just use the available stencil or if we need to generate a new one
+            if steps.max() == +1:
+                coeff_right = coeff.copy()
+            else:  # need to generate lopsided stencils
+                raise NotImplementedError(
+                    'Neumann BCs on the right are not implemented for your desired stencil. Maybe try a lower order'
+                )
+
+            # modify system matrix and inhomogeneity according to BC
+            b[-1] = bc_params[1]['val'] * (coeff_right[-1] / dx**derivative) / (bc_coeff_right[0] / dx)
+            A_1d[-1, -len(bc_coeff_right) + 1 :] -= coeff_right[-1] / bc_coeff_right[0] * bc_coeff_right[::-1][:-1]
+
+    print(A_1d.toarray())
+    print(b)
+    # elif "dirichlet" in bc:
+    # elif "neumann" in bc:
+    #     """
+    #     We will solve only for values within the boundary because the values on the boundary can be determined from the
+    #     discretization of the boundary condition (BC). Therefore, we discretize both the BC and the original problem
+    #     such that the stencils reach into the boundary with one element. We then proceed to eliminate the values on the
+    #     boundary, which modifies the finite difference matrix and yields an inhomogeneity if the BCs are inhomogeneous.
+
+    #     Keep in mind that centered stencils are often more efficient in terms of sparsity of the resulting matrix. High
+    #     order centered discretizations will reach beyond the boundary and hence need to be replaced with lopsided
+    #     stencils near the boundary, changing the number of non-zero diagonals.
+    #     """
+    #     bc_params_defaults = {
+    #             'val_left': 0.,
+    #             'val_right': 0.,
+    #             'neumann_bc_order': order,
+    #             'reduce': False,
+    #     }
+    #     bc_params[0] = {**bc_params_defaults, **bc_params[0]} if 'neumann' in bc[0] else bc_params[0]
+    #     bc_params[1] = {**bc_params_defaults, **bc_params[1]} if 'neumann' in bc[1] else bc_params[1]
+    #
+    #     # check if we need to alter the sparsity structure because of the BC
+    #     if steps.min() < -1 or steps.max() > 1:
+    #         A_1d = sp.diags(coeff, steps, shape=(size, size), format='lil')
+    #     else:
+    #         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
+
+    #     if derivative == 1 and (steps.min() < -1 or steps.max() > 1):
+    #         neumann_bc_order = neumann_bc_order if neumann_bc_order else order + 1
+    #         assert neumann_bc_order != order, 'Need different stencils for BC and the rest'
+    #     else:
+    #         neumann_bc_order = neumann_bc_order if neumann_bc_order else order
+
+    #     if dim > 1 and (val_left != 0.0 or val_right != 0):
+    #         raise NotImplementedError(
+    #             f'Non-zero Neumann BCs are only implemented in 1D. You asked for {dim} dimensions.'
+    #         )
+
+    #     # ---- left boundary ----
+    #     # generate the one-sided stencil to discretize the first derivative at the boundary
+    #     if 'neumann' in bc[0]:
+    #     bc_coeff_left, bc_steps_left = get_finite_difference_stencil(
+    #         derivative=1, order=neumann_bc_order, stencil_type='forward'
+    #     )
+
+    #     # check if we can just use the available stencil or if we need to generate a new one
+    #     if steps.min() == -1:
+    #         coeff_left = coeff.copy()
+    #     else:  # need to generate lopsided stencils
+    #         raise NotImplementedError(
+    #             'Neumann BCs on the right are not implemented for your desired stencil. Maybe try a lower order'
+    #         )
+
+    #     # modify system matrix and inhomogeneity according to BC
+    #     b[0] = val_left * (coeff_left[0] / dx**derivative) / (bc_coeff_left[0] / dx)
+    #     A_1d[0, : len(bc_coeff_left) - 1] -= coeff_left[0] / bc_coeff_left[0] * bc_coeff_left[1:]
+
+    #     # ---- right boundary ----
+    #     # generate the one-sided stencil to discretize the first derivative at the boundary
+    #     bc_coeff_right, bc_steps_right = get_finite_difference_stencil(
+    #         derivative=1, order=neumann_bc_order, stencil_type='backward'
+    #     )
+
+    #     # check if we can just use the available stencil or if we need to generate a new one
+    #     if steps.max() == +1:
+    #         coeff_right = coeff.copy()
+    #     else:  # need to generate lopsided stencils
+    #         raise NotImplementedError(
+    #             'Neumann BCs on the right are not implemented for your desired stencil. Maybe try a lower order'
+    #         )
+
+    #     # modify system matrix and inhomogeneity according to BC
+    #     b[-1] = val_right * (coeff_right[-1] / dx**derivative) / (bc_coeff_right[0] / dx)
+    #     A_1d[-1, -len(bc_coeff_right) + 1 :] -= coeff_right[-1] / bc_coeff_right[0] * bc_coeff_right[::-1][:-1]
+    # else:
+    #     raise NotImplementedError(f'Boundary conditions \"{bc}\" not implemented.')
 
     # TODO: extend the BCs to higher dimensions
+    A_1d = A_1d.tocsc()
     if dim == 1:
         A = A_1d
     elif dim == 2:

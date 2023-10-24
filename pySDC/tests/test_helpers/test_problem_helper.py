@@ -149,11 +149,10 @@ def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
         order=order,
         stencil_type='center',
         bc='neumann',
-        bc_val_left=bc_left,
-        bc_val_right=bc_right,
         dim=1,
         size=4,
         dx=dx,
+        bc_params=[{'val': bc_left}, {'val': bc_right}],
     )
 
     if derivative == 1:
@@ -194,5 +193,84 @@ def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
         ), f'Error in left boundary value! Expected {-bc_left * 2 / (3*dx)}, got {b[0]}'
 
 
+@pytest.mark.parametrize('size', [10, 20, 50])
+@pytest.mark.parametrize('order', [2, 4, 6, 8])
+def test_Dirichtlet_bcs(order, size):
+    from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
+    from scipy.sparse.linalg import spsolve
+    from numpy.random import rand
+    import numpy as np
+
+    L = 2 * np.pi
+
+    dx, x = get_1d_grid(size, 'dirichlet', 0, L)
+
+    bc_right = rand()
+    bc_left = rand()
+
+    A, b = get_finite_difference_matrix(
+        derivative=2,
+        order=order,
+        stencil_type='center',
+        bc='dirichlet',
+        dim=1,
+        size=size,
+        dx=dx,
+        bc_params=[{'val': bc_left}, {'val': bc_right}],
+    )
+
+    u = spsolve(A, -b)
+
+    u_expect = (bc_right - bc_left) * x / L + bc_left
+    assert np.allclose(u, u_expect), 'Dirichlet BCs failed!'
+
+
+@pytest.mark.parametrize('order', [2, 4, 6, 8])
+def test_Dirichtlet_bcs_sin(order):
+    from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
+    from scipy.sparse.linalg import spsolve
+    from numpy.random import rand
+    import numpy as np
+
+    L = 2 * np.pi
+    # L = 7.
+    bc_right = rand()
+    bc_left = rand()
+    k = 4.0
+    reduce = True
+
+    def u_num(size):
+        dx, x = get_1d_grid(size, 'dirichlet', 0, L)
+
+        A, b = get_finite_difference_matrix(
+            derivative=2,
+            order=order,
+            stencil_type='center',
+            bc='dirichlet',
+            dim=1,
+            size=size,
+            dx=dx,
+            bc_params=[{'val': bc_left, 'reduce': reduce}, {'val': bc_right, 'reduce': reduce}],
+        )
+        print(np.linalg.cond(A.toarray()))
+
+        source_term = np.sin(k * x)
+
+        u = spsolve(A, source_term - b)
+
+        u_expect = (bc_right - bc_left) * x / L + bc_left - np.sin(k * x) / k**2
+        return max(np.abs(u - u_expect))
+
+    sizes = [int(128 / 2**i) for i in [-2, -1, 0, 1, 2, 3, 4]]
+    # sizes = [6]
+    errors = np.array([u_num(size) for size in sizes])
+    order = np.array(
+        [-np.log(errors[i + 1] / errors[i]) / np.log(sizes[i + 1] / sizes[i]) for i in range(len(sizes) - 1)]
+    )
+    print(order)
+    print(errors)
+    print(sizes)
+
+
 if __name__ == '__main__':
-    test_Neumann_bcs(2, 0, 1, 3.0 / 3.0, 2)
+    test_Dirichtlet_bcs_sin(4)
