@@ -219,8 +219,7 @@ def test_Dirichtlet_bcs(order, size, reduce):
         dim=1,
         size=size,
         dx=dx,
-        bc_params=[{'val': bc_left, "reduce": reduce},
-                   {'val': bc_right, "reduce": reduce}],
+        bc_params=[{'val': bc_left, "reduce": reduce}, {'val': bc_right, "reduce": reduce}],
     )
 
     u = spsolve(A, -b)
@@ -257,29 +256,107 @@ def test_Dirichtlet_bcs_sin(order, reduce):
             bc_params=[{'val': bc_left, 'reduce': reduce}, {'val': bc_right, 'reduce': reduce}],
         )
 
-        source_term = np.sin(k * x * 2*np.pi/L)
+        source_term = np.sin(k * x * 2 * np.pi / L)
         u = spsolve(A, source_term - b)
         u_expect = (bc_right - bc_left) * x / L + bc_left - source_term / k**2
 
         return max(np.abs(u - u_expect))
 
-    size0 = {
-        2: 64,
-        4: 64,
-        6: 16,
-        8: 9}
-    sizes = size0[order] * 2**np.arange(3)
+    size0 = {2: 64, 4: 64, 6: 16, 8: 9}
+    sizes = size0[order] * 2 ** np.arange(3)
     errors = np.array([u_num(size) for size in sizes])
-    orders = np.log2(errors[:-1]/errors[1:])
+    orders = np.log2(errors[:-1] / errors[1:])
 
     if reduce:
         assert np.min(orders) > 1.9
-        assert np.max(orders) < order+1
+        assert np.max(orders) < order + 1
     else:
-        diff = np.mean(np.abs(orders-order))
+        diff = np.mean(np.abs(orders - order))
         assert diff < (0.999 if order != 8 else 1.2), (orders, order)
 
 
+def test_Neumann_Dirichlet_BCs(order, reduce):
+    from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
+    from scipy.sparse.linalg import spsolve
+    from numpy.random import rand
+    import numpy as np
+
+    L = 1.0
+    size = 16
+
+    dx, x = get_1d_grid(size, 'dirichlet', 0, L)
+
+    bc_right = rand()
+    bc_left = rand()
+
+    A, b = get_finite_difference_matrix(
+        derivative=2,
+        order=order,
+        stencil_type='center',
+        bc=('neumann', 'dirichlet'),
+        dim=1,
+        size=size,
+        dx=dx,
+        bc_params=[{'val': bc_left, "reduce": reduce}, {'val': bc_right, "reduce": reduce}],
+    )
+
+    u = spsolve(A, -b)
+
+    u_expect = bc_left * x / L + (bc_right - bc_left)
+
+    assert np.allclose(u, u_expect), 'Dirichlet-Neumann BCs failed!'
+
+
+@pytest.mark.parametrize('reduce', [True, False])
+@pytest.mark.parametrize('order', [2, 4, 6, 8])
+def test_Neumann_Dirichlet_bcs_order(order, reduce):
+    from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
+    from scipy.sparse.linalg import spsolve
+    from numpy.random import rand
+    import numpy as np
+
+    L = 2 * np.pi
+    bc_right = rand()
+    bc_left = rand()
+
+    import matplotlib.pyplot as plt
+
+    def u_num(size):
+        dx, x = get_1d_grid(size, 'dirichlet', 0, L)
+
+        A, b = get_finite_difference_matrix(
+            derivative=2,
+            order=order,
+            stencil_type='center',
+            bc=('neumann', 'dirichlet'),
+            dim=1,
+            size=size,
+            dx=dx,
+            bc_params=[{'val': bc_left, 'reduce': reduce}, {'val': bc_right, 'reduce': reduce}],
+        )
+
+        source_term = x
+        # source_term = x**3 / 6. + bc_left * x + (bv_right - bc_left - 1./6.)
+        u = spsolve(A, source_term - b)
+        u_expect = bc_left * x + (bc_right - bc_left - 1.0 / 6.0) + x**3 / 6.0
+        plt.plot(x, u)
+        plt.plot(x, u_expect, ls='--')
+        plt.show()
+
+        return max(np.abs(u - u_expect))
+
+    size0 = {2: 64, 4: 64, 6: 16, 8: 9}
+    sizes = size0[order] * 2 ** np.arange(3)
+    errors = np.array([u_num(size) for size in sizes])
+    orders = np.log2(errors[:-1] / errors[1:])
+
+    if reduce:
+        assert np.min(orders) > 1.9
+        assert np.max(orders) < order + 1
+    else:
+        diff = np.mean(np.abs(orders - order))
+        assert diff < (0.999 if order != 8 else 1.2), (orders, order)
+
 
 if __name__ == '__main__':
-    test_Dirichtlet_bcs_sin(4, False)
+    test_Neumann_Dirichlet_bcs_order(4, False)
