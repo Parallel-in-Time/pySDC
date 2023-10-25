@@ -13,8 +13,12 @@ class SwitchEstimator(ConvergenceController):
     """
 
     def setup(self, controller, params, description):
-        """
-        Function sets default variables to handle with the switch at the beginning.
+        r"""
+        Function sets default variables to handle with the event at the beginning. The default params are:
+
+        - control_order : controls the order of the SE's call of convergence controllers
+        - coll.nodes : defines the collocation nodes for interpolation
+        - tol_zero : inner tolerance for SE; state function has to satisfy it to terminate
 
         Parameters
         ----------
@@ -39,8 +43,9 @@ class SwitchEstimator(ConvergenceController):
         )
 
         defaults = {
-            'control_order': 100,
+            'control_order': 0,
             'nodes': coll.nodes,
+            'tol_zero': 1e-13,
         }
         return {**defaults, **params}
 
@@ -92,11 +97,20 @@ class SwitchEstimator(ConvergenceController):
                 )
 
                 # when the state function is already close to zero the event is already resolved well
-                if abs(state_function[-1]) <= self.params.tol:
-                    self.log("Is already close enough to one of the end point!", S)
+                if abs(state_function[-1]) <= self.params.tol_zero or abs(state_function[0]) <= self.params.tol_zero:
+                    if abs(state_function[0]) <= self.params.tol_zero:
+                        t_switch = t_interp[0]
+                        boundary = 'left'
+                    elif abs(state_function[-1]) <= self.params.tol_zero:
+                        boundary = 'right'
+                        t_switch = t_interp[-1]
+
+                    msg = f"The value of state function is close to zero, thus event time is already close enough to the {boundary} end point!"
+                    self.log(msg, S)
                     self.log_event_time(
-                        controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_interp[-1]
+                        controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_switch
                     )
+
                     L.prob.count_switches()
                     self.status.is_zero = True
 
@@ -104,14 +118,32 @@ class SwitchEstimator(ConvergenceController):
                 if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
                     self.status.t_switch = self.get_switch(t_interp, state_function, m_guess)
 
+                    controller.hooks[0].add_to_stats(
+                        process=S.status.slot,
+                        time=L.time,
+                        level=L.level_index,
+                        iter=0,
+                        sweep=L.status.sweep,
+                        type='switch_all',
+                        value=self.status.t_switch,
+                    )
+                    controller.hooks[0].add_to_stats(
+                        process=S.status.slot,
+                        time=L.time,
+                        level=L.level_index,
+                        iter=0,
+                        sweep=L.status.sweep,
+                        type='h_all',
+                        value=max([abs(item) for item in state_function]),
+                    )
                     if L.time < self.status.t_switch < L.time + L.dt:
-                        dt_switch = self.status.t_switch - L.time
+                        dt_switch = (self.status.t_switch - L.time) * self.params.alpha
 
                         if (
                             abs(self.status.t_switch - L.time) <= self.params.tol
                             or abs((L.time + L.dt) - self.status.t_switch) <= self.params.tol
                         ):
-                            self.log(f"Switch located at time {self.status.t_switch:.12f}", S)
+                            self.log(f"Switch located at time {self.status.t_switch:.15f}", S)
                             L.prob.t_switch = self.status.t_switch
                             self.log_event_time(
                                 controller.hooks[0],
@@ -125,7 +157,7 @@ class SwitchEstimator(ConvergenceController):
                             L.prob.count_switches()
 
                         else:
-                            self.log(f"Located Switch at time {self.status.t_switch:.12f} is outside the range", S)
+                            self.log(f"Located Switch at time {self.status.t_switch:.15f} is outside the range", S)
 
                         # when an event is found, step size matching with this event should be preferred
                         dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
@@ -137,8 +169,7 @@ class SwitchEstimator(ConvergenceController):
                     else:
                         # event occurs on L.time or L.time + L.dt; no restart necessary
                         boundary = 'left boundary' if self.status.t_switch == L.time else 'right boundary'
-                        self.log(f"Estimated switch {self.status.t_switch:.12f} occurs at {boundary}", S)
-
+                        self.log(f"Estimated switch {self.status.t_switch:.15f} occurs at {boundary}", S)
                         self.log_event_time(
                             controller.hooks[0],
                             S.status.slot,
@@ -240,10 +271,10 @@ class SwitchEstimator(ConvergenceController):
         Returns
         -------
         t_switch : float
-           Time point of the founded switch.
+           Time point of found event.
         """
 
-        Interpolator = sp.interpolate.BarycentricInterpolator(t_interp, state_function)
+        LagrangeInterpolator = LagrangeInterpolation(t_interp, state_function)
 
         def p(t):
             """
@@ -259,7 +290,7 @@ class SwitchEstimator(ConvergenceController):
             p(t) : float
                 The value of the interpolated function at time t.
             """
-            return Interpolator.__call__(t)
+            return LagrangeInterpolator.eval(t)
 
         def fprime(t):
             """
@@ -275,13 +306,12 @@ class SwitchEstimator(ConvergenceController):
             dp : float
                 Derivative of interpolation p at time t.
             """
-            dt = 1e-8
-            dp = (p(t + dt) - p(t)) / dt
+            dt_FD = 1e-10
+            dp = (p(t + dt_FD) - p(t)) / dt_FD  # forward difference
             return dp
 
-        newton_tol, newton_maxiter = 1e-8, 50
+        newton_tol, newton_maxiter = 1e-15, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
-
         return t_switch
 
     @staticmethod
@@ -353,7 +383,49 @@ def newton(x0, p, fprime, newton_tol, newton_maxiter):
         n += 1
 
     root = x0
-    msg = "Newton's method took {} iterations".format(n)
-    print(msg)
 
     return root
+
+
+class LagrangeInterpolation(object):
+    def __init__(self, ti, yi):
+        """Initialization routine"""
+        self.ti = np.asarray(ti)
+        self.yi = np.asarray(yi)
+        self.n = len(ti)
+
+    def get_Lagrange_polynomial(self, t, i):
+        """
+        Computes the basis of the i-th Lagrange polynomial.
+
+        Parameters
+        ----------
+        t : float
+            Time where the polynomial is computed at.
+        i : int
+            Index of the Lagrange polynomial
+
+        Returns
+        -------
+        product : float
+            The product of the bases.
+        """
+        product = np.prod([(t - self.ti[k]) / (self.ti[i] - self.ti[k]) for k in range(self.n) if k != i])
+        return product
+
+    def eval(self, t):
+        """
+        Evaluates the Lagrange interpolation at time t.
+
+        Parameters
+        ----------
+        t : float
+            Time where interpolation is computed.
+
+        Returns
+        -------
+        p : float
+            Value of interpolant at time t.
+        """
+        p = np.sum([self.yi[i] * self.get_Lagrange_polynomial(t, i) for i in range(self.n)])
+        return p
