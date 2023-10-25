@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Feb 11 22:39:30 2023
-
-@author: telu
 """
 import numpy as np
 import scipy.sparse as sp
@@ -30,7 +28,8 @@ class GenericNDimFinDiff(ptype):
     Parameters
     ----------
     nvars : int, optional
-        Spatial resolution for the ND problem. For :math:`N = 2`, set ``nvars=(16, 16)``.
+        Spatial resolution for the ND problem. For :math:`N = 2`,
+        set ``nvars=(16, 16)``.
     coeff : float, optional
         Factor for finite difference matrix :math:`A`.
     derivative : int, optional
@@ -47,8 +46,26 @@ class GenericNDimFinDiff(ptype):
         Maximum number of iterations for linear solver.
     solver_type : str, optional
         Type of solver. Can be ``'direct'``, ``'GMRES'`` or ``'CG'``.
-    bc : str, optional
+    bc : str or tuple of 2 string, optional
         Type of boundary conditions. Default is ``'periodic'``.
+        To define two different types of boundary condition for each side,
+        you can use a tuple, for instance ``bc=("dirichlet", "neumann")``
+        uses Dirichlet BC on the left side, and Neumann BC on the right side.
+    bcParams : dict, optional
+        Parameters for boundary conditions, that can contains those keys :
+
+        - **val** : value for the boundary value (Dirichlet) or derivative
+          (Neumann), default to 0
+        - **reduce** : if true, reduce the order of the A matrix close to the
+          boundary. If false (default), use shifted stencils close to the
+          boundary.
+        - **neumann_bc_order** : finite difference order that should be used
+          for the neumann BC derivative. If None (default), uses the same
+          order as the discretization for A.
+
+        Default is None, which takes the default values for each parameters.
+        You can also define a tuple to set different parameters for each
+        side.
 
     Attributes
     ----------
@@ -74,6 +91,7 @@ class GenericNDimFinDiff(ptype):
         liniter=10000,
         solver_type='direct',
         bc='periodic',
+        bcParams=None,
     ):
         # make sure parameters have the correct types
         if not type(nvars) in [int, tuple]:
