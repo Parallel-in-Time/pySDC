@@ -40,12 +40,12 @@ class DiscontinuousTestODE(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, newton_maxiter=100, newton_tol=1e-8):
+    def __init__(self, newton_maxiter=100, newton_tol=1e-8, stop_at_nan=True):
         """Initialization routine"""
         nvars = 1
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', localVars=locals(), readOnly=True)
-        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals())
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals())
 
         if self.nvars != 1:
             raise ParameterError('nvars has to be equal to 1!')
