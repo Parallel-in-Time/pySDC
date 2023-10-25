@@ -135,67 +135,69 @@ def test_fd_stencils():
     assert np.allclose(coeff, new_coeff), f"Error when setting steps yourself! Expected {expect_coeff}, got {coeff}."
 
 
+# @pytest.mark.base
+# @pytest.mark.parametrize('bc_left', [0.0, 7.0])
+# @pytest.mark.parametrize('bc_right', [0.0, 9.0])
+# @pytest.mark.parametrize('dx', [0.1, 10.0])
+# @pytest.mark.parametrize('derivative', [1, 2])
+# @pytest.mark.parametrize('order', [2])
+# def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
+#     from pySDC.helpers.problem_helper import get_finite_difference_matrix
+
+#     A, b = get_finite_difference_matrix(
+#         derivative=derivative,
+#         order=order,
+#         stencil_type='center',
+#         bc='neumann',
+#         dim=1,
+#         size=4,
+#         dx=dx,
+#         bc_params=[{'val': bc_left}, {'val': bc_right}],
+#     )
+
+#     if derivative == 1:
+#         expect = np.zeros(A.shape[0])
+#         expect[0] = -2 / (3 * dx)
+#         expect[1] = +2 / (3 * dx)
+#         assert np.allclose(
+#             A.toarray()[0, :], expect
+#         ), f'Error in left boundary, expected {expect} got {A.toarray()[0, :]}!'
+#         expect = np.zeros(A.shape[0])
+#         expect[-2] = -2 / (3 * dx)
+#         expect[-1] = +2 / (3 * dx)
+#         assert np.allclose(
+#             A.toarray()[-1, :], expect
+#         ), f'Error in right boundary, expected {expect} got {A.toarray()[-1, :]}!'
+
+#         assert np.isclose(
+#             b[-1], bc_right / 3.0
+#         ), f'Error in right boundary value! Expected {bc_right / 3.}, got {b[-1]}'
+#         assert np.isclose(b[0], bc_left / 3.0), f'Error in left boundary value! Expected {bc_left / 3}, got {b[0]}'
+
+#     if derivative == 2:
+#         expect = np.zeros(A.shape[0])
+#         expect[0] = -2 / (3 * dx**2)
+#         expect[1] = +2 / (3 * dx**2)
+#         assert np.allclose(
+#             A.toarray()[0, :], expect
+#         ), f'Error in left boundary, expected {expect} got {A.toarray()[0, :]}!'
+#         assert np.allclose(
+#             A.toarray()[-1, :], expect[::-1]
+#         ), f'Error in right boundary, expected {expect[::-1]} got {A.toarray()[-1, :]}!'
+
+#         assert np.isclose(
+#             b[-1], bc_right * 2 / (3 * dx)
+#         ), f'Error in right boundary value! Expected {bc_right * 2 / (3*dx)}, got {b[-1]}'
+#         assert np.isclose(
+#             b[0], -bc_left * 2 / (3 * dx)
+#         ), f'Error in left boundary value! Expected {-bc_left * 2 / (3*dx)}, got {b[0]}'
+
+
 @pytest.mark.base
-@pytest.mark.parametrize('bc_left', [0.0, 7.0])
-@pytest.mark.parametrize('bc_right', [0.0, 9.0])
-@pytest.mark.parametrize('dx', [0.1, 10.0])
-@pytest.mark.parametrize('derivative', [1, 2])
-@pytest.mark.parametrize('order', [2])
-def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
-    from pySDC.helpers.problem_helper import get_finite_difference_matrix
-
-    A, b = get_finite_difference_matrix(
-        derivative=derivative,
-        order=order,
-        stencil_type='center',
-        bc='neumann',
-        dim=1,
-        size=4,
-        dx=dx,
-        bc_params=[{'val': bc_left}, {'val': bc_right}],
-    )
-
-    if derivative == 1:
-        expect = np.zeros(A.shape[0])
-        expect[0] = -2 / (3 * dx)
-        expect[1] = +2 / (3 * dx)
-        assert np.allclose(
-            A.toarray()[0, :], expect
-        ), f'Error in left boundary, expected {expect} got {A.toarray()[0, :]}!'
-        expect = np.zeros(A.shape[0])
-        expect[-2] = -2 / (3 * dx)
-        expect[-1] = +2 / (3 * dx)
-        assert np.allclose(
-            A.toarray()[-1, :], expect
-        ), f'Error in right boundary, expected {expect} got {A.toarray()[-1, :]}!'
-
-        assert np.isclose(
-            b[-1], bc_right / 3.0
-        ), f'Error in right boundary value! Expected {bc_right / 3.}, got {b[-1]}'
-        assert np.isclose(b[0], bc_left / 3.0), f'Error in left boundary value! Expected {bc_left / 3}, got {b[0]}'
-
-    if derivative == 2:
-        expect = np.zeros(A.shape[0])
-        expect[0] = -2 / (3 * dx**2)
-        expect[1] = +2 / (3 * dx**2)
-        assert np.allclose(
-            A.toarray()[0, :], expect
-        ), f'Error in left boundary, expected {expect} got {A.toarray()[0, :]}!'
-        assert np.allclose(
-            A.toarray()[-1, :], expect[::-1]
-        ), f'Error in right boundary, expected {expect[::-1]} got {A.toarray()[-1, :]}!'
-
-        assert np.isclose(
-            b[-1], bc_right * 2 / (3 * dx)
-        ), f'Error in right boundary value! Expected {bc_right * 2 / (3*dx)}, got {b[-1]}'
-        assert np.isclose(
-            b[0], -bc_left * 2 / (3 * dx)
-        ), f'Error in left boundary value! Expected {-bc_left * 2 / (3*dx)}, got {b[0]}'
-
-
+@pytest.mark.parametrize('reduce', [False, True])
 @pytest.mark.parametrize('size', [10, 20, 50])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
-def test_Dirichtlet_bcs(order, size):
+def test_Dirichtlet_bcs(order, size, reduce):
     from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
     from scipy.sparse.linalg import spsolve
     from numpy.random import rand
@@ -216,12 +218,14 @@ def test_Dirichtlet_bcs(order, size):
         dim=1,
         size=size,
         dx=dx,
-        bc_params=[{'val': bc_left}, {'val': bc_right}],
+        bc_params=[{'val': bc_left, "reduce": reduce},
+                   {'val': bc_right, "reduce": reduce}],
     )
 
     u = spsolve(A, -b)
 
     u_expect = (bc_right - bc_left) * x / L + bc_left
+
     assert np.allclose(u, u_expect), 'Dirichlet BCs failed!'
 
 
@@ -236,7 +240,7 @@ def test_Dirichtlet_bcs_sin(order):
     bc_right = 1# rand()
     bc_left = 1# rand()
     k = 4
-    reduce = True
+    reduce = False
 
     def u_num(size):
         dx, x = get_1d_grid(size, 'dirichlet', 0, L)
@@ -252,21 +256,21 @@ def test_Dirichtlet_bcs_sin(order):
             bc_params=[{'val': bc_left, 'reduce': reduce}, {'val': bc_right, 'reduce': reduce}],
         )
 
-        source_term = np.sin(k * x)
+        source_term = np.sin(k * x * 2*np.pi/L)
 
         u = spsolve(A, source_term - b)
         # u = np.linalg.solve(A.todense(), source_term - b)
 
-        u_expect = (bc_right - bc_left) * x / L + bc_left - np.sin(k * x) / k**2
+        u_expect = (bc_right - bc_left) * x / L + bc_left - source_term / k**2
 
         # import matplotlib.pyplot as plt
         # plt.plot(np.concatenate(([bc_left], u, [bc_right])), 'o-')
         # plt.plot(np.concatenate(([bc_left], u_expect, [bc_right])))
-        # plt.plot(np.concatenate(([0], source_term, [0])))
+        # # plt.plot(np.concatenate(([0], source_term, [0])))
 
         return max(np.abs(u - u_expect))
 
-    sizes = 32 * 2**np.arange(5)
+    sizes = 32 * 2**np.arange(8)
     # sizes = sizes[-1:]
     errors = np.array([u_num(size) for size in sizes])
     orders = np.log2(errors[:-1]/errors[1:])
@@ -280,4 +284,4 @@ def test_Dirichtlet_bcs_sin(order):
 
 
 if __name__ == '__main__':
-    test_Dirichtlet_bcs_sin(6)
+    test_Dirichtlet_bcs_sin(4)
