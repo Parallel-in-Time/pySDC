@@ -73,6 +73,10 @@ def get_finite_difference_stencil(derivative, order=None, stencil_type=None, ste
     # solve the linear system for the finite difference coefficients
     coeff = np.linalg.solve(A, sol)
 
+    # sort coefficients and steps
+    coeff = coeff[np.argsort(steps)]
+    steps = np.sort(steps)
+
     return coeff, steps
 
 
@@ -172,7 +176,9 @@ def get_finite_difference_matrix(
                     )
                 else:
                     # -- shift stencil close to boundary
-                    b_steps = steps+sWidth-1-i if iS == 0 else steps-sWidth+1+i
+                    b_steps = np.arange(-(i + 1), order + derivative - (i + 1)) if iS == 0 else \
+                        np.arange(-(order + derivative) + (i + 2), (i + 2))
+
                     b_coeff, b_steps = get_finite_difference_stencil(
                         derivative=derivative,
                         steps=b_steps)
@@ -185,8 +191,35 @@ def get_finite_difference_matrix(
                 A_1d[iLine, :] = 0
                 A_1d[iLine, colSlice] = b_coeff[sCoeff]
 
-                # -- modify b
-                b[iLine] = par['val'] * b_coeff[iCoeff]
+                if "dirichlet" in bc[iS]:
+
+                    # -- modify b
+                    b[iLine] = par['val'] * b_coeff[iCoeff]
+
+                elif "neumann" in bc[iS]:
+
+                    nOrder = par["neumann_bc_order"]
+
+                    # -- generate the first derivative stencil
+                    n_coeff, n_steps = get_finite_difference_stencil(
+                        derivative=1,
+                        order = nOrder,
+                        stencil_type="forward" if iS == 0 else "backward")
+
+                    # -- column slice where to put coefficients in the A matrix
+                    colSlice = slice(None, len(n_coeff) - 1) if iS == 0 \
+                        else slice(-len(n_coeff) + 1, None)
+
+                    # -- additional modification to A
+                    A_1d[iLine, colSlice] -= b_coeff[iCoeff] / n_coeff[iCoeff] * n_coeff[sCoeff]
+
+                    # -- modify B
+                    b[iLine] = par['val'] * b_coeff[iCoeff] / n_coeff[iCoeff]  * dx
+
+
+
+
+
 
 
         # if 'dirichlet' in bc[0]:
