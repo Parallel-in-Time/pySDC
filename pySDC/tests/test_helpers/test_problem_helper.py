@@ -141,7 +141,7 @@ def test_fd_stencils():
 @pytest.mark.parametrize('dx', [0.1, 10.0])
 @pytest.mark.parametrize('derivative', [1, 2])
 @pytest.mark.parametrize('order', [2])
-def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
+def test_Neumann_BCs(derivative, bc_left, bc_right, dx, order):
     from pySDC.helpers.problem_helper import get_finite_difference_matrix
 
     A, b = get_finite_difference_matrix(
@@ -198,7 +198,7 @@ def test_Neumann_bcs(derivative, bc_left, bc_right, dx, order):
 @pytest.mark.parametrize('reduce', [False, True])
 @pytest.mark.parametrize('size', [10, 20, 50])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
-def test_Dirichtlet_bcs(order, size, reduce):
+def test_Dirichtlet_BCs(order, size, reduce):
     from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
     from scipy.sparse.linalg import spsolve
     from numpy.random import rand
@@ -231,7 +231,7 @@ def test_Dirichtlet_bcs(order, size, reduce):
 
 @pytest.mark.parametrize('reduce', [True, False])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
-def test_Dirichtlet_bcs_sin(order, reduce):
+def test_Dirichtlet_BCs_sin(order, reduce):
     from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
     from scipy.sparse.linalg import spsolve
     from numpy.random import rand
@@ -275,6 +275,8 @@ def test_Dirichtlet_bcs_sin(order, reduce):
         assert diff < (0.999 if order != 8 else 1.2), (orders, order)
 
 
+@pytest.mark.parametrize('reduce', [True, False])
+@pytest.mark.parametrize('order', [2, 4, 6, 8])
 def test_Neumann_Dirichlet_BCs(order, reduce):
     from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
     from scipy.sparse.linalg import spsolve
@@ -307,45 +309,43 @@ def test_Neumann_Dirichlet_BCs(order, reduce):
     assert np.allclose(u, u_expect), 'Dirichlet-Neumann BCs failed!'
 
 
+@pytest.mark.parametrize('invert', [False, True])
 @pytest.mark.parametrize('reduce', [True, False])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
-def test_Neumann_Dirichlet_bcs_order(order, reduce):
+def test_Neumann_Dirichlet_BCs_order(order, reduce, invert):
     from pySDC.helpers.problem_helper import get_finite_difference_matrix, get_1d_grid
     from scipy.sparse.linalg import spsolve
     from numpy.random import rand
     import numpy as np
 
-    L = 2 * np.pi
-    bc_right = rand()
-    bc_left = rand()
-
-    import matplotlib.pyplot as plt
+    vR = rand()
+    vL = rand()
+    bc = ('dirichlet', 'neumann') if invert else ('neumann', 'dirichlet')
 
     def u_num(size):
-        dx, x = get_1d_grid(size, 'dirichlet', 0, L)
+        dx, x = get_1d_grid(size, 'dirichlet', 0, 2 * np.pi)
 
         A, b = get_finite_difference_matrix(
             derivative=2,
             order=order,
             stencil_type='center',
-            bc=('neumann', 'dirichlet'),
+            bc=bc,
             dim=1,
             size=size,
             dx=dx,
-            bc_params=[{'val': bc_left, 'reduce': reduce}, {'val': bc_right, 'reduce': reduce}],
+            bc_params=[{'val': vL, 'reduce': reduce}, {'val': vR, 'reduce': reduce}],
         )
 
-        source_term = x
-        # source_term = x**3 / 6. + bc_left * x + (bv_right - bc_left - 1./6.)
+        source_term = np.sin(x)
         u = spsolve(A, source_term - b)
-        u_expect = bc_left * x + (bc_right - bc_left - 1.0 / 6.0) + x**3 / 6.0
-        plt.plot(x, u)
-        plt.plot(x, u_expect, ls='--')
-        plt.show()
+        if invert:
+            u_expect = (vR + 1) * x + vL - source_term
+        else:
+            u_expect = (vL + 1) * (x - 2 * np.pi) + vR - source_term
 
-        return max(np.abs(u - u_expect))
+        return np.linalg.norm(u - u_expect, ord=np.inf)
 
-    size0 = {2: 64, 4: 64, 6: 16, 8: 9}
+    size0 = {2: 64, 4: 64, 6: 16, 8: 16}
     sizes = size0[order] * 2 ** np.arange(3)
     errors = np.array([u_num(size) for size in sizes])
     orders = np.log2(errors[:-1] / errors[1:])
@@ -355,8 +355,8 @@ def test_Neumann_Dirichlet_bcs_order(order, reduce):
         assert np.max(orders) < order + 1
     else:
         diff = np.mean(np.abs(orders - order))
-        assert diff < (0.999 if order != 8 else 1.2), (orders, order)
+        assert diff < 0.4, (orders, order)
 
 
 if __name__ == '__main__':
-    test_Neumann_Dirichlet_bcs_order(4, False)
+    test_Neumann_Dirichlet_BCs_order(6, False, True)
