@@ -216,7 +216,7 @@ class DiscontinuousTestODE(ptype):
                 m_guess = m - 1
                 break
 
-        state_function = [u[m][0] - 5 for m in range(len(u))] if switch_detected else []
+        state_function = [u[m][0] - 5 for m in range(len(u))]
         return switch_detected, m_guess, state_function
 
     def count_switches(self):

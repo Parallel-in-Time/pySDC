@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Collocation import CollBase
 from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
@@ -46,6 +47,7 @@ class SwitchEstimator(ConvergenceController):
             'control_order': 0,
             'nodes': coll.nodes,
             'tol_zero': 1e-13,
+            't_interp': [],
         }
         return {**defaults, **params}
 
@@ -86,27 +88,27 @@ class SwitchEstimator(ConvergenceController):
         """
 
         L = S.levels[0]
-
+        print('conv', CheckConvergence.check_convergence(S))
         if CheckConvergence.check_convergence(S):
             self.status.switch_detected, m_guess, state_function = L.prob.get_switching_info(L.u, L.time)
-
+            print('detected:', self.status.switch_detected, state_function)
             if self.status.switch_detected:
-                t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
-                t_interp, state_function = self.adapt_interpolation_info(
-                    L.time, L.sweep.coll.left_is_node, t_interp, state_function
+                self.params.t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
+                self.params.t_interp, state_function = self.adapt_interpolation_info(
+                    L.time, L.sweep.coll.left_is_node, self.params.t_interp, state_function
                 )
-
+                # print(t_interp, state_function)
                 # when the state function is already close to zero the event is already resolved well
                 if abs(state_function[-1]) <= self.params.tol_zero or abs(state_function[0]) <= self.params.tol_zero:
                     if abs(state_function[0]) <= self.params.tol_zero:
-                        t_switch = t_interp[0]
+                        t_switch = self.params.t_interp[0]
                         boundary = 'left'
                     elif abs(state_function[-1]) <= self.params.tol_zero:
                         boundary = 'right'
-                        t_switch = t_interp[-1]
+                        t_switch = self.params.t_interp[-1]
 
                     msg = f"The value of state function is close to zero, thus event time is already close enough to the {boundary} end point!"
-                    self.log(msg, S)
+                    # self.log(msg, S)
                     self.log_event_time(
                         controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_switch
                     )
@@ -116,7 +118,7 @@ class SwitchEstimator(ConvergenceController):
 
                 # intermediate value theorem states that a root is contained in current step
                 if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(t_interp, state_function, m_guess)
+                    self.status.t_switch = self.get_switch(self.params.t_interp, state_function, m_guess)
 
                     controller.hooks[0].add_to_stats(
                         process=S.status.slot,
@@ -178,6 +180,7 @@ class SwitchEstimator(ConvergenceController):
                             L.status.sweep,
                             self.status.t_switch,
                         )
+                        print('Occurs at boundary')
                         L.prob.count_switches()
                         self.status.switch_detected = False
 
