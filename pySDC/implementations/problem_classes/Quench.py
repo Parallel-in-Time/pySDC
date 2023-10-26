@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import spsolve, gmres, inv
+from scipy.sparse.linalg import spsolve, gmres
+from scipy.linalg import inv
 
 from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype, WorkCounter
@@ -51,7 +52,7 @@ class Quench(ptype):
         Spatial resolution.
     newton_tol : float, optional
         Tolerance for Newton to terminate.
-    newton_iter : int, optional
+    newton_maxiter : int, optional
         Maximum number of Newton iterations to be done.
     lintol : float, optional
         Tolerance for linear solver to be done.
@@ -89,8 +90,8 @@ class Quench(ptype):
         self,
         Cv=1000.0,
         K=1000.0,
-        u_thresh=1e-2,
-        u_max=2e-2,
+        u_thresh=3e-2,
+        u_max=6e-2,
         Q_max=1.0,
         leak_range=(0.45, 0.55),
         leak_type='linear',
@@ -100,10 +101,11 @@ class Quench(ptype):
         bc='neumann-zero',
         nvars=2**7,
         newton_tol=1e-8,
-        newton_iter=99,
+        newton_maxiter=99,
         lintol=1e-8,
         liniter=99,
         direct_solver=True,
+        inexact_linear_ratio=None,
         reference_sol_type='scipy',
     ):
         """
@@ -129,30 +131,35 @@ class Quench(ptype):
             'stencil_type',
             'bc',
             'nvars',
-            'newton_tol',
-            'newton_iter',
-            'lintol',
-            'liniter',
             'direct_solver',
             'reference_sol_type',
             localVars=locals(),
             readOnly=True,
         )
+        self._makeAttributeAndRegister(
+            'newton_tol',
+            'newton_maxiter',
+            'lintol',
+            'liniter',
+            'inexact_linear_ratio',
+            localVars=locals(),
+            readOnly=False,
+        )
 
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        if self.bc == 'periodic':
-            self.dx = 1.0 / self.nvars
-            xvalues = np.array([i * self.dx for i in range(self.nvars)])
-        elif self.bc == 'dirichlet-zero':
-            self.dx = 1.0 / (self.nvars + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.nvars)])
-        elif self.bc == 'neumann-zero':
-            self.dx = 1.0 / (self.nvars - 1)
-            xvalues = np.array([i * self.dx for i in range(self.nvars)])
-        else:
-            raise ProblemError(f'Boundary conditions {self.bc} not implemented.')
+        self._makeAttributeAndRegister(
+            'newton_tol',
+            'newton_maxiter',
+            'lintol',
+            'liniter',
+            'direct_solver',
+            localVars=locals(),
+            readOnly=False,
+        )
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        # setup finite difference discretization from problem helper
+        self.dx, xvalues = problem_helper.get_1d_grid(size=self.nvars, bc=self.bc)
+
+        self.A, self.b = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,
             stencil_type=self.stencil_type,
@@ -232,7 +239,8 @@ class Quench(ptype):
             The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.eval_f_non_linear(u, t)
+        f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.b + self.eval_f_non_linear(u, t)
+
         self.work_counters['rhs']()
         return f
 
@@ -298,13 +306,14 @@ class Quench(ptype):
         """
         u = self.dtype_u(u0)
         res = np.inf
-        delta = np.zeros_like(u)
+        delta = self.dtype_u(self.init, val=0.0)
+        z = self.dtype_u(self.init, val=0.0)
 
         # construct a preconditioner for the space solver
         if not self.direct_solver:
-            M = inv(self.Id - factor * self.A)
+            M = inv((self.Id - factor * self.A).toarray())
 
-        for n in range(0, self.newton_iter):
+        for n in range(0, self.newton_maxiter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
             self.work_counters[
@@ -314,6 +323,9 @@ class Quench(ptype):
             res = np.linalg.norm(G, np.inf)
             if res <= self.newton_tol and n > 0:  # we want to make at least one Newton iteration
                 break
+
+            if self.inexact_linear_ratio:
+                self.lintol = max([res * self.inexact_linear_ratio, 1e-12])
 
             # assemble Jacobian J of G
             J = self.Id - factor * (self.A + self.get_non_linear_Jacobian(u))
@@ -325,7 +337,7 @@ class Quench(ptype):
                 delta, info = gmres(
                     J,
                     G,
-                    x0=delta,
+                    x0=z,
                     M=M,
                     tol=self.lintol,
                     maxiter=self.liniter,
@@ -410,7 +422,7 @@ class Quench(ptype):
                 description['problem_class'] = Quench
                 description['problem_params'] = {
                     'newton_tol': 1e-10,
-                    'newton_iter': 99,
+                    'newton_maxiter': 99,
                     'nvars': 2**10,
                     **self.params,
                 }
@@ -492,7 +504,7 @@ class QuenchIMEX(Quench):
 
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.nvars)
-        f.expl[:] = self.eval_f_non_linear(u, t)
+        f.expl[:] = self.eval_f_non_linear(u, t) + self.b
 
         self.work_counters['rhs']()
         return f

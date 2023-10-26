@@ -221,7 +221,7 @@ class Strategy:
         elif problem.__name__ == "run_quench":
             custom_description['level_params'] = {'restol': -1, 'dt': 8.0}
             custom_description['step_params'] = {'maxiter': 5}
-            custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-11}
+            custom_description['problem_params'] = {'newton_maxiter': 99, 'newton_tol': 1e-11, 'nvars': 2**7}
 
         custom_description['convergence_controllers'] = {
             StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
