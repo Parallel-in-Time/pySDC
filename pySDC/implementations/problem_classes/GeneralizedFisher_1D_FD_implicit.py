@@ -102,7 +102,7 @@ class generalized_fisher(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = (self.interval[1] - self.interval[0]) / (self.nvars + 1)
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=2,
             stencil_type='center',
