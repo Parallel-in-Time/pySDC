@@ -121,7 +121,7 @@ class DiscontinuousTestDAE(ptype_dae):
             Exact solution.
         """
 
-        assert t >= 1, 'ERROR: u_exact only valid for t>=1'
+        assert t >= 1, 'ERROR: u_exact only available for t>=1'
 
         me = self.dtype_u(self.init)
         if t <= self.t_switch_exact:
@@ -132,10 +132,9 @@ class DiscontinuousTestDAE(ptype_dae):
 
     def get_switching_info(self, u, t):
         r"""
-        Provides information about the state function of the problem. When the state function changes its sign,
-        typically an event occurs. So the check for an event should be done in the way that the state function
-        is checked for a sign change. If this is the case, the intermediate value theorem states a root in this
-        step.
+        Provides information about the state function of the problem. A change in sign of the state function
+        indicates an event. If a sign change is detected, a root can be found within the step according to the
+        intermediate value theorem.
 
         The state function for this problem is given by
 
