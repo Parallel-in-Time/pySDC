@@ -143,7 +143,7 @@
 
         <span class="c1"># compute dx and get discretization matrix A</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
             <span class="n">derivative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">stencil_type</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>

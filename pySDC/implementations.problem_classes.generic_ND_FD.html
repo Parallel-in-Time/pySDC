@@ -50,10 +50,9 @@
   <section id="module-implementations.problem_classes.generic_ND_FD">
 <span id="implementations-problem-classes-generic-nd-fd-module"></span><h1>implementations.problem_classes.generic_ND_FD module<a class="headerlink" href="#module-implementations.problem_classes.generic_ND_FD" title="Link to this heading">¶</a></h1>
 <p>Created on Sat Feb 11 22:39:30 2023</p>
-<p>&#64;author: telu</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericNDimFinDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericNDimFinDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'direct'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcParams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>Base class for finite difference spatial discretisation in <span class="math notranslate nohighlight">\(N\)</span> dimensions</p>
 <div class="math notranslate nohighlight">
@@ -65,7 +64,8 @@ equation and the heat equation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution for the ND problem. For <span class="math notranslate nohighlight">\(N = 2\)</span>, set <code class="docutils literal notranslate"><span class="pre">nvars=(16,</span> <span class="pre">16)</span></code>.</p></li>
+<li><p><strong>nvars</strong> (<em>int</em><em>, </em><em>optional</em>) – Spatial resolution for the ND problem. For <span class="math notranslate nohighlight">\(N = 2\)</span>,
+set <code class="docutils literal notranslate"><span class="pre">nvars=(16,</span> <span class="pre">16)</span></code>.</p></li>
 <li><p><strong>coeff</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor for finite difference matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
 <li><p><strong>derivative</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of the spatial derivative.</p></li>
 <li><p><strong>freq</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Spatial frequency, can be a tuple.</p></li>
@@ -74,7 +74,25 @@ equation and the heat equation.</p>
 <li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for spatial solver.</p></li>
 <li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for linear solver.</p></li>
 <li><p><strong>solver_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of solver. Can be <code class="docutils literal notranslate"><span class="pre">'direct'</span></code>, <code class="docutils literal notranslate"><span class="pre">'GMRES'</span></code> or <code class="docutils literal notranslate"><span class="pre">'CG'</span></code>.</p></li>
-<li><p><strong>bc</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is <code class="docutils literal notranslate"><span class="pre">'periodic'</span></code>.</p></li>
+<li><p><strong>bc</strong> (<em>str</em><em> or </em><em>tuple</em><em> of </em><em>2 string</em><em>, </em><em>optional</em>) – Type of boundary conditions. Default is <code class="docutils literal notranslate"><span class="pre">'periodic'</span></code>.
+To define two different types of boundary condition for each side,
+you can use a tuple, for instance <code class="docutils literal notranslate"><span class="pre">bc=(&quot;dirichlet&quot;,</span> <span class="pre">&quot;neumann&quot;)</span></code>
+uses Dirichlet BC on the left side, and Neumann BC on the right side.</p></li>
+<li><p><strong>bcParams</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Parameters for boundary conditions, that can contains those keys :</p>
+<ul>
+<li><p><strong>val</strong> : value for the boundary value (Dirichlet) or derivative
+(Neumann), default to 0</p></li>
+<li><p><strong>reduce</strong> : if true, reduce the order of the A matrix close to the
+boundary. If false (default), use shifted stencils close to the
+boundary.</p></li>
+<li><p><strong>neumann_bc_order</strong> : finite difference order that should be used
+for the neumann BC derivative. If None (default), uses the same
+order as the discretization for A.</p></li>
+</ul>
+<p>Default is None, which takes the default values for each parameters.
+You can also define a tuple to set different parameters for each
+side.</p>
+</p></li>
 </ul>
 </dd>
 </dl>

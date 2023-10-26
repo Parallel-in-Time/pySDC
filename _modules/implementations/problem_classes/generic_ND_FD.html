@@ -41,8 +41,6 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Created on Sat Feb 11 22:39:30 2023</span>
-
-<span class="sd">@author: telu</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
@@ -71,7 +69,8 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : int, optional</span>
-<span class="sd">        Spatial resolution for the ND problem. For :math:`N = 2`, set ``nvars=(16, 16)``.</span>
+<span class="sd">        Spatial resolution for the ND problem. For :math:`N = 2`,</span>
+<span class="sd">        set ``nvars=(16, 16)``.</span>
 <span class="sd">    coeff : float, optional</span>
 <span class="sd">        Factor for finite difference matrix :math:`A`.</span>
 <span class="sd">    derivative : int, optional</span>
@@ -88,8 +87,26 @@
 <span class="sd">        Maximum number of iterations for linear solver.</span>
 <span class="sd">    solver_type : str, optional</span>
 <span class="sd">        Type of solver. Can be ``&#39;direct&#39;``, ``&#39;GMRES&#39;`` or ``&#39;CG&#39;``.</span>
-<span class="sd">    bc : str, optional</span>
+<span class="sd">    bc : str or tuple of 2 string, optional</span>
 <span class="sd">        Type of boundary conditions. Default is ``&#39;periodic&#39;``.</span>
+<span class="sd">        To define two different types of boundary condition for each side,</span>
+<span class="sd">        you can use a tuple, for instance ``bc=(&quot;dirichlet&quot;, &quot;neumann&quot;)``</span>
+<span class="sd">        uses Dirichlet BC on the left side, and Neumann BC on the right side.</span>
+<span class="sd">    bcParams : dict, optional</span>
+<span class="sd">        Parameters for boundary conditions, that can contains those keys :</span>
+
+<span class="sd">        - **val** : value for the boundary value (Dirichlet) or derivative</span>
+<span class="sd">          (Neumann), default to 0</span>
+<span class="sd">        - **reduce** : if true, reduce the order of the A matrix close to the</span>
+<span class="sd">          boundary. If false (default), use shifted stencils close to the</span>
+<span class="sd">          boundary.</span>
+<span class="sd">        - **neumann_bc_order** : finite difference order that should be used</span>
+<span class="sd">          for the neumann BC derivative. If None (default), uses the same</span>
+<span class="sd">          order as the discretization for A.</span>
+
+<span class="sd">        Default is None, which takes the default values for each parameters.</span>
+<span class="sd">        You can also define a tuple to set different parameters for each</span>
+<span class="sd">        side.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -115,6 +132,7 @@
         <span class="n">liniter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
         <span class="n">solver_type</span><span class="o">=</span><span class="s1">&#39;direct&#39;</span><span class="p">,</span>
         <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span>
+        <span class="n">bcParams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># make sure parameters have the correct types</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]:</span>
@@ -156,17 +174,9 @@
         <span class="c1"># invoke super init, passing number of dofs</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)))</span>
 
-        <span class="c1"># compute dx (equal in both dimensions) and get discretization matrix A</span>
-        <span class="k">if</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
-            <span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
-        <span class="k">elif</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">:</span>
-            <span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Boundary conditions </span><span class="si">{</span><span class="n">bc</span><span class="si">}</span><span class="s1"> not implemented.&#39;</span><span class="p">)</span>
+        <span class="n">dx</span><span class="p">,</span> <span class="n">xvalues</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_1d_grid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bc</span><span class="o">=</span><span class="n">bc</span><span class="p">,</span> <span class="n">left_boundary</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right_boundary</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
             <span class="n">derivative</span><span class="o">=</span><span class="n">derivative</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
             <span class="n">stencil_type</span><span class="o">=</span><span class="n">stencil_type</span><span class="p">,</span>

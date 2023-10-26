@@ -39,7 +39,8 @@
   <h1>Source code for implementations.problem_classes.Quench</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">spsolve</span><span class="p">,</span> <span class="n">gmres</span><span class="p">,</span> <span class="n">inv</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">spsolve</span><span class="p">,</span> <span class="n">gmres</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">inv</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ProblemError</span>
 <span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">WorkCounter</span>
@@ -92,7 +93,7 @@
 <span class="sd">        Spatial resolution.</span>
 <span class="sd">    newton_tol : float, optional</span>
 <span class="sd">        Tolerance for Newton to terminate.</span>
-<span class="sd">    newton_iter : int, optional</span>
+<span class="sd">    newton_maxiter : int, optional</span>
 <span class="sd">        Maximum number of Newton iterations to be done.</span>
 <span class="sd">    lintol : float, optional</span>
 <span class="sd">        Tolerance for linear solver to be done.</span>
@@ -130,8 +131,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">Cv</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
         <span class="n">K</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
-        <span class="n">u_thresh</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
-        <span class="n">u_max</span><span class="o">=</span><span class="mf">2e-2</span><span class="p">,</span>
+        <span class="n">u_thresh</span><span class="o">=</span><span class="mf">3e-2</span><span class="p">,</span>
+        <span class="n">u_max</span><span class="o">=</span><span class="mf">6e-2</span><span class="p">,</span>
         <span class="n">Q_max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">leak_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">),</span>
         <span class="n">leak_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
@@ -141,10 +142,11 @@
         <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;neumann-zero&#39;</span><span class="p">,</span>
         <span class="n">nvars</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">,</span>
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-        <span class="n">newton_iter</span><span class="o">=</span><span class="mi">99</span><span class="p">,</span>
+        <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">99</span><span class="p">,</span>
         <span class="n">lintol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
         <span class="n">liniter</span><span class="o">=</span><span class="mi">99</span><span class="p">,</span>
         <span class="n">direct_solver</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">inexact_linear_ratio</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">reference_sol_type</span><span class="o">=</span><span class="s1">&#39;scipy&#39;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -170,30 +172,35 @@
             <span class="s1">&#39;stencil_type&#39;</span><span class="p">,</span>
             <span class="s1">&#39;bc&#39;</span><span class="p">,</span>
             <span class="s1">&#39;nvars&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;newton_iter&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;lintol&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;liniter&#39;</span><span class="p">,</span>
             <span class="s1">&#39;direct_solver&#39;</span><span class="p">,</span>
             <span class="s1">&#39;reference_sol_type&#39;</span><span class="p">,</span>
             <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
             <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lintol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;liniter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;inexact_linear_ratio&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        <span class="c1"># compute dx (equal in both dimensions) and get discretization matrix A</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span>
-            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;dirichlet-zero&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;neumann-zero&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Boundary conditions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bc</span><span class="si">}</span><span class="s1"> not implemented.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lintol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;liniter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;direct_solver&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+        <span class="c1"># setup finite difference discretization from problem helper</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">xvalues</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_1d_grid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bc</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">problem_helper</span><span class="o">.</span><span class="n">get_finite_difference_matrix</span><span class="p">(</span>
             <span class="n">derivative</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
             <span class="n">stencil_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stencil_type</span><span class="p">,</span>
@@ -278,7 +285,8 @@
 <span class="sd">            The right-hand side of the problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
@@ -350,13 +358,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
-        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
         <span class="c1"># construct a preconditioner for the space solver</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">direct_solver</span><span class="p">:</span>
-            <span class="n">M</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">inv</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
 
-        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_iter</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">):</span>
             <span class="c1"># assemble G such that G(u) = 0 at the solution of the step</span>
             <span class="n">G</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">rhs</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span>
@@ -366,6 +375,9 @@
             <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># we want to make at least one Newton iteration</span>
                 <span class="k">break</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inexact_linear_ratio</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lintol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">res</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inexact_linear_ratio</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">])</span>
 
             <span class="c1"># assemble Jacobian J of G</span>
             <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_non_linear_Jacobian</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
@@ -377,7 +389,7 @@
                 <span class="n">delta</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">gmres</span><span class="p">(</span>
                     <span class="n">J</span><span class="p">,</span>
                     <span class="n">G</span><span class="p">,</span>
-                    <span class="n">x0</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span>
+                    <span class="n">x0</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
                     <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span>
                     <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lintol</span><span class="p">,</span>
                     <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">liniter</span><span class="p">,</span>
@@ -465,7 +477,7 @@
                 <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Quench</span>
                 <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s1">&#39;newton_tol&#39;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
-                    <span class="s1">&#39;newton_iter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+                    <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
                     <span class="s1">&#39;nvars&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="o">**</span><span class="mi">10</span><span class="p">,</span>
                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
                 <span class="p">}</span>
@@ -553,7 +565,7 @@
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_non_linear</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
