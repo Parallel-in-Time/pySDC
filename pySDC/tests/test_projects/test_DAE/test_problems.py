@@ -334,7 +334,6 @@ def test_WSCC9_SDC_detection():
     can be reduced.
     """
 
-    from pySDC.projects.PinTSimE.battery_model import getRecomputed
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
@@ -462,7 +461,7 @@ def test_WSCC9_SDC_detection():
         [me[1][11 * m + 2 * m + n : 11 * m + 2 * m + 2 * n] for me in get_sorted(stats, type='u', sortby='time')]
     )[-1, :]
 
-    switches = getRecomputed(stats, type='switch', sortby='time')
+    switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
     assert len(switches) >= 1, "ERROR: No events found!"
     t_switch = np.array([item[1] for item in switches])[-1]
 
