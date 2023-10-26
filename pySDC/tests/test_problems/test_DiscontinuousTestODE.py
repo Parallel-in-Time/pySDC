@@ -18,7 +18,7 @@ def test_event():
     u_event = DODE.u_exact(DODE.t_switch_exact)
     h = u_event[0] - 5
 
-    assert h < 1e-15, 'Value of state function at exact event time is not zero!'
+    assert abs(h) < 1e-15, 'Value of state function at exact event time is not zero!'
 
     t0 = 1.6
     dt = 1e-2
