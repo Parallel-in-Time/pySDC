@@ -51,7 +51,7 @@
 <span id="implementations-problem-classes-discontinuoustestode-module"></span><h1>implementations.problem_classes.DiscontinuousTestODE module<a class="headerlink" href="#module-implementations.problem_classes.DiscontinuousTestODE" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DiscontinuousTestODE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newton_maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_at_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#DiscontinuousTestODE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ptype</span></code></p>
 <p>This class implements a very simple test case of a ordinary differential equation consisting of one discrete event. The dynamics of
 the solution changes when the state function <span class="math notranslate nohighlight">\(h(u) := u - 5\)</span> changes the sign. The problem is defined by:</p>
@@ -101,23 +101,12 @@ the solution changes when the state function <span class="math notranslate nohig
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount">
-<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount" title="Link to this definition">¶</a></dt>
-<dd><p>Counts the number of Newton iterations.</p>
+<dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.work_counters" title="Link to this definition">¶</a></dt>
+<dd><p>Counts different things, here: Number of Newton iterations is counted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls">
-<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Counts the number of how often Newton is called in the simulation of the problem.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.Problem.html#core.Problem.WorkCounter" title="core.Problem.WorkCounter">WorkCounter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -247,8 +236,7 @@ step.</p>
 <li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact"><code class="docutils literal notranslate"><span class="pre">t_switch_exact</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch"><code class="docutils literal notranslate"><span class="pre">t_switch</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.nswitches"><code class="docutils literal notranslate"><span class="pre">nswitches</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches"><code class="docutils literal notranslate"><span class="pre">count_switches()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
