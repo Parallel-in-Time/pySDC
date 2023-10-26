@@ -328,6 +328,217 @@ def test_synchgen_infinite_bus_main():
 
 
 @pytest.mark.base
+def test_DiscontinuousTestDAE_singularity():
+    """
+    Test if the the event occurs at the correct time and proves if the right-hand side with the correct values.
+    """
+    import numpy as np
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+
+    t_event = np.arccosh(50.0)
+    disc_test_DAE = DiscontinuousTestDAE()
+
+    # test for t < t^* by setting t^* = t^* - eps
+    eps = 1e-3
+    t_before_event = t_event - eps
+    u_before_event = disc_test_DAE.u_exact(t_before_event)
+    du_before_event = (np.sinh(t_before_event), np.cosh(t_before_event))
+    f_before_event = disc_test_DAE.eval_f(u_before_event, du_before_event, t_before_event)
+
+    assert np.isclose(f_before_event[0], 0.0) and np.isclose(
+        f_before_event[1], 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(0.0, 0.0)}, got {f_before_event}"
+
+    # test for t <= t^*
+    u_event = disc_test_DAE.u_exact(t_event)
+    du_event = (np.sinh(t_event), np.cosh(t_event))
+    f_event = disc_test_DAE.eval_f(u_event, du_event, t_event)
+
+    assert np.isclose(f_event[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_event[1], 0.0
+    ), f"ERROR: Right-hand side at event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_event}"
+
+    # test for t > t^* by setting t^* = t^* + eps
+    t_after_event = t_event + eps
+    u_after_event = disc_test_DAE.u_exact(t_after_event)
+    du_after_event = (np.sinh(t_event), np.cosh(t_event))
+    f_after_event = disc_test_DAE.eval_f(u_after_event, du_after_event, t_after_event)
+
+    assert np.isclose(f_after_event[0], 7 * np.sqrt(51.0)) and np.isclose(
+        f_after_event[1], 0.0
+    ), f"ERROR: Right-hand side after event does not match! Expected {(7 * np.sqrt(51), 0.0)}, got {f_after_event}"
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('M', [2, 3, 4, 5])
+def test_DiscontinuousTestDAE_SDC(M):
+    """
+    Simulates one SDC run for different number of coll.nodes and compares if the error satisfies an approppriate value.
+    """
+
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+    # large errors are expected since the simulation domain contains the event
+    err_tol = {
+        2: 0.2025,
+        3: 0.2308,
+        4: 0.2407,
+        5: 0.245,
+    }
+
+    level_params = {
+        'restol': 1e-13,
+        'dt': 1e-1,
+    }
+
+    problem_params = {
+        'newton_tol': 1e-6,
+    }
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'num_nodes': M,
+        'QI': 'IE',
+    }
+
+    step_params = {
+        'maxiter': 45,
+    }
+
+    controller_params = {
+        'logger_level': 30,
+    }
+
+    description = {
+        'problem_class': DiscontinuousTestDAE,
+        'problem_params': problem_params,
+        'sweeper_class': fully_implicit_DAE,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+    }
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    t0 = 4.6
+    Tend = 4.7
+
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    uex = P.u_exact(Tend)
+
+    uend, _ = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    err = abs(uex[0] - uend[0])
+    assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]}, got {err}"
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('M', [2, 3, 4, 5])
+def test_DiscontinuousTestDAE_SDC_detection(M):
+    """
+    Test for one SDC run with event detection if the found event is close to the exact value and if the global error
+    can be reduced.
+    """
+
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+
+    err_tol = {
+        2: 5.3952e-9,
+        3: 2.6741e-9,
+        4: 1.9163e-8,
+        5: 2.4791e-8,
+    }
+
+    event_err_tol = {
+        2: 3.6968e-5,
+        3: 1.3496e-8,
+        4: 7.6006e-8,
+        5: 0.0101,
+    }
+
+    level_params = {
+        'restol': 1e-13,
+        'dt': 1e-2,
+    }
+
+    problem_params = {
+        'newton_tol': 1e-6,
+    }
+
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'num_nodes': M,
+        'QI': 'IE',
+    }
+
+    step_params = {
+        'maxiter': 45,
+    }
+
+    controller_params = {
+        'logger_level': 30,
+    }
+
+    switch_estimator_params = {
+        'tol': 1e-10,
+        'alpha': 0.95,
+    }
+
+    restarting_params = {
+        'max_restarts': 200,
+        'crash_after_max_restarts': False,
+    }
+
+    convergence_controllers = {
+        SwitchEstimator: switch_estimator_params,
+        BasicRestartingNonMPI: restarting_params,
+    }
+
+    description = {
+        'problem_class': DiscontinuousTestDAE,
+        'problem_params': problem_params,
+        'sweeper_class': fully_implicit_DAE,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+        'convergence_controllers': convergence_controllers,
+    }
+
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    t0 = 4.6
+    Tend = 4.7
+
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    uex = P.u_exact(Tend)
+
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    err = abs(uex[0] - uend[0])
+    assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
+
+    switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
+    assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
+    t_switches = [item[1] for item in switches]
+    t_switch = t_switches[-1]
+
+    t_switch_exact = P.t_switch_exact
+    event_err = abs(t_switch_exact - t_switch)
+    assert (
+        event_err < event_err_tol[M]
+    ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
+
+
+@pytest.mark.base
 def test_WSCC9_SDC_detection():
     """
     Test for one SDC run with event detection if the found event is close to the exact value and if the global error
