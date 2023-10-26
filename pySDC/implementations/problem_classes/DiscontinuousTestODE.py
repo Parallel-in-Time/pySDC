@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -31,10 +31,11 @@ class DiscontinuousTestODE(ptype):
         Time point of the discrete event found by switch estimation.
     nswitches: int
         Number of switches found by switch estimation.
-    newton_itercount: int
-        Counts the number of Newton iterations.
-    newton_ncalls: int
-        Counts the number of how often Newton is called in the simulation of the problem.
+
+    Attributes
+    ----------
+    work_counters : WorkCounter
+        Counts different things, here: Number of Newton iterations is counted.
     """
 
     dtype_u = mesh
@@ -53,8 +54,7 @@ class DiscontinuousTestODE(ptype):
         self.t_switch_exact = np.log(5)
         self.t_switch = None
         self.nswitches = 0
-        self.newton_itercount = 0
-        self.newton_ncalls = 0
+        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
@@ -133,6 +133,7 @@ class DiscontinuousTestODE(ptype):
             u -= 1.0 / dg * g
 
             n += 1
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
@@ -141,9 +142,6 @@ class DiscontinuousTestODE(ptype):
 
         if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
-
-        self.newton_ncalls += 1
-        self.newton_itercount += n
 
         me = self.dtype_u(self.init)
         me[:] = u[:]
