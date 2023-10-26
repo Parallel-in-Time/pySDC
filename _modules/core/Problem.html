@@ -120,6 +120,13 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a data variable for RHS&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
+<div class="viewcode-block" id="ptype.get_default_sweeper_class">
+<a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype.get_default_sweeper_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_default_sweeper_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No default sweeper class implemented for </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s1"> problem!&#39;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="ptype.eval_f">
 <a class="viewcode-back" href="../../pySDC/core.Problem.html#core.Problem.ptype.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>

@@ -208,6 +208,15 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
 
+<div class="viewcode-block" id="GenericNDimFinDiff.get_default_sweeper_class">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_default_sweeper_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
+
+        <span class="k">return</span> <span class="n">generic_implicit</span></div>
+
+
 <div class="viewcode-block" id="GenericNDimFinDiff.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
