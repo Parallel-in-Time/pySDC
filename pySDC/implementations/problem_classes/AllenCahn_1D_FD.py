@@ -93,7 +93,7 @@ class allencahn_front_fullyimplicit(ptype):
         self.dx = (self.interval[1] - self.interval[0]) / (self.nvars + 1)
         self.xvalues = np.array([(i + 1 - (self.nvars + 1) / 2) * self.dx for i in range(self.nvars)])
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=2,
             stencil_type='center',
@@ -556,7 +556,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         self.dx = (self.interval[1] - self.interval[0]) / self.nvars
         self.xvalues = np.array([self.interval[0] + i * self.dx for i in range(self.nvars)])
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=2,
             stencil_type='center',
