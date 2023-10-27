@@ -105,7 +105,7 @@ class DiscontinuousTestDAE(ptype_dae):
             )
         return f
 
-    def u_exact(self, t, u_init=None, t_init=None):
+    def u_exact(self, t, **kwargs):
         r"""
         Routine for the exact solution at time :math:`t \leq 1`. For this problem, the exact
         solution is piecewise.

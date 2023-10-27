@@ -1208,19 +1208,16 @@ class WSCC9BusSystem(ptype_dae):
         """
 
         switch_detected = False
-        already_detected = False
         m_guess = -100
         for m in range(1, len(u)):
             h_prev_node = u[m - 1][10 * self.m] - self.psv_max
             h_curr_node = u[m][10 * self.m] - self.psv_max
-            if h_prev_node < 0 and h_curr_node >= 0 and not already_detected:
+            if h_prev_node < 0 and h_curr_node >= 0:
                 switch_detected = True
                 m_guess = m - 1
-                state_function = [u[m][10 * self.m] - self.psv_max for m in range(len(u))]
-                already_detected = True
                 break
-            else:
-                state_function = [u[m][10 * self.m] - self.psv_max for m in range(len(u))]
+
+        state_function = [u[m][10 * self.m] - self.psv_max for m in range(len(u))]
         return switch_detected, m_guess, state_function
 
     def count_switches(self):
