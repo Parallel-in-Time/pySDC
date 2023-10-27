@@ -717,7 +717,6 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         stop_at_nan=True,
     ):
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
-        self.A -= sp.eye(self.nvars) * 0.0 / self.eps**2
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -805,7 +804,6 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         stop_at_nan=True,
     ):
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
-        self.A -= sp.eye(nvars) * 0.0 / self.eps**2
 
     def solve_system_1(self, rhs, factor, u0, t):
         r"""
