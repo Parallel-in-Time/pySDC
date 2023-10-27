@@ -122,7 +122,9 @@ def test_periodic_imex_vs_fully_implicit_vs_multi_implicit():
     assert e_imex < 1e-2, f"Error is too large in semi-implicit case! Got {e_imex}"
     assert e_full < 1.2e-3, f"Error is too large in fully-implicit case! Got {e_full}"
     assert e_multi1 < 1e-2, f"Error is too large in multi-implicit case solving the Laplacian part! Got {e_multi1}"
-    assert e_multi2 < 1.2e-2, f"Error is too large in multi-implicit case solving the part without the Laplacian! Got {e_multi2}"
+    assert (
+        e_multi2 < 1.2e-2
+    ), f"Error is too large in multi-implicit case solving the part without the Laplacian! Got {e_multi2}"
 
     # check if number of right-hand side evaluations do match
     rhs_count_imex = imex.work_counters['rhs'].niter
