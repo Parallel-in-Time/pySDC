@@ -177,13 +177,13 @@ class allencahn_front_fullyimplicit(ptype):
             # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
-            self.work_counters['newton']
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
-
+            print(f'{type(self).__name__}')
         if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
@@ -221,7 +221,7 @@ class allencahn_front_fullyimplicit(ptype):
             - 2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
             - 6.0 * self.dw * u * (1.0 - u)
         )
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
@@ -293,7 +293,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(self.uext)[1:-1]
         f.expl[:] = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * self.dw * u * (1.0 - u)
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -424,7 +424,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             # u -= cg(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
-            self.work_counters['newton']
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
@@ -466,7 +466,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         gprim = 1.0 / self.dx**2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1) * (2.0 * u - 1.0)
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * self.dw * u * (1.0 - u)
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
 
@@ -627,7 +627,7 @@ class allencahn_periodic_fullyimplicit(ptype):
             # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
-            self.work_counters['newton']
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
@@ -660,7 +660,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         """
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(u) - 2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * self.dw * u * (1.0 - u)
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
@@ -717,7 +717,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         stop_at_nan=True,
     ):
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
-        self.A -= sp.eye(nvars) * 0.0 / self.eps**2
+        self.A -= sp.eye(self.nvars) * 0.0 / self.eps**2
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -767,7 +767,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
             - 6.0 * self.dw * u * (1.0 - u)
             + 0.0 / self.eps**2 * u
         )
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
 
@@ -855,7 +855,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
             - 6.0 * self.dw * u * (1.0 - u)
             + 0.0 / self.eps**2 * u
         )
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
     def solve_system_2(self, rhs, factor, u0, t):
@@ -915,7 +915,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
             # u -= gmres(dg, g, x0=z, tol=self.lin_tol)[0]
             # increase iteration count
             n += 1
-            self.work_counters['newton']
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
