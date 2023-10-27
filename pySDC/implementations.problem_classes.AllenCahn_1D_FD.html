@@ -190,45 +190,13 @@ exact solution is given by</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount">
-<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount" title="Link to this definition">¶</a></dt>
-<dd><p>Counter for iterations in Newton solver.</p>
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.work_counters" title="Link to this definition">¶</a></dt>
+<dd><p>Counter for statistics. Here, number of Newton calls and number of evaluations
+of right-hand side are counted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount">
-<span class="sig-name descname"><span class="pre">lin_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount" title="Link to this definition">¶</a></dt>
-<dd><p>Counter for iterations in linear solver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls">
-<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Number of calls of Newton solver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls">
-<span class="sig-name descname"><span class="pre">lin_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Number of calls of linear solver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.Problem.html#core.Problem.WorkCounter" title="core.Problem.WorkCounter">WorkCounter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -434,45 +402,13 @@ The exact solution is</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount">
-<span class="sig-name descname"><span class="pre">newton_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount" title="Link to this definition">¶</a></dt>
-<dd><p>Number of iterations for Newton solver.</p>
+<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.work_counters">
+<span class="sig-name descname"><span class="pre">work_counters</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.work_counters" title="Link to this definition">¶</a></dt>
+<dd><p>Counter for statistics. Here, number of Newton calls and number of evaluations
+of right-hand side are counted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount">
-<span class="sig-name descname"><span class="pre">lin_itercount</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount" title="Link to this definition">¶</a></dt>
-<dd><p>Number of iterations for linear solver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls">
-<span class="sig-name descname"><span class="pre">newton_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Number of calls of Newton solver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls">
-<span class="sig-name descname"><span class="pre">lin_ncalls</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls" title="Link to this definition">¶</a></dt>
-<dd><p>Number of calls of linear solver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><a class="reference internal" href="core.Problem.html#core.Problem.WorkCounter" title="core.Problem.WorkCounter">WorkCounter</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -726,10 +662,7 @@ side is only evaluated at each time.</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.uext"><code class="docutils literal notranslate"><span class="pre">uext</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_itercount"><code class="docutils literal notranslate"><span class="pre">lin_itercount</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.lin_ncalls"><code class="docutils literal notranslate"><span class="pre">lin_ncalls</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
@@ -747,10 +680,7 @@ side is only evaluated at each time.</p>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.xvalues"><code class="docutils literal notranslate"><span class="pre">xvalues</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_itercount"><code class="docutils literal notranslate"><span class="pre">newton_itercount</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_itercount"><code class="docutils literal notranslate"><span class="pre">lin_itercount</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.newton_ncalls"><code class="docutils literal notranslate"><span class="pre">newton_ncalls</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.lin_ncalls"><code class="docutils literal notranslate"><span class="pre">lin_ncalls</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.work_counters"><code class="docutils literal notranslate"><span class="pre">work_counters</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
