@@ -169,101 +169,101 @@ def discontinuousTestProblem_run(problem, sweeper, quad_type, num_nodes, t0, Ten
     return stats, t_switch_exact
 
 
-@pytest.mark.base
-def test_adapt_interpolation_info():
-    """
-    Test if the ``adapt_interpolation_info`` method of ``SwitchEstimator`` does what it is supposed to do.
-    """
-    from pySDC.core.Step import step
-    from pySDC.core.Controller import controller
-    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-    from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+# @pytest.mark.base
+# def test_adapt_interpolation_info():
+#     """
+#     Test if the ``adapt_interpolation_info`` method of ``SwitchEstimator`` does what it is supposed to do.
+#     """
+#     from pySDC.core.Step import step
+#     from pySDC.core.Controller import controller
+#     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+#     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+#     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-    t0 = 1.6
-    Tend = ExactDiscontinuousTestODE().t_switch_exact
-    eps = 1e-14  # choose this eps to enforce a sign chance in state function
-    dt = (Tend - t0) + eps
+#     t0 = 1.6
+#     Tend = ExactDiscontinuousTestODE().t_switch_exact
+#     eps = 1e-14  # choose this eps to enforce a sign chance in state function
+#     dt = (Tend - t0) + eps
 
-    level_params = {
-        'dt': dt,
-        'restol': 1e-13,
-    }
+#     level_params = {
+#         'dt': dt,
+#         'restol': 1e-13,
+#     }
 
-    sweeper_params = {
-        'quad_type': 'LOBATTO',
-        'num_nodes': 3,
-        'QI': 'IE',
-        'initial_guess': 'spread',
-    }
+#     sweeper_params = {
+#         'quad_type': 'LOBATTO',
+#         'num_nodes': 3,
+#         'QI': 'IE',
+#         'initial_guess': 'spread',
+#     }
 
-    step_params = {
-        'maxiter': 10,
-    }
+#     step_params = {
+#         'maxiter': 10,
+#     }
 
-    # convergence controllers
-    convergence_controllers = dict()
-    switch_estimator_params = {
-        'tol': 1e-10,
-        'alpha': 1.0,
-    }
-    convergence_controllers.update({SwitchEstimator: switch_estimator_params})
+#     # convergence controllers
+#     convergence_controllers = dict()
+#     switch_estimator_params = {
+#         'tol': 1e-10,
+#         'alpha': 1.0,
+#     }
+#     convergence_controllers.update({SwitchEstimator: switch_estimator_params})
 
-    convergence_controllers[BasicRestartingNonMPI] = {
-        'max_restarts': 3,
-        'crash_after_max_restarts': False,
-    }
+#     convergence_controllers[BasicRestartingNonMPI] = {
+#         'max_restarts': 3,
+#         'crash_after_max_restarts': False,
+#     }
 
-    description = {
-        'problem_class': ExactDiscontinuousTestODE,
-        'problem_params': dict(),
-        'sweeper_class': generic_implicit,
-        'sweeper_params': sweeper_params,
-        'level_params': level_params,
-        'step_params': step_params,
-        'convergence_controllers': convergence_controllers,
-    }
+#     description = {
+#         'problem_class': ExactDiscontinuousTestODE,
+#         'problem_params': dict(),
+#         'sweeper_class': generic_implicit,
+#         'sweeper_params': sweeper_params,
+#         'level_params': level_params,
+#         'step_params': step_params,
+#         'convergence_controllers': convergence_controllers,
+#     }
 
-    # set up step
-    S = step(description=description)
-    L = S.levels[0]
-    P = L.prob
+#     # set up step
+#     S = step(description=description)
+#     L = S.levels[0]
+#     P = L.prob
 
-    # initialise switch estimator
-    switch_estimator_params = {
-        'tol': 1e-10,
-        'alpha': 1.0,
-    }
-    SE = SwitchEstimator(controller=controller, params=switch_estimator_params, description=description)
+#     # initialise switch estimator
+#     switch_estimator_params = {
+#         'tol': 1e-10,
+#         'alpha': 1.0,
+#     }
+#     SE = SwitchEstimator(controller=controller, params=switch_estimator_params, description=description)
 
-    SE.setup_status_variables(controller)
+#     SE.setup_status_variables(controller)
 
-    # set initial time in the status of the level
-    L.status.time = t0
+#     # set initial time in the status of the level
+#     L.status.time = t0
 
-    # compute initial value (using the exact function here)
-    L.u[0] = P.u_exact(L.time)
+#     # compute initial value (using the exact function here)
+#     L.u[0] = P.u_exact(L.time)
 
-    # call prediction function to initialise nodes
-    L.sweep.predict()
+#     # call prediction function to initialise nodes
+#     L.sweep.predict()
 
-    # compute the residual (we may be done already!)
-    L.sweep.compute_residual()
+#     # compute the residual (we may be done already!)
+#     L.sweep.compute_residual()
 
-    # reset iteration counter
-    S.status.iter = 0
+#     # reset iteration counter
+#     S.status.iter = 0
 
-    # run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough
-    while S.status.iter < S.params.maxiter and L.status.residual > L.params.restol:
-        # this is where the nodes are actually updated according to the SDC formulas
-        L.sweep.update_nodes()
+#     # run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough
+#     while S.status.iter < S.params.maxiter and L.status.residual > L.params.restol:
+#         # this is where the nodes are actually updated according to the SDC formulas
+#         L.sweep.update_nodes()
 
-        # compute/update the residual
-        L.sweep.compute_residual()
+#         # compute/update the residual
+#         L.sweep.compute_residual()
 
-        # increment the iteration counter
-        S.status.iter += 1
+#         # increment the iteration counter
+#         S.status.iter += 1
 
     # # get state function
     # _, _, state_function = P.get_switching_info(L.u, L.status.time)
@@ -279,68 +279,68 @@ def test_adapt_interpolation_info():
     # print(t_interp)
 
 
-# @pytest.mark.base
-# @pytest.mark.parametrize('num_nodes', [3, 4, 5])
-# def test_detection_at_boundary(num_nodes):
-#     """
-#     This test checks whether a restart is executed or not when the event exactly occurs at the boundary. In this case,
-#     no restart should be done because occuring the event at the boundary means that the event is already resolved well,
-#     i.e., the state function there should have a value close to zero.
-#     """
-#     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-#     from pySDC.helpers.stats_helper import get_sorted
+@pytest.mark.base
+@pytest.mark.parametrize('num_nodes', [3, 4, 5])
+def test_detection_at_boundary(num_nodes):
+    """
+    This test checks whether a restart is executed or not when the event exactly occurs at the boundary. In this case,
+    no restart should be done because occuring the event at the boundary means that the event is already resolved well,
+    i.e., the state function there should have a value close to zero.
+    """
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.helpers.stats_helper import get_sorted
 
-#     problem = ExactDiscontinuousTestODE
-#     t0 = 1.6
-#     Tend = ExactDiscontinuousTestODE().t_switch_exact
-#     dt = Tend - t0
+    problem = ExactDiscontinuousTestODE
+    t0 = 1.6
+    Tend = ExactDiscontinuousTestODE().t_switch_exact
+    dt = Tend - t0
 
-#     stats, _ = discontinuousTestProblem_run(
-#         problem=problem,
-#         sweeper=generic_implicit,
-#         quad_type='LOBATTO',
-#         num_nodes=num_nodes,
-#         t0=t0,
-#         Tend=Tend,
-#         dt=dt,
-#         tol=1e-10,
-#     )
+    stats, _ = discontinuousTestProblem_run(
+        problem=problem,
+        sweeper=generic_implicit,
+        quad_type='LOBATTO',
+        num_nodes=num_nodes,
+        t0=t0,
+        Tend=Tend,
+        dt=dt,
+        tol=1e-10,
+    )
 
-#     sum_restarts = np.sum(np.array(get_sorted(stats, type='restart', sortby='time', recomputed=None))[:, 1])
-#     assert sum_restarts == 0, 'Event occurs at boundary, but restart(s) are executed anyway!'
+    sum_restarts = np.sum(np.array(get_sorted(stats, type='restart', sortby='time', recomputed=None))[:, 1])
+    assert sum_restarts == 0, 'Event occurs at boundary, but restart(s) are executed anyway!'
 
 
-# @pytest.mark.base
-# @pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
-# @pytest.mark.parametrize('num_nodes', [3, 4, 5])
-# def test_all_tolerances_ODE(tol, num_nodes):
-#     r"""
-#     Tests a problem for different tolerances for the switch estimator. Here, a dummy problem of
-#     ``DiscontinuousTestODE`` is used, where the dynamics of the differential equation is replaced by its
-#     exact dynamics to see if the switch estimator predicts the event correctly.
-#     """
-#     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-#     from pySDC.helpers.stats_helper import get_sorted
+@pytest.mark.base
+@pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
+@pytest.mark.parametrize('num_nodes', [3, 4, 5])
+def test_all_tolerances_ODE(tol, num_nodes):
+    r"""
+    Tests a problem for different tolerances for the switch estimator. Here, a dummy problem of
+    ``DiscontinuousTestODE`` is used, where the dynamics of the differential equation is replaced by its
+    exact dynamics to see if the switch estimator predicts the event correctly.
+    """
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.helpers.stats_helper import get_sorted
 
-#     t0 = 1.6
-#     Tend = 1.62
-#     problem = ExactDiscontinuousTestODE
+    t0 = 1.6
+    Tend = 1.62
+    problem = ExactDiscontinuousTestODE
 
-#     stats, t_switch_exact = discontinuousTestProblem_run(
-#         problem=problem,
-#         sweeper=generic_implicit,
-#         quad_type='LOBATTO',
-#         num_nodes=num_nodes,
-#         t0=t0,
-#         Tend=Tend,
-#         dt=2e-2,
-#         tol=tol,
-#     )
+    stats, t_switch_exact = discontinuousTestProblem_run(
+        problem=problem,
+        sweeper=generic_implicit,
+        quad_type='LOBATTO',
+        num_nodes=num_nodes,
+        t0=t0,
+        Tend=Tend,
+        dt=2e-2,
+        tol=tol,
+    )
 
-#     # in this specific example only one event has to be found
-#     switches = [me[1] for me in get_sorted(stats, type='switch', sortby='time', recomputed=False)]
-#     assert len(switches) >= 1, f'{problem.__name__}: No events found for tol={tol}!'
+    # in this specific example only one event has to be found
+    switches = [me[1] for me in get_sorted(stats, type='switch', sortby='time', recomputed=False)]
+    assert len(switches) >= 1, f'{problem.__name__}: No events found for tol={tol}!'
 
-#     t_switch = switches[-1]
-#     event_err = abs(t_switch - t_switch_exact)
-#     assert event_err < 1e-14, f'Event time error for is not small enough!'
+    t_switch = switches[-1]
+    event_err = abs(t_switch - t_switch_exact)
+    assert event_err < 1e-14, f'Event time error for is not small enough!'
