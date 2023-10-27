@@ -183,7 +183,7 @@ class allencahn_front_fullyimplicit(ptype):
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
-            print(f'{type(self).__name__}')
+
         if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
