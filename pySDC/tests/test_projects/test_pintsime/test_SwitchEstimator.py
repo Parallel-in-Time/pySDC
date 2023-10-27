@@ -45,7 +45,7 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
         else:
             f[:] = np.exp(t)
         return f
-    
+
     def solve_system(self, rhs, factor, u0, t):
         """
         Just return the exact solution...
@@ -67,16 +67,18 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
             The solution as mesh.
         """
 
-        return self.u_exact(t)    
+        return self.u_exact(t)
 
 
-def discontinuousTestProblem_run(problem, sweeper, quad_type, num_nodes, t0, Tend, dt, tol):
-    """
-    Simulates one run of a discontinuous test problem class for one specific tolerance specified in
-    the parameters. For testing, only one time step should be considered.
+def get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt, tol):
+    r"""
+    This function prepares the controller for one simulation run. Based on function in
+    ``pySDC.tests.test_convergence_controllers.test_adaptivity.py``
 
     Parameters
     ----------
+    switch_estimator : pySDC.core.ConvergenceController
+        Switch estimator.
     problem : pySDC.core.Problem
         Problem class to be simulated.
     sweeper: pySDC.core.Sweeper
@@ -94,9 +96,7 @@ def discontinuousTestProblem_run(problem, sweeper, quad_type, num_nodes, t0, Ten
     tol : float
         Tolerance for the switch estimator.
     """
-
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
     from pySDC.implementations.hooks.log_solution import LogSolution
@@ -133,7 +133,7 @@ def discontinuousTestProblem_run(problem, sweeper, quad_type, num_nodes, t0, Ten
         'tol': tol,
         'alpha': 1.0,
     }
-    convergence_controllers.update({SwitchEstimator: switch_estimator_params})
+    convergence_controllers.update({switch_estimator: switch_estimator_params})
 
     convergence_controllers[BasicRestartingNonMPI] = {
         'max_restarts': 3,
@@ -151,12 +151,44 @@ def discontinuousTestProblem_run(problem, sweeper, quad_type, num_nodes, t0, Ten
         'convergence_controllers': convergence_controllers,
     }
 
+    # instantiate controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+    return controller
+
+
+def discontinuousTestProblem_run(switch_estimator, problem, sweeper, quad_type, num_nodes, t0, Tend, dt, tol):
+    """
+    Simulates one run of a discontinuous test problem class for one specific tolerance specified in
+    the parameters. For testing, only one time step should be considered.
+
+    Parameters
+    ----------
+    switch_estimator : pySDC.core.ConvergenceController
+        Switch Estimator.
+    problem : pySDC.core.Problem
+        Problem class to be simulated.
+    sweeper: pySDC.core.Sweeper
+        Sweeper used for the simulation.
+    quad_type : str
+        Type of quadrature used.
+    num_nodes : int
+        Number of collocation nodes.
+    t0 : float
+        Starting time.
+    Tend : float
+        End time.
+    dt : float
+        Time step size.
+    tol : float
+        Tolerance for the switch estimator.
+    """
+
+    controller = get_controller(switch_estimator, problem, sweeper, quad_type, num_nodes, dt, tol)
+
     # set time parameters
     t0 = t0
     Tend = Tend
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -169,114 +201,86 @@ def discontinuousTestProblem_run(problem, sweeper, quad_type, num_nodes, t0, Ten
     return stats, t_switch_exact
 
 
-# @pytest.mark.base
-# def test_adapt_interpolation_info():
-#     """
-#     Test if the ``adapt_interpolation_info`` method of ``SwitchEstimator`` does what it is supposed to do.
-#     """
-#     from pySDC.core.Step import step
-#     from pySDC.core.Controller import controller
-#     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-#     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-#     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+@pytest.mark.base
+@pytest.mark.parametrize('quad_type', ['LOBATTO', 'RADAU-RIGHT'])
+def test_adapt_interpolation_info(quad_type):
+    r"""
+    Tests if the method ``adapt_interpolation_info`` does what it is supposed to do.
 
-#     t0 = 1.6
-#     Tend = ExactDiscontinuousTestODE().t_switch_exact
-#     eps = 1e-14  # choose this eps to enforce a sign chance in state function
-#     dt = (Tend - t0) + eps
+    - For ``quad_type='RADAU-RIGHT'``, the value at ``t0`` has to be added to the list of
+      ``state_function``, since it is no collocation node but can be used for the interpolation
+      anyway.
 
-#     level_params = {
-#         'dt': dt,
-#         'restol': 1e-13,
-#     }
+    - For ``quad_type='LOBATTO'``, the first value in ``state_function`` has to be removed
+      since ``t0`` is also a collocation node here and the state function would include double values.
 
-#     sweeper_params = {
-#         'quad_type': 'LOBATTO',
-#         'num_nodes': 3,
-#         'QI': 'IE',
-#         'initial_guess': 'spread',
-#     }
+    Parameters
+    ----------
+    quad_type : str
+        Type of quadrature used.
+    """
 
-#     step_params = {
-#         'maxiter': 10,
-#     }
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
-#     # convergence controllers
-#     convergence_controllers = dict()
-#     switch_estimator_params = {
-#         'tol': 1e-10,
-#         'alpha': 1.0,
-#     }
-#     convergence_controllers.update({SwitchEstimator: switch_estimator_params})
+    t0 = 1.6
+    Tend = ExactDiscontinuousTestODE().t_switch_exact
+    eps = 1e-13  # choose this eps to enforce a sign chance in state function
+    dt = (Tend - t0) + eps
 
-#     convergence_controllers[BasicRestartingNonMPI] = {
-#         'max_restarts': 3,
-#         'crash_after_max_restarts': False,
-#     }
+    tol = 1e-10
+    num_nodes = 3
 
-#     description = {
-#         'problem_class': ExactDiscontinuousTestODE,
-#         'problem_params': dict(),
-#         'sweeper_class': generic_implicit,
-#         'sweeper_params': sweeper_params,
-#         'level_params': level_params,
-#         'step_params': step_params,
-#         'convergence_controllers': convergence_controllers,
-#     }
+    controller = get_controller(
+        switch_estimator=SwitchEstimator,
+        problem=ExactDiscontinuousTestODE,
+        sweeper=generic_implicit,
+        quad_type=quad_type,
+        num_nodes=num_nodes,
+        dt=dt,
+        tol=tol,
+    )
 
-#     # set up step
-#     S = step(description=description)
-#     L = S.levels[0]
-#     P = L.prob
+    S = controller.MS[0]
+    L = S.levels[0]
+    P = L.prob
 
-#     # initialise switch estimator
-#     switch_estimator_params = {
-#         'tol': 1e-10,
-#         'alpha': 1.0,
-#     }
-#     SE = SwitchEstimator(controller=controller, params=switch_estimator_params, description=description)
+    # instance of switch estimator
+    SE = controller.convergence_controllers[
+        np.arange(len(controller.convergence_controllers))[
+            [type(me).__name__ == SwitchEstimator.__name__ for me in controller.convergence_controllers]
+        ][0]
+    ]
 
-#     SE.setup_status_variables(controller)
+    S.status.slot = 0
+    L.status.time = t0
+    S.status.iter = 10
+    L.status.residual = 0.0
+    L.u[0] = P.u_exact(L.status.time)
 
-#     # set initial time in the status of the level
-#     L.status.time = t0
+    L.sweep.predict()
 
-#     # compute initial value (using the exact function here)
-#     L.u[0] = P.u_exact(L.time)
+    # perform one update to get state function with different signs
+    L.sweep.update_nodes()
 
-#     # call prediction function to initialise nodes
-#     L.sweep.predict()
+    SE.get_new_step_size(controller, S)
 
-#     # compute the residual (we may be done already!)
-#     L.sweep.compute_residual()
+    t_interp, state_function = SE.params.t_interp, SE.params.state_function
 
-#     # reset iteration counter
-#     S.status.iter = 0
+    assert len(t_interp) == len(
+        state_function
+    ), 'Length of interpolation values does not match with length of list containing the state function'
 
-#     # run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough
-#     while S.status.iter < S.params.maxiter and L.status.residual > L.params.restol:
-#         # this is where the nodes are actually updated according to the SDC formulas
-#         L.sweep.update_nodes()
+    if quad_type == 'LOBATTO':
+        assert t_interp[0] != t_interp[1], 'Starting time from interpolation axis is not removed!'
+        assert (
+            len(t_interp) == num_nodes
+        ), f'Number of values on interpolation axis does not match. Expected {num_nodes}, got {len(t_interp)}'
 
-#         # compute/update the residual
-#         L.sweep.compute_residual()
-
-#         # increment the iteration counter
-#         S.status.iter += 1
-
-    # # get state function
-    # _, _, state_function = P.get_switching_info(L.u, L.status.time)
-    # t_interp = SE.params.t_interp
-    # left_is_node = L.sweep.coll.left_is_node
-    # print('in test:', state_function)
-    # # t_interp_update, state_function_update = SE.adapt_interpolation_info(
-    # #     t=L.status.time, left_is_node=left_is_node, t_interp=t_interp, state_function=state_function
-    # # )
-
-    # SE.get_new_step_size(controller, S)
-    # t_interp2 = SE.params.t_interp
-    # print(t_interp)
+    elif quad_type == 'RADAU-RIGHT':
+        assert (
+            len(t_interp) == num_nodes + 1
+        ), f'Number of values on interpolation axis does not match. Expected {num_nodes + 1}, got {len(t_interp)}'
 
 
 @pytest.mark.base
@@ -286,8 +290,15 @@ def test_detection_at_boundary(num_nodes):
     This test checks whether a restart is executed or not when the event exactly occurs at the boundary. In this case,
     no restart should be done because occuring the event at the boundary means that the event is already resolved well,
     i.e., the state function there should have a value close to zero.
+
+    Parameters
+    ----------
+    num_nodes : int
+        Number of collocation nodes.
     """
+
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.helpers.stats_helper import get_sorted
 
     problem = ExactDiscontinuousTestODE
@@ -296,6 +307,7 @@ def test_detection_at_boundary(num_nodes):
     dt = Tend - t0
 
     stats, _ = discontinuousTestProblem_run(
+        switch_estimator=SwitchEstimator,
         problem=problem,
         sweeper=generic_implicit,
         quad_type='LOBATTO',
@@ -313,13 +325,29 @@ def test_detection_at_boundary(num_nodes):
 @pytest.mark.base
 @pytest.mark.parametrize('tol', [10 ** (-m) for m in range(8, 13)])
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
-def test_all_tolerances_ODE(tol, num_nodes):
+@pytest.mark.parametrize('quad_type', ['LOBATTO', 'RADAU-RIGHT'])
+def test_all_tolerances_ODE(tol, num_nodes, quad_type):
     r"""
-    Tests a problem for different tolerances for the switch estimator. Here, a dummy problem of
-    ``DiscontinuousTestODE`` is used, where the dynamics of the differential equation is replaced by its
-    exact dynamics to see if the switch estimator predicts the event correctly.
+    Here, the switch estimator is applied to a dummy problem of ``DiscontinuousTestODE``,
+    where the dynamics of the differential equation is replaced by its exact dynamics to see if
+    the switch estimator predicts the event correctly. The problem is tested for a combination
+    of different tolerances ``tol`` and different number of collocation nodes ``num_nodes``.
+
+    Since the problem only uses the exact dynamics, the event should be predicted very accurately
+    by the switch estimator.
+
+    Parameters
+    ----------
+    tol : float
+        Tolerance for switch estimator.
+    num_nodes : int
+        Number of collocation nodes.
+    quad_type : str
+        Type of quadrature.
     """
+
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
     from pySDC.helpers.stats_helper import get_sorted
 
     t0 = 1.6
@@ -327,9 +355,10 @@ def test_all_tolerances_ODE(tol, num_nodes):
     problem = ExactDiscontinuousTestODE
 
     stats, t_switch_exact = discontinuousTestProblem_run(
+        switch_estimator=SwitchEstimator,
         problem=problem,
         sweeper=generic_implicit,
-        quad_type='LOBATTO',
+        quad_type=quad_type,
         num_nodes=num_nodes,
         t0=t0,
         Tend=Tend,

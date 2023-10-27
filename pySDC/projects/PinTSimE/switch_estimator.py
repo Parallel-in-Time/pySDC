@@ -48,6 +48,7 @@ class SwitchEstimator(ConvergenceController):
             'nodes': coll.nodes,
             'tol_zero': 1e-13,
             't_interp': [],
+            'state_function': [],
         }
         return {**defaults, **params}
 
@@ -88,27 +89,30 @@ class SwitchEstimator(ConvergenceController):
         """
 
         L = S.levels[0]
-        print('conv', CheckConvergence.check_convergence(S))
+
         if CheckConvergence.check_convergence(S):
-            self.status.switch_detected, m_guess, state_function = L.prob.get_switching_info(L.u, L.time)
-            print('detected:', self.status.switch_detected, state_function)
+            self.status.switch_detected, m_guess, self.params.state_function = L.prob.get_switching_info(L.u, L.time)
+
             if self.status.switch_detected:
                 self.params.t_interp = [L.time + L.dt * self.params.nodes[m] for m in range(len(self.params.nodes))]
-                self.params.t_interp, state_function = self.adapt_interpolation_info(
-                    L.time, L.sweep.coll.left_is_node, self.params.t_interp, state_function
+                self.params.t_interp, self.params.state_function = self.adapt_interpolation_info(
+                    L.time, L.sweep.coll.left_is_node, self.params.t_interp, self.params.state_function
                 )
-                # print(t_interp, state_function)
+
                 # when the state function is already close to zero the event is already resolved well
-                if abs(state_function[-1]) <= self.params.tol_zero or abs(state_function[0]) <= self.params.tol_zero:
-                    if abs(state_function[0]) <= self.params.tol_zero:
+                if (
+                    abs(self.params.state_function[-1]) <= self.params.tol_zero
+                    or abs(self.params.state_function[0]) <= self.params.tol_zero
+                ):
+                    if abs(self.params.state_function[0]) <= self.params.tol_zero:
                         t_switch = self.params.t_interp[0]
                         boundary = 'left'
-                    elif abs(state_function[-1]) <= self.params.tol_zero:
+                    elif abs(self.params.state_function[-1]) <= self.params.tol_zero:
                         boundary = 'right'
                         t_switch = self.params.t_interp[-1]
 
                     msg = f"The value of state function is close to zero, thus event time is already close enough to the {boundary} end point!"
-                    # self.log(msg, S)
+                    self.log(msg, S)
                     self.log_event_time(
                         controller.hooks[0], S.status.slot, L.time, L.level_index, L.status.sweep, t_switch
                     )
@@ -117,8 +121,8 @@ class SwitchEstimator(ConvergenceController):
                     self.status.is_zero = True
 
                 # intermediate value theorem states that a root is contained in current step
-                if state_function[0] * state_function[-1] < 0 and self.status.is_zero is None:
-                    self.status.t_switch = self.get_switch(self.params.t_interp, state_function, m_guess)
+                if self.params.state_function[0] * self.params.state_function[-1] < 0 and self.status.is_zero is None:
+                    self.status.t_switch = self.get_switch(self.params.t_interp, self.params.state_function, m_guess)
 
                     controller.hooks[0].add_to_stats(
                         process=S.status.slot,
@@ -136,7 +140,7 @@ class SwitchEstimator(ConvergenceController):
                         iter=0,
                         sweep=L.status.sweep,
                         type='h_all',
-                        value=max([abs(item) for item in state_function]),
+                        value=max([abs(item) for item in self.params.state_function]),
                     )
                     if L.time < self.status.t_switch < L.time + L.dt:
                         dt_switch = (self.status.t_switch - L.time) * self.params.alpha
@@ -414,7 +418,9 @@ class LinearInterpolation(object):
 
         for i in range(1, self.n):
             if t >= self.ti[i - 1] or t <= self.ti[i]:
-                p = self.yi[i - 1] + (self.yi[i] - self.yi[i - 1]) / (self.ti[i] - self.ti[i - 1]) * (t - self.ti[i - 1])
+                p = self.yi[i - 1] + (self.yi[i] - self.yi[i - 1]) / (self.ti[i] - self.ti[i - 1]) * (
+                    t - self.ti[i - 1]
+                )
             else:
                 p = 0
                 raise ParameterError('Interpolant is only evaluated for time occuring between time nodes')
