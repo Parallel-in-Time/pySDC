@@ -1,4 +1,30 @@
 import pytest
+from scipy.optimize import newton_krylov
+
+
+def solve_system_reference(rhs, factor, u0, t):
+    r"""
+    Solve the nonlinear system :math:`(1 - factor \cdot f)(\vec{u}) = \vec{rhs}` using a ``SciPy``
+    Newton-Krylov solver. See also ``solve_system`` in
+    ``pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT``.
+
+    Parameters
+    ----------
+    rhs : dtype_f
+        Right-hand side for the linear system.
+    factor : float
+        Abbrev. for the node-to-node stepsize (or any other factor required).
+    u0 : dtype_u
+        Initial guess for the iterative solver (not used here so far).
+    t : float
+        Current time (e.g. for time-dependent BCs).
+
+    Returns
+    -------
+    me : dtype_u
+        The solution as mesh.
+    """
+    
 
 
 @pytest.mark.base
@@ -109,17 +135,20 @@ def test_periodic_imex_vs_fully_implicit_vs_multi_implicit():
 
     u_imex = imex.solve_system(**args)
     u_full = full.solve_system(**args)
-    u_multi = multi.solve_system(**args)
+    u_multi1 = multi.solve_system_1(**args)
+    u_multi2 = multi.solve_system_2(**args)
 
     u_exact = imex.u_exact(t0 + dt)
 
     e_imex = abs(u_imex - u_exact) / abs(u_exact)
     e_full = abs(u_full - u_exact) / abs(u_exact)
-    e_multi = abs(u_multi - u_exact) / abs(u_exact)
+    e_multi1 = abs(u_multi1 - u_exact) / abs(u_exact)
+    e_multi2 = abs(u_multi2 - u_exact) / abs(u_exact)
 
     assert e_imex < 1e-2, f"Error is too large in semi-implicit case! Got {e_imex}"
     assert e_full < 1.2e-3, f"Error is too large in fully-implicit case! Got {e_full}"
-    assert e_multi < 1.2e-3, f"Error is too large in multi-implicit case! Got {e_multi}"
+    assert e_multi1 < 1e-2, f"Error is too large in multi-implicit case solving the Laplacian part! Got {e_multi1}"
+    assert e_multi2 < 1.2e-2, f"Error is too large in multi-implicit case solving the part without the Laplacian! Got {e_multi2}"
 
     # check if number of right-hand side evaluations do match
     rhs_count_imex = imex.work_counters['rhs'].niter
@@ -196,7 +225,7 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
         with pytest.raises(ProblemError):
             full_periodic.solve_system(**args_periodic)
             imex_periodic.solve_system(**args_periodic)
-            multi_periodic.solve_system(**args_periodic)
+            multi_periodic.solve_system_2(**args_periodic)
 
     else:
         # test if warnings are raised when nan values arise
@@ -224,10 +253,17 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
         ), 'Number of Newton iterations in fully-implicit periodic case does not match with maximum number of iterations!'
         caplog.clear()
 
-        multi_periodic.solve_system(**args_periodic)
+        multi_periodic.solve_system_2(**args_periodic)
         assert f'Newton got nan after {newton_maxiter} iterations...' in caplog.text
         assert 'Newton did not converge after 1 iterations, error is nan' in caplog.text
         assert (
             multi_periodic.work_counters['newton'].niter == newton_maxiter
         ), 'Number of Newton iterations in multi-implicit periodic case does not match with maximum number of iterations!'
         caplog.clear()
+
+
+@pytest.mark.base
+def test_solve_system_with_reference():
+    """
+    Computes a solution using the Newton solver and compares it with a Newton-Krylov solver as reference.
+    """
