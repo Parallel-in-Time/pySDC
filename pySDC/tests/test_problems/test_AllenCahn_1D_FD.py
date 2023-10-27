@@ -1,30 +1,4 @@
 import pytest
-from scipy.optimize import newton_krylov
-
-
-def solve_system_reference(rhs, factor, u0, t):
-    r"""
-    Solve the nonlinear system :math:`(1 - factor \cdot f)(\vec{u}) = \vec{rhs}` using a ``SciPy``
-    Newton-Krylov solver. See also ``solve_system`` in
-    ``pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT``.
-
-    Parameters
-    ----------
-    rhs : dtype_f
-        Right-hand side for the linear system.
-    factor : float
-        Abbrev. for the node-to-node stepsize (or any other factor required).
-    u0 : dtype_u
-        Initial guess for the iterative solver (not used here so far).
-    t : float
-        Current time (e.g. for time-dependent BCs).
-
-    Returns
-    -------
-    me : dtype_u
-        The solution as mesh.
-    """
-    
 
 
 @pytest.mark.base
