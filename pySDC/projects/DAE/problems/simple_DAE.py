@@ -1,7 +1,6 @@
 import warnings
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.optimize import root
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
 from pySDC.core.Problem import WorkCounter
@@ -38,8 +37,7 @@ class pendulum_2d(ptype_dae):
     ----------
     work_counters : WorkCounter
         Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``, the number of function calls of the Newton-like solver is stored in
-        ``work_counters['newton']``.
+        ``work_counters['rhs']``.
 
     References
     ----------
@@ -57,7 +55,6 @@ class pendulum_2d(ptype_dae):
         # solution = data[:, 1:]
         # self.u_ref = interp1d(t, solution, kind='cubic', axis=0, fill_value='extrapolate')
         self.t_end = 0.0
-        self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
@@ -85,36 +82,6 @@ class pendulum_2d(ptype_dae):
         f[:] = (du[0] - u[2], du[1] - u[3], du[2] + u[4] * u[0], du[3] + u[4] * u[1] + g, u[0] ** 2 + u[1] ** 2 - 1)
         self.work_counters['rhs']()
         return f
-
-    def solve_system(self, impl_sys, u0, t):
-        r"""
-        Solver for nonlinear implicit system (defined in sweeper).
-
-        Parameters
-        ----------
-        impl_sys : callable
-            Implicit system to be solved.
-        u0 : dtype_u
-            Initial guess for solver.
-        t : float
-            Current time :math:`t`.
-
-        Returns
-        -------
-        me : dtype_u
-            Numerical solution.
-        """
-
-        me = self.dtype_u(self.init)
-        opt = root(
-            impl_sys,
-            u0,
-            method='hybr',
-            tol=self.newton_tol,
-        )
-        me[:] = opt.x
-        self.work_counters['newton'].niter += opt.nfev
-        return me
 
     def u_exact(self, t):
         """
@@ -177,8 +144,7 @@ class simple_dae_1(ptype_dae):
     ----------
     work_counters : WorkCounter
         Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``, the number of function calls of the Newton-like solver is stored in
-        ``work_counters['newton']``.
+        ``work_counters['rhs']``.
 
     References
     ----------
@@ -190,7 +156,6 @@ class simple_dae_1(ptype_dae):
         """Initialization routine"""
         super().__init__(nvars, newton_tol)
 
-        self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
@@ -221,36 +186,6 @@ class simple_dae_1(ptype_dae):
         )
         self.work_counters['rhs']()
         return f
-
-    def solve_system(self, impl_sys, u0, t):
-        r"""
-        Solver for nonlinear implicit system (defined in sweeper).
-
-        Parameters
-        ----------
-        impl_sys : callable
-            Implicit system to be solved.
-        u0 : dtype_u
-            Initial guess for solver.
-        t : float
-            Current time :math:`t`.
-
-        Returns
-        -------
-        me : dtype_u
-            Numerical solution.
-        """
-
-        me = self.dtype_u(self.init)
-        opt = root(
-            impl_sys,
-            u0,
-            method='hybr',
-            tol=self.newton_tol,
-        )
-        me[:] = opt.x
-        self.work_counters['newton'].niter += opt.nfev
-        return me
 
     def u_exact(self, t):
         """
@@ -297,8 +232,7 @@ class problematic_f(ptype_dae):
         Specific parameter of the problem.
     work_counters : WorkCounter
         Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``, the number of function calls of the Newton-like solver is stored in
-        ``work_counters['newton']``.
+        ``work_counters['rhs']``
 
     References
     ----------
@@ -312,7 +246,6 @@ class problematic_f(ptype_dae):
         self._makeAttributeAndRegister('eta', localVars=locals())
 
         self.work_counters['rhs'] = WorkCounter()
-        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
@@ -339,36 +272,6 @@ class problematic_f(ptype_dae):
         )
         self.work_counters['rhs']()
         return f
-
-    def solve_system(self, impl_sys, u0, t):
-        r"""
-        Solver for nonlinear implicit system (defined in sweeper).
-
-        Parameters
-        ----------
-        impl_sys : callable
-            Implicit system to be solved.
-        u0 : dtype_u
-            Initial guess for solver.
-        t : float
-            Current time :math:`t`.
-
-        Returns
-        -------
-        me : dtype_u
-            Numerical solution.
-        """
-
-        me = self.dtype_u(self.init)
-        opt = root(
-            impl_sys,
-            u0,
-            method='hybr',
-            tol=self.newton_tol,
-        )
-        me[:] = opt.x
-        self.work_counters['newton'].niter += opt.nfev
-        return me
 
     def u_exact(self, t):
         """

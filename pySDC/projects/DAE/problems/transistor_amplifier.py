@@ -1,6 +1,5 @@
 import warnings
 import numpy as np
-from scipy.optimize import root
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
@@ -58,8 +57,7 @@ class one_transistor_amplifier(ptype_dae):
         The end time at which the reference solution is determined.
     work_counters : WorkCounter
         Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``, the number of function calls of the Newton-like solver is stored in
-        ``work_counters['newton']``.
+        ``work_counters['rhs']``.
 
     References
     ----------
@@ -79,7 +77,6 @@ class one_transistor_amplifier(ptype_dae):
         self.t_end = 0.0
 
         self.work_counters['rhs'] = WorkCounter()
-        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
@@ -115,36 +112,6 @@ class one_transistor_amplifier(ptype_dae):
         )
         self.work_counters['rhs']()
         return f
-
-    def solve_system(self, impl_sys, u0, t):
-        r"""
-        Solver for nonlinear implicit system (defined in sweeper).
-
-        Parameters
-        ----------
-        impl_sys : callable
-            Implicit system to be solved.
-        u0 : dtype_u
-            Initial guess for solver.
-        t : float
-            Current time :math:`t`.
-
-        Returns
-        -------
-        me : dtype_u
-            Numerical solution.
-        """
-
-        me = self.dtype_u(self.init)
-        opt = root(
-            impl_sys,
-            u0,
-            method='hybr',
-            tol=self.newton_tol,
-        )
-        me[:] = opt.x
-        self.work_counters['newton'].niter += opt.nfev
-        return me
 
     def u_exact(self, t):
         """
@@ -229,8 +196,7 @@ class two_transistor_amplifier(ptype_dae):
         The end time at which the reference solution is determined.
     work_counters : WorkCounter
         Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``, the number of function calls of the Newton-like solver is stored in
-        ``work_counters['newton']``.
+        ``work_counters['rhs']``.
 
     References
     ----------
@@ -250,7 +216,6 @@ class two_transistor_amplifier(ptype_dae):
         self.t_end = 0.0
 
         self.work_counters['rhs'] = WorkCounter()
-        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
@@ -289,36 +254,6 @@ class two_transistor_amplifier(ptype_dae):
         )
         self.work_counters['rhs']()
         return f
-
-    def solve_system(self, impl_sys, u0, t):
-        r"""
-        Solver for nonlinear implicit system (defined in sweeper).
-
-        Parameters
-        ----------
-        impl_sys : callable
-            Implicit system to be solved.
-        u0 : dtype_u
-            Initial guess for solver.
-        t : float
-            Current time :math:`t`.
-
-        Returns
-        -------
-        me : dtype_u
-            Numerical solution.
-        """
-
-        me = self.dtype_u(self.init)
-        opt = root(
-            impl_sys,
-            u0,
-            method='hybr',
-            tol=self.newton_tol,
-        )
-        me[:] = opt.x
-        self.work_counters['newton'].niter += opt.nfev
-        return me
 
     def u_exact(self, t):
         """
