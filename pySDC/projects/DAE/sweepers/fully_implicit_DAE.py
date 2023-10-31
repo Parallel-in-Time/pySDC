@@ -6,15 +6,43 @@ from pySDC.core.Sweeper import sweeper
 
 
 class fully_implicit_DAE(sweeper):
-    """
-    Custom sweeper class, implements Sweeper.py
+    r"""
+    Custom sweeper class to implement the fully-implicit SDC for solving DAEs. It solves fully-implicit DAE problems
+    of the form
 
-    Sweeper to solve first order differential equations in fully implicit form
-    Primarily implemented to be used with differential algebraic equations
-    Based on the concepts outlined in "Arbitrary order Krylov deferred correction methods for differential algebraic equations" by Huang et al.
+    .. math::
+        F(t, u, u') = 0.
 
-    Attributes:
-        QI: implicit Euler integration matrix
+    It solves a collocation problem of the form
+
+    .. math::
+        F(\tau, \vec{U}_0 + \Delta t (\mathbf{Q} \otimes \mathbf{I}_n) \vec{U}, \vec{U}) = 0,
+
+    where
+
+    - :math:`\tau=(\tau_1,..,\tau_M) in \mathbb{R}^M` the vector of collocation nodes,
+    - :math:`\vec{U}_0 = (u_0,..,u_0) \in \mathbb{R}^{Mn}` the vector of initial condition spread to each node,
+    - spectral integration matrix :math:`\mathbf{Q} \in \mathbb{R}^{M \times M}`,
+    - :math:`\vec{U}=(U_1,..,U_M) \in \mathbb{R}^{Mn}` the vector of unknown derivatives
+      :math:`U_m \approx U(\tau_m) = u'(\tau_m) \in \mathbb{R}^n`,
+    - and identity matrix :math:`\mathbf{I}_n \in \mathbb{R}^{n \times n}`.
+
+    The construction of this sweeper is based on the concepts outlined in [1]_.
+
+    Parameters
+    ----------
+    params : dict
+        Parameters passed to the sweeper.
+
+    Attributes
+    ----------
+    QI : np.2darray
+        Implicit Euler integration matrix.
+
+    References
+    ----------
+    .. [1] J. Huang, J. Jun, M. L. Minion. Arbitrary order Krylov deferred correction methods for differential algebraic equation.
+       J. Comput. Phys. Vol. 221 No. 2 (2007).
     """
 
     def __init__(self, params):
@@ -40,12 +68,15 @@ class fully_implicit_DAE(sweeper):
     # TODO: hijacking this function to return solution from its gradient i.e. fundamental theorem of calculus.
     # This works well since (ab)using level.f to store the gradient. Might need to change this for release?
     def integrate(self):
-        """
-        Returns the solution by integrating its gradient (fundamental theorem of calculus)
-        Note that level.f stores the gradient values in the fully implicit case, rather than the evaluation of the rhs as in the ODE case
+        r"""
+        Returns the solution by integrating its gradient (fundamental theorem of calculus) at each collocation node.
+        Note that ``level.f`` stores the gradient values in the fully implicit case, rather than the evaluation of
+        the right-hand side as in the ODE case.
 
-        Returns:
-            list of dtype_u: containing the integral as values
+        Returns
+        -------
+        me : list of lists
+            Integral of the gradient at each collocation node.
         """
 
         # get current level and problem description
@@ -65,11 +96,9 @@ class fully_implicit_DAE(sweeper):
         return me
 
     def update_nodes(self):
-        """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single iteration of the preconditioned Richardson iteration in "ordinary" SDC
-
-        Returns:
-            None
+        r"""
+        Updates values of ``u`` and ``f`` at collocation nodes. This correspond to a single iteration of the
+        preconditioned Richardson iteration in **"ordinary"** SDC.
         """
 
         # get current level and problem description
@@ -154,12 +183,16 @@ class fully_implicit_DAE(sweeper):
         return None
 
     def predict(self):
-        """
-        Predictor to fill values at nodes before first sweep
+        r"""
+        Predictor to fill values at nodes before first sweep. It can decides whether the
 
-        Default prediction for the sweepers, only copies the values to all collocation nodes
-        This function overrides the base implementation by always initialising level.f to zero
-        This is necessary since level.f stores the solution derivative in the fully implicit case, which is not initially known
+            - initial condition is spread to each node ('initial_guess' = 'spread'),
+            - zero values are spread to each node ('initial_guess' = 'zero'),
+            - or random values are spread to each collocation node ('initial_guess' = 'random').
+
+        Default prediction for the sweepers, only copies the values to all collocation nodes. This function
+        overrides the base implementation by always initialising ``level.f`` to zero. This is necessary since
+        ``level.f`` stores the solution derivative in the fully implicit case, which is not initially known.
         """
         # get current level and problem description
         L = self.level
@@ -187,15 +220,18 @@ class fully_implicit_DAE(sweeper):
         L.status.updated = True
 
     def compute_residual(self, stage=None):
-        """
-        Overrides the base implementation
-        Uses the absolute value of the implicit function ||F(u', u, t)|| as the residual
+        r"""
+        Uses the absolute value of the DAE system
 
-        Args:
-            stage (str): The current stage of the step the level belongs to
+        .. math::
+            ||F(t, u, u')||
 
-        Returns:
-            None
+        for computing the residual.
+
+        Parameters
+        ----------
+        stage : str, optional
+            The current stage of the step the level belongs to.
         """
 
         # get current level and problem description
@@ -239,13 +275,11 @@ class fully_implicit_DAE(sweeper):
         return None
 
     def compute_end_point(self):
-        """
-        Compute u at the right point of the interval
-
-        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
-
-        Returns:
-            None
+        r"""
+        Computes the solution ``u`` at the right-hand point. For ``quad_type='RADAU-LEFT'`` a collocation update
+        has to be done, which is the full evaluation of the Picard formulation. In cases of
+        ``quad_type='RADAU-RIGHT'`` or ``quad_type='LOBATTO'`` the value at last collocation node is the new value
+        for the next step.
         """
 
         # get current level and problem description
