@@ -104,16 +104,33 @@ class fully_implicit_DAE(sweeper):
                 u_approx += L.dt * self.QI[m, j] * L.f[j]
 
             # params contains U = u'
-            def impl_fn(params):
-                # make params into a mesh object
+            def implSystem(params):
+                """
+                Build implicit system to solve in order to find the unknowns.
+
+                Parameters
+                ----------
+                params : dtype_u
+                    Unknowns of the system.
+
+                Returns
+                -------
+                sys :
+                    System to be solved as implicit function.
+                """
+
                 params_mesh = P.dtype_f(P.init)
                 params_mesh[:] = params
+
                 # build parameters to pass to implicit function
                 local_u_approx = u_approx
+
                 # note that derivatives of algebraic variables are taken into account here too
                 # these do not directly affect the output of eval_f but rather indirectly via QI
                 local_u_approx += L.dt * self.QI[m, m] * params_mesh
-                return P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
+
+                sys = P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
+                return sys
 
             # get U_k+1
             # note: not using solve_system here because this solve step is the same for any problem
@@ -121,15 +138,11 @@ class fully_implicit_DAE(sweeper):
             # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220
             # options['xtol'] = P.params.newton_tol
             # options['eps'] = 1e-16
-            opt = optimize.root(
-                impl_fn,
-                L.f[m],
-                method='hybr',
-                tol=P.newton_tol
-                # callback= lambda x, f: print("solution:", x, " residual: ", f)
-            )
+
+            u_new = P.solve_system(implSystem, L.f[m], L.time + L.dt * self.coll.nodes[m - 1])
+
             # update gradient (recall L.f is being used to store the gradient)
-            L.f[m][:] = opt.x
+            L.f[m][:] = u_new  # opt.x
 
         # Update solution approximation
         integral = self.integrate()
