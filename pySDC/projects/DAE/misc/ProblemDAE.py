@@ -20,7 +20,9 @@ class ptype_dae(ptype):
     Attributes
     ----------
     work_counters : WorkCounter
-        Counts the work, here the number of function calls during the nonlinear solve is logged.
+        Counts the work, here the number of function calls during the nonlinear solve is logged and stored
+        in work_counters['newton']. The number of each function class of the right-hand side is then stored
+        in work_counters['rhs']
     """
 
     dtype_u = mesh
@@ -32,6 +34,7 @@ class ptype_dae(ptype):
         self._makeAttributeAndRegister('nvars', 'newton_tol', localVars=locals(), readOnly=True)
 
         self.work_counters['newton'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
 
     def solve_system(self, impl_sys, u0, t):
         r"""

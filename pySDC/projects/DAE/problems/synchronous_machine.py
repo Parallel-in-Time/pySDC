@@ -3,7 +3,6 @@ import warnings
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.core.Problem import WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -144,9 +143,6 @@ class synchronous_machine_infinite_bus(ptype_dae):
         Voltage at the field winding.
     T_m: float
         Defines the mechanical torque applied to the rotor shaft.
-    work_counters : WorkCounter
-        Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``.
 
     References
     ----------
@@ -187,8 +183,6 @@ class synchronous_machine_infinite_bus(ptype_dae):
         # These are modelled as constants. Intuition: permanent magnet as rotor
         self.v_F = 8.736809687330562e-4
         self.T_m = 0.854
-
-        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""

@@ -3,7 +3,6 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.core.Problem import WorkCounter
 
 
 # Helper function
@@ -55,9 +54,6 @@ class one_transistor_amplifier(ptype_dae):
     ----------
     t_end: float
         The end time at which the reference solution is determined.
-    work_counters : WorkCounter
-        Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``.
 
     References
     ----------
@@ -75,8 +71,6 @@ class one_transistor_amplifier(ptype_dae):
         # y = data[:, 1:-1]
         # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
         self.t_end = 0.0
-
-        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
@@ -194,9 +188,6 @@ class two_transistor_amplifier(ptype_dae):
     ----------
     t_end: float
         The end time at which the reference solution is determined.
-    work_counters : WorkCounter
-        Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``.
 
     References
     ----------
@@ -214,8 +205,6 @@ class two_transistor_amplifier(ptype_dae):
         # y = data[:, 1:-1]
         # self.u_ref = interp1d(x, y, kind='cubic', axis=0, fill_value='extrapolate')
         self.t_end = 0.0
-
-        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""

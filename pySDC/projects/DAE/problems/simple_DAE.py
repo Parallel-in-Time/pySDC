@@ -3,7 +3,6 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from pySDC.projects.DAE.misc.ProblemDAE import ptype_dae
-from pySDC.core.Problem import WorkCounter
 
 
 class pendulum_2d(ptype_dae):
@@ -33,11 +32,6 @@ class pendulum_2d(ptype_dae):
     ----------
     t_end: float
         The end time at which the reference solution is determined.
-    Attributes
-    ----------
-    work_counters : WorkCounter
-        Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``.
 
     References
     ----------
@@ -55,7 +49,6 @@ class pendulum_2d(ptype_dae):
         # solution = data[:, 1:]
         # self.u_ref = interp1d(t, solution, kind='cubic', axis=0, fill_value='extrapolate')
         self.t_end = 0.0
-        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
@@ -140,23 +133,11 @@ class simple_dae_1(ptype_dae):
     newton_tol : float
         Tolerance for Newton solver.
 
-    Attributes
-    ----------
-    work_counters : WorkCounter
-        Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``.
-
     References
     ----------
     .. [1] U. Ascher, L. R. Petzold. Computer method for ordinary differential equations and differential-algebraic
         equations. Society for Industrial and Applied Mathematics (1998).
     """
-
-    def __init__(self, nvars, newton_tol):
-        """Initialization routine"""
-        super().__init__(nvars, newton_tol)
-
-        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
@@ -230,9 +211,6 @@ class problematic_f(ptype_dae):
     ----------
     eta : float
         Specific parameter of the problem.
-    work_counters : WorkCounter
-        Counts the work, i.e., number of function calls of right-hand side is called and stored in
-        ``work_counters['rhs']``
 
     References
     ----------
@@ -244,8 +222,6 @@ class problematic_f(ptype_dae):
         """Initialization routine"""
         super().__init__(nvars, newton_tol)
         self._makeAttributeAndRegister('eta', localVars=locals())
-
-        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, du, t):
         r"""
