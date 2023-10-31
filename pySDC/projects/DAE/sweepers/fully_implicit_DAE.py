@@ -142,7 +142,7 @@ class fully_implicit_DAE(sweeper):
             u_new = P.solve_system(implSystem, L.f[m], L.time + L.dt * self.coll.nodes[m - 1])
 
             # update gradient (recall L.f is being used to store the gradient)
-            L.f[m][:] = u_new  # opt.x
+            L.f[m][:] = u_new
 
         # Update solution approximation
         integral = self.integrate()
