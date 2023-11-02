@@ -1,14 +1,12 @@
 import numpy as np
-import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import sort_stats, filter_stats, get_sorted
-from pySDC.implementations.problem_classes.Battery import battery, battery_implicit
+from pySDC.implementations.problem_classes.Battery import battery, battery_implicit, battery_n_capacitors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 
 from pySDC.core.Hooks import hooks
@@ -20,14 +18,16 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
+from pySDC.projects.PinTSimE.hardcoded_solutions import testSolution
 
-class LogEvent(hooks):
+
+class LogEventBattery(hooks):
     """
     Logs the problem dependent state function of the battery drain model.
     """
 
     def post_step(self, step, level_number):
-        super(LogEvent, self).post_step(step, level_number)
+        super().post_step(step, level_number)
 
         L = step.levels[level_number]
         P = L.prob
@@ -41,15 +41,17 @@ class LogEvent(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='state_function',
-            value=L.uend[1] - P.V_ref[0],
+            value=L.uend[1:] - P.V_ref[:],
         )
 
 
-def generate_description(
+def generateDescription(
     dt,
     problem,
     sweeper,
     num_nodes,
+    quad_type,
+    QI,
     hook_class,
     use_adaptivity,
     use_switch_estimator,
@@ -58,30 +60,32 @@ def generate_description(
     maxiter,
     max_restarts=None,
     tol_event=1e-10,
+    alpha=1.0,
 ):
-    """
+    r"""
     Generate a description for the battery models for a controller run.
 
     Parameters
     ----------
     dt : float
         Time step for computation.
-    problem : pySDC.core.Problem.ptype
+    problem : pySDC.core.Problem
         Problem class that wants to be simulated.
-    sweeper : pySDC.core.Sweeper.sweeper
+    sweeper : pySDC.core.Sweeper
         Sweeper class for solving the problem class numerically.
     num_nodes : int
         Number of collocation nodes.
-    hook_class : pySDC.core.Hooks
-        Logged data for a problem.
+    quad_type : str
+        Type of quadrature nodes, e.g. ``'LOBATTO'`` or ``'RADAU-RIGHT'``.
+    QI : str
+        Type of preconditioner used in SDC, e.g. ``'IE'`` or ``'LU'``.
+    hook_class : List of pySDC.core.Hooks
+        Logged data for a problem, e.g., hook_class=[LogSolution] logs the solution ``'u'``
+        during the simulation.
     use_adaptivity : bool
         Flag if the adaptivity wants to be used or not.
     use_switch_estimator : bool
         Flag if the switch estimator wants to be used or not.
-    ncapacitors : int
-        Number of capacitors used for the battery_model.
-    alpha : float
-        Multiple used for the initial conditions (problem_parameter).
     problem_params : dict
         Dictionary containing the problem parameters.
     restol : float
@@ -91,7 +95,9 @@ def generate_description(
     max_restarts : int, optional
         Maximum number of restarts per step.
     tol_event : float, optional
-        Tolerance for switch estimation to terminate.
+        Tolerance for event detection to terminate.
+    alpha : float, optional
+        Factor that indicates how the new step size in the Switch Estimator is reduced.
 
     Returns
     -------
@@ -102,59 +108,69 @@ def generate_description(
     """
 
     # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = -1 if use_adaptivity else restol
-    level_params['dt'] = dt
+    level_params = {
+        'restol': -1 if use_adaptivity else restol,
+        'dt': dt,
+    }
+    if use_adaptivity:
+        assert restol == -1, "Please set restol to -1 or omit it"
 
     # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = num_nodes
-    sweeper_params['QI'] = 'IE'
-    sweeper_params['initial_guess'] = 'spread'
+    sweeper_params = {
+        'quad_type': quad_type,
+        'num_nodes': num_nodes,
+        'QI': QI,
+        'initial_guess': 'spread',
+    }
 
     # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = maxiter
+    step_params = {
+        'maxiter': maxiter,
+    }
+    assert 'errtol' not in step_params.keys(), 'No exact solution known to compute error'
 
     # initialize controller parameters
-    controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['hook_class'] = hook_class
-    controller_params['mssdc_jac'] = False
+    controller_params = {
+        'logger_level': 30,
+        'hook_class': hook_class,
+        'mssdc_jac': False,
+    }
 
     # convergence controllers
-    convergence_controllers = dict()
+    convergence_controllers = {}
     if use_switch_estimator:
-        switch_estimator_params = {}
-        switch_estimator_params['tol'] = tol_event
+        switch_estimator_params = {
+            'tol': tol_event,
+            'alpha': alpha,
+        }
         convergence_controllers.update({SwitchEstimator: switch_estimator_params})
-
     if use_adaptivity:
-        adaptivity_params = dict()
-        adaptivity_params['e_tol'] = 1e-7
+        adaptivity_params = {
+            'e_tol': 1e-7,
+        }
         convergence_controllers.update({Adaptivity: adaptivity_params})
-
     if max_restarts is not None:
-        convergence_controllers[BasicRestartingNonMPI] = {
+        restarting_params = {
             'max_restarts': max_restarts,
             'crash_after_max_restarts': False,
         }
+        convergence_controllers.update({BasicRestartingNonMPI: restarting_params})
 
     # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = problem  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = sweeper  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params
-    description['convergence_controllers'] = convergence_controllers
+    description = {
+        'problem_class': problem,
+        'problem_params': problem_params,
+        'sweeper_class': sweeper,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+        'convergence_controllers': convergence_controllers,
+    }
 
     return description, controller_params
 
 
-def controller_run(description, controller_params, use_adaptivity, use_switch_estimator, t0, Tend):
+def controllerRun(description, controller_params, t0, Tend, exact_event_time_avail=False):
     """
     Executes a controller run for a problem defined in the description.
 
@@ -164,10 +180,12 @@ def controller_run(description, controller_params, use_adaptivity, use_switch_es
         Contains all information for a controller run.
     controller_params : dict
         Parameters needed for a controller run.
-    use_adaptivity : bool
-        Flag if the adaptivity wants to be used or not.
-    use_switch_estimator : bool
-        Flag if the switch estimator wants to be used or not.
+    t0 : float
+        Starting time of simulation.
+    Tend : float
+        End time of simulation.
+    exact_event_time_avail : bool, optional
+        Indicates if exact event time of a problem is available.
 
     Returns
     -------
@@ -181,504 +199,402 @@ def controller_run(description, controller_params, use_adaptivity, use_switch_es
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+    t_switch_exact = P.t_switch_exact if exact_event_time_avail else None
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    problem = description['problem_class']
-    sweeper = description['sweeper_class']
-
-    Path("data").mkdir(parents=True, exist_ok=True)
-    fname = 'data/{}_{}_USE{}_USA{}.dat'.format(
-        problem.__name__, sweeper.__name__, use_switch_estimator, use_adaptivity
-    )
-    f = open(fname, 'wb')
-    dill.dump(stats, f)
-    f.close()
-
-    return stats
+    return stats, t_switch_exact
 
 
-def run():
-    """
-    Executes the simulation for the battery model using two different sweepers and plot the results
-    as <problem_class>_model_solution_<sweeper_class>.png
+def main():
+    r"""
+    Executes the simulation.
+
+    Note
+    ----
+    Hardcoded solutions for battery models in `pySDC.projects.PinTSimE.hardcoded_solutions` are only computed for
+    ``dt_list=[1e-2, 1e-3]`` and ``M_fix=4``. Hence changing ``dt_list`` and ``M_fix`` to different values could arise
+    an ``AssertionError``.
     """
 
-    dt = 1e-2
-    t0 = 0.0
-    Tend = 0.3
+    # defines parameters for sweeper
+    M_fix = 4
+    sweeper_params = {
+        'num_nodes': M_fix,
+        'quad_type': 'LOBATTO',
+        'QI': 'IE',
+    }
 
-    problem_classes = [battery, battery_implicit]
-    sweeper_classes = [imex_1st_order, generic_implicit]
-    num_nodes = 4
-    restol = -1
-    maxiter = 8
+    # defines parameters for event detection, restol, and max. number of iterations
+    handling_params = {
+        'restol': -1,
+        'maxiter': 8,
+        'max_restarts': 50,
+        'recomputed': False,
+        'tol_event': 1e-10,
+        'alpha': 1.0,
+        'exact_event_time_avail': None,
+    }
 
-    ncapacitors = 1
-    alpha = 1.2
-    V_ref = np.array([1.0])
-    C = np.array([1.0])
+    all_params = {
+        'sweeper_params': sweeper_params,
+        'handling_params': handling_params,
+    }
 
-    problem_params = dict()
-    problem_params['ncapacitors'] = ncapacitors
-    problem_params['C'] = C
-    problem_params['alpha'] = alpha
-    problem_params['V_ref'] = V_ref
+    hook_class = [LogSolution, LogEventBattery, LogEmbeddedErrorEstimate, LogStepSize]
 
-    max_restarts = 1
-    recomputed = False
-    use_switch_estimator = [True]
+    use_detection = [True]
     use_adaptivity = [True]
 
-    hook_class = [LogSolution, LogEvent, LogEmbeddedErrorEstimate, LogStepSize]
+    for problem, sweeper in zip([battery, battery_implicit], [imex_1st_order, generic_implicit]):
+        for defaults in [False, True]:
+            # for hardcoded solutions problem parameter defaults should match with parameters here
+            if defaults:
+                params_battery_1capacitor = {
+                    'ncapacitors': 1,
+                }
+            else:
+                params_battery_1capacitor = {
+                    'ncapacitors': 1,
+                    'C': np.array([1.0]),
+                    'alpha': 1.2,
+                    'V_ref': np.array([1.0]),
+                }
 
-    for problem, sweeper in zip(problem_classes, sweeper_classes):
-        for use_SE in use_switch_estimator:
-            for use_A in use_adaptivity:
-                tol_event = 1e-10 if sweeper.__name__ == 'generic_implicit' else 1e-17
+            all_params.update({'problem_params': params_battery_1capacitor})
 
-                description, controller_params = generate_description(
-                    dt,
-                    problem,
-                    sweeper,
-                    num_nodes,
-                    hook_class,
-                    use_A,
-                    use_SE,
-                    problem_params,
-                    restol,
-                    maxiter,
-                    max_restarts,
-                    tol_event,
-                )
+            _ = runSimulation(
+                problem=problem,
+                sweeper=sweeper,
+                all_params=all_params,
+                use_adaptivity=use_adaptivity,
+                use_detection=use_detection,
+                hook_class=hook_class,
+                interval=(0.0, 0.3),
+                dt_list=[1e-2, 1e-3],
+                nnodes=[M_fix],
+            )
 
-                # Assertions
-                proof_assertions_description(description, use_A, use_SE)
+    # defines parameters for the problem class
+    params_battery_2capacitors = {
+        'ncapacitors': 2,
+        'C': np.array([1.0, 1.0]),
+        'alpha': 1.2,
+        'V_ref': np.array([1.0, 1.0]),
+    }
 
-                proof_assertions_time(dt, Tend, V_ref, alpha)
+    all_params.update({'problem_params': params_battery_2capacitors})
 
-                stats = controller_run(description, controller_params, use_A, use_SE, t0, Tend)
+    _ = runSimulation(
+        problem=battery_n_capacitors,
+        sweeper=imex_1st_order,
+        all_params=all_params,
+        use_adaptivity=use_adaptivity,
+        use_detection=use_detection,
+        hook_class=hook_class,
+        interval=(0.0, 0.5),
+        dt_list=[1e-2, 1e-3],
+        nnodes=[sweeper_params['num_nodes']],
+    )
 
-            check_solution(stats, dt, problem.__name__, use_A, use_SE)
 
-            plot_voltages(description, problem.__name__, sweeper.__name__, recomputed, use_SE, use_A)
-
-
-def plot_voltages(description, problem, sweeper, recomputed, use_switch_estimator, use_adaptivity, cwd='./'):
-    """
-    Routine to plot the numerical solution of the model.
+def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, hook_class, interval, dt_list, nnodes):
+    r"""
+    Script that executes the simulation for a given problem class for given parameters defined by the user.
 
     Parameters
     ----------
-    description : dict
-        Contains all information for a controller run.
-    problem : pySDC.core.Problem.ptype
-        Problem class that wants to be simulated.
-    sweeper : pySDC.core.Sweeper.sweeper
-        Sweeper class for solving the problem class numerically.
-    recomputed : bool
-        Flag if the values after a restart are used or before.
-    use_switch_estimator : bool
-        Flag if the switch estimator wants to be used or not.
-    use_adaptivity : bool
-        Flag if adaptivity wants to be used or not.
-    cwd : str
-        Current working directory.
+    problem : pySDC.core.Problem
+        Problem class to be simulated.
+    sweeper : pySDC.core.Sweeper
+        Sweeper that is used to simulate the problem class.
+    all_params : dict
+        Dictionary contains the problem parameters for ``problem``, the sweeper parameters for ``sweeper``,
+        and handling parameters needed for event detection, i.e., ``max_restarts``, ``recomputed``, ``tol_event``,
+        ``alpha``, and ``exact_event_time_available``.
+    use_adaptivity : list of bool
+       Indicates whether adaptivity is used in the simulation or not. Here a list is used to iterate over the
+       different cases, i.e., ``use_adaptivity=[True, False]``.
+    use_detection : list of bool
+       Indicates whether event detection is used in the simulation or not. Here a list is used to iterate over the
+       different cases, i.e., ``use_detection=[True, False]``.
+    hook_class : list of pySDC.core.Hooks
+       List containing the different hook classes to log data during the simulation, i.e., ``hook_class=[LogSolution]``
+       logs the solution ``u``.
+    interval : tuple
+       Simulation interval.
+    dt_list : list of float
+       List containing different step sizes where the solution is computed.
+    nnodes : list of int
+       The solution can be computed for different number of collocation nodes.
     """
 
-    f = open(cwd + 'data/{}_{}_USE{}_USA{}.dat'.format(problem, sweeper, use_switch_estimator, use_adaptivity), 'rb')
-    stats = dill.load(f)
-    f.close()
+    Path("data").mkdir(parents=True, exist_ok=True)
 
-    # convert filtered statistics to list of iterations count, sorted by process
-    cL = np.array([me[1][0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
-    vC = np.array([me[1][1] for me in get_sorted(stats, type='u', recomputed=recomputed)])
+    prob_cls_name = problem.__name__
 
-    t = np.array([me[0] for me in get_sorted(stats, type='u', recomputed=recomputed)])
+    u_num = {}
 
-    setup_mpl()
-    fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
-    ax.set_title('Simulation of {} using {}'.format(problem, sweeper), fontsize=10)
-    ax.plot(t, cL, label=r'$i_L$')
-    ax.plot(t, vC, label=r'$v_C$')
+    for dt in dt_list:
+        u_num[dt] = {}
 
-    if use_switch_estimator:
-        switches = get_recomputed(stats, type='switch', sortby='time')
+        for M in nnodes:
+            u_num[dt][M] = {}
 
-        assert len(switches) >= 1, 'No switches found!'
-        t_switch = [v[1] for v in switches]
+            for use_SE in use_detection:
+                u_num[dt][M][use_SE] = {}
 
-        ax.axvline(x=t_switch[-1], linestyle='--', linewidth=0.8, color='r', label='Switch')
+                for use_A in use_adaptivity:
+                    u_num[dt][M][use_SE][use_A] = {}
+
+                    problem_params = all_params['problem_params']
+                    sweeper_params = all_params['sweeper_params']
+                    handling_params = all_params['handling_params']
+
+                    # plotting results for fixed M requires that M_fix is included in nnodes!
+                    M_fix = sweeper_params['num_nodes']
+                    assert (
+                        M_fix in nnodes
+                    ), f"For fixed number of collocation nodes {M_fix} no solution will be computed!"
+
+                    restol = -1 if use_A else handling_params['restol']
+
+                    description, controller_params = generateDescription(
+                        dt=dt,
+                        problem=problem,
+                        sweeper=sweeper,
+                        num_nodes=M,
+                        quad_type=sweeper_params['quad_type'],
+                        QI=sweeper_params['QI'],
+                        hook_class=hook_class,
+                        use_adaptivity=use_A,
+                        use_switch_estimator=use_SE,
+                        problem_params=problem_params,
+                        restol=restol,
+                        maxiter=handling_params['maxiter'],
+                        max_restarts=handling_params['max_restarts'],
+                        tol_event=handling_params['tol_event'],
+                        alpha=handling_params['alpha'],
+                    )
+
+                    stats, t_switch_exact = controllerRun(
+                        description=description,
+                        controller_params=controller_params,
+                        t0=interval[0],
+                        Tend=interval[-1],
+                        exact_event_time_avail=handling_params['exact_event_time_avail'],
+                    )
+
+                    u_num[dt][M][use_SE][use_A] = getDataDict(
+                        stats, prob_cls_name, use_A, use_SE, handling_params['recomputed'], t_switch_exact
+                    )
+
+                    plotSolution(u_num[dt][M][use_SE][use_A], prob_cls_name, use_A, use_SE)
+
+                    testSolution(u_num[dt][M_fix][use_SE][use_A], prob_cls_name, dt, use_A, use_SE)
+
+    return u_num
+
+
+def getUnknownLabels(prob_cls_name):
+    """
+    Returns the unknown for a problem and corresponding labels for a plot.
+
+    Parameters
+    ----------
+    prob_cls_name : str
+        Name of the problem class.
+
+    Returns
+    -------
+    unknowns : list of str
+        Contains the names of unknowns.
+    unknowns_labels : list of str
+        Contains the labels of unknowns for plotting.
+    """
+
+    unknowns = {
+        'battery': ['iL', 'vC'],
+        'battery_implicit': ['iL', 'vC'],
+        'battery_n_capacitors': ['iL', 'vC1', 'vC2'],
+        'DiscontinuousTestODE': ['u'],
+        'piline': ['vC1', 'vC2', 'iLp'],
+        'buck_converter': ['vC1', 'vC2', 'iLp'],
+    }
+
+    unknowns_labels = {
+        'battery': [r'$i_L$', r'$v_C$'],
+        'battery_implicit': [r'$i_L$', r'$v_C$'],
+        'battery_n_capacitors': [r'$i_L$', r'$v_{C_1}$', r'$v_{C_2}$'],
+        'DiscontinuousTestODE': [r'$u$'],
+        'piline': [r'$v_{C_1}$', r'$v_{C_2}$', r'$i_{L_\pi}$'],
+        'buck_converter': [r'$v_{C_1}$', r'$v_{C_2}$', r'$i_{L_\pi}$'],
+    }
+
+    return unknowns[prob_cls_name], unknowns_labels[prob_cls_name]
+
+
+def plotStylingStuff():  # pragma: no cover
+    """
+    Returns plot stuff such as colors, line styles for making plots more pretty.
+    """
+
+    colors = {
+        False: {
+            False: 'dodgerblue',
+            True: 'navy',
+        },
+        True: {
+            False: 'linegreen',
+            True: 'darkgreen',
+        },
+    }
+
+    return colors
+
+
+def plotSolution(u_num, prob_cls_name, use_adaptivity, use_detection):  # pragma: no cover
+    r"""
+    Plots the numerical solution for one simulation run.
+
+    Parameters
+    ----------
+    u_num : dict
+        Contains numerical solution with corresponding times for different problem_classes, and
+        labels for different unknowns of the problem.
+    prob_cls_name : str
+        Name of the problem class to be plotted.
+    use_adaptivity : bool
+        Indicates whether adaptivity is used in the simulation or not.
+    """
+
+    fig, ax = plt_helper.plt.subplots(1, 1, figsize=(7.5, 5))
+
+    unknowns = u_num['unknowns']
+    unknowns_labels = u_num['unknowns_labels']
+    for unknown, unknown_label in zip(unknowns, unknowns_labels):
+        ax.plot(u_num['t'], u_num[unknown], label=unknown_label)
+
+    if use_detection:
+        t_switches = u_num['t_switches']
+        for i in range(len(t_switches)):
+            ax.axvline(x=t_switches[i], linestyle='--', linewidth=0.8, color='r', label='Event {}'.format(i + 1))
 
     if use_adaptivity:
-        dt = np.array(get_sorted(stats, type='dt', recomputed=False))
-
         dt_ax = ax.twinx()
+        dt = u_num['dt']
         dt_ax.plot(dt[:, 0], dt[:, 1], linestyle='-', linewidth=0.8, color='k', label=r'$\Delta t$')
-        dt_ax.set_ylabel(r'$\Delta t$', fontsize=8)
-        dt_ax.legend(frameon=False, fontsize=8, loc='center right')
+        dt_ax.set_ylabel(r'$\Delta t$', fontsize=16)
+        dt_ax.legend(frameon=False, fontsize=12, loc='center right')
 
-    ax.axhline(y=1.0, linestyle='--', linewidth=0.8, color='g', label='$V_{ref}$')
+    ax.legend(frameon=False, fontsize=12, loc='upper right')
+    ax.set_xlabel(r'$t$', fontsize=16)
+    ax.set_ylabel(r'$u(t)$', fontsize=16)
 
-    ax.legend(frameon=False, fontsize=8, loc='upper right')
-
-    ax.set_xlabel('Time', fontsize=8)
-    ax.set_ylabel('Energy', fontsize=8)
-
-    fig.savefig('data/{}_model_solution_{}.png'.format(problem, sweeper), dpi=300, bbox_inches='tight')
+    fig.savefig('data/{}_model_solution.png'.format(prob_cls_name), dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
 
 
-def check_solution(stats, dt, problem, use_adaptivity, use_switch_estimator):
-    """
-    Function that checks the solution based on a hardcoded reference solution.
-    Based on check_solution function from @brownbaerchen.
+def getDataDict(stats, prob_cls_name, use_adaptivity, use_detection, recomputed, t_switch_exact):
+    r"""
+    Extracts statistics and store it in a dictionary. In this routine, from ``stats`` different data are extracted
+    such as
+
+    - each component of solution ``'u'`` and corresponding time domain ``'t'``,
+    - the unknowns of the problem ``'unknowns'``,
+    - the unknowns of the problem as labels for plotting ``'unknowns_labels'``,
+    - global error ``'e_global'`` after each step,
+    - events found by event detection ``'t_switches''``,
+    - exact event time ``'t_switch_exact'``,
+    - event error ``'e_event'``,
+    - state function ``'state_function'``,
+    - embedded error estimate computing when using adaptivity ``'e_em'``,
+    - (adjusted) step sizes ``'dt'``,
+    - sum over restarts ``'sum_restarts'``,
+    - and the sum over all iterations ``'sum_niters'``.
+
+    Note
+    ----
+    In order to use these data, corresponding hook classes has to be defined before the simulation. Otherwise, no values can
+    be obtained.
+
+    The global error does only make sense when an exact solution for the problem is available. Since ``'e_global'`` is stored
+    for each problem class, only for ``DiscontinuousTestODE`` the global error is taken into account when testing the solution.
+
+    Also the event error ``'e_event'`` can only be computed if an exact event time is available. Since the function
+    ``controllerRun`` returns ``t_switch_exact=None`` when no exact event time is available, in order to compute the event error,
+    it has to be proven whether the list (in case of more than one event) contains ``None`` or not.
 
     Parameters
     ----------
     stats : dict
-        Raw statistics from a controller run.
-    dt : float
-        Initial time step.
-    problem : problem_class.__name__
-        The problem_class that is numerically solved
-    use_switch_estimator : bool
-        Indicates if switch detection is used or not.
+        Raw statistics of one simulation run.
+    prob_cls_name : str
+        Name of the problem class.
     use_adaptivity : bool
-        Indicate if adaptivity is used or not.
-    """
-
-    data = get_data_dict(stats, use_adaptivity, use_switch_estimator)
-
-    if problem == 'battery':
-        if use_switch_estimator and use_adaptivity:
-            msg = f'Error when using switch estimator and adaptivity for battery for dt={dt:.1e}:'
-            if dt == 1e-2:
-                expected = {
-                    'cL': 0.5446532674094873,
-                    'vC': 0.9999999999883544,
-                    'dt': 0.01,
-                    'e_em': 2.220446049250313e-16,
-                    'state_function': -1.1645573394503117e-11,
-                    'restarts': 3.0,
-                    'sum_niters': 136.0,
-                }
-            elif dt == 1e-3:
-                expected = {
-                    'cL': 0.539386744746365,
-                    'vC': 0.9999999710472945,
-                    'dt': 0.005520873635314061,
-                    'e_em': 2.220446049250313e-16,
-                    'state_function': -2.8952705455331795e-08,
-                    'restarts': 11.0,
-                    'sum_niters': 264.0,
-                }
-
-            got = {
-                'cL': data['cL'][-1],
-                'vC': data['vC'][-1],
-                'dt': data['dt'][-1],
-                'e_em': data['e_em'][-1],
-                'state_function': data['state_function'][-1],
-                'restarts': data['restarts'],
-                'sum_niters': data['sum_niters'],
-            }
-        elif use_switch_estimator and not use_adaptivity:
-            msg = f'Error when using switch estimator for battery for dt={dt:.1e}:'
-            if dt == 1e-2:
-                expected = {
-                    'cL': 0.5456190026495924,
-                    'vC': 0.999166666941434,
-                    'state_function': -0.0008333330585660326,
-                    'restarts': 4.0,
-                    'sum_niters': 296.0,
-                }
-            elif dt == 1e-3:
-                expected = {
-                    'cL': 0.5403849766797957,
-                    'vC': 0.9999166666752302,
-                    'state_function': -8.33333247698409e-05,
-                    'restarts': 2.0,
-                    'sum_niters': 2424.0,
-                }
-
-            got = {
-                'cL': data['cL'][-1],
-                'vC': data['vC'][-1],
-                'state_function': data['state_function'][-1],
-                'restarts': data['restarts'],
-                'sum_niters': data['sum_niters'],
-            }
-
-        elif not use_switch_estimator and use_adaptivity:
-            msg = f'Error when using adaptivity for battery for dt={dt:.1e}:'
-            if dt == 1e-2:
-                expected = {
-                    'cL': 0.4433805288639916,
-                    'vC': 0.90262388393713,
-                    'dt': 0.18137307612335937,
-                    'e_em': 2.7177844974524135e-09,
-                    'restarts': 0.0,
-                    'sum_niters': 24.0,
-                }
-            elif dt == 1e-3:
-                expected = {
-                    'cL': 0.3994744179584864,
-                    'vC': 0.9679037468770668,
-                    'dt': 0.1701392217033212,
-                    'e_em': 2.0992988458701234e-09,
-                    'restarts': 0.0,
-                    'sum_niters': 32.0,
-                }
-
-            got = {
-                'cL': data['cL'][-1],
-                'vC': data['vC'][-1],
-                'dt': data['dt'][-1],
-                'e_em': data['e_em'][-1],
-                'restarts': data['restarts'],
-                'sum_niters': data['sum_niters'],
-            }
-
-    elif problem == 'battery_implicit':
-        if use_switch_estimator and use_adaptivity:
-            msg = f'Error when using switch estimator and adaptivity for battery_implicit for dt={dt:.1e}:'
-            if dt == 1e-2:
-                expected = {
-                    'cL': 0.5446675396652545,
-                    'vC': 0.9999999999883541,
-                    'dt': 0.01,
-                    'e_em': 2.220446049250313e-16,
-                    'state_function': -1.1645906461410505e-11,
-                    'restarts': 3.0,
-                    'sum_niters': 136.0,
-                }
-            elif dt == 1e-3:
-                expected = {
-                    'cL': 0.5393867447463223,
-                    'vC': 0.9999999710472952,
-                    'dt': 0.005520876908755634,
-                    'e_em': 2.220446049250313e-16,
-                    'state_function': -2.895270478919798e-08,
-                    'restarts': 11.0,
-                    'sum_niters': 264.0,
-                }
-
-            got = {
-                'cL': data['cL'][-1],
-                'vC': data['vC'][-1],
-                'dt': data['dt'][-1],
-                'e_em': data['e_em'][-1],
-                'state_function': data['state_function'][-1],
-                'restarts': data['restarts'],
-                'sum_niters': data['sum_niters'],
-            }
-        elif use_switch_estimator and not use_adaptivity:
-            msg = f'Error when using switch estimator for battery_implicit for dt={dt:.1e}:'
-            if dt == 1e-2:
-                expected = {
-                    'cL': 0.5456190026495138,
-                    'vC': 0.9991666669414431,
-                    'state_function': -0.0008333330585569287,
-                    'restarts': 4.0,
-                    'sum_niters': 296.0,
-                }
-            elif dt == 1e-3:
-                expected = {
-                    'cL': 0.5403849766797896,
-                    'vC': 0.9999166666752302,
-                    'state_function': -8.33333247698409e-05,
-                    'restarts': 2.0,
-                    'sum_niters': 2424.0,
-                }
-
-            got = {
-                'cL': data['cL'][-1],
-                'vC': data['vC'][-1],
-                'state_function': data['state_function'][-1],
-                'restarts': data['restarts'],
-                'sum_niters': data['sum_niters'],
-            }
-
-        elif not use_switch_estimator and use_adaptivity:
-            msg = f'Error when using adaptivity for battery_implicit for dt={dt:.1e}:'
-            if dt == 1e-2:
-                expected = {
-                    'cL': 0.4694087102919169,
-                    'vC': 0.9026238839371302,
-                    'dt': 0.18137307612335937,
-                    'e_em': 2.3469713394952407e-09,
-                    'restarts': 0.0,
-                    'sum_niters': 24.0,
-                }
-            elif dt == 1e-3:
-                expected = {
-                    'cL': 0.39947441811958956,
-                    'vC': 0.9679037468770735,
-                    'dt': 0.1701392217033212,
-                    'e_em': 1.147640815712947e-09,
-                    'restarts': 0.0,
-                    'sum_niters': 32.0,
-                }
-
-            got = {
-                'cL': data['cL'][-1],
-                'vC': data['vC'][-1],
-                'dt': data['dt'][-1],
-                'e_em': data['e_em'][-1],
-                'restarts': data['restarts'],
-                'sum_niters': data['sum_niters'],
-            }
-
-    for key in expected.keys():
-        err_msg = f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
-        if key == 'cL':
-            assert abs(expected[key] - got[key]) <= 1e-2, err_msg
-        else:
-            assert np.isclose(expected[key], got[key], rtol=1e-3), err_msg
-
-
-def get_data_dict(stats, use_adaptivity, use_switch_estimator, recomputed=False):
-    """
-    Converts the statistics in a useful data dictionary so that it can be easily checked in the check_solution function.
-    Based on @brownbaerchen's get_data function.
-
-    Parameters
-    ----------
-    stats : dict
-        Raw statistics from a controller run.
-    use_adaptivity : bool
-        Flag if adaptivity wants to be used or not.
-    use_switch_estimator : bool
-        Flag if the switch estimator wants to be used or not.
+        Indicates whether adaptivity is used in the simulation or not.
+    use_detection : bool
+        Indicates whether event detection is used or not.
     recomputed : bool
-        Flag if the values after a restart are used or before.
+        Indicates if values after successfully steps are used or not.
+    t_switch_exact : float
+        Exact event time of the problem.
 
     Returns
     -------
-    data : dict
-        Contains all information as the statistics dict.
+    res : dict
+        Dictionary with extracted data separated with reasonable keys.
     """
 
-    data = dict()
-    data['cL'] = np.array([me[1][0] for me in get_sorted(stats, type='u', sortby='time', recomputed=recomputed)])
-    data['vC'] = np.array([me[1][1] for me in get_sorted(stats, type='u', sortby='time', recomputed=recomputed)])
+    res = {}
+    unknowns, unknowns_labels = getUnknownLabels(prob_cls_name)
+
+    # numerical solution
+    u_val = get_sorted(stats, type='u', sortby='time', recomputed=recomputed)
+    res['t'] = np.array([item[0] for item in u_val])
+    for i, label in enumerate(unknowns):
+        res[label] = np.array([item[1][i] for item in u_val])
+
+    res['unknowns'] = unknowns
+    res['unknowns_labels'] = unknowns_labels
+
+    # global error
+    res['e_global'] = np.array(get_sorted(stats, type='e_global_post_step', sortby='time', recomputed=recomputed))
+
+    # event time(s) found by event detection
+    if use_detection:
+        switches = get_sorted(stats, type='switch', sortby='time', recomputed=recomputed)
+        assert len(switches) >= 1, 'No events found!'
+        t_switches = [t[1] for t in switches]
+        res['t_switches'] = t_switches
+
+        t_switch_exact = [t_switch_exact]
+        res['t_switch_exact'] = t_switch_exact
+
+        if not all(t is None for t in t_switch_exact):
+            event_err = [
+                abs(num_item - ex_item) for (num_item, ex_item) in zip(res['t_switches'], res['t_switch_exact'])
+            ]
+            res['e_event'] = event_err
+
+    h_val = get_sorted(stats, type='state_function', sortby='time', recomputed=recomputed)
+    h = np.array([np.abs(val[1]) for val in h_val])
+    res['state_function'] = h
+
+    # embedded error and adapted step sizes
     if use_adaptivity:
-        data['dt'] = np.array(get_sorted(stats, type='dt', sortby='time', recomputed=recomputed))[:, 1]
-        data['e_em'] = np.array(
-            get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed)
-        )[:, 1]
-    if use_switch_estimator:
-        data['state_function'] = np.array(
-            get_sorted(stats, type='state_function', sortby='time', recomputed=recomputed)
-        )[:, 1]
-    if use_adaptivity or use_switch_estimator:
-        data['restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
-    data['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
+        res['e_em'] = np.array(get_sorted(stats, type='error_embedded_estimate', sortby='time', recomputed=recomputed))
+        res['dt'] = np.array(get_sorted(stats, type='dt', recomputed=recomputed))
 
-    return data
+    # sum over restarts
+    if use_adaptivity or use_detection:
+        res['sum_restarts'] = np.sum(np.array(get_sorted(stats, type='restart', recomputed=None, sortby='time'))[:, 1])
 
-
-def get_recomputed(stats, type, sortby):
-    """
-    Function that filters statistics after a recomputation. It stores all value of a type before restart. If there are multiple values
-    with same time point, it only stores the elements with unique times.
-
-    Parameters
-    ----------
-    stats : dict
-        Raw statistics from a controller run.
-    type : str
-        The type the be filtered.
-    sortby : str
-        String to specify which key to use for sorting.
-
-    Returns
-    -------
-    sorted_list : list
-        List of filtered statistics.
-    """
-
-    sorted_nested_list = []
-    times_unique = np.unique([me[0] for me in get_sorted(stats, type=type)])
-    filtered_list = [
-        filter_stats(
-            stats,
-            time=t_unique,
-            num_restarts=max([me.num_restarts for me in filter_stats(stats, type=type, time=t_unique).keys()]),
-            type=type,
-        )
-        for t_unique in times_unique
-    ]
-    for item in filtered_list:
-        sorted_nested_list.append(sort_stats(item, sortby=sortby))
-    sorted_list = [item for sub_item in sorted_nested_list for item in sub_item]
-    return sorted_list
-
-
-def proof_assertions_description(description, use_adaptivity, use_switch_estimator):
-    """
-    Function to proof the assertions in the description.
-
-    Parameters
-    ----------
-    description : dict
-        Contains all information for a controller run.
-    use_adaptivity : bool
-        Flag if adaptivity wants to be used or not.
-    use_switch_estimator : bool
-        Flag if the switch estimator wants to be used or not.
-    """
-
-    n = description['problem_params']['ncapacitors']
-    assert (
-        description['problem_params']['alpha'] > description['problem_params']['V_ref'][k] for k in range(n)
-    ), 'Please set "alpha" greater than values of "V_ref"'
-    assert type(description['problem_params']['V_ref']) == np.ndarray, '"V_ref" needs to be an np.ndarray'
-    assert type(description['problem_params']['C']) == np.ndarray, '"C" needs to be an np.ndarray '
-    assert (
-        np.shape(description['problem_params']['V_ref'])[0] == n
-    ), 'Number of reference values needs to be equal to number of condensators'
-    assert (
-        np.shape(description['problem_params']['C'])[0] == n
-    ), 'Number of capacitance values needs to be equal to number of condensators'
-
-    assert (
-        description['problem_params']['V_ref'][k] > 0 for k in range(n)
-    ), 'Please set values of "V_ref" greater than 0'
-
-    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
-    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
-    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
-
-    if use_adaptivity:
-        assert description['level_params']['restol'] == -1, "Please set restol to -1 or omit it"
-
-
-def proof_assertions_time(dt, Tend, V_ref, alpha):
-    """
-    Function to proof the assertions regarding the time domain (in combination with the specific problem).
-
-    Parameters
-    ----------
-    dt : float
-        Time step for computation.
-    Tend : float
-        End time.
-    V_ref : np.ndarray
-        Reference values (problem parameter).
-    alpha : float
-        Multiple used for initial conditions (problem_parameter).
-    """
-
-    assert dt < Tend, "Time step is too large for the time domain!"
-
-    assert (
-        Tend == 0.3 and V_ref[0] == 1.0 and alpha == 1.2
-    ), "Error! Do not use other parameters for V_ref != 1.0, alpha != 1.2, Tend != 0.3 due to hardcoded reference!"
-    assert dt == 1e-2, "Error! Do not use another time step dt!= 1e-2!"
+    # sum over all iterations
+    res['sum_niters'] = np.sum(np.array(get_sorted(stats, type='niter', recomputed=None, sortby='time'))[:, 1])
+    return res
 
 
 if __name__ == "__main__":
-    run()
+    main()

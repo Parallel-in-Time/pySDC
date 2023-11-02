@@ -2,14 +2,18 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocations import Collocation
-from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.EnergyGrids.log_data_battery import log_data_battery
-from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
+
+from pySDC.implementations.hooks.log_solution import LogSolution
+
+from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
 
 def main():
@@ -18,55 +22,65 @@ def main():
     """
 
     # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = -1e-10
-    level_params['e_tol'] = 1e-5
-    level_params['dt'] = 2e-2
+    level_params = {
+        'restol': -1,
+        'dt': 2e-2,
+    }
 
     # initialize sweeper parameters
-    sweeper_params = dict()
-
-    sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 5
-    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'spread'
-
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['Vs'] = 5.0
-    problem_params['Rs'] = 0.5
-    problem_params['C'] = 1
-    problem_params['R'] = 1
-    problem_params['L'] = 1
-    problem_params['alpha'] = 3  # 10
-    problem_params['V_ref'] = 1
+    sweeper_params = {
+        'quad_type': 'LOBATTO',
+        'num_nodes': 5,
+        'QI': 'LU',
+        'initial_guess': 'spread',
+    }
 
     # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = 5
+    step_params = {
+        'maxiter': 10,
+    }
 
     # initialize controller parameters
-    controller_params = dict()
-    controller_params['use_adaptivity'] = True
-    controller_params['use_switch_estimator'] = True
-    controller_params['logger_level'] = 20
-    controller_params['hook_class'] = log_data_battery
+    controller_params = {
+        'logger_level': 30,
+        'hook_class': [LogSolution],
+        'mssdc_jac': False,
+    }
+
+    # convergence controllers
+    convergence_controllers = {}
+    switch_estimator_params = {
+        'tol': 1e-10,
+        'alpha': 1.0,
+    }
+    convergence_controllers.update({SwitchEstimator: switch_estimator_params})
+    adaptivity_params = {
+        'e_tol': 1e-7,
+    }
+    convergence_controllers.update({Adaptivity: adaptivity_params})
+    restarting_params = {
+        'max_restarts': 50,
+        'crash_after_max_restarts': False,
+    }
+    convergence_controllers.update({BasicRestartingNonMPI: restarting_params})
 
     # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = battery
-    description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order
-    description['sweeper_params'] = sweeper_params
-    description['level_params'] = level_params
-    description['step_params'] = step_params
+    description = {
+        'problem_class': battery,
+        'problem_params': {},  # use default problem params
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+        'convergence_controllers': convergence_controllers,
+    }
 
     # set time parameters
     t0 = 0.0
-    Tend = 4
+    Tend = 0.5
 
     # instantiate controller
-    controller = switch_controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -91,19 +105,17 @@ def plot_voltages(cwd='./'):
     stats = dill.load(f)
     f.close()
 
-    # convert filtered statistics to list of iterations count, sorted by process
-    cL = get_sorted(stats, type='current L', sortby='time', recomputed=False)
-    vC = get_sorted(stats, type='voltage C', sortby='time', recomputed=False)
-
-    times = [v[0] for v in cL]
+    u = get_sorted(stats, type='u', sortby='time', recomputed=False)
+    t = np.array([me[0] for me in u])
+    iL = np.array([me[1][0] for me in u])
+    vC = np.array([me[1][1] for me in u])
 
     dt = np.array(get_sorted(stats, type='dt', recomputed=False))
     list_gs = get_sorted(stats, type='restart')
 
-    setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1)
-    ax.plot(times, [v[1] for v in cL], label='$i_L$')
-    ax.plot(times, [v[1] for v in vC], label='$v_C$')
+    ax.plot(t, iL, label='$i_L$')
+    ax.plot(t, vC, label='$v_C$')
     ax.set_xlabel('Time', fontsize=20)
     ax.set_ylabel('Energy', fontsize=20)
     for element in list_gs:
