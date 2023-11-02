@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -20,8 +20,8 @@ class DiscontinuousTestODE(ptype):
         .. math::
             \frac{d u}{dt} = \frac{4}{t^*},
 
-    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) < 0`, i.e., :math:`t \leq t^*` the exact solution is
-    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e., :math:`t \geq t^*` the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
+    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) < 0`, i.e. :math:`t \leq t^*`, the exact solution is
+    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e. :math:`t \geq t^*`, the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
 
     Attributes
     ----------
@@ -31,21 +31,22 @@ class DiscontinuousTestODE(ptype):
         Time point of the discrete event found by switch estimation.
     nswitches: int
         Number of switches found by switch estimation.
-    newton_itercount: int
-        Counts the number of Newton iterations.
-    newton_ncalls: int
-        Counts the number of how often Newton is called in the simulation of the problem.
+
+    Attributes
+    ----------
+    work_counters : WorkCounter
+        Counts different things, here: Number of Newton iterations is counted.
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, newton_maxiter=100, newton_tol=1e-8):
+    def __init__(self, newton_maxiter=100, newton_tol=1e-8, stop_at_nan=True):
         """Initialization routine"""
         nvars = 1
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister('nvars', localVars=locals(), readOnly=True)
-        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals())
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals())
 
         if self.nvars != 1:
             raise ParameterError('nvars has to be equal to 1!')
@@ -53,8 +54,7 @@ class DiscontinuousTestODE(ptype):
         self.t_switch_exact = np.log(5)
         self.t_switch = None
         self.nswitches = 0
-        self.newton_itercount = 0
-        self.newton_ncalls = 0
+        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
@@ -133,6 +133,7 @@ class DiscontinuousTestODE(ptype):
             u -= 1.0 / dg * g
 
             n += 1
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
@@ -142,17 +143,14 @@ class DiscontinuousTestODE(ptype):
         if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
-        self.newton_ncalls += 1
-        self.newton_itercount += n
-
         me = self.dtype_u(self.init)
         me[:] = u[:]
 
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -182,7 +180,7 @@ class DiscontinuousTestODE(ptype):
         return me
 
     def get_switching_info(self, u, t):
-        """
+        r"""
         Provides information about the state function of the problem. When the state function changes its sign,
         typically an event occurs. So the check for an event should be done in the way that the state function
         is checked for a sign change. If this is the case, the intermediate value theorem states a root in this
@@ -191,7 +189,7 @@ class DiscontinuousTestODE(ptype):
         Parameters
         ----------
         u : dtype_u
-            Current values of the numerical solution at time t.
+            Current values of the numerical solution at time :math:`t`.
         t : float
             Current time of the numerical solution.
 

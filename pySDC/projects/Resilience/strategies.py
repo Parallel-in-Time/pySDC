@@ -221,7 +221,7 @@ class Strategy:
         elif problem.__name__ == "run_quench":
             custom_description['level_params'] = {'restol': -1, 'dt': 8.0}
             custom_description['step_params'] = {'maxiter': 5}
-            custom_description['problem_params'] = {'newton_iter': 99, 'newton_tol': 1e-11}
+            custom_description['problem_params'] = {'newton_maxiter': 99, 'newton_tol': 1e-11, 'nvars': 2**7}
 
         custom_description['convergence_controllers'] = {
             StepSizeLimiter: {'dt_min': self.get_Tend(problem=problem, num_procs=num_procs) / self.max_steps}
@@ -1457,8 +1457,8 @@ class AdaptivityExtrapolationWithinQStrategy(Strategy):
         """
         if problem.__name__ == "run_vdp":
             if key == 'work_newton' and op == sum:
-                return 2259
+                return 2677
             elif key == 'e_global_post_run' and op == max:
-                return 9.319882663172407e-06
+                return 4.375184403937471e-06
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')

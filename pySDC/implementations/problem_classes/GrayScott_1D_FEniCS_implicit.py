@@ -11,32 +11,87 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
 
 # noinspection PyUnusedLocal
 class fenics_grayscott(ptype):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions
 
-    Attributes:
-        V: function space
-        w: function for the RHS
-        w1: split of w, part 1
-        w2: split of w, part 2
-        F1: weak form of RHS, first part
-        F2: weak form of RHS, second part
-        F: weak form of RHS, full
-        M: full mass matrix for both parts
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the
+    system with a test function :math:`q`:
+
+    .. math::
+        \int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,
+
+    .. math::
+        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,
+
+    The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Spatial resolution, i.e., number of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is ``'CG'``, which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : list or tuple, optional
+        Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
+        ``refinements=[2, 2]`` or ``refinements=(2, 2)``.
+    Du : float, optional
+        Diffusion rate for :math:`u`.
+    Dv: float, optional
+        Diffusion rate for :math:`v`.
+    A : float, optional
+        Feed rate for :math:`v`.
+    B : float, optional
+        Overall decay rate for :math:`u`.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    w : Function
+        Function for the right-hand side.
+    w1 : Function
+        Split of w, part 1.
+    w2 : Function
+        Split of w, part 2.
+    F1 : scalar, vector, matrix or higher rank tensor
+        Weak form of right-hand side, first part.
+    F2 : scalar, vector, matrix or higher rank tensor
+        Weak form of right-hand side, second part.
+    F : scalar, vector, matrix or higher rank tensor
+        Weak form of full right-hand side.
+    M : matrix
+        Full mass matrix for both parts.
+
+    References
+    ----------
+    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [2] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [3] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh
     dtype_f = fenics_mesh
 
     def __init__(self, c_nvars=256, t0=0.0, family='CG', order=4, refinements=None, Du=1.0, Dv=0.01, A=0.09, B=0.086):
-        """
-        Initialization routine
-
-        Args:
-            problem_params: custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data data type (will be passed to parent class)
-        """
+        """Initialization routine"""
 
         if refinements is None:
             refinements = [1, 0]
@@ -119,7 +174,7 @@ class fenics_grayscott(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Dolfin's linear solver for :math:`(M - factor A) \vec{u} = \vec{rhs}`.
+        Dolfin's linear solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.
 
         Parameters
         ----------
@@ -135,7 +190,7 @@ class fenics_grayscott(ptype):
         Returns
         -------
         me : dtype_u
-            The solution as mesh.
+            Solution as mesh.
         """
 
         sol = self.dtype_u(self.V)
@@ -194,8 +249,8 @@ class fenics_grayscott(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -205,7 +260,7 @@ class fenics_grayscott(ptype):
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            Exact solution (only at :math:`t_0 = 0.0`).
         """
 
         class InitialConditions(df.Expression):

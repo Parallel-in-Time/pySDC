@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import spsolve, gmres, inv
+from scipy.sparse.linalg import spsolve, gmres
+from scipy.linalg import inv
 
 from pySDC.core.Errors import ProblemError
 from pySDC.core.Problem import ptype, WorkCounter
@@ -11,7 +12,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class Quench(ptype):
     """
-    This is a toy problem to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
+    This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
     However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
     sufficiently, there will be a runaway effect heating up the entire magnet.
     This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.
@@ -20,6 +21,66 @@ class Quench(ptype):
     insulated from its environment except for the leak.
     We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
     leak itself.
+
+    The problem is discretised with finite difference in space and treated *fully-implicitly*.
+
+    Parameters
+    ----------
+    Cv : float, optional
+        Volumetric heat capacity.
+    K : float, optional
+        Thermal conductivity.
+    u_thresh : float, optional
+        Threshold for temperature.
+    u_max : float, optional
+        Maximum temperature.
+    Q_max : float, optional
+        Maximum heat source power density.
+    leak_range : tuple of float
+        Range of the leak.
+    leak_type : str, optional
+        Type of leak, choose between ``'linear'`` or ``'exponential'``.
+    leak_transition : str, optional
+        Indicates how the heat in the leak propagates, choose between ``'step'`` and ``'Gaussian'``.
+    order : int, optional
+        Order of the finite difference discretization.
+    stencil_type : str, optional
+        Type of stencil for finite differences.
+    bc : str, optional
+        Type of boundary conditions. Default is ``'neumann-zero'``.
+    nvars : int, optional
+        Spatial resolution.
+    newton_tol : float, optional
+        Tolerance for Newton to terminate.
+    newton_maxiter : int, optional
+        Maximum number of Newton iterations to be done.
+    lintol : float, optional
+        Tolerance for linear solver to be done.
+    liniter : int, optional
+        Maximum number of linear iterations inside the Newton solver.
+    direct_solver : bool, optional
+        Indicates if a direct solver should be used.
+    reference_sol_type : str, optional
+        Indicates which method should be used to compute a reference solution.
+        Choose between ``'scipy'``, ``'SDC'``, or ``'DIRK'``.
+
+    Attributes
+    ----------
+    A : sparse matrix (CSC)
+        FD discretization matrix of the ND grad operator.
+    Id : sparse matrix (CSC)
+        Identity matrix of the same dimension as A.
+    dx : float
+        Distance between two spatial nodes.
+    xv : np.1darray
+        Spatial grid values.
+    leak : np.1darray of bool
+        Indicates the leak.
+
+    References
+    ----------
+    .. [1] Thermal thin shell approximation towards finite element quench simulation. E. Schnaubelt, M. Wozniak, S. Schöps.
+       Supercond. Sci. Technol. 36 044004. DOI 10.1088/1361-6668/acbeea
     """
 
     dtype_u = mesh
@@ -29,8 +90,8 @@ class Quench(ptype):
         self,
         Cv=1000.0,
         K=1000.0,
-        u_thresh=1e-2,
-        u_max=2e-2,
+        u_thresh=3e-2,
+        u_max=6e-2,
         Q_max=1.0,
         leak_range=(0.45, 0.55),
         leak_type='linear',
@@ -40,10 +101,11 @@ class Quench(ptype):
         bc='neumann-zero',
         nvars=2**7,
         newton_tol=1e-8,
-        newton_iter=99,
+        newton_maxiter=99,
         lintol=1e-8,
         liniter=99,
         direct_solver=True,
+        inexact_linear_ratio=None,
         reference_sol_type='scipy',
     ):
         """
@@ -69,30 +131,35 @@ class Quench(ptype):
             'stencil_type',
             'bc',
             'nvars',
-            'newton_tol',
-            'newton_iter',
-            'lintol',
-            'liniter',
             'direct_solver',
             'reference_sol_type',
             localVars=locals(),
             readOnly=True,
         )
+        self._makeAttributeAndRegister(
+            'newton_tol',
+            'newton_maxiter',
+            'lintol',
+            'liniter',
+            'inexact_linear_ratio',
+            localVars=locals(),
+            readOnly=False,
+        )
 
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        if self.bc == 'periodic':
-            self.dx = 1.0 / self.nvars
-            xvalues = np.array([i * self.dx for i in range(self.nvars)])
-        elif self.bc == 'dirichlet-zero':
-            self.dx = 1.0 / (self.nvars + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.nvars)])
-        elif self.bc == 'neumann-zero':
-            self.dx = 1.0 / (self.nvars - 1)
-            xvalues = np.array([i * self.dx for i in range(self.nvars)])
-        else:
-            raise ProblemError(f'Boundary conditions {self.bc} not implemented.')
+        self._makeAttributeAndRegister(
+            'newton_tol',
+            'newton_maxiter',
+            'lintol',
+            'liniter',
+            'direct_solver',
+            localVars=locals(),
+            readOnly=False,
+        )
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        # setup finite difference discretization from problem helper
+        self.dx, xvalues = problem_helper.get_1d_grid(size=self.nvars, bc=self.bc)
+
+        self.A, self.b = problem_helper.get_finite_difference_matrix(
             derivative=2,
             order=self.order,
             stencil_type=self.stencil_type,
@@ -172,7 +239,8 @@ class Quench(ptype):
             The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.eval_f_non_linear(u, t)
+        f[:] = self.A.dot(u.flatten()).reshape(self.nvars) + self.b + self.eval_f_non_linear(u, t)
+
         self.work_counters['rhs']()
         return f
 
@@ -218,7 +286,7 @@ class Quench(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple Newton solver for :math:`(I - factor f)(\vec{u}) = \vec{rhs}`.
+        Simple Newton solver for :math:`(I - factor \cdot f)(\vec{u}) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -238,13 +306,14 @@ class Quench(ptype):
         """
         u = self.dtype_u(u0)
         res = np.inf
-        delta = np.zeros_like(u)
+        delta = self.dtype_u(self.init, val=0.0)
+        z = self.dtype_u(self.init, val=0.0)
 
         # construct a preconditioner for the space solver
         if not self.direct_solver:
-            M = inv(self.Id - factor * self.A)
+            M = inv((self.Id - factor * self.A).toarray())
 
-        for n in range(0, self.newton_iter):
+        for n in range(0, self.newton_maxiter):
             # assemble G such that G(u) = 0 at the solution of the step
             G = u - factor * self.eval_f(u, t) - rhs
             self.work_counters[
@@ -254,6 +323,9 @@ class Quench(ptype):
             res = np.linalg.norm(G, np.inf)
             if res <= self.newton_tol and n > 0:  # we want to make at least one Newton iteration
                 break
+
+            if self.inexact_linear_ratio:
+                self.lintol = max([res * self.inexact_linear_ratio, 1e-12])
 
             # assemble Jacobian J of G
             J = self.Id - factor * (self.A + self.get_non_linear_Jacobian(u))
@@ -265,7 +337,7 @@ class Quench(ptype):
                 delta, info = gmres(
                     J,
                     G,
-                    x0=delta,
+                    x0=z,
                     M=M,
                     tol=self.lintol,
                     maxiter=self.liniter,
@@ -284,8 +356,8 @@ class Quench(ptype):
         return u
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -307,25 +379,35 @@ class Quench(ptype):
                     """
                     Get the Jacobian for the implicit BDF method to use in `scipy.solve_ivp`
 
-                    Args:
-                        t (float): The current time
-                        u (dtype_u): Current solution
+                    Parameters
+                    ----------
+                    t : float
+                        The current time.
+                    u : dtype_u
+                        Current solution.
 
-                    Returns:
-                        scipy.sparse.csc: The derivative of the non-linear part of the solution w.r.t. to the solution.
+                    Returns
+                    -------
+                    scipy.sparse.csc
+                        The derivative of the non-linear part of the solution w.r.t. to the solution.
                     """
                     return self.A + self.get_non_linear_Jacobian(u)
 
                 def eval_rhs(t, u):
                     """
-                    Function to pass to `scipy.solve_ivp` to evaluate the full RHS
+                    Function to pass to `scipy.solve_ivp` to evaluate the full right-hand side.
 
-                    Args:
-                        t (float): Current time
-                        u (numpy.1darray): Current solution
+                    Parameters
+                    ----------
+                    t : float
+                        Current time.
+                    u : numpy.1darray
+                        Current solution.
 
-                    Returns:
-                        (numpy.1darray): RHS
+                    Returns
+                    -------
+                    numpy.1darray
+                        Right-hand side.
                     """
                     return self.eval_f(u.reshape(self.init[0]), t).flatten()
 
@@ -340,7 +422,7 @@ class Quench(ptype):
                 description['problem_class'] = Quench
                 description['problem_params'] = {
                     'newton_tol': 1e-10,
-                    'newton_iter': 99,
+                    'newton_maxiter': 99,
                     'nvars': 2**10,
                     **self.params,
                 }
@@ -387,6 +469,20 @@ class Quench(ptype):
 
 
 class QuenchIMEX(Quench):
+    """
+    This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
+    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
+    sufficiently, there will be a runaway effect heating up the entire magnet.
+    This effect has actually lead to huge magnets being destroyed at CERN in the past and hence warrants investigation.
+
+    The model we use is a 1d heat equation with Neumann-zero boundary conditions, meaning this magnet is totally
+    insulated from its environment except for the leak.
+    We add a non-linear term that heats parts of the domain that exceed a certain temperature threshold as well as the
+    leak itself.
+
+    The problem is discretised with finite difference in space and treated *semi-implicitly*.
+    """
+
     dtype_f = imex_mesh
 
     def eval_f(self, u, t):
@@ -408,14 +504,14 @@ class QuenchIMEX(Quench):
 
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.nvars)
-        f.expl[:] = self.eval_f_non_linear(u, t)
+        f.expl[:] = self.eval_f_non_linear(u, t) + self.b
 
         self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple linear solver for :math:`(I - factor f_{expl})(\vec{u}) = \vec{rhs}`.
+        Simple linear solver for :math:`(I - factor \cdot f_{expl})(\vec{u}) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -439,8 +535,8 @@ class QuenchIMEX(Quench):
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

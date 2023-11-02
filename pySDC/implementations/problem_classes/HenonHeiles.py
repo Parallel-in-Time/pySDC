@@ -6,8 +6,20 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 
 # noinspection PyUnusedLocal
 class henon_heiles(ptype):
-    """
-    Example implementing the harmonic oscillator
+    r"""
+    This class implements the second-order Hénon-Heiles system
+
+    .. math::
+        \frac{d^2 x}{dt^2} = - x - 2 x y,
+
+    .. math::
+        \frac{d^2 y}{dt} = - y - x^2 + y^2
+
+    with Hamiltonian
+
+    .. math::
+        H = 0.5 \left[\left(\frac{d x}{d t}\right)^2 + \left(\frac{d y}{d t}\right)^2\right] + 0.5 \left(x^2 + y^2\right)
+            + x^2 y - \frac{y^3}{3}.
     """
 
     dtype_u = particles
@@ -40,8 +52,8 @@ class henon_heiles(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact/initial trajectory at time t.
+        r"""
+        Routine to compute the exact/initial trajectory at time :math:`t`.
 
         Parameters
         ----------

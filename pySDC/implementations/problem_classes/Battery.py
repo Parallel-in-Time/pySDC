@@ -1,7 +1,7 @@
 import numpy as np
 
-from pySDC.core.Errors import ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
@@ -21,34 +21,34 @@ class battery_n_capacitors(ptype):
 
     Parameters
     ----------
-    ncapacitors : int
+    ncapacitors : int, optional
         Number of capacitors :math:`n_{capacitors}` in the circuit.
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C : np.ndarray
-        Capacitances of the capacitors.
-    R : float
-        Resistance for the load.
-    L : float
-        Inductance of inductor.
-    alpha : float
+    C : np.1darray, optional
+        Capacitances of the capacitors :math:`C_n`.
+    R : float, optional
+        Resistance for the load :math:`R_\ell`.
+    L : float, optional
+        Inductance of inductor :math:`L`.
+    alpha : float, optional
         Factor greater than zero to describe the storage of the capacitor(s).
-    V_ref : np.ndarray
+    V_ref : np.1darray, optional
         Array contains the reference values greater than zero for each capacitor to switch to the next energy source.
 
     Attributes
     ----------
-    A: matrix
+    A : matrix
         Coefficients matrix of the linear system of ordinary differential equations (ODEs).
-    switch_A: dict
+    switch_A : dict
         Dictionary that contains the coefficients for the coefficient matrix A.
-    switch_f: dict
+    switch_f : dict
         Dictionary that contains the coefficients of the right-hand side f of the ODE system.
-    t_switch: float
+    t_switch : float
         Time point of the discrete event found by switch estimation.
-    nswitches: int
+    nswitches : int
         Number of switches found by switch estimation.
 
     Note
@@ -66,10 +66,37 @@ class battery_n_capacitors(ptype):
         nvars = n + 1
 
         if C is None:
-            C = np.array([1.0, 1.0])
+            if ncapacitors == 1:
+                C = np.array([1.0])
+            elif ncapacitors == 2:
+                C = np.array([1.0, 1.0])
+            else:
+                raise ParameterError(f"No default value for C is set up for ncapacitors={ncapacitors}")
+        else:
+            msgC = "ERROR for capacitance C: C has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"
+            assert all([type(C) == np.ndarray, np.shape(C)[0] == n]), msgC
 
         if V_ref is None:
-            V_ref = np.array([1.0, 1.0])
+            if ncapacitors == 1:
+                V_ref = np.array([1.0])
+            elif ncapacitors == 2:
+                V_ref = np.array([1.0, 1.0])
+            else:
+                raise ParameterError(f"No default value for V_ref is set up for ncapacitors={ncapacitors}")
+        else:
+            assertions_V_ref_1 = [
+                type(V_ref) == np.ndarray,
+                np.shape(V_ref)[0] == n,
+            ]
+            msg1 = "ERROR for reference value V_ref: V_ref has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"
+            assert all(assertions_V_ref_1), msg1
+
+            assertions_V_ref_2 = [
+                (alpha > V_ref[k] for k in range(n)),
+                (V_ref[k] > 0 for k in range(n)),
+            ]
+            msg2 = "ERROR for V_ref: At least one of V_ref is less than zero and/or alpha!"
+            assert all(assertions_V_ref_2), msg2
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -185,8 +212,8 @@ class battery_n_capacitors(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -230,6 +257,7 @@ class battery_n_capacitors(ptype):
         switch_detected = False
         m_guess = -100
         break_flag = False
+        k_detected = 1
         for m in range(1, len(u)):
             for k in range(1, self.nvars):
                 h_prev_node = u[m - 1][k] - self.V_ref[k - 1]
@@ -244,9 +272,7 @@ class battery_n_capacitors(ptype):
             if break_flag:
                 break
 
-        state_function = (
-            [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(len(u))] if switch_detected else []
-        )
+        state_function = [u[m][k_detected] - self.V_ref[k_detected - 1] for m in range(len(u))]
 
         return switch_detected, m_guess, state_function
 
@@ -276,7 +302,7 @@ class battery_n_capacitors(ptype):
 
 class battery(battery_n_capacitors):
     r"""
-    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from battery_n_capacitors. This model is an example
+    Example implementing the battery drain model with :math:`N=1` capacitor, inherits from ``battery_n_capacitors``. This model is an example
     of a discontinuous problem. The state function :math:`decides` which differential equation is solved. When the state function has
     a sign change the dynamics of the solution changes by changing the differential equation. The ODE system of this model is given by
     the following equations:
@@ -303,8 +329,11 @@ class battery(battery_n_capacitors):
     ----
     This class has the same attributes as the class it inherits from.
     """
-
     dtype_f = imex_mesh
+
+    def __init__(self, ncapacitors=1, Vs=5.0, Rs=0.5, C=None, R=1.0, L=1.0, alpha=1.2, V_ref=None):
+        """Initialization routine"""
+        super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
 
     def eval_f(self, u, t):
         """
@@ -371,8 +400,8 @@ class battery(battery_n_capacitors):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -400,33 +429,31 @@ class battery_implicit(battery):
 
     Parameters
     ----------
-    ncapacitors : int
+    ncapacitors : int, optional
         Number of capacitors in the circuit.
-    Vs : float
+    Vs : float, optional
         Voltage at the voltage source :math:`V_s`.
-    Rs : float
+    Rs : float, optional
         Resistance of the resistor :math:`R_s` at the voltage source.
-    C : np.ndarray
+    C : np.1darray, optional
         Capacitances of the capacitors. Length of array must equal to number of capacitors.
-    R : float
-        Resistance for the load.
-    L : float
-        Inductance of inductor.
-    alpha : float
+    R : float, optional
+        Resistance for the load :math:`R_\ell`.
+    L : float, optional
+        Inductance of inductor :math:`L`.
+    alpha : float, optional
         Factor greater than zero to describe the storage of the capacitor(s).
-    V_ref : float
+    V_ref : float, optional
         Reference value greater than zero for the battery to switch to the voltage source.
-    newton_maxiter : int
+    newton_maxiter : int, optional
         Number of maximum iterations for the Newton solver.
-    newton_tol : float
+    newton_tol : float, optional
         Tolerance for determination of the Newton solver.
 
     Attributes
     ----------
-    newton_itercount: int
-        Counts the number of Newton iterations.
-    newton_ncalls: int
-        Counts the number of how often Newton is called in the simulation of the problem.
+    work_counters : WorkCounter
+        Counts different things, here: Number of Newton iterations is counted.
     """
     dtype_f = mesh
 
@@ -443,17 +470,10 @@ class battery_implicit(battery):
         newton_maxiter=100,
         newton_tol=1e-11,
     ):
-        if C is None:
-            C = np.array([1.0])
-
-        if V_ref is None:
-            V_ref = np.array([1.0])
-
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
 
-        self.newton_itercount = 0
-        self.newton_ncalls = 0
+        self.work_counters['newton'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
@@ -544,6 +564,7 @@ class battery_implicit(battery):
 
             # increase iteration count
             n += 1
+            self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
@@ -552,9 +573,6 @@ class battery_implicit(battery):
 
         if n == self.newton_maxiter:
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
-
-        self.newton_ncalls += 1
-        self.newton_itercount += n
 
         me = self.dtype_u(self.init)
         me[:] = u[:]

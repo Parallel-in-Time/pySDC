@@ -5,6 +5,62 @@ from pySDC.implementations.datatype_classes.mesh import imex_mesh
 
 
 class heatNd_unforced(GenericNDimFinDiff):
+    r"""
+    This class implements the unforced :math:`N`-dimensional heat equation with periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \nu
+        \left(
+            \frac{\partial^2 u}{\partial x^2_1} + .. + \frac{\partial^2 u}{\partial x^2_N}
+        \right)
+
+    for :math:`(x_1,..,x_N) \in [0, 1]^{N}` with :math:`N \leq 3`. The initial solution is of the form
+
+    .. math::
+        u({\bf x},0) = \prod_{i=1}^N \sin(\pi k_i x_i).
+
+    The spatial term is discretized using finite differences.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Spatial resolution (same in all dimensions). Using a tuple allows to
+        consider several dimensions, e.g ``nvars=(16,16)`` for a 2D problem.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+    freq : int, optional
+        Spatial frequency :math:`k_i` of the initial conditions, can be tuple.
+    stencil_type : str, optional
+        Type of the finite difference stencil.
+    order : int, optional
+        Order of the finite difference discretization.
+    lintol : float, optional
+        Tolerance for spatial solver.
+    liniter : int, optional
+        Max. iterations number for spatial solver.
+    solver_type : str, optional
+        Solve the linear system directly or using CG.
+    bc : str, optional
+        Boundary conditions, either ``'periodic'`` or ``'dirichlet'``.
+    sigma : float, optional
+        If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form
+
+        .. math::
+            u(x,0) = e^{
+                \frac{\displaystyle 1}{\displaystyle 2}
+                \left(
+                    \frac{\displaystyle x-1/2}{\displaystyle \sigma}
+                \right)^2
+                }
+
+    Attributes
+    ----------
+    A : sparse matrix (CSC)
+        FD discretization matrix of the ND operator.
+    Id : sparse matrix (CSC)
+        Identity matrix of the same dimension as A
+    """
+
     def __init__(
         self,
         nvars=512,
@@ -18,6 +74,7 @@ class heatNd_unforced(GenericNDimFinDiff):
         bc='periodic',
         sigma=6e-2,
     ):
+        """Initialization routine"""
         super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc)
         if solver_type == 'GMRES':
             self.logger.warning('GMRES is not usually used for heat equation')
@@ -25,8 +82,8 @@ class heatNd_unforced(GenericNDimFinDiff):
         self._makeAttributeAndRegister('sigma', localVars=locals())
 
     def u_exact(self, t, **kwargs):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
@@ -76,13 +133,28 @@ class heatNd_unforced(GenericNDimFinDiff):
 
 
 class heatNd_forced(heatNd_unforced):
-    """
-    Example implementing the ND heat equation with periodic or Diriclet-Zero BCs in [0,1]^N,
-    discretized using central finite differences
+    r"""
+    This class implements the forced :math:`N`-dimensional heat equation with periodic boundary conditions
 
-    Attributes:
-        A: FD discretization of the ND laplace operator
-        dx: distance between two spatial nodes (here: being the same in all dimensions)
+    .. math::
+        \frac{\partial u}{\partial t} = \nu
+        \left(
+            \frac{\partial^2 u}{\partial x^2_1} + .. + \frac{\partial^2 u}{\partial x^2_N}
+        \right) + f({\bf x}, t)
+
+    for :math:`(x_1,..,x_N) \in [0, 1]^{N}` with :math:`N \leq 3`, and forcing term
+
+    .. math::
+        f({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \left(
+            \nu \pi^2 \sum_{i=1}^N k_i^2 \cos(t) - \sin(t)
+        \right),
+
+    where :math:`k_i` denotes the frequency in the :math:`i^{th}` dimension. The exact solution is
+
+    .. math::
+        u({\bf x}, t) = \prod_{i=1}^N \sin(\pi k_i x_i) \cos(t).
+
+    The spatial term is discretized using finite differences.
     """
 
     dtype_f = imex_mesh
@@ -132,8 +204,8 @@ class heatNd_forced(heatNd_unforced):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------

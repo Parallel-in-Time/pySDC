@@ -49,7 +49,7 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             dict: Updated parameters
         """
-        sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__bases__ else 'SDC'
+        sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__mro__ else 'SDC'
         return {
             "control_order": -80,
             "sweeper_type": sweeper_type,

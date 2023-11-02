@@ -2,7 +2,7 @@ import numpy as np
 from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import (
     getWave1DMatrix,
@@ -40,14 +40,14 @@ class acoustic_1d_imex(ptype):
         Sound velocity :math:`c_s`.
     cadv : float, optional
         Advection speed :math:`U`.
-    order_adv : knt, optional
+    order_adv : int, optional
         Order of which the advective derivative is discretized.
     waveno : int, optional
         The wave number.
 
     Attributes
     ----------
-    mesh : np.ndarray
+    mesh : np.1darray
         1d mesh.
     dx : float
         Mesh size.
@@ -71,7 +71,7 @@ class acoustic_1d_imex(ptype):
         """Initialization routine"""
 
         if nvars is None:
-            nvars = [(2, 300)]
+            nvars = (2, 300)
 
         # invoke super init, passing number of dofs
         super().__init__((nvars, None, np.dtype('float64')))
@@ -83,6 +83,8 @@ class acoustic_1d_imex(ptype):
         self.Dx = -self.cadv * getWave1DAdvectionMatrix(self.nvars[1], self.dx, self.order_adv)
         self.Id, A = getWave1DMatrix(self.nvars[1], self.dx, ['periodic', 'periodic'], ['periodic', 'periodic'])
         self.A = -self.cs * A
+
+        self.work_counters['rhs'] = WorkCounter()
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -186,11 +188,13 @@ class acoustic_1d_imex(ptype):
         f = self.dtype_f(self.init)
         f.impl = self.__eval_fimpl(u, t)
         f.expl = self.__eval_fexpl(u, t)
+
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t.
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
         Parameters
         ----------
