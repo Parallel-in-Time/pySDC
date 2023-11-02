@@ -26,7 +26,7 @@ def main():
     # initialize sweeper parameters (part I)
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
-    sweeper_params['num_nodes'] = 3
+    sweeper_params['num_nodes'] = 4
     sweeper_params['initial_guess'] = 'spread'
 
     # initialize step parameters
@@ -39,13 +39,13 @@ def main():
 
     # set up list of Q-delta types and setups
     #qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
-    qd_list = ['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
+    qd_list = ['LU', 'MIN-SR-S', 'MIN3', 'FLEX-MIN-2']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
-        ('vanderpol', 2, [0.1 * 2**i for i in range(0, 10)]),
+        ('vanderpol', 2, [0.9 **i for i in range(0, 10)]),
         ('fisher', 63, [2**i for i in range(-2, 3)]),
-        ('testequation', 2, [1.2 ** i for i in range(0, 10)])
+        ('testequation', 2, [1.2 ** i for i in range(0, 15)])
     ]
 
     # pre-fill results with lists of  setups
@@ -188,10 +188,10 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 7, 'ERROR did not find seven preconditioners, got %s' % qd_type_list
-    assert len(setup_list) == 5, 'ERROR: did not find five setup, got %s' % setup_list
+    #assert len(qd_type_list) == 7, 'ERROR did not find seven preconditioners, got %s' % qd_type_list
+    #assert len(setup_list) == 5, 'ERROR: did not find five setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
+    qd_type_list = ['LU', 'MIN-SR-S', 'MIN3', 'FLEX-MIN-2']#['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
     marker_list = [None, 'X', 's', 'o', '^', 'd', 'x']
     color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 
