@@ -43,7 +43,7 @@ def main():
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
-        ('vanderpol', 2, [0.9 **i for i in range(0, 10)]),
+        ('vanderpol', 2, [0.1 * 2**i for i in range(0, 10)]),
         ('fisher', 63, [2**i for i in range(-2, 3)]),
         ('testequation', 2, [1.2 ** i for i in range(0, 15)])
     ]
