@@ -73,6 +73,7 @@ class pendulum_2d(ptype_dae):
         # weight somehow
         f = self.dtype_f(self.init)
         f[:] = (du[0] - u[2], du[1] - u[3], du[2] + u[4] * u[0], du[3] + u[4] * u[1] + g, u[0] ** 2 + u[1] ** 2 - 1)
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
@@ -164,6 +165,7 @@ class simple_dae_1(ptype_dae):
             -du[1] + (1 - a) / (t - 2) * u[0] - u[1] + (a - 1) * u[2] + 2 * np.exp(t),
             (t + 2) * u[0] + (t**2 - 4) * u[1] - (t**2 + t - 2) * np.exp(t),
         )
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
@@ -207,7 +209,7 @@ class problematic_f(ptype_dae):
 
     Attributes
     ----------
-    eta: float
+    eta : float
         Specific parameter of the problem.
 
     References
@@ -244,6 +246,7 @@ class problematic_f(ptype_dae):
             u[0] + self.eta * t * u[1] - np.sin(t),
             du[0] + self.eta * t * du[1] + (1 + self.eta) * u[1] - np.cos(t),
         )
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
