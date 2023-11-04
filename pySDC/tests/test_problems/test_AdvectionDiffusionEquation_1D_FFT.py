@@ -1,6 +1,47 @@
 import pytest
 
 
+def get_error_thresholds(freq, nu):
+    r"""
+    Returns the error thresholds for parameters ``nu`` and ``freq``.
+
+    Parameters
+    ----------
+    freq : int
+        Wave number.
+    nu : float
+        Diffusion coefficient.
+    """
+    e_tol_imex = {
+        -1: {
+            0.02: 0.011,
+        },
+        0: {
+            -0.02: 0.076,
+            0.02: 0.055,
+        },
+        1: {
+            -0.02: 0.0063,
+            0.02: 0.0063,
+        },
+    }
+
+    e_tol_full = {
+        -1: {
+            0.02: 0.00021,
+        },
+        0: {
+            -0.02: 0.078,
+            0.02: 0.064,
+        },
+        1: {
+            -0.02: 2.01e-05,
+            0.02: 2e-05,
+        },
+    }
+    return e_tol_imex[freq][nu], e_tol_full[freq][nu]
+
+
 @pytest.mark.base
 @pytest.mark.parametrize('freq', [-1, 0, 1])
 @pytest.mark.parametrize('nu', [0.02, -0.02])
@@ -57,35 +98,10 @@ def test_imex_vs_implicit(freq, nu):
         e_imex = abs(u_ex - u_imex)
         e_full = abs(u_ex - u_full)
 
-        e_tol_imex = {
-            -1: {
-                0.02: 0.011,
-            },
-            0: {
-                -0.02: 0.076,
-                0.02: 0.055,
-            },
-            1: {
-                -0.02: 0.0063,
-                0.02: 0.0063,
-            },
-        }
+        e_tol_imex, e_tol_full = get_error_thresholds(freq, nu)
 
-        e_tol_full = {
-            -1: {
-                0.02: 0.00021,
-            },
-            0: {
-                -0.02: 0.078,
-                0.02: 0.064,
-            },
-            1: {
-                -0.02: 2.01e-05,
-                0.02: 2e-05,
-            },
-        }
-        assert e_imex < e_tol_imex[freq][nu], "Error is too large in semi-explicit case!"
-        assert e_full < e_tol_full[freq][nu], "Error is too large in fully-implicit case!"
+        assert e_imex < e_tol_imex, "Error is too large in semi-explicit case!"
+        assert e_full < e_tol_full, "Error is too large in fully-implicit case!"
 
         # check if ProblemError is raised correctly in case if nvars % 2 != 0
         problem_params.update({'nvars': 31})
