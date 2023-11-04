@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
@@ -70,6 +70,8 @@ class advectiondiffusion1d_imex(ptype):
         self.ddx = kx * 1j
         self.lap = -(kx**2)
 
+        self.work_counters['rhs'] = WorkCounter()
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -94,6 +96,7 @@ class advectiondiffusion1d_imex(ptype):
         f.impl[:] = np.fft.irfft(tmp_impl)
         f.expl[:] = np.fft.irfft(tmp_expl)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -153,6 +156,8 @@ class advectiondiffusion1d_imex(ptype):
                     for i in range(self.init[0]):
                         x = self.xvalues[i] - self.c * t + k * self.L
                         me[i] += np.sqrt(t00) / np.sqrt(t00 + t) * np.exp(-(x**2) / (4.0 * self.nu * (t00 + t)))
+            else:
+                raise ParameterError("There is no exact solution implemented for negative frequency and negative nu!")
         return me
 
 
@@ -177,6 +182,9 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     This class has the same attributes as the class it inherits from.
     """
 
+    dtype_u = mesh
+    dtype_f = mesh
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -199,6 +207,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         tmp = self.nu * self.lap * tmp_u - self.c * self.ddx * tmp_u
         f[:] = np.fft.irfft(tmp)
 
+        self.work_counters['rhs']
         return f
 
     def solve_system(self, rhs, factor, u0, t):
