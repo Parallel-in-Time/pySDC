@@ -165,6 +165,7 @@ class vanderpol(ptype):
             self.work_counters['newton']()
 
         if np.isnan(res) and self.stop_at_nan:
+            self.logger.warning('Newton got nan after %i iterations...' % n)
             raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)

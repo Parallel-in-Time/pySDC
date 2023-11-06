@@ -44,7 +44,7 @@ class ConvergenceController(object):
         """
         self.params = Pars(self.setup(controller, params, description))
         params_ok, msg = self.check_parameters(controller, params, description)
-        assert params_ok, msg
+        assert params_ok, f'{type(self).__name__} -- {msg}'
         self.dependencies(controller, description)
         self.logger = logging.getLogger(f"{type(self).__name__}")
 

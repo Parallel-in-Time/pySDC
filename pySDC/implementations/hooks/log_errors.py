@@ -48,7 +48,7 @@ class LogError(hooks):
             iter=step.status.iter,
             sweep=L.status.sweep,
             type=f'e_global_rel{suffix}',
-            value=abs((u_ref - L.uend / u_ref)),
+            value=abs(u_ref - L.uend) / abs(u_ref),
         )
 
     def log_local_error(self, step, level_number, suffix=''):
@@ -195,7 +195,7 @@ class LogGlobalErrorPostRun(hooks):
                 iter=step.status.iter,
                 sweep=L.status.sweep,
                 type='e_global_rel_post_run',
-                value=abs((u_num - u_ref) / u_ref),
+                value=abs(u_num - u_ref) / abs(u_ref),
             )
 
 
