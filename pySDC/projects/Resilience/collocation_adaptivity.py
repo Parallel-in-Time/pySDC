@@ -55,13 +55,6 @@ special_params = {
 }
 
 
-def get_collocation_order(quad_type, num_nodes, node_type):
-    """
-    Compute the maximal order achievable by a given collocation method
-    """
-    pass
-
-
 # define a few hooks
 class LogSweeperParams(hooks):
     """

@@ -35,6 +35,9 @@ class WorkCounter(object):
     def decrement(self):
         self.niter -= 1
 
+    def __str__(self):
+        return f'{self.niter}'
+
 
 class ptype(RegisterParams):
     """
