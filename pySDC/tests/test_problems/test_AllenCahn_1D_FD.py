@@ -236,10 +236,3 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
             multi_periodic.work_counters['newton'].niter == newton_maxiter
         ), 'Number of Newton iterations in multi-implicit periodic case does not match with maximum number of iterations!'
         caplog.clear()
-
-
-@pytest.mark.base
-def test_solve_system_with_reference():
-    """
-    Computes a solution using the Newton solver and compares it with a Newton-Krylov solver as reference.
-    """
