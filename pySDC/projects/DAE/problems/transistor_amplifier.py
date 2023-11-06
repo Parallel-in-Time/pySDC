@@ -104,6 +104,7 @@ class one_transistor_amplifier(ptype_dae):
             (u_b - u[3]) / r_k + c_3 * (du[4] - du[3]) - alpha * _transistor(u[1] - u[2]),
             -u[4] / r_k + c_3 * (du[3] - du[4]),
         )
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
@@ -240,6 +241,7 @@ class two_transistor_amplifier(ptype_dae):
             (u_b - u[6]) / r_k - c_5 * (du[6] - du[7]) - alpha * _transistor(u[4] - u[5]),
             -u[7] / r_k + c_5 * (du[6] - du[7]),
         )
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):

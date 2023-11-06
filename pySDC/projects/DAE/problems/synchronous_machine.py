@@ -257,6 +257,7 @@ class synchronous_machine_infinite_bus(ptype_dae):
             -psi_Q1 + self.L_mq * i_q + self.L_Q1 * i_Q1 + self.L_mq * i_Q2,
             -psi_Q2 + self.L_mq * i_q + self.L_mq * i_Q1 + self.L_Q2 * i_Q2,
         )
+        self.work_counters['rhs']()
         return f
 
     def u_exact(self, t):
