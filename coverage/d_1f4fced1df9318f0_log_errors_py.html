@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_1f4fced1df9318f0_log_extrapolated_error_estimate_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-06 07:09 +0000
+            created at 2023-11-06 20:27 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -130,7 +130,7 @@
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">            <span class="nam">iter</span><span class="op">=</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">            <span class="nam">sweep</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">sweep</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">            <span class="nam">type</span><span class="op">=</span><span class="str">f'e_global_rel{suffix}'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">            <span class="nam">value</span><span class="op">=</span><span class="nam">abs</span><span class="op">(</span><span class="op">(</span><span class="nam">u_ref</span> <span class="op">-</span> <span class="nam">L</span><span class="op">.</span><span class="nam">uend</span> <span class="op">/</span> <span class="nam">u_ref</span><span class="op">)</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">            <span class="nam">value</span><span class="op">=</span><span class="nam">abs</span><span class="op">(</span><span class="nam">u_ref</span> <span class="op">-</span> <span class="nam">L</span><span class="op">.</span><span class="nam">uend</span><span class="op">)</span> <span class="op">/</span> <span class="nam">abs</span><span class="op">(</span><span class="nam">u_ref</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">    <span class="key">def</span> <span class="nam">log_local_error</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">step</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">,</span> <span class="nam">suffix</span><span class="op">=</span><span class="str">''</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -277,7 +277,7 @@
     <p class="pln"><span class="n"><a id="t195" href="#t195">195</a></span><span class="t">                <span class="nam">iter</span><span class="op">=</span><span class="nam">step</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">iter</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t196" href="#t196">196</a></span><span class="t">                <span class="nam">sweep</span><span class="op">=</span><span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">sweep</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t197" href="#t197">197</a></span><span class="t">                <span class="nam">type</span><span class="op">=</span><span class="str">'e_global_rel_post_run'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t198" href="#t198">198</a></span><span class="t">                <span class="nam">value</span><span class="op">=</span><span class="nam">abs</span><span class="op">(</span><span class="op">(</span><span class="nam">u_num</span> <span class="op">-</span> <span class="nam">u_ref</span><span class="op">)</span> <span class="op">/</span> <span class="nam">u_ref</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t198" href="#t198">198</a></span><span class="t">                <span class="nam">value</span><span class="op">=</span><span class="nam">abs</span><span class="op">(</span><span class="nam">u_num</span> <span class="op">-</span> <span class="nam">u_ref</span><span class="op">)</span> <span class="op">/</span> <span class="nam">abs</span><span class="op">(</span><span class="nam">u_ref</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t199" href="#t199">199</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t200" href="#t200">200</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t201" href="#t201">201</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -319,7 +319,7 @@
             <a id="nextFileLink" class="nav" href="d_1f4fced1df9318f0_log_extrapolated_error_estimate_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-06 07:09 +0000
+            created at 2023-11-06 20:27 +0000
         </p>
     </div>
 </footer>

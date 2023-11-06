@@ -211,7 +211,7 @@
             <span class="n">neumann_bc_order</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;neumann_bc_order&#39;</span><span class="p">)</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">par</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;unused BCs parameters : </span><span class="si">{</span><span class="n">par</span><span class="si">}</span><span class="s2">&quot;</span>
 
-            <span class="c1"># -- halh stencil width</span>
+            <span class="c1"># -- half stencil width</span>
             <span class="n">sWidth</span> <span class="o">=</span> <span class="o">-</span><span class="nb">min</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span> <span class="k">if</span> <span class="n">iS</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
 
             <span class="c1"># -- loop over lines of A that have to be modified</span>

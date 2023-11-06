@@ -344,7 +344,7 @@ using the level.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2023-11-06 07:05:42,332 - controller - Controller - welcome_message - 146 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2023-11-06 20:20:33,179 - controller - Controller - welcome_message - 146 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
                                  _____ _____   _____ 
                                 / ____|  __ \ / ____|
                     _ __  _   _| (___ | |  | | |     
@@ -354,45 +354,46 @@ using the level.</p></li>
                    | |     __/ |                     
                    |_|    |___/                      
                                                      
-2023-11-06 07:05:42,332 - controller - Controller - dump_setup - 160 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
-2023-11-06 07:05:42,333 - controller - Controller - dump_setup - 226 - INFO: ----------------------------------------------------------------------------------------------------
+2023-11-06 20:20:33,179 - controller - Controller - dump_setup - 160 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
+2023-11-06 20:20:33,179 - controller - Controller - dump_setup - 227 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
-    mssdc_jac = True
-    predict_type = None
     all_to_done = False
-    logger_level = 20
---&gt; log_to_file = True
     dump_setup = True
 --&gt; fname = data/step_3_B_out.txt
-    use_iteration_estimator = False
 --&gt; hook_class = &lt;class &#39;pySDC.tutorial.step_3.HookClass_Particles.particle_hook&#39;&gt;
+--&gt; log_to_file = True
+    logger_level = 20
+    mssdc_jac = True
+    predict_type = None
+    use_iteration_estimator = False
 
 Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
 --&gt; maxiter = 20
+    Number of steps: None
     Level: &lt;class &#39;pySDC.core.Level.level&#39;&gt;
         Level  0
 --&gt;         dt = 0.0625
             dt_initial = 0.0625
---&gt;         restol = 1e-08
             nsweeps = 1
             residual_type = full_abs
+--&gt;         restol = 1e-08
 --&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.PenningTrap_3D.penningtrap&#39;&gt;
 --&gt;             nparts = 1
 --&gt;             omega_B = 25.0
---&gt;             sig = 0.1
 --&gt;             omega_E = 4.9
+--&gt;             sig = 0.1
 --&gt;             u0 = [list([10, 0, 0]) list([100, 0, 100]) list([1]) list([1])]
 --&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.particles.particles&#39;&gt;
 --&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.particles.fields&#39;&gt;
 --&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
+                    QE = EE
+                    QI = IE
                     do_coll_update = False
                     initial_guess = spread
-                    skip_residual_computation = ()
---&gt;                 quad_type = RADAU-RIGHT
 --&gt;                 num_nodes = 3
-                    QI = IE
-                    QE = EE
+--&gt;                 quad_type = RADAU-RIGHT
+                    skip_residual_computation = ()
 --&gt;                 Collocation: &lt;class &#39;pySDC.core.Collocation.CollBase&#39;&gt;
 
 Active convergence controllers:
@@ -402,21 +403,21 @@ Active convergence controllers:
  -&gt; |  1 |   100 | SpreadStepSizesBlockwiseNonMPI
     |  2 |   200 | CheckConvergence
 
-2023-11-06 07:05:42,333 - controller - Controller - dump_setup - 229 - INFO: ----------------------------------------------------------------------------------------------------
-2023-11-06 07:05:42,333 - controller - Controller - dump_setup - 231 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
+2023-11-06 20:20:33,179 - controller - Controller - dump_setup - 230 - INFO: ----------------------------------------------------------------------------------------------------
+2023-11-06 20:20:33,179 - controller - Controller - dump_setup - 232 - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
 
-2023-11-06 07:05:42,345 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2023-11-06 07:05:42,356 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2023-11-06 07:05:42,367 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2023-11-06 07:05:42,379 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2023-11-06 07:05:42,390 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2023-11-06 07:05:42,401 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2023-11-06 07:05:42,412 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2023-11-06 07:05:42,423 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
-2023-11-06 07:05:42,434 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968022e-07
-2023-11-06 07:05:42,446 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408171e-08
-2023-11-06 07:05:42,456 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
-2023-11-06 07:05:42,461 - hooks - default_hook - post_run - 340 - INFO: Finished run after 0.13s
+2023-11-06 20:20:33,186 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2023-11-06 20:20:33,192 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2023-11-06 20:20:33,197 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2023-11-06 20:20:33,203 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2023-11-06 20:20:33,209 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2023-11-06 20:20:33,215 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2023-11-06 20:20:33,220 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2023-11-06 20:20:33,226 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
+2023-11-06 20:20:33,232 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968022e-07
+2023-11-06 20:20:33,237 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408171e-08
+2023-11-06 20:20:33,243 - hooks - default_hook - post_sweep - 170 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2023-11-06 20:20:33,245 - hooks - default_hook - post_run - 340 - INFO: Finished run after 0.07s
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>

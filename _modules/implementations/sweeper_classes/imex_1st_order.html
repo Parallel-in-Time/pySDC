@@ -69,7 +69,7 @@
             <span class="n">params</span><span class="p">[</span><span class="s1">&#39;QE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;EE&#39;</span>
 
         <span class="c1"># call parent&#39;s initialization routine</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">imex_1st_order</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># IMEX integration matrices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="n">coll</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QI</span><span class="p">)</span>
