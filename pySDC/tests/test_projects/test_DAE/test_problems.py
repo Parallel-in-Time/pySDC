@@ -552,7 +552,7 @@ def test_WSCC9_SDC_detection():
 
     WSCC9 = WSCC9BusSystem(**problem_params)
     m, n = WSCC9.m, WSCC9.n
-    nvars = 13*m + 2*n
+    nvars = 13 * m + 2 * n
 
     # test if right-hand side of does have the correct length
     t0 = 0.0
@@ -579,10 +579,11 @@ def test_WSCC9_update_YBus():
     """
     Test if YBus is updated at time 0.05. For this SDC performs one time step.
     """
+
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    # do one time step of size dt = 0.05 and see if YBus is updated (because it has to be changed due to the line outage)
+
     dt = 0.05
     level_params = {
         'restol': 5e-13,
@@ -633,9 +634,9 @@ def test_WSCC9_update_YBus():
 
     YBus_line_outage = P.YBus
     YBus_line6_8_outage = get_event_Ybus()
-    assert np.allclose(YBus_line_outage, YBus_line6_8_outage), 'YBus after line outage does not match with the one it should supposed to!'
-
-
+    assert np.allclose(
+        YBus_line_outage, YBus_line6_8_outage
+    ), 'YBus after line outage does not match with the one it should supposed to!'
 
 
 # @pytest.mark.base
