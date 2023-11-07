@@ -97,8 +97,8 @@ def test_sweeper(num_nodes, quad_type, residual_type, imex, launch=True):
             use_MPI=False, num_nodes=int(num_nodes), quad_type=quad_type, residual_type=residual_type, imex=imex
         )
 
-        assert np.allclose(MPI.uend, nonMPI.uend), 'Got different solutions at end point!'
-        assert np.allclose(MPI.status.residual, nonMPI.status.residual), 'Got different residuals!'
+        assert np.allclose(MPI.uend, nonMPI.uend, atol=1e-14), 'Got different solutions at end point!'
+        assert np.allclose(MPI.status.residual, nonMPI.status.residual, atol=1e-14), 'Got different residuals!'
 
 
 if __name__ == '__main__':

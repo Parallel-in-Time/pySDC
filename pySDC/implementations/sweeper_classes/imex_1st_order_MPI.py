@@ -58,15 +58,14 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
         # get QF(u^k)
         rhs = self.integrate()
 
+        # subtract QdF(u^k)
         rhs -= L.dt * (self.QI[self.rank + 1, self.rank + 1] * L.f[self.rank + 1].impl)
 
-        # add initial value
+        # add initial conditions
         rhs += L.u[0]
         # add tau if associated
         if L.tau[self.rank] is not None:
             rhs += L.tau[self.rank]
-
-        # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
 
         # implicit solve with prefactor stemming from the diagonal of Qd
         L.u[self.rank + 1] = P.solve_system(
@@ -86,8 +85,6 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
     def compute_end_point(self):
         """
         Compute u at the right point of the interval
-
-        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
 
         Returns:
             None
