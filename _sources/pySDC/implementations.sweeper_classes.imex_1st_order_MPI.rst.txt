@@ -1,0 +1,7 @@
+implementations.sweeper\_classes.imex\_1st\_order\_MPI module
+=============================================================
+
+.. automodule:: implementations.sweeper_classes.imex_1st_order_MPI
+   :members:
+   :undoc-members:
+   :show-inheritance:
