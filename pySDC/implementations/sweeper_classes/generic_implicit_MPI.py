@@ -60,7 +60,10 @@ class SweeperMPI(sweeper):
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
-            L.uend[:] = self.params.comm.bcast(L.u[self.rank + 1], root=self.params.comm.Get_size() - 1)
+            root = self.comm.Get_size() - 1
+            if self.comm.rank == root:
+                L.uend[:] = L.u[-1]
+            self.comm.Bcast(L.uend, root=root)
         else:
             raise NotImplementedError('require last node to be identical with right interval boundary')
 
@@ -88,7 +91,7 @@ class SweeperMPI(sweeper):
         # compute the residual for each node
 
         # build QF(u)
-        res = self.integrate()
+        res = self.integrate(last_only=L.params.residual_type[:4] == 'last')
         res += L.u[0] - L.u[self.rank + 1]
         # add tau if associated
         if L.tau[self.rank] is not None:
@@ -97,7 +100,16 @@ class SweeperMPI(sweeper):
         res_norm = abs(res)
 
         # find maximal residual over the nodes
-        L.status.residual = self.params.comm.allreduce(res_norm, op=MPI.MAX)
+        if L.params.residual_type == 'full_abs':
+            L.status.residual = self.comm.allreduce(res_norm, op=MPI.MAX)
+        elif L.params.residual_type == 'last_abs':
+            L.status.residual = self.comm.bcast(res_norm, root=self.comm.size - 1)
+        elif L.params.residual_type == 'full_rel':
+            L.status.residual = self.comm.allreduce(res_norm / abs(L.u[0]), op=MPI.MAX)
+        elif L.params.residual_type == 'last_rel':
+            L.status.residual = self.comm.bcast(res_norm / abs(L.u[0]), root=self.comm.size - 1)
+        else:
+            raise NotImplementedError(f'residual type \"{L.params.residual_type}\" not implemented!')
 
         # indicate that the residual has seen the new values
         L.status.updated = False
@@ -139,21 +151,23 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
         rank (int): MPI rank
     """
 
-    def integrate(self):
+    def integrate(self, last_only=False):
         """
         Integrates the right-hand side
+
+        Args:
+            last_only (bool): Integrate only the last node for the residual or all of them
 
         Returns:
             list of dtype_u: containing the integral as values
         """
-
         L = self.level
         P = L.prob
 
         me = P.dtype_u(P.init, val=0.0)
-        for m in range(self.coll.num_nodes):
+        for m in [self.coll.num_nodes - 1] if last_only else range(self.coll.num_nodes):
             recvBuf = me if m == self.rank else None
-            self.params.comm.Reduce(
+            self.comm.Reduce(
                 L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1], recvBuf, root=m, op=MPI.SUM
             )
 
@@ -225,7 +239,7 @@ class generic_implicit_MPI(SweeperMPI, generic_implicit):
             super().compute_end_point()
         else:
             L.uend = P.dtype_u(L.u[0])
-            self.params.comm.Allreduce(L.dt * self.coll.weights[self.rank] * L.f[self.rank + 1], L.uend, op=MPI.SUM)
+            self.comm.Allreduce(L.dt * self.coll.weights[self.rank] * L.f[self.rank + 1], L.uend, op=MPI.SUM)
             L.uend += L.u[0]
 
             # add up tau correction of the full interval (last entry)
