@@ -49,7 +49,11 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             dict: Updated parameters
         """
-        sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__mro__ else 'SDC'
+        sweeper_type = 'SDC'
+        if RungeKutta in description['sweeper_class'].__mro__:
+            sweeper_type = 'RK'
+        elif 'SweeperMPI' in [me.__name__ for me in description['sweeper_class'].__mro__]:
+            sweeper_type = 'MPI'
         return {
             "control_order": -80,
             "sweeper_type": sweeper_type,
@@ -94,10 +98,13 @@ class EstimateEmbeddedError(ConvergenceController):
         elif self.params.sweeper_type == "SDC":
             # order rises by one between sweeps, making this so ridiculously easy
             return abs(L.uold[-1] - L.u[-1])
+        elif self.params.sweeper_type == 'MPI':
+            comm = L.sweep.comm
+            return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
         else:
             raise NotImplementedError(
                 f"Don't know how to estimate embedded error for sweeper type \
-{self.params.sweeper_type}"
+\"{self.params.sweeper_type}\""
             )
 
     def setup_status_variables(self, controller, **kwargs):
@@ -139,6 +146,7 @@ class EstimateEmbeddedError(ConvergenceController):
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
                 L.status.error_embedded_estimate = max([self.estimate_embedded_error_serial(L), np.finfo(float).eps])
+                self.debug(f'L.status.error_embedded_estimate={L.status.error_embedded_estimate:.5e}', S)
 
         return None
 
