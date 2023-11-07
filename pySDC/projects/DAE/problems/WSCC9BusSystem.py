@@ -766,18 +766,16 @@ class WSCC9BusSystem(ptype_dae):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, nvars=None, newton_tol=1e-10):
+    def __init__(self, nvars=None, newton_tol=1e-10, m=3, n=9):
         """Initialization routine"""
 
-        m, n = 3, 9  # m is number of machines (adjust this according to your specific case)
         nvars = 11 * m + 2 * m + 2 * n
         # invoke super init, passing number of dofs
         super().__init__(nvars, newton_tol)
         self._makeAttributeAndRegister('nvars', 'newton_tol', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('m', 'n', localVars=locals())
         self.mpc = WSCC9Bus()
 
-        self.m = m
-        self.n = n
         self.baseMVA = self.mpc['baseMVA']
         self.ws = 2 * np.pi * 60
         self.ws_vector = self.ws * np.ones(self.m)
@@ -850,7 +848,7 @@ class WSCC9BusSystem(ptype_dae):
         n_prev, m_prev = self.n, self.m
         self.n = len(self.bus)  # Number of rows in 'bus' list; self.n already defined above?!
         self.m = len(self.gen)  # Number of rows in 'gen' list; self.m already defined above?!
-        if n_prev != self.n or m_prev != self.m:
+        if n_prev != 9 or m_prev != 3:
             raise ParameterError("Number of rows in bus or gen not equal to initialised n or m!")
 
         gen0 = [0] * self.n

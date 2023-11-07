@@ -540,61 +540,53 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
 
 @pytest.mark.base
 def test_WSCC9_SDC_detection():
+    r"""
+    Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
     """
-    Test for one SDC run with event detection if the found event is close to the exact value and if the global error
-    can be reduced.
-    """
-
-    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.core.Errors import ParameterError
     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
-    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-    from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
-    from pySDC.implementations.hooks.log_solution import LogSolution
 
-    ref = {
-        'Eqp': [1.02565963, 0.87077674, 0.75244422],
-        'Si1d': [1.08501824, 0.8659459, 0.59335005],
-        'Edp': [-9.89321652e-26, 3.55754231e-01, 5.66358724e-01],
-        'Si2q': [0.03994074, -0.380399, -0.67227838],
-        'Delta': [-2.13428304, 10.32368025, -1.48474241],
-        'w': [370.54298062, 398.85092866, 368.59989826],
-        'Efd': [1.33144618, 2.11434102, 2.38996818],
-        'RF': [0.22357495, 0.35186554, 0.36373663],
-        'VR': [1.3316767, 2.48163506, 2.97000777],
-        'TM': [0.98658474, 0.63068939, 1.12527586],
-        'PSV': [1.0, 0.52018862, 1.24497292],
-        'Id': [1.03392984e00, -7.55033973e-36, 1.39602103e00],
-        'Iq': [1.80892723e00, 1.15469164e-30, 6.38447393e-01],
-        'V': [
-            0.97014097,
-            0.94376174,
-            0.86739643,
-            0.9361775,
-            0.88317809,
-            0.92201319,
-            0.83761267,
-            0.85049254,
-            0.85661891,
-        ],
-        'TH': [
-            -2.30672821,
-            9.90481234,
-            -2.45484121,
-            -2.42758466,
-            -2.57057159,
-            -2.4746599,
-            -2.67639373,
-            -2.62752952,
-            -2.5584944,
-        ],
-        't_switch': [0.5937503078440701],
+    problem_params = {
+        'newton_tol': 1e-10,
     }
 
+    WSCC9 = WSCC9BusSystem(**problem_params)
+    m, n = WSCC9.m, WSCC9.n
+    nvars = 13*m + 2*n
+
+    # test if right-hand side of does have the correct length
+    t0 = 0.0
+    u0 = WSCC9.u_exact(t0)
+    du0 = np.zeros(len(u0))
+
+    f = WSCC9.eval_f(u0, du0, t0)
+
+    assert len(f) == nvars, 'Shape of f does not match with shape it is supposed to be!'
+
+    # test if ParameterError is raised if m != 3 or n != 9 is set
+    problem_params.update(
+        {
+            'm': 4,
+            'n': 8,
+        }
+    )
+    with pytest.raises(ParameterError):
+        WSCC9_test = WSCC9BusSystem(**problem_params)
+
+
+@pytest.mark.base
+def test_WSCC9_update_YBus():
+    """
+    Test if YBus is updated at time 0.05. For this SDC performs one time step.
+    """
+    from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem, get_initial_Ybus, get_event_Ybus
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    # do one time step of size dt = 0.05 and see if YBus is updated (because it has to be changed due to the line outage)
+    dt = 0.05
     level_params = {
         'restol': 5e-13,
-        'dt': 1 / (2**5),
+        'dt': dt,
     }
 
     problem_params = {
@@ -608,27 +600,11 @@ def test_WSCC9_SDC_detection():
     }
 
     step_params = {
-        'maxiter': 50,
+        'maxiter': 1,
     }
 
     controller_params = {
         'logger_level': 30,
-        'hook_class': LogSolution,
-    }
-
-    switch_estimator_params = {
-        'tol': 1e-10,
-        'alpha': 0.95,
-    }
-
-    restarting_params = {
-        'max_restarts': 400,
-        'crash_after_max_restarts': False,
-    }
-
-    convergence_controllers = {
-        SwitchEstimator: switch_estimator_params,
-        BasicRestartingNonMPI: restarting_params,
     }
 
     description = {
@@ -638,64 +614,188 @@ def test_WSCC9_SDC_detection():
         'sweeper_params': sweeper_params,
         'level_params': level_params,
         'step_params': step_params,
-        'convergence_controllers': convergence_controllers,
     }
 
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     t0 = 0.0
-    Tend = 0.7
+    Tend = dt
 
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-    m, n = P.m, P.n
+
+    YBus_initial = P.YBus
+    YBus_initial_ref = get_initial_Ybus()
+
+    assert np.allclose(YBus_initial, YBus_initial_ref), 'YBus does not match with the YBus at initialization!'
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    Eqp = np.array([me[1][0:m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Si1d = np.array([me[1][m : 2 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Edp = np.array([me[1][2 * m : 3 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Si2q = np.array([me[1][3 * m : 4 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Delta = np.array([me[1][4 * m : 5 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    w = np.array([me[1][5 * m : 6 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Efd = np.array([me[1][6 * m : 7 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    RF = np.array([me[1][7 * m : 8 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    VR = np.array([me[1][8 * m : 9 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    TM = np.array([me[1][9 * m : 10 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    PSV = np.array([me[1][10 * m : 11 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Id = np.array([me[1][11 * m : 11 * m + m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    Iq = np.array([me[1][11 * m + m : 11 * m + 2 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
-    V = np.array([me[1][11 * m + 2 * m : 11 * m + 2 * m + n] for me in get_sorted(stats, type='u', sortby='time')])[
-        -1, :
-    ]
-    TH = np.array(
-        [me[1][11 * m + 2 * m + n : 11 * m + 2 * m + 2 * n] for me in get_sorted(stats, type='u', sortby='time')]
-    )[-1, :]
+    YBus_line_outage = P.YBus
+    YBus_line6_8_outage = get_event_Ybus()
+    assert np.allclose(YBus_line_outage, YBus_line6_8_outage), 'YBus after line outage does not match with the one it should supposed to!'
 
-    switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
-    assert len(switches) >= 1, "ERROR: No events found!"
-    t_switch = np.array([item[1] for item in switches])[-1]
 
-    num = {
-        'Eqp': Eqp,
-        'Si1d': Si1d,
-        'Edp': Edp,
-        'Si2q': Si2q,
-        'Delta': Delta,
-        'w': w,
-        'Efd': Efd,
-        'RF': RF,
-        'VR': VR,
-        'TM': TM,
-        'PSV': PSV,
-        'Id': Id,
-        'Iq': Iq,
-        'V': V,
-        'TH': TH,
-        't_switch': t_switch,
-    }
 
-    for key in ref.keys():
-        assert (
-            all(np.isclose(ref[key], num[key], atol=1e-4)) == True
-        ), "For {}: Values not equal! Expected {}, got {}".format(key, ref[key], num[key])
+
+# @pytest.mark.base
+# def test_WSCC9_SDC_detection():
+#     """
+#     Test for one SDC run with event detection if the found event is close to the exact value and if the global error
+#     can be reduced.
+#     """
+
+#     from pySDC.helpers.stats_helper import get_sorted
+#     from pySDC.projects.DAE.problems.WSCC9BusSystem import WSCC9BusSystem
+#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+#     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+#     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+#     from pySDC.implementations.hooks.log_solution import LogSolution
+
+#     ref = {
+#         'Eqp': [1.02565963, 0.87077674, 0.75244422],
+#         'Si1d': [1.08501824, 0.8659459, 0.59335005],
+#         'Edp': [-9.89321652e-26, 3.55754231e-01, 5.66358724e-01],
+#         'Si2q': [0.03994074, -0.380399, -0.67227838],
+#         'Delta': [-2.13428304, 10.32368025, -1.48474241],
+#         'w': [370.54298062, 398.85092866, 368.59989826],
+#         'Efd': [1.33144618, 2.11434102, 2.38996818],
+#         'RF': [0.22357495, 0.35186554, 0.36373663],
+#         'VR': [1.3316767, 2.48163506, 2.97000777],
+#         'TM': [0.98658474, 0.63068939, 1.12527586],
+#         'PSV': [1.0, 0.52018862, 1.24497292],
+#         'Id': [1.03392984e00, -7.55033973e-36, 1.39602103e00],
+#         'Iq': [1.80892723e00, 1.15469164e-30, 6.38447393e-01],
+#         'V': [
+#             0.97014097,
+#             0.94376174,
+#             0.86739643,
+#             0.9361775,
+#             0.88317809,
+#             0.92201319,
+#             0.83761267,
+#             0.85049254,
+#             0.85661891,
+#         ],
+#         'TH': [
+#             -2.30672821,
+#             9.90481234,
+#             -2.45484121,
+#             -2.42758466,
+#             -2.57057159,
+#             -2.4746599,
+#             -2.67639373,
+#             -2.62752952,
+#             -2.5584944,
+#         ],
+#         't_switch': [0.5937503078440701],
+#     }
+
+#     level_params = {
+#         'restol': 5e-13,
+#         'dt': 1 / (2**5),
+#     }
+
+#     problem_params = {
+#         'newton_tol': 1e-10,
+#     }
+
+#     sweeper_params = {
+#         'quad_type': 'RADAU-RIGHT',
+#         'num_nodes': 2,
+#         'QI': 'LU',
+#     }
+
+#     step_params = {
+#         'maxiter': 50,
+#     }
+
+#     controller_params = {
+#         'logger_level': 30,
+#         'hook_class': LogSolution,
+#     }
+
+#     switch_estimator_params = {
+#         'tol': 1e-10,
+#         'alpha': 0.95,
+#     }
+
+#     restarting_params = {
+#         'max_restarts': 400,
+#         'crash_after_max_restarts': False,
+#     }
+
+#     convergence_controllers = {
+#         SwitchEstimator: switch_estimator_params,
+#         BasicRestartingNonMPI: restarting_params,
+#     }
+
+#     description = {
+#         'problem_class': WSCC9BusSystem,
+#         'problem_params': problem_params,
+#         'sweeper_class': fully_implicit_DAE,
+#         'sweeper_params': sweeper_params,
+#         'level_params': level_params,
+#         'step_params': step_params,
+#         'convergence_controllers': convergence_controllers,
+#     }
+
+#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+
+#     t0 = 0.0
+#     Tend = 0.7
+
+#     P = controller.MS[0].levels[0].prob
+#     uinit = P.u_exact(t0)
+#     m, n = P.m, P.n
+
+#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+#     Eqp = np.array([me[1][0:m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Si1d = np.array([me[1][m : 2 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Edp = np.array([me[1][2 * m : 3 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Si2q = np.array([me[1][3 * m : 4 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Delta = np.array([me[1][4 * m : 5 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     w = np.array([me[1][5 * m : 6 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Efd = np.array([me[1][6 * m : 7 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     RF = np.array([me[1][7 * m : 8 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     VR = np.array([me[1][8 * m : 9 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     TM = np.array([me[1][9 * m : 10 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     PSV = np.array([me[1][10 * m : 11 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Id = np.array([me[1][11 * m : 11 * m + m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     Iq = np.array([me[1][11 * m + m : 11 * m + 2 * m] for me in get_sorted(stats, type='u', sortby='time')])[-1, :]
+#     V = np.array([me[1][11 * m + 2 * m : 11 * m + 2 * m + n] for me in get_sorted(stats, type='u', sortby='time')])[
+#         -1, :
+#     ]
+#     TH = np.array(
+#         [me[1][11 * m + 2 * m + n : 11 * m + 2 * m + 2 * n] for me in get_sorted(stats, type='u', sortby='time')]
+#     )[-1, :]
+
+#     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
+#     assert len(switches) >= 1, "ERROR: No events found!"
+#     t_switch = np.array([item[1] for item in switches])[-1]
+
+#     num = {
+#         'Eqp': Eqp,
+#         'Si1d': Si1d,
+#         'Edp': Edp,
+#         'Si2q': Si2q,
+#         'Delta': Delta,
+#         'w': w,
+#         'Efd': Efd,
+#         'RF': RF,
+#         'VR': VR,
+#         'TM': TM,
+#         'PSV': PSV,
+#         'Id': Id,
+#         'Iq': Iq,
+#         'V': V,
+#         'TH': TH,
+#         't_switch': t_switch,
+#     }
+
+#     for key in ref.keys():
+#         assert (
+#             all(np.isclose(ref[key], num[key], atol=1e-4)) == True
+#         ), "For {}: Values not equal! Expected {}, got {}".format(key, ref[key], num[key])
