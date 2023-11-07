@@ -539,7 +539,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
 
 
 @pytest.mark.base
-def test_WSCC9_SDC_detection():
+def test_WSCC9_evaluation():
     r"""
     Test for WSCC9 bus test case. The class is written for components :math:`m = 3`, :math:`n = 9`.
     """
