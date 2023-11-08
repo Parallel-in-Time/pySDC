@@ -133,9 +133,6 @@ class generic_implicit_efficient(efficient_sweeper, generic_implicit):
             super().compute_residual(stage=stage)
             return None
 
-        # compute residual of last rank without involvement of all of them
-        lvl.f[-1] = lvl.prob.eval_f(lvl.u[-1], lvl.time + lvl.dt * self.coll.nodes[-1])
-
         res = lvl.u[0] - lvl.u[-1]
         for m in range(1, self.coll.num_nodes + 1):
             res += lvl.dt * self.coll.Qmat[-1, m] * lvl.f[m]
@@ -240,9 +237,6 @@ class imex_1st_order_efficient(efficient_sweeper, imex_1st_order):
         if lvl.params.residual_type[:4] == 'full' or stage in self.params.skip_residual_computation:
             super().compute_residual(stage=stage)
             return None
-
-        # compute residual of last rank without involvement of all of them
-        lvl.f[-1] = lvl.prob.eval_f(lvl.u[-1], lvl.time + lvl.dt * self.coll.nodes[-1])
 
         res = lvl.u[0] - lvl.u[-1]
         for m in range(1, self.coll.num_nodes + 1):
