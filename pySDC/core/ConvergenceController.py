@@ -51,6 +51,15 @@ class ConvergenceController(object):
         if self.params.useMPI:
             self.prepare_MPI_datatypes()
 
+    def prepare_MPI_logical_operations(self):
+        """
+        Prepare MPI logical operations so we don't need to import mpi4py all the time
+        """
+        from mpi4py import MPI
+
+        self.MPI_LAND = MPI.LAND
+        self.MPI_LOR = MPI.LOR
+
     def prepare_MPI_datatypes(self):
         """
         Prepare MPI datatypes so we don't need to import mpi4py all the time
