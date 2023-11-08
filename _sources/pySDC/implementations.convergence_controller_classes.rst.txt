@@ -12,6 +12,7 @@ Submodules
    implementations.convergence_controller_classes.basic_restarting
    implementations.convergence_controller_classes.check_convergence
    implementations.convergence_controller_classes.check_iteration_estimator
+   implementations.convergence_controller_classes.crash
    implementations.convergence_controller_classes.estimate_contraction_factor
    implementations.convergence_controller_classes.estimate_embedded_error
    implementations.convergence_controller_classes.estimate_extrapolation_error
@@ -21,7 +22,6 @@ Submodules
    implementations.convergence_controller_classes.interpolate_between_restarts
    implementations.convergence_controller_classes.spread_step_sizes
    implementations.convergence_controller_classes.step_size_limiter
-   implementations.convergence_controller_classes.stop_at_nan
    implementations.convergence_controller_classes.store_uold
 
 Module contents

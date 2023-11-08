@@ -436,6 +436,8 @@
       </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.check_convergence.html#implementations.convergence_controller_classes.check_convergence.CheckConvergence.communicate_convergence">communicate_convergence() (CheckConvergence method)</a>
 </li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase.communicate_crash">communicate_crash() (CrashBase method)</a>
+</li>
       <li><a href="pySDC/core.Errors.html#core.Errors.CommunicationError">CommunicationError</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.comp2_cupy_mesh.comp1">comp1 (comp2_cupy_mesh attribute)</a>
@@ -630,6 +632,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicholson">CrankNicholson (class in implementations.sweeper_classes.Runge_Kutta)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase">CrashBase (class in implementations.convergence_controller_classes.crash)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh">cupy_mesh (class in implementations.datatype_classes.cupy_mesh)</a>
 </li>
@@ -1812,6 +1816,13 @@
 </li>
       </ul></li>
       <li>
+    implementations.convergence_controller_classes.crash
+
+      <ul>
+        <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#module-implementations.convergence_controller_classes.crash">module</a>
+</li>
+      </ul></li>
+      <li>
     implementations.convergence_controller_classes.estimate_contraction_factor
 
       <ul>
@@ -1872,13 +1883,6 @@
 
       <ul>
         <li><a href="pySDC/implementations.convergence_controller_classes.step_size_limiter.html#module-implementations.convergence_controller_classes.step_size_limiter">module</a>
-</li>
-      </ul></li>
-      <li>
-    implementations.convergence_controller_classes.stop_at_nan
-
-      <ul>
-        <li><a href="pySDC/implementations.convergence_controller_classes.stop_at_nan.html#module-implementations.convergence_controller_classes.stop_at_nan">module</a>
 </li>
       </ul></li>
       <li>
@@ -2854,6 +2858,8 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#module-implementations.convergence_controller_classes.check_iteration_estimator">implementations.convergence_controller_classes.check_iteration_estimator</a>
 </li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#module-implementations.convergence_controller_classes.crash">implementations.convergence_controller_classes.crash</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_contraction_factor.html#module-implementations.convergence_controller_classes.estimate_contraction_factor">implementations.convergence_controller_classes.estimate_contraction_factor</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_embedded_error.html#module-implementations.convergence_controller_classes.estimate_embedded_error">implementations.convergence_controller_classes.estimate_embedded_error</a>
@@ -2871,8 +2877,6 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#module-implementations.convergence_controller_classes.spread_step_sizes">implementations.convergence_controller_classes.spread_step_sizes</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.step_size_limiter.html#module-implementations.convergence_controller_classes.step_size_limiter">implementations.convergence_controller_classes.step_size_limiter</a>
-</li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.stop_at_nan.html#module-implementations.convergence_controller_classes.stop_at_nan">implementations.convergence_controller_classes.stop_at_nan</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.store_uold.html#module-implementations.convergence_controller_classes.store_uold">implementations.convergence_controller_classes.store_uold</a>
 </li>
@@ -3270,8 +3274,6 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.post_iteration_processing">(NewtonInexactness method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.stop_at_nan.html#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.post_iteration_processing">(StopAtNan method)</a>
-</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_iteration_processing">(StoreUOld method)</a>
 </li>
       </ul></li>
@@ -3281,8 +3283,6 @@
 </li>
       <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.post_setup">post_setup() (hooks method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_collocation.html#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.post_spread_processing">post_spread_processing() (AdaptiveCollocation method)</a>
 
       <ul>
@@ -3293,6 +3293,8 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_spread_processing">(StoreUOld method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.Hooks.html#core.Hooks.hooks.post_step">post_step() (hooks method)</a>
 </li>
       <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.post_step_processing">post_step_processing() (ConvergenceController method)</a>
@@ -3337,6 +3339,8 @@
       </ul></li>
       <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.prepare_MPI_datatypes">prepare_MPI_datatypes() (ConvergenceController method)</a>
 </li>
+      <li><a href="pySDC/core.ConvergenceController.html#core.ConvergenceController.ConvergenceController.prepare_MPI_logical_operations">prepare_MPI_logical_operations() (ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/implementations.convergence_controller_classes.basic_restarting.html#implementations.convergence_controller_classes.basic_restarting.BasicRestartingMPI.prepare_next_block">prepare_next_block() (BasicRestartingMPI method)</a>
 
       <ul>
@@ -3349,6 +3353,10 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI.prepare_next_block">(SpreadStepSizesBlockwiseMPI method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI.prepare_next_block">(SpreadStepSizesBlockwiseNonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtMaxRuntime.prepare_next_block">(StopAtMaxRuntime method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan.prepare_next_block">(StopAtNan method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/core.Step.html#core.Step.step.prev">prev (step property)</a>
@@ -3670,7 +3678,9 @@
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter.setup">(StepSizeSlopeLimiter method)</a>
 </li>
-        <li><a href="pySDC/implementations.convergence_controller_classes.stop_at_nan.html#implementations.convergence_controller_classes.stop_at_nan.StopAtNan.setup">(StopAtNan method)</a>
+        <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtMaxRuntime.setup">(StopAtMaxRuntime method)</a>
+</li>
+        <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan.setup">(StopAtNan method)</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.setup">(StoreUOld method)</a>
 </li>
@@ -3889,7 +3899,9 @@
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter">StepSizeSlopeLimiter (class in implementations.convergence_controller_classes.step_size_limiter)</a>
 </li>
-      <li><a href="pySDC/implementations.convergence_controller_classes.stop_at_nan.html#implementations.convergence_controller_classes.stop_at_nan.StopAtNan">StopAtNan (class in implementations.convergence_controller_classes.stop_at_nan)</a>
+      <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtMaxRuntime">StopAtMaxRuntime (class in implementations.convergence_controller_classes.crash)</a>
+</li>
+      <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan">StopAtNan (class in implementations.convergence_controller_classes.crash)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values">store_values() (EstimateExtrapolationErrorBase method)</a>
 </li>
