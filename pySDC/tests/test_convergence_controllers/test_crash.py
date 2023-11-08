@@ -13,7 +13,7 @@ def get_controller(MPIsweeper, MPIcontroller):
        (pySDC.Controller.controller): Controller used in the run
     """
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
-    from pySDC.implementations.convergence_controller_classes.stop_at_nan import StopAtNan
+    from pySDC.implementations.convergence_controller_classes.crash import StopAtNan
 
     if MPIcontroller:
         from pySDC.implementations.controller_classes.controller_MPI import controller_MPI as controller_class
