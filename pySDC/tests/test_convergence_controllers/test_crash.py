@@ -125,16 +125,16 @@ def single_test(MPIsweeper=False, MPIcontroller=False):
     try:
         if modify:
             level.u[0][:] = np.nan
-        cont.post_iteration_processing(controller, step, comm=comm)
-        raise Exception('Did not raise error!')
+        cont.prepare_next_block(controller, step, comm=comm)
+        raise Exception('Did not raise error when the solution is nan!')
     except ConvergenceError:
         print('Successfully raised error when nan is part of the solution')
 
     try:
         if modify:
             level.u[0][:] = 1e99
-        cont.post_iteration_processing(controller, step, comm=comm)
-        raise Exception('Did not raise error!')
+        cont.prepare_next_block(controller, step, comm=comm)
+        raise Exception('Did not raise error when the solution exceeds limit!')
     except ConvergenceError:
         print('Successfully raised error solution exceeds limit')
 
@@ -146,7 +146,7 @@ def test_stop_at_nan():
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('mode', ['0 1', '1 0'])
-def test_interpolation_error_MPI(mode):
+def test_stop_at_nan_MPI(mode):
     import subprocess
     import os
 
