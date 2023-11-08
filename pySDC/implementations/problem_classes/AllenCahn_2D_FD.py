@@ -3,7 +3,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
@@ -78,6 +78,7 @@ class allencahn_fullyimplicit(ptype):
         newton_tol=1e-12,
         lin_tol=1e-8,
         lin_maxiter=100,
+        inexact_linear_ratio=None,
         radius=0.25,
         order=2,
     ):
@@ -96,14 +97,19 @@ class allencahn_fullyimplicit(ptype):
             'nvars',
             'nu',
             'eps',
-            'newton_maxiter',
-            'newton_tol',
-            'lin_tol',
-            'lin_maxiter',
             'radius',
             'order',
             localVars=locals(),
             readOnly=True,
+        )
+        self._makeAttributeAndRegister(
+            'newton_maxiter',
+            'newton_tol',
+            'lin_tol',
+            'lin_maxiter',
+            'inexact_linear_ratio',
+            localVars=locals(),
+            readOnly=False,
         )
 
         # compute dx and get discretization matrix A
@@ -123,6 +129,10 @@ class allencahn_fullyimplicit(ptype):
         self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
+
+        self.work_counters['newton'] = WorkCounter()
+        self.work_counters['rhs'] = WorkCounter()
+        self.work_counters['linear'] = WorkCounter()
 
     @staticmethod
     def __get_A(N, dx):
@@ -198,6 +208,10 @@ class allencahn_fullyimplicit(ptype):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
+            # do inexactness in the linear solver
+            if self.inexact_linear_ratio:
+                self.lin_tol = res * self.inexact_linear_ratio
+
             if res < self.newton_tol:
                 break
 
@@ -206,10 +220,14 @@ class allencahn_fullyimplicit(ptype):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.lin_tol, atol=0)[0]
+            u -= cg(
+                dg, g, x0=z, tol=self.lin_tol, maxiter=self.lin_maxiter, atol=0, callback=self.work_counters['linear']
+            )[0]
             # increase iteration count
             n += 1
             # print(n, res)
+
+            self.work_counters['newton']()
 
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
@@ -242,9 +260,10 @@ class allencahn_fullyimplicit(ptype):
         v = u.flatten()
         f[:] = (self.A.dot(v) + 1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         r"""
         Routine to compute the exact solution at time :math:`t`.
 
@@ -258,13 +277,19 @@ class allencahn_fullyimplicit(ptype):
         me : dtype_u
             The exact solution.
         """
-
-        assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
-        for i in range(self.nvars[0]):
-            for j in range(self.nvars[1]):
-                r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                me[i, j] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
+        if t > 0:
+
+            def eval_rhs(t, u):
+                return self.eval_f(u.reshape(self.init[0]), t).flatten()
+
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
+
+        else:
+            for i in range(self.nvars[0]):
+                for j in range(self.nvars[1]):
+                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
+                    me[i, j] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
 
         return me
 
@@ -310,6 +335,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         f.impl[:] = self.A.dot(v).reshape(self.nvars)
         f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -338,6 +364,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         def callback(xk):
             context.num_iter += 1
+            self.work_counters['linear']()
             return context.num_iter
 
         me = self.dtype_u(self.init)
@@ -357,6 +384,32 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         self.lin_ncalls += 1
         self.lin_itercount += context.num_iter
 
+        return me
+
+    def u_exact(self, t, u_init=None, t_init=None):
+        """
+        Routine to compute the exact solution at time t.
+
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        if t > 0:
+
+            def eval_rhs(t, u):
+                f = self.eval_f(u.reshape(self.init[0]), t)
+                return (f.impl + f.expl).flatten()
+
+            me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
+        else:
+            me[:] = super().u_exact(t, u_init, t_init)
         return me
 
 

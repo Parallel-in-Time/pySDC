@@ -459,6 +459,8 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         default_params = {
             'Taylor_order': 2 * num_nodes,
             'n': num_nodes,
+            'recompute_coefficients': False,
+            **params,
         }
 
         return {**super().setup(controller, params, description, **kwargs), **default_params}
@@ -485,18 +487,21 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         t_eval = S.time + nodes_[-1]
 
         dts = np.append(nodes_[0], nodes_[1:] - nodes_[:-1])
-        self.params.Taylor_order = 2 * len(nodes)
+        self.params.Taylor_order = len(nodes)
         self.params.n = len(nodes)
 
         # compute the extrapolation coefficients
-        # TODO: Maybe this can be reused
-        self.get_extrapolation_coefficients(nodes, dts, t_eval)
+        if None in self.coeff.u or self.params.recompute_coefficients:
+            self.get_extrapolation_coefficients(nodes, dts, t_eval)
 
         # compute the extrapolated solution
+        if lvl.f[0] is None:
+            lvl.f[0] = lvl.prob.eval_f(lvl.u[0], lvl.time)
+
         if type(lvl.f[0]) == imex_mesh:
-            f = [me.impl + me.expl for me in lvl.f]
+            f = [lvl.f[i].impl + lvl.f[i].expl if self.coeff.f[i] and lvl.f[i] else 0.0 for i in range(len(lvl.f) - 1)]
         elif type(lvl.f[0]) == mesh:
-            f = lvl.f
+            f = [lvl.f[i] if self.coeff.f[i] else 0.0 for i in range(len(lvl.f) - 1)]
         else:
             raise DataError(
                 f"Unable to store f from datatype {type(lvl.f[0])}, extrapolation based error estimate only\
@@ -506,7 +511,7 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         # compute the error with the weighted sum
         if self.comm:
             idx = (self.comm.rank + 1) % self.comm.size
-            sendbuf = self.coeff.u[idx] * lvl.u[idx] + self.coeff.f[idx] * lvl.f[idx]
+            sendbuf = self.coeff.u[idx] * lvl.u[idx] + self.coeff.f[idx] * f[idx]
             u_ex = lvl.prob.dtype_u(lvl.prob.init, val=0.0) if self.comm.rank == self.comm.size - 1 else None
             self.comm.Reduce(sendbuf, u_ex, op=self.sum, root=self.comm.size - 1)
         else:
