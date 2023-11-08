@@ -127,7 +127,6 @@ class CheckConvergence(ConvergenceController):
         """
         # Either gather information about all status or send forward own
         if controller.params.all_to_done:
-
             for hook in controller.hooks:
                 hook.pre_comm(step=S, level_number=0)
             S.status.done = comm.allreduce(sendobj=S.status.done, op=self.MPI_LAND)
