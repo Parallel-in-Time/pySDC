@@ -1,7 +1,7 @@
 import pytest
 
 
-def get_controller(dt, num_nodes, quad_type, useMPI, **kwargs):
+def get_controller(dt, num_nodes, quad_type, useMPI, imex, **kwargs):
     """
     Gets a controller setup for the polynomial test problem.
 
@@ -10,16 +10,25 @@ def get_controller(dt, num_nodes, quad_type, useMPI, **kwargs):
         num_nodes (int): Number of nodes
         quad_type (str): Type of quadrature
         useMPI (bool): Whether or not to use MPI
+        imex (bool): Use IMEX version of the test problem
 
     Returns:
        (dict): Stats object generated during the run
        (pySDC.Controller.controller): Controller used in the run
     """
-    from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
         EstimateExtrapolationErrorWithinQ,
     )
+
+    if imex:
+        from pySDC.implementations.problem_classes.polynomial_test_problem import (
+            polynomial_testequation_IMEX as problem_class,
+        )
+    else:
+        from pySDC.implementations.problem_classes.polynomial_test_problem import (
+            polynomial_testequation as problem_class,
+        )
 
     if useMPI:
         from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
@@ -55,7 +64,7 @@ def get_controller(dt, num_nodes, quad_type, useMPI, **kwargs):
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = polynomial_testequation
+    description['problem_class'] = problem_class
     description['problem_params'] = problem_params
     description['sweeper_class'] = sweeper_class
     description['sweeper_params'] = sweeper_params
@@ -179,6 +188,7 @@ def test_extrapolation_within_Q(num_nodes, quad_type):
         'quad_type': quad_type,
         'useMPI': False,
         'QI': 'MIN',
+        'imex': False,
     }
 
     import numpy as np
@@ -219,5 +229,6 @@ if __name__ == "__main__":
             'quad_type': sys.argv[2],
             'useMPI': True,
             'QI': 'MIN',
+            'imex': True,
         }
         check_order([5e-1, 1e-1, 8e-2, 5e-2], **kwargs)
