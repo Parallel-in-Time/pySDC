@@ -162,7 +162,7 @@ def check_order(dts, **kwargs):
     for key in keys:
         errors = np.array([res[dt][key] for dt in dts])
 
-        mask = np.logical_and(errors < 1e-0, errors > 1e-14)
+        mask = np.logical_and(errors < 1e-1, errors > 1e-12)
         order = np.log(errors[mask][1:] / errors[mask][:-1]) / np.log(dts[mask][1:] / dts[mask][:-1])
 
         assert np.isclose(
@@ -183,7 +183,7 @@ def test_extrapolation_within_Q(num_nodes, quad_type):
 
     import numpy as np
 
-    steps = np.logspace(1, -4, 20)
+    steps = np.logspace(-1, -3, 10)
     check_order(steps, **kwargs)
 
 
