@@ -1,7 +1,7 @@
 #!/bin/bash -l                    
 #SBATCH --job-name="monodomain"                    
 #SBATCH --account="s1074"                    
-#SBATCH --time=00:30:00                    
+#SBATCH --time=00:10:00                    
 #SBATCH --ntasks=12
 #SBATCH --ntasks-per-node=12                    
 #SBATCH --output=./PFASST_MPI.log                    

@@ -22,7 +22,10 @@ class Monodomain:
         self.fibrosis = problem_params["fibrosis"]
 
         if "cuboid" in problem_params["domain_name"]:
-            self.dom_size = [[0.0, 0.0, 0.0], [20.0, 7.0, 3.0]]
+            if "small" in problem_params["domain_name"]:
+                self.dom_size = [[0.0, 0.0, 0.0], [5.0, 3.0, 1.0]]
+            else:
+                self.dom_size = [[0.0, 0.0, 0.0], [20.0, 7.0, 3.0]]
             self.import_fibers = False
         else:
             self.import_fibers = True
@@ -57,16 +60,23 @@ class Monodomain:
         self.problem_params = problem_params
 
     def get_tend(self):
-        if self.domain_name == "cuboid_2D" or self.domain_name == "cuboid_3D":
-            return 0.15  # 70.
+        if "cuboid" in self.domain_name:
+            if "small" in self.domain_name:
+                return 10.0
+            else:
+                return 25.0
         else:
-            return 200.0
+            return 50.0  # for the initial value simulate till 800 ms, then for 50 ms
 
     def define_eval_points(self):
         # used to compute CV, valid only on cuboid domain
-        if self.domain_name == "cuboid_2D" or self.domain_name == "cuboid_3D":
-            n_pts = 10
-            a = np.array([[1.5, 1.5, 1.5]])
+        if "cuboid" in self.domain_name:
+            if "small" in self.domain_name:
+                n_pts = 5
+                a = np.array([[0.5, 0.5, 0.5]])
+            else:
+                n_pts = 10
+                a = np.array([[1.5, 1.5, 1.5]])
             b = np.reshape(np.array(self.dom_size[1]), (1, 3))
             x = np.reshape(np.linspace(0.0, 1.0, n_pts), (n_pts, 1))
             self.eval_points = np.zeros((n_pts, 3))
@@ -230,7 +240,10 @@ class Monodomain:
 
         if not self.import_fibers:
             stim_centers = [[0.0, 0.0, 0.0]]
-            stim_radius = 1.5
+            if "small" in self.domain_name:
+                stim_radius = 0.5
+            else:
+                stim_radius = 1.5
             self.stim_protocol = [[0.0, stim_dur]]  # list of stim_time, sitm_dur values
         else:
             if self.domain_name == "truncated_ellipsoid":

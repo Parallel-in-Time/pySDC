@@ -55,10 +55,6 @@ class fenicsx_mesh_vec(object):
     def __mul__(self, other):
         if isinstance(other, fenicsx_mesh_vec):
             V = self.val_list[0].values.function_space
-            # mult = fenicsx_mesh_vec(init=V,val=0.,size=self.size)
-            # for i in range(self.size):
-            #     mult.val_list[i].values.interpolate(fem.Expression(self.val_list[i].values*other.val_list[i].values,V.element.interpolation_points()))
-
             mult = fenicsx_mesh_vec(init=V, val=0.0, size=self.size)
             for i in range(self.size):
                 mult.val_list[i].values.x.array[:] = self.val_list[i].values.x.array[:] * other.val_list[i].values.x.array[:]

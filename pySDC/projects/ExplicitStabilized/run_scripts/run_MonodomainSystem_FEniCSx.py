@@ -34,7 +34,7 @@ def main():
     integrators = ["IMEXEXP_EXPRK"]
     # integrators = ["exp_mES_EXPRK"]
 
-    num_procs = 6
+    num_procs = 4
 
     ref = 2
     time_order = 1
@@ -50,7 +50,7 @@ def main():
     sweeper_params = dict()
     sweeper_params["initial_guess"] = "spread"
     sweeper_params["quad_type"] = "RADAU-RIGHT"
-    sweeper_params["num_nodes"] = [3, 2, 1]
+    sweeper_params["num_nodes"] = [5]
     sweeper_params["QI"] = "IE"
     # specific for explicit stabilized methods
     sweeper_params["es_class"] = "RKW1"
@@ -65,7 +65,7 @@ def main():
 
     # initialize step parameters
     step_params = dict()
-    step_params["maxiter"] = 30
+    step_params["maxiter"] = 50
 
     space_comm = MPI.COMM_WORLD
     space_rank = space_comm.Get_rank()
@@ -76,26 +76,26 @@ def main():
     problem_params["communicator"] = space_comm
     problem_params["family"] = "CG"
     if problem_params["family"] == "CG":
-        problem_params["order"] = 1
+        problem_params["order"] = [1]
         problem_params["mass_lumping"] = True  # has effect for family=CG and order=1
     elif problem_params["family"] == "DG":
         problem_params["order"] = max(time_order - 1, 1)
         problem_params["mass_lumping"] = False
-    problem_params["domain_name"] = "cuboid_2D"
+    problem_params["domain_name"] = "cuboid_2D_small"
     problem_params["refinements"] = [2, 1, 0]
     problem_params["ionic_model"] = "HH"
     problem_params["ionic_model_eval"] = "c++"
     problem_params["fibrosis"] = False
     problem_params["meshes_fibers_root_folder"] = "../../../../../meshes_fibers_fibrosis/results"
-    problem_params["output_root"] = "../../../../data/ExplicitStabilized/"
+    problem_params["output_root"] = "../../../../data/ExplicitStabilized/results_tmp"
     problem_params["output_file_name"] = "monodomain"
-    problem_params["enable_output"] = True
+    problem_params["enable_output"] = False
     problem_params["output_V_only"] = True
     problem_params["ref_sol"] = "ref_sol"
     problem_params["solver_rtol"] = 1e-8
-    problem_params["read_initial_value"] = True
+    problem_params["read_init_val"] = True
     problem_params["init_val_name"] = "init_val"
-    problem_params["istim_dur"] = 0.0 if problem_params["read_initial_value"] else -1.0
+    problem_params["istim_dur"] = 0.0 if problem_params["read_init_val"] else -1.0
 
     # base transfer parameters
     base_transfer_params = dict()
