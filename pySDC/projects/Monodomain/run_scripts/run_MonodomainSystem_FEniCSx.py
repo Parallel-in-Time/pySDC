@@ -4,24 +4,24 @@ from mpi4py import MPI
 
 from pySDC.core.Errors import ParameterError
 
-from pySDC.projects.ExplicitStabilized.problem_classes.MonodomainSystem_FEniCSx_vec import monodomain_system, monodomain_system_exp_expl_impl
-from pySDC.projects.ExplicitStabilized.transfer_classes.TransferFenicsxMeshVec import mesh_to_mesh_fenicsx
-from pySDC.projects.ExplicitStabilized.hooks.HookClass_pde import pde_hook
-from pySDC.projects.ExplicitStabilized.hooks.HookClass_post_iter_info import post_iter_info_hook
+from pySDC.projects.Monodomain.problem_classes.MonodomainSystem_FEniCSx_vec import monodomain_system, monodomain_system_exp_expl_impl
+from pySDC.projects.Monodomain.transfer_classes.TransferFenicsxMeshVec import mesh_to_mesh_fenicsx
+from pySDC.projects.Monodomain.hooks.HookClass_pde import pde_hook
+from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
-from pySDC.projects.ExplicitStabilized.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
     exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK,
 )
 
-from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
-from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
-from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
-from pySDC.projects.ExplicitStabilized.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
     integrators = ["IMEXEXP_EXPRK"]
     # integrators = ["exp_mES_EXPRK"]
 
-    num_procs = 4
+    num_procs = 2
 
     ref = 2
     time_order = 1
@@ -50,7 +50,7 @@ def main():
     sweeper_params = dict()
     sweeper_params["initial_guess"] = "spread"
     sweeper_params["quad_type"] = "RADAU-RIGHT"
-    sweeper_params["num_nodes"] = [5]
+    sweeper_params["num_nodes"] = [5, 3, 1]
     sweeper_params["QI"] = "IE"
     # specific for explicit stabilized methods
     sweeper_params["es_class"] = "RKW1"
@@ -87,7 +87,7 @@ def main():
     problem_params["ionic_model_eval"] = "c++"
     problem_params["fibrosis"] = False
     problem_params["meshes_fibers_root_folder"] = "../../../../../meshes_fibers_fibrosis/results"
-    problem_params["output_root"] = "../../../../data/ExplicitStabilized/results_tmp"
+    problem_params["output_root"] = "../../../../data/Monodomain/results_tmp"
     problem_params["output_file_name"] = "monodomain"
     problem_params["enable_output"] = False
     problem_params["output_V_only"] = True
@@ -183,7 +183,7 @@ def main():
         out = f"Time to solution: {timing[0][1]:6.4f} sec."
         controller.logger.info(out)
 
-        from pySDC.projects.ExplicitStabilized.utils.visualization_tools import show_residual_across_simulation
+        from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
 
         fname = problem_params["output_root"] + "residuals.png"
         if space_rank == 0:
