@@ -257,6 +257,7 @@ class monodomain_system(ptype):
                         uh.sub(i).function_space.mesh._cpp_object, uh.sub(i).function_space.element, sol_ref.function_space.mesh._cpp_object
                     ),
                 )
+            del mesh_ref, V_ref, sol_ref
             uh.ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD, True)
         else:
             raise Exception("read full sol not implemented for DG")
@@ -268,7 +269,7 @@ class monodomain_system(ptype):
         for i in range(self.exact.size):
             u0.sub(i).name = f"u_{i+1}"
 
-        if not self.read_initial_value:
+        if not self.read_init_val:
             for i in range(self.exact.size):
                 u0.sub(i).interpolate(fem.Expression(self.exact.u0_expr[i], self.V.element.interpolation_points()))
         else:
@@ -349,7 +350,7 @@ class monodomain_system(ptype):
                     for j, u in zip(loc_glob_map, u_val_loc):
                         u_val[j] = u
             else:
-                assert data == None
+                assert data is None
                 u_val = np.zeros((self.exact.eval_points.shape[0], 1))
 
             self.domain.comm.Bcast(u_val, root=0)
@@ -371,7 +372,7 @@ class monodomain_system(ptype):
         if fh is None:
             fh = self.dtype_f(init=self.V, val=0.0)
 
-        self.update_u_and_uh(u, False)
+        # self.update_u_and_uh(u, False)
 
         # eval ionic model
         self.eval_expr(self.im_f_expr, u, fh, list(range(self.exact.size)))
@@ -386,23 +387,25 @@ class monodomain_system(ptype):
 
         return fh
 
-    def update_u_and_uh(self, u, ghost_update_all=True):
-        u.ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD, ghost_update_all)
-        if self.ionic_model_eval in ["c++", "numpy"]:
-            pass
-        elif self.ionic_model_eval == "ufl":
-            self.exact.uh.copy(u)
+    # def update_u_and_uh(self, u, ghost_update_all=True):
+    # u.ghostUpdate(PETSc.InsertMode.INSERT, PETSc.ScatterMode.FORWARD, ghost_update_all)
+    # if self.ionic_model_eval in ["c++", "numpy"]:
+    #     pass
+    # elif self.ionic_model_eval == "ufl":
+    #     self.exact.uh.copy(u)
+    # pass
 
-    def eval_expr(self, expr, u, fh, indeces):
+    def eval_expr(self, expr, u, fh, indeces, zero_untouched_indeces=True):
         if self.ionic_model_eval in ["c++", "numpy"] and expr is not None:
             expr(u.np_list, fh.np_list)
         elif self.ionic_model_eval == "ufl":
             for i in indeces:
                 fh[i].values.interpolate(expr[i])
 
-        non_indeces = [i for i in range(self.exact.size) if i not in indeces]
-        for i in non_indeces:
-            fh[i].zero()
+        if zero_untouched_indeces:
+            non_indeces = [i for i in range(self.exact.size) if i not in indeces]
+            for i in non_indeces:
+                fh[i].zero()
 
 
 class monodomain_system_imex(monodomain_system):
@@ -498,7 +501,7 @@ class monodomain_system_exp_expl_impl(monodomain_system_imex):
             for i in self.im_exp_indeces:
                 lmbda[i].values.interpolate(self.ufl_im_lmbda_exp[i])
 
-    def eval_f(self, u, t, eval_impl=True, eval_expl=True, eval_exp=True, fh=None):
+    def eval_f(self, u, t, eval_impl=True, eval_expl=True, eval_exp=True, fh=None, zero_untouched_indeces=True):
         """
         Evaluates F(u,t) = M^-1*( A*u + f(u,t) )
 
@@ -507,28 +510,31 @@ class monodomain_system_exp_expl_impl(monodomain_system_imex):
         """
 
         self.exact.update_time(t)
-        self.update_u_and_uh(u, False)
+        # self.update_u_and_uh(u, False)
 
         if fh is None:
             fh = self.dtype_f(init=self.V, val=0.0)
 
         # evaluate explicit (non stiff) part M^-1*f_nonstiff(u,t)
         if eval_expl:
-            fh.expl = self.eval_f_nonstiff(u, t, fh.expl)
+            fh.expl = self.eval_f_nonstiff(u, t, fh.expl, zero_untouched_indeces)
 
         # evaluate implicit (stiff) part M^1*A*u+M^-1*f_stiff(u,t)
         if eval_impl:
-            fh.impl = self.eval_f_stiff(u, t, fh.impl)
+            fh.impl = self.eval_f_stiff(u, t, fh.impl, zero_untouched_indeces)
 
         # evaluate exponential part
         if eval_exp:
-            fh.exp = self.eval_f_exp(u, t, fh.exp)
+            fh.exp = self.eval_f_exp(u, t, fh.exp, zero_untouched_indeces)
 
         return fh
 
-    def eval_f_nonstiff(self, u, t, fh_nonstiff):
+    def eval_f_nonstiff(self, u, t, fh_nonstiff, zero_untouched_indeces=True):
         # eval ionic model nonstiff terms
-        self.eval_expr(self.im_f_nonstiff, u, fh_nonstiff, self.im_nonstiff_indeces)
+        self.eval_expr(self.im_f_nonstiff, u, fh_nonstiff, self.im_nonstiff_indeces, zero_untouched_indeces)
+
+        if not zero_untouched_indeces and 0 not in self.im_nonstiff_indeces:
+            fh_nonstiff[0].zero()
 
         # apply stimulus
         self.interp_f.values.interpolate(self.stim_expr)
@@ -536,9 +542,12 @@ class monodomain_system_exp_expl_impl(monodomain_system_imex):
 
         return fh_nonstiff
 
-    def eval_f_stiff(self, u, t, fh_stiff):
+    def eval_f_stiff(self, u, t, fh_stiff, zero_untouched_indeces=True):
         # eval ionic model stiff terms
-        self.eval_expr(self.im_f_stiff, u, fh_stiff, self.im_stiff_indeces)
+        self.eval_expr(self.im_f_stiff, u, fh_stiff, self.im_stiff_indeces, zero_untouched_indeces)
+
+        if not zero_untouched_indeces and 0 not in self.im_stiff_indeces:
+            fh_stiff[0].zero()
 
         # apply diffusion
         self.K.mult(u[0].values.vector, self.b)  # WARNING: DO NOT DO -u[0].values.vector HERE AND += self.interp_f BELOW SINCE IT CREATES MEMORY LEAK!!!
@@ -547,18 +556,19 @@ class monodomain_system_exp_expl_impl(monodomain_system_imex):
 
         return fh_stiff
 
-    def eval_f_exp(self, u, t, fh_exp):
-        self.update_u_and_uh(u, False)
+    def eval_f_exp(self, u, t, fh_exp, zero_untouched_indeces=True):
+        # self.update_u_and_uh(u, False)
         self.eval_lmbda_yinf_exp(u, self.lmbda, self.yinf)
         for i in self.im_exp_indeces:
             fh_exp.np_list[i][:] = self.lmbda.np_list[i] * (u.np_list[i] - self.yinf.np_list[i])
 
-        fh_exp.zero_sub(self.im_non_exp_indeces)
+        if zero_untouched_indeces:
+            fh_exp.zero_sub(self.im_non_exp_indeces)
 
         return fh_exp
 
-    def eval_phi_f_exp(self, u, factor, t, u_sol=None):
-        self.update_u_and_uh(u, False)
+    def eval_phi_f_exp(self, u, factor, t, u_sol=None, zero_untouched_indeces=True):
+        # self.update_u_and_uh(u, False)
 
         if u_sol is None:
             u_sol = self.dtype_u(init=self.V, val=0.0)
@@ -567,12 +577,13 @@ class monodomain_system_exp_expl_impl(monodomain_system_imex):
         for i in self.im_exp_indeces:
             u_sol.np_list[i][:] = (np.exp(factor * self.lmbda.np_list[i]) - 1.0) / (factor) * (u.np_list[i] - self.yinf.np_list[i])
 
-        u_sol.zero_sub(self.im_non_exp_indeces)
+        if zero_untouched_indeces:
+            u_sol.zero_sub(self.im_non_exp_indeces)
 
         return u_sol
 
     def phi_eval(self, u, factor, t, k, u_sol=None):
-        self.update_u_and_uh(u, False)
+        # self.update_u_and_uh(u, False)
 
         if u_sol is None:
             u_sol = self.dtype_u(init=self.V, val=0.0)
@@ -596,7 +607,7 @@ class monodomain_system_exp_expl_impl(monodomain_system_imex):
     def lmbda_eval(self, u, t, lmbda=None):
         self.exact.update_time(t)
 
-        self.update_u_and_uh(u, False)
+        # self.update_u_and_uh(u, False)
 
         if lmbda is None:
             lmbda = self.dtype_u(init=self.V, val=0.0)

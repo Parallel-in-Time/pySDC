@@ -35,7 +35,7 @@ def main():
     integrators = ["IMEXEXP_EXPRK"]
     # integrators = ["exp_mES_EXPRK"]
 
-    n_time_ranks = 1  # number of time ranks. Space ranks chosen accoding to world_size/n_time_ranks
+    n_time_ranks = 4  # number of time ranks. Space ranks chosen accoding to world_size/n_time_ranks
 
     # cuboid_2D with 24 procs in time, 2 in space: time to sol 186.4860 sec.
     # the same but with 1 proc in time took 736.8081 sec
@@ -53,7 +53,7 @@ def main():
     sweeper_params = dict()
     sweeper_params["initial_guess"] = "spread"
     sweeper_params["quad_type"] = "RADAU-RIGHT"
-    sweeper_params["num_nodes"] = [3]
+    sweeper_params["num_nodes"] = [4, 2, 1]
     sweeper_params["QI"] = "IE"
     # specific for explicit stabilized methods
     sweeper_params["es_class"] = "RKW1"
@@ -96,21 +96,21 @@ def main():
     elif problem_params["family"] == "DG":
         problem_params["order"] = [2, 1]
         problem_params["mass_lumping"] = False
-    problem_params["domain_name"] = "cuboid_2D"
+    problem_params["domain_name"] = "cuboid_2D_small"
     problem_params["refinements"] = [2, 1, 0]
-    problem_params["ionic_model"] = "TTP"
+    problem_params["ionic_model"] = "HH"
     problem_params["ionic_model_eval"] = "c++"
     problem_params["fibrosis"] = False
     problem_params["meshes_fibers_root_folder"] = "../../../../../meshes_fibers_fibrosis/results"
-    problem_params["output_root"] = "../../../../data/ExplicitStabilized/"
+    problem_params["output_root"] = "../../../../data/ExplicitStabilized/results_tmp"
     problem_params["output_file_name"] = "monodomain"
     problem_params["enable_output"] = False
     problem_params["output_V_only"] = True
     problem_params["ref_sol"] = "ref_sol"
     problem_params["solver_rtol"] = 1e-8
-    problem_params["read_initial_value"] = True
+    problem_params["read_init_val"] = True
     problem_params["init_val_name"] = "init_val"
-    problem_params["istim_dur"] = 0.0 if problem_params["read_initial_value"] else -1.0
+    problem_params["istim_dur"] = 0.0 if problem_params["read_init_val"] else -1.0
 
     # base transfer parameters
     base_transfer_params = dict()
