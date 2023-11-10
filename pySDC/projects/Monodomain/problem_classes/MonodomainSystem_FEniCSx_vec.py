@@ -9,11 +9,11 @@ from pathlib import Path
 import logging
 
 
-from pySDC.projects.ExplicitStabilized.datatype_classes.fenicsx_mesh import fenicsx_mesh
-from pySDC.projects.ExplicitStabilized.datatype_classes.fenicsx_mesh_vec import fenicsx_mesh_vec, rhs_fenicsx_mesh_vec, exp_rhs_fenicsx_mesh_vec
+from pySDC.projects.Monodomain.datatype_classes.fenicsx_mesh import fenicsx_mesh
+from pySDC.projects.Monodomain.datatype_classes.fenicsx_mesh_vec import fenicsx_mesh_vec, rhs_fenicsx_mesh_vec, exp_rhs_fenicsx_mesh_vec
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
-from pySDC.projects.ExplicitStabilized.problem_classes.monodomain_system_helpers.monodomain import Monodomain
+from pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.monodomain import Monodomain
 
 
 class monodomain_system(ptype):
@@ -21,22 +21,6 @@ class monodomain_system(ptype):
     dtype_f_vec = fenicsx_mesh_vec
 
     def __init__(self, **problem_params):
-        # # these parameters will be used later, so assert their existence
-        # essential_keys = ['family', 'order','enable_output']
-        # for key in essential_keys:
-        #     if key not in problem_params:
-        #         msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-        #         raise ParameterError(msg)
-        # if problem_params['enable_output']:
-        #     essential_keys = ['output_root','output_file_name']
-        #     for key in essential_keys:
-        #         if key not in problem_params:
-        #             msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-        #             raise ParameterError(msg)
-
-        # if problem_params["dim"]==2 and problem_params["domain_name"]!="cuboid":
-        #     raise Exception('In dim==2 the only possible domain_name is "cuboid"')
-
         self.logger = logging.getLogger("step")
 
         self.exact = Monodomain(**problem_params)

@@ -62,7 +62,7 @@ class Monodomain:
     def get_tend(self):
         if "cuboid" in self.domain_name:
             if "small" in self.domain_name:
-                return 10.0
+                return 0.05
             else:
                 return 25.0
         else:
@@ -89,9 +89,9 @@ class Monodomain:
 
     def define_ionic_model(self, model_name, ionic_model_eval, scale):
         if ionic_model_eval == "ufl":
-            import pySDC.projects.ExplicitStabilized.problem_classes.monodomain_system_helpers.ionicmodels.ufl as ionicmodels
+            import pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.ufl as ionicmodels
         elif ionic_model_eval == "c++":
-            import pySDC.projects.ExplicitStabilized.problem_classes.monodomain_system_helpers.ionicmodels.cpp as ionicmodels
+            import pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.cpp as ionicmodels
         else:
             raise Exception("Unknown ionic model evaluation language. User either 'c++' (preferred) or 'ufl'")
 

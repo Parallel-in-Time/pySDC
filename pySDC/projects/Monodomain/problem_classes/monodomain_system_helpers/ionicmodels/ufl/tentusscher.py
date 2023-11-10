@@ -1,7 +1,7 @@
 import numpy as np
 import ufl
-from pySDC.projects.ExplicitStabilized.problem_classes.monodomain_system_helpers.ionicmodels.ufl.ionicmodel import IonicModel
-from pySDC.projects.ExplicitStabilized.problem_classes.monodomain_system_helpers.ionicmodels.ufl.ionicmodel import NV_Ith_S
+from pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.ufl.ionicmodel import IonicModel
+from pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.ufl.ionicmodel import NV_Ith_S
 
 
 # Stiff with rho_max ~ 950

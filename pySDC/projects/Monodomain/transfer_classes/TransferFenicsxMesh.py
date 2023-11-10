@@ -2,7 +2,7 @@ import dolfinx as df
 from petsc4py import PETSc
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.projects.ExplicitStabilized.datatype_classes.fenicsx_mesh import fenicsx_mesh, rhs_fenicsx_mesh, exp_rhs_fenicsx_mesh
+from pySDC.projects.Monodomain.datatype_classes.fenicsx_mesh import fenicsx_mesh, rhs_fenicsx_mesh, exp_rhs_fenicsx_mesh
 
 
 class mesh_to_mesh_fenicsx(space_transfer):

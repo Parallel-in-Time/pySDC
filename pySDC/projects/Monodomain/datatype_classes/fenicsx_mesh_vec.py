@@ -1,4 +1,4 @@
-from pySDC.projects.ExplicitStabilized.datatype_classes.fenicsx_mesh import fenicsx_mesh
+from pySDC.projects.Monodomain.datatype_classes.fenicsx_mesh import fenicsx_mesh
 import numpy as np
 from pySDC.core.Errors import DataError
 from dolfinx import fem

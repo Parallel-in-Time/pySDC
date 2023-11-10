@@ -2,9 +2,9 @@ import numpy as np
 
 from pySDC.core.Sweeper import sweeper
 from pySDC.core.Errors import CollocationError
-from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.rho_estimator import rho_estimator
+from pySDC.projects.Monodomain.explicit_stabilized_classes.rho_estimator import rho_estimator
 from pySDC.core.Lagrange import LagrangeApproximation
-from pySDC.projects.ExplicitStabilized.explicit_stabilized_classes.es_methods import mRKC1
+from pySDC.projects.Monodomain.explicit_stabilized_classes.es_methods import mRKC1
 
 
 class multirate_explicit_stabilized(sweeper):
