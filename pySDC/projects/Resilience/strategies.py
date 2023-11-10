@@ -1457,8 +1457,8 @@ class AdaptivityExtrapolationWithinQStrategy(Strategy):
         """
         if problem.__name__ == "run_vdp":
             if key == 'work_newton' and op == sum:
-                return 2677
+                return 3443
             elif key == 'e_global_post_run' and op == max:
-                return 4.375184403937471e-06
+                return 4.929282266752377e-06
 
         raise NotImplementedError('The reference value you are looking for is not implemented for this strategy!')

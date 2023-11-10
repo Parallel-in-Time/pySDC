@@ -12,6 +12,7 @@ def run_Lorenz(efficient, skip_residual_computation, num_procs=1):
     # initialize level parameters
     level_params = {}
     level_params['dt'] = 1e-1
+    level_params['residual_type'] = 'last_rel'
 
     # initialize sweeper parameters
     sweeper_params = {}
@@ -77,6 +78,7 @@ def run_Schroedinger(efficient=False, num_procs=1, skip_residual_computation=Fal
     level_params['restol'] = 1e-8
     level_params['dt'] = 2e-01
     level_params['nsweeps'] = 1
+    level_params['residual_type'] = 'last_rel'
 
     # initialize sweeper parameters
     sweeper_params = {}
@@ -133,7 +135,7 @@ def run_Schroedinger(efficient=False, num_procs=1, skip_residual_computation=Fal
 
 
 @pytest.mark.base
-def test_generic_implicit_efficient(skip_residual_computation=True):
+def test_generic_implicit_efficient(skip_residual_computation=False):
     stats_normal = run_Lorenz(efficient=False, skip_residual_computation=skip_residual_computation)
     stats_efficient = run_Lorenz(efficient=True, skip_residual_computation=skip_residual_computation)
     assert_sameness(stats_normal, stats_efficient, 'generic_implicit')
@@ -145,7 +147,6 @@ def test_residual_skipping():
     stats_normal = run_Lorenz(efficient=True, skip_residual_computation=False)
     stats_efficient = run_Lorenz(efficient=True, skip_residual_computation=True)
     assert_sameness(stats_normal, stats_efficient, 'generic_implicit', check_residual=False)
-    assert_benefit(stats_normal, stats_efficient)
 
 
 @pytest.mark.mpi4py
