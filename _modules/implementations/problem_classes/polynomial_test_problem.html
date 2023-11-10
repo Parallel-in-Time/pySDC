@@ -40,7 +40,7 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
 
 <div class="viewcode-block" id="polynomial_testequation">
@@ -137,6 +137,44 @@
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poly</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="polynomial_testequation_IMEX">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX">[docs]</a>
+<span class="k">class</span> <span class="nc">polynomial_testequation_IMEX</span><span class="p">(</span><span class="n">polynomial_testequation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    IMEX version of the polynomial test problem that assigns half the derivative to the implicit part and the other half to the explicit part.</span>
+<span class="sd">    Keep in mind that you still cannot Really perform any solves.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+<div class="viewcode-block" id="polynomial_testequation_IMEX.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.eval_f">[docs]</a>
+    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Derivative of the polynomial.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time of the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side of the problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">derivative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poly</span><span class="o">.</span><span class="n">deriv</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">derivative</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">derivative</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">f</span></div>
 </div>
 
 </pre></div>

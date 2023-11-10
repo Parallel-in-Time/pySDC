@@ -131,6 +131,40 @@ solving an appropriate system. This class is indented to be used for tests of op
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">polynomial_testequation_IMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">26266</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation_IMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation" title="implementations.problem_classes.polynomial_test_problem.polynomial_testequation"><code class="xref py py-class docutils literal notranslate"><span class="pre">polynomial_testequation</span></code></a></p>
+<p>IMEX version of the polynomial test problem that assigns half the derivative to the implicit part and the other half to the explicit part.
+Keep in mind that you still cannot Really perform any solves.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.dtype_f">
+<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.dtype_f" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_mesh</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/polynomial_test_problem.html#polynomial_testequation_IMEX.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.eval_f" title="Link to this definition">¶</a></dt>
+<dd><p>Derivative of the polynomial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side of the problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -150,6 +184,11 @@ solving an appropriate system. This class is indented to be used for tests of op
 <li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX"><code class="docutils literal notranslate"><span class="pre">polynomial_testequation_IMEX</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
 </ul>
 </li>
 </ul>

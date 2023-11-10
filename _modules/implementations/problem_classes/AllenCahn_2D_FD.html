@@ -42,7 +42,7 @@
 <span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">cg</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">ProblemError</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">WorkCounter</span>
 <span class="kn">from</span> <span class="nn">pySDC.helpers</span> <span class="kn">import</span> <span class="n">problem_helper</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span><span class="p">,</span> <span class="n">comp2_mesh</span>
 
@@ -119,6 +119,7 @@
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
         <span class="n">lin_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
         <span class="n">lin_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">inexact_linear_ratio</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
         <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="p">):</span>
@@ -137,14 +138,19 @@
             <span class="s1">&#39;nvars&#39;</span><span class="p">,</span>
             <span class="s1">&#39;nu&#39;</span><span class="p">,</span>
             <span class="s1">&#39;eps&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;lin_tol&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;lin_maxiter&#39;</span><span class="p">,</span>
             <span class="s1">&#39;radius&#39;</span><span class="p">,</span>
             <span class="s1">&#39;order&#39;</span><span class="p">,</span>
             <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
             <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">&#39;newton_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;newton_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lin_tol&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lin_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;inexact_linear_ratio&#39;</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># compute dx and get discretization matrix A</span>
@@ -164,6 +170,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_itercount</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">newton_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__get_A</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
@@ -241,6 +251,10 @@
             <span class="c1"># if g is close to 0, then we are done</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 
+            <span class="c1"># do inexactness in the linear solver</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inexact_linear_ratio</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lin_tol</span> <span class="o">=</span> <span class="n">res</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inexact_linear_ratio</span>
+
             <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
                 <span class="k">break</span>
 
@@ -249,10 +263,14 @@
 
             <span class="c1"># newton update: u1 = u0 - g/dg</span>
             <span class="c1"># u -= spsolve(dg, g)</span>
-            <span class="n">u</span> <span class="o">-=</span> <span class="n">cg</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lin_tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">u</span> <span class="o">-=</span> <span class="n">cg</span><span class="p">(</span>
+                <span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lin_tol</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lin_maxiter</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="c1"># increase iteration count</span>
             <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="c1"># print(n, res)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;newton&#39;</span><span class="p">]()</span>
 
         <span class="c1"># if n == self.newton_maxiter:</span>
         <span class="c1">#     raise ProblemError(&#39;Newton did not converge after %i iterations, error is %s&#39; % (n, res))</span>
@@ -288,12 +306,13 @@
         <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">v</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 
 <div class="viewcode-block" id="allencahn_fullyimplicit.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.u_exact">[docs]</a>
-    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
 
@@ -307,13 +326,19 @@
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            The exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="n">r2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-                <span class="n">me</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">r2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="n">me</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
 </div>
@@ -365,6 +390,7 @@
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">v</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 
@@ -396,6 +422,7 @@
 
         <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
             <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]()</span>
             <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span>
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
@@ -415,6 +442,35 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin_itercount</span> <span class="o">+=</span> <span class="n">context</span><span class="o">.</span><span class="n">num_iter</span>
 
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="allencahn_semiimplicit.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit.u_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time t.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The exact solution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">eval_rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_scipy_reference_solution</span><span class="p">(</span><span class="n">eval_rhs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">t_init</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 </div>
 

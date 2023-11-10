@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/core/Sweeper.py: 78%</title>
+    <title>Coverage for pySDC/core/Sweeper.py: 79%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/core/Sweeper.py</b>:
-            <span class="pc_cov">78%</span>
+            <span class="pc_cov">79%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">215 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">167<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">48<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">169<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">46<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">10<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_41564483689e14fd_plot_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-09 08:56 +0000
+            created at 2023-11-10 06:59 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -486,8 +486,8 @@
     <p class="run"><span class="n"><a id="t404" href="#t404">404</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">=</span> <span class="nam">res_norm</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t">        <span class="key">elif</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">residual_type</span> <span class="op">==</span> <span class="str">'full_rel'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t406" href="#t406">406</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">=</span> <span class="nam">max</span><span class="op">(</span><span class="nam">res_norm</span><span class="op">)</span> <span class="op">/</span> <span class="nam">abs</span><span class="op">(</span><span class="nam">L</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t">        <span class="key">elif</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">residual_type</span> <span class="op">==</span> <span class="str">'last_rel'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t408" href="#t408">408</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">=</span> <span class="nam">res_norm</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span> <span class="op">/</span> <span class="nam">abs</span><span class="op">(</span><span class="nam">L</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t">        <span class="key">elif</span> <span class="nam">L</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">residual_type</span> <span class="op">==</span> <span class="str">'last_rel'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t408" href="#t408">408</a></span><span class="t">            <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">=</span> <span class="nam">res_norm</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span> <span class="op">/</span> <span class="nam">abs</span><span class="op">(</span><span class="nam">L</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t409" href="#t409">409</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t410" href="#t410">410</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ParameterError</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t411" href="#t411">411</a></span><span class="t">                <span class="str">f'residual_type = {L.params.residual_type} not implemented, choose '</span>&nbsp;</span><span class="r"></span></p>
@@ -550,7 +550,7 @@
             <a id="nextFileLink" class="nav" href="d_41564483689e14fd_plot_helper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-09 08:56 +0000
+            created at 2023-11-10 06:59 +0000
         </p>
     </div>
 </footer>

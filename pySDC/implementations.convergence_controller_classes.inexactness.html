@@ -55,6 +55,23 @@
 <p>Gradually refine Newton tolerance based on SDC residual.
 Be aware that the problem needs a parameter called “newton_tol” which controls the tolerance for the Newton solver for this to work!</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/inexactness.html#NewtonInexactness.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.dependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Load the embedded error estimator if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.post_iteration_processing">
 <span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/inexactness.html#NewtonInexactness.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.post_iteration_processing" title="Link to this definition">¶</a></dt>
 <dd><p>Change the Newton tolerance after every iteration.</p>
@@ -70,6 +87,16 @@ Be aware that the problem needs a parameter called “newton_tol” which contro
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter">
+<span class="sig-name descname"><span class="pre">set_maxiter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/inexactness.html#NewtonInexactness.set_maxiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance">
+<span class="sig-name descname"><span class="pre">set_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lvl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/inexactness.html#NewtonInexactness.set_tolerance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.setup">
@@ -108,7 +135,10 @@ Be aware that the problem needs a parameter called “newton_tol” which contro
     <ul>
 <li><a class="reference internal" href="#">implementations.convergence_controller_classes.inexactness module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness"><code class="docutils literal notranslate"><span class="pre">NewtonInexactness</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter"><code class="docutils literal notranslate"><span class="pre">set_maxiter()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance"><code class="docutils literal notranslate"><span class="pre">set_tolerance()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
 </li>
