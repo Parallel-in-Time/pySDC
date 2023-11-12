@@ -9,11 +9,11 @@ import copy
 import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
+from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol, ProblemError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
-def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="LU", nSweeps=4):
+def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3):
 
     description = {
         # Sweeper and its parameters
@@ -22,6 +22,7 @@ def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="LU", nSweeps=4):
             "quad_type": quadType,
             "num_nodes": numNodes,
             "initial_guess": 'spread',
+            "QI": qDeltaI,
             },
         # Step parameters
         "step_params": {
@@ -32,14 +33,14 @@ def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="LU", nSweeps=4):
     return description
 
 
-def setupVanderpol(description, dt=0.1, mu=40):
+def setupVanderpol(description, dt=0.1, mu=10):
     """Add Vanderpol settings to pySDC description parameters"""
 
     # Problem class and parameters
     description["problem_class"] = vanderpol
     description["problem_params"] = {
         'newton_tol': 1e-09,
-        'newton_maxiter': 20,
+        'newton_maxiter': 30,
         'mu': mu,   # from 0.1 to 50
         'u0': np.array([2.0, 0]),
         }
@@ -52,8 +53,8 @@ def setupVanderpol(description, dt=0.1, mu=40):
         }
 
 
-def solVanderpolSDC(t, nSteps, paramsSDC, mu=40):
-    dt = t/nSteps
+def solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=10):
+    dt = tEnd/nSteps
     setupVanderpol(paramsSDC, dt, mu)
 
     controller = controller_nonMPI(
@@ -62,13 +63,41 @@ def solVanderpolSDC(t, nSteps, paramsSDC, mu=40):
         description=paramsSDC
     )
 
-    uinit = controller.MS[0].levels[0].prob.u_exact(0)
-    uSDC, _ = controller.run(u0=uinit, t0=0, Tend=t)
+    uInit = controller.MS[0].levels[0].prob.u_exact(0)
+    uTmp = uInit.copy()
+
+    uSDC = np.zeros((nSteps+1, uInit.size), dtype=uInit.dtype)
+    uSDC[0] = uInit
+
+    tVals = np.linspace(0, tEnd, nSteps+1)
+    for i in range(nSteps):
+        uTmp[:] = uSDC[i]
+        try:
+            uSDC[i+1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i+1])
+        except ProblemError:
+            return None
 
     return uSDC
 
 
-def solVanderpolColl(t, nSteps, paramsSDC, mu=40):
+def solVanderpolExact(tEnd, nSteps, mu=10):
+    """Return the exact solution of the Van-der-Pol problem at tEnd"""
+    params = getParamsSDC()
+    setupVanderpol(params, mu=mu)
+
+    controller = controller_nonMPI(
+        num_procs=1,
+        controller_params={'logger_level': 30},
+        description=params
+    )
+
+    tVals = np.linspace(0, tEnd, nSteps+1)
+    return np.array([
+        controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
+
+
+def solVanderpolColl(t, nSteps, paramsSDC, mu=10):
+    # TODO : correct implementation
     paramsColl = copy.deepcopy(paramsSDC)
     paramsColl["step_params"]["maxiter"] = 100
 
@@ -85,17 +114,3 @@ def solVanderpolColl(t, nSteps, paramsSDC, mu=40):
     uColl, _ = controller.run(u0=uinit, t0=0, Tend=t)
 
     return uColl
-
-
-def solVanderpolExact(t, mu=40):
-    """Return the exact solution of the Van-der-Pol problem at t"""
-    params = getParamsSDC()
-    setupVanderpol(params, mu=mu)
-
-    controller = controller_nonMPI(
-        num_procs=1,
-        controller_params={'logger_level': 30},
-        description=params
-    )
-
-    return controller.MS[0].levels[0].prob.u_exact(t)

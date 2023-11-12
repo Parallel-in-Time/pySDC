@@ -10,4 +10,5 @@ Common utility scripts :
 
 ## Van der Pol
 
-- [`vanderpol_period.py`](./vanderpol_period.py) : script to numerically determine period for different `mu` values, and plot scaled exact solution on one period
+- [`vanderpol_period.py`](./vanderpol_period.py) : determine period for different `mu` values, and plot scaled exact solution on one period
+- [`vanderpol_accuracy.py`](./vanderpol_accuracy.py) : investigate accuracy of diagonal SDC variants on the different Van der Pol problems
