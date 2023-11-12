@@ -28,7 +28,7 @@ class imex_1st_order(sweeper):
             params['QE'] = 'EE'
 
         # call parent's initialization routine
-        super(imex_1st_order, self).__init__(params)
+        super().__init__(params)
 
         # IMEX integration matrices
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)

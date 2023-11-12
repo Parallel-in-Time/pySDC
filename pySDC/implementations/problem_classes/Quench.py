@@ -60,6 +60,10 @@ class Quench(ptype):
         Maximum number of linear iterations inside the Newton solver.
     direct_solver : bool, optional
         Indicates if a direct solver should be used.
+    inexact_linear_ratio : float, optional
+        Ratio of tolerance of linear solver to the Newton residual, overrides `lintol`
+    min_lintol : float, optional
+        Minimal tolerance for the linear solver
     reference_sol_type : str, optional
         Indicates which method should be used to compute a reference solution.
         Choose between ``'scipy'``, ``'SDC'``, or ``'DIRK'``.
@@ -106,6 +110,7 @@ class Quench(ptype):
         liniter=99,
         direct_solver=True,
         inexact_linear_ratio=None,
+        min_lintol=1e-12,
         reference_sol_type='scipy',
     ):
         """
@@ -142,6 +147,7 @@ class Quench(ptype):
             'lintol',
             'liniter',
             'inexact_linear_ratio',
+            'min_lintol',
             localVars=locals(),
             readOnly=False,
         )
@@ -307,11 +313,11 @@ class Quench(ptype):
         u = self.dtype_u(u0)
         res = np.inf
         delta = self.dtype_u(self.init, val=0.0)
-        z = self.dtype_u(self.init, val=0.0)
 
         # construct a preconditioner for the space solver
         if not self.direct_solver:
             M = inv((self.Id - factor * self.A).toarray())
+            zero = self.dtype_u(self.init, val=0.0)
 
         for n in range(0, self.newton_maxiter):
             # assemble G such that G(u) = 0 at the solution of the step
@@ -325,7 +331,7 @@ class Quench(ptype):
                 break
 
             if self.inexact_linear_ratio:
-                self.lintol = max([res * self.inexact_linear_ratio, 1e-12])
+                self.lintol = max([res * self.inexact_linear_ratio, self.min_lintol])
 
             # assemble Jacobian J of G
             J = self.Id - factor * (self.A + self.get_non_linear_Jacobian(u))
@@ -337,7 +343,7 @@ class Quench(ptype):
                 delta, info = gmres(
                     J,
                     G,
-                    x0=z,
+                    x0=zero,
                     M=M,
                     tol=self.lintol,
                     maxiter=self.liniter,

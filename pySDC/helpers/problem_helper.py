@@ -164,7 +164,7 @@ def get_finite_difference_matrix(
             neumann_bc_order = par.pop('neumann_bc_order')
             assert len(par) == 0, f"unused BCs parameters : {par}"
 
-            # -- halh stencil width
+            # -- half stencil width
             sWidth = -min(steps) if iS == 0 else max(steps)
 
             # -- loop over lines of A that have to be modified

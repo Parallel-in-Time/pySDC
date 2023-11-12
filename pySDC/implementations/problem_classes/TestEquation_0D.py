@@ -35,6 +35,13 @@ class testequation0d(ptype):
 
     def __init__(self, lambdas=None, u0=0.0):
         """Initialization routine"""
+        if lambdas is None:
+            re = np.linspace(-30, 19, 50)
+            im = np.linspace(-50, 49, 50)
+            lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+                (len(re) * len(im))
+            )
+
         assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
         nvars = len(lambdas)
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
