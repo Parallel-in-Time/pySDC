@@ -5,8 +5,8 @@ Created on Sun Nov 12 18:50:39 2023
 
 Utility functions to investigate parallel SDC on non-linear problems
 """
-import numpy as np
 import copy
+import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
@@ -87,7 +87,7 @@ def solVanderpolColl(t, nSteps, paramsSDC, mu=40):
     return uColl
 
 
-def solVanderpolExact(t, nSteps, mu=40):
+def solVanderpolExact(t, mu=40):
     """Return the exact solution of the Van-der-Pol problem at t"""
     params = getParamsSDC()
     setupVanderpol(params, mu=mu)
@@ -98,40 +98,4 @@ def solVanderpolExact(t, nSteps, mu=40):
         description=params
     )
 
-    tVals = np.linspace(0, t, nSteps+1)
-    return np.array([
-        controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
-
-
-
-if __name__ == "__main__":
-
-    import matplotlib.pyplot as plt
-
-    paramsSDC = getParamsSDC(nSweeps=2)
-
-    tEnd = 10
-    nSteps = 100
-
-    tVals = np.linspace(0, tEnd, nSteps+1)
-
-    for mu in [0.1, 2, 5, 10]:
-        uExact = solVanderpolExact(tEnd, nSteps, mu=mu)
-        plt.figure("vanderpol_traj_exact")
-        plt.plot(tVals, uExact[:, 0], '-', label=f"$\mu=${mu}")
-        plt.figure("vanderpol_acc_exact")
-        plt.plot(tVals, uExact[:, 1], '-', label=f"$\mu=${mu}")
-
-    for figName in ["vanderpol_traj_exact", "vanderpol_acc_exact"]:
-        plt.figure(figName)
-        plt.legend()
-        plt.xlabel("time")
-        plt.ylabel("trajectory" if "traj" in figName else "acceleration")
-        plt.savefig(f'{figName}.pdf', bbox_inches="tight")
-
-    plt.show()
-
-    # uColl = solVanderpolColl(tEnd, nSteps, paramsSDC)
-    # uSDC = solVanderpolSDC(tEnd, nSteps, paramsSDC)
-
-    # print(uExact, uColl, uSDC)
+    return controller.MS[0].levels[0].prob.u_exact(t)
