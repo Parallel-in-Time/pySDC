@@ -1,11 +1,4 @@
-import os
-import pickle
-from collections import namedtuple
-
 import numpy as np
-
-import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
