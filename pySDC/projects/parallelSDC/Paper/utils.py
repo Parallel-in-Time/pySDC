@@ -5,6 +5,7 @@ Created on Sun Nov 12 18:50:39 2023
 
 Utility functions to investigate parallel SDC on non-linear problems
 """
+import json
 import copy
 import numpy as np
 
@@ -82,6 +83,19 @@ def solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=10):
 
 def solVanderpolExact(tEnd, nSteps, mu=10):
     """Return the exact solution of the Van-der-Pol problem at tEnd"""
+
+    key = f"{tEnd}_{nSteps}_{mu}"
+
+    # Eventually load already computed solution from local cache
+    try:
+        with open('_solVanderpolExact.json', "r") as f:
+            cache = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        cache = {}
+    if key in cache:
+        return np.array(cache[key])
+
+    # Compute solution
     params = getParamsSDC()
     setupVanderpol(params, mu=mu)
 
@@ -92,8 +106,14 @@ def solVanderpolExact(tEnd, nSteps, mu=10):
     )
 
     tVals = np.linspace(0, tEnd, nSteps+1)
-    return np.array([
-        controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
+    sol = np.array([controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
+
+    # Save solution in local cache
+    cache[key] = sol.tolist()
+    with open('_solVanderpolExact.json', "w") as f:
+        json.dump(cache, f)
+
+    return sol
 
 
 def solVanderpolColl(t, nSteps, paramsSDC, mu=10):

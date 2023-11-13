@@ -15,7 +15,7 @@ from utils import solVanderpolExact, solVanderpolSDC, getParamsSDC
 script = __file__.split('/')[-1].split('.')[0]
 
 
-muVals = [0.1, 2, 10]
+muVals = [0.1, 1, 10]
 muPeriods = []
 
 tEnd = 20

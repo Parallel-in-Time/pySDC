@@ -15,8 +15,8 @@ import numpy as np
 
 from utils import getParamsSDC, solVanderpolSDC, solVanderpolExact
 
-muVals = [0.1, 2, 10]
-tEndVals = [6.3, 7.6, 18.9] # 1 periods for each mu
+muVals = [0.1, 1, 10]
+tEndVals = [6.3, 6.7, 18.9] # 1 periods for each mu
 
 def getError(uNum, uRef):
     if uNum is None:
