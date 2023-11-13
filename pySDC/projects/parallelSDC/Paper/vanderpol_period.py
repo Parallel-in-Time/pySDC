@@ -50,7 +50,7 @@ for mu, tEnd in zip(muVals, muPeriods):
     print(' -- done')
 
     print(f"Computing SDC solution up to t={tEnd:.1f} for mu={mu} ...")
-    uSDC = solVanderpolSDC(tEnd, nSteps, getParamsSDC(), mu=mu)
+    uSDC, _ = solVanderpolSDC(tEnd, nSteps, getParamsSDC(), mu=mu)
     plt.figure(f"{script}_traj_scaled_sdc")
     plt.plot(tVals/tEnd, uExact[:, 0], '-', label=f"$\mu=${mu}")
     print(' -- done')

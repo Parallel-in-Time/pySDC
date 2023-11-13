@@ -6,8 +6,8 @@ Created on Sun Nov 12 22:14:03 2023
 Script to investigate diagonal SDC on Van der Pol with different mu parameters,
 in particular with graphs such as :
 
-- accuracy VS time-step
-- accuracy VS rhs evaluation
+- error VS time-step
+- error VS computation cost
 
 Note : implementation in progress ...
 """
@@ -17,12 +17,17 @@ import matplotlib.pyplot as plt
 from utils import getParamsSDC, solVanderpolSDC, solVanderpolExact
 
 muVals = [0.1, 2, 10]
-tEndVals = [6.3, 7.6, 18.9] # 1 periods for each mu
+tEndVals = [6.3, 7.6, 18.9] # tEnd = 1 period for each mu
 
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
     return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
+
+def getCost(counters):
+    nNewton, nRHS = counters
+    return nNewton + nRHS
+
 
 # Base variable parameters
 qDeltaList = ['LU', 'IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1', 'MIN3']
@@ -30,22 +35,25 @@ nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4]
 
 
-nSweepList = [3]
+# qDeltaList = ['FLEX-MIN-1']
+nSweepList = [4]
 
-for mu, tEnd in zip(muVals, tEndVals):
+fig, axs = plt.subplots(2, len(muVals))
+
+for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
     print("-"*80)
     print(f"mu={mu}")
     print("-"*80)
 
     dtVals = tEnd/nStepsList
 
-    plt.figure(f'mu={mu}')
     for qDelta in qDeltaList:
         for nSweeps in nSweepList:
             name = f"{qDelta}({nSweeps})"
             print(f'computing for {name} ...')
 
             errors = []
+            costs = []
 
             for nSteps in nStepsList:
                 print(f' -- nSteps={nSteps} ...')
@@ -53,16 +61,29 @@ for mu, tEnd in zip(muVals, tEndVals):
                 uRef = solVanderpolExact(tEnd, nSteps, mu=mu)
 
                 paramsSDC = getParamsSDC(qDeltaI=qDelta, nSweeps=nSweeps)
-                uSDC = solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=mu)
+                uSDC, counters = solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=mu)
 
                 err = getError(uSDC, uRef)
-                # some hack for very stiff configurations
-                if mu == 10 and nSteps == 2:
-                    err = np.inf
                 errors.append(err)
 
-            plt.loglog(dtVals, errors, 'o-', label=name)
-    plt.legend()
-    plt.xlabel(r"$\Delta{t}$")
-    plt.ylabel(r"$L_\infty$ error")
-    plt.grid()
+                costs.append(getCost(counters))
+
+            # error VS dt
+            axs[0, j].loglog(dtVals, errors, 'o-', label=name)
+            # error VS cost
+            axs[1, j].loglog(costs, errors, 'o-', label=name)
+
+    for i in range(2):
+        if i == 0:
+            axs[i, j].set_title(f"mu={mu}")
+        axs[i, j].set(
+            xlabel=r"$\Delta{t}$" if i == 0 else "cost",
+            ylabel=r"$L_\infty$ error",
+            ylim=(1e-11, 10),
+        )
+        axs[i, j].legend(loc="lower right" if i == 0 else "lower left")
+        axs[i, j].grid()
+
+fig.set_size_inches(18.2, 10.4)
+fig.tight_layout()
+plt.show()

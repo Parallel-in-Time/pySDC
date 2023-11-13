@@ -64,7 +64,9 @@ def solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=10):
         description=paramsSDC
     )
 
-    uInit = controller.MS[0].levels[0].prob.u_exact(0)
+    prob = controller.MS[0].levels[0].prob
+
+    uInit = prob.u_exact(0)
     uTmp = uInit.copy()
 
     uSDC = np.zeros((nSteps+1, uInit.size), dtype=uInit.dtype)
@@ -76,9 +78,13 @@ def solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=10):
         try:
             uSDC[i+1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i+1])
         except ProblemError:
-            return None
+            return None, (0, 0)
 
-    return uSDC
+    nNewton = prob.work_counters["newton"].niter
+    nRHS = prob.work_counters["rhs"].niter
+    print(f"    done, newton:{nNewton}, rhs:{nRHS}")
+
+    return uSDC, (nNewton, nRHS)
 
 
 def solVanderpolExact(tEnd, nSteps, mu=10):
