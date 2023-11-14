@@ -29,7 +29,7 @@ plot_helper.setup_mpl(reset=True)
 LOGGER_LEVEL = 40
 
 RECOVERY_THRESH_ABS = {
-    run_quench: 5e-3,
+    # run_quench: 5e-3,
     # run_Schroedinger: 1.7e-6,
 }
 
@@ -142,7 +142,7 @@ class FaultStats:
                 return None
 
         comm = MPI.COMM_WORLD if comm is None else comm
-        step = (runs if step is None else step) if comm.size == 1 else comm.size
+        step = (runs if comm.size == 1 else comm.size) if step is None else step
         _runs_partial = step if _runs_partial == 0 else _runs_partial
         reload = self.reload or _reload
 
@@ -175,7 +175,7 @@ class FaultStats:
 
         for j in range(0, len(strategies), comm.size):
             self.generate_stats(
-                strategy=strategies[j + (comm.rank % len(strategies) % (len(strategies)) - j)],
+                strategy=strategies[j + (comm.rank % len(strategies) % (len(strategies) - j))],
                 runs=min(_runs_partial, max_runs),
                 faults=faults,
                 reload=reload,
@@ -255,28 +255,30 @@ class FaultStats:
                 continue
 
             # perform a single experiment with the correct random seed
-            stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults, space_comm=space_comm)
+            stats, controller, crash = self.single_run(strategy=strategy, run=i, faults=faults, space_comm=space_comm)
 
             # get the data from the stats
             faults_run = get_sorted(stats, type='bitflip')
-            t, u = get_sorted(stats, type='u', recomputed=False)[-1]
 
-            error = self.get_error(u, t, controller, strategy, Tend)
+            if faults:
+                assert len(faults_run) > 0, f"Did not record a fault in run {i} of {strategy.name}!"
+                dat['level'][i] = faults_run[0][1][0]
+                dat['iteration'][i] = faults_run[0][1][1]
+                dat['node'][i] = faults_run[0][1][2]
+                dat['problem_pos'] += [faults_run[0][1][3]]
+                dat['bit'][i] = faults_run[0][1][4]
+                dat['target'][i] = faults_run[0][1][5]
+                dat['rank'][i] = faults_run[0][1][6]
+            if crash:
+                print('Code crashed!')
+                continue
+
+            # record the rest of the data
+            t, u = get_sorted(stats, type='u', recomputed=False)[-1]
+            error = self.get_error(u, t, controller, strategy, self.get_Tend())
             total_iteration = sum([k[1] for k in get_sorted(stats, type='k')])
             total_newton_iteration = sum([k[1] for k in get_sorted(stats, type='work_newton')])
 
-            # record the new data point
-            if faults:
-                if len(faults_run) > 0:
-                    dat['level'][i] = faults_run[0][1][0]
-                    dat['iteration'][i] = faults_run[0][1][1]
-                    dat['node'][i] = faults_run[0][1][2]
-                    dat['problem_pos'] += [faults_run[0][1][3]]
-                    dat['bit'][i] = faults_run[0][1][4]
-                    dat['target'][i] = faults_run[0][1][5]
-                    dat['rank'][i] = faults_run[0][1][6]
-                else:
-                    assert self.mode == 'regular', f'No faults where recorded in run {i} of strategy {strategy.name}!'
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
             dat['total_newton_iteration'][i] = total_newton_iteration
@@ -320,7 +322,8 @@ class FaultStats:
         Tend_reached = t + lvl.params.dt_initial >= Tend
 
         if Tend_reached:
-            return abs(u - lvl.prob.u_exact(t=t))
+            u_star = lvl.prob.u_exact(t=t)
+            return abs(u - u_star) / abs(u_star)
         else:
             print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
             return np.inf
@@ -357,7 +360,7 @@ class FaultStats:
         force_params = {} if force_params is None else force_params
 
         # build the custom description
-        custom_description = strategy.get_custom_description(self.prob, self.num_procs)
+        custom_description = strategy.get_custom_description_for_faults(self.prob, self.num_procs)
         for k in force_params.keys():
             custom_description[k] = {**custom_description.get(k, {}), **force_params[k]}
 
@@ -515,7 +518,7 @@ class FaultStats:
 
         u_all = get_sorted(stats, type='u', recomputed=False)
         t, u = get_sorted(stats, type='u', recomputed=False)[np.argmax([me[0] for me in u_all])]
-        k = get_sorted(stats, type='k')
+        k = [me[1] for me in get_sorted(stats, type='k')]
 
         fault_hook = [me for me in controller.hooks if type(me) == FaultInjector]
 
@@ -546,8 +549,7 @@ class FaultStats:
         recovery_thresh = self.get_thresh(strategy)
 
         print(
-            f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
-{error < recovery_thresh}'
+            f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: {error < recovery_thresh}, e_rel = {error/abs(u):.2e}'
         )
         print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
 
@@ -560,7 +562,7 @@ class FaultStats:
 
         # checkout the step size
         dt = [me[1] for me in get_sorted(stats, type='dt')]
-        print(f'dt: min: {np.min(dt):.2e}, max: {np.max(dt):.2e}, mean: {np.mean(dt):.2e}')
+        print(f't: {t:.2f}, dt: min: {np.min(dt):.2e}, max: {np.max(dt):.2e}, mean: {np.mean(dt):.2e}')
 
         # restarts
         restarts = [me[1] for me in get_sorted(stats, type='restart')]
@@ -789,7 +791,15 @@ class FaultStats:
             return None
 
     def plot_thingA_per_thingB(
-        self, strategy, thingA, thingB, ax=None, mask=None, recovered=False, op=None
+        self,
+        strategy,
+        thingA,
+        thingB,
+        ax=None,
+        mask=None,
+        recovered=False,
+        op=None,
+        **kwargs,
     ):  # pragma: no cover
         '''
         Plot thingA vs. thingB for a single strategy
@@ -832,10 +842,17 @@ class FaultStats:
                 marker=strategy.marker,
                 ls='--',
                 linewidth=3,
+                **kwargs,
             )
 
         ax.plot(
-            admissable_thingB, me, label=f'{strategy.label}', color=strategy.color, marker=strategy.marker, linewidth=2
+            admissable_thingB,
+            me,
+            label=f'{strategy.label}',
+            color=strategy.color,
+            marker=strategy.marker,
+            linewidth=2,
+            **kwargs,
         )
 
         ax.legend(frameon=False)
@@ -856,6 +873,7 @@ class FaultStats:
         store=True,
         ax=None,
         fig=None,
+        plotting_args=None,
     ):  # pragma: no cover
         '''
         Plot thingA vs thingB for multiple strategies
@@ -887,7 +905,16 @@ class FaultStats:
 
         # execute the plots for all strategies
         for s in strategies:
-            self.plot_thingA_per_thingB(s, thingA=thingA, thingB=thingB, recovered=recovered, ax=ax, mask=mask, op=op)
+            self.plot_thingA_per_thingB(
+                s,
+                thingA=thingA,
+                thingB=thingB,
+                recovered=recovered,
+                ax=ax,
+                mask=mask,
+                op=op,
+                **(plotting_args if plotting_args else {}),
+            )
 
         # set the parameters
         [plt.setp(ax, k, v) for k, v in args.items()]
@@ -1627,22 +1654,32 @@ def main():
         'prob': run_quench,
         'num_procs': 1,
         'mode': 'default',
-        'runs': 5000,
-        'reload': True,
+        'runs': 2000,
+        'reload': False,
         **parse_args(),
     }
-    from pySDC.projects.Resilience.strategies import DIRKStrategy, ERKStrategy
+
+    strategy_args = {
+        'stop_at_nan': True,
+    }
+
+    from pySDC.projects.Resilience.strategies import AdaptivityPolynomialError, kAdaptivityStrategy
 
     stats_analyser = FaultStats(
-        # strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(), HotRodStrategy()],
-        strategies=[DIRKStrategy(), ERKStrategy()],
+        strategies=[
+            BaseStrategy(**strategy_args),
+            AdaptivityStrategy(**strategy_args),
+            kAdaptivityStrategy(**strategy_args),
+            HotRodStrategy(**strategy_args),
+            AdaptivityPolynomialError(**strategy_args),
+        ],
         faults=[False, True],
-        recovery_thresh=1.5,
+        recovery_thresh=1.15,
         recovery_thresh_abs=RECOVERY_THRESH_ABS.get(kwargs.get('prob', None), 0),
         stats_path='data/stats-jusuf',
         **kwargs,
     )
-    stats_analyser.run_stats_generation(runs=kwargs['runs'])
+    stats_analyser.run_stats_generation(runs=kwargs['runs'], step=12)
 
     if MPI.COMM_WORLD.rank > 0:  # make sure only one rank accesses the data
         return None
@@ -1682,7 +1719,7 @@ def main():
 
     fig, ax = plt.subplots(1, 1, figsize=(13, 4))
     stats_analyser.plot_recovery_thresholds(ax=ax, thresh_range=np.logspace(-1, 1, 1000))
-    ax.axvline(stats_analyser.get_thresh(BaseStrategy()), color='grey', ls=':', label='recovery threshold')
+    # ax.axvline(stats_analyser.get_thresh(BaseStrategy()), color='grey', ls=':', label='recovery threshold')
     ax.set_xscale('log')
     ax.legend(frameon=False)
     fig.tight_layout()
@@ -1709,7 +1746,8 @@ def main():
         'error', 'bit', True, op=stats_analyser.mean, mask=mask, args={'yscale': 'log'}
     )
 
-    stats_analyser.plot_recovery_thresholds()
+    stats_analyser.plot_recovery_thresholds(thresh_range=np.linspace(0.9, 1.3, 100))
+    plt.show()
 
 
 if __name__ == "__main__":
