@@ -248,10 +248,5 @@ class AdaptiveCollocation(ConvergenceController):
                 False,
                 "Switching the collocation problems requires solving them to some tolerance that can be reached. Please set attainable `restol` in the level params",
             )
-        if description["step_params"].get("maxiter", -1.0) < 99:
-            return (
-                False,
-                "Switching the collocation problems requires solving them exactly, which may require many iterations please set `maxiter` to at least 99 in the step params",
-            )
 
         return True, ""
