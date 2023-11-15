@@ -153,6 +153,7 @@ def plot_recovery_rate(stats_analyser, **kwargs):  # pragma: no cover
     axs[0].get_legend().remove()
     axs[0].set_title('All faults')
     axs[1].set_title('Only recoverable faults')
+    axs[0].set_ylim((-0.05, 1.05))
     savefig(fig, 'recovery_rate_compared', **kwargs)
 
 
@@ -211,12 +212,11 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
     for ax in axs.flatten():
         ax.get_legend().remove()
 
-    axs[0, 0].set_ylim((0, 1))
-
     if kwargs.get('strategy_type', 'SDC') == 'SDC':
         axs[1, 1].legend(frameon=False)
     else:
         axs[0, 1].legend(frameon=False)
+    axs[0, 0].set_ylim((-0.05, 1.05))
     axs[1, 0].set_ylabel('recovery rate')
     axs[0, 0].set_ylabel('recovery rate')
 

@@ -11,7 +11,6 @@ from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
-from pySDC.projects.Resilience.AC import run_AC
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -1109,6 +1108,7 @@ def get_configs(mode, problem):
             'strategies': [AdaptivityPolynomialError(useMPI=True)],
             'num_procs': 1,
             'num_procs_sweeper': 3,
+            'plotting_params': {'label': r'$\Delta t$-$k$ adaptivity $N$=1x3'},
         }
         configurations[-1] = {
             'strategies': [
@@ -1123,6 +1123,7 @@ def get_configs(mode, problem):
             'strategies': [AdaptivityStrategy(useMPI=True)],
             'custom_description': desc,
             'num_procs': 4,
+            'plotting_params': {'label': r'$\Delta t$ adaptivity $N$=4x1'},
         }
     elif mode == 'RK_comp_high_order':
         """
