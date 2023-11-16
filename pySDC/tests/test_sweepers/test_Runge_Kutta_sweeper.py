@@ -68,12 +68,13 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
 
         problem_params = {}
     else:
-        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0dXPU
+
+        problem_class = testequation0dXPU.get_XPU_version(version='GPU' if useGPU else 'CPU')
 
         problem_params = {
             'lambdas': lambdas,
             'u0': 1.0 + 0.0j,
-            'useGPU': useGPU,
         }
 
     sweeper_params = {

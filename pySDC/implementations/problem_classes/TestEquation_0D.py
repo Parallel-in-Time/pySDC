@@ -1,12 +1,8 @@
-import numpy as np
-
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype, WorkCounter
-from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
-class testequation0d(ptype):
+class testequation0dXPU(ptype):
     r"""
     This class implements the simple test equation of the form
 
@@ -14,6 +10,9 @@ class testequation0d(ptype):
         \frac{d u(t)}{dt} = A u(t)
 
     for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.
+
+    It is compatible with both CPU and GPU, but requires setting class attributes to select the corresponding numerical
+    library. Use the classmethod `get_XPU_version` to get a runnable problem class.
 
     Parameters
     ----------
@@ -28,38 +27,42 @@ class testequation0d(ptype):
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
 
-    dtype_u = mesh
-    dtype_f = mesh
+    @classmethod
+    def get_XPU_version(cls, version):
+        """
+        Get a runnable version for either CPU or GPU by specifying this as `version`.
 
-    def __init__(self, lambdas=None, u0=0.0, useGPU=False):
+        Parameters
+        ----------
+        version : str
+            Supply "GPU" or "CPU" to obtain the desired implementation
+
+        Returns
+        -------
+        pySDC.Problem
+            A problem class implementing the desired implementation
+        """
+        if version == 'CPU':
+            return testequation0d
+        elif version == 'GPU':
+            return testequation0dGPU
+        else:
+            from pySDC.core.Errors import ParameterError
+
+            raise ParameterError(f'Don\'t know version {version}! Please choose \'CPU\' or \'GPU\'!')
+
+    def __init__(self, lambdas=None, u0=0.0):
         """Initialization routine"""
         if lambdas is None:
-            re = np.linspace(-30, 19, 50)
-            im = np.linspace(-50, 49, 50)
-            lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+            re = self.xp.linspace(-30, 19, 50)
+            im = self.xp.linspace(-50, 49, 50)
+            lambdas = self.xp.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
                 (len(re) * len(im))
             )
 
         assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
         nvars = len(lambdas)
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
-
-        if useGPU:
-            import cupy as xp
-            import cupyx.scipy.sparse as sp
-            from cupyx.scipy.sparse.linalg import splu
-            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
-
-            self.dtype_u = cupy_mesh
-            self.dtype_f = cupy_mesh
-        else:
-            import numpy as xp
-            import scipy.sparse as sp
-            from scipy.sparse.linalg import splu
-
-        self.xp = xp
-        self.xsp = sp
-        self.splu = splu
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
@@ -161,3 +164,33 @@ class testequation0d(ptype):
         me = self.dtype_u(self.init)
         me[:] = u_init * self.xp.exp((t - t_init) * self.lambdas)
         return me
+
+
+class testequation0d(testequation0dXPU):
+    """
+    CPU implementation of `testequation0dXPU`
+    """
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    import numpy as xp
+    import scipy.sparse as xsp
+    from scipy.sparse.linalg import splu as _splu
+
+    dtype_u = mesh
+    dtype_f = mesh
+    splu = staticmethod(_splu)
+
+
+class testequation0dGPU(testequation0dXPU):
+    """
+    GPU implementation of `testequation0dXPU`
+    """
+
+    from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+    import cupy as xp
+    import cupyx.scipy.sparse as xsp
+    from cupyx.scipy.sparse.linalg import splu as _splu
+
+    dtype_u = cupy_mesh
+    dtype_f = cupy_mesh
+    splu = staticmethod(_splu)
