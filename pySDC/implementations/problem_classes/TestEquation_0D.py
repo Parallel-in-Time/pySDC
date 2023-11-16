@@ -28,7 +28,7 @@ class testequation0dXPU(ptype):
     """
 
     @classmethod
-    def get_XPU_version(cls, version):
+    def get_XPU_version(cls, version='CPU'):
         """
         Get a runnable version for either CPU or GPU by specifying this as `version`.
 
