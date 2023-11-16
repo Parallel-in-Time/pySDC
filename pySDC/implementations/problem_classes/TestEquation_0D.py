@@ -45,6 +45,8 @@ class testequation0dXPU(ptype):
         if version == 'CPU':
             return testequation0d
         elif version == 'GPU':
+            from pySDC.implementations.problem_classes.TestEquation_0D_GPU import testequation0dGPU
+
             return testequation0dGPU
         else:
             from pySDC.core.Errors import ParameterError
@@ -178,19 +180,4 @@ class testequation0d(testequation0dXPU):
 
     dtype_u = mesh
     dtype_f = mesh
-    splu = staticmethod(_splu)
-
-
-class testequation0dGPU(testequation0dXPU):
-    """
-    GPU implementation of `testequation0dXPU`
-    """
-
-    from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
-    import cupy as xp
-    import cupyx.scipy.sparse as xsp
-    from cupyx.scipy.sparse.linalg import splu as _splu
-
-    dtype_u = cupy_mesh
-    dtype_f = cupy_mesh
     splu = staticmethod(_splu)
