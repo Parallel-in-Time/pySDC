@@ -1,6 +1,4 @@
 import numpy as np
-import scipy.sparse as sp
-from scipy.sparse.linalg import splu
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype, WorkCounter
@@ -33,7 +31,7 @@ class testequation0d(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, lambdas=None, u0=0.0):
+    def __init__(self, lambdas=None, u0=0.0, useGPU=False):
         """Initialization routine"""
         if lambdas is None:
             re = np.linspace(-30, 19, 50)
@@ -46,15 +44,33 @@ class testequation0d(ptype):
         nvars = len(lambdas)
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(init=(nvars, None, np.dtype('complex128')))
+        if useGPU:
+            import cupy as xp
+            import cupyx.scipy.sparse as sp
+            from cupyx.scipy.sparse.linalg import splu
+            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
-        self.A = self.__get_A(lambdas)
+            self.dtype_u = cupy_mesh
+            self.dtype_f = cupy_mesh
+        else:
+            import numpy as xp
+            import scipy.sparse as sp
+            from scipy.sparse.linalg import splu
+
+        self.xp = xp
+        self.xsp = sp
+        self.splu = splu
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
+
+        lambdas = self.xp.array(lambdas)
+        self.A = self.__get_A(lambdas, self.xsp)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
 
     @staticmethod
-    def __get_A(lambdas):
+    def __get_A(lambdas, xsp):
         """
         Helper function to assemble FD matrix A in sparse format.
 
@@ -69,7 +85,7 @@ class testequation0d(ptype):
             Diagonal matrix A in CSC format.
         """
 
-        A = sp.diags(lambdas)
+        A = xsp.diags(lambdas)
         return A
 
     def eval_f(self, u, t):
@@ -116,7 +132,7 @@ class testequation0d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.nvars, format='csc') - factor * self.A)
+        L = self.splu(self.xsp.eye(self.nvars, format='csc') - factor * self.A)
         me[:] = L.solve(rhs)
         return me
 
@@ -143,5 +159,5 @@ class testequation0d(ptype):
         t_init = 0.0 if t_init is None else t_init * 1.0
 
         me = self.dtype_u(self.init)
-        me[:] = u_init * np.exp((t - t_init) * np.array(self.lambdas))
+        me[:] = u_init * self.xp.exp((t - t_init) * self.lambdas)
         return me
