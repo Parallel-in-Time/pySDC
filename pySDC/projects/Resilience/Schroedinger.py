@@ -1,18 +1,14 @@
-from mpi4py import MPI
 import numpy as np
 
-from pySDC.helpers.stats_helper import get_sorted
-
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import (
     nonlinearschroedinger_imex,
     nonlinearschroedinger_fully_implicit,
 )
-from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.strategies import merge_descriptions
+from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient, generic_implicit_efficient
+from pySDC.core.Errors import ConvergenceError
 
 from pySDC.core.Hooks import hooks
 
@@ -95,7 +91,7 @@ def run_Schroedinger(
     Returns:
         dict: The stats object
         controller: The controller
-        Tend: The time that was supposed to be integrated to
+        bool: If the code crashed
     """
     if custom_description is not None:
         problem_params = custom_description.get('problem_params', {})
@@ -119,6 +115,7 @@ def run_Schroedinger(
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
+    sweeper_params['QE'] = 'PIC'
     sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
@@ -148,7 +145,7 @@ def run_Schroedinger(
     description = dict()
     description['problem_params'] = problem_params
     description['problem_class'] = nonlinearschroedinger_imex if imex else nonlinearschroedinger_fully_implicit
-    description['sweeper_class'] = imex_1st_order if imex else generic_implicit
+    description['sweeper_class'] = imex_1st_order_efficient if imex else generic_implicit_efficient
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -187,12 +184,20 @@ def run_Schroedinger(
         prepare_controller_for_faults(controller, fault_stuff, rnd_args)
 
     # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    crash = False
+    try:
+        uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    except (ConvergenceError, OverflowError) as e:
+        print(f'Warning: Premature termination: {e}')
+        stats = controller.return_stats()
+        crash = True
 
-    return stats, controller, Tend
+    return stats, controller, crash
 
 
 def main():
+    from mpi4py import MPI
+
     stats, _, _ = run_Schroedinger(space_comm=MPI.COMM_WORLD, hook_class=live_plotting, imex=False)
     plt.show()
 
