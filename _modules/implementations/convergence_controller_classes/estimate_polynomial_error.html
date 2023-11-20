@@ -101,6 +101,8 @@
                 <span class="s1">&#39;You cannot interpolate with lower accuracy to the end point if the end point is a node!&#39;</span>
             <span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="k">return</span> <span class="n">defaults</span></div>
 
 
@@ -183,16 +185,18 @@
             <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="n">estimate_on_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">estimate_on_node</span>
 
-            <span class="n">interpolator</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span>
-                <span class="n">points</span><span class="o">=</span><span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">interpolator</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span>
+                    <span class="n">points</span><span class="o">=</span><span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span> <span class="o">=</span> <span class="n">interpolator</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">estimate_on_node</span><span class="p">]])</span>
+
             <span class="n">u</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">estimate_on_node</span>
             <span class="p">]</span>
-            <span class="n">u_inter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">interpolation_matrix</span><span class="p">,</span> <span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">u_inter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span><span class="p">,</span> <span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
             <span class="c1"># compute end point if needed</span>
             <span class="k">if</span> <span class="n">estimate_on_node</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
@@ -211,7 +215,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="n">buf</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_inter</span> <span class="o">-</span> <span class="n">high_order_sol</span><span class="p">)</span></div>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_inter</span> <span class="o">-</span> <span class="n">high_order_sol</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Obtained error estimate: </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> of order </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order_embedded_estimate</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">S</span><span class="p">,</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EstimatePolynomialError.check_parameters">

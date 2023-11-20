@@ -312,11 +312,6 @@
                 <span class="kc">False</span><span class="p">,</span>
                 <span class="s2">&quot;Switching the collocation problems requires solving them to some tolerance that can be reached. Please set attainable `restol` in the level params&quot;</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;maxiter&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">99</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">&quot;Switching the collocation problems requires solving them exactly, which may require many iterations please set `maxiter` to at least 99 in the step params&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
 </div>

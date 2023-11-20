@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.py: 97%</title>
+    <title>Coverage for pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.py: 98%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.py</b>:
-            <span class="pc_cov">97%</span>
+            <span class="pc_cov">98%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">167 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">162<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">5<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">163<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">4<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">8<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_estimate_polynomial_error_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-10 06:59 +0000
+            created at 2023-11-20 08:58 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -578,7 +578,7 @@
     <p class="pln"><span class="n"><a id="t496" href="#t496">496</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t497" href="#t497">497</a></span><span class="t">        <span class="com"># compute the extrapolated solution</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t498" href="#t498">498</a></span><span class="t">        <span class="key">if</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t499" href="#t499">499</a></span><span class="t">            <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">=</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">time</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t499" href="#t499">499</a></span><span class="t">            <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">=</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">time</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t500" href="#t500">500</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t501" href="#t501">501</a></span><span class="t">        <span class="key">if</span> <span class="nam">type</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span> <span class="op">==</span> <span class="nam">imex_mesh</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t502" href="#t502">502</a></span><span class="t">            <span class="nam">f</span> <span class="op">=</span> <span class="op">[</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">.</span><span class="nam">impl</span> <span class="op">+</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">.</span><span class="nam">expl</span> <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coeff</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span> <span class="key">and</span> <span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span> <span class="key">else</span> <span class="num">0.0</span> <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">lvl</span><span class="op">.</span><span class="nam">f</span><span class="op">)</span> <span class="op">-</span> <span class="num">1</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
@@ -621,7 +621,7 @@
             <a id="nextFileLink" class="nav" href="d_c28af68f8f845bbd_estimate_polynomial_error_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-10 06:59 +0000
+            created at 2023-11-20 08:58 +0000
         </p>
     </div>
 </footer>

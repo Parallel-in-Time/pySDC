@@ -573,6 +573,23 @@ nodes.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AdaptivityForConvergedCollocationProblems</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityBase" title="implementations.convergence_controller_classes.adaptivity.AdaptivityBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptivityBase</span></code></a></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.dependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Load interpolation between restarts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart">
 <span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance</p>
@@ -614,6 +631,11 @@ nodes.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence">
+<span class="sig-name descname"><span class="pre">trigger_restart_upon_nonconvergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -838,6 +860,7 @@ size.</p>
 <li><p>control_order (int): The order relative to other convergence controllers</p></li>
 <li><p>e_tol_low (float): Lower absolute threshold for the residual</p></li>
 <li><p>e_tol (float): Upper absolute threshold for the residual</p></li>
+<li><p>use_restol (bool): Restart if the residual tolerance was not reached</p></li>
 <li><p>max_restarts: Override maximum number of restarts</p></li>
 </ul>
 </dd>
@@ -928,9 +951,11 @@ size.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems"><code class="docutils literal notranslate"><span class="pre">AdaptivityForConvergedCollocationProblems</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence"><code class="docutils literal notranslate"><span class="pre">get_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence"><code class="docutils literal notranslate"><span class="pre">trigger_restart_upon_nonconvergence()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError"><code class="docutils literal notranslate"><span class="pre">AdaptivityPolynomialError</span></code></a><ul>

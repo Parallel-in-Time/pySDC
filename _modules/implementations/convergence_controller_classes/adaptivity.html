@@ -78,6 +78,10 @@
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogStepSize</span><span class="p">)</span>
 
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_convergence</span> <span class="kn">import</span> <span class="n">CheckConvergence</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">communicate_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">communicate_convergence</span>
+
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
 
@@ -211,6 +215,35 @@
 <div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems">[docs]</a>
 <span class="k">class</span> <span class="nc">AdaptivityForConvergedCollocationProblems</span><span class="p">(</span><span class="n">AdaptivityBase</span><span class="p">):</span>
+<div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.dependencies">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.dependencies">[docs]</a>
+    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load interpolation between restarts.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">interpolate_between_restarts</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.interpolate_between_restarts</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">InterpolateBetweenRestarts</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
+                <span class="n">InterpolateBetweenRestarts</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolator</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
 <div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.get_convergence">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence">[docs]</a>
     <span class="k">def</span> <span class="nf">get_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -234,10 +267,13 @@
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;restol_rel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;e_tol_rel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s1">&#39;restart_at_maxiter&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;restart_at_maxiter&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="s1">&#39;restol_min&#39;</span><span class="p">:</span> <span class="mf">1e-12</span><span class="p">,</span>
             <span class="s1">&#39;restol_max&#39;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+            <span class="s1">&#39;factor_if_not_converged&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
+            <span class="s1">&#39;residual_max_tol&#39;</span><span class="p">:</span> <span class="mf">1e9</span><span class="p">,</span>
             <span class="s1">&#39;maxiter&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxiter&#39;</span><span class="p">,</span> <span class="mi">99</span><span class="p">),</span>
+            <span class="s1">&#39;interpolate_between_restarts&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restol_rel&#39;</span><span class="p">]:</span>
@@ -249,6 +285,9 @@
 
         <span class="k">if</span> <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;restart_at_maxiter&#39;</span><span class="p">]:</span>
             <span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxiter&#39;</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">res_last_iter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
         <span class="k">return</span> <span class="n">defaults</span></div>
 
 
@@ -256,16 +295,36 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart">[docs]</a>
     <span class="k">def</span> <span class="nf">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_convergence</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">res_last_iter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_at_maxiter</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&gt;</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trigger_restart_upon_nonconvergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restart_at_maxiter</span><span class="p">:</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
-                    <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="mf">2.0</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s1">&#39;Collocation problem not converged after max. number of iterations, halving step size to </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                        <span class="n">S</span><span class="p">,</span>
-                    <span class="p">)</span></div>
+        <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time_size</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_last_iter</span> <span class="o">&lt;</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trigger_restart_upon_nonconvergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_max_tol</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trigger_restart_upon_nonconvergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">res_last_iter</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">*</span> <span class="mf">1.0</span></div>
+
+
+<div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence">[docs]</a>
+    <span class="k">def</span> <span class="nf">trigger_restart_upon_nonconvergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">factor_if_not_converged</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Collocation problem not converged. Reducing step size to </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">S</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">interpolate_between_restarts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interpolator</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">skip_interpolation</span> <span class="o">=</span> <span class="kc">True</span></div>
 </div>
 
 
@@ -330,7 +389,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.estimate_embedded_error</span> <span class="kn">import</span> <span class="n">EstimateEmbeddedError</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
             <span class="n">EstimateEmbeddedError</span><span class="o">.</span><span class="n">get_implementation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">embedded_error_flavor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">),</span>
@@ -501,6 +560,7 @@
 <span class="sd">         - control_order (int): The order relative to other convergence controllers</span>
 <span class="sd">         - e_tol_low (float): Lower absolute threshold for the residual</span>
 <span class="sd">         - e_tol (float): Upper absolute threshold for the residual</span>
+<span class="sd">         - use_restol (bool): Restart if the residual tolerance was not reached</span>
 <span class="sd">         - max_restarts: Override maximum number of restarts</span>
 
 <span class="sd">        Args:</span>
@@ -515,6 +575,7 @@
             <span class="s2">&quot;control_order&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">45</span><span class="p">,</span>
             <span class="s2">&quot;e_tol_low&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="s2">&quot;e_tol&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="s2">&quot;use_restol&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
             <span class="s2">&quot;max_restarts&quot;</span><span class="p">:</span> <span class="mi">99</span> <span class="k">if</span> <span class="s2">&quot;e_tol_low&quot;</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;allowed_modifications&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;increase&#39;</span><span class="p">,</span> <span class="s1">&#39;decrease&#39;</span><span class="p">],</span>  <span class="c1"># what we are allowed to do with the step size</span>
         <span class="p">}</span>
@@ -593,7 +654,9 @@
 
             <span class="n">dt_planned</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
 
-            <span class="k">if</span> <span class="n">res</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span> <span class="ow">and</span> <span class="s1">&#39;decrease&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">allowed_modifications</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">res</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span> <span class="ow">or</span> <span class="p">(</span><span class="n">res</span> <span class="o">&gt;</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_restol</span><span class="p">)</span>
+            <span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;decrease&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">allowed_modifications</span><span class="p">:</span>
                 <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">dt_planned</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Adjusting step size from </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">dt_new</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol_low</span> <span class="ow">and</span> <span class="s1">&#39;increase&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">allowed_modifications</span><span class="p">:</span>
@@ -691,7 +754,7 @@
             <span class="n">EstimateEmbeddedErrorCollocation</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;adaptive_coll_params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">adaptive_coll_params</span><span class="p">}</span>
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
@@ -854,7 +917,7 @@
             <span class="n">EstimateExtrapolationErrorWithinQ</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
             <span class="n">EstimateExtrapolationErrorWithinQ</span><span class="p">,</span>
@@ -933,11 +996,12 @@
 
         <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;control_order&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
             <span class="o">**</span><span class="n">params</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
-        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+        <span class="k">return</span> <span class="n">defaults</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityPolynomialError.get_convergence">
@@ -963,7 +1027,7 @@
             <span class="n">EstimatePolynomialError</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span>
             <span class="n">EstimatePolynomialError</span><span class="p">,</span>
