@@ -97,9 +97,9 @@ class generic_implicit(sweeper):
         Returns:
             list of dtype_u: containing the integral as values
         """
-        rhs = self.initialize_right_hand_side_buffer()
-        self.add_matrix_times_f_evaluations_to(self.coll.Qmat, rhs)
-        return rhs
+        integral = self.initialize_right_hand_side_buffer()
+        self.add_matrix_times_f_evaluations_to(self.coll.Qmat, integral)
+        return integral
 
     def compute_end_point(self):
         """

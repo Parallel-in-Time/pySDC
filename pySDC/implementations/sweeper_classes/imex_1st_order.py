@@ -1,12 +1,10 @@
 import numpy as np
 
-from pySDC.core.Sweeper import sweeper
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
-class imex_1st_order(sweeper):
+class imex_1st_order(generic_implicit):
     """
-    Custom sweeper class, implements Sweeper.py
-
     First-order IMEX sweeper using implicit/explicit Euler as base integrator
 
     Attributes:
@@ -15,99 +13,43 @@ class imex_1st_order(sweeper):
     """
 
     def __init__(self, params):
-        """
-        Initialization routine for the custom sweeper
-
-        Args:
-            params: parameters for the sweeper
-        """
-
-        if 'QI' not in params:
-            params['QI'] = 'IE'
         if 'QE' not in params:
             params['QE'] = 'EE'
 
-        # call parent's initialization routine
         super().__init__(params)
 
-        # IMEX integration matrices
-        self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
         self.QE = self.get_Qdelta_explicit(coll=self.coll, qd_type=self.params.QE)
+
+    def add_Q_minus_QD_times_F(self, rhs):
+        self.add_matrix_times_implicit_f_evaluations_to(self.coll.Qmat - self.QI, rhs)
+        self.add_matrix_times_explicit_f_evaluations_to(self.coll.Qmat - self.QE, rhs)
+
+    def add_matrix_times_implicit_f_evaluations_to(self, matrix, rhs):
+        for m in range(1, self.coll.num_nodes + 1):
+            for j in range(1, self.coll.num_nodes + 1):
+                rhs[m - 1] += self.level.dt * matrix[m, j] * self.level.f[j].impl
+
+    def add_matrix_times_explicit_f_evaluations_to(self, matrix, rhs):
+        for m in range(1, self.coll.num_nodes + 1):
+            for j in range(1, self.coll.num_nodes + 1):
+                rhs[m - 1] += self.level.dt * matrix[m, j] * self.level.f[j].expl
+
+    def add_new_information_from_forward_substitution(self, rhs, current_node):
+        for j in range(1, current_node + 1):
+            rhs[current_node] += self.level.dt * self.QI[current_node + 1, j] * self.level.f[j].impl
+            rhs[current_node] += self.level.dt * self.QE[current_node + 1, j] * self.level.f[j].expl
 
     def integrate(self):
         """
-        Integrates the right-hand side (here impl + expl)
+        Integrates the right-hand side
 
         Returns:
             list of dtype_u: containing the integral as values
         """
-
-        # get current level and problem description
-        L = self.level
-
-        me = []
-
-        # integrate RHS over all collocation nodes
-        for m in range(1, self.coll.num_nodes + 1):
-            me.append(L.dt * self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl))
-            # new instance of dtype_u, initialize values with 0
-            for j in range(2, self.coll.num_nodes + 1):
-                me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl)
-
-        return me
-
-    def update_nodes(self):
-        """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
-
-        Returns:
-            None
-        """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-
-        # only if the level has been touched before
-        assert L.status.unlocked
-
-        # get number of collocation nodes for easier access
-        M = self.coll.num_nodes
-
-        # gather all terms which are known already (e.g. from the previous iteration)
-        # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
-
-        # get QF(u^k)
-        integral = self.integrate()
-        for m in range(M):
-            # subtract QIFI(u^k)_m + QEFE(u^k)_m
-            for j in range(1, M + 1):
-                integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
-            # add initial value
-            integral[m] += L.u[0]
-            # add tau if associated
-            if L.tau[m] is not None:
-                integral[m] += L.tau[m]
-
-        # do the sweep
-        for m in range(0, M):
-            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = P.dtype_u(integral[m])
-            for j in range(1, m + 1):
-                rhs += L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
-
-            # implicit solve with prefactor stemming from QI
-            L.u[m + 1] = P.solve_system(
-                rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
-            )
-
-            # update function values
-            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-        # indicate presence of new values at this level
-        L.status.updated = True
-
-        return None
+        integral = self.initialize_right_hand_side_buffer()
+        self.add_matrix_times_implicit_f_evaluations_to(self.coll.Qmat, integral)
+        self.add_matrix_times_explicit_f_evaluations_to(self.coll.Qmat, integral)
+        return integral
 
     def compute_end_point(self):
         """
