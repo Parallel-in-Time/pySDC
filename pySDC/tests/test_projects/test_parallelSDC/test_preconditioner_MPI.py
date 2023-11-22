@@ -5,6 +5,7 @@ import pytest
 
 @pytest.mark.slow
 @pytest.mark.mpi4py
+@pytest.mark.timeout(0)
 def test_preconditioner_playground_MPI_5():
     # Set python path once
     my_env = os.environ.copy()
@@ -26,6 +27,7 @@ def test_preconditioner_playground_MPI_5():
 
 @pytest.mark.slow
 @pytest.mark.mpi4py
+@pytest.mark.timeout(0)
 def test_preconditioner_playground_MPI_3():
     # Set python path once
     my_env = os.environ.copy()

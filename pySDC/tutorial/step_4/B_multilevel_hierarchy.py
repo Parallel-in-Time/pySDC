@@ -3,7 +3,7 @@ from pathlib import Path
 from pySDC.core.Step import step
 
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 
@@ -21,6 +21,7 @@ def main():
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [5, 3]
+    sweeper_params['QI'] = 'LU'
 
     # initialize problem parameters
     problem_params = dict()
@@ -40,14 +41,14 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heatNd_unforced  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = generic_LU  # pass sweeper (see part B)
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params  # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
+    description['problem_class'] = heatNd_unforced
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = generic_implicit
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+    description['space_transfer_class'] = mesh_to_mesh
+    description['space_transfer_params'] = space_transfer_params
 
     # now the description contains more or less everything we need to create a step with multiple levels
     S = step(description=description)

@@ -1,4 +1,3 @@
-import pkg_resources
 import pytest
 
 
@@ -21,71 +20,67 @@ def test_B():
 def test_C():
     from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
 
-    installed_packages = [d for d in pkg_resources.working_set]
-    flat_installed_packages = [package.project_name for package in installed_packages]
+    cwd = 'pySDC/tutorial/step_6'
+    main_C(cwd)
 
-    if "mpi4py" in flat_installed_packages:
-        cwd = 'pySDC/tutorial/step_6'
-        main_C(cwd)
-
-        with open('data/step_6_C1_out.txt', 'r') as file1:
-            with open('data/step_6_A_ml_out.txt', 'r') as file2:
-                diff = set(file1).difference(file2)
-        diff.discard('\n')
-        for line in diff:
-            assert 'iterations' not in line, (
-                'ERROR: iteration counts differ between MPI and nonMPI for even ' 'distribution of time-steps'
-            )
-
-        with open('data/step_6_C2_out.txt', 'r') as file1:
-            with open('data/step_6_B_out.txt', 'r') as file2:
-                diff = set(file1).difference(file2)
-        diff.discard('\n')
-        for line in diff:
-            assert 'iterations' not in line, (
-                'ERROR: iteration counts differ between MPI and nonMPI for odd distribution ' 'of time-steps'
-            )
-
-        diff_MPI = []
-        with open("data/step_6_C1_out.txt") as f:
-            for line in f:
-                if "Diff" in line:
-                    diff_MPI.append(float(line.split()[1]))
-
-        diff_nonMPI = []
-        with open("data/step_6_A_ml_out.txt") as f:
-            for line in f:
-                if "Diff" in line:
-                    diff_nonMPI.append(float(line.split()[1]))
-
-        assert len(diff_MPI) == len(diff_nonMPI), (
-            'ERROR: got different number of results form MPI and nonMPI for even ' 'distribution of time-steps'
+    with open('data/step_6_C1_out.txt', 'r') as file1:
+        with open('data/step_6_A_ml_out.txt', 'r') as file2:
+            diff = set(file1).difference(file2)
+    diff.discard('\n')
+    for line in diff:
+        assert 'iterations' not in line, (
+            'ERROR: iteration counts differ between MPI and nonMPI for even ' 'distribution of time-steps'
         )
 
-        for i, j in zip(diff_MPI, diff_nonMPI):
-            assert abs(i - j) < 6e-11, (
-                'ERROR: difference between MPI and nonMPI results is too large for even '
-                'distributions of time-steps, got %s' % abs(i - j)
-            )
-
-        diff_MPI = []
-        with open("data/step_6_C2_out.txt") as f:
-            for line in f:
-                if "Diff" in line:
-                    diff_MPI.append(float(line.split()[1]))
-
-        diff_nonMPI = []
-        with open("data/step_6_B_out.txt") as f:
-            for line in f:
-                if "Diff" in line:
-                    diff_nonMPI.append(float(line.split()[1]))
-
-        assert len(diff_MPI) == len(diff_nonMPI), (
-            'ERROR: got different number of results form MPI and nonMPI for odd ' 'distribution of time-steps'
+    with open('data/step_6_C2_out.txt', 'r') as file1:
+        with open('data/step_6_B_out.txt', 'r') as file2:
+            diff = set(file1).difference(file2)
+    diff.discard('\n')
+    for line in diff:
+        assert 'iterations' not in line, (
+            'ERROR: iteration counts differ between MPI and nonMPI for odd distribution ' 'of time-steps'
         )
 
-        for i, j in zip(diff_MPI, diff_nonMPI):
-            assert abs(i - j) < 6e-11, (
-                'ERROR: difference between MPI and nonMPI results is too large for odd '
-                'distributions of time-steps, got %s' % abs(i - j)
-            )
+    diff_MPI = []
+    with open("data/step_6_C1_out.txt") as f:
+        for line in f:
+            if "Diff" in line:
+                diff_MPI.append(float(line.split()[1]))
+
+    diff_nonMPI = []
+    with open("data/step_6_A_ml_out.txt") as f:
+        for line in f:
+            if "Diff" in line:
+                diff_nonMPI.append(float(line.split()[1]))
+
+    assert len(diff_MPI) == len(diff_nonMPI), (
+        'ERROR: got different number of results form MPI and nonMPI for even ' 'distribution of time-steps'
+    )
+
+    for i, j in zip(diff_MPI, diff_nonMPI):
+        assert abs(i - j) < 6e-11, (
+            'ERROR: difference between MPI and nonMPI results is too large for even '
+            'distributions of time-steps, got %s' % abs(i - j)
+        )
+
+    diff_MPI = []
+    with open("data/step_6_C2_out.txt") as f:
+        for line in f:
+            if "Diff" in line:
+                diff_MPI.append(float(line.split()[1]))
+
+    diff_nonMPI = []
+    with open("data/step_6_B_out.txt") as f:
+        for line in f:
+            if "Diff" in line:
+                diff_nonMPI.append(float(line.split()[1]))
+
+    assert len(diff_MPI) == len(diff_nonMPI), (
+        'ERROR: got different number of results form MPI and nonMPI for odd ' 'distribution of time-steps'
+    )
+
+    for i, j in zip(diff_MPI, diff_nonMPI):
+        assert abs(i - j) < 6e-11, (
+            'ERROR: difference between MPI and nonMPI results is too large for odd '
+            'distributions of time-steps, got %s' % abs(i - j)
+        )

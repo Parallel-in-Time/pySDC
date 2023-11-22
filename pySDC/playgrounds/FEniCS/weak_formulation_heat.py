@@ -1,6 +1,6 @@
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
 if __name__ == "__main__":
@@ -27,10 +27,11 @@ if __name__ == "__main__":
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
+    sweeper_params['QI'] = 'LU'
 
     problem_params = dict()
     problem_params['nu'] = 1.0
-    problem_params['t0'] = t0  # ugly, but necessary to set up ProblemClass
+    problem_params['t0'] = t0  # ugly, but necessary to set up problem class
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
@@ -44,12 +45,12 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_heat
     description['problem_params'] = problem_params
-    description['sweeper_class'] = generic_LU  # pass sweeper (see part B)
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params  # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh_fenics  # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['sweeper_class'] = generic_implicit
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+    description['space_transfer_class'] = mesh_to_mesh_fenics
+    description['space_transfer_params'] = space_transfer_params
 
     # quickly generate block of steps
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)

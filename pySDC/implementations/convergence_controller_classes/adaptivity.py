@@ -3,9 +3,6 @@ from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
     StepSizeLimiter,
 )
-from pySDC.implementations.convergence_controller_classes.basic_restarting import (
-    BasicRestartingNonMPI,
-)
 
 
 class AdaptivityBase(ConvergenceController):
@@ -37,6 +34,10 @@ class AdaptivityBase(ConvergenceController):
         from pySDC.implementations.hooks.log_step_size import LogStepSize
 
         controller.add_hook(LogStepSize)
+
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+
+        self.communicate_convergence = CheckConvergence.communicate_convergence
 
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
@@ -151,6 +152,105 @@ class AdaptivityBase(ConvergenceController):
         return None
 
 
+class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load interpolation between restarts.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        """
+        super().dependencies(controller, description, **kwargs)
+
+        if self.params.interpolate_between_restarts:
+            from pySDC.implementations.convergence_controller_classes.interpolate_between_restarts import (
+                InterpolateBetweenRestarts,
+            )
+
+            controller.add_convergence_controller(
+                InterpolateBetweenRestarts,
+                description=description,
+                params={},
+            )
+        self.interpolator = controller.convergence_controllers[-1]
+        return None
+
+    def get_convergence(self, controller, S, **kwargs):
+        raise NotImplementedError("Please implement a way to check if the collocation problem is converged!")
+
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Add a default value for control order to the parameters.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters
+        """
+        defaults = {
+            'restol_rel': None,
+            'e_tol_rel': None,
+            'restart_at_maxiter': True,
+            'restol_min': 1e-12,
+            'restol_max': 1e-5,
+            'factor_if_not_converged': 4.0,
+            'residual_max_tol': 1e9,
+            'maxiter': description['sweeper_params'].get('maxiter', 99),
+            'interpolate_between_restarts': True,
+            **super().setup(controller, params, description, **kwargs),
+        }
+        if defaults['restol_rel']:
+            description['level_params']['restol'] = min(
+                [max([defaults['restol_rel'] * defaults['e_tol'], defaults['restol_min']]), defaults['restol_max']]
+            )
+        elif defaults['e_tol_rel']:
+            description['level_params']['e_tol'] = min([max([defaults['e_tol_rel'] * defaults['e_tol'], 1e-10]), 1e-5])
+
+        if defaults['restart_at_maxiter']:
+            defaults['maxiter'] = description['step_params'].get('maxiter', 99)
+
+        self.res_last_iter = np.inf
+
+        return defaults
+
+    def determine_restart(self, controller, S, **kwargs):
+        if self.get_convergence(controller, S, **kwargs):
+            self.res_last_iter = np.inf
+
+            if self.params.restart_at_maxiter and S.levels[0].status.residual > S.levels[0].params.restol:
+                self.trigger_restart_upon_nonconvergence(S)
+            elif self.get_local_error_estimate(controller, S, **kwargs) > self.params.e_tol:
+                S.status.restart = True
+        elif S.status.time_size == 1 and self.res_last_iter < S.levels[0].status.residual and S.status.iter > 0:
+            self.trigger_restart_upon_nonconvergence(S)
+        elif S.levels[0].status.residual > self.params.residual_max_tol:
+            self.trigger_restart_upon_nonconvergence(S)
+
+        if self.params.useMPI:
+            self.communicate_convergence(self, controller, S, **kwargs)
+
+        self.res_last_iter = S.levels[0].status.residual * 1.0
+
+    def trigger_restart_upon_nonconvergence(self, S):
+        S.status.restart = True
+        S.status.force_done = True
+        for L in S.levels:
+            L.status.dt_new = L.params.dt / self.params.factor_if_not_converged
+            self.log(
+                f'Collocation problem not converged. Reducing step size to {L.status.dt_new:.2e}',
+                S,
+            )
+        if self.params.interpolate_between_restarts:
+            self.interpolator.status.skip_interpolation = True
+
+
 class Adaptivity(AdaptivityBase):
     """
     Class to compute time step size adaptively based on embedded error estimate.
@@ -204,7 +304,7 @@ class Adaptivity(AdaptivityBase):
         """
         from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 
-        super().dependencies(controller, description)
+        super().dependencies(controller, description, **kwargs)
 
         controller.add_convergence_controller(
             EstimateEmbeddedError.get_implementation(self.params.embedded_error_flavor, self.params.useMPI),
@@ -351,6 +451,7 @@ class AdaptivityResidual(AdaptivityBase):
          - control_order (int): The order relative to other convergence controllers
          - e_tol_low (float): Lower absolute threshold for the residual
          - e_tol (float): Upper absolute threshold for the residual
+         - use_restol (bool): Restart if the residual tolerance was not reached
          - max_restarts: Override maximum number of restarts
 
         Args:
@@ -365,6 +466,7 @@ class AdaptivityResidual(AdaptivityBase):
             "control_order": -45,
             "e_tol_low": 0,
             "e_tol": np.inf,
+            "use_restol": False,
             "max_restarts": 99 if "e_tol_low" in params else None,
             "allowed_modifications": ['increase', 'decrease'],  # what we are allowed to do with the step size
         }
@@ -380,9 +482,11 @@ class AdaptivityResidual(AdaptivityBase):
         Reutrns:
             None
         """
+        from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
+
         if self.params.max_restarts is not None:
             conv_controllers = controller.convergence_controllers
-            restart_cont = [me for me in conv_controllers if type(me) == BasicRestartingNonMPI]
+            restart_cont = [me for me in conv_controllers if BasicRestarting in type(me).__bases__]
 
             if len(restart_cont) == 0:
                 raise NotImplementedError("Please implement override of maximum number of restarts!")
@@ -393,7 +497,6 @@ class AdaptivityResidual(AdaptivityBase):
     def check_parameters(self, controller, params, description, **kwargs):
         """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
-        For adaptivity, we want a fixed order of the scheme.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -404,13 +507,6 @@ class AdaptivityResidual(AdaptivityBase):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        if description["level_params"].get("restol", -1.0) >= 0:
-            return (
-                False,
-                "Adaptivity needs constant order in time and hence restol in the step parameters has to be \
-smaller than 0!",
-            )
-
         if controller.params.mssdc_jac:
             return (
                 False,
@@ -440,7 +536,9 @@ smaller than 0!",
 
             dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
-            if res > self.params.e_tol and 'decrease' in self.params.allowed_modifications:
+            if (
+                res > self.params.e_tol or (res > L.params.restol and self.params.use_restol)
+            ) and 'decrease' in self.params.allowed_modifications:
                 L.status.dt_new = min([dt_planned, L.params.dt / 2.0])
                 self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
             elif res < self.params.e_tol_low and 'increase' in self.params.allowed_modifications:
@@ -463,7 +561,7 @@ smaller than 0!",
         return S.levels[0].status.residual
 
 
-class AdaptivityCollocation(AdaptivityBase):
+class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
     """
     Control the step size via a collocation based estimate of the local error.
     The error estimate works by subtracting two solutions to collocation problems with different order. You can
@@ -494,6 +592,9 @@ class AdaptivityCollocation(AdaptivityBase):
             if type(defaults['adaptive_coll_params'][key]) == list:
                 defaults['num_colls'] = max([defaults['num_colls'], len(defaults['adaptive_coll_params'][key])])
 
+        if defaults['restart_at_maxiter']:
+            defaults['maxiter'] = description['step_params'].get('maxiter', 99) * defaults['num_colls']
+
         return defaults
 
     def setup_status_variables(self, controller, **kwargs):
@@ -517,7 +618,7 @@ class AdaptivityCollocation(AdaptivityBase):
             EstimateEmbeddedErrorCollocation,
         )
 
-        super().dependencies(controller, description)
+        super().dependencies(controller, description, **kwargs)
 
         params = {'adaptive_coll_params': self.params.adaptive_coll_params}
         controller.add_convergence_controller(
@@ -525,6 +626,9 @@ class AdaptivityCollocation(AdaptivityBase):
             params=params,
             description=description,
         )
+
+    def get_convergence(self, controller, S, **kwargs):
+        return len(self.status.order) == self.params.num_colls
 
     def get_local_error_estimate(self, controller, S, **kwargs):
         """
@@ -570,34 +674,6 @@ class AdaptivityCollocation(AdaptivityBase):
             )
             self.log(f'Adjusting step size from {lvl.params.dt:.2e} to {lvl.status.dt_new:.2e}', S)
 
-    def check_parameters(self, controller, params, description, **kwargs):
-        """
-        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
-        For adaptivity, we need to know the order of the scheme.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): The params passed for this specific convergence controller
-            description (dict): The description object used to instantiate the controller
-
-        Returns:
-            bool: Whether the parameters are compatible
-            str: The error message
-        """
-        if controller.params.mssdc_jac:
-            return (
-                False,
-                "Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!",
-            )
-
-        if "e_tol" not in params.keys():
-            return (
-                False,
-                "Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!",
-            )
-
-        return True, ""
-
     def determine_restart(self, controller, S, **kwargs):
         """
         Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance
@@ -614,3 +690,208 @@ class AdaptivityCollocation(AdaptivityBase):
             if e_est >= self.params.e_tol:
                 S.status.restart = True
                 self.log(f"Restarting: e={e_est:.2e} >= e_tol={self.params.e_tol:.2e}", S)
+
+    def check_parameters(self, controller, params, description, **kwargs):
+        """
+        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+        For adaptivity, we need to know the order of the scheme.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: The error message
+        """
+        if "e_tol" not in params.keys():
+            return (
+                False,
+                "Adaptivity needs a local tolerance! Please pass `e_tol` to the parameters for this convergence controller!",
+            )
+
+        return True, ""
+
+
+class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
+    """
+    Class to compute time step size adaptively based on error estimate obtained from extrapolation within the quadrature
+    nodes.
+
+    This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.
+    """
+
+    def setup(self, controller, params, description, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+
+        defaults = {
+            'high_Taylor_order': False,
+            **params,
+        }
+
+        self.check_convergence = CheckConvergence.check_convergence
+        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
+    def get_convergence(self, controller, S, **kwargs):
+        return self.check_convergence(S)
+
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load the error estimator.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        """
+        from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
+            EstimateExtrapolationErrorWithinQ,
+        )
+
+        super().dependencies(controller, description, **kwargs)
+
+        controller.add_convergence_controller(
+            EstimateExtrapolationErrorWithinQ,
+            description=description,
+            params={'high_Taylor_order': self.params.high_Taylor_order},
+        )
+        return None
+
+    def get_new_step_size(self, controller, S, **kwargs):
+        """
+        Determine a step size for the next step from the error estimate.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        if self.get_convergence(controller, S, **kwargs):
+            L = S.levels[0]
+
+            # compute next step size
+            order = L.sweep.coll.num_nodes + 1 if self.params.high_Taylor_order else L.sweep.coll.num_nodes
+
+            e_est = self.get_local_error_estimate(controller, S)
+            L.status.dt_new = self.compute_optimal_step_size(
+                self.params.beta, L.params.dt, self.params.e_tol, e_est, order
+            )
+
+            self.log(
+                f'Error target: {self.params.e_tol:.2e}, error estimate: {e_est:.2e}, update_order: {order}',
+                S,
+                level=10,
+            )
+            self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
+
+        return None
+
+    def get_local_error_estimate(self, controller, S, **kwargs):
+        """
+        Get the embedded error estimate of the finest level of the step.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            float: Embedded error estimate
+        """
+        return S.levels[0].status.error_extrapolation_estimate
+
+
+class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
+    """
+    Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature
+    nodes.
+
+    This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.
+    """
+
+    def setup(self, controller, params, description, **kwargs):
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+
+        defaults = {
+            'control_order': -50,
+            **super().setup(controller, params, description, **kwargs),
+            **params,
+        }
+
+        self.check_convergence = CheckConvergence.check_convergence
+        return defaults
+
+    def get_convergence(self, controller, S, **kwargs):
+        return self.check_convergence(S)
+
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load the error estimator.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        """
+        from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+            EstimatePolynomialError,
+        )
+
+        super().dependencies(controller, description, **kwargs)
+
+        controller.add_convergence_controller(
+            EstimatePolynomialError,
+            description=description,
+            params={},
+        )
+        return None
+
+    def get_new_step_size(self, controller, S, **kwargs):
+        """
+        Determine a step size for the next step from the error estimate.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        if self.get_convergence(controller, S, **kwargs):
+            L = S.levels[0]
+
+            # compute next step size
+            order = L.status.order_embedded_estimate
+
+            e_est = self.get_local_error_estimate(controller, S)
+            L.status.dt_new = self.compute_optimal_step_size(
+                self.params.beta, L.params.dt, self.params.e_tol, e_est, order
+            )
+
+            self.log(
+                f'Error target: {self.params.e_tol:.2e}, error estimate: {e_est:.2e}, update_order: {order}',
+                S,
+                level=10,
+            )
+            self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
+
+        return None
+
+    def get_local_error_estimate(self, controller, S, **kwargs):
+        """
+        Get the embedded error estimate of the finest level of the step.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            float: Embedded error estimate
+        """
+        return S.levels[0].status.error_embedded_estimate

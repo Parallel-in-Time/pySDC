@@ -18,6 +18,7 @@ class LogEmbeddedErrorEstimate(hooks):
                     value = L.status.error_embedded_estimate
                 self.add_to_stats(
                     process=step.status.slot,
+                    process_sweeper=L.sweep.rank,
                     time=L.time + L.dt,
                     level=L.level_index,
                     iter=iter,

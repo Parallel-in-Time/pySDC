@@ -148,6 +148,9 @@ def main():
         out = 'Error vs. PDE solution: %6.4e' % err
         print(out)
 
+    space_comm.Free()
+    time_comm.Free()
+
 
 if __name__ == "__main__":
     main()

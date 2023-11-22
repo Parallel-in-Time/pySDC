@@ -2,13 +2,11 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-# from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.playgrounds.EnergyGrids.log_data import log_data
+from pySDC.implementations.hooks.log_solution import LogSolution
 import pySDC.helpers.plot_helper as plt_helper
 
 
@@ -46,16 +44,16 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
-    controller_params['hook_class'] = log_data
+    controller_params['hook_class'] = [LogSolution]
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = piline  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params  # pass step parameters
+    description['problem_class'] = piline
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = imex_1st_order
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
 
     # set time parameters
     t0 = 0.0
@@ -83,16 +81,16 @@ def plot_voltages(cwd='./'):
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    v1 = get_sorted(stats, type='v1', sortby='time')
-    v2 = get_sorted(stats, type='v2', sortby='time')
-    p3 = get_sorted(stats, type='p3', sortby='time')
-
-    times = [v[0] for v in v1]
+    u_val = get_sorted(stats, type='u', sortby='time')
+    t = np.array([me[0] for me in u_val])
+    v1 = np.array([me[1][0] for me in u_val])
+    v2 = np.array([me[1][1] for me in u_val])
+    p3 = np.array([me[1][2] for me in u_val])
 
     # plt_helper.setup_mpl()
-    plt_helper.plt.plot(times, [v[1] for v in v1], label='v1')
-    plt_helper.plt.plot(times, [v[1] for v in v2], label='v2')
-    plt_helper.plt.plot(times, [v[1] for v in p3], label='p3')
+    plt_helper.plt.plot(t, v1, label='v1')
+    plt_helper.plt.plot(t, v2, label='v2')
+    plt_helper.plt.plot(t, p3, label='p3')
     plt_helper.plt.legend()
 
     plt_helper.plt.show()

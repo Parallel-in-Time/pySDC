@@ -21,7 +21,7 @@ class generic_implicit(sweeper):
             params['QI'] = 'IE'
 
         # call parent's initialization routine
-        super(generic_implicit, self).__init__(params)
+        super().__init__(params)
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
@@ -34,7 +34,6 @@ class generic_implicit(sweeper):
             list of dtype_u: containing the integral as values
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 
@@ -57,7 +56,6 @@ class generic_implicit(sweeper):
             None
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 
@@ -112,7 +110,6 @@ class generic_implicit(sweeper):
             None
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 

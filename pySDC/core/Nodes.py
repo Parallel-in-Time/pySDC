@@ -81,7 +81,7 @@ class NodesGenerator(object):
         """
         # Check number of nodes
         if self.quad_type in ['LOBATTO', 'RADAU-LEFT'] and num_nodes < 2:
-            raise NodesError(f"num_nodes must be larger than 2 for {self.quad_type}, " f"but for {num_nodes}")
+            raise NodesError(f"num_nodes must be larger than 2 for {self.quad_type}, but got {num_nodes}")
         elif num_nodes < 1:
             raise NodesError("you surely want at least one node ;)")
 

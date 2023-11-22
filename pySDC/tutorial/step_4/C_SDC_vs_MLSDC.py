@@ -4,7 +4,7 @@ from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 
@@ -23,11 +23,13 @@ def main():
     sweeper_params_sdc['node_type'] = 'LEGENDRE'
     sweeper_params_sdc['quad_type'] = 'RADAU-RIGHT'
     sweeper_params_sdc['num_nodes'] = 5
+    sweeper_params_sdc['QI'] = 'LU'
 
     sweeper_params_mlsdc = dict()
     sweeper_params_mlsdc['node_type'] = 'LEGENDRE'
     sweeper_params_mlsdc['quad_type'] = 'RADAU-RIGHT'
     sweeper_params_mlsdc['num_nodes'] = [5, 3, 2]
+    sweeper_params_mlsdc['QI'] = 'LU'
 
     # initialize problem parameters
     problem_params_sdc = dict()
@@ -57,23 +59,23 @@ def main():
 
     # fill description dictionary for SDC
     description_sdc = dict()
-    description_sdc['problem_class'] = heatNd_unforced  # pass problem class
-    description_sdc['problem_params'] = problem_params_sdc  # pass problem parameters
-    description_sdc['sweeper_class'] = generic_LU  # pass sweeper (see part B)
-    description_sdc['sweeper_params'] = sweeper_params_sdc  # pass sweeper parameters
-    description_sdc['level_params'] = level_params  # pass level parameters
-    description_sdc['step_params'] = step_params  # pass step parameters
+    description_sdc['problem_class'] = heatNd_unforced
+    description_sdc['problem_params'] = problem_params_sdc
+    description_sdc['sweeper_class'] = generic_implicit
+    description_sdc['sweeper_params'] = sweeper_params_sdc
+    description_sdc['level_params'] = level_params
+    description_sdc['step_params'] = step_params
 
     # fill description dictionary for MLSDC
     description_mlsdc = dict()
-    description_mlsdc['problem_class'] = heatNd_unforced  # pass problem class
-    description_mlsdc['problem_params'] = problem_params_mlsdc  # pass problem parameters
-    description_mlsdc['sweeper_class'] = generic_LU  # pass sweeper (see part B)
-    description_mlsdc['sweeper_params'] = sweeper_params_mlsdc  # pass sweeper parameters
-    description_mlsdc['level_params'] = level_params  # pass level parameters
-    description_mlsdc['step_params'] = step_params  # pass step parameters
-    description_mlsdc['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    description_mlsdc['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
+    description_mlsdc['problem_class'] = heatNd_unforced
+    description_mlsdc['problem_params'] = problem_params_mlsdc
+    description_mlsdc['sweeper_class'] = generic_implicit
+    description_mlsdc['sweeper_params'] = sweeper_params_mlsdc
+    description_mlsdc['level_params'] = level_params
+    description_mlsdc['step_params'] = step_params
+    description_mlsdc['space_transfer_class'] = mesh_to_mesh
+    description_mlsdc['space_transfer_params'] = space_transfer_params
 
     # instantiate the controller (no controller parameters used here)
     controller_sdc = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description_sdc)

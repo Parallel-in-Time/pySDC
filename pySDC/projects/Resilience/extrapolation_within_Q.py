@@ -12,7 +12,7 @@ from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
 
 
-def multiple_runs(prob, dts, num_nodes, quad_type='RADAU-RIGHT'):
+def multiple_runs(prob, dts, num_nodes, quad_type='RADAU-RIGHT', QI='LU', useMPI=False):
     """
     Make multiple runs of a specific problem and record vital error information
 
@@ -31,6 +31,14 @@ def multiple_runs(prob, dts, num_nodes, quad_type='RADAU-RIGHT'):
     description['step_params'] = {'maxiter': 99}
     description['sweeper_params'] = {'num_nodes': num_nodes, 'quad_type': quad_type}
     description['convergence_controllers'] = {EstimateExtrapolationErrorWithinQ: {}}
+
+    if useMPI:
+        from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI, MPI
+
+        description['sweeper_class'] = generic_implicit_MPI
+        description['sweeper_params']['comm'] = MPI.COMM_WORLD.Split(MPI.COMM_WORLD.rank < num_nodes)
+        if MPI.COMM_WORLD.rank > num_nodes:
+            return None
 
     if prob.__name__ == 'run_advection':
         description['problem_params'] = {'order': 6, 'stencil_type': 'center'}
@@ -90,7 +98,7 @@ def plot_and_compute_order(ax, res, num_nodes, coll_order):
         ax.legend(frameon=False)
 
 
-def check_order(ax, prob, dts, num_nodes, quad_type):
+def check_order(ax, prob, dts, num_nodes, quad_type, **kwargs):
     """
     Check the order by calling `multiple_runs` and then `plot_and_compute_order`.
 
@@ -101,7 +109,7 @@ def check_order(ax, prob, dts, num_nodes, quad_type):
         num_nodes (int): Number of nodes
         quad_type (str): Type of nodes
     """
-    res, coll_order = multiple_runs(prob, dts, num_nodes, quad_type)
+    res, coll_order = multiple_runs(prob, dts, num_nodes, quad_type, **kwargs)
     plot_and_compute_order(ax, res, num_nodes, coll_order)
 
 
@@ -109,7 +117,7 @@ def main():
     fig, ax = plt.subplots()
     num_nodes = 3
     quad_type = 'RADAU-RIGHT'
-    check_order(ax, run_advection, [5e-1, 1e-1, 5e-2, 1e-2], num_nodes, quad_type)
+    check_order(ax, run_advection, [5e-1, 1e-1, 5e-2, 1e-2], num_nodes, quad_type, QI='MIN', useMPI=True)
     plt.show()
 
 

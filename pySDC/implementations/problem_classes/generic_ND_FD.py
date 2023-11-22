@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Feb 11 22:39:30 2023
-
-@author: telu
 """
 import numpy as np
 import scipy.sparse as sp
@@ -16,6 +14,68 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class GenericNDimFinDiff(ptype):
+    r"""
+    Base class for finite difference spatial discretisation in :math:`N` dimensions
+
+    .. math::
+        \frac{d u}{dt} = A u,
+
+    where :math:`A \in \mathbb{R}^{nN \times nN}` is a matrix arising from finite difference discretisation of spatial
+    derivatives with :math:`n` degrees of freedom per dimension and :math:`N` dimensions. This generic class follows the MOL
+    (method-of-lines) approach and can be used to discretize partial differential equations such as the advection
+    equation and the heat equation.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Spatial resolution for the ND problem. For :math:`N = 2`,
+        set ``nvars=(16, 16)``.
+    coeff : float, optional
+        Factor for finite difference matrix :math:`A`.
+    derivative : int, optional
+        Order of the spatial derivative.
+    freq : tuple of int, optional
+        Spatial frequency, can be a tuple.
+    stencil_type : str, optional
+        Stencil type for finite differences.
+    order : int, optional
+        Order of accuracy of the finite difference discretization.
+    lintol : float, optional
+        Tolerance for spatial solver.
+    liniter : int, optional
+        Maximum number of iterations for linear solver.
+    solver_type : str, optional
+        Type of solver. Can be ``'direct'``, ``'GMRES'`` or ``'CG'``.
+    bc : str or tuple of 2 string, optional
+        Type of boundary conditions. Default is ``'periodic'``.
+        To define two different types of boundary condition for each side,
+        you can use a tuple, for instance ``bc=("dirichlet", "neumann")``
+        uses Dirichlet BC on the left side, and Neumann BC on the right side.
+    bcParams : dict, optional
+        Parameters for boundary conditions, that can contains those keys :
+
+        - **val** : value for the boundary value (Dirichlet) or derivative
+          (Neumann), default to 0
+        - **reduce** : if true, reduce the order of the A matrix close to the
+          boundary. If false (default), use shifted stencils close to the
+          boundary.
+        - **neumann_bc_order** : finite difference order that should be used
+          for the neumann BC derivative. If None (default), uses the same
+          order as the discretization for A.
+
+        Default is None, which takes the default values for each parameters.
+        You can also define a tuple to set different parameters for each
+        side.
+
+    Attributes
+    ----------
+    A : sparse matrix (CSC)
+        FD discretization matrix of the ND operator.
+    Id : sparse matrix (CSC)
+        Identity matrix of the same dimension as A.
+    xvalues : np.1darray
+        Values of spatial grid.
+    """
     dtype_u = mesh
     dtype_f = mesh
 
@@ -31,6 +91,7 @@ class GenericNDimFinDiff(ptype):
         liniter=10000,
         solver_type='direct',
         bc='periodic',
+        bcParams=None,
     ):
         # make sure parameters have the correct types
         if not type(nvars) in [int, tuple]:
@@ -72,17 +133,9 @@ class GenericNDimFinDiff(ptype):
         # invoke super init, passing number of dofs
         super().__init__(init=(nvars[0] if ndim == 1 else nvars, None, np.dtype('float64')))
 
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        if bc == 'periodic':
-            dx = 1.0 / nvars[0]
-            xvalues = np.array([i * dx for i in range(nvars[0])])
-        elif bc == 'dirichlet-zero':
-            dx = 1.0 / (nvars[0] + 1)
-            xvalues = np.array([(i + 1) * dx for i in range(nvars[0])])
-        else:
-            raise ProblemError(f'Boundary conditions {bc} not implemented.')
+        dx, xvalues = problem_helper.get_1d_grid(size=nvars[0], bc=bc, left_boundary=0.0, right_boundary=1.0)
 
-        self.A = problem_helper.get_finite_difference_matrix(
+        self.A, _ = problem_helper.get_finite_difference_matrix(
             derivative=derivative,
             order=order,
             stencil_type=stencil_type,
@@ -124,9 +177,15 @@ class GenericNDimFinDiff(ptype):
         if self.ndim == 3:
             return x[None, :, None], x[:, None, None], x[None, None, :]
 
+    @classmethod
+    def get_default_sweeper_class(cls):
+        from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+        return generic_implicit
+
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
         Parameters
         ----------
@@ -138,15 +197,15 @@ class GenericNDimFinDiff(ptype):
         Returns
         -------
         f : dtype_f
-            The RHS values.
+            Values of the right-hand side of the problem.
         """
         f = self.f_init
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs.
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
         Parameters
         ----------
@@ -185,6 +244,7 @@ class GenericNDimFinDiff(ptype):
                 maxiter=liniter,
                 atol=0,
                 callback=self.work_counters[solver_type],
+                callback_type='legacy',
             )[0].reshape(nvars)
         elif solver_type == 'CG':
             sol[:] = cg(

@@ -159,6 +159,9 @@ def main():
     assert err < 2e-04, 'ERROR: did not match error tolerance, got %s' % err
     assert np.mean(niters) <= 12, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
+    space_comm.Free()
+    time_comm.Free()
+
 
 if __name__ == "__main__":
     main()

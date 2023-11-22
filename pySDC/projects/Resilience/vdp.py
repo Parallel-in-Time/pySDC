@@ -107,7 +107,7 @@ def run_vdp(
     Returns:
         dict: The stats object
         controller: The controller
-        Tend: The time that was supposed to be integrated to
+        bool: If the code crashed
     """
 
     # initialize level parameters
@@ -179,19 +179,18 @@ def run_vdp(
     if fault_stuff is not None:
         from pySDC.projects.Resilience.fault_injection import prepare_controller_for_faults
 
-        rnd_args = {'iteration': 3}
-        # args = {'time': 0.9, 'target': 0}
-        args = {'time': 5.25, 'target': 0}
-        prepare_controller_for_faults(controller, fault_stuff, rnd_args, args)
+        prepare_controller_for_faults(controller, fault_stuff, {}, {})
 
     # call main function to get things done...
+    crash = False
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except (ProblemError, ConvergenceError):
-        print('Warning: Premature termination!')
+    except (ProblemError, ConvergenceError, ZeroDivisionError) as e:
+        crash = True
+        print(f'Warning: Premature termination: {e}')
         stats = controller.return_stats()
 
-    return stats, controller, Tend
+    return stats, controller, crash
 
 
 def fetch_test_data(stats, comm=None, use_MPI=False):
@@ -212,10 +211,14 @@ def fetch_test_data(stats, comm=None, use_MPI=False):
         if type not in get_list_of_types(stats):
             raise ValueError(f"Can't read type \"{type}\" from stats, only got", get_list_of_types(stats))
 
-        if comm is None or use_MPI is False:
-            data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time')]
-        else:
-            data[type] = [me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time', comm=comm)]
+        data[type] = [
+            me[1] for me in get_sorted(stats, type=type, recomputed=None, sortby='time', comm=comm if use_MPI else None)
+        ]
+
+    # add time
+    data['time'] = [
+        me[0] for me in get_sorted(stats, type='u', recomputed=None, sortby='time', comm=comm if use_MPI else None)
+    ]
     return data
 
 
@@ -268,8 +271,6 @@ def mpi_vs_nonMPI(MPI_ready, comm):
     custom_description = {'convergence_controllers': {}}
     custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7, 'avoid_restarts': False}
 
-    custom_controller_params = {'logger_level': 30}
-
     data = [{}, {}]
 
     for i in range(2):
@@ -278,7 +279,6 @@ def mpi_vs_nonMPI(MPI_ready, comm):
                 custom_description=custom_description,
                 num_procs=size,
                 use_MPI=use_MPI[i],
-                custom_controller_params=custom_controller_params,
                 Tend=1.0,
                 comm=comm,
             )
@@ -309,7 +309,7 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
     """
     fig, ax = plt.subplots()
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
-    custom_controller_params = {'logger_level': 30, 'all_to_done': False}
+    custom_controller_params = {'all_to_done': False}
     results = {'e': {}, 'sweeps': {}, 'restarts': {}}
     size = comm.size if comm is not None else size
 
@@ -384,7 +384,6 @@ def check_step_size_limiter(size=4, comm=None):
     from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
 
     custom_description = {'convergence_controllers': {}, 'level_params': {'dt': 1.0e-2}}
-    custom_controller_params = {'logger_level': 30}
     expect = {}
     params = {'e_tol': 1e-6}
 
@@ -405,7 +404,6 @@ def check_step_size_limiter(size=4, comm=None):
             custom_description=custom_description,
             num_procs=size,
             use_MPI=comm is not None,
-            custom_controller_params=custom_controller_params,
             Tend=5.0e0,
             comm=comm,
         )
@@ -496,10 +494,8 @@ def interpolation_stuff():  # pragma: no cover
             'sweeper_params': sweeper_params,
         }
 
-        custom_controller_params = {'logger_level': 30}
         stats, controller, _ = run_vdp(
             custom_description=custom_description,
-            custom_controller_params=custom_controller_params,
             hook_class=[LogLocalErrorPostStep, LogData, LogWork] + hook_collection,
         )
 
@@ -529,6 +525,8 @@ def interpolation_stuff():  # pragma: no cover
 
 
 if __name__ == "__main__":
+    import sys
+
     try:
         from mpi4py import MPI
 
@@ -540,8 +538,18 @@ if __name__ == "__main__":
         comm = None
         size = 1
 
-    mpi_vs_nonMPI(MPI_ready, comm)
-    check_step_size_limiter(size, comm)
+    if len(sys.argv) == 1:
+        mpi_vs_nonMPI(MPI_ready, comm)
+        check_step_size_limiter(size, comm)
 
-    if size == 1:
+        if size == 1:
+            check_adaptivity_with_avoid_restarts(comm=None, size=1)
+
+    elif 'mpi_vs_nonMPI' in sys.argv:
+        mpi_vs_nonMPI(MPI_ready, comm)
+    elif 'check_step_size_limiter' in sys.argv:
+        check_step_size_limiter(MPI_ready, comm)
+    elif 'check_adaptivity_with_avoid_restarts' and size == 1:
         check_adaptivity_with_avoid_restarts(comm=None, size=1)
+    else:
+        raise NotImplementedError('Your test is not implemented!')

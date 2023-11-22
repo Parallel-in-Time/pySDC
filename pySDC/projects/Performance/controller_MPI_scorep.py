@@ -130,7 +130,9 @@ class controller_MPI(controller):
             all_active = all_time < Tend - 10 * np.finfo(float).eps
             active = all_active[rank]
             if not all(all_active):
-                comm_active = comm_active.Split(active)
+                comm_active_new = comm_active.Split(active)
+                comm_active.Free()
+                comm_active = comm_active_new
                 rank = comm_active.Get_rank()
                 num_procs = comm_active.Get_size()
                 self.S.status.slot = rank

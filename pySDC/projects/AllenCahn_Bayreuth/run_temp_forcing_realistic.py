@@ -121,6 +121,8 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         out = '...Done <---------\n'
         print(out)
 
+    space_comm.Free()
+
 
 def main(nprocs_space=None):
     """

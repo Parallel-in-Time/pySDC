@@ -6,20 +6,36 @@ from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_ve
 
 
 class Fisher_full(object):
-    """
-    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
+    r"""
+    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES.
+
+    Parameters
+    ----------
+    da : DMDA object
+        Object of ``PETSc``.
+    prob : problem instance
+        Contains problem information for ``PETSc``.
+    factor : float
+        Temporal factor :math:`\Delta t Q_\Delta`.
+    dx : float
+        Grid spacing in x direction.
+
+    Attributes
+    ----------
+    localX : PETSc vector object
+        Local vector for ``PETSc``.
+    xs, xe : int
+        Defines the ranges for spatial domain.
+    mx : tuple
+        Get sizes for the vector containing the spatial points.
+    row : PETSc matrix stencil object
+        Row for a matrix.
+    col : PETSc matrix stencil object
+        Column for a matrix.
     """
 
     def __init__(self, da, prob, factor, dx):
-        """
-        Initialization routine
-
-        Args:
-            da: DMDA object
-            prob: problem instance
-            factor: temporal factor (dt*Qd)
-            dx: grid spacing in x direction
-        """
+        """Initialization routine"""
         assert da.getDim() == 1
         self.da = da
         self.factor = factor
@@ -32,18 +48,23 @@ class Fisher_full(object):
         self.col = PETSc.Mat.Stencil()
 
     def formFunction(self, snes, X, F):
-        """
-        Function to evaluate the residual for the Newton solver
+        r"""
+        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
+        in the solution.
 
-        This function should be equal to the RHS in the solution
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        F : PETSc vector object
+            Output vector :math:`F(X)`.
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            F: output vector F(X)
-
-        Returns:
-            None (overwrites F)
+        Returns
+        -------
+        None
+            Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -61,16 +82,23 @@ class Fisher_full(object):
 
     def formJacobian(self, snes, X, J, P):
         """
-        Function to return the Jacobian matrix
+        Function to return the Jacobian matrix.
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            J: Jacobian matrix (current?)
-            P: Jacobian matrix (new)
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        J : PETSc matrix object
+            Current Jacobian matrix.
+        P : PETSc matrix object
+            New Jacobian matrix.
 
-        Returns:
-            matrix status
+        Returns
+        -------
+        PETSc.Mat.Structure.SAME_NONZERO_PATTERN
+            Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -100,20 +128,28 @@ class Fisher_full(object):
 
 
 class Fisher_reaction(object):
-    """
-    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
+    r"""
+    Helper class to generate residual and Jacobian matrix for ``PETSc``'s nonlinear solver SNES.
+
+    Parameters
+    ----------
+    da : DMDA object
+        Object of ``PETSc``.
+    prob : problem instance
+        Contains problem information for ``PETSc``.
+    factor : float
+        Temporal factor :math:`\Delta t Q_\Delta`.
+    dx : float
+        Grid spacing in x direction.
+
+    Attributes
+    ----------
+    localX : PETSc vector object
+        Local vector for ``PETSc``.
     """
 
     def __init__(self, da, prob, factor):
-        """
-        Initialization routine
-
-        Args:
-            da: DMDA object
-            prob: problem instance
-            factor: temporal factor (dt*Qd)
-            dx: grid spacing in x direction
-        """
+        """Initialization routine"""
         assert da.getDim() == 1
         self.da = da
         self.prob = prob
@@ -121,18 +157,23 @@ class Fisher_reaction(object):
         self.localX = da.createLocalVec()
 
     def formFunction(self, snes, X, F):
-        """
-        Function to evaluate the residual for the Newton solver
+        r"""
+        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS
+        in the solution.
 
-        This function should be equal to the RHS in the solution
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        F : PETSc vector object
+            Output vector :math:`F(X)`.
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            F: output vector F(X)
-
-        Returns:
-            None (overwrites F)
+        Returns
+        -------
+        None
+            Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -147,16 +188,23 @@ class Fisher_reaction(object):
 
     def formJacobian(self, snes, X, J, P):
         """
-        Function to return the Jacobian matrix
+        Function to return the Jacobian matrix.
 
-        Args:
-            snes: nonlinear solver object
-            X: input vector
-            J: Jacobian matrix (current?)
-            P: Jacobian matrix (new)
+        Parameters
+        ----------
+        snes : PETSc solver object
+            Nonlinear solver object.
+        X : PETSc vector object
+            Input vector.
+        J : PETSc matrix object
+            Current Jacobian matrix.
+        P : PETSc matrix object
+            New Jacobian matrix.
 
-        Returns:
-            matrix status
+        Returns
+        -------
+        PETSc.Mat.Structure.SAME_NONZERO_PATTERN
+            Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
@@ -179,8 +227,81 @@ class Fisher_reaction(object):
 
 
 class petsc_fisher_multiimplicit(ptype):
-    """
-    Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc
+    r"""
+    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
+    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
+    problem [1]_ using periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)
+
+    with exact solution
+
+    .. math::
+        u(x, 0) = \left[
+                1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+            \right]^{-2 / \nu}
+
+    for :math:`x \in \mathbb{R}`, and
+
+    .. math::
+        \sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},
+
+    .. math::
+        \lambda_1 = \frac{\lambda_0}{2} \left[
+            \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
+        \right].
+
+    This class is implemented to be solved in spatial using ``PETSc`` [2]_, [3]_. For time-stepping, the problem will be solved
+    *multi-implicitly*.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Spatial resolution.
+    lambda0 : float, optional
+        Problem parameter : math:`\lambda_0`.
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    interval : tuple, optional
+        Defines the spatial domain.
+    comm : PETSc.COMM_WORLD, optional
+        Communicator for PETSc.
+    lsol_tol : float, optional
+        Tolerance for linear solver to terminate.
+    nlsol_tol : float, optional
+        Tolerance for nonlinear solver to terminate.
+    lsol_maxiter : int, optional
+        Maximum number of iterations for linear solver.
+    nlsol_maxiter : int, optional
+        Maximum number of iterations for nonlinear solver.
+
+    Attributes
+    ----------
+    dx : float
+        Mesh grid width.
+    xs, xe : int
+        Define the ranges.
+    A : PETSc matrix object
+        Discretization matrix.
+    localX : PETSc vector object
+        Local vector for solution.
+    ksp : PETSc solver object
+        Linear solver object.
+    snes : PETSc solver object
+        Nonlinear solver object.
+    F : PETSc vector object
+        Global vector.
+    J : PETSc matrix object
+        Jacobi matrix.
+
+    References
+    ----------
+    .. [1] Z. Feng. Traveling wave behavior for a generalized fisher equation. Chaos Solitons Fractals 38(2),
+        481–488 (2008).
+    .. [2] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).
+    .. [3] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,
+        Alejandro Cosimo. Advances in Water Resources (2011).
     """
 
     dtype_u = petsc_vec
@@ -198,11 +319,7 @@ class petsc_fisher_multiimplicit(ptype):
         lsol_maxiter=None,
         nlsol_maxiter=None,
     ):
-        """
-        Initialization routine
-
-        TODO : doku
-        """
+        """Initialization routine"""
         # create DMDA object which will be used for all grid operations
         da = PETSc.DMDA().create([nvars], dof=1, stencil_width=1, comm=comm)
 
@@ -264,11 +381,13 @@ class petsc_fisher_multiimplicit(ptype):
         self.J = self.init.createMatrix()
 
     def __get_A(self):
-        """
-        Helper function to assemble PETSc matrix A
+        r"""
+        Helper function to assemble ``PETSc`` matrix A.
 
-        Returns:
-            PETSc matrix object
+        Returns
+        -------
+        A : PETSc matrix object
+            Discretization matrix.
         """
         # create matrix and set basic options
         A = self.init.createMatrix()
@@ -303,10 +422,17 @@ class petsc_fisher_multiimplicit(ptype):
 
     def get_sys_mat(self, factor):
         """
-        Helper function to assemble the system matrix of the linear problem
+        Helper function to assemble the system matrix of the linear problem.
 
-        Returns:
-            PETSc matrix object
+        Parameters
+        ----------
+        factor : float
+            Factor to define the system matrix.
+
+        Returns
+        -------
+        A : PETSc matrix object
+           Matrix for the system to solve.
         """
 
         # create matrix and set basic options
@@ -342,14 +468,19 @@ class petsc_fisher_multiimplicit(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -368,17 +499,24 @@ class petsc_fisher_multiimplicit(ptype):
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
-        """
-        Linear solver for (I-factor*A)u = rhs
+        r"""
+        Linear solver for :math:`(I - factor \cdot A)\vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)
@@ -392,17 +530,24 @@ class petsc_fisher_multiimplicit(ptype):
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
-        """
-        Nonlinear solver for (I-factor*F)(u) = rhs
+        r"""
+        Nonlinear solver for :math:`(I - factor \cdot F)(\vec{u}) = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)
@@ -422,14 +567,18 @@ class petsc_fisher_multiimplicit(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution.
         """
 
         lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
@@ -447,22 +596,52 @@ class petsc_fisher_multiimplicit(ptype):
 
 
 class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
-    """
-    Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
+    r"""
+    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
+    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
+    problem [1]_ using periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)
+
+    with exact solution
+
+    .. math::
+        u(x, 0) = \left[
+                1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+            \right]^{-2 / \nu}
+
+    for :math:`x \in \mathbb{R}`, and
+
+    .. math::
+        \sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},
+
+    .. math::
+        \lambda_1 = \frac{\lambda_0}{2} \left[
+            \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
+        \right].
+
+    This class is implemented to be solved in spatial using ``PETSc`` [2]_, [3]_. For time-stepping, the problem is treated
+    *fully-implicitly*.
     """
 
     dtype_f = petsc_vec
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -478,17 +657,24 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Nonlinear solver for (I-factor*F)(u) = rhs
+        r"""
+        Nonlinear solver for :math:`(I - factor \cdot F)(\vec{u}) = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)
@@ -508,22 +694,52 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
 
 
 class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
-    """
-    Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
+    r"""
+    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
+    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
+    problem [1]_ using periodic boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)
+
+    with exact solution
+
+    .. math::
+        u(x, 0) = \left[
+                1 + \left(2^{\nu / 2} - 1\right) \exp\left(-(\nu / 2)\sigma_1 x + 2 \lambda_1 t\right)
+            \right]^{-2 / \nu}
+
+    for :math:`x \in \mathbb{R}`, and
+
+    .. math::
+        \sigma_1 = \lambda_1 - \sqrt{\lambda_1^2 - \lambda_0^2},
+
+    .. math::
+        \lambda_1 = \frac{\lambda_0}{2} \left[
+            \left(1 + \frac{\nu}{2}\right)^{1/2} + \left(1 + \frac{\nu}{2}\right)^{-1/2}
+        \right].
+
+    This class is implemented to be solved in spatial using ``PETSc`` [2]_, [3]_. For time-stepping, the problem here will be
+    solved in a *semi-implicit* way.
     """
 
     dtype_f = petsc_vec_imex
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            Right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -542,17 +758,24 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor \cdot A)\vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         me = self.dtype_u(u0)

@@ -11,26 +11,74 @@ from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cup
 
 
 class allencahn_fullyimplicit(ptype):  # pragma: no cover
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
 
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated *fully-implicitly*, i.e., the nonlinear system is solved by Newton.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
+
+    Parameters
+    ----------
+    nvars : tuple of int, optional
+        Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
+    nu : float, optional
+        Problem parameter :math:`\nu`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    newton_maxiter : int, optional
+        Maximum number of iterations for the Newton solver.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate.
+    lin_tol : float, optional
+        Tolerance for linear solver to terminate.
+    lin_maxiter : int, optional
+        Maximum number of iterations for the linear solver.
+    radius : float, optional
+        Radius of the circles.
+
+    Attributes
+    ----------
+    A : scipy.spdiags
+        Second-order FD discretization of the 2D laplace operator.
+    dx : float
+        Distance between two spatial nodes (same for both directions).
+    xvalues : np.1darray
+        Spatial grid points, here both dimensions have the same grid points.
+    newton_itercount : int
+        Number of iterations of Newton solver.
+    lin_itercount
+        Number of iterations of linear solver.
+    newton_ncalls : int
+        Number of calls of Newton solver.
+    lin_ncalls : int
+        Number of calls of linear solver.
     """
 
     dtype_u = cupy_mesh
     dtype_f = cupy_mesh
 
-    def __init__(self, nvars, nu, eps, newton_maxiter, newton_tol, lin_tol, lin_maxiter, radius):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: cupy_mesh data type (will be passed parent class)
-            dtype_f: cupy_mesh data type (will be passed parent class)
-        """
+    def __init__(
+        self,
+        nvars=(128, 128),
+        nu=2,
+        eps=0.04,
+        newton_maxiter=1e-12,
+        newton_tol=100,
+        lin_tol=1e-8,
+        lin_maxiter=100,
+        radius=0.25,
+    ):
+        """Initialization routine"""
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % nvars)
@@ -67,14 +115,19 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     @staticmethod
     def __get_A(N, dx):
         """
-        Helper function to assemble FD matrix A in sparse format
+        Helper function to assemble FD matrix A in sparse format.
 
-        Args:
-            N (list): number of dofs
-            dx (float): distance between two spatial nodes
+        Parameters
+        ----------
+        N : list
+            Number of degrees of freedom.
+        dx : float
+            Distance between two spatial nodes.
 
-        Returns:
-             cupyx.scipy.sparse.csr_matrix: cupy-matrix A in CSR format
+        Returns
+        -------
+        A : cupyx.scipy.sparse.csr_matrix
+            CuPy-matrix A in CSR format.
         """
 
         stencil = cp.asarray([-2, 1])
@@ -91,16 +144,23 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -146,14 +206,19 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -162,14 +227,18 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The exact solution.
         """
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
@@ -182,22 +251,41 @@ class allencahn_fullyimplicit(ptype):  # pragma: no cover
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated in a *semi-implicit* way, i.e., the linear system containing the Laplacian is solved by the
+    conjugate gradients method, and the system containing the rest of the right-hand side is only evaluated at each time.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
     """
 
     dtype_f = imex_cupy_mesh
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -207,17 +295,24 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         return f
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         class context:
@@ -248,22 +343,42 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
+    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is only evaluated at each time.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
     """
 
     dtype_f = imex_cupy_mesh
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -274,16 +389,23 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -330,22 +452,41 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
+    r"""
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. Initial condition are circles of the form
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math::`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
+    treated in *multi-implicit* fashion, i.e., the nonlinear system containing the second order term is solved by the
+    conjugate gradients method, and the system containing the rest of the right-hand side will be solved by Newton's method.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
     """
 
     dtype_f = comp2_cupy_mesh
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -355,17 +496,24 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         class context:
@@ -395,16 +543,23 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
     def solve_system_2(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -451,22 +606,42 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
-    """
-    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
+    r"""
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+
+    .. math::
+        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+
+    for constant parameter :math:`\nu`. The initial condition has the form of circles
+
+    .. math::
+        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+
+    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
+    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is solved by a linear solver provided by a ``SciPy`` routine.
+
+    This class is especially developed for solving it on GPUs using ``CuPy``.
     """
 
     dtype_f = comp2_cupy_mesh
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed (not used here).
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
@@ -477,16 +652,23 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
-        Simple Newton solver
+        Simple Newton solver.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (required here for the BC)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (required here for the BC).
 
-        Returns:
-            dtype_u: solution u
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         u = self.dtype_u(u0).flatten()
@@ -531,17 +713,24 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-factor*A)u = rhs
+        r"""
+        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver.
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = self.dtype_u(self.init)

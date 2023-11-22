@@ -9,30 +9,76 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 
 # noinspection PyUnusedLocal
 class fenics_heat_weak_fullyimplicit(ptype):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation
+    r"""
+    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
-    Attributes:
-        V: function space
-        w: function for weak form
-        a_K: weak form of RHS (incl. BC)
-        M: mass matrix for FEM
-        g: forcing term
-        bc: boundary conditions
+    .. math::
+        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
+
+    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+
+    .. math::
+        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
+
+    The exact solution of the problem is
+
+    .. math::
+        u(x, t) = \sin(\pi x)\cos(t).
+
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
+    is reformulated to the *weak formulation*
+
+    .. math:
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
+
+    The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver provided by the routine
+    ``df.NonlinearVariationalSolver``.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is ``'CG'``, which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    w : Function
+        Function for the weak form.
+    a_K : scalar, vector, matrix or higher rank tensor
+        The expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx` (incl. BC).
+    M : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`\int_\Omega u_t v\,dx`.
+    g : Expression
+        The forcing term :math:`f` in the heat equation.
+    bc : DirichletBC
+        Denotes the Dirichlet boundary conditions.
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh
     dtype_f = fenics_mesh
 
-    def __init__(self, c_nvars, t0, family, order, refinements, nu):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data type (will be passed to parent class)
-        """
+    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
+        """Initialization routine"""
 
         # define the Dirichlet boundary
         def Boundary(x, on_boundary):
@@ -87,14 +133,18 @@ class fenics_heat_weak_fullyimplicit(ptype):
         self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
     def __invert_mass_matrix(self, u):
-        """
-        Helper routine to invert mass matrix
+        r"""
+        Helper routine to invert mass matrix.
 
-        Args:
-            u (dtype_u): current values
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            dtype_u: inv(M)*u
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M^{-1} \vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -109,17 +159,24 @@ class fenics_heat_weak_fullyimplicit(ptype):
         return me
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Dolfin's weak solver for (M-dtA)u = rhs
+        r"""
+        Dolfin's weak solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)
-            t (float): current time
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        sol : dtype_u
+            Solution.
         """
 
         sol = self.dtype_u(self.V)
@@ -152,14 +209,19 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         self.g.t = t
@@ -174,14 +236,18 @@ class fenics_heat_weak_fullyimplicit(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution.
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
@@ -192,30 +258,79 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
 
 class fenics_heat_weak_imex(ptype):
-    """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation, IMEX
+    r"""
+    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
-    Attributes:
-        V: function space
-        w: function for weak form
-        a_K: weak form of RHS (incl. BC)
-        M: mass matrix for FEM
-        g: forcing term
-        bc: boundary conditions
+    .. math::
+        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
+
+    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+
+    .. math::
+        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
+
+    The exact solution of the problem is
+
+    .. math::
+        u(x, t) = \sin(\pi x)\cos(t).
+
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
+    is reformulated to the *weak formulation*
+
+    .. math:
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
+
+    The problem is solved in a *semi-explicit* way, i.e., the part containing the forcing term is treated explicitly, where
+    it is interpolated in the function space. The first expression in the right-hand side of the weak formulations is solved
+    implicitly.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Spatial resolution, i.e., numbers of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is ``'CG'``, which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    u : TrialFunction
+        The unknown function of the problem.
+    v : TestFunction
+        The test function for the weak form.
+    a_K : scalar, vector, matrix or higher rank tensor
+        The expression :math:`- \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx` (incl. BC).
+    M : scalar, vector, matrix or higher rank tensor
+        Denotes the expression :math:`\int_\Omega u_t v\,dx`.
+    g : Expression
+        The forcing term :math:`f` in the heat equation.
+    bc : DirichletBC
+        Denotes the Dirichlet boundary conditions.
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
 
     dtype_u = fenics_mesh
     dtype_f = rhs_fenics_mesh
 
-    def __init__(self, c_nvars, t0, family, order, refinements, nu):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
-        """
+    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
+        """Initialization routine"""
 
         # define the Dirichlet boundary
         def Boundary(x, on_boundary):
@@ -266,14 +381,18 @@ class fenics_heat_weak_imex(ptype):
         self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
     def __invert_mass_matrix(self, u):
-        """
-        Helper routine to invert mass matrix
+        r"""
+        Helper routine to invert mass matrix.
 
-        Args:
-            u (dtype_u): current values
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            dtype_u: inv(M)*u
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M^{-1} \vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -287,17 +406,24 @@ class fenics_heat_weak_imex(ptype):
         return me
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Dolfin's weak solver for (M-dtA)u = rhs
+        r"""
+        Dolfin's weak solver for :math:`(M - factor \cdot A)\vec{u} = \vec{u}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)
-            t (float): current time
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        sol : dtype_u
+            Solution.
         """
 
         sol = self.dtype_u(u0)
@@ -308,14 +434,19 @@ class fenics_heat_weak_imex(ptype):
 
     def __eval_fexpl(self, u, t):
         """
-        Helper routine to evaluate the explicit part of the RHS
+        Helper routine to evaluate the explicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values (not used here)
-            t (fliat): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution (not used here).
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            explicit part of RHS
+        Returns
+        -------
+        fexpl : dtype_u
+            Explicit part of the right-hand side.
         """
 
         self.g.t = t
@@ -325,14 +456,19 @@ class fenics_heat_weak_imex(ptype):
 
     def __eval_fimpl(self, u, t):
         """
-        Helper routine to evaluate the implicit part of the RHS
+        Helper routine to evaluate the implicit part of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time (not used here)
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed (not used here).
 
-        Returns:
-            implicit part of RHS
+        Returns
+        -------
+        fimpl : dtype_u
+            Implicit part of the right-hand side.
         """
 
         tmp = self.dtype_u(self.V)
@@ -343,14 +479,19 @@ class fenics_heat_weak_imex(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.V)
@@ -359,14 +500,18 @@ class fenics_heat_weak_imex(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution.
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)

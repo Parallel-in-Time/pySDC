@@ -32,6 +32,7 @@ class LogError(hooks):
 
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
@@ -41,12 +42,13 @@ class LogError(hooks):
         )
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type=f"e_global_rel{suffix}",
-            value=abs((u_ref - L.uend / u_ref)),
+            type=f'e_global_rel{suffix}',
+            value=abs(u_ref - L.uend) / abs(u_ref),
         )
 
     def log_local_error(self, step, level_number, suffix=""):
@@ -65,14 +67,29 @@ class LogError(hooks):
 
         L.sweep.compute_end_point()
 
+        value = abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend)
+
         self.add_to_stats(
             process=step.status.slot,
+            process_sweeper=L.sweep.rank,
             time=L.time + L.dt,
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type=f"e_local{suffix}",
-            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend),
+            type=f'e_local{suffix}',
+            value=value,
+        )
+
+        self.logger.debug(
+            'Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Sweep: %2i -- '
+            'local_error: %12.8e',
+            step.status.slot,
+            L.time,
+            step.status.stage,
+            L.level_index,
+            step.status.iter,
+            L.status.sweep,
+            value,
         )
 
 
@@ -82,6 +99,25 @@ class LogGlobalErrorPostStep(LogError):
         self.log_global_error(step, level_number, "_post_step")
 
 
+class LogGlobalErrorPostIter(LogError):
+    """
+    Log the global error after each iteration
+    """
+
+    def post_iteration(self, step, level_number):
+        """
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
+        super().post_iteration(step, level_number)
+
+        self.log_global_error(step, level_number, suffix='_post_iteration')
+
+
 class LogGlobalErrorPostRun(hooks):
     """
     Compute the global error once after the run is finished.
@@ -89,10 +125,7 @@ class LogGlobalErrorPostRun(hooks):
     The issue is that the convergence controllers can change the step size after the final iteration but before the
     `post_run` functions of the hooks are called, which results in a mismatch of `L.time + L.dt` as corresponding to
     when the solution is computed and when the error is computed. The issue is resolved by recording the time at which
-    the solution is computed in a private attribute of this class.
-
-    There is another issue: The MPI controller instantiates a step after the run is completed, meaning the final
-    solution is not accessed by computing the end point, but by using the initial value on the finest level.
+    the solution is computed in an attribute of this class.
     Additionally, the number of restarts is reset, which we need to filter recomputed values in post processing.
     For this reason, we need to mess with the private `__num_restarts` of the core Hooks class.
     """
@@ -133,19 +166,20 @@ class LogGlobalErrorPostRun(hooks):
         Returns:
             None
         """
-        super().post_step(step, level_number)
+        super().post_run(step, level_number)
         self._hooks__num_restarts = self.num_restarts
 
         if level_number == 0 and step.status.last:
             L = step.levels[level_number]
 
-            u_num = self.get_final_solution(L)
+            u_num = L.uend
             u_ref = L.prob.u_exact(t=self.t_last_solution)
 
             self.logger.info(f"Finished with a global error of e={abs(u_num-u_ref):.2e}")
 
             self.add_to_stats(
                 process=step.status.slot,
+                process_sweeper=L.sweep.rank,
                 time=self.t_last_solution,
                 level=L.level_index,
                 iter=step.status.iter,
@@ -155,45 +189,14 @@ class LogGlobalErrorPostRun(hooks):
             )
             self.add_to_stats(
                 process=step.status.slot,
+                process_sweeper=L.sweep.rank,
                 time=self.t_last_solution,
                 level=L.level_index,
                 iter=step.status.iter,
                 sweep=L.status.sweep,
-                type="e_global_rel_post_run",
+                type='e_global_rel_post_run',
                 value=abs(u_num - u_ref) / abs(u_ref),
             )
-
-    def get_final_solution(self, lvl):
-        """
-        Get the final solution from the level
-
-        Args:
-            lvl (pySDC.Level.level): The level
-        """
-        return lvl.uend
-
-
-class LogGlobalErrorPostRunMPI(LogGlobalErrorPostRun):
-    """
-    The MPI controller shows slightly different behaviour which is why the final solution is stored in a different place
-    than in the nonMPI controller.
-    """
-
-    def __init__(self):
-        super().__init__()
-
-    def post_step(self, step, level_number):
-        super().post_step(step, level_number)
-        self.num_restarts = self._hooks__num_restarts
-
-    def get_final_solution(self, lvl):
-        """
-        Get the final solution from the level
-
-        Args:
-            lvl (pySDC.Level.level): The level
-        """
-        return lvl.u[0]
 
 
 class LogLocalErrorPostStep(LogError):

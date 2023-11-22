@@ -11,40 +11,94 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
 
 # noinspection PyUnusedLocal
 class fenics_grayscott(ptype):
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the
+    system with a test function :math:`q`:
+
+    .. math::
+        \int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,
+
+    .. math::
+        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,
+
+    The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.
+
+    Parameters
+    ----------
+    c_nvars : int, optional
+        Spatial resolution, i.e., number of degrees of freedom in space.
+    t0 : float, optional
+        Starting time.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is ``'CG'``, which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : list or tuple, optional
+        Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
+        ``refinements=[2, 2]`` or ``refinements=(2, 2)``.
+    Du : float, optional
+        Diffusion rate for :math:`u`.
+    Dv: float, optional
+        Diffusion rate for :math:`v`.
+    A : float, optional
+        Feed rate for :math:`v`.
+    B : float, optional
+        Overall decay rate for :math:`u`.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    w : Function
+        Function for the right-hand side.
+    w1 : Function
+        Split of w, part 1.
+    w2 : Function
+        Split of w, part 2.
+    F1 : scalar, vector, matrix or higher rank tensor
+        Weak form of right-hand side, first part.
+    F2 : scalar, vector, matrix or higher rank tensor
+        Weak form of right-hand side, second part.
+    F : scalar, vector, matrix or higher rank tensor
+        Weak form of full right-hand side.
+    M : matrix
+        Full mass matrix for both parts.
+
+    References
+    ----------
+    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [2] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [3] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
     """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
-    Attributes:
-        V: function space
-        w: function for the RHS
-        w1: split of w, part 1
-        w2: split of w, part 2
-        F1: weak form of RHS, first part
-        F2: weak form of RHS, second part
-        F: weak form of RHS, full
-        M: full mass matrix for both parts
-    """
+    dtype_u = fenics_mesh
+    dtype_f = fenics_mesh
 
-    def __init__(self, problem_params, dtype_u=fenics_mesh, dtype_f=fenics_mesh):
-        """
-        Initialization routine
+    def __init__(self, c_nvars=256, t0=0.0, family='CG', order=4, refinements=None, Du=1.0, Dv=0.01, A=0.09, B=0.086):
+        """Initialization routine"""
 
-        Args:
-            problem_params: custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data data type (will be passed to parent class)
-        """
+        if refinements is None:
+            refinements = [1, 0]
 
         # define the Dirichlet boundary
         def Boundary(x, on_boundary):
             return on_boundary
-
-        # these parameters will be used later, so assert their existence
-        essential_keys = ['c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B']
-        for key in essential_keys:
-            if key not in problem_params:
-                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                raise ParameterError(msg)
 
         # set logger level for FFC and dolfin
         df.set_log_level(df.WARNING)
@@ -55,17 +109,19 @@ class fenics_grayscott(ptype):
         df.parameters["form_compiler"]["cpp_optimize"] = True
 
         # set mesh and refinement (for multilevel)
-        mesh = df.IntervalMesh(problem_params['c_nvars'], 0, 100)
-        for _ in range(problem_params['refinements']):
+        mesh = df.IntervalMesh(c_nvars, 0, 100)
+        for _ in range(refinements):
             mesh = df.refine(mesh)
 
         # define function space for future reference
-        V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
+        V = df.FunctionSpace(mesh, family, order)
         self.V = V * V
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_grayscott, self).__init__(self.V, dtype_u, dtype_f, problem_params)
-
+        # invoke super init, passing number of dofs
+        super(fenics_grayscott).__init__(V)
+        self._makeAttributeAndRegister(
+            'c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True
+        )
         # rhs in weak form
         self.w = df.Function(self.V)
         q1, q2 = df.TestFunctions(self.V)
@@ -73,14 +129,14 @@ class fenics_grayscott(ptype):
         self.w1, self.w2 = df.split(self.w)
 
         self.F1 = (
-            -self.params.Du * df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1))
+            -self.Du * df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1))
             - self.w1 * (self.w2**2) * q1
-            + self.params.A * (1 - self.w1) * q1
+            + self.A * (1 - self.w1) * q1
         ) * df.dx
         self.F2 = (
-            -self.params.Dv * df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2))
+            -self.Dv * df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2))
             + self.w1 * (self.w2**2) * q2
-            - self.params.B * self.w2 * q2
+            - self.B * self.w2 * q2
         ) * df.dx
         self.F = self.F1 + self.F2
 
@@ -93,14 +149,18 @@ class fenics_grayscott(ptype):
         self.M = M1 + M2
 
     def __invert_mass_matrix(self, u):
-        """
-        Helper routine to invert mass matrix
+        r"""
+        Helper routine to invert mass matrix.
 
-        Args:
-            u (dtype_u): current values
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
 
-        Returns:
-            dtype_u: inv(M)*u
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M^{-1} \vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -113,17 +173,24 @@ class fenics_grayscott(ptype):
         return me
 
     def solve_system(self, rhs, factor, u0, t):
-        """
-        Dolfin's linear solver for (M-factor*A)u = rhs
+        r"""
+        Dolfin's linear solver for :math:`(M - factor \cdot A) \vec{u} = \vec{rhs}`.
 
-        Args:
-            rhs (dtype_f): right-hand side for the nonlinear system
-            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            Solution as mesh.
         """
 
         sol = self.dtype_u(self.V)
@@ -157,14 +224,19 @@ class fenics_grayscott(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate both parts of the right-hand side.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS divided into two parts
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
         """
 
         f = self.dtype_f(self.V)
@@ -177,14 +249,18 @@ class fenics_grayscott(ptype):
         return f
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
+        r"""
+        Routine to compute the exact solution at time :math:`t`.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution (only at :math:`t_0 = 0.0`).
         """
 
         class InitialConditions(df.Expression):

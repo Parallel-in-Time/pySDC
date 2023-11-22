@@ -14,20 +14,6 @@ class EstimateEmbeddedError(ConvergenceController):
     you make sure your preconditioner is compatible, which you have to just try out...
     """
 
-    def __init__(self, controller, params, description, **kwargs):
-        """
-        Initialisation routine. Add the hook for recording the local error.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): Parameters for the convergence controller
-            description (dict): The description object used to instantiate the controller
-        """
-        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
-
-        super().__init__(controller, params, description, **kwargs)
-        controller.add_hook(LogEmbeddedErrorEstimate)
-
     @classmethod
     def get_implementation(cls, flavor='standard', useMPI=False):
         """
@@ -63,7 +49,11 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             dict: Updated parameters
         """
-        sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__bases__ else 'SDC'
+        sweeper_type = 'SDC'
+        if RungeKutta in description['sweeper_class'].__mro__:
+            sweeper_type = 'RK'
+        elif 'SweeperMPI' in [me.__name__ for me in description['sweeper_class'].__mro__]:
+            sweeper_type = 'MPI'
         return {
             "control_order": -80,
             "sweeper_type": sweeper_type,
@@ -72,7 +62,8 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def dependencies(self, controller, description, **kwargs):
         """
-        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta
+        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta.
+        Add the hook for recording the error.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -83,6 +74,10 @@ class EstimateEmbeddedError(ConvergenceController):
         """
         if RungeKutta not in description["sweeper_class"].__bases__:
             controller.add_convergence_controller(StoreUOld, description=description)
+
+        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+
+        controller.add_hook(LogEmbeddedErrorEstimate)
         return None
 
     def estimate_embedded_error_serial(self, L):
@@ -103,10 +98,13 @@ class EstimateEmbeddedError(ConvergenceController):
         elif self.params.sweeper_type == "SDC":
             # order rises by one between sweeps, making this so ridiculously easy
             return abs(L.uold[-1] - L.u[-1])
+        elif self.params.sweeper_type == 'MPI':
+            comm = L.sweep.comm
+            return comm.bcast(abs(L.uold[comm.rank + 1] - L.u[comm.rank + 1]), root=comm.size - 1)
         else:
             raise NotImplementedError(
                 f"Don't know how to estimate embedded error for sweeper type \
-{self.params.sweeper_type}"
+\"{self.params.sweeper_type}\""
             )
 
     def setup_status_variables(self, controller, **kwargs):
@@ -148,6 +146,7 @@ class EstimateEmbeddedError(ConvergenceController):
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
             for L in S.levels:
                 L.status.error_embedded_estimate = max([self.estimate_embedded_error_serial(L), np.finfo(float).eps])
+                self.debug(f'L.status.error_embedded_estimate={L.status.error_embedded_estimate:.5e}', S)
 
         return None
 
@@ -164,6 +163,23 @@ class EstimateEmbeddedErrorLinearizedNonMPI(EstimateEmbeddedError):
         """
         super().__init__(controller, params, description, **kwargs)
         self.buffers = Pars({'e_em_last': 0.0})
+
+    def setup(self, controller, params, description, **kwargs):
+        """
+        Add option for averaging the local errors.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters
+        """
+        return {
+            'averaged': False,
+            **super().setup(controller, params, description, **kwargs),
+        }
 
     def reset_buffers_nonMPI(self, controller, **kwargs):
         """
@@ -197,11 +213,19 @@ level"
             )
 
         if S.status.iter > 0 or self.params.sweeper_type == "RK":
+            if self.params.averaged:
+                averaging = float(S.status.slot + 1)
+            else:
+                averaging = 1.0
+
             for L in S.levels:
                 temp = self.estimate_embedded_error_serial(L)
-                L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
+                L.status.error_embedded_estimate = max(
+                    [abs(temp - self.buffers.e_em_last) / averaging, np.finfo(float).eps]
+                )
 
-            self.buffers.e_em_last = temp * 1.0
+            if not self.params.averaged:
+                self.buffers.e_em_last = temp * 1.0
 
         return None
 
@@ -301,6 +325,9 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
         controller.add_convergence_controller(
             AdaptiveCollocation, params=self.params.adaptive_coll_params, description=description
         )
+        from pySDC.implementations.hooks.log_embedded_error_estimate import LogEmbeddedErrorEstimate
+
+        controller.add_hook(LogEmbeddedErrorEstimate)
 
     def post_iteration_processing(self, controller, step, **kwargs):
         """

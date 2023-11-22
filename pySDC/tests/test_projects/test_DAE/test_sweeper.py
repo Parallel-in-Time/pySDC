@@ -161,7 +161,7 @@ def test_compute_end_point_main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['quad_type'] = 'RADAU-LEFT'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['initial_guess'] = 'zero'
 
@@ -191,4 +191,5 @@ def test_compute_end_point_main():
     # computer end point
     L.sweep.compute_end_point()
 
-    assert np.array_equal(L.uend, L.u[0]), "ERROR: end point not computed correctly"
+    for m in range(1, L.sweep.coll.num_nodes):
+        assert np.array_equal(L.u[m], L.uend), "ERROR: end point not computed correctly"

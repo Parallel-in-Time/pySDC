@@ -1,6 +1,8 @@
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.projects.compression.compressed_mesh import compressed_mesh
 import numpy as np
+
+np.bool = np.bool_
 import libpressio
 
 

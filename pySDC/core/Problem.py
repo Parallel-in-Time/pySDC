@@ -32,6 +32,12 @@ class WorkCounter(object):
         # *args and **kwargs are necessary for gmres
         self.niter += 1
 
+    def decrement(self):
+        self.niter -= 1
+
+    def __str__(self):
+        return f'{self.niter}'
+
 
 class ptype(RegisterParams):
     """
@@ -69,6 +75,10 @@ class ptype(RegisterParams):
     def f_init(self):
         """Generate a data variable for RHS"""
         return self.dtype_f(self.init)
+
+    @classmethod
+    def get_default_sweeper_class(cls):
+        raise NotImplementedError(f'No default sweeper class implemented for {cls} problem!')
 
     def eval_f(self, u, t):
         """

@@ -7,14 +7,33 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 
 # noinspection PyUnusedLocal
 class harmonic_oscillator(ptype):
-    """
-    Example implementing the harmonic oscillator
+    r"""
+    Example implementing the harmonic oscillator with mass :math:`1`
+
+    .. math::
+        \frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},
+
+    which is a second-order problem. The unknown function :math:`x` denotes the position of the mass, and the
+    derivative is the velocity. :math:`\mu` defines the damping and :math:`k` is the spring constant.
+
+    Parameters
+    ----------
+    k : float, optional
+        Spring constant :math:`k`.
+    mu : float, optional
+        Damping parameter :math:`\mu`.
+    u0 : tuple, optional
+        Initial condition for the position, and the velocity. Should be a tuple, e.g. ``u0=(1, 0)``.
+    phase : float, optional
+        Phase of the oscillation.
+    amp : float, optional
+        Amplitude of the oscillation.
     """
 
     dtype_u = particles
     dtype_f = acceleration
 
-    def __init__(self, k, mu=0.0, u0=(1, 0), phase=1.0, amp=0.0):
+    def __init__(self, k=1.0, mu=0.0, u0=(1, 0), phase=0.0, amp=1.0):
         """Initialization routine"""
         # invoke super init, passing nparts, dtype_u and dtype_f
         u0 = np.asarray(u0)
@@ -23,19 +42,28 @@ class harmonic_oscillator(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to compute the RHS
+        Routine to compute the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): the particles
-            t (float): current time (not used here)
-        Returns:
-            dtype_f: RHS
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the particles.
+        t : float
+            Current time of the numerical solution is computed (not used here).
+
+        Returns
+        -------
+        me : dtype_f
+            The right-hand side of the problem.
         """
         me = self.dtype_f(self.init)
         me[:] = -self.k * u.pos - self.mu * u.vel
         return me
 
     def u_init(self):
+        """
+        Helper function to compute the initial condition for u.
+        """
         u0 = self.u0
 
         u = self.dtype_u(self.init)
@@ -46,13 +74,18 @@ class harmonic_oscillator(ptype):
         return u
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact trajectory at time t
+        r"""
+        Routine to compute the exact trajectory at time :math:`t`.
 
-        Args:
-            t (float): current time
-        Returns:
-            dtype_u: exact position and velocity
+        Parameters
+        ----------
+        t : float
+            Time of the exact trajectory.
+
+        Returns
+        -------
+        me : dtype_u
+            Exact position and velocity.
         """
         me = self.dtype_u(self.init)
         delta = self.mu / (2)
@@ -104,12 +137,17 @@ class harmonic_oscillator(ptype):
 
     def eval_hamiltonian(self, u):
         """
-        Routine to compute the Hamiltonian
+        Routine to compute the Hamiltonian.
 
-        Args:
-            u (dtype_u): the particles
-        Returns:
-            float: hamiltonian
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the particles.
+
+        Returns
+        -------
+        ham : float
+            The Hamiltonian.
         """
 
         ham = 0.5 * self.k * u.pos[0] ** 2 + 0.5 * u.vel[0] ** 2

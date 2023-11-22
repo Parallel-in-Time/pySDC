@@ -24,7 +24,13 @@ def test_schroedinger_fault_insertion():
     from pySDC.helpers.stats_helper import get_sorted
 
     fault_stuff = FaultInjector.generate_fault_stuff_single_fault(
-        bit=0, iteration=5, problem_pos=[20, 30], level_number=0, node=3, time=0.1
+        bit=0,
+        iteration=5,
+        problem_pos=[20, 30],
+        level_number=0,
+        node=3,
+        time=0.1,
+        rank=0,
     )
 
     stats, _, _ = run_Schroedinger(space_comm=MPI.COMM_WORLD, fault_stuff=fault_stuff)

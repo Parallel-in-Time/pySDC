@@ -1,54 +1,91 @@
 import numpy as np
 from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.core.Errors import ConvergenceError
 
 
 class LorenzAttractor(ptype):
-    """
+    r"""
     Simple script to run a Lorenz attractor problem.
 
-    The Lorenz attractor is a system of three ordinary differential equations that exhibits some chaotic behaviour.
-    It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to Tend = 100 or
-    so to see this with these initial conditions) and because of the chaotic nature.
+    The Lorenz attractor is a system of three ordinary differential equations (ODEs) that exhibits some chaotic behaviour.
+    It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to :math:`T_{end} = 100`
+    or so to see this with these initial conditions) and because of the chaotic nature.
+
+    Lorenz developed this system from equations modelling convection in a layer of fluid with the top and bottom surfaces
+    kept at different temperatures. In the notation used here, the first component of u is proportional to the convective
+    motion, the second component is proportional to the temperature difference between the surfaces and the third component
+    is proportional to the distortion of the vertical temperature profile from linearity.
+
+    See doi.org/10.1175/1520-0469(1963)020<0130:DNF>2.0.CO;2 for the original publication.
 
     Since the problem is non-linear, we need to use a Newton solver.
 
-    Problem and initial conditions do not originate from,
-    but were taken from doi.org/10.2140/camcos.2015.10.1
+    The system of ODEs is given by
 
-    TODO : add equations with parameters
+    .. math::
+        \frac{d y_1(t)}{dt} = \sigma (y_2 (t) - y_1 (t)),
+
+    .. math::
+        \frac{d y_2(t)}{dt} = \rho y_1 (t) - y_2 (t) - y_1 (t) y_3 (t),
+
+    .. math::
+        \frac{d y_3(t)}{dt} = y_1 (t) y_2 (t) - \beta y_3 (t)
+
+    with initial condition :math:`(y_1(0), y_2(0), y_3(0))^T = (1, 1, 1)^T` for :math:`t \in [0, 1]`. The problem parameters
+    for this problem are :math:`\sigma = 10`, :math:`\rho = 28` and :math:`\beta = 8/3`. Lorenz chose these parameters such
+    that the Reynolds number :math:`\rho` is slightly supercritical as to provoke instability of steady convection.
+
+    Parameters
+    ----------
+    sigma : float, optional
+        Parameter :math:`\sigma` of the problem.
+    rho : float, optional
+        Parameter :math:`\rho` of the problem.
+    beta : float, optional
+        Parameter :math:`\beta` of the problem.
+    newton_tol : float, optional
+        Tolerance for Newton for termination.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method.
+
+    Attributes
+    ----------
+    work_counter : dict
+        Counts the iterations/nfev (here for Newton's method and the nfev for the right-hand side).
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99):
-        """
-        Initialization routine
+    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99, stop_at_nan=True):
+        """Initialization routine"""
 
-        Args:
-            problem_params (dict): custom parameters for the example
-        """
         nvars = 3
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
-        self._makeAttributeAndRegister('nvars', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('nvars', 'stop_at_nan', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
-            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=True
+            'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=False
         )
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
         # abbreviations
         sigma = self.sigma
@@ -68,14 +105,21 @@ class LorenzAttractor(ptype):
         """
         Simple Newton solver for the nonlinear system.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            dt (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the local stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         # abbreviations
@@ -98,7 +142,13 @@ class LorenzAttractor(ptype):
 
             # compute the residual and determine if we are done
             res = np.linalg.norm(G, np.inf)
-            if res <= self.newton_tol or np.isnan(res):
+            if res <= self.newton_tol:
+                break
+            if np.isnan(res) and self.stop_at_nan:
+                self.logger.warning('Newton got nan after %i iterations...' % _n)
+                raise ConvergenceError('Newton got nan after %i iterations, aborting...' % _n)
+            elif np.isnan(res):
+                self.logger.warning('Newton got nan after %i iterations...' % _n)
                 break
 
             # assemble inverse of Jacobian J of G
@@ -138,24 +188,31 @@ class LorenzAttractor(ptype):
         return u
 
     def u_exact(self, t, u_init=None, t_init=None):
-        """
-        Routine to return initial conditions or to approximate exact solution using scipy.
+        r"""
+        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
 
-        Args:
-            t (float): current time
-            u_init (pySDC.implementations.problem_classes.Lorenz.dtype_u): initial conditions for getting the exact solution
-            t_init (float): the starting time
+        Parameters
+        ----------
+        t : float
+            Time at which the approximated exact solution is computed.
+        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            The approximated exact solution.
         """
+
         me = self.dtype_u(self.init)
 
         if t > 0:
 
             def eval_rhs(t, u):
-                """
-                Evaluate the right hand side, but switch the arguments for scipy.
+                r"""
+                Evaluate the right hand side, but switch the arguments for ``SciPy``.
 
                 Args:
                     t (float): Time

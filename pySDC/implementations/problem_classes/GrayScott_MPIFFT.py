@@ -11,24 +11,72 @@ from mpi4py_fft import newDistArray
 
 
 class grayscott_imex_diffusion(ptype):
-    """
-    Example implementing the Gray-Scott equation in 2-3D using mpi4py-fft for solving linear parts,
-    IMEX time-stepping (implicit diffusion, explicit reaction)
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model
 
-    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
-    Attributes:
-        fft: fft object
-        X: grid coordinates in real space
-        ndim: number of spatial dimensions
-        Ku: Laplace operator in spectral space (u component)
-        Kv: Laplace operator in spectral space (v component)
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    https://mpi4py-fft.readthedocs.io/en/latest/.
+
+    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and reaction
+    is computed in explicit fashion).
+
+    Parameters
+    ----------
+    nvars : tuple of int, optional
+        Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. ``nvars=(127, 127)``.
+    Du : float, optional
+        Diffusion rate for :math:`u`.
+    Dv: float, optional
+        Diffusion rate for :math:`v`.
+    A : float, optional
+        Feed rate for :math:`v`.
+    B : float, optional
+        Overall decay rate for :math:`u`.
+    spectral : bool, optional
+        If True, the solution is computed in spectral space.
+    L : int, optional
+        Denotes the period of the function to be approximated for the Fourier transform.
+    comm : COMM_WORLD, optional
+        Communicator for ``mpi4py-fft``.
+
+    Attributes
+    ----------
+    fft : PFFT
+        Object for parallel FFT transforms.
+    X : mesh-grid
+        Grid coordinates in real space.
+    ndim : int
+        Number of spatial dimensions.
+    Ku : matrix
+        Laplace operator in spectral space (u component).
+    Kv : matrix
+        Laplace operator in spectral space (v component).
+
+    References
+    ----------
+    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+        Journal of Parallel and Distributed Computing (2019).
+    .. [3] https://www.chebfun.org/examples/pde/GrayScott.html
     """
 
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(self, nvars=None, Du=1.0, Dv=0.01, A=0.09, B=0.086, spectral=None, L=2.0, comm=MPI.COMM_WORLD):
+        """Initialization routine"""
+        nvars = (127, 127) if nvars is None else nvars
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')
 
@@ -88,14 +136,19 @@ class grayscott_imex_diffusion(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -126,16 +179,23 @@ class grayscott_imex_diffusion(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part
+        Simple FFT solver for the diffusion part.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            Solution.
         """
 
         me = self.dtype_u(self.init)
@@ -154,14 +214,18 @@ class grayscott_imex_diffusion(ptype):
         return me
 
     def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t=0, see https://www.chebfun.org/examples/pde/GrayScott.html
+        r"""
+        Routine to compute the exact solution at time :math:`t = 0`, see [3]_.
 
-        Args:
-            t (float): current time
+        Parameters
+        ----------
+        t : float
+            Time of the exact solution.
 
-        Returns:
-            dtype_u: exact solution
+        Returns
+        -------
+        me : dtype_u
+            Exact solution.
         """
         assert t == 0.0, 'Exact solution only valid as initial condition'
         assert self.ndim == 2, 'The initial conditions are 2D for now..'
@@ -188,21 +252,48 @@ class grayscott_imex_diffusion(ptype):
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
-    def __init__(self, nvars, Du, Dv, A, B, spectral, L=2.0, comm=MPI.COMM_WORLD):
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model
+
+    .. math::
+        \frac{d u}{d t} = D_u \Delta u - u v^2 + A,
+
+    .. math::
+        \frac{d v}{d t} = D_v \Delta v + u v^2
+
+    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    https://mpi4py-fft.readthedocs.io/en/latest/.
+
+    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear
+    part is computed in an explicit way).
+    """
+
+    def __init__(self, nvars=None, Du=1.0, Dv=0.01, A=0.09, B=0.086, spectral=None, L=2.0, comm=MPI.COMM_WORLD):
+        """Initialization routine"""
+        nvars = (127, 127) if nvars is None else nvars
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         self.Ku -= self.A
         self.Kv -= self.B
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -233,23 +324,101 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
+    r"""
+    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+
+    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    https://mpi4py-fft.readthedocs.io/en/latest/.
+
+    This class implements the problem for *multi-implicit* time-stepping, i.e., both diffusion and reaction part will be treated
+    implicitly.
+
+    Parameters
+    ----------
+    nvars : tuple of int, optional
+        Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. ``nvars=(127, 127)``.
+    Du : float, optional
+        Diffusion rate for :math:`u`.
+    Dv: float, optional
+        Diffusion rate for :math:`v`.
+    A : float, optional
+        Feed rate for :math:`v`.
+    B : float, optional
+        Overall decay rate for :math:`u`.
+    spectral : bool, optional
+        If True, the solution is computed in spectral space.
+    L : int, optional
+        Denotes the period of the function to be approximated for the Fourier transform.
+    comm : COMM_WORLD, optional
+        Communicator for ``mpi4py-fft``.
+
+    Attributes
+    ----------
+    fft : PFFT
+        Object for parallel FFT transforms.
+    X : mesh-grid
+        Grid coordinates in real space.
+    ndim : int
+        Number of spatial dimensions.
+    Ku : matrix
+        Laplace operator in spectral space (u component).
+    Kv : matrix
+        Laplace operator in spectral space (v component).
+
+    References
+    ----------
+    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+        Journal of Parallel and Distributed Computing (2019).
+    """
+
     dtype_f = comp2_mesh
 
-    def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(
+        self,
+        nvars=None,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        spectral=None,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        L=2.0,
+        comm=MPI.COMM_WORLD,
+    ):
+        """Initialization routine"""
+        nvars = (127, 127) if nvars is None else nvars
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         # This may not run in parallel yet..
         assert self.comm.Get_size() == 1
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -280,16 +449,23 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
-        Solver for the first component, can just call the super function
+        Solver for the first component, can just call the super function.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = super(grayscott_mi_diffusion, self).solve_system(rhs, factor, u0, t)
@@ -297,16 +473,23 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     def solve_system_2(self, rhs, factor, u0, t):
         """
-        Newton-Solver for the second component
+        Newton-Solver for the second component.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
         u = self.dtype_u(u0)
 
@@ -388,23 +571,61 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 
 class grayscott_mi_linear(grayscott_imex_linear):
+    r"""
+    The original Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
+    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model
+
+    .. math::
+        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A,
+
+    .. math::
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2
+
+    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    https://mpi4py-fft.readthedocs.io/en/latest/.
+
+    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing
+    the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.
+    """
     dtype_f = comp2_mesh
 
-    def __init__(self, nvars, Du, Dv, A, B, spectral, newton_maxiter, newton_tol, L=2.0, comm=MPI.COMM_WORLD):
+    def __init__(
+        self,
+        nvars=None,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        spectral=None,
+        newton_maxiter=100,
+        newton_tol=1e-12,
+        L=2.0,
+        comm=MPI.COMM_WORLD,
+    ):
+        """Initialization routine"""
+        nvars = (127, 127) if nvars is None else nvars
         super().__init__(nvars, Du, Dv, A, B, spectral, L, comm)
         # This may not run in parallel yet..
         assert self.comm.Get_size() == 1
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the right-hand side of the problem.
 
-        Args:
-            u (dtype_u): current values
-            t (float): current time
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
 
-        Returns:
-            dtype_f: the RHS
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
         """
 
         f = self.dtype_f(self.init)
@@ -435,16 +656,23 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
-        Solver for the first component, can just call the super function
+        Solver for the first component, can just call the super function.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        me : dtype_u
+            The solution as mesh.
         """
 
         me = super(grayscott_mi_linear, self).solve_system(rhs, factor, u0, t)
@@ -452,16 +680,23 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
     def solve_system_2(self, rhs, factor, u0, t):
         """
-        Newton-Solver for the second component
+        Newton-Solver for the second component.
 
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the linear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time (e.g. for time-dependent BCs).
 
-        Returns:
-            dtype_u: solution as mesh
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
         """
         u = self.dtype_u(u0)
 

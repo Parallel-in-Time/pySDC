@@ -109,6 +109,7 @@ def setup_mpl(font_size=8, reset=False):
         }
 
     mpl.rcParams.update(latex_support)
+    plt.close('all')
 
 
 def newfig(textwidth, scale, ratio=0.6180339887):
