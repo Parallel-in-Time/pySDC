@@ -139,7 +139,7 @@ class allencahn_imex(ptype):
 
         else:
             me = self.dtype_u(self.init)
-            rhs_hat = self.fft.forward(rhs[:])
+            rhs_hat = self.fft.forward(rhs)
             rhs_hat /= 1.0 + factor * self.K2
             me[:] = self.fft.backward(rhs_hat)
 
@@ -166,7 +166,7 @@ class allencahn_imex(ptype):
             else:
                 me[:] = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
         elif self.init_type == "circle_rand":
-            ndim = len(me[:].shape)
+            ndim = len(me.shape)
             L = int(self.L)
             # get random radii for circles/spheres
             np.random.seed(1)
@@ -250,7 +250,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
             f.expl[:] = self.fft.forward(tmpf)
 
         else:
-            u_hat = self.fft.forward(u[:])
+            u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * u_hat
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
@@ -258,14 +258,14 @@ class allencahn_imex_timeforcing(allencahn_imex):
                 f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
 
             # build sum over RHS without driving force
-            Rt_local = float(np.sum(f.impl[:] + f.expl[:]))
+            Rt_local = float(np.sum(f.impl + f.expl))
             if self.comm is not None:
                 Rt_global = self.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
             else:
                 Rt_global = Rt_local
 
             # build sum over driving force term
-            Ht_local = float(np.sum(6.0 * u[:] * (1.0 - u[:])))
+            Ht_local = float(np.sum(6.0 * u * (1.0 - u)))
             if self.comm is not None:
                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
             else:

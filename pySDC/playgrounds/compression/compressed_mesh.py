@@ -12,10 +12,9 @@ class compressed_mesh(object):
 
     Attributes:
         values (np.ndarray): contains the ndarray of the values
-        manager: contains the CRAM Manager variables
     """
 
-    manager = CRAM_Manager("ABS", "blosc", 1e-5, "zstd")
+    manager = CRAM_Manager("ABS", "sz", 1)
 
     def __init__(self, init=None, val=0.0):
         """
@@ -30,6 +29,7 @@ class compressed_mesh(object):
         """
         self.name = str(self.manager.name + 1)
         self.manager.name += 1
+
         # if init is another mesh, do a copy (init by copy)
         if isinstance(init, compressed_mesh):
             values = self.manager.decompress(init.name, 0)  # TODO: Modify manager to copy compressed buffer
@@ -37,10 +37,10 @@ class compressed_mesh(object):
                 self.name,
                 values.shape,
                 values.dtype,
-                # numVectors=1,
-                # errBoundMode="ABS",
-                # compType="sz3",
-                # errBound=self.manager.errBound,
+                numVectors=1,
+                errBoundMode="ABS",
+                compType="sz3",
+                errBound=1e-5,
             )
             self.manager.compress(values.copy(), self.name, 0)
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
@@ -49,23 +49,18 @@ class compressed_mesh(object):
                 self.name,
                 init[0],
                 init[2],
-                # numVectors=1,
-                # errBoundMode="ABS",
-                # compType="sz3",
-                # errBound=self.manager.errBound,
+                numVectors=1,
+                errBoundMode="ABS",
+                compType="sz3",
+                errBound=1e-5,
             )
-            self.manager.compress(
-                np.full(init[0], fill_value=val, dtype=np.dtype("float64")),
-                self.name,
-                0,
-            )
+            self.manager.compress(np.full(init[0], fill_value=val), self.name, 0)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError("something went wrong during %s initialization" % type(self))
 
     def __del__(self):
         # print('Delete'+' ' +self.name)
-        # exit()
         self.manager.remove(self.name, 0)
 
     def __add__(self, other):
@@ -80,23 +75,15 @@ class compressed_mesh(object):
             mesh.mesh: sum of caller and other values (self+other)
         """
 
-        me = compressed_mesh(self)
-        values = self.manager.decompress(self.name, 0)
-
         if isinstance(other, compressed_mesh):
-            # always create new mesh, since otherwise c = a - b changes a as well!
+            # always create new mesh, since otherwise c = a + b changes a as well!
+            me = compressed_mesh(self)
+            values = self.manager.decompress(self.name, 0)
             ov = self.manager.decompress(other.name, 0)
-        # else:
-        #     raise DataError(
-        #         "Type error: cannot subtract %s from %s" % (type(other), type(self))
-        #     )
+            self.manager.compress(values + ov, me.name, 0)
+            return me
         else:
-            ov = other
-        self.manager.compress(values + ov, me.name, 0)
-        return me
-
-    def __radd__(self, other):
-        return self.__add__(other)
+            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
 
     def __sub__(self, other):
         """
@@ -109,36 +96,16 @@ class compressed_mesh(object):
         Returns:
             mesh.mesh: differences between caller and other values (self-other)
         """
-        me = compressed_mesh(self)
-        values = self.manager.decompress(self.name, 0)
 
         if isinstance(other, compressed_mesh):
             # always create new mesh, since otherwise c = a - b changes a as well!
+            me = compressed_mesh(self)
+            values = self.manager.decompress(self.name, 0)
             ov = self.manager.decompress(other.name, 0)
-        # else:
-        #     raise DataError(
-        #         "Type error: cannot subtract %s from %s" % (type(other), type(self))
-        #     )
+            self.manager.compress(values - ov, me.name, 0)
+            return me
         else:
-            ov = other
-        self.manager.compress(values - ov, me.name, 0)
-        return me
-
-    def __rsub__(self, other):
-        me = compressed_mesh(self)
-        values = self.manager.decompress(self.name, 0)
-
-        if isinstance(other, compressed_mesh):
-            # always create new mesh, since otherwise c = a - b changes a as well!
-            ov = self.manager.decompress(other.name, 0)
-        # else:
-        #     raise DataError(
-        #         "Type error: cannot subtract %s from %s" % (type(other), type(self))
-        #     )
-        else:
-            ov = other
-        self.manager.compress(ov - values, me.name, 0)
-        return me
+            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
 
     def __rmul__(self, other):
         """
@@ -151,23 +118,15 @@ class compressed_mesh(object):
         Returns:
             mesh.mesh: copy of original values scaled by factor
         """
-        me = compressed_mesh(self)
-        values = self.manager.decompress(self.name, 0)
 
-        if isinstance(other, compressed_mesh):
-            # always create new mesh, since otherwise c = a - b changes a as well!
-            ov = self.manager.decompress(other.name, 0)
-        # else:
-        #     raise DataError(
-        #         "Type error: cannot subtract %s from %s" % (type(other), type(self))
-        #     )
+        if isinstance(other, float) or isinstance(other, complex):
+            # always create new mesh, since otherwise c = f*a changes a as well!
+            values = self.manager.decompress(self.name, 0)
+            me = compressed_mesh(self)
+            self.manager.compress(values * other, me.name, 0)
+            return me
         else:
-            ov = other
-        self.manager.compress(ov * values, me.name, 0)
-        return me
-
-    def __mul__(self, other):
-        return self.__rmul__(other)
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
     def __abs__(self):
         """
@@ -205,14 +164,6 @@ class compressed_mesh(object):
         return self.manager.decompress(self.name, 0).flatten()
 
 
-if __name__ == "__main__":
-    arr1 = compressed_mesh(init=((30,), None, np.float64), val=1)
-    arr2 = compressed_mesh(init=((30,), None, np.float64), val=2.0)
-
-    c = arr1 + arr2
-
-    print(c.manager.mem_map)
-    print(type(c))
 '''
     def apply_mat(self, A):
         """

@@ -72,10 +72,7 @@ class LogError(hooks):
             iter=step.status.iter,
             sweep=L.status.sweep,
             type=f"e_local{suffix}",
-            value=abs(
-                L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time)
-                - L.uend
-            ),
+            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0] * 1.0, t_init=L.time) - L.uend),
         )
 
 
@@ -145,9 +142,7 @@ class LogGlobalErrorPostRun(hooks):
             u_num = self.get_final_solution(L)
             u_ref = L.prob.u_exact(t=self.t_last_solution)
 
-            self.logger.info(
-                f"Finished with a global error of e={abs(u_num-u_ref):.2e}"
-            )
+            self.logger.info(f"Finished with a global error of e={abs(u_num-u_ref):.2e}")
 
             self.add_to_stats(
                 process=step.status.slot,

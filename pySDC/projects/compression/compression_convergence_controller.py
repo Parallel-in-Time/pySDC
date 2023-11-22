@@ -8,15 +8,18 @@ class Compression(ConvergenceController):
     def setup(self, controller, params, description, **kwargs):
         default_compressor_args = {
             # configure which compressor to use
-            "compressor_id": "sz3",
+            "compressor_id": "blosc",
             # configure the set of metrics to be gathered
             "early_config": {
                 "pressio:metric": "composite",
                 "composite:plugins": ["time", "size", "error_stat"],
             },
             # configure SZ
+            # "compressor_config": {
+            #     "pressio:abs": 1e-10,
+            # },
             "compressor_config": {
-                "pressio:abs": 1e-10,
+                "blosc:compressor": "zstd",
             },
         }
 
@@ -30,9 +33,7 @@ class Compression(ConvergenceController):
             "min_buffer_length": 12,
         }
 
-        self.compressor = libpressio.PressioCompressor.from_config(
-            defaults["compressor_args"]
-        )
+        self.compressor = libpressio.PressioCompressor.from_config(defaults["compressor_args"])
 
         return defaults
 
@@ -65,6 +66,7 @@ class Compression_Conv_Controller(ConvergenceController):
         defaults = {
             "control_order": 0,
             "errBound": 1,
+            "losslesscompressor": "zstd",
             **super().setup(controller, params, description, **kwargs),
         }
 
@@ -73,6 +75,7 @@ class Compression_Conv_Controller(ConvergenceController):
         # self.manager = x.manager
         self.manager = compressed_mesh(init=((30,), None, np.float64)).manager
         self.manager.errBound = defaults["errBound"]
+        self.manager.losslesscompressor = defaults["losslesscompressor"]
         return defaults
 
     def dependencies(self, controller, description, **kwargs):

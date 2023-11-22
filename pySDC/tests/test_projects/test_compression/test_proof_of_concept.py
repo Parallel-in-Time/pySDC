@@ -18,9 +18,7 @@ def test_compression_proof_of_concept(thresh, useMPI, num_procs):
         p = subprocess.Popen(cmd, env=my_env, cwd=".")
 
         p.wait()
-        assert (
-            p.returncode == 0
-        ), "ERROR: did not get return code 0, got %s with %2i processes" % (
+        assert p.returncode == 0, "ERROR: did not get return code 0, got %s with %2i processes" % (
             p.returncode,
             num_procs,
         )
@@ -63,8 +61,6 @@ if __name__ == "__main__":
 
     # execute test
     if "--use-subprocess" in sys.argv:
-        test_compression_proof_of_concept(
-            thresh=thresh, useMPI=useMPI, num_procs=num_procs
-        )
+        test_compression_proof_of_concept(thresh=thresh, useMPI=useMPI, num_procs=num_procs)
     else:
         run_single_test(thresh=thresh, useMPI=useMPI, num_procs=num_procs)
