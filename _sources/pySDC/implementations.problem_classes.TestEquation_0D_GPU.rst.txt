@@ -1,0 +1,7 @@
+implementations.problem\_classes.TestEquation\_0D\_GPU module
+=============================================================
+
+.. automodule:: implementations.problem_classes.TestEquation_0D_GPU
+   :members:
+   :undoc-members:
+   :show-inheritance:
