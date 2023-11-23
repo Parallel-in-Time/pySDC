@@ -1,14 +1,8 @@
-import numpy as np
-import scipy.sparse as sp
-from scipy.sparse.linalg import splu
-
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype, WorkCounter
-from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
-class testequation0d(ptype):
+class testequation0dXPU(ptype):
     r"""
     This class implements the simple test equation of the form
 
@@ -16,6 +10,9 @@ class testequation0d(ptype):
         \frac{d u(t)}{dt} = A u(t)
 
     for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.
+
+    It is compatible with both CPU and GPU, but requires setting class attributes to select the corresponding numerical
+    library. Use the classmethod `get_XPU_version` to get a runnable problem class.
 
     Parameters
     ----------
@@ -30,15 +27,38 @@ class testequation0d(ptype):
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
 
-    dtype_u = mesh
-    dtype_f = mesh
+    @classmethod
+    def get_XPU_version(cls, version='CPU'):
+        """
+        Get a runnable version for either CPU or GPU by specifying this as `version`.
+
+        Parameters
+        ----------
+        version : str
+            Supply "GPU" or "CPU" to obtain the desired implementation
+
+        Returns
+        -------
+        pySDC.Problem
+            A problem class implementing the desired implementation
+        """
+        if version == 'CPU':
+            return testequation0d
+        elif version == 'GPU':
+            from pySDC.implementations.problem_classes.TestEquation_0D_GPU import testequation0dGPU
+
+            return testequation0dGPU
+        else:
+            from pySDC.core.Errors import ParameterError
+
+            raise ParameterError(f'Don\'t know version {version}! Please choose \'CPU\' or \'GPU\'!')
 
     def __init__(self, lambdas=None, u0=0.0):
         """Initialization routine"""
         if lambdas is None:
-            re = np.linspace(-30, 19, 50)
-            im = np.linspace(-50, 49, 50)
-            lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+            re = self.xp.linspace(-30, 19, 50)
+            im = self.xp.linspace(-50, 49, 50)
+            lambdas = self.xp.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
                 (len(re) * len(im))
             )
 
@@ -47,14 +67,15 @@ class testequation0d(ptype):
         assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(init=(nvars, None, np.dtype('complex128')))
+        super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
 
-        self.A = self.__get_A(lambdas)
+        lambdas = self.xp.array(lambdas)
+        self.A = self.__get_A(lambdas, self.xsp)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
 
     @staticmethod
-    def __get_A(lambdas):
+    def __get_A(lambdas, xsp):
         """
         Helper function to assemble FD matrix A in sparse format.
 
@@ -69,7 +90,7 @@ class testequation0d(ptype):
             Diagonal matrix A in CSC format.
         """
 
-        A = sp.diags(lambdas)
+        A = xsp.diags(lambdas)
         return A
 
     def eval_f(self, u, t):
@@ -116,7 +137,7 @@ class testequation0d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.nvars, format='csc') - factor * self.A)
+        L = self.splu(self.xsp.eye(self.nvars, format='csc') - factor * self.A)
         me[:] = L.solve(rhs)
         return me
 
@@ -143,5 +164,20 @@ class testequation0d(ptype):
         t_init = 0.0 if t_init is None else t_init * 1.0
 
         me = self.dtype_u(self.init)
-        me[:] = u_init * np.exp((t - t_init) * np.array(self.lambdas))
+        me[:] = u_init * self.xp.exp((t - t_init) * self.lambdas)
         return me
+
+
+class testequation0d(testequation0dXPU):
+    """
+    CPU implementation of `testequation0dXPU`
+    """
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    import numpy as xp
+    import scipy.sparse as xsp
+    from scipy.sparse.linalg import splu as _splu
+
+    dtype_u = mesh
+    dtype_f = mesh
+    splu = staticmethod(_splu)
