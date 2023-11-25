@@ -54,7 +54,7 @@ class CRAM_Manager:
         self,
         varName,
         shape,
-        dtype=np.dtype("float64"),
+        dtype=np.dtype('float64') if np.dtype is None else np.dtype,
         numVectors=1,
         errBoundMode=None,
         compType=None,
@@ -410,7 +410,7 @@ class CRAM_Manager:
 if __name__ == "__main__":
     arr = np.random.rand(100, 100)
     # declare global instance of memory
-    memory = CRAM_Manager(errBoundMode="PW_REL", compType="sz3", errBound=1e-5)
+    memory = CRAM_Manager(errBoundMode="PW_REL", compType="blosc", errBound=1e-5)
 
     memory.registerVar(
         "cat",

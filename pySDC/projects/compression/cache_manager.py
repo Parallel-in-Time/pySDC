@@ -38,21 +38,6 @@ class Cache:
 
     # Add array to the cache if it doesn't exist or update the existing block of array
     def put(self, varName, data):
-        # if varName in self.cache.keys():
-        #     self.cache[varName] = data
-        #     prev_count = self.cacheFrequency[varName]
-        #     self.cacheFrequency[varName] += 1
-        #     count = self.cacheFrequency[varName]
-        #     self.countCache[prev_count].remove(varName)
-        #     if not self.countCache[prev_count]:
-        #         self.countCache.pop(prev_count,None)
-        #     if count not in self.countCache.keys():
-        #         self.countCache[count] = []
-        #         self.countCache[count].append(varName)
-        #     else:
-        #         self.countCache[count].append(varName)
-
-        # else:
         # Implement LFU cache eviction policy
         if len(self.cache) + 1 > self.cacheSize:
             # get minimum count and then the first in the list is evicted and the new array is added there
@@ -88,7 +73,7 @@ class Cache:
                 # print(self.cache)
                 # print(self.countCache)
                 # print('New Array Added')
-            except:
+            except KeyError:
                 print('Failed to evict correctly')
                 os._exit(1)
         else:
@@ -100,3 +85,9 @@ class Cache:
                 self.countCache[count].append(varName)
             else:
                 self.countCache[count].append(varName)
+
+if __name__ == "__main__":
+    arr = np.random.rand(100, 100)
+    # declare global instance of memory
+    memory = Cache()
+    print("Cache instance:")
