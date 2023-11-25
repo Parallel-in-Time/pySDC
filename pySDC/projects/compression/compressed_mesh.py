@@ -15,7 +15,7 @@ class compressed_mesh(object):
         manager: contains the CRAM Manager variables
     """
 
-    manager = CRAM_Manager("ABS", "blosc", 1e-5, "zstd")
+    manager = CRAM_Manager("PW_REL", "blosc", 1e-5, "zstd")
 
     def __init__(self, init=None, val=0.0):
         """
