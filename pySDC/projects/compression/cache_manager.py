@@ -86,6 +86,7 @@ class Cache:
             else:
                 self.countCache[count].append(varName)
 
+
 if __name__ == "__main__":
     arr = np.random.rand(100, 100)
     # declare global instance of memory
