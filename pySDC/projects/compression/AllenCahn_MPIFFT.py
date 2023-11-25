@@ -10,79 +10,31 @@ from mpi4py_fft import newDistArray
 
 
 class allencahn_imex(ptype):
-    r"""
-    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
+    """
+    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping
 
-    .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
-            - 6 d_w u (1 - u)
+    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, driving force :math:`d_w`, and :math:`N=2,3`. Different initial
-    conditions can be used, for example, circles of the form
-
-    .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
-
-    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
-    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
-    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
-
-    Parameters
-    ----------
-    nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
-    eps : float, optional
-        Scaling parameter :math:`\varepsilon`.
-    radius : float, optional
-        Radius of the circles.
-    spectral : bool, optional
-        Indicates if spectral initial condition is used.
-    dw : float, optional
-        Driving force.
-    L : float, optional
-        Denotes the period of the function to be approximated for the Fourier transform.
-    init_type : str, optional
-        Initialises type of initial state.
-    comm : bool, optional
-        Communicator for parallelization.
-
-    Attributes
-    ----------
-    fft : fft object
-        Object for FFT.
-    X : np.ogrid
-        Grid coordinates in real space.
-    K2 : np.1darray
-        Laplace operator in spectral space.
-    dx : float
-        Mesh width in x direction.
-    dy : float
-        Mesh width in y direction.
-
-    References
-    ----------
-    .. [1] https://mpi4py-fft.readthedocs.io/en/latest/
+    Attributes:
+        fft: fft object
+        X: grid coordinates in real space
+        K2: Laplace operator in spectral space
+        dx: mesh width in x direction
+        dy: mesh width in y direction
     """
 
     dtype_u = mesh
     dtype_f = imex_mesh
 
-    def __init__(
-        self,
-        nvars=None,
-        eps=0.04,
-        radius=0.25,
-        spectral=None,
-        dw=0.0,
-        L=1.0,
-        init_type='circle',
-        comm=MPI.COMM_WORLD,
-    ):
-        """Initialization routine"""
+    def __init__(self, nvars, eps, radius, spectral, dw=0.0, L=1.0, init_type="circle", comm=None):
+        """
+        Initialization routine
 
-        if nvars is None:
-            nvars = (128, 128)
-
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: fft data type (will be passed to parent class)
+            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
+        """
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError("Need at least two dimensions")
 
@@ -138,19 +90,14 @@ class allencahn_imex(ptype):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the right-hand side of the problem.
+        Routine to evaluate the RHS
 
-        Parameters
-        ----------
-        u : dtype_u
-            Current values of the numerical solution.
-        t : float
-            Current time of the numerical solution is computed.
+        Args:
+            u (dtype_u): current values
+            t (float): current time
 
-        Returns
-        -------
-        f : dtype_f
-            The right-hand side of the problem.
+        Returns:
+            dtype_f: the RHS
         """
 
         f = self.dtype_f(self.init)
@@ -175,23 +122,16 @@ class allencahn_imex(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple FFT solver for the diffusion part.
+        Simple FFT solver for the diffusion part
 
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side for the linear system.
-        factor : float
-            Abbrev. for the node-to-node stepsize (or any other factor required).
-        u0 : dtype_u
-            Initial guess for the iterative solver (not used here so far).
-        t : float
-            Current time (e.g. for time-dependent BCs).
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
+            t (float): current time (e.g. for time-dependent BCs)
 
-        Returns
-        -------
-        me : dtype_u
-            The solution as mesh.
+        Returns:
+            dtype_u: solution as mesh
         """
 
         if self.spectral:
@@ -199,25 +139,21 @@ class allencahn_imex(ptype):
 
         else:
             me = self.dtype_u(self.init)
-            rhs_hat = self.fft.forward(rhs[:])
+            rhs_hat = self.fft.forward(rhs)
             rhs_hat /= 1.0 + factor * self.K2
             me[:] = self.fft.backward(rhs_hat)
 
         return me
 
     def u_exact(self, t):
-        r"""
-        Routine to compute the exact solution at time :math:`t`.
+        """
+        Routine to compute the exact solution at time t
 
-        Parameters
-        ----------
-        t : float
-            Time of the exact solution.
+        Args:
+            t (float): current time
 
-        Returns
-        -------
-        me : dtype_u
-            The exact solution.
+        Returns:
+            dtype_u: exact solution
         """
 
         assert t == 0, "ERROR: u_exact only valid for t=0"
@@ -230,7 +166,7 @@ class allencahn_imex(ptype):
             else:
                 me[:] = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
         elif self.init_type == "circle_rand":
-            ndim = len(me[:].shape)
+            ndim = len(me.shape)
             L = int(self.L)
             # get random radii for circles/spheres
             np.random.seed(1)
@@ -260,40 +196,21 @@ class allencahn_imex(ptype):
 
 
 class allencahn_imex_timeforcing(allencahn_imex):
-    r"""
-    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
-    using time-dependent forcing
-
-    .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
-            - 6 d_w u (1 - u)
-
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, driving force :math:`d_w`, and :math:`N=2,3`. Different initial
-    conditions can be used, for example, circles of the form
-
-    .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
-
-    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
-    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Tranform (FFT) and the nonlinear part in the right-hand
-    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
+    """
+    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping,
+    time-dependent forcing
     """
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the right-hand side of the problem.
+        Routine to evaluate the RHS
 
-        Parameters
-        ----------
-        u : dtype_u
-            Current values of the numerical solution.
-        t : float
-            Current time of the numerical solution is computed.
+        Args:
+            u (dtype_u): current values
+            t (float): current time
 
-        Returns
-        -------
-        f : dtype_f
-            The right-hand side of the problem.
+        Returns:
+            dtype_f: the RHS
         """
 
         f = self.dtype_f(self.init)
@@ -333,7 +250,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
             f.expl[:] = self.fft.forward(tmpf)
 
         else:
-            u_hat = self.fft.forward(u[:])
+            u_hat = self.fft.forward(u)
             lap_u_hat = -self.K2 * u_hat
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
@@ -341,14 +258,14 @@ class allencahn_imex_timeforcing(allencahn_imex):
                 f.expl = -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
 
             # build sum over RHS without driving force
-            Rt_local = float(np.sum(f.impl[:] + f.expl[:]))
+            Rt_local = float(np.sum(f.impl + f.expl))
             if self.comm is not None:
                 Rt_global = self.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
             else:
                 Rt_global = Rt_local
 
             # build sum over driving force term
-            Ht_local = float(np.sum(6.0 * u[:] * (1.0 - u[:])))
+            Ht_local = float(np.sum(6.0 * u * (1.0 - u)))
             if self.comm is not None:
                 Ht_global = self.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
             else:

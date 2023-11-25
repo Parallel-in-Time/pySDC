@@ -6,6 +6,10 @@
 *detail.txt
 data/*
 step_*.png
+/pySDC/projects/compression/*.png
+/pySDC/projects/compression/*.txt
+/pySDC/projects/compression/*.csv
+.flakeheaven_cache/
 *.pkl
 *.swp
 

@@ -1,14 +1,14 @@
 from pySDC.core.Hooks import hooks
 
 
-class LogSolution(hooks):
+class LogCompressionRatio(hooks):
     """
-    Store the solution at the end of each step as "u".
+    Store the compression ratio at the end of each step as "u".
     """
 
     def post_step(self, step, level_number):
         """
-        Record solution at the end of the step
+        Record compression ratio at the end of the step
 
         Args:
             step (pySDC.Step.step): the current step
@@ -20,7 +20,6 @@ class LogSolution(hooks):
         super().post_step(step, level_number)
 
         L = step.levels[level_number]
-        L.sweep.compute_end_point()
 
         self.add_to_stats(
             process=step.status.slot,
@@ -28,19 +27,19 @@ class LogSolution(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type="u",
-            value=L.uend[:],
+            type="compression_ratio",
+            value=L.u[0].manager.sumCompressionRatio(),
         )
 
 
-class LogSolutionAfterIteration(hooks):
+class LogCacheSize(hooks):
     """
-    Store the solution at the end of each iteration as "u".
+    Store the compression ratio at the end of each step as "u".
     """
 
-    def post_iteration(self, step, level_number):
+    def post_step(self, step, level_number):
         """
-        Record solution at the end of the iteration
+        Record compression ratio at the end of the step
 
         Args:
             step (pySDC.Step.step): the current step
@@ -49,10 +48,9 @@ class LogSolutionAfterIteration(hooks):
         Returns:
             None
         """
-        super().post_iteration(step, level_number)
+        super().post_step(step, level_number)
 
         L = step.levels[level_number]
-        L.sweep.compute_end_point()
 
         self.add_to_stats(
             process=step.status.slot,
@@ -60,6 +58,6 @@ class LogSolutionAfterIteration(hooks):
             level=L.level_index,
             iter=step.status.iter,
             sweep=L.status.sweep,
-            type="u",
-            value=L.uend,
+            type="num_arrays_cache",
+            value=len(L.u[0].manager.cacheManager.cache),
         )
