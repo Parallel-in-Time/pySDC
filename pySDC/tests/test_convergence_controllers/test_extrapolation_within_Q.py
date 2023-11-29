@@ -1,28 +1,34 @@
 import pytest
 
 
-def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI):
+def get_controller(dt, num_nodes, quad_type, useMPI, imex, **kwargs):
     """
-    Runs a single advection problem with certain parameters
+    Gets a controller setup for the polynomial test problem.
 
     Args:
         dt (float): Step size
-        Tend (float): Final time
         num_nodes (int): Number of nodes
         quad_type (str): Type of quadrature
-        QI (str): Preconditioner
         useMPI (bool): Whether or not to use MPI
+        imex (bool): Use IMEX version of the test problem
 
     Returns:
        (dict): Stats object generated during the run
        (pySDC.Controller.controller): Controller used in the run
     """
-    from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostStep
     from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
         EstimateExtrapolationErrorWithinQ,
     )
+
+    if imex:
+        from pySDC.implementations.problem_classes.polynomial_test_problem import (
+            polynomial_testequation_IMEX as problem_class,
+        )
+    else:
+        from pySDC.implementations.problem_classes.polynomial_test_problem import (
+            polynomial_testequation as problem_class,
+        )
 
     if useMPI:
         from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
@@ -37,30 +43,28 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI):
     # initialize level parameters
     level_params = {}
     level_params['dt'] = dt
-    level_params['restol'] = 1e-10
+    level_params['restol'] = 1.0
 
     # initialize sweeper parameters
     sweeper_params = {}
     sweeper_params['quad_type'] = quad_type
     sweeper_params['num_nodes'] = num_nodes
-    sweeper_params['QI'] = QI
     sweeper_params['comm'] = comm
 
-    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'stencil_type': 'center', 'order': 6, 'bc': 'periodic'}
+    problem_params = {'degree': 20}
 
     # initialize step parameters
     step_params = {}
-    step_params['maxiter'] = 99
+    step_params['maxiter'] = 0
 
     # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = LogGlobalErrorPostStep
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = advectionNd
+    description['problem_class'] = problem_class
     description['problem_params'] = problem_params
     description['sweeper_class'] = sweeper_class
     description['sweeper_params'] = sweeper_params
@@ -68,19 +72,57 @@ def single_run(dt, Tend, num_nodes, quad_type, QI, useMPI):
     description['step_params'] = step_params
     description['convergence_controllers'] = {EstimateExtrapolationErrorWithinQ: {}}
 
-    # set time parameters
-    t0 = 0.0
-
-    # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    return controller
 
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
 
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    return stats, controller
+def single_test(**kwargs):
+    """
+    Run a single test where the solution is replaced by a polynomial and the nodes are changed.
+    Because we know the polynomial going in, we can check if the interpolation based change was
+    exact. If the solution is not a polynomial or a polynomial of higher degree then the number
+    of nodes, the change in nodes does add some error, of course, but here it is on the order of
+    machine precision.
+    """
+    import numpy as np
+
+    args = {
+        'num_nodes': 3,
+        'quad_type': 'RADAU-RIGHT',
+        'useMPI': False,
+        'dt': 1.0,
+        **kwargs,
+    }
+
+    # prepare variables
+    controller = get_controller(**args)
+    step = controller.MS[0]
+    level = step.levels[0]
+    prob = level.prob
+    cont = controller.convergence_controllers[
+        np.arange(len(controller.convergence_controllers))[
+            [type(me).__name__ == 'EstimateExtrapolationErrorWithinQ' for me in controller.convergence_controllers]
+        ][0]
+    ]
+    nodes = np.append([0], level.sweep.coll.nodes)
+
+    # initialize variables
+    step.status.slot = 0
+    step.status.iter = 1
+    level.status.time = 0.0
+    level.status.residual = 0.0
+    level.u[0] = prob.u_exact(t=0)
+    level.sweep.predict()
+
+    for i in range(len(level.u)):
+        if level.u[i] is not None:
+            level.u[i][:] = prob.u_exact(nodes[i] * level.dt)
+
+    # perform the interpolation
+    cont.post_iteration_processing(controller, step)
+    error = level.status.error_extrapolation_estimate
+
+    return error
 
 
 def multiple_runs(dts, **kwargs):
@@ -101,14 +143,10 @@ def multiple_runs(dts, **kwargs):
     res = {}
 
     for dt in dts:
-        stats, controller = single_run(Tend=5.0 * dt, dt=dt, **kwargs)
-
         res[dt] = {}
-        res[dt]['e_loc'] = max([me[1] for me in get_sorted(stats, type='e_global_post_step')])
-        res[dt]['e_ex'] = max([me[1] for me in get_sorted(stats, type='error_extrapolation_estimate')])
+        res[dt]['e'] = single_test(dt=dt, **kwargs)
 
-    coll_order = controller.MS[0].levels[0].sweep.coll.order
-    return res, coll_order
+    return res
 
 
 def check_order(dts, **kwargs):
@@ -122,19 +160,18 @@ def check_order(dts, **kwargs):
     """
     import numpy as np
 
-    res, coll_order = multiple_runs(dts, **kwargs)
+    res = multiple_runs(dts, **kwargs)
     dts = np.array(list(res.keys()))
     keys = list(res[dts[0]].keys())
 
     expected_order = {
-        'e_loc': coll_order + 1,
-        'e_ex': kwargs['num_nodes'] + 1,
+        'e': kwargs['num_nodes'],
     }
 
     for key in keys:
         errors = np.array([res[dt][key] for dt in dts])
 
-        mask = np.logical_and(errors < 1e-0, errors > 1e-10)
+        mask = np.logical_and(errors < 1e-1, errors > 1e-12)
         order = np.log(errors[mask][1:] / errors[mask][:-1]) / np.log(dts[mask][1:] / dts[mask][:-1])
 
         assert np.isclose(
@@ -143,7 +180,7 @@ def check_order(dts, **kwargs):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('num_nodes', [2, 3])
+@pytest.mark.parametrize('num_nodes', [2, 3, 4])
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
 def test_extrapolation_within_Q(num_nodes, quad_type):
     kwargs = {
@@ -151,13 +188,18 @@ def test_extrapolation_within_Q(num_nodes, quad_type):
         'quad_type': quad_type,
         'useMPI': False,
         'QI': 'MIN',
+        'imex': False,
     }
-    check_order([5e-1, 1e-1, 8e-2, 5e-2], **kwargs)
+
+    import numpy as np
+
+    steps = np.logspace(-1, -3, 10)
+    check_order(steps, **kwargs)
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_nodes', [2, 3])
-@pytest.mark.parametrize('quad_type', ['RADAU-RIGHT'])
+@pytest.mark.parametrize('num_nodes', [2, 4])
+@pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
 def test_extrapolation_within_Q_MPI(num_nodes, quad_type):
     import subprocess
     import os
@@ -187,5 +229,6 @@ if __name__ == "__main__":
             'quad_type': sys.argv[2],
             'useMPI': True,
             'QI': 'MIN',
+            'imex': True,
         }
         check_order([5e-1, 1e-1, 8e-2, 5e-2], **kwargs)

@@ -1,6 +1,7 @@
 import numpy as np
 from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.core.Errors import ConvergenceError
 
 
 class LorenzAttractor(ptype):
@@ -57,13 +58,13 @@ class LorenzAttractor(ptype):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99):
+    def __init__(self, sigma=10.0, rho=28.0, beta=8.0 / 3.0, newton_tol=1e-9, newton_maxiter=99, stop_at_nan=True):
         """Initialization routine"""
 
         nvars = 3
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
-        self._makeAttributeAndRegister('nvars', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('nvars', 'stop_at_nan', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister(
             'sigma', 'rho', 'beta', 'newton_tol', 'newton_maxiter', localVars=locals(), readOnly=False
         )
@@ -141,7 +142,13 @@ class LorenzAttractor(ptype):
 
             # compute the residual and determine if we are done
             res = np.linalg.norm(G, np.inf)
-            if res <= self.newton_tol or np.isnan(res):
+            if res <= self.newton_tol:
+                break
+            if np.isnan(res) and self.stop_at_nan:
+                self.logger.warning('Newton got nan after %i iterations...' % _n)
+                raise ConvergenceError('Newton got nan after %i iterations, aborting...' % _n)
+            elif np.isnan(res):
+                self.logger.warning('Newton got nan after %i iterations...' % _n)
                 break
 
             # assemble inverse of Jacobian J of G

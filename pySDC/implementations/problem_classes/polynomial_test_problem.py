@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class polynomial_testequation(ptype):
@@ -88,3 +88,35 @@ class polynomial_testequation(ptype):
         me = self.dtype_u(self.init)
         me[:] = self.poly(t)
         return me
+
+
+class polynomial_testequation_IMEX(polynomial_testequation):
+    """
+    IMEX version of the polynomial test problem that assigns half the derivative to the implicit part and the other half to the explicit part.
+    Keep in mind that you still cannot Really perform any solves.
+    """
+
+    dtype_f = imex_mesh
+
+    def eval_f(self, u, t):
+        """
+        Derivative of the polynomial.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time of the numerical solution is computed.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side of the problem.
+        """
+
+        f = self.dtype_f(self.init)
+        derivative = self.poly.deriv(m=1)(t)
+        f.impl[:] = derivative / 2
+        f.expl[:] = derivative / 2
+        return f

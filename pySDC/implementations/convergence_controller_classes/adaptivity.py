@@ -35,6 +35,10 @@ class AdaptivityBase(ConvergenceController):
 
         controller.add_hook(LogStepSize)
 
+        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+
+        self.communicate_convergence = CheckConvergence.communicate_convergence
+
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
@@ -149,6 +153,32 @@ class AdaptivityBase(ConvergenceController):
 
 
 class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
+    def dependencies(self, controller, description, **kwargs):
+        """
+        Load interpolation between restarts.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        """
+        super().dependencies(controller, description, **kwargs)
+
+        if self.params.interpolate_between_restarts:
+            from pySDC.implementations.convergence_controller_classes.interpolate_between_restarts import (
+                InterpolateBetweenRestarts,
+            )
+
+            controller.add_convergence_controller(
+                InterpolateBetweenRestarts,
+                description=description,
+                params={},
+            )
+        self.interpolator = controller.convergence_controllers[-1]
+        return None
+
     def get_convergence(self, controller, S, **kwargs):
         raise NotImplementedError("Please implement a way to check if the collocation problem is converged!")
 
@@ -167,10 +197,13 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
         defaults = {
             'restol_rel': None,
             'e_tol_rel': None,
-            'restart_at_maxiter': False,
+            'restart_at_maxiter': True,
             'restol_min': 1e-12,
             'restol_max': 1e-5,
+            'factor_if_not_converged': 4.0,
+            'residual_max_tol': 1e9,
             'maxiter': description['sweeper_params'].get('maxiter', 99),
+            'interpolate_between_restarts': True,
             **super().setup(controller, params, description, **kwargs),
         }
         if defaults['restol_rel']:
@@ -182,20 +215,40 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
 
         if defaults['restart_at_maxiter']:
             defaults['maxiter'] = description['step_params'].get('maxiter', 99)
+
+        self.res_last_iter = np.inf
+
         return defaults
 
     def determine_restart(self, controller, S, **kwargs):
         if self.get_convergence(controller, S, **kwargs):
-            if self.get_local_error_estimate(controller, S, **kwargs) > self.params.e_tol:
+            self.res_last_iter = np.inf
+
+            if self.params.restart_at_maxiter and S.levels[0].status.residual > S.levels[0].params.restol:
+                self.trigger_restart_upon_nonconvergence(S)
+            elif self.get_local_error_estimate(controller, S, **kwargs) > self.params.e_tol:
                 S.status.restart = True
-            elif S.status.iter >= self.params.maxiter and self.params.restart_at_maxiter:
-                S.status.restart = True
-                for L in S.levels:
-                    L.status.dt_new = L.params.dt / 2.0
-                    self.log(
-                        f'Collocation problem not converged after max. number of iterations, halving step size to {L.status.dt_new:.2e}',
-                        S,
-                    )
+        elif S.status.time_size == 1 and self.res_last_iter < S.levels[0].status.residual and S.status.iter > 0:
+            self.trigger_restart_upon_nonconvergence(S)
+        elif S.levels[0].status.residual > self.params.residual_max_tol:
+            self.trigger_restart_upon_nonconvergence(S)
+
+        if self.params.useMPI:
+            self.communicate_convergence(self, controller, S, **kwargs)
+
+        self.res_last_iter = S.levels[0].status.residual * 1.0
+
+    def trigger_restart_upon_nonconvergence(self, S):
+        S.status.restart = True
+        S.status.force_done = True
+        for L in S.levels:
+            L.status.dt_new = L.params.dt / self.params.factor_if_not_converged
+            self.log(
+                f'Collocation problem not converged. Reducing step size to {L.status.dt_new:.2e}',
+                S,
+            )
+        if self.params.interpolate_between_restarts:
+            self.interpolator.status.skip_interpolation = True
 
 
 class Adaptivity(AdaptivityBase):
@@ -251,7 +304,7 @@ class Adaptivity(AdaptivityBase):
         """
         from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedError
 
-        super().dependencies(controller, description)
+        super().dependencies(controller, description, **kwargs)
 
         controller.add_convergence_controller(
             EstimateEmbeddedError.get_implementation(self.params.embedded_error_flavor, self.params.useMPI),
@@ -398,6 +451,7 @@ class AdaptivityResidual(AdaptivityBase):
          - control_order (int): The order relative to other convergence controllers
          - e_tol_low (float): Lower absolute threshold for the residual
          - e_tol (float): Upper absolute threshold for the residual
+         - use_restol (bool): Restart if the residual tolerance was not reached
          - max_restarts: Override maximum number of restarts
 
         Args:
@@ -412,6 +466,7 @@ class AdaptivityResidual(AdaptivityBase):
             "control_order": -45,
             "e_tol_low": 0,
             "e_tol": np.inf,
+            "use_restol": False,
             "max_restarts": 99 if "e_tol_low" in params else None,
             "allowed_modifications": ['increase', 'decrease'],  # what we are allowed to do with the step size
         }
@@ -481,7 +536,9 @@ class AdaptivityResidual(AdaptivityBase):
 
             dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
-            if res > self.params.e_tol and 'decrease' in self.params.allowed_modifications:
+            if (
+                res > self.params.e_tol or (res > L.params.restol and self.params.use_restol)
+            ) and 'decrease' in self.params.allowed_modifications:
                 L.status.dt_new = min([dt_planned, L.params.dt / 2.0])
                 self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
             elif res < self.params.e_tol_low and 'increase' in self.params.allowed_modifications:
@@ -561,7 +618,7 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
             EstimateEmbeddedErrorCollocation,
         )
 
-        super().dependencies(controller, description)
+        super().dependencies(controller, description, **kwargs)
 
         params = {'adaptive_coll_params': self.params.adaptive_coll_params}
         controller.add_convergence_controller(
@@ -694,7 +751,7 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
             EstimateExtrapolationErrorWithinQ,
         )
 
-        super().dependencies(controller, description)
+        super().dependencies(controller, description, **kwargs)
 
         controller.add_convergence_controller(
             EstimateExtrapolationErrorWithinQ,
@@ -761,11 +818,12 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
 
         defaults = {
             'control_order': -50,
+            **super().setup(controller, params, description, **kwargs),
             **params,
         }
 
         self.check_convergence = CheckConvergence.check_convergence
-        return {**defaults, **super().setup(controller, params, description, **kwargs)}
+        return defaults
 
     def get_convergence(self, controller, S, **kwargs):
         return self.check_convergence(S)
@@ -785,7 +843,7 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
             EstimatePolynomialError,
         )
 
-        super().dependencies(controller, description)
+        super().dependencies(controller, description, **kwargs)
 
         controller.add_convergence_controller(
             EstimatePolynomialError,

@@ -2,19 +2,47 @@ import numpy as np
 from scipy import optimize
 
 from pySDC.core.Errors import ParameterError
-from pySDC.core.Sweeper import sweeper
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
-class fully_implicit_DAE(sweeper):
-    """
-    Custom sweeper class, implements Sweeper.py
+class fully_implicit_DAE(generic_implicit):
+    r"""
+    Custom sweeper class to implement the fully-implicit SDC for solving DAEs. It solves fully-implicit DAE problems
+    of the form
 
-    Sweeper to solve first order differential equations in fully implicit form
-    Primarily implemented to be used with differential algebraic equations
-    Based on the concepts outlined in "Arbitrary order Krylov deferred correction methods for differential algebraic equations" by Huang et al.
+    .. math::
+        F(t, u, u') = 0.
 
-    Attributes:
-        QI: implicit Euler integration matrix
+    It solves a collocation problem of the form
+
+    .. math::
+        F(\tau, \vec{U}_0 + \Delta t (\mathbf{Q} \otimes \mathbf{I}_n) \vec{U}, \vec{U}) = 0,
+
+    where
+
+    - :math:`\tau=(\tau_1,..,\tau_M) in \mathbb{R}^M` the vector of collocation nodes,
+    - :math:`\vec{U}_0 = (u_0,..,u_0) \in \mathbb{R}^{Mn}` the vector of initial condition spread to each node,
+    - spectral integration matrix :math:`\mathbf{Q} \in \mathbb{R}^{M \times M}`,
+    - :math:`\vec{U}=(U_1,..,U_M) \in \mathbb{R}^{Mn}` the vector of unknown derivatives
+      :math:`U_m \approx U(\tau_m) = u'(\tau_m) \in \mathbb{R}^n`,
+    - and identity matrix :math:`\mathbf{I}_n \in \mathbb{R}^{n \times n}`.
+
+    The construction of this sweeper is based on the concepts outlined in [1]_.
+
+    Parameters
+    ----------
+    params : dict
+        Parameters passed to the sweeper.
+
+    Attributes
+    ----------
+    QI : np.2darray
+        Implicit Euler integration matrix.
+
+    References
+    ----------
+    .. [1] J. Huang, J. Jun, M. L. Minion. Arbitrary order Krylov deferred correction methods for differential algebraic equation.
+       J. Comput. Phys. Vol. 221 No. 2 (2007).
     """
 
     def __init__(self, params):
@@ -37,39 +65,10 @@ class fully_implicit_DAE(sweeper):
 
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
 
-    # TODO: hijacking this function to return solution from its gradient i.e. fundamental theorem of calculus.
-    # This works well since (ab)using level.f to store the gradient. Might need to change this for release?
-    def integrate(self):
-        """
-        Returns the solution by integrating its gradient (fundamental theorem of calculus)
-        Note that level.f stores the gradient values in the fully implicit case, rather than the evaluation of the rhs as in the ODE case
-
-        Returns:
-            list of dtype_u: containing the integral as values
-        """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-        M = self.coll.num_nodes
-
-        me = []
-
-        # integrate gradient over all collocation nodes
-        for m in range(1, M + 1):
-            # new instance of dtype_u, initialize values with 0
-            me.append(P.dtype_u(P.init, val=0.0))
-            for j in range(1, M + 1):
-                me[-1] += L.dt * self.coll.Qmat[m, j] * L.f[j]
-
-        return me
-
     def update_nodes(self):
-        """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single iteration of the preconditioned Richardson iteration in "ordinary" SDC
-
-        Returns:
-            None
+        r"""
+        Updates values of ``u`` and ``f`` at collocation nodes. This correspond to a single iteration of the
+        preconditioned Richardson iteration in **"ordinary"** SDC.
         """
 
         # get current level and problem description
@@ -104,16 +103,33 @@ class fully_implicit_DAE(sweeper):
                 u_approx += L.dt * self.QI[m, j] * L.f[j]
 
             # params contains U = u'
-            def impl_fn(params):
-                # make params into a mesh object
+            def implSystem(params):
+                """
+                Build implicit system to solve in order to find the unknowns.
+
+                Parameters
+                ----------
+                params : dtype_u
+                    Unknowns of the system.
+
+                Returns
+                -------
+                sys :
+                    System to be solved as implicit function.
+                """
+
                 params_mesh = P.dtype_f(P.init)
                 params_mesh[:] = params
+
                 # build parameters to pass to implicit function
                 local_u_approx = u_approx
+
                 # note that derivatives of algebraic variables are taken into account here too
                 # these do not directly affect the output of eval_f but rather indirectly via QI
                 local_u_approx += L.dt * self.QI[m, m] * params_mesh
-                return P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
+
+                sys = P.eval_f(local_u_approx, params_mesh, L.time + L.dt * self.coll.nodes[m - 1])
+                return sys
 
             # get U_k+1
             # note: not using solve_system here because this solve step is the same for any problem
@@ -121,15 +137,11 @@ class fully_implicit_DAE(sweeper):
             # https://github.com/scipy/scipy/blob/8a6f1a0621542f059a532953661cd43b8167fce0/scipy/optimize/_root.py#L220
             # options['xtol'] = P.params.newton_tol
             # options['eps'] = 1e-16
-            opt = optimize.root(
-                impl_fn,
-                L.f[m],
-                method='hybr',
-                tol=P.newton_tol
-                # callback= lambda x, f: print("solution:", x, " residual: ", f)
-            )
+
+            u_new = P.solve_system(implSystem, L.f[m], L.time + L.dt * self.coll.nodes[m - 1])
+
             # update gradient (recall L.f is being used to store the gradient)
-            L.f[m][:] = opt.x
+            L.f[m][:] = u_new
 
         # Update solution approximation
         integral = self.integrate()
@@ -141,12 +153,16 @@ class fully_implicit_DAE(sweeper):
         return None
 
     def predict(self):
-        """
-        Predictor to fill values at nodes before first sweep
+        r"""
+        Predictor to fill values at nodes before first sweep. It can decide whether the
 
-        Default prediction for the sweepers, only copies the values to all collocation nodes
-        This function overrides the base implementation by always initialising level.f to zero
-        This is necessary since level.f stores the solution derivative in the fully implicit case, which is not initially known
+            - initial condition is spread to each node ('initial_guess' = 'spread'),
+            - zero values are spread to each node ('initial_guess' = 'zero'),
+            - or random values are spread to each collocation node ('initial_guess' = 'random').
+
+        Default prediction for the sweepers, only copies the values to all collocation nodes. This function
+        overrides the base implementation by always initialising ``level.f`` to zero. This is necessary since
+        ``level.f`` stores the solution derivative in the fully implicit case, which is not initially known.
         """
         # get current level and problem description
         L = self.level
@@ -158,7 +174,6 @@ class fully_implicit_DAE(sweeper):
             if self.params.initial_guess == 'spread':
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
-            # start with zero everywhere
             elif self.params.initial_guess == 'zero':
                 L.u[m] = P.dtype_u(init=P.init, val=0.0)
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
@@ -174,15 +189,18 @@ class fully_implicit_DAE(sweeper):
         L.status.updated = True
 
     def compute_residual(self, stage=None):
-        """
-        Overrides the base implementation
-        Uses the absolute value of the implicit function ||F(u', u, t)|| as the residual
+        r"""
+        Uses the absolute value of the DAE system
 
-        Args:
-            stage (str): The current stage of the step the level belongs to
+        .. math::
+            ||F(t, u, u')||
 
-        Returns:
-            None
+        for computing the residual.
+
+        Parameters
+        ----------
+        stage : str, optional
+            The current stage of the step the level belongs to.
         """
 
         # get current level and problem description
@@ -222,31 +240,5 @@ class fully_implicit_DAE(sweeper):
 
         # indicate that the residual has seen the new values
         L.status.updated = False
-
-        return None
-
-    def compute_end_point(self):
-        """
-        Compute u at the right point of the interval
-
-        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
-
-        Returns:
-            None
-        """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-
-        # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
-        if self.coll.right_is_node and not self.params.do_coll_update:
-            # a copy is sufficient
-            L.uend = P.dtype_u(L.u[-1])
-        else:
-            # start with u0 and add integral over the full interval (using coll.weights)
-            L.uend = P.dtype_u(L.u[0])
-            for m in range(self.coll.num_nodes):
-                L.uend += L.dt * self.coll.weights[m] * L.f[m + 1]
 
         return None

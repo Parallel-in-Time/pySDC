@@ -160,7 +160,7 @@ class controller(object):
         self.logger.info(out)
         out = '----------------------------------------------------------------------------------------------------\n\n'
         out += 'Controller: %s\n' % self.__class__
-        for k, v in vars(self.params).items():
+        for k, v in sorted(vars(self.params).items()):
             if not k.startswith('_'):
                 if k in controller_params:
                     out += '--> %s = %s\n' % (k, v)
@@ -168,24 +168,25 @@ class controller(object):
                     out += '    %s = %s\n' % (k, v)
 
         out += '\nStep: %s\n' % step.__class__
-        for k, v in vars(step.params).items():
+        for k, v in sorted(vars(step.params).items()):
             if not k.startswith('_'):
                 if k in description['step_params']:
                     out += '--> %s = %s\n' % (k, v)
                 else:
                     out += '    %s = %s\n' % (k, v)
+        out += f'    Number of steps: {step.status.time_size}\n'
 
         out += '    Level: %s\n' % step.levels[0].__class__
         for L in step.levels:
             out += '        Level %2i\n' % L.level_index
-            for k, v in vars(L.params).items():
+            for k, v in sorted(vars(L.params).items()):
                 if not k.startswith('_'):
                     if k in description['level_params']:
                         out += '-->         %s = %s\n' % (k, v)
                     else:
                         out += '            %s = %s\n' % (k, v)
             out += '-->         Problem: %s\n' % L.prob.__class__
-            for k, v in L.prob.params.items():
+            for k, v in sorted(L.prob.params.items()):
                 if k in description['problem_params']:
                     out += '-->             %s = %s\n' % (k, v)
                 else:
@@ -193,7 +194,7 @@ class controller(object):
             out += '-->             Data type u: %s\n' % L.prob.dtype_u
             out += '-->             Data type f: %s\n' % L.prob.dtype_f
             out += '-->             Sweeper: %s\n' % L.sweep.__class__
-            for k, v in vars(L.sweep.params).items():
+            for k, v in sorted(vars(L.sweep.params).items()):
                 if not k.startswith('_'):
                     if k in description['sweeper_params']:
                         out += '-->                 %s = %s\n' % (k, v)
@@ -206,14 +207,14 @@ class controller(object):
                 out += '-->     Base Transfer: %s\n' % step.base_transfer.__class__
             else:
                 out += '        Base Transfer: %s\n' % step.base_transfer.__class__
-            for k, v in vars(step.base_transfer.params).items():
+            for k, v in sorted(vars(step.base_transfer.params).items()):
                 if not k.startswith('_'):
                     if k in description['base_transfer_params']:
                         out += '-->         %s = %s\n' % (k, v)
                     else:
                         out += '            %s = %s\n' % (k, v)
             out += '-->     Space Transfer: %s\n' % step.base_transfer.space_transfer.__class__
-            for k, v in vars(step.base_transfer.space_transfer.params).items():
+            for k, v in sorted(vars(step.base_transfer.space_transfer.params).items()):
                 if not k.startswith('_'):
                     if k in description['space_transfer_params']:
                         out += '-->         %s = %s\n' % (k, v)

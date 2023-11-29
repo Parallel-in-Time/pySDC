@@ -44,12 +44,21 @@ class ConvergenceController(object):
         """
         self.params = Pars(self.setup(controller, params, description))
         params_ok, msg = self.check_parameters(controller, params, description)
-        assert params_ok, msg
+        assert params_ok, f'{type(self).__name__} -- {msg}'
         self.dependencies(controller, description)
         self.logger = logging.getLogger(f"{type(self).__name__}")
 
         if self.params.useMPI:
             self.prepare_MPI_datatypes()
+
+    def prepare_MPI_logical_operations(self):
+        """
+        Prepare MPI logical operations so we don't need to import mpi4py all the time
+        """
+        from mpi4py import MPI
+
+        self.MPI_LAND = MPI.LAND
+        self.MPI_LOR = MPI.LOR
 
     def prepare_MPI_datatypes(self):
         """
