@@ -25,7 +25,6 @@ def setup():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['newton_tol'] = 1e-3  # tollerance for implicit solver
-    problem_params['nvars'] = 3
 
     # This comes as read-in for the step class
     step_params = dict()

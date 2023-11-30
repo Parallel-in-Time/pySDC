@@ -32,7 +32,6 @@ def setup():
     # Absolute termination tollerance for implicit solver
     # Exactly how this is used can be adjusted in update_nodes() in the fully implicit sweeper
     problem_params['newton_tol'] = 1e-7
-    problem_params['nvars'] = 3
 
     # This comes as read-in for the step class
     step_params = dict()

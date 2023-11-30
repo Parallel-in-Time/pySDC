@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.DAE.problems.simple_DAE import problematic_f
+from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1  # problematic_f
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
 from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
@@ -27,7 +27,6 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['newton_tol'] = 1e-12  # tollerance for implicit solver
-    problem_params['nvars'] = 2
 
     # initialize step parameters
     step_params = dict()
@@ -40,7 +39,7 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = problematic_f
+    description['problem_class'] = simple_dae_1  # problematic_f
     description['problem_params'] = problem_params
     description['sweeper_class'] = fully_implicit_DAE
     description['sweeper_params'] = sweeper_params
@@ -72,7 +71,12 @@ def main():
     # store results
     sol = get_sorted(stats, type='approx_solution_hook', sortby='time')
     sol_dt = np.array([sol[i][0] for i in range(len(sol))])
-    sol_data = np.array([[sol[j][1][i] for j in range(len(sol))] for i in range(problem_params['nvars'])])
+    sol_data = np.array(
+        [
+            [(sol[j][1].diff[id], sol[j][1].alg[ia]) for j in range(len(sol))]
+            for id, ia in zip(range(len(uend.diff)), range(len(uend.alg)))
+        ]
+    )
 
     data = dict()
     data['dt'] = sol_dt
