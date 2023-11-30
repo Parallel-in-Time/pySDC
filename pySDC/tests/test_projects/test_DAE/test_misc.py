@@ -8,7 +8,7 @@ def test_problem_class_main():
     from pySDC.projects.DAE.problems.simple_DAE import simple_dae_1
 
     # initialize problem parameters
-    problem_params = dict()
+    problem_params = {'nvars': 3}
 
     # instantiate problem
     try:
