@@ -12,7 +12,7 @@ def _transistor(u_in):
 
 class one_transistor_amplifier(ptype_dae):
     r"""
-    The one transistor amplifier example from pg. 404 in [1]_. The problem is an index-1 differential-algebraic equation
+    The one transistor amplifier example from pg. 377 in [1]_. The problem is an index-1 differential-algebraic equation
     (DAE) having the equations
 
     .. math::
@@ -61,8 +61,8 @@ class one_transistor_amplifier(ptype_dae):
         Springer (2009).
     """
 
-    def __init__(self, nvars, newton_tol):
-        super().__init__(nvars, newton_tol)
+    def __init__(self, newton_tol):
+        super().__init__(nvars=(5, 0), newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/one_trans_amp.npy')
@@ -97,12 +97,15 @@ class one_transistor_amplifier(ptype_dae):
         r_k = 9000
         c_1, c_2, c_3 = 1e-6, 2e-6, 3e-6
         f = self.dtype_f(self.init)
-        f[:] = (
-            (u_e - u[0]) / r_0 + c_1 * (du[1] - du[0]),
-            (u_b - u[1]) / r_k - u[1] / r_k + c_1 * (du[0] - du[1]) - (1 - alpha) * _transistor(u[1] - u[2]),
-            _transistor(u[1] - u[2]) - u[2] / r_k - c_2 * du[2],
-            (u_b - u[3]) / r_k + c_3 * (du[4] - du[3]) - alpha * _transistor(u[1] - u[2]),
-            -u[4] / r_k + c_3 * (du[3] - du[4]),
+        f.diff[:] = (
+            (u_e - u.diff[0]) / r_0 + c_1 * (du.diff[1] - du.diff[0]),
+            (u_b - u.diff[1]) / r_k
+            - u.diff[1] / r_k
+            + c_1 * (du.diff[0] - du.diff[1])
+            - (1 - alpha) * _transistor(u.diff[1] - u.diff[2]),
+            _transistor(u.diff[1] - u.diff[2]) - u.diff[2] / r_k - c_2 * du.diff[2],
+            (u_b - u.diff[3]) / r_k + c_3 * (du.diff[4] - du.diff[3]) - alpha * _transistor(u.diff[1] - u.diff[2]),
+            -u.diff[4] / r_k + c_3 * (du.diff[3] - du.diff[4]),
         )
         self.work_counters['rhs']()
         return f
@@ -125,12 +128,12 @@ class one_transistor_amplifier(ptype_dae):
         me = self.dtype_u(self.init)
 
         if t == 0:
-            me[:] = (0, 3, 3, 6, 0)
+            me.diff[:] = (0, 3, 3, 6, 0)
         elif t < self.t_end:
-            me[:] = self.u_ref(t)
+            me.diff[:] = self.u_ref(t)
         else:
             self.logger.warning("Requested time exceeds domain of the reference solution. Returning zero.")
-            me[:] = (0, 0, 0, 0, 0)
+            me.diff[:] = (0, 0, 0, 0, 0)
         return me
 
 
@@ -195,8 +198,8 @@ class two_transistor_amplifier(ptype_dae):
         Lect. Notes Math. (1989).
     """
 
-    def __init__(self, nvars, newton_tol):
-        super().__init__(nvars, newton_tol)
+    def __init__(self, newton_tol):
+        super().__init__(nvars=(8, 0), newton_tol=newton_tol)
         # load reference solution
         # data file must be generated and stored under misc/data and self.t_end = t[-1]
         # data = np.load(r'pySDC/projects/DAE/misc/data/two_trans_amp.npy')
@@ -231,15 +234,21 @@ class two_transistor_amplifier(ptype_dae):
         r_k = 9000.0
         c_1, c_2, c_3, c_4, c_5 = 1e-6, 2e-6, 3e-6, 4e-6, 5e-6
         f = self.dtype_f(self.init)
-        f[:] = (
-            (u_e - u[0]) / r_0 - c_1 * (du[0] - du[1]),
-            (u_b - u[1]) / r_k - u[1] / r_k + c_1 * (du[0] - du[1]) + (alpha - 1) * _transistor(u[1] - u[2]),
-            _transistor(u[1] - u[2]) - u[2] / r_k - c_2 * du[2],
-            (u_b - u[3]) / r_k - c_3 * (du[3] - du[4]) - alpha * _transistor(u[1] - u[2]),
-            (u_b - u[4]) / r_k - u[4] / r_k + c_3 * (du[3] - du[4]) + (alpha - 1) * _transistor(u[4] - u[5]),
-            _transistor(u[4] - u[5]) - u[5] / r_k - c_4 * du[5],
-            (u_b - u[6]) / r_k - c_5 * (du[6] - du[7]) - alpha * _transistor(u[4] - u[5]),
-            -u[7] / r_k + c_5 * (du[6] - du[7]),
+        f.diff[:] = (
+            (u_e - u.diff[0]) / r_0 - c_1 * (du.diff[0] - du.diff[1]),
+            (u_b - u.diff[1]) / r_k
+            - u.diff[1] / r_k
+            + c_1 * (du.diff[0] - du.diff[1])
+            + (alpha - 1) * _transistor(u.diff[1] - u.diff[2]),
+            _transistor(u.diff[1] - u.diff[2]) - u.diff[2] / r_k - c_2 * du.diff[2],
+            (u_b - u.diff[3]) / r_k - c_3 * (du.diff[3] - du.diff[4]) - alpha * _transistor(u.diff[1] - u.diff[2]),
+            (u_b - u.diff[4]) / r_k
+            - u.diff[4] / r_k
+            + c_3 * (du.diff[3] - du.diff[4])
+            + (alpha - 1) * _transistor(u.diff[4] - u.diff[5]),
+            _transistor(u.diff[4] - u.diff[5]) - u.diff[5] / r_k - c_4 * du.diff[5],
+            (u_b - u.diff[6]) / r_k - c_5 * (du.diff[6] - du.diff[7]) - alpha * _transistor(u.diff[4] - u.diff[5]),
+            -u.diff[7] / r_k + c_5 * (du.diff[6] - du.diff[7]),
         )
         self.work_counters['rhs']()
         return f
@@ -263,10 +272,10 @@ class two_transistor_amplifier(ptype_dae):
         me = self.dtype_u(self.init)
 
         if t == 0:
-            me[:] = (0, 3, 3, 6, 3, 3, 6, 0)
+            me.diff[:] = (0, 3, 3, 6, 3, 3, 6, 0)
         elif t < self.t_end:
-            me[:] = self.u_ref(t)
+            me.diff[:] = self.u_ref(t)
         else:
             self.logger.warning("Requested time exceeds domain of the reference solution. Returning zero.")
-            me[:] = (0, 0, 0, 0, 0, 0, 0, 0)
+            me.diff[:] = (0, 0, 0, 0, 0, 0, 0, 0)
         return me

@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import root
 
 from pySDC.core.Problem import ptype, WorkCounter
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.projects.DAE.misc.dae_mesh import DAEMesh
 
 
 class ptype_dae(ptype):
@@ -25,8 +25,8 @@ class ptype_dae(ptype):
         in work_counters['rhs']
     """
 
-    dtype_u = mesh
-    dtype_f = mesh
+    dtype_u = DAEMesh
+    dtype_f = DAEMesh
 
     def __init__(self, nvars, newton_tol):
         """Initialization routine"""
@@ -54,14 +54,21 @@ class ptype_dae(ptype):
         me : dtype_u
             Numerical solution.
         """
-
         me = self.dtype_u(self.init)
+
+        def implSysAsNumpy(unknowns, **kwargs):
+            me.diff[:] = unknowns[: np.size(me.diff)].reshape(me.diff.shape)
+            me.alg[:] = unknowns[np.size(me.diff) :].reshape(me.alg.shape)
+            sys = impl_sys(me, **kwargs)
+            return np.append(sys.diff.flatten(), sys.alg.flatten())  # TODO: more efficient way?
+
         opt = root(
-            impl_sys,
-            u0,
+            implSysAsNumpy,
+            np.append(u0.diff.flatten(), u0.alg.flatten()),
             method='hybr',
             tol=self.newton_tol,
         )
-        me[:] = opt.x
+        me.diff[:] = opt.x[: np.size(me.diff)].reshape(me.diff.shape)
+        me.alg[:] = opt.x[np.size(me.diff) :].reshape(me.alg.shape)
         self.work_counters['newton'].niter += opt.nfev
         return me
