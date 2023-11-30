@@ -434,108 +434,108 @@ def test_DiscontinuousTestDAE_SDC(M):
     assert err < err_tol[M], f"ERROR: Error is too large! Expected {err_tol[M]}, got {err}"
 
 
-# @pytest.mark.base
-# @pytest.mark.parametrize('M', [2, 3, 4, 5])
-# def test_DiscontinuousTestDAE_SDC_detection(M):
-#     """
-#     Test for one SDC run with event detection if the found event is close to the exact value and if the global error
-#     can be reduced.
-#     """
+@pytest.mark.base
+@pytest.mark.parametrize('M', [2, 3, 4, 5])
+def test_DiscontinuousTestDAE_SDC_detection(M):
+    """
+    Test for one SDC run with event detection if the found event is close to the exact value and if the global error
+    can be reduced.
+    """
 
-#     from pySDC.helpers.stats_helper import get_sorted
-#     from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE#, DiscontinuousTestDAEOld
-#     from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-#     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-#     from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-#     from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.projects.DAE.problems.DiscontinuousTestDAE import DiscontinuousTestDAE
+    from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
-#     err_tol = {
-#         2: 5.3952e-9,
-#         3: 2.6741e-9,
-#         4: 1.9163e-8,
-#         5: 2.4791e-8,
-#     }
+    err_tol = {
+        2: 5.3952e-9,
+        3: 2.6741e-9,
+        4: 1.9163e-8,
+        5: 2.4791e-8,
+    }
 
-#     event_err_tol = {
-#         2: 0.0011,
-#         3: 0.01,
-#         4: 0.02,
-#         5: 0.0101,
-#     }
+    event_err_tol = {
+        2: 0.0011,
+        3: 0.01,
+        4: 0.02,
+        5: 0.0101,
+    }
 
-#     level_params = {
-#         'restol': 1e-13,
-#         'dt': 1e-2,
-#     }
+    level_params = {
+        'restol': 1e-13,
+        'dt': 1e-2,
+    }
 
-#     problem_params = {
-#         'newton_tol': 1e-6,
-#     }
+    problem_params = {
+        'newton_tol': 1e-6,
+    }
 
-#     sweeper_params = {
-#         'quad_type': 'RADAU-RIGHT',
-#         'num_nodes': M,
-#         'QI': 'IE',
-#     }
+    sweeper_params = {
+        'quad_type': 'RADAU-RIGHT',
+        'num_nodes': M,
+        'QI': 'IE',
+    }
 
-#     step_params = {
-#         'maxiter': 45,
-#     }
+    step_params = {
+        'maxiter': 45,
+    }
 
-#     controller_params = {
-#         'logger_level': 30,
-#     }
+    controller_params = {
+        'logger_level': 30,
+    }
 
-#     switch_estimator_params = {
-#         'tol': 1e-10,
-#         'alpha': 0.95,
-#     }
+    switch_estimator_params = {
+        'tol': 1e-10,
+        'alpha': 0.95,
+    }
 
-#     restarting_params = {
-#         'max_restarts': 200,
-#         'crash_after_max_restarts': False,
-#     }
+    restarting_params = {
+        'max_restarts': 200,
+        'crash_after_max_restarts': False,
+    }
 
-#     convergence_controllers = {
-#         SwitchEstimator: switch_estimator_params,
-#         BasicRestartingNonMPI: restarting_params,
-#     }
+    convergence_controllers = {
+        SwitchEstimator: switch_estimator_params,
+        BasicRestartingNonMPI: restarting_params,
+    }
 
-#     description = {
-#         'problem_class': DiscontinuousTestDAE,  #DiscontinuousTestDAE,
-#         'problem_params': problem_params,
-#         'sweeper_class': fully_implicit_DAE,
-#         'sweeper_params': sweeper_params,
-#         'level_params': level_params,
-#         'step_params': step_params,
-#         'convergence_controllers': convergence_controllers,
-#     }
+    description = {
+        'problem_class': DiscontinuousTestDAE,  #DiscontinuousTestDAE,
+        'problem_params': problem_params,
+        'sweeper_class': fully_implicit_DAE,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+        'convergence_controllers': convergence_controllers,
+    }
 
-#     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
-#     t0 = 4.6
-#     Tend = 4.7
+    t0 = 4.6
+    Tend = 4.7
 
-#     P = controller.MS[0].levels[0].prob
-#     uinit = P.u_exact(t0)
-#     uex = P.u_exact(Tend)
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    uex = P.u_exact(Tend)
 
-#     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-#     # err = abs(uex.diff - uend.diff)
-#     err = abs(uex - uend)
-#     assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
+    # err = abs(uex.diff - uend.diff)
+    err = abs(uex - uend)
+    assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
 
-#     switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
-#     assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
-#     t_switches = [item[1] for item in switches]
-#     t_switch = t_switches[-1]
+    switches = get_sorted(stats, type='switch', sortby='time', recomputed=False)
+    assert len(switches) >= 1, 'ERROR for M={M}: No events found!'
+    t_switches = [item[1] for item in switches]
+    t_switch = t_switches[-1]
 
-#     t_switch_exact = P.t_switch_exact
-#     event_err = abs(t_switch_exact - t_switch)
-#     assert (
-#         event_err < event_err_tol[M]
-#     ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
+    t_switch_exact = P.t_switch_exact
+    event_err = abs(t_switch_exact - t_switch)
+    assert (
+        event_err < event_err_tol[M]
+    ), f"ERROR for M={M}: Event error is too large! Expected {event_err_tol[M]}, got {event_err}"
 
 
 @pytest.mark.base

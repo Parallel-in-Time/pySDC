@@ -6,7 +6,7 @@ import statistics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.DAE.problems.synchronous_machine import synchronous_machine_infinite_bus
 from pySDC.projects.DAE.sweepers.fully_implicit_DAE import fully_implicit_DAE
-from pySDC.projects.DAE.misc.HookClass_DAE import LogSolutionDiff, LogSolutionAlg, approx_solution_hook
+from pySDC.projects.DAE.misc.HookClass_DAE import approx_solution_hook
 from pySDC.projects.DAE.misc.HookClass_DAE import error_hook
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.stats_helper import filter_stats

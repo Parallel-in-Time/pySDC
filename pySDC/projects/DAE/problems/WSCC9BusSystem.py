@@ -1149,7 +1149,6 @@ class WSCC9BusSystem(ptype_dae):
 
         f.diff[:] = eqs_flatten[0 : 11 * self.m]
         f.alg[:] = eqs_flatten[11 * self.m :]
-        # f[:] = eqs_flatten
         return f
 
     def u_exact(self, t):
