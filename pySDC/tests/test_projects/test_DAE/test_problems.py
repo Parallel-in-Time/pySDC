@@ -502,7 +502,7 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
     }
 
     description = {
-        'problem_class': DiscontinuousTestDAE,  #DiscontinuousTestDAE,
+        'problem_class': DiscontinuousTestDAE,
         'problem_params': problem_params,
         'sweeper_class': fully_implicit_DAE,
         'sweeper_params': sweeper_params,
@@ -522,7 +522,6 @@ def test_DiscontinuousTestDAE_SDC_detection(M):
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # err = abs(uex.diff - uend.diff)
     err = abs(uex - uend)
     assert err < err_tol[M], f"ERROR for M={M}: Error is too large! Expected {err_tol[M]}, got {err}"
 
