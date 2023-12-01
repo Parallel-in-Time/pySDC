@@ -10,7 +10,6 @@ import os
 from pySDC.core.Errors import ParameterError
 
 from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MonodomainODE, MultiscaleMonodomainODE
-
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
 from pySDC.helpers.stats_helper import get_sorted
@@ -379,7 +378,6 @@ def setup_and_run(
 
     # get PDE data
     t0, Tend, uinit, P = get_P_data(controller, truly_time_parallel)
-
     # print dofs stats (dofs per processor, etc.)
     print_dofs_stats(space_rank, time_rank, controller, P, uinit)
 
