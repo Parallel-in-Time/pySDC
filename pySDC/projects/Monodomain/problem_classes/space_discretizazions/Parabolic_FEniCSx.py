@@ -12,7 +12,7 @@ import json
 
 from pySDC.core.Common import RegisterParams
 from pySDC.core.Errors import ParameterError
-from pySDC.projects.Monodomain_NEW.datatype_classes.FEniCSx_Vector import FEniCSx_Vector
+from pySDC.projects.Monodomain.datatype_classes.FEniCSx_Vector import FEniCSx_Vector
 
 
 class Parabolic_FEniCSx(RegisterParams):

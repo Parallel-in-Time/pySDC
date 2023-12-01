@@ -105,11 +105,6 @@ def show_residual_across_simulation(stats, fname="residuals.png", comm=None):
             log_residual[iter - 1, step] = np.log10(v)
             residual[iter - 1, step] = v
 
-    # if comm is None or comm.Get_rank() == 0:
-    #     for step in range(n_steps):
-    #         for iter in range(maxiter):
-    #             print(f"res step {step} iter {iter} =  {residual[iter,step]}")
-
     # Set up plotting stuff and fonts
     rc("font", **{"size": 30})
     rc("legend", fontsize="small")
@@ -127,11 +122,5 @@ def show_residual_across_simulation(stats, fname="residuals.png", comm=None):
 
     ax.set_xlabel("SDC Tteration")
     ax.set_ylabel("Time")
-
-    # yticklabels = [f"{t:.2f} (p={int(p+1)})" for t, p in zip(np.nditer(times), np.nditer(procs))]
-    # ax.set_xticks(np.arange(maxiter) + 0.5, minor=False)
-    # ax.set_yticks(np.arange(n_steps) + 0.5, minor=False)
-    # ax.set_xticklabels(np.arange(maxiter) + 1, minor=False)
-    # ax.set_yticklabels(yticklabels, minor=False)
 
     plt.savefig(fname, transparent=True, bbox_inches="tight")

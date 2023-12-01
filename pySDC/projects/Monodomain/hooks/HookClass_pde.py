@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from pathlib import Path
 from pySDC.core.Hooks import hooks
 
 
@@ -41,12 +42,12 @@ class pde_hook(hooks):
     def save_sol_at_points(self, u, t, P):
         self.t_val = np.append(self.t_val, t)
         unew = P.eval_on_points(u)
-        if P.domain.comm.rank == 0 and unew is not None:
+        if P.comm.rank == 0 and unew is not None:
             self.u_val = np.append(self.u_val, unew, axis=1)
 
     def write_sol_at_points(self, P):
-        if P.domain.comm.rank == 0 and self.u_val is not None:
+        if P.comm.rank == 0 and self.u_val is not None:
             os.makedirs(P.output_folder, exist_ok=True)
-            np.save(P.output_folder + P.output_file_name + "_t", self.t_val)
-            np.save(P.output_folder + P.output_file_name + "_u", self.u_val)
-            np.save(P.output_folder + P.output_file_name + "_p", P.exact.eval_points)
+            np.save(P.output_folder / Path(P.output_file_name + "_t"), self.t_val)
+            np.save(P.output_folder / Path(P.output_file_name + "_u"), self.u_val)
+            np.save(P.output_folder / Path(P.output_file_name + "_p"), P.parabolic.eval_points)

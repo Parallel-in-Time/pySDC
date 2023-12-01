@@ -6,28 +6,28 @@ import os
 
 from pySDC.core.Errors import ParameterError
 
-from pySDC.projects.Monodomain_NEW.problem_classes.MonodomainODE import MonodomainODE, MultiscaleMonodomainODE
-from pySDC.projects.Monodomain_NEW.problem_classes.space_discretizazions.Parabolic_FEniCSx import Parabolic_FEniCSx
-from pySDC.projects.Monodomain_NEW.transfer_classes.TransferVectorOfVectors import TransferVectorOfVectors
-from pySDC.projects.Monodomain_NEW.hooks.HookClass_pde_MPI import pde_hook as pde_hook_MPI
-from pySDC.projects.Monodomain_NEW.hooks.HookClass_pde import pde_hook
-from pySDC.projects.Monodomain_NEW.hooks.HookClass_post_iter_info import post_iter_info_hook
+from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MonodomainODE, MultiscaleMonodomainODE
+from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_FEniCSx import Parabolic_FEniCSx
+from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfVectors import TransferVectorOfVectors
+from pySDC.projects.Monodomain.hooks.HookClass_pde_MPI import pde_hook as pde_hook_MPI
+from pySDC.projects.Monodomain.hooks.HookClass_pde import pde_hook
+from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
 
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.projects.Monodomain_NEW.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
-from pySDC.projects.Monodomain_NEW.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
-# from pySDC.projects.Monodomain_NEW.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
+# from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
 #     exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK,
 # )
 
-# from pySDC.projects.Monodomain_NEW.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
-# from pySDC.projects.Monodomain_NEW.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
-# from pySDC.projects.Monodomain_NEW.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
+# from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
+# from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
+# from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
 
 
 def set_logger(controller_params):

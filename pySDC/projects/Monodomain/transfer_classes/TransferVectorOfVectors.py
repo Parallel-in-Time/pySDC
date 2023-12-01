@@ -2,7 +2,7 @@ import dolfinx as df
 from petsc4py import PETSc
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.projects.Monodomain_NEW.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
+from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
 
 
 class TransferVectorOfVectors(space_transfer):

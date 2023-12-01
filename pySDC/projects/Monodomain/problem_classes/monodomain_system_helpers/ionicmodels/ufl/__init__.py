@@ -1,3 +1,0 @@
-from pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.ufl.hodgkinhuxley import HodgkinHuxley
-from pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.ufl.courtemanche import Courtemanche1998
-from pySDC.projects.Monodomain.problem_classes.monodomain_system_helpers.ionicmodels.ufl.tentusscher import TenTusscher2006_epi

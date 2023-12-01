@@ -52,12 +52,6 @@ class imexexp_1st_order(sweeper):
 
         M = self.coll.num_nodes
 
-        # this works for M==1
-        # lmbda = P.lmbda_eval(L.u[0],L.time)
-        # phi_one = P.phi_eval(L.u[0],L.dt,L.time,1)
-        # me.append( L.dt*( L.f[1].impl + L.f[1].expl +  phi_one.__rmul__(L.f[1].exp+lmbda.__rmul__(L.u[0]-L.u[1]))) )
-        # return me
-
         # compute phi[k][i] = phi_{k}(dt*c_i*lmbda), i=0,...,M-1, k=0,...,M
         phi = []
         c = self.coll.nodes
