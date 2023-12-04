@@ -64,6 +64,8 @@ stages:
 benchmark:
   image: mambaorg/micromamba
   stage: benchmark
+  tags:
+    - docker
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   artifacts:
