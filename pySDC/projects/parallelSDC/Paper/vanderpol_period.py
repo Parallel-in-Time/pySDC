@@ -15,11 +15,11 @@ from utils import solVanderpolExact, solVanderpolSDC, getParamsSDC
 script = __file__.split('/')[-1].split('.')[0]
 
 
-muVals = [0.1, 2, 10]
+muVals = [0.1, 2, 10, 50]
 muPeriods = []
 
-tEnd = 20
-nSteps = 200
+tEnd = 100
+nSteps = 1000
 tVals = np.linspace(0, tEnd, nSteps+1)
 
 # Compute and plot unscaled solution to determined period for each mu

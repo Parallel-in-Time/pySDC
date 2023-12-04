@@ -16,8 +16,9 @@ import matplotlib.pyplot as plt
 
 from utils import getParamsSDC, solVanderpolSDC, solVanderpolExact
 
-muVals = [0.1, 2, 10]
-tEndVals = [6.3, 7.6, 18.9] # tEnd = 1 period for each mu
+muVals = [0.1, 2, 50]
+tEndVals = [6.3, 7.6, 82.3] # tEnd = 1 period for each mu
+# mu = 10, tEnd = 18.9
 
 def getError(uNum, uRef):
     if uNum is None:
@@ -32,10 +33,10 @@ def getCost(counters):
 # Base variable parameters
 qDeltaList = ['LU', 'IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1', 'MIN3']
 nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
-nSweepList = [1, 2, 3, 4]
+nSweepList = [1, 2, 3, 4, 5, 6]
 
 
-# qDeltaList = ['FLEX-MIN-1']
+# qDeltaList = ['LU']
 nSweepList = [4]
 
 fig, axs = plt.subplots(2, len(muVals))
