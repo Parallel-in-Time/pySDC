@@ -16,9 +16,8 @@ import matplotlib.pyplot as plt
 
 from utils import getParamsSDC, solVanderpolSDC, solVanderpolExact
 
-muVals = [0.1, 2, 50]
-tEndVals = [6.3, 7.6, 82.3] # tEnd = 1 period for each mu
-# mu = 10, tEnd = 18.9
+muVals = [0.1, 2, 10]
+tEndVals = [6.3, 7.6, 18.9] # tEnd = 1 period for each mu
 
 def getError(uNum, uRef):
     if uNum is None:

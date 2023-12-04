@@ -41,8 +41,8 @@ def setupVanderpol(description, dt=0.1, mu=10):
     description["problem_class"] = vanderpol
     description["problem_params"] = {
         'newton_tol': 1e-09,
-        'newton_maxiter': 30,
-        'mu': mu,   # from 0.1 to 50
+        'newton_maxiter': 300,
+        'mu': mu,   # vanderpol parameter
         'u0': np.array([2.0, 0]),
         }
 

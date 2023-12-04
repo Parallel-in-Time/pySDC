@@ -10,16 +10,16 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
-from utils import solVanderpolExact, solVanderpolSDC, getParamsSDC
+from utils import solVanderpolExact
 
 script = __file__.split('/')[-1].split('.')[0]
 
 
-muVals = [0.1, 2, 10, 50]
+muVals = [0.1, 2, 10]
 muPeriods = []
 
-tEnd = 100
-nSteps = 1000
+tEnd = 20
+nSteps = 200
 tVals = np.linspace(0, tEnd, nSteps+1)
 
 # Compute and plot unscaled solution to determined period for each mu
@@ -49,17 +49,8 @@ for mu, tEnd in zip(muVals, muPeriods):
     plt.plot(tVals/tEnd, uExact[:, 0], '-', label=f"$\mu=${mu}")
     print(' -- done')
 
-    print(f"Computing SDC solution up to t={tEnd:.1f} for mu={mu} ...")
-    uSDC, _ = solVanderpolSDC(tEnd, nSteps, getParamsSDC(), mu=mu)
-    plt.figure(f"{script}_traj_scaled_sdc")
-    plt.plot(tVals/tEnd, uExact[:, 0], '-', label=f"$\mu=${mu}")
-    print(' -- done')
-
 # Figure settings
-for figName in [
-        f"{script}_traj", f"{script}_accel",
-        f"{script}_traj_scaled", f"{script}_traj_scaled_sdc"
-        ]:
+for figName in [f"{script}_traj", f"{script}_accel", f"{script}_traj_scaled"]:
     plt.figure(figName)
     plt.legend()
     plt.xlabel("time (scaled)" if "scaled" in figName else "time")
