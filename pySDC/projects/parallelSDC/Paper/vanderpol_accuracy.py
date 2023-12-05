@@ -14,7 +14,7 @@ Note : implementation in progress ...
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import getParamsSDC, solVanderpolSDC, solVanderpolExact
+from utils import getParamsSDC, solutionSDC, solutionExact
 
 muVals = [0.1, 2, 10]
 tEndVals = [6.3, 7.6, 18.9] # tEnd = 1 period for each mu
@@ -35,6 +35,8 @@ nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
 
+symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
+
 # qDeltaList = ['LU']
 nSweepList = [4]
 
@@ -47,8 +49,13 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
 
     dtVals = tEnd/nStepsList
 
+    i = 0
     for qDelta in qDeltaList:
         for nSweeps in nSweepList:
+
+            sym = symList[i]
+            i += 1
+
             name = f"{qDelta}({nSweeps})"
             print(f'computing for {name} ...')
 
@@ -58,10 +65,11 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
             for nSteps in nStepsList:
                 print(f' -- nSteps={nSteps} ...')
 
-                uRef = solVanderpolExact(tEnd, nSteps, mu=mu)
+                uRef = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
 
                 paramsSDC = getParamsSDC(qDeltaI=qDelta, nSweeps=nSweeps)
-                uSDC, counters = solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=mu)
+                uSDC, counters = solutionSDC(
+                    tEnd, nSteps, paramsSDC, "VANDERPOL", mu=mu)
 
                 err = getError(uSDC, uRef)
                 errors.append(err)
@@ -69,9 +77,9 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
                 costs.append(getCost(counters))
 
             # error VS dt
-            axs[0, j].loglog(dtVals, errors, 'o-', label=name)
+            axs[0, j].loglog(dtVals, errors, sym+'-', label=name)
             # error VS cost
-            axs[1, j].loglog(costs, errors, 'o-', label=name)
+            axs[1, j].loglog(costs, errors, sym+'-', label=name)
 
     for i in range(2):
         if i == 0:

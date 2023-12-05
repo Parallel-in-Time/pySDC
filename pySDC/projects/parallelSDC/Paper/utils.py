@@ -13,9 +13,26 @@ from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
+import matplotlib.pyplot as _plt
 
-def getParamsSDC(
-        quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3, dt=0.1):
+# General matplotlib settings
+_plt.rc('font', size=12)
+_plt.rcParams['lines.linewidth'] = 2
+_plt.rcParams['axes.titlesize'] = 18
+_plt.rcParams['axes.labelsize'] = 16
+_plt.rcParams['xtick.labelsize'] = 16
+_plt.rcParams['ytick.labelsize'] = 16
+_plt.rcParams['xtick.major.pad'] = 5
+_plt.rcParams['ytick.major.pad'] = 5
+_plt.rcParams['axes.labelpad'] = 6
+_plt.rcParams['markers.fillstyle'] = 'none'
+_plt.rcParams['lines.markersize'] = 7.0
+_plt.rcParams['lines.markeredgewidth'] = 1.5
+_plt.rcParams['mathtext.fontset'] = 'cm'
+_plt.rcParams['mathtext.rm'] = 'serif'
+_plt.rcParams['figure.max_open_warning'] = 100
+
+def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3):
 
     description = {
         # Sweeper and its parameters
@@ -30,51 +47,41 @@ def getParamsSDC(
         "step_params": {
             "maxiter": nSweeps,
             },
-        # Level parameters
-        "level_params": {
-            "restol": 1e-16,
-            "dt": dt,
-            "nsweeps": 1,
-            },
         }
 
     return description
 
 
-def setupProblem(name, description, **kwargs):
-    """Add Vanderpol settings to pySDC description parameters"""
+def setupProblem(name, description, dt, **kwargs):
+    """Add problem settings to pySDC description parameters"""
 
-    # Problem class and parameters
-    description["problem_class"] = vanderpol
-    description["problem_params"] = {
-        'newton_tol': 1e-09,
-        'newton_maxiter': 300,
-        'mu': kwargs.get("mu"),   # vanderpol parameter
-        'u0': np.array([2.0, 0]),
-        }
-
-
-def setupLorenz(description, dt=0.1):
-    """Add Lorenz settings to pySDC description parameters"""
-
-    # Problem class and parameters
-    description["problem_class"] = LorenzAttractor
+    # Common newton tolerance and max number of iterations
     description["problem_params"] = {
         'newton_tol': 1e-09,
         'newton_maxiter': 300,
         }
-
-    # Level parameters
+        # Level parameters
     description["level_params"] = {
         "restol": 1e-16,
         "dt": dt,
         "nsweeps": 1,
         }
 
+    if name == "VANDERPOL":
+        description["problem_class"] = vanderpol
+        description["problem_params"].update({
+            'mu': kwargs.get("mu", 10),   # vanderpol parameter
+            'u0': np.array([2.0, 0]),
+            })
+    elif name == "LORENZ":
+        description["problem_class"] = LorenzAttractor
+    else:
+        raise NotImplementedError(f"problem {name} not implemented")
 
-def solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=10):
+
+def solutionSDC(tEnd, nSteps, paramsSDC, probName, **kwargs):
     dt = tEnd/nSteps
-    setupVanderpol(paramsSDC, dt, mu)
+    setupProblem(probName, paramsSDC, dt, **kwargs)
 
     controller = controller_nonMPI(
         num_procs=1,
@@ -105,14 +112,20 @@ def solVanderpolSDC(tEnd, nSteps, paramsSDC, mu=10):
     return uSDC, (nNewton, nRHS)
 
 
-def solVanderpolExact(tEnd, nSteps, mu=10):
+def solutionExact(tEnd, nSteps, probName, **kwargs):
     """Return the exact solution of the Van-der-Pol problem at tEnd"""
 
-    key = f"{tEnd}_{nSteps}_{mu}"
+    if probName == "VANDERPOL":
+        mu = kwargs.get('mu', 10)
+        key = f"{tEnd}_{nSteps}_{mu}"
+        cacheFile = '_solVanderpolExact.json'
+    elif probName == "LORENZ":
+        key = f"{tEnd}_{nSteps}"
+        cacheFile = '_solLorenzExact.json'
 
     # Eventually load already computed solution from local cache
     try:
-        with open('_solVanderpolExact.json', "r") as f:
+        with open(cacheFile, "r") as f:
             cache = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         cache = {}
@@ -121,7 +134,8 @@ def solVanderpolExact(tEnd, nSteps, mu=10):
 
     # Compute solution
     params = getParamsSDC()
-    setupVanderpol(params, mu=mu)
+    dt = tEnd/nSteps
+    setupProblem(probName, params, dt, **kwargs)
 
     controller = controller_nonMPI(
         num_procs=1,
@@ -130,11 +144,11 @@ def solVanderpolExact(tEnd, nSteps, mu=10):
     )
 
     tVals = np.linspace(0, tEnd, nSteps+1)
-    sol = np.array([controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
+    uExact = np.array([controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
 
     # Save solution in local cache
-    cache[key] = sol.tolist()
-    with open('_solVanderpolExact.json', "w") as f:
+    cache[key] = uExact.tolist()
+    with open(cacheFile, "w") as f:
         json.dump(cache, f)
 
-    return sol
+    return uExact

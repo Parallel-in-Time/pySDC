@@ -10,7 +10,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
-from utils import solVanderpolExact
+from utils import solutionExact
 
 script = __file__.split('/')[-1].split('.')[0]
 
@@ -26,11 +26,11 @@ tVals = np.linspace(0, tEnd, nSteps+1)
 for mu in muVals:
 
     print(f"Computing exact solution up to t={tEnd} for mu={mu} ...")
-    uExact = solVanderpolExact(tEnd, nSteps, mu=mu)
+    uExact = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
     plt.figure(f"{script}_traj")
-    plt.plot(tVals, uExact[:, 0], '-', label=f"$\mu=${mu}")
+    plt.plot(tVals, uExact[:, 0], '-', label=f"$\mu={mu}$")
     plt.figure(f"{script}_accel")
-    plt.plot(tVals, uExact[:, 1], '-', label=f"$\mu=${mu}")
+    plt.plot(tVals, uExact[:, 1], '-', label=f"$\mu={mu}$")
 
     x = uExact[:, 0]
     idx = sp.signal.find_peaks(x)[0][0]
@@ -44,9 +44,9 @@ for mu, tEnd in zip(muVals, muPeriods):
     tVals = np.linspace(0, tEnd, nSteps+1)
 
     print(f"Computing exact solution up to t={tEnd:.1f} for mu={mu} ...")
-    uExact = solVanderpolExact(tEnd, nSteps, mu=mu)
+    uExact = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
     plt.figure(f"{script}_traj_scaled")
-    plt.plot(tVals/tEnd, uExact[:, 0], '-', label=f"$\mu=${mu}")
+    plt.plot(tVals/tEnd, uExact[:, 0], '-', label=f"$\mu={mu}$")
     print(' -- done')
 
 # Figure settings
@@ -55,6 +55,7 @@ for figName in [f"{script}_traj", f"{script}_accel", f"{script}_traj_scaled"]:
     plt.legend()
     plt.xlabel("time (scaled)" if "scaled" in figName else "time")
     plt.ylabel("trajectory" if "traj" in figName else "acceleration")
+    plt.tight_layout()
     plt.savefig(f'{figName}.pdf', bbox_inches="tight")
 
 plt.show()
