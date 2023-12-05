@@ -75,6 +75,9 @@ def setupProblem(name, description, dt, **kwargs):
             })
     elif name == "LORENZ":
         description["problem_class"] = LorenzAttractor
+        description["problem_params"].update({
+            'u0': kwargs.get("u0", (1, 1, 1)),
+            })
     else:
         raise NotImplementedError(f"problem {name} not implemented")
 
@@ -120,7 +123,8 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         key = f"{tEnd}_{nSteps}_{mu}"
         cacheFile = '_solVanderpolExact.json'
     elif probName == "LORENZ":
-        key = f"{tEnd}_{nSteps}"
+        u0 = kwargs.get('u0', (1, 1, 1))
+        key = f"{tEnd}_{nSteps}_{u0}"
         cacheFile = '_solLorenzExact.json'
 
     # Eventually load already computed solution from local cache
