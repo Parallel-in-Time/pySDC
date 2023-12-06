@@ -10,7 +10,7 @@ import numpy as np
 from time import time
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol, ProblemError
+from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
@@ -138,7 +138,7 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
         uTmp[:] = uSDC[i]
         try:
             uSDC[i+1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i+1])
-        except ProblemError:
+        except Exception:
             return None, (0, 0, 0)
     tComp = time() - tBeg
 

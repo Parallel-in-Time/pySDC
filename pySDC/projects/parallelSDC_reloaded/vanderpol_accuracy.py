@@ -28,14 +28,15 @@ def getCost(counters):
     nNewton, nRHS, tComp = counters
     return nNewton + nRHS
 
-parEfficiency = 0.8
-
-
 # Base variable parameters
 nNodes = 4
+quadType = 'RADAU-RIGHT'
+nodeType = 'LEGENDRE'
+parEfficiency = 1/nNodes
+
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'DIRK43',
-    # 'IE', 'LU', 'IEpar',
+    # 'RK4', 'ESDIRK53', 'DIRK43',
+    'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1'
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
@@ -69,7 +70,7 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
                 name = name[:-3]
             except KeyError:
                 params = getParamsSDC(
-                    quadType="RADAU-RIGHT", numNodes=nNodes, nodeType="LEGENDRE",
+                    quadType=quadType, numNodes=nNodes, nodeType=nodeType,
                     qDeltaI=qDelta, nSweeps=nSweeps)
             print(f'computing for {name} ...')
 
@@ -88,7 +89,7 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
                 errors.append(err)
 
                 cost = getCost(counters)
-                if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']:
+                if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1', 'PIC']:
                     cost /= nNodes*parEfficiency
                 costs.append(cost)
 
