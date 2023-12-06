@@ -12,6 +12,11 @@ job_juwels_compute:
     - jacamar
     - compute
     - slurm
+  variables:
+    SCHEDULER_PARAMETERS: >
+      --account=cstma
+      --nodes=1 
+      --partition=devel
   artifacts:
     paths:
       - test.file
