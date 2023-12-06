@@ -14,7 +14,7 @@ Note : implementation in progress ...
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import getParamsSDC, solutionSDC, solutionExact
+from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 tEnd = 2.82
 
@@ -25,11 +25,11 @@ def getError(uNum, uRef):
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return tComp
+    return nNewton, nRHS
 
 
 # Base variable parameters
-qDeltaList = ['LU', 'IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']
+qDeltaList = ['RK4', 'ESDIRK53', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']
 nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
@@ -37,7 +37,7 @@ nSweepList = [1, 2, 3, 4, 5, 6]
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
 # qDeltaList = ['MIN-SR-NS']
-nSweepList = [4]
+nSweepList = [5]
 
 fig, axs = plt.subplots(1, 2)
 
@@ -52,6 +52,13 @@ for qDelta in qDeltaList:
         i += 1
 
         name = f"{qDelta}({nSweeps})"
+        try:
+            params = getParamsRK(qDelta)
+            name = name[:-3]
+        except KeyError:
+            params = getParamsSDC(
+                quadType="RADAU-RIGHT", numNodes=4, nodeType="LEGENDRE",
+                qDeltaI=qDelta, nSweeps=nSweeps)
         print(f'computing for {name} ...')
 
         errors = []
@@ -62,16 +69,15 @@ for qDelta in qDeltaList:
 
             uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
-            paramsSDC = getParamsSDC(
-                quadType="LOBATTO", numNodes=5, nodeType="EQUID",
-                qDeltaI=qDelta, nSweeps=nSweeps)
             uSDC, counters = solutionSDC(
-                tEnd, nSteps, paramsSDC, "LORENZ", u0=(5, -5, 20))
+                tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
+            if qDelta not in ["RK4", "ESDIRK53"]:
+                cost /= 4
             costs.append(cost)
 
         # error VS dt

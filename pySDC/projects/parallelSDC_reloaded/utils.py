@@ -13,6 +13,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol, ProblemError
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
 import matplotlib.pyplot as _plt
 
@@ -56,6 +57,28 @@ def getParamsSDC(
     return description
 
 
+RK_SWEEPERS = {
+    "RK4": rk.RK4,
+    "DIRK43": rk.DIRK43,
+    "ESDIRK53": rk.ESDIRK53
+}
+
+
+def getParamsRK(method="RK4"):
+
+    description = {
+        # Sweeper and its parameters
+        "sweeper_class": RK_SWEEPERS[method],
+        "sweeper_params": {},
+        # Step parameters
+        "step_params": {
+            "maxiter": 1,
+            },
+        }
+
+    return description
+
+
 def setupProblem(name, description, dt, **kwargs):
     """Add problem settings to pySDC description parameters"""
 
@@ -66,7 +89,7 @@ def setupProblem(name, description, dt, **kwargs):
         }
         # Level parameters
     description["level_params"] = {
-        "restol": 1e-16,
+        "restol": -1,
         "dt": dt,
         "nsweeps": 1,
         }
@@ -86,14 +109,14 @@ def setupProblem(name, description, dt, **kwargs):
         raise NotImplementedError(f"problem {name} not implemented")
 
 
-def solutionSDC(tEnd, nSteps, paramsSDC, probName, **kwargs):
+def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
     dt = tEnd/nSteps
-    setupProblem(probName, paramsSDC, dt, **kwargs)
+    setupProblem(probName, params, dt, **kwargs)
 
     controller = controller_nonMPI(
         num_procs=1,
         controller_params={'logger_level': 30},
-        description=paramsSDC
+        description=params
     )
 
     prob = controller.MS[0].levels[0].prob
@@ -162,3 +185,7 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         json.dump(cache, f)
 
     return uExact
+
+
+def solutionRK(tEnd, nSteps, probName, method="RK4"):
+    pass

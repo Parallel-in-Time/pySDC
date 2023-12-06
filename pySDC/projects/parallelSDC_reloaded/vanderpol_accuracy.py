@@ -14,7 +14,7 @@ Note : implementation in progress ...
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import getParamsSDC, solutionSDC, solutionExact
+from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 muVals = [0.1, 2, 10]
 tEndVals = [6.3, 7.6, 18.9] # tEnd = 1 period for each mu
@@ -38,7 +38,7 @@ nSweepList = [1, 2, 3, 4, 5, 6]
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
 # qDeltaList = ['LU']
-nSweepList = [4]
+nSweepList = [5]
 
 fig, axs = plt.subplots(2, len(muVals))
 
@@ -57,6 +57,14 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
             i += 1
 
             name = f"{qDelta}({nSweeps})"
+            try:
+                params = getParamsRK(qDelta)
+                name = name[:-3]
+            except KeyError:
+                params = getParamsSDC(
+                    quadType="RADAU-RIGHT", numNodes=4, nodeType="LEGENDRE",
+                    qDeltaI=qDelta, nSweeps=nSweeps)
+            print(f'computing for {name} ...')
             print(f'computing for {name} ...')
 
             errors = []
@@ -67,9 +75,8 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
 
                 uRef = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
 
-                paramsSDC = getParamsSDC(qDeltaI=qDelta, nSweeps=nSweeps)
                 uSDC, counters = solutionSDC(
-                    tEnd, nSteps, paramsSDC, "VANDERPOL", mu=mu)
+                    tEnd, nSteps, params, "VANDERPOL", mu=mu)
 
                 err = getError(uSDC, uRef)
                 errors.append(err)
