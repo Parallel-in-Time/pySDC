@@ -203,50 +203,50 @@ jobs:
 #          ls -ratl
 
 
-  post-processing:
-    runs-on: ubuntu-latest
+  # post-processing:
+  #   runs-on: ubuntu-latest
 
-    if: ${{ github.repository_owner == 'Parallel-in-Time'}}
+  #   if: ${{ github.repository_owner == 'Parallel-in-Time'}}
 
-    needs:
-      - lint
-      - user_cpu_tests_linux
-      - user_libpressio_tests
+  #   needs:
+  #     - lint
+  #     - user_cpu_tests_linux
+  #     - user_libpressio_tests
 #       - wait_for_gitlab
 
-    defaults:
-      run:
-        shell: bash -l {0}
+    # defaults:
+    #   run:
+    #     shell: bash -l {0}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    # steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v3
 
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: "etc/environment-base.yml"
+    #   - name: Install Conda environment with Micromamba
+    #     uses: mamba-org/setup-micromamba@v1
+    #     with:
+    #       environment-file: "etc/environment-base.yml"
 
-      - name: Downloading artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: .
+    #   - name: Downloading artifacts
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       path: .
 
-      - name: Prepare artifacts
-        run: |
-          ls -artl cpu-test-artifacts
-          cp cpu-test-artifacts/data_3.10/* data/.
-          python -m coverage combine cpu-test-artifacts/coverage_*_3.10.dat
-          python -m coverage xml
-          python -m coverage html
+    #   - name: Prepare artifacts
+    #     run: |
+    #       ls -artl cpu-test-artifacts
+    #       cp cpu-test-artifacts/data_3.10/* data/.
+    #       python -m coverage combine cpu-test-artifacts/coverage_*_3.10.dat
+    #       python -m coverage xml
+    #       python -m coverage html
 
-      - name: Generate Coverage badge
-        run: |
-          pip install genbadge[all]
-          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
+    #   - name: Generate Coverage badge
+    #     run: |
+    #       pip install genbadge[all]
+    #       genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
           
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+    #   - name: Upload coverage reports to Codecov
+    #     uses: codecov/codecov-action@v3
         
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
@@ -271,13 +271,13 @@ jobs:
 #          user_email: 'sig.pancetta+github@email.com'
 #          user_name: 'pancetta'
 
-      - name: Build html I
-        run: |
-          chmod u+x ./docs/update_apidocs.sh
-          ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
-          mkdir -p docs/build/html/coverage
-          mv htmlcov/* docs/build/html/coverage/.
+      # - name: Build html I
+      #   run: |
+      #     chmod u+x ./docs/update_apidocs.sh
+      #     ./docs/update_apidocs.sh
+      #     sphinx-build -b html docs/source docs/build/html
+      #     mkdir -p docs/build/html/coverage
+      #     mv htmlcov/* docs/build/html/coverage/.
 
 #      - name: Build html II
 #        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
@@ -285,18 +285,18 @@ jobs:
 #          mkdir -p docs/build/html/benchmarks
 #          cp -r bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
 
-      - name: Store docs
-        uses: actions/upload-artifact@v3
-        with:
-          name: docs
-          path: docs/build/html
+      # - name: Store docs
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: docs
+      #     path: docs/build/html
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' }}
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/html # The folder the action should deploy.
+      # - name: Deploy 🚀
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' }}
+      #   with:
+      #     branch: gh-pages # The branch the action should deploy to.
+      #     folder: docs/build/html # The folder the action should deploy.
 
 #  spawn_gitlab_and_postprocess:
 #    runs-on: ubuntu-latest
