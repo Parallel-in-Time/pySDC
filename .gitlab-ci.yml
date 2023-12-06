@@ -4,11 +4,11 @@ stages:
   - execute
   - upload
 
-variables:
-  SCHEDULER_PARAMETERS: '--account=cstma --nodes=1 --partition=devel'
 
 job_juwels_compute:
   stage: execute
+  variables:
+    SCHEDULER_PARAMETERS: '--account=cstma --nodes=1 --partition=devel'
   tags:
     - juwels
     - jacamar
