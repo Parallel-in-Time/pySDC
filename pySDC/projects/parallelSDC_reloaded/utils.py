@@ -7,6 +7,7 @@ Utility functions to investigate parallel SDC on non-linear problems
 """
 import json
 import numpy as np
+from time import time
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol, ProblemError
@@ -32,7 +33,9 @@ _plt.rcParams['mathtext.fontset'] = 'cm'
 _plt.rcParams['mathtext.rm'] = 'serif'
 _plt.rcParams['figure.max_open_warning'] = 100
 
-def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3):
+def getParamsSDC(
+        quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3,
+        nodeType="LEGENDRE"):
 
     description = {
         # Sweeper and its parameters
@@ -40,6 +43,7 @@ def getParamsSDC(quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3):
         "sweeper_params": {
             "quad_type": quadType,
             "num_nodes": numNodes,
+            "node_type": nodeType,
             "initial_guess": 'spread',
             "QI": qDeltaI,
             },
@@ -101,18 +105,20 @@ def solutionSDC(tEnd, nSteps, paramsSDC, probName, **kwargs):
     uSDC[0] = uInit
 
     tVals = np.linspace(0, tEnd, nSteps+1)
+    tBeg = time()
     for i in range(nSteps):
         uTmp[:] = uSDC[i]
         try:
             uSDC[i+1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i+1])
         except ProblemError:
-            return None, (0, 0)
+            return None, (0, 0, 0)
+    tComp = time() - tBeg
 
     nNewton = prob.work_counters["newton"].niter
     nRHS = prob.work_counters["rhs"].niter
-    print(f"    done, newton:{nNewton}, rhs:{nRHS}")
+    print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
 
-    return uSDC, (nNewton, nRHS)
+    return uSDC, (nNewton, nRHS, tComp)
 
 
 def solutionExact(tEnd, nSteps, probName, **kwargs):

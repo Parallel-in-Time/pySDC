@@ -25,8 +25,8 @@ def getError(uNum, uRef):
     return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
 
 def getCost(counters):
-    nNewton, nRHS = counters
-    return nNewton + nRHS
+    nNewton, nRHS, tComp = counters
+    return tComp
 
 
 # Base variable parameters

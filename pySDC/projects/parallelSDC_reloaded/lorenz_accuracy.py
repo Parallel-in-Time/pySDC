@@ -24,12 +24,12 @@ def getError(uNum, uRef):
     return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
 
 def getCost(counters):
-    nNewton, nRHS = counters
-    return nNewton + nRHS
+    nNewton, nRHS, tComp = counters
+    return tComp
 
 
 # Base variable parameters
-qDeltaList = ['LU', 'IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1', 'MIN3']
+qDeltaList = ['LU', 'IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']
 nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
@@ -62,7 +62,9 @@ for qDelta in qDeltaList:
 
             uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
 
-            paramsSDC = getParamsSDC(qDeltaI=qDelta, nSweeps=nSweeps)
+            paramsSDC = getParamsSDC(
+                quadType="LOBATTO", numNodes=5, nodeType="EQUID",
+                qDeltaI=qDelta, nSweeps=nSweeps)
             uSDC, counters = solutionSDC(
                 tEnd, nSteps, paramsSDC, "LORENZ", u0=(5, -5, 20))
 
@@ -81,6 +83,7 @@ for i in range(2):
     axs[i].set(
         xlabel=r"$\Delta{t}$" if i == 0 else "cost",
         ylabel=r"$L_\infty$ error",
+        ylim=(8.530627786509715e-08, 372.2781393394293),
     )
     axs[i].legend(loc="lower right" if i == 0 else "lower left")
     axs[i].grid()
