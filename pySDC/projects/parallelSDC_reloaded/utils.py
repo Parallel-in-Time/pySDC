@@ -47,6 +47,8 @@ def getParamsSDC(
             "node_type": nodeType,
             "initial_guess": 'spread',
             "QI": qDeltaI,
+            'skip_residual_computation':
+                ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
             },
         # Step parameters
         "step_params": {
@@ -69,7 +71,10 @@ def getParamsRK(method="RK4"):
     description = {
         # Sweeper and its parameters
         "sweeper_class": RK_SWEEPERS[method],
-        "sweeper_params": {},
+        "sweeper_params": {
+            'skip_residual_computation':
+                ('IT_CHECK', 'IT_DOWN', 'IT_UP', 'IT_FINE', 'IT_COARSE')
+            },
         # Step parameters
         "step_params": {
             "maxiter": 1,
@@ -175,9 +180,13 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         controller_params={'logger_level': 30},
         description=params
     )
+    solver = controller.MS[0].levels[0].prob.u_exact
 
     tVals = np.linspace(0, tEnd, nSteps+1)
-    uExact = np.array([controller.MS[0].levels[0].prob.u_exact(t) for t in tVals])
+    uExact = [solver(0)]
+    for i in range(nSteps):
+        uExact.append(solver(tVals[i+1], uExact[-1], tVals[i]))
+    uExact = np.array(uExact)
 
     # Save solution in local cache
     cache[key] = uExact.tolist()

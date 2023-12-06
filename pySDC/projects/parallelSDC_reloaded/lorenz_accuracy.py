@@ -25,12 +25,19 @@ def getError(uNum, uRef):
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return nNewton, nRHS
+    return nNewton + nRHS
+
+parEfficiency = 0.8
 
 
 # Base variable parameters
-qDeltaList = ['RK4', 'ESDIRK53', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']
-nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
+nNodes = 4
+qDeltaList = [
+    'RK4', 'ESDIRK53', 'DIRK43',
+    # 'IE', 'LU', 'IEpar',
+    'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1'
+]
+nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
 
@@ -57,7 +64,7 @@ for qDelta in qDeltaList:
             name = name[:-3]
         except KeyError:
             params = getParamsSDC(
-                quadType="RADAU-RIGHT", numNodes=4, nodeType="LEGENDRE",
+                quadType="RADAU-RIGHT", numNodes=nNodes, nodeType="LEGENDRE",
                 qDeltaI=qDelta, nSweeps=nSweeps)
         print(f'computing for {name} ...')
 
@@ -76,8 +83,8 @@ for qDelta in qDeltaList:
             errors.append(err)
 
             cost = getCost(counters)
-            if qDelta not in ["RK4", "ESDIRK53"]:
-                cost /= 4
+            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']:
+                cost /= nNodes*parEfficiency
             costs.append(cost)
 
         # error VS dt

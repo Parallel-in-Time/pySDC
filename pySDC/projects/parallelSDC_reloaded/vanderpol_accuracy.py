@@ -26,19 +26,26 @@ def getError(uNum, uRef):
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return tComp
+    return nNewton + nRHS
+
+parEfficiency = 0.8
 
 
 # Base variable parameters
-qDeltaList = ['LU', 'IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1', 'MIN3']
-nStepsList = np.array([2, 5, 10, 100, 200, 500, 1000])
+nNodes = 4
+qDeltaList = [
+    'RK4', 'ESDIRK53', 'DIRK43',
+    # 'IE', 'LU', 'IEpar',
+    'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1'
+]
+nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
 # qDeltaList = ['LU']
-nSweepList = [5]
+nSweepList = [4]
 
 fig, axs = plt.subplots(2, len(muVals))
 
@@ -62,9 +69,8 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
                 name = name[:-3]
             except KeyError:
                 params = getParamsSDC(
-                    quadType="RADAU-RIGHT", numNodes=4, nodeType="LEGENDRE",
+                    quadType="RADAU-RIGHT", numNodes=nNodes, nodeType="LEGENDRE",
                     qDeltaI=qDelta, nSweeps=nSweeps)
-            print(f'computing for {name} ...')
             print(f'computing for {name} ...')
 
             errors = []
@@ -81,7 +87,10 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
                 err = getError(uSDC, uRef)
                 errors.append(err)
 
-                costs.append(getCost(counters))
+                cost = getCost(counters)
+                if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN-1']:
+                    cost /= nNodes*parEfficiency
+                costs.append(cost)
 
             # error VS dt
             axs[0, j].loglog(dtVals, errors, sym+'-', label=name)
