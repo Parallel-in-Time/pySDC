@@ -3,6 +3,40 @@ stages:
   - benchmark
   - upload
 
+test_JUWELS:
+  image: rcaspart/micromamba-cuda
+  stage: benchmark
+  variables:
+    SCHEDULER_PARAMETERS: >
+      --account=cstma
+      --nodes=1 
+      --partition=devel
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  tags:
+    - jacamar
+    - juwels
+    - slurm
+    - compute
+  parallel:
+    matrix:
+      - PYTHON: [ '3.9', '3.10' ]
+  artifacts:
+    paths:
+      - benchmarks
+  # before_script:
+    # - micromamba create --yes -f etc/environment-base.yml
+    # - eval "$(micromamba shell hook --shell=bash)"
+    # - micromamba activate pySDC
+    # - micromamba install -c conda-forge git openssh
+    # - git config --global --add safe.directory '*'
+  script:
+    - mkdir -p benchmarks
+    - touch benchmarks/output.json
+    - echo $SYSTEMNAME
+    # - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
+
+
 #test_kit:
 #  image: rcaspart/micromamba-cuda
 #  stage: benchmark
@@ -64,6 +98,7 @@ stages:
 benchmark:
   image: mambaorg/micromamba
   stage: benchmark
+  when: manual
   tags:
     - docker
   rules:
