@@ -117,7 +117,7 @@ class sweeper(object):
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
             self.parallelizable = True
-        elif qd_type.startswith('FLEX-MIN'):
+        elif qd_type.startswith('MIN-SR-FLEX'):
             m = QDmat.shape[0] - 1
             try:
                 k = int(qd_type[9:])

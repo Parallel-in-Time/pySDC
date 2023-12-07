@@ -995,7 +995,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=0.790070in,y=1.118612in,left,base]{\color{textcolor}\rmfamily\fontsize{8.000000}{9.600000}\selectfont FLEX-MIN-2}%
+\pgftext[x=0.790070in,y=1.118612in,left,base]{\color{textcolor}\rmfamily\fontsize{8.000000}{9.600000}\selectfont MIN-SR-FLEX-2}%
 \end{pgfscope}%
 \end{pgfpicture}%
 \makeatother%

@@ -13,7 +13,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 
 def main():
 
-    qd_list = ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN', 'MIN3']
+    qd_list = ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'MIN3']
 
     level_params = dict()
     level_params['restol'] = 1e-16

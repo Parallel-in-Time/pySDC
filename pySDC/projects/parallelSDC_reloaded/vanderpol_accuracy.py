@@ -37,7 +37,7 @@ parEfficiency = 1/nNodes
 qDeltaList = [
     # 'RK4', 'ESDIRK53', 'DIRK43',
     'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN'
+    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX'
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
@@ -89,7 +89,7 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals)):
                 errors.append(err)
 
                 cost = getCost(counters)
-                if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN', 'PIC']:
+                if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
                     cost /= nNodes*parEfficiency
                 costs.append(cost)
 

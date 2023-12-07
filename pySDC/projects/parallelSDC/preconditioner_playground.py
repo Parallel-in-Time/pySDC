@@ -39,7 +39,7 @@ def main():
 
     # set up list of Q-delta types and setups
     #qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN', 'MIN3', 'MIN_GT']
-    qd_list = ['LU', 'MIN-SR-S', 'MIN3', 'FLEX-MIN-2']
+    qd_list = ['LU', 'MIN-SR-S', 'MIN3', 'MIN-SR-FLEX']
     setup_list = [
         ('heat', 63, [10.0**i for i in range(-3, 3)]),
         ('advection', 64, [10.0**i for i in range(-3, 3)]),
@@ -191,7 +191,7 @@ def plot_iterations():
     #assert len(qd_type_list) == 7, 'ERROR did not find seven preconditioners, got %s' % qd_type_list
     #assert len(setup_list) == 5, 'ERROR: did not find five setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'MIN-SR-S', 'MIN3', 'FLEX-MIN-2']#['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'FLEX-MIN-2']
+    qd_type_list = ['LU', 'MIN-SR-S', 'MIN3', 'MIN-SR-FLEX']#['LU', 'MIN-SR-S', 'IEpar', 'MIN', 'MIN3', 'MIN_GT', 'MIN-SR-FLEX']
     marker_list = [None, 'X', 's', 'o', '^', 'd', 'x']
     color_list = ['k', 'k', 'r', 'g', 'b', 'c', 'm']
 

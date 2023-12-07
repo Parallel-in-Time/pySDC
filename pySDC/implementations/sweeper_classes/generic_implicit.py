@@ -65,9 +65,9 @@ class generic_implicit(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        # update the FLEX-MIN- preconditioner
-        if self.params.QI.startswith('FLEX-MIN'):
-            self.params.QI = 'FLEX-MIN' + str(L.status.sweep)
+        # update the MIN-SR-FLEX preconditioner
+        if self.params.QI.startswith('MIN-SR-FLEX'):
+            self.params.QI = 'MIN-SR-FLEX' + str(L.status.sweep)
             self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
 
         # gather all terms which are known already (e.g. from the previous iteration)

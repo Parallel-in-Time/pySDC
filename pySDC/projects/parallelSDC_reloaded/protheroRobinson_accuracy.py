@@ -19,7 +19,7 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 # Problem parameters
 tEnd = 2*np.pi
 nonLinear = False
-epsilon = 1e-9
+epsilon = 1e-3
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -42,13 +42,13 @@ parEfficiency = 1/nNodes
 qDeltaList = [
     'RK4', 'ESDIRK53', 'DIRK43',
     # 'IE', 'LU', 'IEpar', 'PIC',
-    'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN',
-    "MIN3",
+    'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
+    # "MIN3",
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
-# qDeltaList = ['FLEX-MIN']
+# qDeltaList = ['MIN-SR-FLEX']
 nSweepList = [4]
 
 
@@ -90,7 +90,7 @@ for qDelta in qDeltaList:
             errors.append(err)
 
             cost = getCost(counters)
-            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'FLEX-MIN', 'PIC']:
+            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
                 cost /= nNodes*parEfficiency
             costs.append(cost)
 
