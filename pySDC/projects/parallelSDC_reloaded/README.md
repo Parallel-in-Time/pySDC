@@ -20,5 +20,10 @@ Common utility scripts :
 
 ## Prothero-Robinson
 
-- [`protheroRobinson_setup.py`](./protheroRobinson_setup.py) : numerical solution for linear and non-linear case
+- [`protheroRobinson_setup.py`](./protheroRobinson_setup.py) : numerical solution for linear and non-linear case, for a given epsilon value
 - [`protheroRobinson_accuracy.py`](./protheroRobinson_accuracy.py) : investigate accuracy of diagonal SDC variants
+
+## Kaps
+
+- [`kaps_setup.py`](./kaps_setup.py) : numerical solution for a given epsilon value
+- [`kaps_accuracy.py`](./kaps_accuracy.py) : investigate accuracy of diagonal SDC variants

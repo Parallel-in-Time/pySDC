@@ -17,17 +17,17 @@ import matplotlib.pyplot as plt
 from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
-tEnd = 2*np.pi
-nonLinear = False
-epsilon = 1e-6
-
-pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
-
+tEnd = 1
+epsilon = 1e-9
+pName = "KAPS"
 
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
-    return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
+    return max(
+        np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf),
+        np.linalg.norm(uRef[:, 1] - uNum[:, 1], np.inf)
+        )
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
@@ -45,11 +45,11 @@ qDeltaList = [
     'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
     # "MIN3",
 ]
-nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
+nStepsList = np.array([2, 5, 10, 20, 50, 100])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
 # qDeltaList = ['MIN-SR-FLEX']
-nSweepList = [4]
+nSweepList = [5]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
@@ -103,7 +103,7 @@ for i in range(2):
     axs[i].set(
         xlabel=r"$\Delta{t}$" if i == 0 else "cost",
         ylabel=r"$L_\infty$ error",
-        ylim=(1e-5, 1e3),
+        ylim=(1e-17, 1e0),
     )
     axs[i].legend(loc="lower right" if i == 0 else "lower left")
     axs[i].grid()
