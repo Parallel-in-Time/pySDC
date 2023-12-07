@@ -12,6 +12,7 @@ from time import time
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
+from pySDC.implementations.problem_classes.odeScalar import ProtheroRobinson
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
@@ -110,6 +111,17 @@ def setupProblem(name, description, dt, **kwargs):
         description["problem_params"].update({
             'u0': kwargs.get("u0", (1, 1, 1)),
             })
+    elif name == "PROTHERO-ROBINSON":
+        description["problem_class"] = ProtheroRobinson
+        description["problem_params"].update({
+            'epsilon': kwargs.get("epsilon", 1e-3),
+            })
+    elif name == "PROTHERO-ROBINSON-NL":
+        description["problem_class"] = ProtheroRobinson
+        description["problem_params"].update({
+            'epsilon': kwargs.get("epsilon", 1e-3),
+            'nonLinear': True,
+            })
     else:
         raise NotImplementedError(f"problem {name} not implemented")
 
@@ -161,14 +173,16 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         key = f"{tEnd}_{nSteps}_{u0}"
         cacheFile = '_solLorenzExact.json'
 
+
+
     # Eventually load already computed solution from local cache
     try:
         with open(cacheFile, "r") as f:
             cache = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+        if key in cache:
+            return np.array(cache[key])
+    except (FileNotFoundError, json.JSONDecodeError, UnboundLocalError):
         cache = {}
-    if key in cache:
-        return np.array(cache[key])
 
     # Compute solution
     params = getParamsSDC()
@@ -188,10 +202,13 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         uExact.append(solver(tVals[i+1], uExact[-1], tVals[i]))
     uExact = np.array(uExact)
 
-    # Save solution in local cache
-    cache[key] = uExact.tolist()
-    with open(cacheFile, "w") as f:
-        json.dump(cache, f)
+    try:
+        # Save solution in local cache
+        cache[key] = uExact.tolist()
+        with open(cacheFile, "w") as f:
+            json.dump(cache, f)
+    except UnboundLocalError:
+        pass
 
     return uExact
 
