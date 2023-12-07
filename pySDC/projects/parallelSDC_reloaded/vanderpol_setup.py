@@ -56,6 +56,6 @@ for figName in [f"{script}_traj", f"{script}_accel", f"{script}_traj_scaled"]:
     plt.xlabel("time (scaled)" if "scaled" in figName else "time")
     plt.ylabel("trajectory" if "traj" in figName else "acceleration")
     plt.tight_layout()
-    plt.savefig(f'{figName}.pdf', bbox_inches="tight")
+    plt.savefig(f'fig/{figName}.pdf', bbox_inches="tight")
 
 plt.show()

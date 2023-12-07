@@ -40,6 +40,6 @@ plt.legend()
 plt.xlabel("time")
 plt.ylabel("trajectory")
 plt.tight_layout()
-plt.savefig(f'{figName}.pdf', bbox_inches="tight")
+plt.savefig(f'fig/{figName}.pdf', bbox_inches="tight")
 
 plt.show()

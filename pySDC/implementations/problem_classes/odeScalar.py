@@ -168,6 +168,6 @@ class ProtheroRobinson(ptype):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
         if n == self.newton_maxiter:
-            self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
+            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u
