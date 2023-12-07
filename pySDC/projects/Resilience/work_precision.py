@@ -11,6 +11,7 @@ from pySDC.projects.Resilience.Lorenz import run_Lorenz
 from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.Schroedinger import run_Schroedinger
 from pySDC.projects.Resilience.quench import run_quench
+from pySDC.projects.Resilience.AC import run_AC
 
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
@@ -32,10 +33,12 @@ MAPPINGS = {
     'k_linear': ('work_linear', sum, None),
     'k_Newton_no_restart': ('work_newton', sum, False),
     'k_rhs': ('work_rhs', sum, None),
+    'num_steps': ('dt', len, None),
     'restart': ('restart', sum, None),
     'dt_mean': ('dt', np.mean, False),
     'dt_max': ('dt', max, False),
     'dt_min': ('dt', min, False),
+    'dt_sigma': ('dt', np.std, False),
     'e_embedded_max': ('error_embedded_estimate', max, False),
     'u0_increment_max': ('u0_increment', max, None),
     'u0_increment_mean': ('u0_increment', np.mean, None),
@@ -55,12 +58,8 @@ def get_forbidden_combinations(problem, strategy, **kwargs):
         problem (function): A problem to run
         strategy (Strategy): SDC strategy
     """
-    if problem.__name__ == 'run_quench':
-        if strategy.name in ['ERK']:
-            return True
-
-    if problem.__name__ == 'run_Schroedinger':
-        if strategy.name in ['ERK']:
+    if strategy.name == 'ERK':
+        if problem.__name__ in ['run_quench', 'run_Schroedinger', 'run_AC']:
             return True
 
     return False
@@ -266,7 +265,7 @@ def record_work_precision(
             exponents = [-4, -3, -2, -1, 0, 1, 2]
     elif param == 'dt':
         power = 2.0
-        exponents = [-1, 0, 1, 2, 3]
+        exponents = [-1, 0, 1, 2, 3][::-1]
     elif param == 'restol':
         power = 10.0
         exponents = [-2, -1, 0, 1, 2, 3]
@@ -285,13 +284,9 @@ def record_work_precision(
         elif param == 'dt':
             param_range = [1.25, 2.5, 5.0, 10.0, 20.0][::-1]
 
-    elif problem.__name__ == 'run_AC':
-        if param == 'e_tol':
-            param_range = [1e-4, 1e-5, 1e-6, 1e-7, 1e-8][::-1]
-
     # run multiple times with different parameters
     for i in range(len(param_range)):
-        set_parameter(description, where, param_range[i] * strategy.precision_range_fac)
+        set_parameter(description, where, param_range[i])
 
         data[param_range[i]] = {key: [] for key in MAPPINGS.keys()}
         data[param_range[i]]['param'] = [param_range[i]]
@@ -537,6 +532,8 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'e_local_max': 'max. local error',
         'restart': 'restarts',
         'dt_max': r'$\Delta t_\mathrm{max}$',
+        'dt_min': r'$\Delta t_\mathrm{min}$',
+        'dt_sigma': r'$\sigma(\Delta t)$',
         'dt_mean': r'$\bar{\Delta t}$',
         'param': 'parameter',
         'u0_increment_max': r'$\| \Delta u_0 \|_{\infty} $',
@@ -559,6 +556,7 @@ def decorate_panel(ax, problem, work_key, precision_key, num_procs=1, title_only
         'run_Lorenz': 'Lorenz attractor',
         'run_Schroedinger': r'Schr\"odinger',
         'run_quench': 'Quench',
+        'run_AC': 'Allen-Cahn',
     }
     ax.set_title(titles.get(problem.__name__, ''))
 
@@ -744,19 +742,21 @@ def get_configs(mode, problem):
             BaseStrategy,
         )
 
-        configurations[1] = {
-            'strategies': [AdaptivityPolynomialError(useMPI=True)],
-        }
         configurations[2] = {
             'strategies': [kAdaptivityStrategy(useMPI=True)],
         }
-
+        configurations[1] = {
+            'strategies': [AdaptivityPolynomialError(useMPI=True)],
+        }
         configurations[0] = {
             'custom_description': {
                 'step_params': {'maxiter': 5},
                 'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
             },
-            'strategies': [AdaptivityStrategy(useMPI=True), BaseStrategy(useMPI=True)],
+            'strategies': [
+                AdaptivityStrategy(useMPI=True),
+                BaseStrategy(useMPI=True),
+            ],
         }
 
     elif mode == 'interpolate_between_restarts':
@@ -767,7 +767,7 @@ def get_configs(mode, problem):
 
         i = 0
         for interpolate_between_restarts, handle, ls in zip(
-            [True, False], ['Interpolation bewteen restarts', 'regular'], ['--', '-']
+            [True, False], ['Interpolation between restarts', 'regular'], ['--', '-']
         ):
             configurations[i] = {
                 'strategies': [
@@ -814,7 +814,7 @@ def get_configs(mode, problem):
         """
         from pySDC.projects.Resilience.strategies import AdaptivityStrategy, AdaptivityPolynomialError
 
-        if problem.__name__ in ['run_Schroedinger']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
@@ -1077,7 +1077,7 @@ def get_configs(mode, problem):
             AdaptivityPolynomialError,
         )
 
-        if problem.__name__ in ['run_Schroedinger']:
+        if problem.__name__ in ['run_Schroedinger', 'run_AC']:
             from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as parallel_sweeper
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit_MPI import (
@@ -1099,10 +1099,6 @@ def get_configs(mode, problem):
             5: ':',
         }
 
-        desc_RK = {}
-        if problem.__name__ in ['run_Schroedinger']:
-            desc_RK['problem_params'] = {'imex': True}
-
         configurations[3] = {
             'custom_description': desc_poly,
             'strategies': [AdaptivityPolynomialError(useMPI=True)],
@@ -1113,18 +1109,19 @@ def get_configs(mode, problem):
         configurations[-1] = {
             'strategies': [
                 ERKStrategy(useMPI=True),
-                ARKStrategy(useMPI=True) if problem.__name__ in ['run_Schroedinger'] else ESDIRKStrategy(useMPI=True),
+                ARKStrategy(useMPI=True)
+                if problem.__name__ in ['run_Schroedinger', 'run_AC']
+                else ESDIRKStrategy(useMPI=True),
             ],
             'num_procs': 1,
-            'custom_description': desc_RK,
         }
-
         configurations[2] = {
             'strategies': [AdaptivityStrategy(useMPI=True)],
             'custom_description': desc,
             'num_procs': 4,
             'plotting_params': {'label': r'$\Delta t$ adaptivity $N$=4x1'},
         }
+
     elif mode == 'RK_comp_high_order':
         """
         Compare higher order SDC than we can get with RKM to RKM
@@ -1307,7 +1304,7 @@ def all_problems(mode='compare_strategies', plotting=True, base_path='data', **k
         **kwargs,
     }
 
-    problems = [run_vdp, run_Lorenz, run_Schroedinger, run_quench]
+    problems = [run_vdp, run_quench, run_Schroedinger, run_AC]
 
     logger.log(26, f"Doing for all problems {mode}")
     for i in range(len(problems)):
@@ -1498,46 +1495,38 @@ def aggregate_parallel_efficiency_plot():  # pragma: no cover
 if __name__ == "__main__":
     comm_world = MPI.COMM_WORLD
 
-    record = True
-    for mode in [
-        # 'compare_strategies',
-        #'RK_comp_high_order',
-        # 'step_size_limiting',
-        # 'parallel_efficiency',
-        'diagonal_SDC',
-    ]:
-        params = {
-            'mode': mode,
-            'runs': 1,
-            #'num_procs': 1,  # min(comm_world.size, 5),
-            'plotting': comm_world.rank == 0,
-        }
-        params_single = {
-            **params,
-            'problem': run_Schroedinger,
-        }
-        single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
+    # record = False
+    # for mode in [
+    #     'compare_strategies',
+    #     'RK_comp',
+    #     'parallel_efficiency',
+    # ]:
+    #     params = {
+    #         'mode': mode,
+    #         'runs': 5,
+    #         'plotting': comm_world.rank == 0,
+    #     }
+    #     params_single = {
+    #         **params,
+    #         'problem': run_AC,
+    #     }
+    #     single_problem(**params_single, work_key='t', precision_key='e_global_rel', record=record)
 
     all_params = {
-        'record': False,
-        'runs': 1,
-        'work_key': 'k_linear',
+        'record': True,
+        'runs': 5,
+        'work_key': 't',
         'precision_key': 'e_global_rel',
         'plotting': comm_world.rank == 0,
-        #'num_procs': 4,
     }
 
     for mode in [
-        # 'RK_comp',
-        # 'parallel_efficiency',
-        # 'compare_adaptivity',
-        # 'compare_strategies',
-        # 'preconditioners',
-        # 'diagonal_SDC',
+        'RK_comp',
+        'parallel_efficiency',
+        'compare_strategies',
     ]:
         all_problems(**all_params, mode=mode)
         comm_world.Barrier()
 
     if comm_world.rank == 0:
-        # parallel_efficiency(**params_single, work_key='k_SDC', precision_key='e_global_rel')
         plt.show()

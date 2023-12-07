@@ -59,6 +59,9 @@ class AdaptivityBase(ConvergenceController):
             step_limiter_params = {key: self.params.__dict__[key] for key in available_keys}
             controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
 
+        if self.params.useMPI:
+            self.prepare_MPI_logical_operations()
+
         return None
 
     def get_new_step_size(self, controller, S, **kwargs):

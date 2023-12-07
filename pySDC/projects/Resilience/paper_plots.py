@@ -8,6 +8,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_Schroedinger,
     run_vdp,
     run_quench,
+    run_AC,
     RECOVERY_THRESH_ABS,
 )
 from pySDC.projects.Resilience.strategies import (
@@ -196,11 +197,11 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
     """
     stats = [
         get_stats(run_vdp, **kwargs),
-        get_stats(run_Lorenz, **kwargs),
-        get_stats(run_Schroedinger, **kwargs),
         get_stats(run_quench, **kwargs),
+        get_stats(run_Schroedinger, **kwargs),
+        get_stats(run_AC, **kwargs),
     ]
-    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger', 'Quench']
+    titles = ['Van der Pol', 'Quench', r'Schr\"odinger', 'Allen-Cahn']
 
     my_setup_mpl()
     fig, axs = plt.subplots(2, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.8), sharey=True)
@@ -409,6 +410,37 @@ def plot_quench_solution():  # pragma: no cover
     savefig(fig, 'quench_sol')
 
 
+def plot_AC_solution():  # pragma: no cover
+    from pySDC.projects.TOMS.AllenCahn_monitor import monitor
+
+    my_setup_mpl()
+    if JOURNAL == 'JSC_beamer':
+        raise NotImplementedError
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 0.9))
+    else:
+        fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
+
+    stats, _, _ = run_AC(Tend=0.032, hook_class=monitor)
+
+    u = get_sorted(stats, type='u')
+
+    computed_radius = get_sorted(stats, type='computed_radius')
+    exact_radius = get_sorted(stats, type='exact_radius')
+    axs[1].plot([me[0] for me in computed_radius], [me[1] for me in computed_radius], ls='-', label='numerical')
+    axs[1].plot([me[0] for me in exact_radius], [me[1] for me in exact_radius], ls='--', color='black', label='exact')
+    axs[1].axvline(0.025, ls=':', label=r'$t=0.025$', color='grey')
+    axs[1].set_title('Radius over time')
+    axs[1].set_xlabel('$t$')
+    axs[1].legend(frameon=False)
+
+    im = axs[0].imshow(u[0][1], extent=(-0.5, 0.5, -0.5, 0.5))
+    fig.colorbar(im)
+    axs[0].set_title(r'$u_0$')
+    axs[0].set_xlabel('$x$')
+    axs[0].set_ylabel('$y$')
+    savefig(fig, 'AC_sol')
+
+
 def plot_vdp_solution():  # pragma: no cover
     """
     Plot the solution of van der Pol problem over time to illustrate the varying time scales.
@@ -545,6 +577,7 @@ def make_plots_for_paper():  # pragma: no cover
     work_precision()
 
     plot_vdp_solution()
+    plot_AC_solution()
     plot_quench_solution()
 
     plot_recovery_rate(get_stats(run_vdp))
