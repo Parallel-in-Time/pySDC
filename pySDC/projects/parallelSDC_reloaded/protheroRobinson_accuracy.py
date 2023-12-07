@@ -19,7 +19,7 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 # Problem parameters
 tEnd = 2*np.pi
 nonLinear = False
-epsilon = 1e-3
+epsilon = 1e-6
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -36,7 +36,7 @@ def getCost(counters):
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
-nodeType = 'LEGENDRE'
+nodeType = 'EQUID'
 parEfficiency = 1/nNodes
 
 qDeltaList = [

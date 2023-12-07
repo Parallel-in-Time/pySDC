@@ -3,8 +3,7 @@
 """
 Created on Tue Dec  5 11:02:39 2023
 
-Script to investigate diagonal SDC on Lorenz system with a given number of
-revolution periods :
+Script to investigate diagonal SDC on Lorenz system
 
 - error VS time-step
 - error VS computation cost
@@ -25,13 +24,13 @@ def getError(uNum, uRef):
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return nNewton + nRHS
+    return tComp
 
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 1/nNodes
+parEfficiency = 0.8 # 1/nNodes
 
 qDeltaList = [
     'RK4', 'ESDIRK53', 'DIRK43',
@@ -45,7 +44,7 @@ nSweepList = [1, 2, 3, 4, 5, 6]
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
 # qDeltaList = ['MIN-SR-NS']
-nSweepList = [4]
+nSweepList = [5]
 
 fig, axs = plt.subplots(1, 2)
 
