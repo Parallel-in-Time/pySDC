@@ -53,8 +53,13 @@ def getParamsSDC(
             },
         # Step parameters
         "step_params": {
-            "maxiter": nSweeps,
+            "maxiter": 1,
             },
+        # Level parameters
+        "level_params": {
+            "restol": -1,
+            "nsweeps": nSweeps,
+            }
         }
 
     return description
@@ -80,6 +85,11 @@ def getParamsRK(method="RK4"):
         "step_params": {
             "maxiter": 1,
             },
+        # Level parameters
+        "level_params": {
+            "restol": -1,
+            "nsweeps": 1,
+            }
         }
 
     return description
@@ -93,12 +103,8 @@ def setupProblem(name, description, dt, **kwargs):
         'newton_tol': 1e-08,
         'newton_maxiter': 300,
         }
-        # Level parameters
-    description["level_params"] = {
-        "restol": -1,
-        "dt": dt,
-        "nsweeps": 1,
-        }
+    # Level parameters
+    description["level_params"]["dt"] = dt
 
     if name == "VANDERPOL":
         description["problem_class"] = vanderpol

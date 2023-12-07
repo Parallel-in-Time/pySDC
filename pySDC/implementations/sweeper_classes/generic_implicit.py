@@ -65,6 +65,11 @@ class generic_implicit(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
+        # update the FLEX-MIN- preconditioner
+        if self.params.QI.startswith('FLEX-MIN'):
+            self.params.QI = 'FLEX-MIN' + str(L.status.sweep)
+            self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
+
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
 
@@ -97,12 +102,6 @@ class generic_implicit(sweeper):
 
         # indicate presence of new values at this level
         L.status.updated = True
-
-        # update the FLEX-MIN- preconditioner
-        if 'FLEX-MIN-' in self.params.QI:
-            k = int(self.params.QI[9:]) + 1
-            self.params.QI = 'FLEX-MIN-' + str(k)
-            self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
 
         return None
 
