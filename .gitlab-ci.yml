@@ -5,49 +5,48 @@ stages:
   - upload
 
 
-job_juwels_compute:
-  stage: execute
+# job_juwels_compute:
+#   stage: execute
+#   variables:
+#     SCHEDULER_PARAMETERS: '--account=cstma --nodes=1 --partition=devel'
+#   tags:
+#     - juwels
+#     - jacamar
+#     - compute
+#     - slurm
+#   artifacts:
+#     paths:
+#       - test.file
+#   script:
+#     - echo $SYSTEMNAME
+#     - touch test.file
+#   after_script:
+#     - hostname
+#     - id
+
+
+test_JUWELS:
+  stage: benchmark
   variables:
     SCHEDULER_PARAMETERS: '--account=cstma --nodes=1 --partition=devel'
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   tags:
-    - juwels
     - jacamar
+    - juwels
     - compute
     - slurm
   artifacts:
     paths:
-      - test.file
+      - benchmarks
+  before_script:
+    - mkdir -p benchmarks
   script:
+    # - touch benchmarks/output.json
     - echo $SYSTEMNAME
-    - touch test.file
+    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
   after_script:
-    - hostname
-    - id
-
-
-# test_JUWELS:
-#   image: rcaspart/micromamba-cuda
-#   stage: benchmark
-#   variables:
-#     SCHEDULER_PARAMETERS: >
-#       --account=cstma
-#       --nodes=1 
-#       --partition=devel
-#   rules:
-#     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
-#   tags:
-#     - jacamar
-#     - juwels
-#     - slurm
-#     - compute
-#   artifacts:
-#     paths:
-#       - benchmarks
-#   script:
-#     - mkdir -p benchmarks
-#     - touch benchmarks/output.json
-#     - echo $SYSTEMNAME
-#     # - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
+    - ls -lh benchmarks
 
 
 #test_kit:
