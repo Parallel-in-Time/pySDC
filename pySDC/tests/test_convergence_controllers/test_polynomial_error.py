@@ -3,7 +3,7 @@ import pytest
 
 def get_controller(dt, num_nodes, quad_type, useMPI):
     """
-    Runs a single advection problem with certain parameters
+    Get a controller prepared for polynomial test equation
 
     Args:
         dt (float): Step size
