@@ -105,6 +105,9 @@
             <span class="n">step_limiter_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">}</span>
             <span class="n">controller</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">StepSizeLimiter</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">step_limiter_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prepare_MPI_logical_operations</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="kc">None</span></div>
 
 

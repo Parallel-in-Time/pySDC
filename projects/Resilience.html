@@ -70,6 +70,20 @@ You can see the results below, except for the solution, which looks the same as 
 <a class="reference internal image-reference" href="../_images/piline_hotrod_4procs.png"><img alt="../_images/piline_hotrod_4procs.png" src="../_images/piline_hotrod_4procs.png" style="width: 24%;" /></a>
 <a class="reference internal image-reference" href="../../data/error_estimate_order_parallel.png"><img alt="../../data/error_estimate_order_parallel.png" src="../../data/error_estimate_order_parallel.png" style="width: 23%;" /></a>
 </section>
+<section id="reproduction-of-the-plots-in-the-adaptive-sdc-paper">
+<h2>Reproduction of the plots in the adaptive SDC paper<a class="headerlink" href="#reproduction-of-the-plots-in-the-adaptive-sdc-paper" title="Link to this heading">¶</a></h2>
+<p>To reproduce the plots you need to install pySDC with all packages in the mpi4py environment.
+Then, navigate to this directory, <cite>pySDC/projects/Resilience/</cite> and run the following commands:</p>
+<p><a href="#id2"><span class="problematic" id="id3">``</span></a><a href="#id4"><span class="problematic" id="id5">`</span></a>bash</p>
+<p>mpirun -np 4 python work_precision.py
+mpirun -np 4 python fault_stats.py prob run_vdp
+mpirun -np 4 python fault_stats.py prob run_quench
+mpirun -np 4 python fault_stats.py prob run_AC
+mpirun -np 4 python fault_stats.py prob run_Schroedinger
+python paper_plots.py</p>
+<p><a href="#id6"><span class="problematic" id="id7">``</span></a><a href="#id8"><span class="problematic" id="id9">`</span></a></p>
+<p>Possibly, you need to create some directories in this one to store and load things, if path errors occur.</p>
+</section>
 </section>
 
 
@@ -84,6 +98,7 @@ You can see the results below, except for the solution, which looks the same as 
     <ul>
 <li><a class="reference internal" href="#">Resilience in SDC</a><ul>
 <li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#reproduction-of-the-plots-in-the-adaptive-sdc-paper">Reproduction of the plots in the adaptive SDC paper</a></li>
 </ul>
 </li>
 </ul>
