@@ -18,7 +18,7 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
 tEnd = 1
-epsilon = 1e-9
+epsilon = 1e-6
 pName = "KAPS"
 
 def getError(uNum, uRef):
@@ -36,7 +36,7 @@ def getCost(counters):
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
-nodeType = 'CHEBY-4'
+nodeType = 'LEGENDRE'
 parEfficiency = 1/nNodes
 
 qDeltaList = [
@@ -48,7 +48,7 @@ qDeltaList = [
 nStepsList = np.array([2, 5, 10, 20, 50, 100])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
-# qDeltaList = ['MIN-SR-FLEX']
+# qDeltaList = ['MIN-SR-S']
 nSweepList = [5]
 
 

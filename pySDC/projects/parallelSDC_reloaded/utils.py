@@ -13,7 +13,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.problem_classes.odeScalar import ProtheroRobinson
-from pySDC.implementations.problem_classes.odeSystem import Kaps
+from pySDC.implementations.problem_classes.odeSystem import Kaps, ChemicalReaction3Var
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
@@ -134,6 +134,8 @@ def setupProblem(name, description, dt, **kwargs):
         description["problem_params"].update({
             'epsilon': kwargs.get("epsilon", 1e-3),
             })
+    elif name == "CHEMREC":
+        description["problem_class"] = ChemicalReaction3Var
     else:
         raise NotImplementedError(f"problem {name} not implemented")
 
