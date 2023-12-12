@@ -14,6 +14,7 @@ from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.problem_classes.odeScalar import ProtheroRobinson
 from pySDC.implementations.problem_classes.odeSystem import Kaps, ChemicalReaction3Var
+from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front_fullyimplicit, allencahn_periodic_fullyimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
@@ -136,6 +137,10 @@ def setupProblem(name, description, dt, **kwargs):
             })
     elif name == "CHEMREC":
         description["problem_class"] = ChemicalReaction3Var
+    elif name == "ALLEN-CAHN":
+        periodic = kwargs.get("periodic", False)
+        description["problem_class"] = allencahn_periodic_fullyimplicit if periodic \
+            else allencahn_front_fullyimplicit
     else:
         raise NotImplementedError(f"problem {name} not implemented")
 
@@ -157,9 +162,9 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
 
     uSDC = np.zeros((nSteps+1, uInit.size), dtype=uInit.dtype)
     uSDC[0] = uInit
-
     tVals = np.linspace(0, tEnd, nSteps+1)
     tBeg = time()
+    print(" -- computing numerical solution with pySDC ...")
     for i in range(nSteps):
         uTmp[:] = uSDC[i]
         try:
@@ -186,8 +191,9 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
         u0 = kwargs.get('u0', (1, 1, 1))
         key = f"{tEnd}_{nSteps}_{u0}"
         cacheFile = '_solLorenzExact.json'
-
-
+    elif probName == "CHEMREC":
+        key = f"{tEnd}_{nSteps}"
+        cacheFile = '_solChemicalReactionExact.json'
 
     # Eventually load already computed solution from local cache
     try:
@@ -210,11 +216,14 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
     )
     solver = controller.MS[0].levels[0].prob.u_exact
 
+    print(" -- computing analytical solution with scipy ...")
+    tBeg = time()
     tVals = np.linspace(0, tEnd, nSteps+1)
     uExact = [solver(0)]
     for i in range(nSteps):
         uExact.append(solver(tVals[i+1], uExact[-1], tVals[i]))
     uExact = np.array(uExact)
+    print(f"    done in {time()-tBeg:1.2f}s")
 
     try:
         # Save solution in local cache

@@ -17,12 +17,8 @@ import matplotlib.pyplot as plt
 from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
-tEnd = 1
-pName = "KAPS"
-pParams = {
-    "epsilon": 1e-6,
-    }
-
+tEnd = 300
+pName = "CHEMREC"
 
 def getError(uNum, uRef):
     if uNum is None:
@@ -40,7 +36,7 @@ def getCost(counters):
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 0.8 # 1/nNodes
+parEfficiency = 1/nNodes
 
 qDeltaList = [
     'RK4', 'ESDIRK53', 'DIRK43',
@@ -83,9 +79,9 @@ for qDelta in qDeltaList:
         for nSteps in nStepsList:
             print(f' -- nSteps={nSteps} ...')
 
-            uRef = solutionExact(tEnd, nSteps, pName, **pParams)
+            uRef = solutionExact(tEnd, nSteps, pName)
 
-            uSDC, counters = solutionSDC(tEnd, nSteps, params, pName, **pParams)
+            uSDC, counters = solutionSDC(tEnd, nSteps, params, pName)
 
             err = getError(uSDC, uRef)
             errors.append(err)
@@ -104,7 +100,7 @@ for i in range(2):
     axs[i].set(
         xlabel=r"$\Delta{t}$" if i == 0 else "cost",
         ylabel=r"$L_\infty$ error",
-        ylim=(1e-17, 1e0),
+        ylim=(1e-9, 1e0),
     )
     axs[i].legend(loc="lower right" if i == 0 else "lower left")
     axs[i].grid()

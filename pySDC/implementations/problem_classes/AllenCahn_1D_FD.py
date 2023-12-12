@@ -224,21 +224,24 @@ class allencahn_front_fullyimplicit(ptype):
         self.work_counters['rhs']()
         return f
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to compute the exact solution at time :math:`t`.
+        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
 
         Parameters
         ----------
         t : float
-            Time of the exact solution.
+            Time at which the approximated exact solution is computed.
+        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            The approximated exact solution.
         """
-
         v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
         me[:] = 0.5 * (1 + np.tanh((self.xvalues - v * t) / (np.sqrt(2) * self.eps)))
@@ -663,21 +666,24 @@ class allencahn_periodic_fullyimplicit(ptype):
         self.work_counters['rhs']()
         return f
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         r"""
-        Routine to compute the exact solution at time :math:`t`.
+        Routine to return initial conditions or to approximate exact solution using ``SciPy``.
 
         Parameters
         ----------
         t : float
-            Time of the exact solution.
+            Time at which the approximated exact solution is computed.
+        u_init : pySDC.implementations.problem_classes.Lorenz.dtype_u
+            Initial conditions for getting the exact solution.
+        t_init : float
+            The starting time.
 
         Returns
         -------
         me : dtype_u
-            The exact solution.
+            The approximated exact solution.
         """
-
         v = 3.0 * np.sqrt(2) * self.eps * self.dw
         me = self.dtype_u(self.init, val=0.0)
         me[:] = 0.5 * (1 + np.tanh((self.radius - abs(self.xvalues) - v * t) / (np.sqrt(2) * self.eps)))

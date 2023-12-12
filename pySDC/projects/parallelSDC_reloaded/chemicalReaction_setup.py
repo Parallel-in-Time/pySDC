@@ -12,9 +12,9 @@ from utils import solutionExact, getParamsRK, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
-tEnd = 100
+tEnd = 300
 nSteps = 10
-rkScheme = "DIRK43"
+rkScheme = "RK4"
 
 tVals = np.linspace(0, tEnd, nSteps+1)
 
