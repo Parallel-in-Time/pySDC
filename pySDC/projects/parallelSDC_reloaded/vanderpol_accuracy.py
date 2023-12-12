@@ -46,7 +46,7 @@ nSweepList = [1, 2, 3, 4, 5, 6]
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
 # qDeltaList = ['LU']
-nSweepList = [4]
+nSweepList = [5]
 
 fig, axs = plt.subplots(2, len(muVals))
 
