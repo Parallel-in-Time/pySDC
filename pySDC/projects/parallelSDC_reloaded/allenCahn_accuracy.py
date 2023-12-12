@@ -21,7 +21,8 @@ pName = "ALLEN-CAHN"
 periodic = False
 pParams  = {
     "periodic": periodic,
-    "nvars": 2**11 - (not periodic)
+    "nvars": 2**11 - (not periodic),
+    "epsilon": 0.04,
     }
 
 def getError(uNum, uRef):

@@ -143,6 +143,7 @@ def setupProblem(name, description, dt, **kwargs):
             else allencahn_front_fullyimplicit
         description["problem_params"].update({
             'nvars': kwargs.get("nvars", 128 if periodic else 127),
+            'eps': kwargs.get("epsilon", 0.04),
             })
     else:
         raise NotImplementedError(f"problem {name} not implemented")
