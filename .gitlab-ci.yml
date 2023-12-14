@@ -31,9 +31,6 @@ variables:
 
 test_JUWELS:
   stage: benchmark
-  variables:
-  #   SCHEDULER_PARAMETERS: '--account=cstma --nodes=1 --partition=devel'
-    JUWELS_ACCOUNT: "cstma"
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   tags:
@@ -64,7 +61,6 @@ test_JUWELS:
   script:
     # - touch benchmarks/output.json
     - echo $SYSTEMNAME
-    # - python -m pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
     - sbatch --wait etc/juwels_benchmark.sh
     - echo "Following Errors occured:"
     - cat sbatch.err
