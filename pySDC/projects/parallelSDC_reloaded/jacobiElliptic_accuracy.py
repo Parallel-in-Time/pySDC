@@ -3,8 +3,7 @@
 """
 Created on Tue Dec  5 11:02:39 2023
 
-Script to investigate diagonal SDC on the ProtheroRobinson
-(linear and non-linear) problem :
+Script to investigate diagonal SDC on the JacobianElliptic problem
 
 - error VS time-step
 - error VS computation cost
@@ -17,17 +16,18 @@ import matplotlib.pyplot as plt
 from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
-tEnd = 2*np.pi
-nonLinear = False
-epsilon = 1e-9
-
-pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
-
+tEnd = 10
+pName = "JACELL"
 
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
-    return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
+    return np.linalg.norm(uRef[-1] - uNum[-1], np.inf)
+    return max(
+        np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf),
+        np.linalg.norm(uRef[:, 1] - uNum[:, 1], np.inf),
+        np.linalg.norm(uRef[:, 2] - uNum[:, 2], np.inf)
+        )
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
@@ -43,13 +43,13 @@ qDeltaList = [
     'RK4', 'ESDIRK53', 'DIRK43',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
-    "MIN3",
+    # "MIN3",
 ]
-nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
+nStepsList = np.array([10, 20, 50, 100, 200, 500])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
-# qDeltaList = ['MIN-SR-FLEX']
-nSweepList = [4]
+# qDeltaList = ['MIN-SR-S']
+nSweepList = [5]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
@@ -80,11 +80,9 @@ for qDelta in qDeltaList:
         for nSteps in nStepsList:
             print(f' -- nSteps={nSteps} ...')
 
-            uRef = solutionExact(
-                tEnd, nSteps, pName, epsilon=epsilon)
+            uRef = solutionExact(tEnd, nSteps, pName)
 
-            uSDC, counters = solutionSDC(
-                tEnd, nSteps, params, pName, epsilon=epsilon)
+            uSDC, counters = solutionSDC(tEnd, nSteps, params, pName)
 
             err = getError(uSDC, uRef)
             errors.append(err)
@@ -103,7 +101,7 @@ for i in range(2):
     axs[i].set(
         xlabel=r"$\Delta{t}$" if i == 0 else "cost",
         ylabel=r"$L_\infty$ error",
-        ylim=(1e-5, 1e3),
+        # ylim=(1e-9, 1e0),
     )
     axs[i].legend(loc="lower right" if i == 0 else "lower left")
     axs[i].grid()

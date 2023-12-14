@@ -3,21 +3,21 @@
 """
 Created on Thu Dec  7 21:22:52 2023
 
-Setup script for the Allen-Cahn problem
+Setup script for the JacobianElliptic problem
 """
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import solutionExact, getParamsRK, solutionSDC, getParamsSDC
+from utils import solutionExact, getParamsRK, getParamsSDC, solutionSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
-tEnd = 50
-nSteps = 10
+tEnd = 10
+nSteps = 100
 
-useRK = False
+useRK = True
 if useRK:
-    rkScheme = "ESDIRK53"
+    rkScheme = "RK4"
     params = getParamsRK(rkScheme)
 else:
     nNodes = 4
@@ -27,12 +27,9 @@ else:
     qDelta = "MIN-SR-S"
     params = getParamsSDC(quadType, nNodes, qDelta, nSweeps, nodeType)
 
-pName = "ALLEN-CAHN"
+pName = "JACELL"
 periodic = False
 pParams  = {
-    "periodic": periodic,
-    "nvars": 2**11 - (not periodic),
-    "epsilon": 0.04,
     }
 
 tVals = np.linspace(0, tEnd, nSteps+1)
@@ -40,20 +37,21 @@ tVals = np.linspace(0, tEnd, nSteps+1)
 print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, pName, **pParams)
 
-
 uNum, counters = solutionSDC(tEnd, nSteps, params, pName, **pParams)
 
 figName = f"{script}_solution"
 plt.figure(figName)
-plt.plot(uExact[0, :], '-', label="$u(0)$")
-plt.plot(uExact[-1, :], '-', label="$u_{exact}(T)$")
-plt.plot(uNum[-1, :], '--', label="$u_{num}(T)$")
-
+plt.plot(tVals, uExact[:, 0], '-', label="u1-exact")
+plt.plot(tVals, uExact[:, 1], '-', label="u2-exact")
+plt.plot(tVals, uExact[:, 2], '-', label="u3-exact")
+plt.plot(tVals, uNum[:, 0], '--', label="u1-num")
+plt.plot(tVals, uNum[:, 1], '--', label="u2-num")
+plt.plot(tVals, uNum[:, 2], '--', label="u3-num")
 
 plt.legend()
-plt.xlabel("X")
+plt.xlabel("time")
 plt.ylabel("solution")
 plt.tight_layout()
 plt.savefig(f'fig/{figName}.pdf')
 
-# plt.show()
+plt.show()

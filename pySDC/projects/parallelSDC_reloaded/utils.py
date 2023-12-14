@@ -13,7 +13,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.problem_classes.odeScalar import ProtheroRobinson
-from pySDC.implementations.problem_classes.odeSystem import Kaps, ChemicalReaction3Var
+from pySDC.implementations.problem_classes.odeSystem import Kaps, ChemicalReaction3Var, JacobiElliptic
 from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front_fullyimplicit, allencahn_periodic_fullyimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
@@ -145,6 +145,12 @@ def setupProblem(name, description, dt, **kwargs):
             'nvars': kwargs.get("nvars", 128 if periodic else 127),
             'eps': kwargs.get("epsilon", 0.04),
             })
+    elif name == "JACELL":
+        description["problem_class"] = JacobiElliptic
+        description["problem_params"].update({
+            'newton_tol': 1e-13,
+            'newton_maxiter': 300,
+            })
     else:
         raise NotImplementedError(f"problem {name} not implemented")
 
@@ -198,6 +204,9 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
     elif probName == "CHEMREC":
         key = f"{tEnd}_{nSteps}"
         cacheFile = '_solChemicalReactionExact.json'
+    elif probName == "JACELL":
+        key = f"{tEnd}_{nSteps}"
+        cacheFile = '_solJacobiEllipticExact.json'
 
     # Eventually load already computed solution from local cache
     try:
@@ -220,7 +229,7 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
     )
     solver = controller.MS[0].levels[0].prob.u_exact
 
-    print(" -- computing analytical solution with scipy ...")
+    print(" -- computing analytical solution with P.u_exact ...")
     tBeg = time()
     tVals = np.linspace(0, tEnd, nSteps+1)
     uExact = [solver(0)]
