@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --time=00:10:00
 #SBATCH --partition=devel
-#SBATCH --export-file=sbatch.out
+#SBATCH --output=sbatch.out
 #SBATCH --error=sbatch.err
 
 python -m pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
