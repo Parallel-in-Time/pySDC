@@ -59,7 +59,7 @@ test_JUWELS:
     - module load CuPy
     - pwd
     - ls -lah
-    - pip install -e pySDC
+    - pip install -e .
     - pip install pytest-benchmark
   script:
     # - touch benchmarks/output.json
