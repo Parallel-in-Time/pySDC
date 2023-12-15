@@ -18,8 +18,8 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
 tEnd = 2*np.pi
-nonLinear = False
-epsilon = 1e-9
+nonLinear = True
+epsilon = 1e-4
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -31,16 +31,16 @@ def getError(uNum, uRef):
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
-    return nNewton + nRHS
+    return 2*nNewton + nRHS
 
 # Base variable parameters
 nNodes = 4
 quadType = 'RADAU-RIGHT'
 nodeType = 'LEGENDRE'
-parEfficiency = 1/nNodes
+parEfficiency = 0.8
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'DIRK43',
+    'RK4', 'ESDIRK53', 'PIC',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX',
     "MIN3",
@@ -49,7 +49,7 @@ nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 nSweepList = [1, 2, 3, 4, 5, 6]
 
 # qDeltaList = ['MIN-SR-FLEX']
-nSweepList = [4]
+nSweepList = [5]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
@@ -90,7 +90,7 @@ for qDelta in qDeltaList:
             errors.append(err)
 
             cost = getCost(counters)
-            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
+            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC', 'MIN3']:
                 cost /= nNodes*parEfficiency
             costs.append(cost)
 
@@ -105,7 +105,7 @@ for i in range(2):
         ylabel=r"$L_\infty$ error",
         ylim=(1e-5, 1e3),
     )
-    axs[i].legend(loc="lower right" if i == 0 else "lower left")
+    axs[i].legend()
     axs[i].grid()
 
 fig.set_size_inches(12, 5)
