@@ -39,6 +39,7 @@ test_JUWELS:
     - login
     - shell
   artifacts:
+    when: always
     paths:
       - benchmarks
       - sbatch.err

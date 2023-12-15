@@ -6,4 +6,4 @@
 #SBATCH --output=sbatch.out
 #SBATCH --error=sbatch.err
 
-python -m pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
+srun python -m pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
