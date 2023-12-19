@@ -25,10 +25,6 @@ $$
 \quad u(0) = g(0).
 $$
 
-The analytical solution is $u_1(t)=\exp(-2t)$ 
-and $u_2(t)=\exp(-t)$ whatever $\epsilon$ value, and the smaller 
-the $\epsilon$, the stiffer the problem. 
-
 The exact solution of this problem is $g(t)$, 
 whatever the value of $\epsilon$. The smaller the later parameter, 
 the stiffer the problem is (numerically speaking).
@@ -44,7 +40,7 @@ that has exactly the same analytical solution, and similar behavior
 considering the $\epsilon$ parameter.
 
 For both linear and non-linear problems, 
-we set $g(t)=\cost(t)$ 
+we set $g(t)=\cos(t)$ 
 and $T=2\pi$.
 
 - [`protheroRobinson_setup.py`](./protheroRobinson_setup.py) : numerical solution for linear and non-linear case, for a given epsilon value
@@ -63,6 +59,10 @@ $$
 1 \\ 1
 \end{pmatrix}, \quad T=1.
 $$
+
+The analytical solution is $u_1(t)=\exp(-2t)$ 
+and $u_2(t)=\exp(-t)$ whatever $\epsilon$ value, and the smaller 
+the $\epsilon$, the stiffer the problem. 
 
 - [`kaps_setup.py`](./kaps_setup.py) : numerical solution for a given epsilon value
 - [`kaps_accuracy.py`](./kaps_accuracy.py) : investigate accuracy of diagonal SDC variants
