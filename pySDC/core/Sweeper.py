@@ -64,7 +64,7 @@ class sweeper(object):
 
         self.params = _Pars(params)
 
-        self.coll = params['collocation_class'](**params)
+        self.coll:CollBase = params['collocation_class'](**params)
 
         if not self.coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning(
@@ -279,29 +279,66 @@ class sweeper(object):
             self.parallelizable = True
 
         elif qd_type == "MIN-SR-S":
+
             M = QDmat.shape[0] - 1
-            Q = coll.Qmat[1:, 1:]
-            nodes = coll.nodes
+            quadType = coll.quad_type
+            nodeType = coll.node_type
 
-            nCoeffs = M
-            if coll.quad_type in ['LOBATTO', 'RADAU-LEFT']:
-                nCoeffs -= 1
-                Q = Q[1:, 1:]
-                nodes = nodes[1:]
+            # Main function to compute coefficients
+            def computeCoeffs(m, a=None, b=None):
+                coll = CollBase(num_nodes=m, node_type=nodeType, quad_type=quadType)
 
-            def func(coeffs):
-                coeffs = np.asarray(coeffs)
-                kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ Q for z in nodes]
-                vals = [np.linalg.det(K) - 1 for K in kMats]
-                return np.array(vals)
+                Q = coll.Qmat[1:, 1:]
+                nodes = coll.nodes
 
-            coeffs = sp.optimize.fsolve(func, nodes / M, xtol=1e-13)
+                nCoeffs = len(nodes)
+                if quadType in ['LOBATTO', 'RADAU-LEFT']:
+                    nCoeffs -= 1
+                    Q = Q[1:, 1:]
+                    nodes = nodes[1:]
 
-            if coll.quad_type in ['LOBATTO', 'RADAU-LEFT']:
-                coeffs = [0] + list(coeffs)
+                if nCoeffs == 1:
+                    coeffs = np.diag(Q)
+
+                else:
+                    def func(coeffs):
+                        """Function verifying the nilpotency from given coefficients"""
+                        coeffs = np.asarray(coeffs)
+                        kMats = [(1 - z) * np.eye(nCoeffs) + z * np.diag(1 / coeffs) @ Q for z in nodes]
+                        vals = [np.linalg.det(K) - 1 for K in kMats]
+                        return np.array(vals)
+
+                    if a is None:
+                        coeffs0 = nodes / m
+                    else:
+                        coeffs0 = a*nodes**b / m
+
+                    coeffs = sp.optimize.fsolve(func, coeffs0, xtol=1e-15)
+
+                # Handle first node equal to zero
+                if quadType in ['LOBATTO', 'RADAU-LEFT']:
+                    coeffs = np.asarray([0.] + list(coeffs))
+                    nodes = coll.nodes
+
+                return coeffs, nodes
+
+            def fit(coeffs, nodes):
+                """Function fitting given coefficients to a power law"""
+                def law(ab):
+                    a, b = ab
+                    return np.linalg.norm(a*nodes**b - coeffs)
+                sol = sp.optimize.minimize(law, [1., 1.], method="nelder-mead")
+                return sol.x
+
+            # Compute incrementaly coefficients
+            a, b = None, None
+            m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
+            for m in range(m0, M+1):
+                coeffs, nodes = computeCoeffs(m, a, b)
+                if m > 1:
+                    a, b = fit(coeffs*m, nodes)
 
             QDmat[1:, 1:] = np.diag(coeffs)
-
             self.parallelizable = True
 
         else:
