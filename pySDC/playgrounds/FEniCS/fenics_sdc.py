@@ -43,6 +43,7 @@ print('DoFs on this level:', len(tmp.vector()[:]))
 
 # set boundary values
 bc = df.DirichletBC(V, df.Constant(1.0), Boundary)
+bh = df.DirichletBC(V, df.Constant(0.0), Boundary)
 
 # Stiffness term (Laplace)
 u_trial = df.TrialFunction(V)
@@ -117,6 +118,7 @@ for k in range(kmax):
         for j in range(nnodes + 1):
             res -= dt * Q[m + 1, j] * (fimpl[j] + fexpl[j])
         res = df.project(res, V)
+        bh.apply(res.vector())
         res_norm.append(df.norm(res, 'L2'))
 
     uex = uexact(t0 + dt, order, V)
