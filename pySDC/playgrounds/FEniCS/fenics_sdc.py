@@ -56,9 +56,6 @@ a_M = u_trial * v_test * df.dx
 M = df.assemble(a_M)
 K = df.assemble(a_K)
 
-bc.apply(M)
-bc.apply(K)
-
 # set forcing term as expression
 g = df.Expression(
     '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
