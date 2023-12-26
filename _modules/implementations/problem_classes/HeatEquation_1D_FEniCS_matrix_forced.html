@@ -61,10 +61,15 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        f(x, t) = -\cos(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
 
-<span class="sd">    The exact solution of the problem is</span>
+<span class="sd">    For initial conditions with constant c and</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u(x, t) = \cos(\pi x)\cos(t).</span>
+<span class="sd">        u(x, 0) = \sin(\pi x) + c</span>
+
+<span class="sd">    the exact solution of the problem is given by</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        u(x, t) = \sin(\pi x)\cos(t) + c.</span>
 
 <span class="sd">    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem</span>
 <span class="sd">    is reformulated to the *weak formulation*</span>
@@ -91,6 +96,8 @@
 <span class="sd">        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
+<span class="sd">    c: float, optional</span>
+<span class="sd">        Constant for the Dirichlet boundary condition :math: `c`</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -103,7 +110,11 @@
 <span class="sd">    g : Expression</span>
 <span class="sd">        The forcing term :math:`f` in the heat equation.</span>
 <span class="sd">    bc : DirichletBC</span>
-<span class="sd">        Denotes the Dirichlet boundary conditions (currently not used here).</span>
+<span class="sd">        Denotes the Dirichlet boundary conditions.</span>
+<span class="sd">    bc_hom : DirichletBC</span>
+<span class="sd">        Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual</span>
+<span class="sd">    fix_bc_for_residual: boolean</span>
+<span class="sd">        flag to indicate that the residual requires special treatment due to boundary conditions</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -116,12 +127,12 @@
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
 
         <span class="c1"># define the Dirichlet boundary</span>
-        <span class="c1"># def Boundary(x, on_boundary):</span>
-        <span class="c1">#     return on_boundary</span>
+        <span class="k">def</span> <span class="nf">Boundary</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">on_boundary</span>
 
         <span class="c1"># set logger level for FFC and dolfin</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;FFC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
@@ -145,7 +156,7 @@
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">fenics_heat</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">&#39;c_nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;family&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;refinements&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s1">&#39;c_nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;family&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;refinements&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
         <span class="c1"># Stiffness term (Laplace)</span>
@@ -159,21 +170,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_M</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_K</span><span class="p">)</span>
 
+        <span class="c1"># set boundary values, incl. homogeneous ones for the residual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">Boundary</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc_hom</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Boundary</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fix_bc_for_residual</span> <span class="o">=</span> <span class="kc">True</span>
+
         <span class="c1"># set forcing term as expression</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span>
-            <span class="s1">&#39;-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))&#39;</span><span class="p">,</span>
             <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
             <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">,</span>
             <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">,</span>
             <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="c1"># self.g = df.Expression(&#39;0&#39;, a=np.pi, b=self.nu, t=self.t0,</span>
-        <span class="c1">#                        degree=self.order)</span>
-        <span class="c1"># set boundary values</span>
-        <span class="c1"># bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)</span>
-        <span class="c1">#</span>
-        <span class="c1"># bc.apply(self.M)</span>
-        <span class="c1"># bc.apply(self.K)</span>
 
 <div class="viewcode-block" id="fenics_heat.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system">[docs]</a>
@@ -201,7 +210,9 @@
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">u</span></div>
 
@@ -317,9 +328,10 @@
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
 
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc_hom</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
 
-        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
-
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">me</span>
 
 <div class="viewcode-block" id="fenics_heat.u_exact">
@@ -339,8 +351,8 @@
 <span class="sd">            Exact solution.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">u0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="s1">&#39;cos(a*x[0]) * cos(t)&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
-        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">))</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="s1">&#39;sin(a*x[0]) * cos(t) + c&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">),</span> <span class="n">val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
 </div>
@@ -438,7 +450,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">rhs</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">u</span></div>
 

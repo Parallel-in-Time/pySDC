@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">49 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">47<span class="text"> run</span></button>
+            <span class="text">51 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">49<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">1<span class="text"> excluded</span></button>
         </h2>
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_multi_implicit_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.4">coverage.py v7.3.4</a>,
-            created at 2023-12-24 13:09 +0000
+            created at 2023-12-26 12:38 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -207,16 +207,18 @@
     <p class="pln"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t">            <span class="com"># add tau if associated</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">            <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">tau</span><span class="op">[</span><span class="nam">m</span><span class="op">]</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">                <span class="nam">res</span><span class="op">[</span><span class="nam">m</span><span class="op">]</span> <span class="op">+=</span> <span class="nam">L</span><span class="op">.</span><span class="nam">tau</span><span class="op">[</span><span class="nam">m</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">            <span class="com"># use abs function from data type here</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">            <span class="nam">res_norm</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">abs</span><span class="op">(</span><span class="nam">res</span><span class="op">[</span><span class="nam">m</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">        <span class="com"># find maximal residual over the nodes</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">        <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">=</span> <span class="nam">max</span><span class="op">(</span><span class="nam">res_norm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">        <span class="com"># indicate that the residual has seen the new values</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">        <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">updated</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">            <span class="key">if</span> <span class="nam">L</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">fix_bc_for_residual</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">                <span class="nam">res</span><span class="op">[</span><span class="nam">m</span><span class="op">]</span><span class="op">.</span><span class="nam">fix_bc</span><span class="op">(</span><span class="nam">L</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">bc_hom</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">            <span class="com"># use abs function from data type here</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="nam">res_norm</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">abs</span><span class="op">(</span><span class="nam">res</span><span class="op">[</span><span class="nam">m</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">        <span class="com"># find maximal residual over the nodes</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">        <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">residual</span> <span class="op">=</span> <span class="nam">max</span><span class="op">(</span><span class="nam">res_norm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">        <span class="com"># indicate that the residual has seen the new values</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">updated</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">        <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -226,7 +228,7 @@
             <a id="nextFileLink" class="nav" href="d_b9c274c7ffe3e178_multi_implicit_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.4">coverage.py v7.3.4</a>,
-            created at 2023-12-24 13:09 +0000
+            created at 2023-12-26 12:38 +0000
         </p>
     </div>
 </footer>

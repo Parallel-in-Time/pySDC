@@ -41,7 +41,6 @@ Submodules
    implementations.problem_classes.GrayScott_MPIFFT
    implementations.problem_classes.HarmonicOscillator
    implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced
-   implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced
    implementations.problem_classes.HeatEquation_2D_PETSc_forced
    implementations.problem_classes.HeatEquation_ND_FD
    implementations.problem_classes.HeatEquation_ND_FD_CuPy
