@@ -4,7 +4,11 @@ import numpy as np
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass, fenics_heat
+from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import (
+    fenics_heat_mass,
+    fenics_heat,
+    fenics_heat_mass_timebc,
+)
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
@@ -98,6 +102,11 @@ def run_variants(variant=None, ml=None, num_procs=None):
     elif variant == 'mass_inv':
         description['problem_class'] = fenics_heat
         description['sweeper_class'] = imex_1st_order
+    elif variant == 'mass_timebc':
+        # Can increase the tolerance here, errors are higher anyway
+        description['level_params']['restol'] *= 20
+        description['problem_class'] = fenics_heat_mass_timebc
+        description['sweeper_class'] = imex_1st_order_mass
     else:
         raise NotImplementedError('Variant %s is not implemented' % variant)
 
@@ -146,10 +155,13 @@ def run_variants(variant=None, ml=None, num_procs=None):
 
     if num_procs == 1:
         assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        assert err <= 4.1e-08, 'Error is too high, got %s' % err
+        if variant == 'mass' or variant == 'mass_inv':
+            assert err <= 1.14e-08, 'Error is too high, got %s' % err
+        else:
+            assert err <= 3.25e-07, 'Error is too high, got %s' % err
     else:
         assert np.mean(niters) <= 11.6, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        assert err <= 4.0e-08, 'Error is too high, got %s' % err
+        assert err <= 1.14e-08, 'Error is too high, got %s' % err
 
     f.write('\n')
     print()
@@ -159,9 +171,12 @@ def run_variants(variant=None, ml=None, num_procs=None):
 def main():
     run_variants(variant='mass_inv', ml=False, num_procs=1)
     run_variants(variant='mass', ml=False, num_procs=1)
+    run_variants(variant='mass_timebc', ml=False, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=1)
     run_variants(variant='mass', ml=True, num_procs=1)
+    run_variants(variant='mass_timebc', ml=True, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=5)
+
     # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
     # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
     # correction is not satisfied, mass matrix does not permute with restriction).

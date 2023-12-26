@@ -2,7 +2,7 @@ import numpy as np
 
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
+from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass, fenics_heat_mass_timebc
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
@@ -55,7 +55,7 @@ def run_simulation(ml=None, mass=None):
     # Fill description dictionary for easy hierarchy creation
     description = dict()
     if mass:
-        description['problem_class'] = fenics_heat_mass
+        description['problem_class'] = fenics_heat_mass_timebc
         description['sweeper_class'] = imex_1st_order_mass
         description['base_transfer_class'] = base_transfer_mass
     else:
