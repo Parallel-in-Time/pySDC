@@ -70,10 +70,6 @@ class fenics_heat(ptype):
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC
         Denotes the Dirichlet boundary conditions.
-    bc_hom : DirichletBC
-        Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual
-    fix_bc_for_residual: boolean
-        flag to indicate that the residual requires special treatment due to boundary conditions
 
     References
     ----------
@@ -129,10 +125,9 @@ class fenics_heat(ptype):
         self.M = df.assemble(a_M)
         self.K = df.assemble(a_K)
 
-        # set boundary values, incl. homogeneous ones for the residual
+        # set boundary values
         self.bc = df.DirichletBC(self.V, df.Constant(c), Boundary)
         self.bc_hom = df.DirichletBC(self.V, df.Constant(0), Boundary)
-        self.fix_bc_for_residual = True
 
         # set forcing term as expression
         self.g = df.Expression(
@@ -360,7 +355,11 @@ class fenics_heat_mass(fenics_heat):
     g : Expression
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC
-        Denotes the Dirichlet boundary conditions (currently not used here).
+        Denotes the Dirichlet boundary conditions.
+    bc_hom : DirichletBC
+        Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual
+    fix_bc_for_residual: boolean
+        flag to indicate that the residual requires special treatment due to boundary conditions
 
     References
     ----------
@@ -369,6 +368,13 @@ class fenics_heat_mass(fenics_heat):
     .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
+
+    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1, c=0.0):
+        """Initialization routine"""
+
+        super().__init__(c_nvars, t0, family, order, refinements, nu, c)
+
+        self.fix_bc_for_residual = True
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -428,3 +434,15 @@ class fenics_heat_mass(fenics_heat):
         f.expl = self.apply_mass_matrix(f.expl)
 
         return f
+
+    def fix_residual(self, res):
+        """
+        Applies homogeneous Dirichlet boundary conditions to the residual
+
+        Parameters
+        ----------
+        res : dtype_u
+              Residual
+        """
+        self.bc_hom.apply(res.values.vector())
+        return None
