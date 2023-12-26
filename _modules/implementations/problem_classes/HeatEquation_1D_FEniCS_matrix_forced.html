@@ -111,10 +111,6 @@
 <span class="sd">        The forcing term :math:`f` in the heat equation.</span>
 <span class="sd">    bc : DirichletBC</span>
 <span class="sd">        Denotes the Dirichlet boundary conditions.</span>
-<span class="sd">    bc_hom : DirichletBC</span>
-<span class="sd">        Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual</span>
-<span class="sd">    fix_bc_for_residual: boolean</span>
-<span class="sd">        flag to indicate that the residual requires special treatment due to boundary conditions</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -170,10 +166,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_M</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_K</span><span class="p">)</span>
 
-        <span class="c1"># set boundary values, incl. homogeneous ones for the residual</span>
+        <span class="c1"># set boundary values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bc</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">Boundary</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bc_hom</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">Boundary</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fix_bc_for_residual</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># set forcing term as expression</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span>
@@ -416,7 +411,11 @@
 <span class="sd">    g : Expression</span>
 <span class="sd">        The forcing term :math:`f` in the heat equation.</span>
 <span class="sd">    bc : DirichletBC</span>
-<span class="sd">        Denotes the Dirichlet boundary conditions (currently not used here).</span>
+<span class="sd">        Denotes the Dirichlet boundary conditions.</span>
+<span class="sd">    bc_hom : DirichletBC</span>
+<span class="sd">        Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual</span>
+<span class="sd">    fix_bc_for_residual: boolean</span>
+<span class="sd">        flag to indicate that the residual requires special treatment due to boundary conditions</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -425,6 +424,13 @@
 <span class="sd">    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.</span>
 <span class="sd">        Wells and others. Springer (2012).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c_nvars</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;CG&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">refinements</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">c_nvars</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">family</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">refinements</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fix_bc_for_residual</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="fenics_heat_mass.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system">[docs]</a>
@@ -489,6 +495,21 @@
         <span class="n">f</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="fenics_heat_mass.fix_residual">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_residual">[docs]</a>
+    <span class="k">def</span> <span class="nf">fix_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies homogeneous Dirichlet boundary conditions to the residual</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        res : dtype_u</span>
+<span class="sd">              Residual</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc_hom</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 </div>
 
 </pre></div>

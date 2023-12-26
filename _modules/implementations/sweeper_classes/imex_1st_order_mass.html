@@ -174,8 +174,9 @@
             <span class="c1"># add tau if associated</span>
             <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="c1"># Due to different boundary conditions we might have to fix the residual</span>
             <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">fix_bc_for_residual</span><span class="p">:</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">fix_bc</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">bc_hom</span><span class="p">)</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">fix_residual</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
             <span class="c1"># use abs function from data type here</span>
             <span class="n">res_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span>
 

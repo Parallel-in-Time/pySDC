@@ -139,28 +139,6 @@ of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, 
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc_hom">
-<span class="sig-name descname"><span class="pre">bc_hom</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc_hom" title="Link to this definition">¶</a></dt>
-<dd><p>Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DirichletBC</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.fix_bc_for_residual">
-<span class="sig-name descname"><span class="pre">fix_bc_for_residual</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.fix_bc_for_residual" title="Link to this definition">¶</a></dt>
-<dd><p>flag to indicate that the residual requires special treatment due to boundary conditions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>boolean</p>
-</dd>
-</dl>
-</dd></dl>
-
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="doc-footnote">
@@ -342,10 +320,32 @@ of Continuous Galerkin, a <em>synonym</em> for the Lagrange family of elements, 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc">
 <span class="sig-name descname"><span class="pre">bc</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc" title="Link to this definition">¶</a></dt>
-<dd><p>Denotes the Dirichlet boundary conditions (currently not used here).</p>
+<dd><p>Denotes the Dirichlet boundary conditions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>DirichletBC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc_hom">
+<span class="sig-name descname"><span class="pre">bc_hom</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc_hom" title="Link to this definition">¶</a></dt>
+<dd><p>Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DirichletBC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_bc_for_residual">
+<span class="sig-name descname"><span class="pre">fix_bc_for_residual</span></span><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_bc_for_residual" title="Link to this definition">¶</a></dt>
+<dd><p>flag to indicate that the residual requires special treatment due to boundary conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
 </dd>
 </dl>
 </dd></dl>
@@ -379,6 +379,17 @@ Wells and others. Springer (2012).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_residual">
+<span class="sig-name descname"><span class="pre">fix_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass.fix_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Applies homogeneous Dirichlet boundary conditions to the residual</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>res</strong> (<em>dtype_u</em>) – Residual</p>
 </dd>
 </dl>
 </dd></dl>
@@ -426,8 +437,6 @@ Wells and others. Springer (2012).</p>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K"><code class="docutils literal notranslate"><span class="pre">K</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g"><code class="docutils literal notranslate"><span class="pre">g</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc"><code class="docutils literal notranslate"><span class="pre">bc</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc_hom"><code class="docutils literal notranslate"><span class="pre">bc_hom</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.fix_bc_for_residual"><code class="docutils literal notranslate"><span class="pre">fix_bc_for_residual</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix"><code class="docutils literal notranslate"><span class="pre">apply_mass_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
@@ -442,7 +451,10 @@ Wells and others. Springer (2012).</p>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.K"><code class="docutils literal notranslate"><span class="pre">K</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.g"><code class="docutils literal notranslate"><span class="pre">g</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc"><code class="docutils literal notranslate"><span class="pre">bc</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.bc_hom"><code class="docutils literal notranslate"><span class="pre">bc_hom</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_bc_for_residual"><code class="docutils literal notranslate"><span class="pre">fix_bc_for_residual</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_residual"><code class="docutils literal notranslate"><span class="pre">fix_residual()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 </ul>
 </li>
