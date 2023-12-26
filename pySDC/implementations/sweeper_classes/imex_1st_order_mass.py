@@ -117,7 +117,6 @@ class imex_1st_order_mass(imex_1st_order):
         res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
-
             # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
             if L.level_index == 0:
                 res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
