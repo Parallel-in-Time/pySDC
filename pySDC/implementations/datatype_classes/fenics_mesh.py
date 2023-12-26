@@ -108,6 +108,11 @@ class fenics_mesh(object):
         # return maximum
         return absval
 
+    def fix_bc(self, bc):
+        bc.apply(self.values.vector())
+
+        return None
+
 
 class rhs_fenics_mesh(object):
     """

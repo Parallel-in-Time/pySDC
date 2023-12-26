@@ -117,6 +117,7 @@ class imex_1st_order_mass(imex_1st_order):
         res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
+
             # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
             if L.level_index == 0:
                 res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
@@ -125,6 +126,8 @@ class imex_1st_order_mass(imex_1st_order):
             # add tau if associated
             if L.tau[m] is not None:
                 res[m] += L.tau[m]
+            if L.prob.fix_bc_for_residual:
+                res[m].fix_bc(L.prob.bc_hom)
             # use abs function from data type here
             res_norm.append(abs(res[m]))
 

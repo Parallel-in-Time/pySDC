@@ -20,10 +20,15 @@ class fenics_heat(ptype):
     .. math::
         f(x, t) = -\cos(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
 
-    The exact solution of the problem is
+    For initial conditions with constant c and
 
     .. math::
-        u(x, t) = \cos(\pi x)\cos(t).
+        u(x, 0) = \sin(\pi x) + c
+
+    the exact solution of the problem is given by
+
+    .. math::
+        u(x, t) = \sin(\pi x)\cos(t) + c.
 
     In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
     is reformulated to the *weak formulation*
@@ -50,6 +55,8 @@ class fenics_heat(ptype):
         Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
+    c: float, optional
+        Constant for the Dirichlet boundary condition :math: `c`
 
     Attributes
     ----------
@@ -62,7 +69,11 @@ class fenics_heat(ptype):
     g : Expression
         The forcing term :math:`f` in the heat equation.
     bc : DirichletBC
-        Denotes the Dirichlet boundary conditions (currently not used here).
+        Denotes the Dirichlet boundary conditions.
+    bc_hom : DirichletBC
+        Denotes the homogeneous Dirichlet boundary conditions, potentially required for fixing the residual
+    fix_bc_for_residual: boolean
+        flag to indicate that the residual requires special treatment due to boundary conditions
 
     References
     ----------
@@ -75,12 +86,12 @@ class fenics_heat(ptype):
     dtype_u = fenics_mesh
     dtype_f = rhs_fenics_mesh
 
-    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1):
+    def __init__(self, c_nvars=128, t0=0.0, family='CG', order=4, refinements=1, nu=0.1, c=0.0):
         """Initialization routine"""
 
         # define the Dirichlet boundary
-        # def Boundary(x, on_boundary):
-        #     return on_boundary
+        def Boundary(x, on_boundary):
+            return on_boundary
 
         # set logger level for FFC and dolfin
         logging.getLogger('FFC').setLevel(logging.WARNING)
@@ -104,7 +115,7 @@ class fenics_heat(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat, self).__init__(self.V)
         self._makeAttributeAndRegister(
-            'c_nvars', 't0', 'family', 'order', 'refinements', 'nu', localVars=locals(), readOnly=True
+            'c_nvars', 't0', 'family', 'order', 'refinements', 'nu', 'c', localVars=locals(), readOnly=True
         )
 
         # Stiffness term (Laplace)
@@ -118,21 +129,19 @@ class fenics_heat(ptype):
         self.M = df.assemble(a_M)
         self.K = df.assemble(a_K)
 
+        # set boundary values, incl. homogeneous ones for the residual
+        self.bc = df.DirichletBC(self.V, df.Constant(c), Boundary)
+        self.bc_hom = df.DirichletBC(self.V, df.Constant(0), Boundary)
+        self.fix_bc_for_residual = True
+
         # set forcing term as expression
         self.g = df.Expression(
-            '-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))',
+            '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
             a=np.pi,
             b=self.nu,
             t=self.t0,
             degree=self.order,
         )
-        # self.g = df.Expression('0', a=np.pi, b=self.nu, t=self.t0,
-        #                        degree=self.order)
-        # set boundary values
-        # bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
-        #
-        # bc.apply(self.M)
-        # bc.apply(self.K)
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -158,7 +167,9 @@ class fenics_heat(ptype):
         b = self.apply_mass_matrix(rhs)
 
         u = self.dtype_u(u0)
-        df.solve(self.M - factor * self.K, u.values.vector(), b.values.vector())
+        T = self.M - factor * self.K
+        self.bc.apply(T, b.values.vector())
+        df.solve(T, u.values.vector(), b.values.vector())
 
         return u
 
@@ -267,9 +278,10 @@ class fenics_heat(ptype):
         me = self.dtype_u(self.V)
 
         b = self.dtype_u(u)
+        M = self.M
+        self.bc_hom.apply(M, b.values.vector())
 
-        df.solve(self.M, me.values.vector(), b.values.vector())
-
+        df.solve(M, me.values.vector(), b.values.vector())
         return me
 
     def u_exact(self, t):
@@ -287,8 +299,8 @@ class fenics_heat(ptype):
             Exact solution.
         """
 
-        u0 = df.Expression('cos(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.order)
-        me = self.dtype_u(df.interpolate(u0, self.V))
+        u0 = df.Expression('sin(a*x[0]) * cos(t) + c', c=self.c, a=np.pi, t=t, degree=self.order)
+        me = self.dtype_u(df.interpolate(u0, self.V), val=self.V)
 
         return me
 
@@ -380,7 +392,13 @@ class fenics_heat_mass(fenics_heat):
         """
 
         u = self.dtype_u(u0)
-        df.solve(self.M - factor * self.K, u.values.vector(), rhs.values.vector())
+        T = self.M - factor * self.K
+        b = self.dtype_u(rhs)
+
+        self.bc.apply(T, b.values.vector())
+        self.bc.apply(b.values.vector())
+
+        df.solve(T, u.values.vector(), b.values.vector())
 
         return u
 

@@ -5,7 +5,6 @@ from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass, fenics_heat
-from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat_weak_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
@@ -45,6 +44,7 @@ def setup(t0=None, ml=None):
     problem_params['t0'] = t0  # ugly, but necessary to set up this ProblemClass
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
+    problem_params['c'] = 1.0
     if ml:
         # We can do rather aggressive coarsening here. As long as we have 1 node on the coarse level, all is "well" (ie.
         # MLSDC does not take more iterations than SDC, but also not less). If we just coarsen in the refinement (and
@@ -97,9 +97,6 @@ def run_variants(variant=None, ml=None, num_procs=None):
         description['sweeper_class'] = imex_1st_order_mass
     elif variant == 'mass_inv':
         description['problem_class'] = fenics_heat
-        description['sweeper_class'] = imex_1st_order
-    elif variant == 'weak':
-        description['problem_class'] = fenics_heat_weak_imex
         description['sweeper_class'] = imex_1st_order
     else:
         raise NotImplementedError('Variant %s is not implemented' % variant)
@@ -162,16 +159,13 @@ def run_variants(variant=None, ml=None, num_procs=None):
 def main():
     run_variants(variant='mass_inv', ml=False, num_procs=1)
     run_variants(variant='mass', ml=False, num_procs=1)
-    run_variants(variant='weak', ml=False, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=1)
     run_variants(variant='mass', ml=True, num_procs=1)
-    run_variants(variant='weak', ml=True, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=5)
     # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
     # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
     # correction is not satisfied, mass matrix does not permute with restriction).
     # run_pfasst_variants(variant='mass', ml=True, num_procs=5)
-    # run_pfasst_variants(variant='weak', ml=True, num_procs=5)
 
 
 if __name__ == "__main__":

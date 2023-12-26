@@ -24,7 +24,7 @@ def Boundary(x, on_boundary):
     return on_boundary
 
 def uexact(t, order, V):
-    return df.interpolate(df.Expression('sin(a*x[0]) * cos(t) + 1', a=np.pi, t=t, degree=order), V)
+    return df.interpolate(df.Expression('cos(a*x[0]) * cos(t)', a=np.pi, t=t, degree=order), V)
 
 # set solver and form parameters
 df.parameters["form_compiler"]["optimize"] = True
@@ -42,7 +42,7 @@ tmp = df.Function(V)
 print('DoFs on this level:', len(tmp.vector()[:]))
 
 # set boundary values
-bc = df.DirichletBC(V, df.Constant(1.0), Boundary)
+# bc = df.DirichletBC(V, df.Constant(1.0), Boundary)
 bh = df.DirichletBC(V, df.Constant(0.0), Boundary)
 
 # Stiffness term (Laplace)
@@ -56,9 +56,18 @@ a_M = u_trial * v_test * df.dx
 M = df.assemble(a_M)
 K = df.assemble(a_K)
 
-# set forcing term as expression
+# # set forcing term as expression
+# g = df.Expression(
+#     '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
+#     a=np.pi,
+#     b=nu,
+#     t=t0,
+#     degree=order,
+# )
+
+# Time-dependent boundary conditions
 g = df.Expression(
-    '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
+    '-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))',
     a=np.pi,
     b=nu,
     t=t0,
@@ -102,6 +111,7 @@ for k in range(kmax):
         rhs = df.project(rhs, V)
 
         T = M - dt * QI[m + 1, m + 1] * K
+        bc = df.DirichletBC(V, df.Expression('cos(a*x[0]) * cos(t)', a=np.pi, t=t0 + dt * sweeper.coll.nodes[m], degree=order), Boundary)
         bc.apply(T, rhs.vector())
         df.solve(T, u[m + 1].vector(), rhs.vector())
 
