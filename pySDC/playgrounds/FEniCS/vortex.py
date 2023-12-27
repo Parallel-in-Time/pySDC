@@ -1,5 +1,5 @@
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d
+from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d, fenics_vortex_2d_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
@@ -10,7 +10,7 @@ def setup_and_run(variant='mass'):
 
     t0 = 0
     dt = 0.001
-    Tend = 4 * dt
+    Tend = 1 * dt
 
     # initialize level parameters
     level_params = dict()
@@ -52,11 +52,12 @@ def setup_and_run(variant='mass'):
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = fenics_vortex_2d
     description['problem_params'] = problem_params
     if variant == 'mass_inv':
+        description['problem_class'] = fenics_vortex_2d
         description['sweeper_class'] = imex_1st_order
     elif variant == 'mass':
+        description['problem_class'] = fenics_vortex_2d_mass
         description['sweeper_class'] = imex_1st_order_mass
     else:
         raise NotImplementedError('variant unknown')
@@ -83,4 +84,4 @@ def setup_and_run(variant='mass'):
 
 if __name__ == "__main__":
     setup_and_run(variant='mass')
-    # setup_and_run(variant='mass_inv')
+    setup_and_run(variant='mass_inv')
