@@ -1,9 +1,11 @@
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
-if __name__ == "__main__":
+def setup_and_run(variant='mass'):
+
     num_procs = 1
 
     t0 = 0
@@ -12,7 +14,12 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5e-09
+    if variant == 'mass':
+        level_params['restol'] = 5e-09 / 500
+    elif variant == 'mass_inv':
+        level_params['restol'] = 5e-09
+    else:
+        raise NotImplementedError('variant unknown')
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -27,7 +34,8 @@ if __name__ == "__main__":
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = 'LU'
+    sweeper_params['QI'] = 'MIN-SR-S'
+    sweeper_params['QE'] = 'PIC'
 
     problem_params = dict()
     problem_params['nu'] = 0.01
@@ -36,7 +44,7 @@ if __name__ == "__main__":
     problem_params['c_nvars'] = [(32, 32)]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
-    problem_params['refinements'] = [1, 0]
+    problem_params['refinements'] = [1]
 
     # initialize controller parameters
     controller_params = dict()
@@ -46,7 +54,12 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_vortex_2d
     description['problem_params'] = problem_params
-    description['sweeper_class'] = generic_implicit
+    if variant == 'mass_inv':
+        description['sweeper_class'] = imex_1st_order
+    elif variant == 'mass':
+        description['sweeper_class'] = imex_1st_order_mass
+    else:
+        raise NotImplementedError('variant unknown')
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -63,7 +76,11 @@ if __name__ == "__main__":
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # compute exact solution and compare
-    uex = P.u_exact(Tend)
+    # # compute exact solution and compare
+    # uex = P.u_exact(Tend)
+    #
+    # print('(classical) error at time %s: %s' % (Tend, abs(uex - uend) / abs(uex)))
 
-    print('(classical) error at time %s: %s' % (Tend, abs(uex - uend) / abs(uex)))
+if __name__ == "__main__":
+    setup_and_run(variant='mass')
+    # setup_and_run(variant='mass_inv')

@@ -3,7 +3,6 @@ import logging
 import dolfin as df
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
@@ -78,9 +77,9 @@ class fenics_vortex_2d(ptype):
             c_nvars = [(32, 32)]
 
         if refinements is None:
-            refinements = [1, 0]
+            refinements = 1
 
-        # Sub domain for Periodic boundary condition
+        # Subdomain for Periodic boundary condition
         class PeriodicBoundary(df.SubDomain):
             # Left boundary is "target domain" G
             def inside(self, x, on_boundary):
@@ -103,8 +102,8 @@ class fenics_vortex_2d(ptype):
                     y[1] = x[1] - 1.0
 
         # set logger level for FFC and dolfin
-        df.set_log_level(df.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
+        logging.getLogger('UFL').setLevel(logging.WARNING)
 
         # set solver and form parameters
         df.parameters["form_compiler"]["optimize"] = True
@@ -120,7 +119,8 @@ class fenics_vortex_2d(ptype):
         # define function space for future reference
         self.V = df.FunctionSpace(mesh, family, order, constrained_domain=PeriodicBoundary())
         tmp = df.Function(self.V)
-        print('DoFs on this level:', len(tmp.vector().vector()[:]))
+        print('DoFs on this level:', len(tmp.vector()[:]))
+        self.fix_bc_for_residual = False
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_vortex_2d, self).__init__(self.V)
@@ -162,7 +162,8 @@ class fenics_vortex_2d(ptype):
         """
 
         A = self.M + self.nu * factor * self.K
-        b = self.__apply_mass_matrix(rhs)
+        # b = self.apply_mass_matrix(rhs)
+        b = self.dtype_u(rhs)
 
         u = self.dtype_u(u0)
         df.solve(A, u.values.vector(), b.values.vector())
@@ -186,8 +187,9 @@ class fenics_vortex_2d(ptype):
             Explicit part of the right-hand side.
         """
 
-        A = 1.0 * self.K
-        b = self.__apply_mass_matrix(u)
+        A = self.K
+        b = self.apply_mass_matrix(u)
+        # b = self.dtype_u(u)
         psi = self.dtype_u(self.V)
         df.solve(A, psi.values.vector(), b.values.vector())
 
@@ -195,6 +197,7 @@ class fenics_vortex_2d(ptype):
         fexpl.values = df.project(
             df.Dx(psi.values, 1) * df.Dx(u.values, 0) - df.Dx(psi.values, 0) * df.Dx(u.values, 1), self.V
         )
+        fexpl = self.apply_mass_matrix(fexpl)
 
         return fexpl
 
@@ -215,9 +218,10 @@ class fenics_vortex_2d(ptype):
             Implicit part of the right-hand side.
         """
 
-        tmp = self.dtype_u(self.V)
-        tmp.values = df.Function(self.V, -1.0 * self.nu * self.K * u.values.vector())
-        fimpl = self.__invert_mass_matrix(tmp)
+        A = -self.nu * self.K
+        fimpl = self.dtype_u(self.V)
+        A.mult(u.values.vector(), fimpl.values.vector())
+        # fimpl = self.__invert_mass_matrix(fimpl)
 
         return fimpl
 
@@ -243,7 +247,7 @@ class fenics_vortex_2d(ptype):
         f.expl = self.__eval_fexpl(u, t)
         return f
 
-    def __apply_mass_matrix(self, u):
+    def apply_mass_matrix(self, u):
         r"""
         Routine to apply mass matrix.
 
@@ -258,7 +262,7 @@ class fenics_vortex_2d(ptype):
         """
 
         me = self.dtype_u(self.V)
-        me.values = df.Function(self.V, self.M * u.values.vector())
+        self.M.mult(u.values.vector(), me.values.vector())
 
         return me
 
@@ -278,12 +282,7 @@ class fenics_vortex_2d(ptype):
         """
 
         me = self.dtype_u(self.V)
-
-        A = 1.0 * self.M
-        b = self.dtype_u(u)
-
-        df.solve(A, me.values.vector(), b.values.vector())
-
+        df.solve(self.M, me.values.vector(), u.values.vector())
         return me
 
     def u_exact(self, t):

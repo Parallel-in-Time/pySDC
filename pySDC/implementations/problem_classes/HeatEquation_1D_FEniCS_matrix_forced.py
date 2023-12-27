@@ -407,7 +407,6 @@ class fenics_heat_mass(fenics_heat):
         b = self.dtype_u(rhs)
 
         self.bc.apply(T, b.values.vector())
-        self.bc.apply(b.values.vector())
 
         df.solve(T, u.values.vector(), b.values.vector())
 
