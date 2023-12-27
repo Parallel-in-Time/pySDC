@@ -123,6 +123,25 @@ C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software
 Wells and others. Springer (2012).</p>
 </aside>
 </aside>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.apply_mass_matrix">
+<span class="sig-name descname"><span class="pre">apply_mass_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d.apply_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.apply_mass_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Routine to apply mass matrix.</p>
+<p>Parameters
+u : dtype_u</p>
+<blockquote>
+<div><p>Current values of the numerical solution.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>me</strong> – The product :math:` Mvec{u}`.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.dtype_f" title="Link to this definition">¶</a></dt>
@@ -213,6 +232,7 @@ Wells and others. Springer (2012).</p>
 <li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V"><code class="docutils literal notranslate"><span class="pre">V</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.M"><code class="docutils literal notranslate"><span class="pre">M</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.K"><code class="docutils literal notranslate"><span class="pre">K</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.apply_mass_matrix"><code class="docutils literal notranslate"><span class="pre">apply_mass_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
