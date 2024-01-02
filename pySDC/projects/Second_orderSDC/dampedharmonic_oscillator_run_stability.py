@@ -1,5 +1,4 @@
 import numpy as np
-
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Stability_implementation
@@ -7,57 +6,47 @@ from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Stability_impl
 
 def dampedharmonic_oscillator_params():
     """
-    Runtine to compute modulues of the stability function
+    Routine to compute modules of the stability function
 
     Returns:
-        description
+        description (dict): A dictionary containing parameters for the damped harmonic oscillator problem
     """
 
-    # initialize level parameters
-    level_params = dict()
-    level_params['restol'] = 1e-16
-    level_params["dt"] = 1.0
+    # Initialize level parameters
+    level_params = {'restol': 1e-16, 'dt': 1.0}
 
-    # initialize problem parameters for the Damped harmonic oscillator problem
-    problem_params = dict()
-    problem_params["k"] = 0
-    problem_params["mu"] = 0
-    problem_params["u0"] = np.array([1, 1])
+    # Initialize problem parameters for the Damped harmonic oscillator problem
+    problem_params = {'k': 0, 'mu': 0, 'u0': np.array([1, 1])}
 
-    # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['quad_type'] = 'GAUSS'
-    sweeper_params["num_nodes"] = 3
-    sweeper_params["do_coll_update"] = True
-    sweeper_params["picard_mats_sweep"] = True
+    # Initialize sweeper parameters
+    sweeper_params = {'quad_type': 'GAUSS', 'num_nodes': 3, 'do_coll_update': True, 'picard_mats_sweep': True}
 
-    # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = 50
+    # Initialize step parameters
+    step_params = {'maxiter': 50}
 
-    # fill description dictionary for easy step instantiation
-    description = dict()
-    description["problem_class"] = harmonic_oscillator
-    description["problem_params"] = problem_params
-    description["sweeper_class"] = boris_2nd_order
-    description["sweeper_params"] = sweeper_params
-    description["level_params"] = level_params
-    description["step_params"] = step_params
+    # Fill description dictionary for easy step instantiation
+    description = {
+        'problem_class': harmonic_oscillator,
+        'problem_params': problem_params,
+        'sweeper_class': boris_2nd_order,
+        'sweeper_params': sweeper_params,
+        'level_params': level_params,
+        'step_params': step_params,
+    }
 
     return description
 
 
 if __name__ == '__main__':
     """
-    Damped harmonic oscillatro as test problem for the stability plot:
-        x'=v
-        v'=-kappa*x-mu*v
+    Damped harmonic oscillator as a test problem for the stability plot:
+        x' = v
+        v' = -kappa * x - mu * v
         kappa: spring constant
         mu: friction
-
-        https://beltoforion.de/en/harmonic_oscillator/
+        Source: https://beltoforion.de/en/harmonic_oscillator/
     """
-    # exec(open("check_data_folder.py").read())
+    # Execute the stability analysis for the damped harmonic oscillator
     description = dampedharmonic_oscillator_params()
     Stability = Stability_implementation(description, kappa_max=18, mu_max=18, Num_iter=(200, 200))
     Stability.run_SDC_stability()

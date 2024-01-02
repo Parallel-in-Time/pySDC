@@ -230,7 +230,7 @@ class plotmanager(object):  # pragma: no cover
 
         for ii, jj in enumerate(self.K_iter):
             # =============================================================================
-            #           # If you want to get exactly the same picture like in paper uncomment this only for vertical axis
+            # # If you want to get exactly the same picture like in paper uncomment this only for vertical axis
             # if ii==0 or ii==1:
             #     ax1.loglog(func_eval_SDC[ii, :][1:], error_SDC['pos'][value, ii, :][1:], ls='solid', color=color[ii], marker=shape[ii], label='k={}'.format(jj))
             #     ax1.loglog(func_eval_picard[ii,:][1:], error_picard['pos'][value, ii, :][1:], ls='--', color=color[ii], marker=shape[ii])
@@ -886,8 +886,8 @@ class Stability_implementation(object):
         plt.xlim([0.0, lam_k_max])
         plt.ylim([0.0, lam_mu_max])
 
-        plt.xlabel(r"$\Delta t\cdot \kappa }$", labelpad=0.0)
-        plt.ylabel(r"$\Delta t\cdot \mu }$", labelpad=0.0)
+        plt.xlabel(r"$\Delta t\cdot \kappa$", labelpad=0.0)
+        plt.ylabel(r"$\Delta t\cdot \mu$", labelpad=0.0)
         if self.RKN:
             plt.title(f"{title}")
         if self.radius:
