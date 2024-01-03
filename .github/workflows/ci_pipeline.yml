@@ -45,7 +45,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Mirror
-        uses: jakob-fritz/github2lab_action@main
+        uses: jakob-fritz/github2lab_action@Iss35_mirror_pr
         env:
           MODE: 'mirror' # Either 'mirror', 'get_status', 'get_artifact', or 'all'
           GITLAB_TOKEN: ${{ secrets.GITLAB_SECRET_J }}
