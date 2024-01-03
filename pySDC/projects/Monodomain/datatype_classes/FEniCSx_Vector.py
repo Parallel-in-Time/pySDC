@@ -103,7 +103,8 @@ class FEniCSx_Vector(object):
     def ghostUpdate(self, addv, mode):
         self.values.vector.ghostUpdate(addv, mode)
 
-    def get_numpy_array(self):
+    @property
+    def numpy_array(self):
         return self.values.x.array
 
     def isend(self, dest=None, tag=None, comm=None):
@@ -151,7 +152,6 @@ class FEniCSx_Vector(object):
             me = FEniCSx_Vector(self)
             me *= other
             return me
-
         else:
             raise DataError("Type error: cannot rmul %s to %s" % (type(other), type(self)))
 
@@ -169,6 +169,7 @@ class FEniCSx_Vector(object):
             return self
         elif isinstance(other, FEniCSx_Vector):
             self.values.x.array[:] *= other.values.x.array[:]
+            return self
         else:
             raise DataError("Type error: cannot imul %s to %s" % (type(other), type(self)))
 

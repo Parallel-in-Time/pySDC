@@ -8,7 +8,9 @@ from pySDC.core.Errors import ParameterError
 
 from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MonodomainODE, MultiscaleMonodomainODE
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_FEniCSx import Parabolic_FEniCSx
-from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfVectors import TransferVectorOfVectors
+from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_FD import Parabolic_FD
+from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFEniCSxVectors import TransferVectorOfFEniCSxVectors
+from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFDVectors import TransferVectorOfFDVectors
 from pySDC.projects.Monodomain.hooks.HookClass_pde_MPI import pde_hook as pde_hook_MPI
 from pySDC.projects.Monodomain.hooks.HookClass_pde import pde_hook
 from pySDC.projects.Monodomain.hooks.HookClass_post_iter_info import post_iter_info_hook
@@ -59,7 +61,7 @@ def print_statistics(stats, controller, problem_params, space_rank, time_comm, n
         timing = np.mean(np.array(timing))
         controller.logger.info(f"Time to solution: {timing:6.4f} sec.")
 
-    from pySDC.projects.Monodomain_NEW.utils.visualization_tools import show_residual_across_simulation
+    from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
 
     fname = problem_params["output_root"] + f"residuals_{n_time_ranks}_time_ranks.png"
     if space_rank == 0:
@@ -130,7 +132,7 @@ def get_controller_params(problem_params, space_rank, truly_time_parallel):
     return controller_params
 
 
-def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params):
+def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params):
     description = dict()
 
     if integrator != "ES":
@@ -164,7 +166,8 @@ def get_description(integrator, problem_params, sweeper_params, level_params, st
     description["level_params"] = level_params
     description["step_params"] = step_params
     description["base_transfer_params"] = base_transfer_params
-    description["space_transfer_class"] = TransferVectorOfVectors
+    description["space_transfer_class"] = space_transfer_class
+    description["space_transfer_params"] = space_transfer_params
     return description
 
 
@@ -204,7 +207,22 @@ def get_sweeper_params(num_nodes):
     return sweeper_params
 
 
-def get_problem_params(space_comm, domain_name, pre_refinements, ionic_model_name, read_init_val, enable_output, end_time):
+def get_space_tranfer_params(problem_params, iorder, rorder):
+    if problem_params['parabolic_class'] is Parabolic_FEniCSx:
+        space_transfer_class = TransferVectorOfFEniCSxVectors
+        space_transfer_params = dict()
+    elif problem_params['parabolic_class'] is Parabolic_FD:
+        space_transfer_class = TransferVectorOfFDVectors
+        space_transfer_params = dict()
+        space_transfer_params["iorder"] = iorder
+        space_transfer_params["rorder"] = rorder
+        space_transfer_params["periodic"] = False
+        space_transfer_params["equidist_nested"] = False
+
+    return space_transfer_class, space_transfer_params
+
+
+def get_problem_params(space_comm, domain_name, parabolic_class, pre_refinements, ionic_model_name, read_init_val, enable_output, end_time):
     # initialize problem parameters
     problem_params = dict()
     problem_params["comm"] = space_comm
@@ -222,7 +240,7 @@ def get_problem_params(space_comm, domain_name, pre_refinements, ionic_model_nam
     problem_params["meshes_fibers_root_folder"] = executed_file_dir + "/../../../../../meshes_fibers_fibrosis/results"
     problem_params["domain_name"] = domain_name
     problem_params["solver_rtol"] = 1e-8
-    problem_params["parabolic_class"] = Parabolic_FEniCSx
+    problem_params["parabolic_class"] = parabolic_class
     problem_params["ionic_model_name"] = ionic_model_name
     problem_params["read_init_val"] = read_init_val
     problem_params["init_val_name"] = "init_val"
@@ -247,6 +265,8 @@ def main():
     # integrator = "IMEXEXP"
     integrator = "IMEXEXP_EXPRK"
 
+    space_disc = 'FD'
+
     # set time parallelism to True or emulated (False)
     truly_time_parallel = True
     # number of time ranks. If truly_parallel, space ranks chosen accoding to world_size/n_time_ranks, else space_ranks = world_size
@@ -258,7 +278,7 @@ def main():
     # set maximum number of iterations in SDC/ESDC/MLSDC/etc
     step_params = get_step_params(maxiter=50)
     # set number of collocation nodes in each level
-    sweeper_params = get_sweeper_params(num_nodes=[3, 1])
+    sweeper_params = get_sweeper_params(num_nodes=[4,2,1])
     # set step size, number of sweeps per iteration, and residual tolerance for the stopping criterion
     level_params = get_level_params(
         dt=0.025,
@@ -269,18 +289,25 @@ def main():
     problem_params = get_problem_params(
         space_comm=space_comm,
         domain_name="cuboid_2D_small",
-        pre_refinements=[2],
-        ionic_model_name="HH",
+        parabolic_class=Parabolic_FEniCSx if space_disc == 'FEM' else Parabolic_FD,
+        pre_refinements=[3,2,1],
+        ionic_model_name="TTP",
         read_init_val=True,
         enable_output=False,
         end_time=0.1,
+    )
+
+    space_transfer_class, space_transfer_params = get_space_tranfer_params(
+        problem_params,
+        iorder=6,
+        rorder=2,
     )
 
     # Usually do not modify below this line ------------------
     # get remaining prams
     base_transfer_params = get_base_transfer_params()
     controller_params = get_controller_params(problem_params, space_rank, truly_time_parallel)
-    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params)
+    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params)
     set_logger(controller_params)
     controller = get_controller(controller_params, description, time_comm, n_time_ranks, truly_time_parallel)
 

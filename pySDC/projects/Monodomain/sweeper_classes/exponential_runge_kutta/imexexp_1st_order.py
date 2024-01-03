@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.Sweeper import sweeper
-from pySDC.core.Errors import CollocationError
+from pySDC.core.Errors import CollocationError, ParameterError
 import numdifftools.fornberg as fornberg
 import math
 
@@ -36,6 +36,46 @@ class imexexp_1st_order(sweeper):
         self.QI = self.get_Qdelta_implicit(coll=self.coll, qd_type=self.params.QI)
         self.delta = np.diagonal(self.QI)[1:]
 
+        self.lmbda = None
+        self.phi_one = None
+        self.phi = None
+
+        self.lambda_and_phi_outdated = True
+
+    def compute_lambda_and_phi(self):
+        if self.lambda_and_phi_outdated:
+            L = self.level
+            P = L.prob
+            M = self.coll.num_nodes
+
+            # compute lambda
+            self.lmbda = P.lmbda_eval(L.u[0], L.time)
+
+            # compute phi[k][i] = phi_{k}(dt*c_i*lmbda), i=0,...,M-1, k=0,...,M
+            self.phi = []
+            c = self.coll.nodes
+            for k in range(M + 1):
+                self.phi.append([])
+                for i in range(M):
+                    self.phi[k].append(P.phi_eval(L.u[0], L.dt * c[i], L.time, k))
+
+            self.phi_one = []
+            for m in range(M):
+                self.phi_one.append(P.phi_eval(L.u[0], L.dt * self.delta[m], L.time, 1))
+
+            # compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
+            w = fornberg.fd_weights_all(c, 0.0, M - 1)
+
+            # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
+            self.Qmat_exp = [[None for j in range(M)] for i in range(M)]
+            for i in range(M):
+                for j in range(M):
+                    self.Qmat_exp[i][j] = (w[0, j] * c[i] ** (0 + 1)) * self.phi[0 + 1][i]
+                    for k in range(1, M):
+                        self.Qmat_exp[i][j] += (w[k, j] * c[i] ** (k + 1)) * self.phi[k + 1][i]
+
+            self.lambda_and_phi_outdated = False
+
     def integrate(self):
         """
         Integrates the right-hand side (here impl + expl + exp)
@@ -47,53 +87,23 @@ class imexexp_1st_order(sweeper):
         # get current level and problem description
         L = self.level
         P = L.prob
-
-        me = []
-
         M = self.coll.num_nodes
 
-        # compute phi[k][i] = phi_{k}(dt*c_i*lmbda), i=0,...,M-1, k=0,...,M
-        phi = []
-        c = self.coll.nodes
-        for k in range(M + 1):
-            phi.append([])
-            for i in range(M):
-                phi[k].append(P.phi_eval(L.u[0], L.dt * c[i], L.time, k))
+        self.compute_lambda_and_phi()
 
         # compute polynomial. remember that L.u[k+1] corresponds to c[k]
-        lmbda = P.lmbda_eval(L.u[0], L.time)
         Q = []
         for k in range(M):
-            Q.append(L.f[k + 1].exp + lmbda * (L.u[0] - L.u[k + 1]))
-
-        # compute weights w such that PiQ^(k)(0) = sum_{j=0}^{M-1} w[k,j]*Q[j], k=0,...,M-1
-        w = fornberg.fd_weights_all(c, 0.0, M - 1)
-
-        # compute weight for the integration of \int_0^ci exp(dt*(ci-r)lmbda)*PiQ(r)dr = \sum_{j=0}^{M-1} Qmat_exp[i,j]*Q[j]
-        Qmat_exp = [[P.dtype_u(P.init, val=0.0) for j in range(M)] for i in range(M)]
-        # Qmat_exp_0 = np.zeros((M,M)) # Qmat_exp for lambda==0
-        for i in range(M):
-            for j in range(M):
-                for k in range(M):
-                    Qmat_exp[i][j] += (w[k, j] * c[i] ** (k + 1)) * phi[k + 1][i]
-                    # Qmat_exp_0[i][j] += w[k,j]*c[i]**(k+1)/math.factorial(k+1)
+            Q.append(L.f[k + 1].exp + self.lmbda * (L.u[0] - L.u[k + 1]))
 
         # integrate RHS over all collocation nodes
-        # The two aproaches here below are equivalent
-
+        me = []
         # This one uses standard collocation for f.impl and f.expl
         for m in range(1, self.coll.num_nodes + 1):
-            me.append(L.dt * (self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl) + Qmat_exp[m - 1][0] * (Q[0])))
+            me.append(L.dt * (self.coll.Qmat[m, 1] * (L.f[1].impl + L.f[1].expl) + self.Qmat_exp[m - 1][0] * (Q[0])))
             # new instance of dtype_u, initialize values with 0
             for j in range(2, self.coll.num_nodes + 1):
-                me[m - 1] += L.dt * (self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl) + Qmat_exp[m - 1][j - 1] * (Q[j - 1]))
-
-        # This one uses the weights of exponential-RK with lambda==0 for f.impl and f.expl
-        # for m in range(1, self.coll.num_nodes + 1):
-        #     me.append(L.dt * (Qmat_exp_0[m-1][0] * (L.f[1].impl + L.f[1].expl) + Qmat_exp[m-1][0]*(Q[0])))
-        #     # new instance of dtype_u, initialize values with 0
-        #     for j in range(2, self.coll.num_nodes + 1):
-        #         me[m - 1] += L.dt * (Qmat_exp_0[m-1][j-1] * (L.f[j].impl + L.f[j].expl) + Qmat_exp[m-1][j-1]*(Q[j-1]))
+                me[m - 1] += L.dt * (self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl) + self.Qmat_exp[m - 1][j - 1] * (Q[j - 1]))
 
         return me
 
@@ -122,39 +132,34 @@ class imexexp_1st_order(sweeper):
         for i in range(1, M):
             integral[M - i] -= integral[M - i - 1]
 
-        lmbda = P.lmbda_eval(L.u[0], L.time)
-        phi_one = []
+        # do the sweep, method 1
         for m in range(M):
-            phi_one.append(P.phi_eval(L.u[0], L.dt * self.delta[m], L.time, 1))
-
-        # # do the sweep, method 1
-        # for m in range(M):
-        #     integral[m] -= L.dt * self.delta[m] * (L.f[m].expl + L.f[m + 1].impl + phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m])))
-        # for m in range(M):
-        #     rhs = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m])))
-
-        #     # implicit solve with prefactor stemming from QI
-        #     L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-        #     # update function values
-        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-
-        # do the sweep, method 2
+            integral[m] -= L.dt * self.delta[m] * (L.f[m].expl + L.f[m + 1].impl + self.phi_one[m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
         for m in range(M):
-            rhs = L.u[m] + L.dt * self.delta[m] * phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m]))
-            P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
-            integral[m] -= L.dt * self.delta[m] * (L.f[m + 1].expl + L.f[m + 1].impl) + (rhs - L.u[m])
-        for m in range(M):
-            rhs = L.u[m] + L.dt * self.delta[m] * phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m]))
-
-            P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
-            rhs += L.dt * self.delta[m] * L.f[m + 1].expl + integral[m]
+            rhs = L.u[m] + integral[m] + L.dt * self.delta[m] * (L.f[m].expl + self.phi_one[m] * (L.f[m].exp + self.lmbda * (L.u[0] - L.u[m])))
 
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+
+        # do the sweep, method 2
+        # for m in range(M):
+        #     rhs = L.u[m] + L.dt * self.delta[m] * phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m]))
+        #     P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
+        #     integral[m] -= L.dt * self.delta[m] * (L.f[m + 1].expl + L.f[m + 1].impl) + (rhs - L.u[m])
+        # for m in range(M):
+        #     rhs = L.u[m] + L.dt * self.delta[m] * phi_one[m] * (L.f[m].exp + lmbda * (L.u[0] - L.u[m]))
+
+        #     P.eval_f(rhs, L.time + L.dt * self.coll.nodes[m], eval_impl=False, eval_expl=True, eval_exp=False, fh=L.f[m + 1])
+        #     rhs += L.dt * self.delta[m] * L.f[m + 1].expl + integral[m]
+
+        #     # implicit solve with prefactor stemming from QI
+        #     L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+
+        #     # update function values
+        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
@@ -231,3 +236,5 @@ class imexexp_1st_order(sweeper):
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
         L.status.updated = True
+
+        self.lambda_and_phi_outdated = True

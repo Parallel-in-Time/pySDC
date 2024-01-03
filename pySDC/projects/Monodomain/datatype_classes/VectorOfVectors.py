@@ -23,6 +23,7 @@ class VectorOfVectors(object):
             self.type_sub_vector = init.type_sub_vector
         else:
             if isinstance(val, list):
+                assert len(val) == size, 'val must be a list of size %d' % size
                 self.val_list = [type_sub_vector(init, val[i]) for i in range(size)]
             else:
                 self.val_list = [type_sub_vector(init, val) for _ in range(size)]
@@ -30,7 +31,7 @@ class VectorOfVectors(object):
 
         self.size = len(self.val_list)
 
-        self.np_list = [self.val_list[i].get_numpy_array() for i in range(self.size)]
+        self.np_list = [self.val_list[i].numpy_array for i in range(self.size)]
 
     def __getitem__(self, key):
         return self.val_list[key]
@@ -87,8 +88,8 @@ class VectorOfVectors(object):
                 self.val_list[i] *= other
         elif isinstance(other, VectorOfVectors):
             for i in range(self.size):
-                # self.val_list[i] *= other.val_list[i] # dont know why but this does not work, makes self.val_list[i] be None
-                self.val_list[i].values.x.array[:] *= other.val_list[i].values.x.array[:]
+                self.val_list[i] *= other.val_list[i]  # dont know why but this does not work, makes self.val_list[i] be None
+                # self.val_list[i].values.x.array[:] *= other.val_list[i].values.x.array[:]
         else:
             raise DataError("Type error: cannot imul %s to %s" % (type(other), type(self)))
         return self

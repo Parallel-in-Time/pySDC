@@ -1,11 +1,9 @@
 import dolfinx as df
 from petsc4py import PETSc
-from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.projects.Monodomain.datatype_classes.VectorOfVectors import VectorOfVectors, IMEXEXP_VectorOfVectors
 
 
-class TransferVectorOfVectors(space_transfer):
+class TransferVectorOfFEniCSxVectors(space_transfer):
     """
     This implementation can restrict and prolong between super vectors
     """
@@ -21,7 +19,7 @@ class TransferVectorOfVectors(space_transfer):
         """
 
         # invoke super initialization
-        super(TransferVectorOfVectors, self).__init__(fine_prob, coarse_prob, params)
+        super(TransferVectorOfFEniCSxVectors, self).__init__(fine_prob, coarse_prob, params)
 
         pass
 
