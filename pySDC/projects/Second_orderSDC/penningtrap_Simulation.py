@@ -731,7 +731,8 @@ class Stability_implementation(object):
         self.kappa_iter = Num_iter[0]
         self.mu_iter = Num_iter[1]
         self.lambda_kappa = np.linspace(0.0, self.kappa_max, self.kappa_iter)
-        self.lambda_mu = np.linspace(0.0, self.mu_max, self.mu_iter)
+        self.lambda_mu = np.linspace(1e-10, self.mu_max, self.mu_iter)
+
         self.K_iter = description['step_params']['maxiter']
         self.num_nodes = description['sweeper_params']['num_nodes']
         self.dt = description['level_params']['dt']
