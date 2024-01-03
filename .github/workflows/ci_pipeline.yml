@@ -42,10 +42,8 @@ jobs:
     needs:
       - lint
     steps:
-      # First checkout
       - name: Checkout
         uses: actions/checkout@v1
-      # Then mirror
       - name: Mirror
         uses: jakob-fritz/github2lab_action@Iss35_mirror_pr
         env:
