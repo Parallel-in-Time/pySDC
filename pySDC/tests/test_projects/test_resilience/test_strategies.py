@@ -22,7 +22,7 @@ STRATEGY_NAMES_MPIONLY = ['ARK']
 LOGGER_LEVEL = 30
 
 
-def single_test_vdp(strategy_name, useMPI, num_procs):
+def single_test(strategy_name, useMPI, num_procs):
     import numpy as np
     from pySDC.helpers.stats_helper import get_sorted
     import pySDC.projects.Resilience.strategies as strategies
@@ -103,18 +103,18 @@ def single_test_vdp(strategy_name, useMPI, num_procs):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('strategy_name', STRATEGY_NAMES + STRATEGY_NAMES_MPIONLY)
-def test_strategy_with_vdp_MPI(strategy_name, num_procs=1):
-    single_test_vdp(strategy_name=strategy_name, useMPI=True, num_procs=num_procs)
+def test_strategy_MPI(strategy_name, num_procs=1):
+    single_test(strategy_name=strategy_name, useMPI=True, num_procs=num_procs)
 
 
 @pytest.mark.base
 @pytest.mark.parametrize('strategy_name', STRATEGY_NAMES + STRATEGY_NAMES_NONMPIONLY)
-def test_strategy_with_vdp_nonMPI(strategy_name, num_procs=1):
-    single_test_vdp(strategy_name=strategy_name, useMPI=False, num_procs=num_procs)
+def test_strategy_nonMPI(strategy_name, num_procs=1):
+    single_test(strategy_name=strategy_name, useMPI=False, num_procs=num_procs)
 
 
 if __name__ == '__main__':
     for name in STRATEGY_NAMES + STRATEGY_NAMES_NONMPIONLY:
-        test_strategy_with_vdp_nonMPI(name)
+        test_strategy_nonMPI(name)
     for name in STRATEGY_NAMES:
-        test_strategy_with_vdp_MPI(name)
+        test_strategy_MPI(name)

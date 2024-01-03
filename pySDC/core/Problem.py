@@ -125,11 +125,13 @@ class ptype(RegisterParams):
         import numpy as np
         from scipy.integrate import solve_ivp
 
-        tol = 100 * np.finfo(float).eps
+        kwargs = {
+            'atol': 100 * np.finfo(float).eps,
+            'rtol': 100 * np.finfo(float).eps,
+            **kwargs,
+        }
         u_init = self.u_exact(t=0) if u_init is None else u_init * 1.0
         t_init = 0 if t_init is None else t_init
 
         u_shape = u_init.shape
-        return (
-            solve_ivp(eval_rhs, (t_init, t), u_init.flatten(), rtol=tol, atol=tol, **kwargs).y[:, -1].reshape(u_shape)
-        )
+        return solve_ivp(eval_rhs, (t_init, t), u_init.flatten(), **kwargs).y[:, -1].reshape(u_shape)

@@ -145,30 +145,29 @@ jobs:
 #             data_libpressio
 #             coverage_libpressio_3.10.dat
            
-#   user_cpu_tests_macos:
-#     runs-on: macos-12
-  
-#     strategy:
-#       matrix:
-#         env: ['base', 'fenics', 'mpi4py', 'petsc']
-  
-#     defaults:
-#       run:
-#         shell: bash -l {0}
-  
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-  
-#       - name: Install Conda environment with Micromamba
-#         uses: mamba-org/setup-micromamba@v1
-#         with:
-#           environment-file: "etc/environment-${{ matrix.env }}.yml"
-  
-#       - name: Run pytest for CPU stuff
-#         run: |
-#           pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
-
+#  user_cpu_tests_macos:
+#    runs-on: macos-12
+#
+#    strategy:
+#      matrix:
+#        env: ['base', 'fenics', 'mpi4py', 'petsc']
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/setup-micromamba@v1
+#        with:
+#          environment-file: "etc/environment-${{ matrix.env }}.yml"
+#
+#      - name: Run pytest for CPU stuff
+#        run: |
+#          pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
 
 #   wait_for_gitlab:
 #     runs-on: ubuntu-latest
