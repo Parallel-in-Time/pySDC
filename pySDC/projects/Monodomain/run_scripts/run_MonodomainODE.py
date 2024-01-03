@@ -368,6 +368,12 @@ def setup_and_run(
         fine_to_coarse=['restriction', 'restriction'],  # restriction or injection, for voltage and ionic model variables
     )
 
+    space_transfer_class, space_transfer_params = get_space_tranfer_params(
+        problem_params,
+        iorder=6,
+        rorder=2,
+    )
+
     # Usually do not modify below this line ------------------
     # get remaining prams
     base_transfer_params = get_base_transfer_params()
