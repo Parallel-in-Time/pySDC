@@ -44,8 +44,8 @@ jobs:
       - name: Check if env-vars are set
         run: |
           echo "Following GL secrets and GL secrets J"
-          echo "${secrets.GITLAB_SECRET}"
-          echo "${secrets.GITLAB_SECRET_J}"
+          echo $secrets.GITLAB_SECRET
+          echo $secrets.GITLAB_SECRET_J
 
 
   mirror_to_gitlab:
