@@ -42,15 +42,17 @@ jobs:
     steps:
       - name: Check if env-vars are set
         run: |
-          if [[ -z "${secrets.GITLAB_SECRET}" ]]; then
-            echo "Gitlab secret is not set"
-          else
-            echo "Gitlab secret is set"
+          if [ -z "$secrets.GITLAB_SECRET" ]
+          then
+              echo "not defined"
+          else 
+              echo "defined"
           fi
-          if [[ -z "${secrets.GITLAB_SECRET_J}" ]]; then
-            echo "Gitlab secret J is not set"
-          else
-            echo "Gitlab secret J is set"
+          if [ -z "$secrets.GITLAB_SECRET_J" ]
+          then
+              echo "not defined"
+          else 
+              echo "defined"
           fi
 
 
