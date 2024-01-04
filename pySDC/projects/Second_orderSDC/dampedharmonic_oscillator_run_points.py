@@ -7,7 +7,7 @@ from tabulate import tabulate
 def check_stab_points(points, num_nodes_list, max_iter_list, store=False, filename='stab_results.txt'):
     # Initialize simulation parameters based on the damped harmonic oscillator
     description = dampedharmonic_oscillator_params()
-    quad_type_list = [ 'GAUSS', 'LOBATTO']
+    quad_type_list = ['GAUSS', 'LOBATTO']
 
     # Initialize data as a list of rows
     data = []

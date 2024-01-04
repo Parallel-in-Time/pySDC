@@ -19,7 +19,7 @@ def dampedharmonic_oscillator_params():
     problem_params = {'k': 0, 'mu': 0, 'u0': np.array([1, 1])}
 
     # Initialize sweeper parameters
-    sweeper_params = {'quad_type': 'GAUSS', 'num_nodes':5, 'do_coll_update': True, 'picard_mats_sweep': True}
+    sweeper_params = {'quad_type': 'GAUSS', 'num_nodes': 3, 'do_coll_update': True, 'picard_mats_sweep': True}
 
     # Initialize step parameters
     step_params = {'maxiter': 2}
@@ -48,10 +48,10 @@ if __name__ == '__main__':
     """
     # Execute the stability analysis for the damped harmonic oscillator
     description = dampedharmonic_oscillator_params()
-    Stability = Stability_implementation(description, kappa_max=10, mu_max=60, Num_iter=(200, 200))
+    Stability = Stability_implementation(description, kappa_max=30, mu_max=30, Num_iter=(200, 200))
 
     Stability.run_SDC_stability()
-    # Stability.run_Picard_stability()
-    # Stability.run_RKN_stability()
-    # Stability.run_Ksdc()
+    Stability.run_Picard_stability()
+    Stability.run_RKN_stability()
+    Stability.run_Ksdc()
     # Stability.run_Kpicard
