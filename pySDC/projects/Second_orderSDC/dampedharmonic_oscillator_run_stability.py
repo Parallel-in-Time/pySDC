@@ -22,7 +22,7 @@ def dampedharmonic_oscillator_params():
     sweeper_params = {'quad_type': 'GAUSS', 'num_nodes': 3, 'do_coll_update': True, 'picard_mats_sweep': True}
 
     # Initialize step parameters
-    step_params = {'maxiter': 2}
+    step_params = {'maxiter': 5}
 
     # Fill description dictionary for easy step instantiation
     description = {

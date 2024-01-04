@@ -29,7 +29,7 @@ def test_stability():
 def test_RKN_stability():
     """
     Stability domain test
-    only the values of mu=[6, 20] and kappa=[3, 20]
+    only the values of mu=[1, 20] and kappa=[1, 20]
     It is stable at mu=6, kappa=3 otherwise it is instable
     """
     import numpy as np
@@ -43,10 +43,10 @@ def test_RKN_stability():
     stab_RKN = Stability.stability_data_RKN()
     assert (
         stab_RKN[0, 0] <= 1
-    ), f'The SDC method is instable at mu={Stability.lambda_mu[0]} and kappa={Stability.lambda_kappa[0]}'
+    ), f'The RKN method is instable at mu={Stability.lambda_mu[0]} and kappa={Stability.lambda_kappa[0]}'
     assert (
         stab_RKN[-1, -1] > 1
-    ), f'The SDC method is stable at mu={Stability.lambda_mu[-1]} and kappa={Stability.lambda_kappa[-1]}'
+    ), f'The RKN method is stable at mu={Stability.lambda_mu[-1]} and kappa={Stability.lambda_kappa[-1]}'
 
 
 if __name__ == '__main__':
