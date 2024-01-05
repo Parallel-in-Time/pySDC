@@ -4,7 +4,9 @@ from pySDC.projects.Second_orderSDC.dampedharmonic_oscillator_run_stability impo
 from tabulate import tabulate
 
 
-def stab_interval(num_nodes_list, max_iter_list, save_file=False, filename='stab_results.txt'):
+def stab_interval(
+    num_nodes_list, max_iter_list, save_file=False, filename='./data/stab_interval.txt'
+):  # pragma: no cover
     # Initialize simulation parameters based on the damped harmonic oscillator
     description = dampedharmonic_oscillator_params()
 
@@ -49,7 +51,7 @@ def stab_interval(num_nodes_list, max_iter_list, save_file=False, filename='stab
         print(table_str)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     # Define lists for the number of nodes and maximum iterations
     M_list = np.arange(2, 7, 1)
     K_list = np.arange(1, 11, 1)

@@ -4,10 +4,12 @@ from pySDC.projects.Second_orderSDC.dampedharmonic_oscillator_run_stability impo
 from tabulate import tabulate
 
 
-def check_stab_points(points, num_nodes_list, max_iter_list, store=False, filename='stab_results.txt'):
+def check_stab_points(
+    points, num_nodes_list, max_iter_list, store=False, filename='./data/stab_results.txt'
+):  # pragma: no cover
     # Initialize simulation parameters based on the damped harmonic oscillator
     description = dampedharmonic_oscillator_params()
-    quad_type_list = ['GAUSS', 'LOBATTO']
+    quad_type_list = ['GAUSS', 'LOBATTO', 'RADAU-LEFT', 'RADAU-RIGHT']
 
     # Initialize data as a list of rows
     data = []
@@ -50,7 +52,7 @@ def check_stab_points(points, num_nodes_list, max_iter_list, store=False, filena
         print(table_str)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     # Define lists for the number of nodes and maximum iterations
     M_list = np.arange(3, 6, 1)
     K_list = np.arange(2, 10, 1)
