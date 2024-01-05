@@ -670,7 +670,7 @@ class compute_error(plotmanager):
             file.close()
 
     # find expected local convergence order for position
-    def local_order_pos(self, order_K, order_quad):
+    def local_order_pos(self, order_K, order_quad):  # pragma: no cover
         if self.description['sweeper_params']['initial_guess'] == 'spread':
             if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
                 return np.array([np.min([order_K + 2 + 2, order_quad]), np.min([2 * order_K + 3, order_quad])])
@@ -687,7 +687,7 @@ class compute_error(plotmanager):
                 raise NotImplementedError('order of convergence explicitly not implemented ')
 
     # find expected local convergence order for velocity
-    def local_order_vel(self, order_K, order_quad):
+    def local_order_vel(self, order_K, order_quad):  # pragma: no cover
         if self.description['sweeper_params']['initial_guess'] == 'spread':
             if self.quad_type == 'GAUSS' or self.quad_type == 'RADAU-RIGHT':
                 return np.array([np.min([order_K + 1 + 2, order_quad]), np.min([2 * order_K + 2, order_quad])])
@@ -882,7 +882,7 @@ class Stability_implementation(object):
         plt.clabel(CS1, inline=True, fmt="%3.2f")
 
         plt.gca().set_xticks(np.arange(0, int(lam_k_max) + 3, 3))
-        plt.gca().set_yticks(np.arange(0, int(lam_mu_max) + 3, 3))
+        plt.gca().set_yticks(np.arange(0, int(lam_mu_max) + 5, 5))
         plt.gca().tick_params(axis="both", which="both")
         plt.xlim([0.0, lam_k_max])
         plt.ylim([0.0, lam_mu_max])
