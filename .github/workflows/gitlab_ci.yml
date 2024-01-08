@@ -16,12 +16,14 @@ jobs:
         if: github.event_name == 'pull_request_target'
         uses: actions-cool/check-user-permission@v2
         with:
-          username: ${{ github.triggering_actor }}
-          require: write
+          username: github.triggering_actor
+          require: 'write'
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Interpret the queried result
         if: github.event_name == 'pull_request_target'
         run: |
-          echo $steps.query_permission_triggering_actor.outputs.require-result
+          echo "Current permission level is ${{ steps.query_permission_triggering_actor.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
           exit !steps.query_permission_triggering_actor.outputs.require-result
       - name: Pass if workflow from push or schedule
         if: >-
