@@ -473,7 +473,7 @@ class AdaptivityStrategy(Strategy):
 
     @property
     def label(self):
-        return r'$\Delta t$ adaptivity'
+        return r'$\Delta t$-adaptivity'
 
     def get_fixable_params(self, maxiter, **kwargs):
         """
@@ -716,7 +716,7 @@ class IterateStrategy(Strategy):
 
     @property
     def label(self):
-        return r'$k$ adaptivity'
+        return r'$k$-adaptivity'
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -1949,4 +1949,4 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
 
     @property
     def label(self):
-        return r'$\Delta t$-$k~\mathrm{adaptivity}$'
+        return r'$\Delta t$-$k$-adaptivity'
