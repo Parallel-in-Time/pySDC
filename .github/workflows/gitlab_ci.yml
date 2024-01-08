@@ -16,7 +16,7 @@ jobs:
         if: github.event_name == 'pull_request_target'
         uses: actions-cool/check-user-permission@v2
         with:
-          username: github.triggering_actor
+          username: ${{ github.triggering_actor }}
           require: 'write'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Interpret the queried result
