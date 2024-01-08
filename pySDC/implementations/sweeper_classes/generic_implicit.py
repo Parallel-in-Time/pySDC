@@ -67,7 +67,11 @@ class generic_implicit(sweeper):
 
         # update the MIN-SR-FLEX preconditioner
         if self.params.QI.startswith('MIN-SR-FLEX'):
-            self.params.QI = 'MIN-SR-FLEX' + str(L.status.sweep)
+            k = L.status.sweep
+            if k > M:
+                self.params.QI = "MIN-SR-S"
+            else:
+                self.params.QI = 'MIN-SR-FLEX' + str(k)
             self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
 
         # gather all terms which are known already (e.g. from the previous iteration)

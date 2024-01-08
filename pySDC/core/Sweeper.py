@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 import numpy as np
 import scipy as sp
@@ -120,7 +121,7 @@ class sweeper(object):
         elif qd_type.startswith('MIN-SR-FLEX'):
             m = QDmat.shape[0] - 1
             try:
-                k = int(qd_type[9:])
+                k = abs(int(qd_type[11:]))
             except ValueError:
                 k = 1
             d = min(k, m)
@@ -313,7 +314,9 @@ class sweeper(object):
                     else:
                         coeffs0 = a*nodes**b / m
 
-                    coeffs = sp.optimize.fsolve(func, coeffs0, xtol=1e-15)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        coeffs = sp.optimize.fsolve(func, coeffs0, xtol=1e-15)
 
                 # Handle first node equal to zero
                 if quadType in ['LOBATTO', 'RADAU-LEFT']:
@@ -330,13 +333,33 @@ class sweeper(object):
                 sol = sp.optimize.minimize(law, [1., 1.], method="nelder-mead")
                 return sol.x
 
-            # Compute incrementaly coefficients
-            a, b = None, None
-            m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
-            for m in range(m0, M+1):
-                coeffs, nodes = computeCoeffs(m, a, b)
-                if m > 1:
-                    a, b = fit(coeffs*m, nodes)
+            # TODO : put this somewhere as a parameter ...
+            increment = True
+
+            if increment:
+                # Compute incrementaly coefficients
+                a, b = None, None
+                m0 = 2 if quadType in ['LOBATTO', 'RADAU-LEFT'] else 1
+                for m in range(m0, M+1):
+                    coeffs, nodes = computeCoeffs(m, a, b)
+                    if m > 1:
+                        a, b = fit(coeffs*m, nodes)
+            else:
+                coeffs, _ = computeCoeffs(M)
+
+            QDmat[1:, 1:] = np.diag(coeffs)
+            self.parallelizable = True
+
+        elif qd_type == "HOUWEN-SOMMEIJER":
+
+            m = QDmat.shape[0] - 1
+
+            if m == 4 and coll.node_type == 'LEGENDRE' and coll.quad_type == "RADAU-RIGHT":
+                coeffs = [3055/9532, 531/5956, 1471/8094, 1848/7919]
+            else:
+                raise NotImplementedError(
+                    'no HOUWEN-SOMMEIJER diagonal coefficients for this node configuration'
+                )
 
             QDmat[1:, 1:] = np.diag(coeffs)
             self.parallelizable = True
@@ -350,6 +373,7 @@ class sweeper(object):
                 raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
 
         # check if we got not more than a lower triangular matrix
+        # TODO : this should be a regression test, not run-time ...
         np.testing.assert_array_equal(
             np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg='Lower triangular matrix expected!'
         )

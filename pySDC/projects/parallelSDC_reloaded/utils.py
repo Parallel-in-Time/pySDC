@@ -180,14 +180,18 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
         try:
             uSDC[i+1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i+1])
         except Exception:
-            return None, (0, 0, 0)
+            return None, (0, 0, 0), False
     tComp = time() - tBeg
 
     nNewton = prob.work_counters["newton"].niter
     nRHS = prob.work_counters["rhs"].niter
     print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
+    try:
+        parallel = controller.MS[0].levels[0].sweep.parallelizable
+    except AttributeError:
+        parallel = False
 
-    return uSDC, (nNewton, nRHS, tComp)
+    return uSDC, (nNewton, nRHS, tComp), parallel
 
 
 def solutionExact(tEnd, nSteps, probName, **kwargs):

@@ -12,10 +12,10 @@ from utils import solutionExact, getParamsRK, solutionSDC, getParamsSDC
 
 script = __file__.split('/')[-1].split('.')[0]
 
-tEnd = 50
+tEnd = 10
 nSteps = 10
 
-useRK = False
+useRK = True
 if useRK:
     rkScheme = "ESDIRK53"
     params = getParamsRK(rkScheme)
@@ -32,7 +32,7 @@ periodic = False
 pParams  = {
     "periodic": periodic,
     "nvars": 2**11 - (not periodic),
-    "epsilon": 0.04,
+    "epsilon": 0.08,
     }
 
 tVals = np.linspace(0, tEnd, nSteps+1)
@@ -41,7 +41,7 @@ print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, pName, **pParams)
 
 
-uNum, counters = solutionSDC(tEnd, nSteps, params, pName, **pParams)
+uNum, counters, _ = solutionSDC(tEnd, nSteps, params, pName, **pParams)
 
 figName = f"{script}_solution"
 plt.figure(figName)
