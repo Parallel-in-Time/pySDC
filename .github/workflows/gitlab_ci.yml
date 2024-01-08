@@ -22,18 +22,18 @@ jobs:
         if: github.event_name == 'pull_request_target'
         run: |
           echo $steps.query_permission_triggering_actor.outputs.require-result
-          return !steps.query_permission_triggering_actor.outputs.require-result
+          exit !steps.query_permission_triggering_actor.outputs.require-result
       - name: Pass if workflow from push or schedule
         if: >-
           (github.event_name == 'push') ||
           (github.event_name == 'schedule')
-        run: return 0
+        run: exit 0
       - name: Fail for other triggers
         if: >-
           (github.event_name != 'push') &&
           (github.event_name != 'schedule') &&
           (github.event_name != 'pull_request_target')
-        run: return 1
+        run: exit 1
 
   mirror_to_gitlab:
     runs-on: ubuntu-latest
