@@ -30,9 +30,9 @@ for pType in ["linear", "nonlinear"]:
     uExact = solutionExact(tEnd, nSteps, "PROTHERO-ROBINSON", epsilon=epsilon)
 
     params = getParamsRK(rkScheme)
-    uNum, counters = solutionSDC(
+    uNum, counters, parallel = solutionSDC(
         tEnd, nSteps, params, probName, epsilon=epsilon)
-    uNumFine, counters = solutionSDC(
+    uNumFine, counters, parallel = solutionSDC(
         tEnd, nSteps*10, params, probName, epsilon=epsilon)
 
     figName = f"{script}_{pType}"

@@ -82,13 +82,13 @@ for qDelta in qDeltaList:
 
             uRef = solutionExact(tEnd, nSteps, pName)
 
-            uSDC, counters = solutionSDC(tEnd, nSteps, params, pName)
+            uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName)
 
             err = getError(uSDC, uRef)
             errors.append(err)
 
             cost = getCost(counters)
-            if qDelta in ['IEpar', 'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', 'PIC']:
+            if parallel:
                 cost /= nNodes*parEfficiency
             costs.append(cost)
 

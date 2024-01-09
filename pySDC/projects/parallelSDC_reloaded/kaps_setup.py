@@ -23,7 +23,7 @@ print("Computing ODE solution")
 uExact = solutionExact(tEnd, nSteps, "KAPS", epsilon=epsilon)
 
 params = getParamsRK(rkScheme)
-uNum, counters = solutionSDC(
+uNum, counters, parallel = solutionSDC(
     tEnd, nSteps, params, 'KAPS', epsilon=epsilon)
 
 figName = f"{script}_solution"

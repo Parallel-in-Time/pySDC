@@ -2,7 +2,6 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
@@ -41,6 +40,7 @@ class testequation0d(ptype):
             lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
                 (len(re) * len(im))
             )
+        lambdas = np.asarray(lambdas)
 
         assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
         nvars = len(lambdas)
@@ -90,7 +90,8 @@ class testequation0d(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u)
+        f[:] = self.u
+        f *= self.lambdas
         self.work_counters['rhs']()
         return f
 

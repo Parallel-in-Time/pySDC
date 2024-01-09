@@ -8,13 +8,17 @@ Utility functions to investigate parallel SDC on non-linear problems
 import json
 import numpy as np
 from time import time
+import traceback
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
 from pySDC.implementations.problem_classes.odeScalar import ProtheroRobinson
 from pySDC.implementations.problem_classes.odeSystem import Kaps, ChemicalReaction3Var, JacobiElliptic
 from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front_fullyimplicit, allencahn_periodic_fullyimplicit
+from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
@@ -23,12 +27,12 @@ import matplotlib.pyplot as _plt
 # General matplotlib settings
 _plt.rc('font', size=12)
 _plt.rcParams['lines.linewidth'] = 2
-_plt.rcParams['axes.titlesize'] = 18
+_plt.rcParams['axes.titlesize'] = 16
 _plt.rcParams['axes.labelsize'] = 16
 _plt.rcParams['xtick.labelsize'] = 16
 _plt.rcParams['ytick.labelsize'] = 16
-_plt.rcParams['xtick.major.pad'] = 5
-_plt.rcParams['ytick.major.pad'] = 5
+_plt.rcParams['xtick.major.pad'] = 3
+_plt.rcParams['ytick.major.pad'] = 2
 _plt.rcParams['axes.labelpad'] = 6
 _plt.rcParams['markers.fillstyle'] = 'none'
 _plt.rcParams['lines.markersize'] = 7.0
@@ -147,10 +151,15 @@ def setupProblem(name, description, dt, **kwargs):
             })
     elif name == "JACELL":
         description["problem_class"] = JacobiElliptic
+    elif name == "DAHLQUIST":
+        lambdas = kwargs.get("lambdas", 1j)
+        description["problem_class"] = testequation0d
         description["problem_params"].update({
-            'newton_tol': 1e-13,
-            'newton_maxiter': 300,
+            "lambdas": lambdas,
+            "u0": 1.0,
             })
+        description["problem_params"].pop("newton_tol")
+        description["problem_params"].pop("newton_maxiter")
     else:
         raise NotImplementedError(f"problem {name} not implemented")
 
@@ -179,11 +188,16 @@ def solutionSDC(tEnd, nSteps, params, probName, **kwargs):
         uTmp[:] = uSDC[i]
         try:
             uSDC[i+1], _ = controller.run(u0=uTmp, t0=tVals[i], Tend=tVals[i+1])
-        except Exception:
+        except Exception as e:
+            print(f" -- exception when running controller : {e}")
+            traceback.print_exc()
             return None, (0, 0, 0), False
     tComp = time() - tBeg
 
-    nNewton = prob.work_counters["newton"].niter
+    try:
+        nNewton = prob.work_counters["newton"].niter
+    except KeyError:
+        nNewton = 0
     nRHS = prob.work_counters["rhs"].niter
     print(f"    done, newton:{nNewton}, rhs:{nRHS}, tComp:{tComp}")
     try:
