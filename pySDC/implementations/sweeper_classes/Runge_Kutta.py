@@ -593,7 +593,7 @@ class DIRK43(RungeKutta):
 
 class ESDIRK53(RungeKutta):
     """
-    A-stable embedded RK pair of orders 5 and 3.
+    A-stable embedded RK pair of orders 5 and 3, ESDIRK5(3)6L[2]SA.
     Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
     """
 
@@ -646,6 +646,72 @@ class ESDIRK53(RungeKutta):
                 -18982822128277.0 / 13735826808854.0,
                 23127941173280.0 / 11608435116569.0,
                 2847520232427.0 / 11515777524847.0,
+            ],
+        ]
+    )
+    ButcherTableauClass = ButcherTableauEmbedded
+
+    @classmethod
+    def get_update_order(cls):
+        return 4
+
+
+class ESDIRK43(RungeKutta):
+    """
+    A-stable embedded RK pair of orders 4 and 3, ESDIRK4(3)6L[2]SA.
+    Taken from [here](https://ntrs.nasa.gov/citations/20160005923)
+    """
+    s2 = 2**0.5
+
+    nodes = np.array(
+        [0, 1/2, (2-2**0.5)/4, 5/8, 26/25, 1.0]
+    )
+    matrix = np.zeros((6, 6))
+    matrix[1, :2] = [1/4, 1/4] # OK
+    matrix[2, :3] = [
+        (1-2**0.5)/8,
+        (1-2**0.5)/8,
+        1/4,
+    ] # OK
+    matrix[3, :4] = [
+        (5-7*s2)/64,
+        (5-7*s2)/64,
+        7*(1+s2)/32,
+        1/4,
+    ] # OK
+    matrix[4, :5] = [
+        (-13796 - 54539*s2)/125000,
+        (-13796 - 54539*s2)/125000,
+        (506605 + 132109*s2)/437500,
+        166*(-97 + 376*s2)/109375,
+        1/4,
+    ] # OK
+    matrix[5, :] = [
+        (1181 - 987*s2)/13782,
+        (1181 - 987*s2)/13782,
+        47*(-267 + 1783*s2)/273343,
+        -16*(-22922 + 3525*s2)/571953,
+        -15625*(97 + 376*s2)/90749876,
+        1/4,
+    ] # OK
+
+    weights = np.array(
+        [
+            [
+                (1181 - 987*s2)/13782,
+                (1181 - 987*s2)/13782,
+                47*(-267 + 1783*s2)/273343,
+                -16*(-22922 + 3525*s2)/571953,
+                -15625*(97 + 376*s2)/90749876,
+                1/4,
+            ],
+            [
+                -480923228411.0 / 4982971448372,
+                -480923228411.0 / 4982971448372,
+                6709447293961.0 / 12833189095359,
+                3513175791894.0 / 6748737351361.0,
+                -498863281070.0 / 6042575550617.0,
+                2077005547802.0 / 8945017530137.0,
             ],
         ]
     )
