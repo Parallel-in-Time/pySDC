@@ -39,13 +39,13 @@ qDeltaList = [
     # "MIN3",
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
-nSweepList = [1, 2, 3, 4, 5, 6]
+nSweepList = [1, 2, 3, 4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
-# qDeltaList = ['MIN-SR-NS']
-nSweepList = [5]
+qDeltaList = ['RK4', 'MIN-SR-S']
+# nSweepList = [4]
 
 fig, axs = plt.subplots(1, 2)
 
@@ -63,6 +63,8 @@ for qDelta in qDeltaList:
         try:
             params = getParamsRK(qDelta)
             name = name[:-3]
+            if nSweeps != nSweepList[0]:
+                continue
         except KeyError:
             params = getParamsSDC(
                 quadType=quadType, numNodes=nNodes, nodeType=nodeType,

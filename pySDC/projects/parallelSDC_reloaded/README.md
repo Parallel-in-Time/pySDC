@@ -21,7 +21,7 @@ Common utility scripts :
 From [[Houwen & Sommeijer 1991]](#houwen1991iterated), that took it from an other reference of the two guys from which the problem is named :
 
 $$
-\frac{du}{dt} = \frac{u-g(t)}{\epsilon} + \frac{dg}{dt},
+\frac{du}{dt} = -\frac{u-g(t)}{\epsilon} + \frac{dg}{dt},
 \quad u(0) = g(0).
 $$
 
@@ -32,7 +32,7 @@ the stiffer the problem is (numerically speaking).
 There is also a non-linear version of this problem :
 
 $$
-\frac{du}{dt} = \frac{u^3-g(t)^3}{\epsilon} + \frac{dg}{dt},
+\frac{du}{dt} = -\frac{u^3-g(t)^3}{\epsilon} + \frac{dg}{dt},
 \quad u(0) = g(0).
 $$
 

@@ -45,13 +45,13 @@ for nNodes, quadType, sweepType in config:
 
     # Schemes parameters
     schemes = [
-        ("RK4", None), ("ESDIRK53", None),
+        # ("RK4", None), ("ESDIRK53", None),
         *[(sweepType, i) for i in range(1, nNodes+1)]
     ]
 
     # Plot styles
     styles = [
-        dict(ls="--", c="gray"), dict(ls="-.", c="gray"),
+        # dict(ls="--", c="gray"), dict(ls="-.", c="gray"),
         dict(ls="-", marker='o'),
         dict(ls="-", marker='>'),
         dict(ls="-", marker='s'),
@@ -84,6 +84,8 @@ for nNodes, quadType, sweepType in config:
             errors.append(err)
 
         plt.loglog(dtVals, errors, **style, label=label)
+        if nSweeps is not None:
+            plt.loglog(dtVals, (0.1*dtVals)**nSweeps, '--', c='gray', lw=1.5)
 
     plt.legend()
     plt.xlabel(r"$\Delta{t}$")

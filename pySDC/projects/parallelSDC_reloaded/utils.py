@@ -74,7 +74,8 @@ def getParamsSDC(
 RK_SWEEPERS = {
     "RK4": rk.RK4,
     "DIRK43": rk.DIRK43,
-    "ESDIRK53": rk.ESDIRK53
+    "ESDIRK53": rk.ESDIRK53,
+    "ESDIRK43": rk.ESDIRK43,
 }
 
 

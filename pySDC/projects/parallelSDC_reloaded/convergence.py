@@ -23,19 +23,19 @@ def getError(uNum, uRef):
     return np.linalg.norm(uRef - uNum[:, 0], np.inf)
 
 # Collocation parameters
-nNodes = 5
+nNodes = 4
 nodeType = "LEGENDRE"
-quadType = "LOBATTO"
+quadType = "RADAU-RIGHT"
 sweepType = "MIN-SR-NS"
 
 # Schemes parameters
 schemes = [
-    ("RK4", None), ("ESDIRK53", None),
-    *[(sweepType, i) for i in [1, 2, 3, 4, 5]]
+    ("RK4", None), ("ESDIRK43", None),
+    *[(sweepType, i) for i in [1, 2, 3, 4]][:1]
 ]
 
 styles = [
-    dict(ls="--", c="gray"), dict(ls="-.", c="gray"),
+    dict(ls=":", c="gray"), dict(ls="-.", c="gray"),
     dict(ls="-", marker='o'),
     dict(ls="-", marker='>'),
     dict(ls="-", marker='s'),
@@ -69,6 +69,8 @@ for (qDelta, nSweeps), style in zip(schemes, styles):
         errors.append(err)
 
     plt.loglog(dtVals, errors, **style, label=label)
+    if nSweeps is not None:
+        plt.loglog(dtVals, (0.1*dtVals)**nSweeps, '--', c='gray', lw=1.5)
 
 plt.title(sweepType)
 plt.legend()

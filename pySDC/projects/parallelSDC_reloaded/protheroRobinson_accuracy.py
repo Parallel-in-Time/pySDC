@@ -18,8 +18,8 @@ from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
 # Problem parameters
 tEnd = 2*np.pi
-nonLinear = True
-epsilon = 1e-6
+nonLinear = False
+epsilon = 1
 
 pName = "PROTHERO-ROBINSON"+(nonLinear)*"-NL"
 
@@ -40,16 +40,16 @@ nodeType = 'LEGENDRE'
 parEfficiency = 0.8
 
 qDeltaList = [
-    'RK4', 'ESDIRK53', 'HOUWEN-SOMMEIJER', 'MIN',
+    'RK4', 'ESDIRK43', 'HOUWEN-SOMMEIJER',
     # 'IE', 'LU', 'IEpar', 'PIC',
     'MIN-SR-NS', 'MIN-SR-S', 'MIN-SR-FLEX', "PIC",
     # "MIN3",
 ]
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
-nSweepList = [1, 2, 3, 4, 5, 6]
+nSweepList = [1, 2, 3, 4]
 
-# qDeltaList = ['MIN-SR-FLEX']
-nSweepList = [4]
+qDeltaList = ['RK4', 'ESDIRK43', 'LU']
+# nSweepList = [4]
 
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
@@ -68,6 +68,9 @@ for qDelta in qDeltaList:
         try:
             params = getParamsRK(qDelta)
             name = name[:-3]
+            if nSweeps != nSweepList[0]:
+                continue
+
         except KeyError:
             params = getParamsSDC(
                 quadType=quadType, numNodes=nNodes, nodeType=nodeType,
