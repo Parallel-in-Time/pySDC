@@ -39,3 +39,23 @@ You can see the results below, except for the solution, which looks the same as 
     :width: 24%
 .. image:: ../../../data/error_estimate_order_parallel.png
     :width: 23%
+
+
+Reproduction of the plots in the adaptive SDC paper
+---------------------------------------------------
+To reproduce the plots you need to install pySDC with all packages in the mpi4py environment.
+Then, navigate to this directory, `pySDC/projects/Resilience/` and run the following commands:
+
+ 
+```bash
+ 
+mpirun -np 4 python work_precision.py
+mpirun -np 4 python fault_stats.py prob run_vdp
+mpirun -np 4 python fault_stats.py prob run_quench
+mpirun -np 4 python fault_stats.py prob run_AC
+mpirun -np 4 python fault_stats.py prob run_Schroedinger
+python paper_plots.py
+ 
+```
+
+Possibly, you need to create some directories in this one to store and load things, if path errors occur.

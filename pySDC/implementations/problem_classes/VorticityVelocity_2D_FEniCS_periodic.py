@@ -3,7 +3,6 @@ import logging
 import dolfin as df
 import numpy as np
 
-from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
@@ -23,7 +22,8 @@ class fenics_vortex_2d(ptype):
     .. math::
         \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
 
-    The nonlinear system is solved in a *fully-implicit* way using Dolfin's weak solver.
+    This problem class treats the PDE in an IMEX way, with diffusion being the implicit part and everything else the explicit one.
+    The mass matrix needs inversion for this type of problem class, see the derived one for the mass-matrix version without inversion.
 
     Parameters
     ----------
@@ -78,9 +78,9 @@ class fenics_vortex_2d(ptype):
             c_nvars = [(32, 32)]
 
         if refinements is None:
-            refinements = [1, 0]
+            refinements = 1
 
-        # Sub domain for Periodic boundary condition
+        # Subdomain for Periodic boundary condition
         class PeriodicBoundary(df.SubDomain):
             # Left boundary is "target domain" G
             def inside(self, x, on_boundary):
@@ -103,8 +103,8 @@ class fenics_vortex_2d(ptype):
                     y[1] = x[1] - 1.0
 
         # set logger level for FFC and dolfin
-        df.set_log_level(df.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
+        logging.getLogger('UFL').setLevel(logging.WARNING)
 
         # set solver and form parameters
         df.parameters["form_compiler"]["optimize"] = True
@@ -120,7 +120,8 @@ class fenics_vortex_2d(ptype):
         # define function space for future reference
         self.V = df.FunctionSpace(mesh, family, order, constrained_domain=PeriodicBoundary())
         tmp = df.Function(self.V)
-        print('DoFs on this level:', len(tmp.vector().vector()[:]))
+        print('DoFs on this level:', len(tmp.vector()[:]))
+        self.fix_bc_for_residual = False
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_vortex_2d, self).__init__(self.V)
@@ -162,8 +163,7 @@ class fenics_vortex_2d(ptype):
         """
 
         A = self.M + self.nu * factor * self.K
-        b = self.__apply_mass_matrix(rhs)
-
+        b = self.apply_mass_matrix(rhs)
         u = self.dtype_u(u0)
         df.solve(A, u.values.vector(), b.values.vector())
 
@@ -186,10 +186,9 @@ class fenics_vortex_2d(ptype):
             Explicit part of the right-hand side.
         """
 
-        A = 1.0 * self.K
-        b = self.__apply_mass_matrix(u)
+        b = self.apply_mass_matrix(u)
         psi = self.dtype_u(self.V)
-        df.solve(A, psi.values.vector(), b.values.vector())
+        df.solve(self.K, psi.values.vector(), b.values.vector())
 
         fexpl = self.dtype_u(self.V)
         fexpl.values = df.project(
@@ -215,9 +214,10 @@ class fenics_vortex_2d(ptype):
             Implicit part of the right-hand side.
         """
 
-        tmp = self.dtype_u(self.V)
-        tmp.values = df.Function(self.V, -1.0 * self.nu * self.K * u.values.vector())
-        fimpl = self.__invert_mass_matrix(tmp)
+        A = -self.nu * self.K
+        fimpl = self.dtype_u(self.V)
+        A.mult(u.values.vector(), fimpl.values.vector())
+        fimpl = self.__invert_mass_matrix(fimpl)
 
         return fimpl
 
@@ -243,7 +243,7 @@ class fenics_vortex_2d(ptype):
         f.expl = self.__eval_fexpl(u, t)
         return f
 
-    def __apply_mass_matrix(self, u):
+    def apply_mass_matrix(self, u):
         r"""
         Routine to apply mass matrix.
 
@@ -258,7 +258,7 @@ class fenics_vortex_2d(ptype):
         """
 
         me = self.dtype_u(self.V)
-        me.values = df.Function(self.V, self.M * u.values.vector())
+        self.M.mult(u.values.vector(), me.values.vector())
 
         return me
 
@@ -278,12 +278,7 @@ class fenics_vortex_2d(ptype):
         """
 
         me = self.dtype_u(self.V)
-
-        A = 1.0 * self.M
-        b = self.dtype_u(u)
-
-        df.solve(A, me.values.vector(), b.values.vector())
-
+        df.solve(self.M, me.values.vector(), u.values.vector())
         return me
 
     def u_exact(self, t):
@@ -327,3 +322,162 @@ class fenics_vortex_2d(ptype):
         # exit()
 
         return me
+
+
+class fenics_vortex_2d_mass(fenics_vortex_2d):
+    r"""
+    This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
+    in :math:`[0, 1]^2`
+
+    .. math::
+        \frac{\partial w}{\partial t} = \nu \Delta w
+
+    for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved
+    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*
+
+    .. math::
+        \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
+
+    This problem class treats the PDE in an IMEX way, with diffusion being the implicit part and everything else the explicit one.
+    No mass matrix inversion is needed here, i.e. using this problem class requires the imex_1st_order_mass sweeper.
+
+    Parameters
+    ----------
+    c_nvars : List of int tuple, optional
+        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.
+    family : str, optional
+        Indicates the family of elements used to create the function space
+        for the trail and test functions. The default is ``'CG'``, which are the class
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+    order : int, optional
+        Defines the order of the elements in the function space.
+    refinements : int, optional
+        Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
+    nu : float, optional
+        Diffusion coefficient :math:`\nu`.
+    rho : int, optional
+        Problem parameter.
+    delta : float, optional
+        Problem parameter.
+
+    Attributes
+    ----------
+    V : FunctionSpace
+        Defines the function space of the trial and test functions.
+    M : scalar, vector, matrix or higher rank tensor
+        Mass matrix for FENiCS.
+    K : scalar, vector, matrix or higher rank tensor
+        Stiffness matrix including diffusion coefficient (and correct sign).
+
+    References
+    ----------
+    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+        C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
+    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+        Wells and others. Springer (2012).
+    """
+
+    def solve_system(self, rhs, factor, u0, t):
+        r"""
+        Dolfin's linear solver for :math:`(M - factor \cdot A)\vec{u} = \vec{rhs}`.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side for the nonlinear system.
+        factor : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u0 : dtype_u
+            Initial guess for the iterative solver (not used here so far).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        u : dtype_u
+            The solution as mesh.
+        """
+
+        A = self.M + self.nu * factor * self.K
+        b = self.dtype_u(rhs)
+        u = self.dtype_u(u0)
+        df.solve(A, u.values.vector(), b.values.vector())
+
+        return u
+
+    def __eval_fexpl(self, u, t):
+        """
+        Helper routine to evaluate the explicit part of the right-hand side.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
+
+        Returns
+        -------
+        fexpl : dtype_u
+            Explicit part of the right-hand side.
+        """
+
+        b = self.apply_mass_matrix(u)
+        psi = self.dtype_u(self.V)
+        df.solve(self.K, psi.values.vector(), b.values.vector())
+
+        fexpl = self.dtype_u(self.V)
+        fexpl.values = df.project(
+            df.Dx(psi.values, 1) * df.Dx(u.values, 0) - df.Dx(psi.values, 0) * df.Dx(u.values, 1), self.V
+        )
+        fexpl = self.apply_mass_matrix(fexpl)
+
+        return fexpl
+
+    def __eval_fimpl(self, u, t):
+        """
+        Helper routine to evaluate the implicit part of the right-hand side.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
+
+        Returns
+        -------
+        fimpl : dtype_u
+            Implicit part of the right-hand side.
+        """
+
+        A = -self.nu * self.K
+        fimpl = self.dtype_u(self.V)
+        A.mult(u.values.vector(), fimpl.values.vector())
+
+        return fimpl
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate both parts of the right-hand side.
+
+        Note: Need to add this here, because otherwise the parent class will call the "local" functions __eval_*
+        and not the ones of the child class.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time at which the numerical solution is computed.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side divided into two parts.
+        """
+
+        f = self.dtype_f(self.V)
+        f.impl = self.__eval_fimpl(u, t)
+        f.expl = self.__eval_fexpl(u, t)
+        return f
