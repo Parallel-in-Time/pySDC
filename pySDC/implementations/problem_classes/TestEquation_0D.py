@@ -1,12 +1,9 @@
 import numpy as np
-import scipy.sparse as sp
-from scipy.sparse.linalg import splu
 
 from pySDC.core.Problem import ptype, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
-# noinspection PyUnusedLocal
 class testequation0d(ptype):
     r"""
     This class implements the simple test equation of the form
@@ -28,7 +25,6 @@ class testequation0d(ptype):
     A : scipy.sparse.csc_matrix
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
-
     dtype_u = mesh
     dtype_f = mesh
 
@@ -48,29 +44,8 @@ class testequation0d(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('complex128')))
-
-        self.A = self.__get_A(lambdas)
         self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
-
-    @staticmethod
-    def __get_A(lambdas):
-        """
-        Helper function to assemble FD matrix A in sparse format.
-
-        Parameters
-        ----------
-        lambdas : sequence of array_like
-            List of lambda parameters.
-
-        Returns
-        -------
-        scipy.sparse.csc_matrix
-            Diagonal matrix A in CSC format.
-        """
-
-        A = sp.diags(lambdas)
-        return A
 
     def eval_f(self, u, t):
         """
@@ -90,7 +65,7 @@ class testequation0d(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.u
+        f[:] = u
         f *= self.lambdas
         self.work_counters['rhs']()
         return f
@@ -115,10 +90,11 @@ class testequation0d(ptype):
         me : dtype_u
             The solution as mesh.
         """
-
         me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.nvars, format='csc') - factor * self.A)
-        me[:] = L.solve(rhs)
+        L = 1 - factor*self.lambdas
+        L[L == 0] = 1   # to avoid potential divisions by zeros
+        me[:] = rhs
+        me /= L
         return me
 
     def u_exact(self, t, u_init=None, t_init=None):

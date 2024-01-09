@@ -29,7 +29,7 @@ nodeType = "LEGENDRE"
 quadType = "RADAU-RIGHT"
 
 # SDC parameters
-nSweeps = 1
+nSweeps = 4
 qDeltaType = "MIN-SR-FLEX"
 
 
@@ -72,7 +72,7 @@ axs[1].semilogx(imStab, imVals)
 axs[1].tick_params(
     axis='x',          # changes apply to the x-axis
     which='both',      # both major and minor ticks are affected
-    bottom=True,      # ticks along the bottom edge are off
+    bottom=True,       # ticks along the bottom edge are off
     top=False,         # ticks along the top edge are off
     labelbottom=True)
 axs[1].vlines(1, *imLims, linestyles='--', colors='black', linewidth=1)
@@ -80,5 +80,6 @@ axs[1].set_xlim([0.1, 10])
 axs[1].set_ylim(*imLims)
 axs[1].set_aspect(0.2)
 axs[1].set_xticks([0.1, 1, 10])
+axs[1].set_title("Imaginary axis")
 
 plt.tight_layout()
