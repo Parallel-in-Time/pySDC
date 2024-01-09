@@ -6,9 +6,8 @@ Created on Tue Jan  9 10:12:09 2024
 Compute stability regions for SDC wit given parameters
 """
 import numpy as np
-import matplotlib.pyplot as plt
-
-from utils import getParamsRK, getParamsSDC, solutionSDC
+from utils import getParamsRK, getParamsSDC, solutionSDC, \
+    plotStabContour, plt
 
 SCRIPT = __file__.split('/')[-1].split('.')[0]
 
@@ -24,12 +23,12 @@ nVals = 251
 rkScheme = "ESDIRK53"
 
 # Collocation parameters
-nNodes = 4
+nNodes = 5
 nodeType = "LEGENDRE"
 quadType = "RADAU-RIGHT"
 
 # SDC parameters
-nSweeps = 4
+nSweeps = 5
 qDeltaType = "MIN-SR-FLEX"
 
 
@@ -55,17 +54,11 @@ stab = np.abs(uEnd)
 
 fig, axs = plt.subplots(1, 2)
 
-axs[0].contour(reVals, imVals, stab, levels=[1.], colors='black', linewidths=1.5)
-axs[0].contourf(reVals, imVals, stab, levels=[1., np.inf], colors='gray')
-axs[0].hlines(0, *reLims, linestyles='--', colors='black', linewidth=1)
-axs[0].vlines(0, *imLims, linestyles='--', colors='black', linewidth=1)
-axs[0].set_aspect('equal', 'box')
-axs[0].set_xlabel(r"$Re(\lambda)$")
-axs[0].set_ylabel(r"$Im(\lambda)$")
+ax = plotStabContour(reVals, imVals, stab, ax=axs[0])
 if useRK:
-    axs[0].set_title(rkScheme)
+    ax.set_title(rkScheme)
 else:
-    axs[0].set_title(f"{qDeltaType}, K={nSweeps}")
+    ax.set_title(f"{qDeltaType}, K={nSweeps}")
 
 imStab = stab[:, np.argwhere(reVals == 0)].ravel()
 axs[1].semilogx(imStab, imVals)

@@ -37,10 +37,9 @@ class testequation0d(ptype):
                 (len(re) * len(im))
             )
         lambdas = np.asarray(lambdas)
-
-        assert not any(isinstance(i, list) for i in lambdas), 'ERROR: expect flat list here, got %s' % lambdas
-        nvars = len(lambdas)
-        assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
+        assert lambdas.ndim == 1, f'expect flat list here, got {lambdas}'
+        nvars = lambdas.size
+        assert nvars > 0, 'expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('complex128')))

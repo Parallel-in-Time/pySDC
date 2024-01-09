@@ -22,24 +22,24 @@ from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.implementations.sweeper_classes.Runge_Kutta as rk
 
-import matplotlib.pyplot as _plt
+import matplotlib.pyplot as plt
 
 # General matplotlib settings
-_plt.rc('font', size=12)
-_plt.rcParams['lines.linewidth'] = 2
-_plt.rcParams['axes.titlesize'] = 16
-_plt.rcParams['axes.labelsize'] = 16
-_plt.rcParams['xtick.labelsize'] = 16
-_plt.rcParams['ytick.labelsize'] = 16
-_plt.rcParams['xtick.major.pad'] = 3
-_plt.rcParams['ytick.major.pad'] = 2
-_plt.rcParams['axes.labelpad'] = 6
-_plt.rcParams['markers.fillstyle'] = 'none'
-_plt.rcParams['lines.markersize'] = 7.0
-_plt.rcParams['lines.markeredgewidth'] = 1.5
-_plt.rcParams['mathtext.fontset'] = 'cm'
-_plt.rcParams['mathtext.rm'] = 'serif'
-_plt.rcParams['figure.max_open_warning'] = 100
+plt.rc('font', size=12)
+plt.rcParams['lines.linewidth'] = 2
+plt.rcParams['axes.titlesize'] = 16
+plt.rcParams['axes.labelsize'] = 16
+plt.rcParams['xtick.labelsize'] = 16
+plt.rcParams['ytick.labelsize'] = 16
+plt.rcParams['xtick.major.pad'] = 3
+plt.rcParams['ytick.major.pad'] = 2
+plt.rcParams['axes.labelpad'] = 6
+plt.rcParams['markers.fillstyle'] = 'none'
+plt.rcParams['lines.markersize'] = 7.0
+plt.rcParams['lines.markeredgewidth'] = 1.5
+plt.rcParams['mathtext.fontset'] = 'cm'
+plt.rcParams['mathtext.rm'] = 'serif'
+plt.rcParams['figure.max_open_warning'] = 100
 
 def getParamsSDC(
         quadType="RADAU-RIGHT", numNodes=4, qDeltaI="IE", nSweeps=3,
@@ -152,7 +152,7 @@ def setupProblem(name, description, dt, **kwargs):
     elif name == "JACELL":
         description["problem_class"] = JacobiElliptic
     elif name == "DAHLQUIST":
-        lambdas = kwargs.get("lambdas", 1j)
+        lambdas = kwargs.get("lambdas", None)
         description["problem_class"] = testequation0d
         description["problem_params"].update({
             "lambdas": lambdas,
@@ -267,5 +267,14 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
     return uExact
 
 
-def solutionRK(tEnd, nSteps, probName, method="RK4"):
-    pass
+# Plotting functions
+def plotStabContour(reVals, imVals, stab, ax=None):
+    if ax is None: ax=plt.gca()
+    ax.contour(reVals, imVals, stab, levels=[1.], colors='black', linewidths=1.5)
+    ax.contourf(reVals, imVals, stab, levels=[1., np.inf], colors='gray')
+    ax.hlines(0, min(reVals), max(reVals), linestyles='--', colors='black', linewidth=1)
+    ax.vlines(0, min(imVals), max(imVals), linestyles='--', colors='black', linewidth=1)
+    ax.set_aspect('equal', 'box')
+    ax.set_xlabel(r"$Re(\lambda)$")
+    ax.set_ylabel(r"$Im(\lambda)$")
+    return ax
