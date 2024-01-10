@@ -58,6 +58,8 @@ class EstimatePolynomialError(ConvergenceController):
                 'You cannot interpolate with lower accuracy to the end point if the end point is a node!'
             )
 
+        self.interpolation_matrix = None
+
         return defaults
 
     def reset_status_variables(self, controller, **kwargs):
@@ -131,16 +133,18 @@ class EstimatePolynomialError(ConvergenceController):
             nodes = np.append(np.append(0, coll.nodes), 1.0)
             estimate_on_node = self.params.estimate_on_node
 
-            interpolator = LagrangeApproximation(
-                points=[nodes[i] for i in range(coll.num_nodes + 1) if i != estimate_on_node]
-            )
-            interpolation_matrix = interpolator.getInterpolationMatrix([nodes[estimate_on_node]])
+            if self.interpolation_matrix is None:
+                interpolator = LagrangeApproximation(
+                    points=[nodes[i] for i in range(coll.num_nodes + 1) if i != estimate_on_node]
+                )
+                self.interpolation_matrix = interpolator.getInterpolationMatrix([nodes[estimate_on_node]])
+
             u = [
                 L.u[i].flatten() if L.u[i] is not None else L.u[i]
                 for i in range(coll.num_nodes + 1)
                 if i != estimate_on_node
             ]
-            u_inter = self.matmul(interpolation_matrix, u)[0].reshape(L.prob.init[0])
+            u_inter = self.matmul(self.interpolation_matrix, u)[0].reshape(L.prob.init[0])
 
             # compute end point if needed
             if estimate_on_node == len(nodes) - 1:
@@ -160,6 +164,11 @@ class EstimatePolynomialError(ConvergenceController):
                 L.status.error_embedded_estimate = buf
             else:
                 L.status.error_embedded_estimate = abs(u_inter - high_order_sol)
+
+            self.debug(
+                f'Obtained error estimate: {L.status.error_embedded_estimate:.2e} of order {L.status.order_embedded_estimate}',
+                S,
+            )
 
     def check_parameters(self, controller, params, description, **kwargs):
         """

@@ -85,7 +85,7 @@ class StopAtNan(CrashBase):
             for u in lvl.u:
                 if u is None:
                     break
-                isfinite = all(np.isfinite(u.flatten()))
+                isfinite = np.all(np.isfinite(u))
 
                 below_limit = abs(u) < self.params.thresh
 

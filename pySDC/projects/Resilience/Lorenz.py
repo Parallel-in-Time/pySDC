@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.problem_classes.Lorenz import LorenzAttractor
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.core.Errors import ConvergenceError
 from pySDC.projects.Resilience.hook import LogData, hook_collection
 from pySDC.projects.Resilience.strategies import merge_descriptions
+from pySDC.projects.Resilience.sweepers import generic_implicit_efficient
 
 
 def run_Lorenz(
@@ -37,7 +37,7 @@ def run_Lorenz(
     Returns:
         dict: The stats object
         controller: The controller
-        Tend: The time that was supposed to be integrated to
+        bool: Whether the code crashed
     """
 
     # initialize level parameters
@@ -72,7 +72,7 @@ def run_Lorenz(
     description = dict()
     description['problem_class'] = LorenzAttractor
     description['problem_params'] = problem_params
-    description['sweeper_class'] = generic_implicit
+    description['sweeper_class'] = generic_implicit_efficient
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -105,12 +105,15 @@ def run_Lorenz(
         prepare_controller_for_faults(controller, fault_stuff)
 
     # call main function to get things done...
+    crash = False
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except ConvergenceError:
+    except (ConvergenceError, ZeroDivisionError) as e:
+        print(f'Warning: Premature termination: {e}')
         stats = controller.return_stats()
+        crash = True
 
-    return stats, controller, Tend
+    return stats, controller, crash
 
 
 def plot_solution(stats):  # pragma: no cover

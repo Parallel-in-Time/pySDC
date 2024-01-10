@@ -8,6 +8,7 @@ from pySDC.projects.Resilience.fault_stats import (
     run_Schroedinger,
     run_vdp,
     run_quench,
+    run_AC,
     RECOVERY_THRESH_ABS,
 )
 from pySDC.projects.Resilience.strategies import (
@@ -17,6 +18,7 @@ from pySDC.projects.Resilience.strategies import (
     HotRodStrategy,
     DIRKStrategy,
     ERKStrategy,
+    AdaptivityPolynomialError,
 )
 from pySDC.helpers.plot_helper import setup_mpl, figsize_by_journal
 from pySDC.helpers.stats_helper import get_sorted
@@ -43,7 +45,7 @@ def get_stats(problem, path='data/stats-jusuf', num_procs=1, strategy_type='SDC'
     if strategy_type == 'SDC':
         strategies = [BaseStrategy(), AdaptivityStrategy(), IterateStrategy()]
         if JOURNAL not in ['JSC_beamer']:
-            strategies += [HotRodStrategy()]
+            strategies += [HotRodStrategy(), AdaptivityPolynomialError()]
     elif strategy_type == 'RK':
         strategies = [DIRKStrategy()]
         if problem.__name__ in ['run_Lorenz', 'run_vdp']:
@@ -54,7 +56,7 @@ def get_stats(problem, path='data/stats-jusuf', num_procs=1, strategy_type='SDC'
         strategies=strategies,
         faults=[False, True],
         reload=True,
-        recovery_thresh=1.5,
+        recovery_thresh=1.1,
         recovery_thresh_abs=RECOVERY_THRESH_ABS.get(problem, 0),
         mode='default',
         stats_path=path,
@@ -107,12 +109,6 @@ def analyse_resilience(problem, path='data/stats', **kwargs):  # pragma: no cove
     not_overflow = stats_analyser.get_mask(strategy=strategy, key='bit', val=1, op='uneq', old_mask=not_fixed)
     stats_analyser.print_faults(not_overflow)
 
-    # special = stats_analyser.get_mask(strategy=strategy, key='bit', val=10, op='eq')
-    # stats_analyser.print_faults(special)
-
-    # Adaptivity: 19, ...
-    # stats_analyser.scrutinize(strategy, run=19, faults=True)
-
     compare_strategies(stats_analyser, **kwargs)
     plot_recovery_rate(stats_analyser, **kwargs)
 
@@ -146,12 +142,19 @@ def plot_recovery_rate(stats_analyser, **kwargs):  # pragma: no cover
     my_setup_mpl()
     fig, axs = plt.subplots(1, 2, figsize=(TEXTWIDTH, 5 * cm), sharex=True, sharey=True)
     stats_analyser.plot_things_per_things(
-        'recovered', 'bit', False, op=stats_analyser.rec_rate, args={'ylabel': 'recovery rate'}, ax=axs[0]
+        'recovered',
+        'bit',
+        False,
+        op=stats_analyser.rec_rate,
+        args={'ylabel': 'recovery rate'},
+        plotting_args={'markevery': 5},
+        ax=axs[0],
     )
     plot_recovery_rate_recoverable_only(stats_analyser, fig, axs[1], ylabel='')
-    axs[1].get_legend().remove()
+    axs[0].get_legend().remove()
     axs[0].set_title('All faults')
     axs[1].set_title('Only recoverable faults')
+    axs[0].set_ylim((-0.05, 1.05))
     savefig(fig, 'recovery_rate_compared', **kwargs)
 
 
@@ -180,6 +183,7 @@ def plot_recovery_rate_recoverable_only(stats_analyser, fig, ax, **kwargs):  # p
             ax=ax,
             fig=fig,
             strategies=[stats_analyser.strategies[i]],
+            plotting_args={'markevery': 5},
         )
 
 
@@ -193,11 +197,11 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
     """
     stats = [
         get_stats(run_vdp, **kwargs),
-        get_stats(run_Lorenz, **kwargs),
-        get_stats(run_Schroedinger, **kwargs),
         get_stats(run_quench, **kwargs),
+        get_stats(run_Schroedinger, **kwargs),
+        get_stats(run_AC, **kwargs),
     ]
-    titles = ['Van der Pol', 'Lorenz attractor', r'Schr\"odinger', 'Quench']
+    titles = ['Van der Pol', 'Quench', r'Schr\"odinger', 'Allen-Cahn']
 
     my_setup_mpl()
     fig, axs = plt.subplots(2, 2, figsize=figsize_by_journal(JOURNAL, 1, 0.8), sharey=True)
@@ -209,12 +213,11 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
     for ax in axs.flatten():
         ax.get_legend().remove()
 
-    # axs[0, 0].set_ylim((0, 1))
-
     if kwargs.get('strategy_type', 'SDC') == 'SDC':
         axs[1, 1].legend(frameon=False)
     else:
         axs[0, 1].legend(frameon=False)
+    axs[0, 0].set_ylim((-0.05, 1.05))
     axs[1, 0].set_ylabel('recovery rate')
     axs[0, 0].set_ylabel('recovery rate')
 
@@ -223,27 +226,6 @@ def compare_recovery_rate_problems(**kwargs):  # pragma: no cover
         name = f'{name}_{key}-{val}'
 
     savefig(fig, f'compare_equations{name}.pdf')
-
-
-def plot_recovery_thresholds(problem, num_procs_list=None):
-    num_procs_list = [1, 4] if num_procs_list is None else num_procs_list
-    stats_dict = {n: get_stats(problem, num_procs=n) for n in num_procs_list}
-    strategies = [AdaptivityStrategy(useMPI=True)]
-    thresh_range = np.linspace(0.9, 1.4, 100)
-
-    fig, ax = plt.subplots()
-    [
-        stats.plot_recovery_thresholds(
-            strategies=strategies,
-            thresh_range=thresh_range,
-            ax=ax,
-            mask=stats.get_fixable_faults_only(strategies[0]),
-            label=f'{n} procs',
-            ls='-' if n == 1 else '--',
-        )
-        for n, stats in stats_dict.items()
-    ]
-    savefig(fig, 'threshold', tight_layout=False)
 
 
 def plot_adaptivity_stuff():  # pragma: no cover
@@ -289,23 +271,40 @@ def plot_adaptivity_stuff():  # pragma: no cover
         ax.set_ylabel('local error')
         iter_ax.set_ylabel(r'Newton iterations')
 
-    force_params = {'convergence_controllers': {EstimateEmbeddedError: {}}}
-    # force_params = {'convergence_controllers': {EstimateEmbeddedError: {}}, 'step_params': {'maxiter': 5}, 'level_params': {'dt': 4e-2}}
-    for strategy in [BaseStrategy, AdaptivityStrategy, IterateStrategy]:
+    force_params = {}
+    for strategy in [BaseStrategy, AdaptivityStrategy, IterateStrategy, AdaptivityPolynomialError]:
+        if strategy == AdaptivityPolynomialError:
+            from pySDC.implementations.convergence_controller_classes.adaptivity import (
+                AdaptivityPolynomialError as adaptivity,
+            )
+
+            force_params = {'sweeper_params': {'num_nodes': 2}}
+            force_params['convergence_controllers'] = {
+                adaptivity: {
+                    'e_tol': 7e-5,
+                    'restol_rel': 1e-4,
+                    'restol_min': 1e-10,
+                    'restart_at_maxiter': True,
+                    'factor_if_not_converged': 4.0,
+                },
+            }
+        else:
+            force_params = {}
         stats, _, _ = stats_analyser.single_run(
-            strategy=strategy(), force_params=force_params, hook_class=[LogLocalErrorPostStep, LogData, LogWork]
+            strategy=strategy(useMPI=False),
+            force_params=force_params,
+            hook_class=[LogLocalErrorPostStep, LogData, LogWork],
         )
         plot_error(stats, axs[1], axs[2], strategy())
 
         if strategy == BaseStrategy:
             u = get_sorted(stats, type='u', recomputed=False)
             axs[0].plot([me[0] for me in u], [me[1][0] for me in u], color='black', label=r'$u$')
-            # axs[0].plot([me[0] for me in u], [me[1][1] for me in u], color='black', ls='--', label=r'$u_t$')
-            # axs[0].legend(frameon=False)
 
     axs[2].set_xlabel(r'$t$')
     axs[0].set_ylabel('solution')
     axs[2].legend(frameon=JOURNAL == 'JSC_beamer')
+    axs[1].legend(frameon=True)
     savefig(fig, 'adaptivity')
 
 
@@ -394,13 +393,13 @@ def plot_quench_solution():  # pragma: no cover
 
     strategy = BaseStrategy()
 
-    custom_description = strategy.get_custom_description(run_quench)
+    custom_description = strategy.get_custom_description(run_quench, num_procs=1)
 
     stats, controller, _ = run_quench(custom_description=custom_description, Tend=strategy.get_Tend(run_quench))
 
     prob = controller.MS[0].levels[0].prob
 
-    u = get_sorted(stats, type='u')
+    u = get_sorted(stats, type='u', recomputed=False)
 
     ax.plot([me[0] for me in u], [max(me[1]) for me in u], color='black', label='$T$')
     ax.axhline(prob.u_thresh, label='$T_\mathrm{thresh}$', ls='--', color='grey', zorder=-1)
@@ -409,6 +408,37 @@ def plot_quench_solution():  # pragma: no cover
     ax.set_xlabel(r'$t$')
     ax.legend(frameon=False)
     savefig(fig, 'quench_sol')
+
+
+def plot_AC_solution():  # pragma: no cover
+    from pySDC.projects.TOMS.AllenCahn_monitor import monitor
+
+    my_setup_mpl()
+    if JOURNAL == 'JSC_beamer':
+        raise NotImplementedError
+        fig, ax = plt.subplots(figsize=figsize_by_journal(JOURNAL, 0.5, 0.9))
+    else:
+        fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
+
+    stats, _, _ = run_AC(Tend=0.032, hook_class=monitor)
+
+    u = get_sorted(stats, type='u')
+
+    computed_radius = get_sorted(stats, type='computed_radius')
+    exact_radius = get_sorted(stats, type='exact_radius')
+    axs[1].plot([me[0] for me in computed_radius], [me[1] for me in computed_radius], ls='-', label='numerical')
+    axs[1].plot([me[0] for me in exact_radius], [me[1] for me in exact_radius], ls='--', color='black', label='exact')
+    axs[1].axvline(0.025, ls=':', label=r'$t=0.025$', color='grey')
+    axs[1].set_title('Radius over time')
+    axs[1].set_xlabel('$t$')
+    axs[1].legend(frameon=False)
+
+    im = axs[0].imshow(u[0][1], extent=(-0.5, 0.5, -0.5, 0.5))
+    fig.colorbar(im)
+    axs[0].set_title(r'$u_0$')
+    axs[0].set_xlabel('$x$')
+    axs[0].set_ylabel('$y$')
+    savefig(fig, 'AC_sol')
 
 
 def plot_vdp_solution():  # pragma: no cover
@@ -461,40 +491,43 @@ def work_precision():  # pragma: no cover
     for mode in ['compare_strategies', 'parallel_efficiency', 'RK_comp']:
         all_problems(**all_params, mode=mode)
 
-    # Quench stuff
-    fig, axs = get_fig(x=3, y=1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.47))
-    quench_params = {
-        **all_params,
-        'problem': run_quench,
-        'decorate': True,
-        'configurations': get_configs('step_size_limiting', run_quench),
-        'num_procs': 1,
-        'runs': 1,
-        'comm_world': MPI.COMM_WORLD,
-    }
-    quench_params.pop('base_path', None)
-    execute_configurations(**{**quench_params, 'work_key': 'k_SDC', 'precision_key': 'k_Newton'}, ax=axs[2])
-    execute_configurations(**{**quench_params, 'work_key': 'param', 'precision_key': 'restart'}, ax=axs[1])
-    execute_configurations(**{**quench_params, 'work_key': 't', 'precision_key': 'e_global_rel'}, ax=axs[0])
-    axs[1].set_yscale('linear')
-    axs[2].set_yscale('linear')
-    axs[2].set_xscale('linear')
-    axs[1].set_xlabel(r'$e_\mathrm{tol}$')
-    axs[0].set_xticks([1e0, 3e0], minor=True)
+    # # Quench stuff
+    # fig, axs = get_fig(x=3, y=1, figsize=figsize_by_journal('Springer_Numerical_Algorithms', 1, 0.47))
+    # quench_params = {
+    #     **all_params,
+    #     'problem': run_quench,
+    #     'decorate': True,
+    #     'configurations': get_configs('step_size_limiting', run_quench),
+    #     'num_procs': 1,
+    #     'runs': 1,
+    #     'comm_world': MPI.COMM_WORLD,
+    #     'mode': 'step_size_limiting',
+    # }
+    # quench_params.pop('base_path', None)
+    # execute_configurations(**{**quench_params, 'work_key': 'k_SDC', 'precision_key': 'k_Newton'}, ax=axs[2])
+    # execute_configurations(**{**quench_params, 'work_key': 'param', 'precision_key': 'restart'}, ax=axs[1])
+    # execute_configurations(**{**quench_params, 'work_key': 't', 'precision_key': 'e_global_rel'}, ax=axs[0])
+    # axs[1].set_yscale('linear')
+    # # axs[2].set_yscale('linear')
+    # axs[2].set_xscale('linear')
+    # axs[1].set_xlabel(r'$e_\mathrm{tol}$')
+    # # axs[0].set_xticks([1e0, 3e0], [r'$10^{0}$', r'$3\times 10^{0}$'], minor=False)
 
-    for ax in axs:
-        ax.set_title(ax.get_ylabel())
-        ax.set_ylabel('')
-    fig.suptitle('Quench')
+    # for ax in axs:
+    #     ax.set_title(ax.get_ylabel())
+    #     ax.set_ylabel('')
+    # fig.suptitle('Quench')
 
-    save_fig(
-        fig=fig,
-        name=f'{run_quench.__name__}',
-        work_key='step-size',
-        precision_key='limiting',
-        legend=True,
-        base_path=all_params["base_path"],
-    )
+    # axs[1].set_yticks([4.0, 6.0, 8.0, 10.0, 12.0], minor=False)
+
+    # save_fig(
+    #     fig=fig,
+    #     name=f'{run_quench.__name__}',
+    #     work_key='step-size',
+    #     precision_key='limiting',
+    #     legend=True,
+    #     base_path=all_params["base_path"],
+    # )
     # End Quench stuff
 
     # vdp_stiffness_plot(base_path='data/paper')
@@ -539,17 +572,18 @@ def make_plots_for_paper():  # pragma: no cover
     JOURNAL = 'Springer_Numerical_Algorithms'
     BASE_PATH = 'data/paper'
 
-    # work_precision()
-    # plot_vdp_solution()
-    # plot_quench_solution()
-    # plot_recovery_rate(get_stats(run_vdp))
-    # plot_fault_vdp(0)
-    # plot_fault_vdp(13)
     plot_adaptivity_stuff()
 
-    compare_recovery_rate_problems(num_procs=1, strategy_type='RK')
-    for i in [1, 4]:
-        compare_recovery_rate_problems(num_procs=i, strategy_type='SDC')
+    work_precision()
+
+    plot_vdp_solution()
+    plot_AC_solution()
+    plot_quench_solution()
+
+    plot_recovery_rate(get_stats(run_vdp))
+    plot_fault_vdp(0)
+    plot_fault_vdp(13)
+    compare_recovery_rate_problems(num_procs=1, strategy_type='SDC')
 
 
 def make_plots_for_notes():  # pragma: no cover
@@ -568,5 +602,4 @@ if __name__ == "__main__":
     # make_plots_for_notes()
     # make_plots_for_SIAM_CSE23()
     # make_plots_for_TIME_X_website()
-    # plot_recovery_thresholds(run_Schroedinger)
     make_plots_for_paper()

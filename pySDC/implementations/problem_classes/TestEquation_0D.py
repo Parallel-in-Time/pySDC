@@ -25,25 +25,42 @@ class testequation0d(ptype):
     A : scipy.sparse.csc_matrix
         Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.
     """
+    xp = np
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, lambdas=None, u0=0.0):
+    @classmethod
+    def setup_GPU(cls):
+        """
+        Switch to GPU modules
+        """
+        from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+        import cupy as cp
+        cls.xp = cp
+        cls.dtype_u = cupy_mesh
+        cls.dtype_f = cupy_mesh
+
+    def __init__(self, lambdas=None, u0=0.0, useGPU=False):
         """Initialization routine"""
+        if useGPU:
+            self.setup_GPU()
+
         if lambdas is None:
-            re = np.linspace(-30, 19, 50)
-            im = np.linspace(-50, 49, 50)
-            lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+            re = self.xp.linspace(-30, 19, 50)
+            im = self.xp.linspace(-50, 49, 50)
+            lambdas = self.xp.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
                 (len(re) * len(im))
             )
-        lambdas = np.asarray(lambdas)
+        lambdas = self.xp.asarray(lambdas)
         assert lambdas.ndim == 1, f'expect flat list here, got {lambdas}'
         nvars = lambdas.size
         assert nvars > 0, 'expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super().__init__(init=(nvars, None, np.dtype('complex128')))
-        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', localVars=locals(), readOnly=True)
+        super().__init__(init=(nvars, None, self.xp.dtype('complex128')))
+
+        lambdas = self.xp.array(lambdas)
+        self._makeAttributeAndRegister('nvars', 'lambdas', 'u0', 'useGPU', localVars=locals(), readOnly=True)
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, t):
@@ -119,5 +136,5 @@ class testequation0d(ptype):
         t_init = 0.0 if t_init is None else t_init * 1.0
 
         me = self.dtype_u(self.init)
-        me[:] = u_init * np.exp((t - t_init) * np.array(self.lambdas))
+        me[:] = u_init * self.xp.exp((t - t_init) * self.lambdas)
         return me

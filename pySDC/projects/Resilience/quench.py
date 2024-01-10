@@ -1,12 +1,11 @@
 # script to run a quench problem
 from pySDC.implementations.problem_classes.Quench import Quench, QuenchIMEX
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
+from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient, generic_implicit_efficient
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -98,7 +97,7 @@ def run_quench(
     Returns:
         dict: The stats object
         controller: The controller
-        Tend: The time that was supposed to be integrated to
+        bool: If the code crashed
     """
     if custom_description is not None:
         problem_params = custom_description.get('problem_params', {})
@@ -120,6 +119,8 @@ def run_quench(
     problem_params = {
         'newton_tol': 1e-9,
         'direct_solver': False,
+        'order': 6,
+        'nvars': 2**7,
     }
 
     # initialize step parameters
@@ -139,7 +140,7 @@ def run_quench(
     description = {}
     description['problem_class'] = QuenchIMEX if imex else Quench
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order if imex else generic_implicit
+    description['sweeper_class'] = imex_1st_order_efficient if imex else generic_implicit_efficient
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -155,6 +156,7 @@ def run_quench(
         'controller_params': controller_params,
         'description': description,
     }
+
     if use_MPI:
         from mpi4py import MPI
         from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
@@ -175,12 +177,14 @@ def run_quench(
         prepare_controller_for_faults(controller, fault_stuff)
 
     # call main function to get things done...
+    crash = False
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except ConvergenceError:
-        print('Warning: Premature termination!')
+    except ConvergenceError as e:
+        print(f'Warning: Premature termination! {e}')
         stats = controller.return_stats()
-    return stats, controller, Tend
+        crash = True
+    return stats, controller, crash
 
 
 def faults(seed=0):  # pragma: no cover
@@ -377,8 +381,8 @@ def compare_imex_full(plotting=False, leak_type='linear'):
 
     assert error[True] < 1.2e-4, f'Expected error of IMEX version to be less than 1.2e-4, but got e={error[True]:.2e}!'
     assert (
-        error[False] < 7.7e-5
-    ), f'Expected error of fully implicit version to be less than 7.7e-5, but got e={error[False]:.2e}!'
+        error[False] < 8e-5
+    ), f'Expected error of fully implicit version to be less than 8e-5, but got e={error[False]:.2e}!'
 
 
 def compare_reference_solutions_single():
@@ -455,7 +459,6 @@ def compare_reference_solutions():
     fig, ax = plt.subplots()
     Tend = 500
     dt_list = [Tend / 2.0**me for me in [2, 3, 4, 5, 6, 7, 8, 9, 10]]
-    # dt_list = [Tend / 2.**me for me in [2, 3, 4, 5, 6, 7]]
 
     for j in range(len(types)):
         errors = [None] * len(dt_list)
@@ -495,12 +498,13 @@ def check_order(reference_sol_type='scipy'):
 
     Tend = 500
     maxiter_list = [1, 2, 3, 4, 5]
-    dt_list = [Tend / 2.0**me for me in [4, 5, 6, 7, 8, 9]]
-    # dt_list = [Tend / 2.**me for me in [6, 7, 8]]
+    dt_list = [Tend / 2.0**me for me in [4, 5, 6, 7, 8]]
 
     fig, ax = plt.subplots()
 
     from pySDC.implementations.sweeper_classes.Runge_Kutta import DIRK43
+
+    controller_params = {'logger_level': 30}
 
     colors = ['black', 'teal', 'magenta', 'orange', 'red']
     for j in range(len(maxiter_list)):
@@ -514,8 +518,11 @@ def check_order(reference_sol_type='scipy'):
             description['problem_params'] = {
                 'leak_type': 'linear',
                 'leak_transition': 'step',
-                'nvars': 2**10,
+                'nvars': 2**7,
                 'reference_sol_type': reference_sol_type,
+                'newton_tol': 1e-10,
+                'lintol': 1e-10,
+                'direct_solver': True,
             }
             description['convergence_controllers'] = {EstimateEmbeddedError: {}}
 
@@ -523,11 +530,18 @@ def check_order(reference_sol_type='scipy'):
             #    description['sweeper_class'] = DIRK43
             #    description['sweeper_params'] = {'maxiter': 1}
 
+            hook_class = [
+                # LogGlobalErrorPostRun,
+            ]
             stats, controller, _ = run_quench(
-                custom_description=description, hook_class=[LogGlobalErrorPostRun], Tend=Tend, imex=False
+                custom_description=description,
+                hook_class=hook_class,
+                Tend=Tend,
+                imex=False,
+                custom_controller_params=controller_params,
             )
-            # errors[i] = max([me[1] for me in get_sorted(stats, type='error_embedded_estimate')])
-            errors[i] = get_sorted(stats, type='e_global_post_run')[-1][1]
+            errors[i] = max([me[1] for me in get_sorted(stats, type='error_embedded_estimate')])
+            # errors[i] = get_sorted(stats, type='e_global_post_run')[-1][1]
             print(errors)
         ax.loglog(dt_list, errors, color=colors[j], label=f'{maxiter_list[j]} iterations')
         ax.loglog(
@@ -550,10 +564,11 @@ def check_order(reference_sol_type='scipy'):
 
 
 if __name__ == '__main__':
-    compare_reference_solutions_single()
-    # for reference_sol_type in ['DIRK', 'SDC', 'scipy']:
-    #   check_order(reference_sol_type=reference_sol_type)
+    # compare_reference_solutions_single()
+    for reference_sol_type in ['scipy']:
+        check_order(reference_sol_type=reference_sol_type)
     # faults(19)
     # get_crossing_time()
     # compare_imex_full(plotting=True)
+    # iteration_counts()
     plt.show()

@@ -107,7 +107,7 @@ def run_vdp(
     Returns:
         dict: The stats object
         controller: The controller
-        Tend: The time that was supposed to be integrated to
+        bool: If the code crashed
     """
 
     # initialize level parameters
@@ -182,13 +182,15 @@ def run_vdp(
         prepare_controller_for_faults(controller, fault_stuff, {}, {})
 
     # call main function to get things done...
+    crash = False
     try:
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    except (ProblemError, ConvergenceError) as e:
+    except (ProblemError, ConvergenceError, ZeroDivisionError) as e:
+        crash = True
         print(f'Warning: Premature termination: {e}')
         stats = controller.return_stats()
 
-    return stats, controller, Tend
+    return stats, controller, crash
 
 
 def fetch_test_data(stats, comm=None, use_MPI=False):

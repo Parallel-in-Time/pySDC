@@ -4,7 +4,6 @@ import logging
 from pySDC.core.Sweeper import sweeper, _Pars
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Level import level
-from pySDC.implementations.datatype_classes.mesh import imex_mesh, mesh
 
 
 class ButcherTableau(object):
@@ -218,9 +217,9 @@ class RungeKutta(sweeper):
         Returns:
             mesh: Full right hand side as a mesh
         """
-        if type(f) == mesh:
+        if type(f).__name__ in ['mesh', 'cupy_mesh']:
             return f
-        elif type(f) == imex_mesh:
+        elif type(f).__name__ in ['imex_mesh', 'imex_cupy_mesh']:
             return f.impl + f.expl
         elif f is None:
             prob = self.level.prob
@@ -272,7 +271,7 @@ class RungeKutta(sweeper):
 
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = lvl.u[0]
+            rhs = prob.dtype_u(lvl.u[0])
             for j in range(1, m + 1):
                 rhs += lvl.dt * self.QI[m + 1, j] * self.get_full_f(lvl.f[j])
 
