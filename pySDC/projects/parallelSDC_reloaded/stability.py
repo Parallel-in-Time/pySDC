@@ -20,16 +20,16 @@ nVals = 251
 
 
 # RK parameters
-rkScheme = "ESDIRK53"
+rkScheme = "RK4"
 
 # Collocation parameters
-nNodes = 5
+nNodes = 4
 nodeType = "LEGENDRE"
 quadType = "RADAU-RIGHT"
 
 # SDC parameters
-nSweeps = 5
-qDeltaType = "MIN-SR-FLEX"
+nSweeps = 3
+qDeltaType = "MIN3"
 
 
 # -----------------------------------------------------------------------------

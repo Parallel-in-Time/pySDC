@@ -29,8 +29,8 @@ plt.rc('font', size=12)
 plt.rcParams['lines.linewidth'] = 2
 plt.rcParams['axes.titlesize'] = 16
 plt.rcParams['axes.labelsize'] = 16
-plt.rcParams['xtick.labelsize'] = 16
-plt.rcParams['ytick.labelsize'] = 16
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
 plt.rcParams['xtick.major.pad'] = 3
 plt.rcParams['ytick.major.pad'] = 2
 plt.rcParams['axes.labelpad'] = 6
@@ -271,11 +271,11 @@ def solutionExact(tEnd, nSteps, probName, **kwargs):
 # Plotting functions
 def plotStabContour(reVals, imVals, stab, ax=None):
     if ax is None: ax=plt.gca()
-    ax.contour(reVals, imVals, stab, levels=[1.], colors='black', linewidths=1.5)
-    ax.contourf(reVals, imVals, stab, levels=[1., np.inf], colors='gray')
-    ax.hlines(0, min(reVals), max(reVals), linestyles='--', colors='black', linewidth=1)
-    ax.vlines(0, min(imVals), max(imVals), linestyles='--', colors='black', linewidth=1)
+    ax.contour(reVals, imVals, stab, levels=[1.], colors='black', linewidths=1)
+    ax.contourf(reVals, imVals, stab, levels=[1., np.inf], colors='gainsboro')
+    ax.hlines(0, min(reVals), max(reVals), linestyles='--', colors='black', linewidth=0.5)
+    ax.vlines(0, min(imVals), max(imVals), linestyles='--', colors='black', linewidth=0.5)
     ax.set_aspect('equal', 'box')
-    ax.set_xlabel(r"$Re(\lambda)$")
-    ax.set_ylabel(r"$Im(\lambda)$")
+    ax.set_xlabel(r"$Re(\lambda)$", labelpad=0, fontsize=10)
+    ax.set_ylabel(r"$Im(\lambda)$", labelpad=0, fontsize=10)
     return ax
