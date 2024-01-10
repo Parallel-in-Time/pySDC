@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 
 from utils import getParamsSDC, getParamsRK, solutionSDC, solutionExact
 
-tEnd = 2.82
+tEnd = 1.24
 
 def getError(uNum, uRef):
     if uNum is None:
         return np.inf
-    return np.linalg.norm(uRef[:, 0] - uNum[:, 0], np.inf)
+    return np.linalg.norm(np.linalg.norm(uRef - uNum, np.inf, axis=-1), np.inf)
 
 def getCost(counters):
     nNewton, nRHS, tComp = counters
@@ -44,7 +44,7 @@ nSweepList = [1, 2, 3, 4]
 
 symList = ['o', '^', 's', '>', '*', '<', 'p', '>']*10
 
-qDeltaList = ['RK4', 'MIN-SR-S']
+qDeltaList = ['MIN-SR-S', 'RK4']
 # nSweepList = [4]
 
 fig, axs = plt.subplots(1, 2)
@@ -95,11 +95,15 @@ for qDelta in qDeltaList:
         # error VS cost
         axs[1].loglog(costs, errors, sym+'-', label=name)
 
+x = dtVals[4:]
+for k in [1, 2, 3, 4, 5]:
+    axs[0].loglog(x, 1e4*x**k, "--", color="gray", linewidth=0.8)
+
 for i in range(2):
     axs[i].set(
         xlabel=r"$\Delta{t}$" if i == 0 else "cost",
         ylabel=r"$L_\infty$ error",
-        ylim=(8.530627786509715e-08, 372.2781393394293),
+        ylim=(8.530627786509715e-12, 372.2781393394293),
     )
     axs[i].legend(loc="lower right" if i == 0 else "lower left")
     axs[i].grid()

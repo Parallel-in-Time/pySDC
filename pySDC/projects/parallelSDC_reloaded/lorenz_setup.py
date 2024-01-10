@@ -13,11 +13,11 @@ from utils import solutionExact
 
 script = __file__.split('/')[-1].split('.')[0]
 
-tEnd = 10
+tEnd = 2
 nSteps = tEnd*50
 tVals = np.linspace(0, tEnd, nSteps+1)
 
-nPeriods = 4
+nPeriods = 2
 
 print(f"Computing exact solution up to t={tEnd} ...")
 uExact = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
