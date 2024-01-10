@@ -38,12 +38,16 @@
             
   <h1>Source code for implementations.problem_classes.TestEquation_0D</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span><span class="p">,</span> <span class="n">WorkCounter</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">splu</span> <span class="k">as</span> <span class="n">_splu</span>
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="testequation0dXPU">
-<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0dXPU">[docs]</a>
-<span class="k">class</span> <span class="nc">testequation0dXPU</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+<div class="viewcode-block" id="testequation0d">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d">[docs]</a>
+<span class="k">class</span> <span class="nc">testequation0d</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the simple test equation of the form</span>
 
@@ -51,9 +55,6 @@
 <span class="sd">        \frac{d u(t)}{dt} = A u(t)</span>
 
 <span class="sd">    for :math:`A = diag(\lambda_1, .. ,\lambda_n)`.</span>
-
-<span class="sd">    It is compatible with both CPU and GPU, but requires setting class attributes to select the corresponding numerical</span>
-<span class="sd">    library. Use the classmethod `get_XPU_version` to get a runnable problem class.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -68,37 +69,36 @@
 <span class="sd">        Diagonal matrix containing :math:`\lambda_1,..,\lambda_n`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="testequation0dXPU.get_XPU_version">
-<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0dXPU.get_XPU_version">[docs]</a>
+    <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
+    <span class="n">xsp</span> <span class="o">=</span> <span class="n">sp</span>
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
+    <span class="n">splu</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_splu</span><span class="p">)</span>
+
+<div class="viewcode-block" id="testequation0d.setup_GPU">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.setup_GPU">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_XPU_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;CPU&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get a runnable version for either CPU or GPU by specifying this as `version`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        version : str</span>
-<span class="sd">            Supply &quot;GPU&quot; or &quot;CPU&quot; to obtain the desired implementation</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        pySDC.Problem</span>
-<span class="sd">            A problem class implementing the desired implementation</span>
+<span class="sd">        Switch to GPU modules</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;CPU&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">testequation0d</span>
-        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;GPU&#39;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.TestEquation_0D_GPU</span> <span class="kn">import</span> <span class="n">testequation0dGPU</span>
+        <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span> <span class="kn">import</span> <span class="n">cupy_mesh</span>
+        <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
+        <span class="kn">import</span> <span class="nn">cupyx.scipy.sparse</span> <span class="k">as</span> <span class="nn">csp</span>
+        <span class="kn">from</span> <span class="nn">cupyx.scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">splu</span> <span class="k">as</span> <span class="n">_splu</span>
 
-            <span class="k">return</span> <span class="n">testequation0dGPU</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">xsp</span> <span class="o">=</span> <span class="n">csp</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">splu</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_splu</span><span class="p">)</span></div>
 
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t know version </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">! Please choose </span><span class="se">\&#39;</span><span class="s1">CPU</span><span class="se">\&#39;</span><span class="s1"> or </span><span class="se">\&#39;</span><span class="s1">GPU</span><span class="se">\&#39;</span><span class="s1">!&#39;</span><span class="p">)</span></div>
 
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization routine&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">useGPU</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_GPU</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">lambdas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">re</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
             <span class="n">im</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
@@ -115,7 +115,7 @@
 
         <span class="n">lambdas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_A</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xsp</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;lambdas&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;lambdas&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="s1">&#39;useGPU&#39;</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">&#39;rhs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
@@ -137,8 +137,8 @@
         <span class="n">A</span> <span class="o">=</span> <span class="n">xsp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">lambdas</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">A</span>
 
-<div class="viewcode-block" id="testequation0dXPU.eval_f">
-<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0dXPU.eval_f">[docs]</a>
+<div class="viewcode-block" id="testequation0d.eval_f">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.eval_f">[docs]</a>
     <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
@@ -162,8 +162,8 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 
-<div class="viewcode-block" id="testequation0dXPU.solve_system">
-<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0dXPU.solve_system">[docs]</a>
+<div class="viewcode-block" id="testequation0d.solve_system">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.solve_system">[docs]</a>
     <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
@@ -191,8 +191,8 @@
         <span class="k">return</span> <span class="n">me</span></div>
 
 
-<div class="viewcode-block" id="testequation0dXPU.u_exact">
-<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0dXPU.u_exact">[docs]</a>
+<div class="viewcode-block" id="testequation0d.u_exact">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.u_exact">[docs]</a>
     <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to compute the exact solution at time t.</span>
@@ -219,24 +219,6 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_init</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">t</span> <span class="o">-</span> <span class="n">t_init</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 </div>
-
-
-
-<div class="viewcode-block" id="testequation0d">
-<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d">[docs]</a>
-<span class="k">class</span> <span class="nc">testequation0d</span><span class="p">(</span><span class="n">testequation0dXPU</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    CPU implementation of `testequation0dXPU`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">xp</span>
-    <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">xsp</span>
-    <span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">splu</span> <span class="k">as</span> <span class="n">_splu</span>
-
-    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
-    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
-    <span class="n">splu</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_splu</span><span class="p">)</span></div>
 
 </pre></div>
 

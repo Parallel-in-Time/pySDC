@@ -53,7 +53,6 @@ Submodules
    implementations.problem_classes.Piline
    implementations.problem_classes.Quench
    implementations.problem_classes.TestEquation_0D
-   implementations.problem_classes.TestEquation_0D_GPU
    implementations.problem_classes.Van_der_Pol_implicit
    implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
    implementations.problem_classes.generic_ND_FD
