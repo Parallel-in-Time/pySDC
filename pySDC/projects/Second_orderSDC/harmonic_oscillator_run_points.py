@@ -6,7 +6,7 @@ if __name__ == '__main__':
     # Define lists for the number of nodes and maximum iterations
     description = harmonic_oscillator_params()
     helper_params = {
-        'quad_type_list': ['GAUSS', 'LOBATTO'],
+        'quad_type_list': ('GAUSS', 'LOBATTO'),
         'Num_iter': (2, 2),
         'num_nodes_list': np.arange(3, 6, 1),
         'max_iter_list': np.arange(2, 10, 1),
