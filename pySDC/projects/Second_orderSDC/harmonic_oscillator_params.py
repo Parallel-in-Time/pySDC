@@ -1,10 +1,10 @@
 import numpy as np
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.projects.Second_orderSDC.penningtrap_Simulation import Stability_implementation
 
 
-def dampedharmonic_oscillator_params():
+
+def harmonic_oscillator_params():
     """
     Routine to compute modules of the stability function
 
@@ -35,23 +35,3 @@ def dampedharmonic_oscillator_params():
     }
 
     return description
-
-
-if __name__ == '__main__':
-    """
-    Damped harmonic oscillator as a test problem for the stability plot:
-        x' = v
-        v' = -kappa * x - mu * v
-        kappa: spring constant
-        mu: friction
-        Source: https://beltoforion.de/en/harmonic_oscillator/
-    """
-    # Execute the stability analysis for the damped harmonic oscillator
-    description = dampedharmonic_oscillator_params()
-    Stability = Stability_implementation(description, kappa_max=30, mu_max=30, Num_iter=(200, 200))
-
-    Stability.run_SDC_stability()
-    Stability.run_Picard_stability()
-    Stability.run_RKN_stability()
-    Stability.run_Ksdc()
-    # Stability.run_Kpicard

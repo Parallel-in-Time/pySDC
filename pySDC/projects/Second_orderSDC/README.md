@@ -31,14 +31,14 @@ If you utilize it, either in whole or in part, for a publication, please provide
 
 ## Reproducing Figures from the Publication
 
-- **Fig. 1:** Execute `dampedharmonic_oscillator_run_stability.py` while setting `kappa_max=18` and `mu_max=18`.
-- **Fig. 2:** Run `dampedharmonic_oscillator_run_stability.py` with the following configurations:
+- **Fig. 1:** Execute `harmonic_oscillator_run_stability.py` while setting `kappa_max=18` and `mu_max=18`.
+- **Fig. 2:** Run `harmonic_oscillator_run_stability.py` with the following configurations:
    - Set `kappa_max=30` and `mu_max=30`.
    - Adjust `maxiter` to 1, 2, 3, or 4 and execute each individually.
-- **Table 1:** Execute `dampedharmonic_socillator_run_stab_interval.py`:
+- **Table 1:** Execute `harmonic_socillator_run_stab_interval.py`:
    - To save the results set: `save_file=True`
 
-- Use the script `dampedharmonic_oscillator_run_points.py` to create a table based on given $(\kappa, \mu)$ points. This table assists in determining suitable values for `M`, `K`, and `quadrature nodes` to ensure stability in the SDC method.
+- Use the script `harmonic_oscillator_run_points.py` to create a table based on given $(\kappa, \mu)$ points. This table assists in determining suitable values for `M`, `K`, and `quadrature nodes` to ensure stability in the SDC method.
    - To save the results set: `save_file=True`
 
 - **Fig. 3:** Run `penningtrap_run_error.py` (Run local convergence: `conv.run_local_error()`) with `dt=0.015625/4` and `axes=(0,)`.
