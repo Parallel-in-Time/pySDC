@@ -1,6 +1,6 @@
 import numpy as np
 from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import get_default_harmonic_oscillator_description
-from pySDC.projects.Second_orderSDC.stability_simulation import compute_and_check_stability
+from pySDC.projects.Second_orderSDC.stability_simulation import compute_and_generate_table
 
 '''
 This script generates table for the given points to compare in what quadrature type,
@@ -23,4 +23,4 @@ if __name__ == '__main__':
     points = ((1, 100), (3, 100), (10, 100))
     # Iterate through points and perform stability check
     for ii in points:
-        compute_and_check_stability(description, helper_params, ii, check_stability=True)
+        compute_and_generate_table(description, helper_params, ii, check_stability_point=True)

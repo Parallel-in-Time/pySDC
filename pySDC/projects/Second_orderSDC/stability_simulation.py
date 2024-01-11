@@ -228,28 +228,15 @@ class StabilityImplementation:
         self.plot_stability(region_RKN.T, title='RKN-4 stability region')
 
 
-def compute_and_check_stability(
-    description,
-    helper_params,
-    point,
-    compute_interval=False,
-    save_interval_file=False,
-    interval_filename='./data/stab_interval.txt',
-    check_stability=False,
-    save_points_table=False,
-    points_table_filename='./data/point_table.txt',
-    quadrature_list=('GAUSS', 'LOBATTO'),
-):
-    from tabulate import tabulate
-
+def check_points_and_interval(description, helper_params, point, compute_interval=False, check_stability_point=False):
     # Storage for stability interval and stability check
     interval_data = []
-    results_data = []
+    points_data = []
 
     # Loop through different numbers of nodes and maximum iterations
-    for num_nodes in helper_params['num_nodes_list']:
-        for max_iter in helper_params['max_iter_list']:
-            for quad_type in helper_params['quad_type_list']:
+    for quad_type in helper_params['quad_type_list']:
+        for num_nodes in helper_params['num_nodes_list']:
+            for max_iter in helper_params['max_iter_list']:
                 # Update simulation parameters
                 description['sweeper_params']['num_nodes'] = num_nodes
                 description['sweeper_params']['quad_type'] = quad_type
@@ -272,7 +259,7 @@ def compute_and_check_stability(
                     # Add row to the interval data
                     interval_data.append([quad_type, num_nodes, max_iter, kappa_max_interval])
 
-                if check_stability:
+                if check_stability_point:
                     # Check stability and print results
                     if stab_model.SDC[-1, -1] <= 1:
                         stability_result = "Stable"
@@ -280,16 +267,41 @@ def compute_and_check_stability(
                         stability_result = "Unstable. Increase M or K"
 
                     # Add row to the results data
-                    results_data.append(
+                    points_data.append(
                         [quad_type, num_nodes, max_iter, point, stability_result, stab_model.SDC[-1, -1]]
                     )
+    if compute_interval:
+        return interval_data
+    else:
+        return points_data
+
+
+def compute_and_generate_table(
+    description,
+    helper_params,
+    point,
+    compute_interval=False,
+    save_interval_file=False,
+    interval_filename='./data/stab_interval.txt',
+    check_stability_point=False,
+    save_points_table=False,
+    points_table_filename='./data/point_table.txt',
+    quadrature_list=('GAUSS', 'LOBATTO'),
+):  # pragma: no cover
+    from tabulate import tabulate
+
+    if compute_interval:
+        interval_data = check_points_and_interval(description, helper_params, point, compute_interval=compute_interval)
+    else:
+        points_data = check_points_and_interval(
+            description, helper_params, point, check_stability_point=check_stability_point
+        )
 
     # Define column names for interval data
     interval_headers = ["Quad Type", "Num Nodes", "Max Iter", 'kappa_max']
 
     # Define column names for results data
-    results_headers = ["Quad Type", "Num Nodes", "Max Iter", "(kappa, mu)", "Stability", "Spectral Radius"]
-    print(results_data)
+    points_headers = ["Quad Type", "Num Nodes", "Max Iter", "(kappa, mu)", "Stability", "Spectral Radius"]
     # Print or save the tables using tabulate
     if save_interval_file and compute_interval:
         interval_table_str = tabulate(interval_data, headers=interval_headers, tablefmt="grid")
@@ -297,16 +309,16 @@ def compute_and_check_stability(
             file.write(interval_table_str)
         print(f"Stability Interval Table saved to {interval_filename}")
 
-    if save_points_table and check_stability:
-        results_table_str = tabulate(results_data, headers=results_headers, tablefmt="grid")
+    if save_points_table and check_stability_point:
+        points_table_str = tabulate(points_data, headers=points_headers, tablefmt="grid")
         with open(points_table_filename, 'w') as file:
-            file.write(results_table_str)
+            file.write(points_table_str)
         print(f"Stability Results Table saved to {points_table_filename}")
 
     if compute_interval:
         print("Stability Interval Table:")
         print(tabulate(interval_data, headers=interval_headers, tablefmt="grid"))
 
-    if check_stability:
+    if check_stability_point:
         print("\nStability Results Table:")
-        print(tabulate(results_data, headers=results_headers, tablefmt="grid"))
+        print(tabulate(points_data, headers=points_headers, tablefmt="grid"))
