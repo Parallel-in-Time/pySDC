@@ -220,7 +220,7 @@ def compute_and_check_stability(
     check_stability=False,
     store_results=False,
     results_filename='./data/stab_results.txt',
-    quadrature_list=['GAUSS', 'LOBATTO'],
+    quadrature_list=('GAUSS', 'LOBATTO'),
 ):
     # Storage for stability interval and stability check
     interval_data = []
