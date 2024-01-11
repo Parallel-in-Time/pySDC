@@ -10,9 +10,9 @@ def test_stability():
     """
     import numpy as np
     from pySDC.projects.Second_orderSDC.stability_simulation import StabilityImplementation
-    from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import harmonic_oscillator_params
+    from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import get_default_harmonic_oscillator_description
 
-    description = harmonic_oscillator_params()
+    description = get_default_harmonic_oscillator_description()
     stability = StabilityImplementation(description, kappa_max=14, mu_max=14, Num_iter=(2, 2))
     stability.lambda_kappa = np.array([6, 20])
     stability.lambda_mu = np.array([3, 20])
@@ -34,9 +34,9 @@ def test_RKN_stability():
     """
     import numpy as np
     from pySDC.projects.Second_orderSDC.stability_simulation import StabilityImplementation
-    from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import harmonic_oscillator_params
+    from pySDC.projects.Second_orderSDC.harmonic_oscillator_params import get_default_harmonic_oscillator_description
 
-    description = harmonic_oscillator_params()
+    description = get_default_harmonic_oscillator_description()
     stability = StabilityImplementation(description, kappa_max=14, mu_max=14, Num_iter=(2, 2))
     stability.lambda_kappa = np.array([1, 20])
     stability.lambda_mu = np.array([1, 20])
